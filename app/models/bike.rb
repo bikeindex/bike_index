@@ -294,7 +294,8 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
-  def current_initial_abandoned_record; current_abandoned_records.initial_record.first end
+  # This is really current_initial_abandoned_record - but more convenient naming
+  def current_abandoned_record; current_abandoned_records.initial_records.first end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -645,6 +646,7 @@ class Bike < ApplicationRecord
     [city, state].reject(&:blank?).join(", ")
   end
 
+  # TODO: put this method in Geocodeable
   def location_info_present?(record)
     return false if record.blank?
 
@@ -660,14 +662,21 @@ class Bike < ApplicationRecord
   # Set the bike's location data (lat/long, city, postal code, country)
   # in the following order of precedence:
   #
-  # 1. From the current stolen record, if one is present
-  # 2. From the creation organization, if one is present
-  # 3. From the bike owner's address, if available
-  # 4. From the request's IP address, if given
+  # 1. From the current abandoned record, if one is present
+  # 2. From the current stolen record, if one is present
+  # 3. From the creation organization, if one is present
+  # 4. From the bike owner's address, if available
+  # 5. From the request's IP address, if given
   def set_location_info(request_location: nil)
     find_current_stolen_record
 
-    if location_info_present?(current_stolen_record)
+    if location_info_present?(current_abandoned_record)
+      self.latitude = current_abandoned_record.latitude
+      self.longitude = current_abandoned_record.longitude
+      self.city = current_abandoned_record.city
+      self.country = current_abandoned_record.country
+      self.zipcode = current_abandoned_record.zipcode
+    elsif location_info_present?(current_stolen_record)
       self.latitude = current_stolen_record.latitude
       self.longitude = current_stolen_record.longitude
       self.city = current_stolen_record.city

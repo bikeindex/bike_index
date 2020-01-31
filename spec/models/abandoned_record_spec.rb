@@ -9,7 +9,7 @@ RSpec.describe AbandonedRecord, type: :model do
       expect(abandoned_record.id).to be_present
       expect(abandoned_record.owner_known?).to be_falsey
       expect(abandoned_record.send_message?).to be_falsey
-      expect(bike.current_initial_abandoned_record).to eq abandoned_record
+      expect(bike.current_abandoned_record).to eq abandoned_record
       expect(bike.state_abandoned?).to be_truthy
       expect(bike.state).to eq "state_abandoned"
       expect(abandoned_record.organization).to be_nil
@@ -22,7 +22,7 @@ RSpec.describe AbandonedRecord, type: :model do
         expect(abandoned_record.valid?).to be_truthy
         expect(abandoned_record.owner_known?).to be_truthy
         expect(abandoned_record.send_message?).to be_truthy
-        expect(bike.current_initial_abandoned_record).to eq abandoned_record
+        expect(bike.current_abandoned_record).to eq abandoned_record
         expect(bike.state_abandoned?).to be_truthy
         expect(bike.state).to eq "state_abandoned"
         expect(abandoned_record.organization).to eq organization

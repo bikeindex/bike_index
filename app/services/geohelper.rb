@@ -7,8 +7,7 @@ class Geohelper
     def reverse_geocode(latitude, longitude, formatted_address_hash: false)
       result = Geocoder.search([latitude, longitude])
       return nil unless result&.first
-      addy = result.first.formatted_address || result.first.address
-      formatted_address_hash ? formatted_address_hash(addy) : addy
+      result.first.formatted_address || result.first.address
     end
 
     # accept 'result' parameter to skip lookup for formatted_address_hash
@@ -32,6 +31,7 @@ class Geohelper
       address.match(/\A\d{5}\z/).present? ? "zipcode: #{address}" : address
     end
 
+    # TODO: location refactor - make this return the updated location attrs
     # Given a string, return a address hash for that location
     def formatted_address_hash(addy)
       result = Geocoder.search(formatted_address(addy))

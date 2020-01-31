@@ -219,7 +219,7 @@
               = t(".record_again")
             - else
               = t(".record")
-          - existing_kind = @bike.current_initial_abandoned_record&.kind
+          - existing_kind = @bike.current_abandoned_record&.kind
           - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
           - abandoned_kinds.each do |kind|
             %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }
