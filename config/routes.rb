@@ -3,7 +3,7 @@
 require "soulheart/server"
 require "sidekiq/web"
 
-Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
+Sidekiq::Web.set :session_secret, Rails.application.credentials[:secret_key_base]
 
 Rails.application.routes.draw do
   use_doorkeeper do
