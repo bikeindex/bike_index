@@ -4089,7 +4089,7 @@ en:
         bike: Bike
         impounded: Impounded
         kind: Kind
-        matches_visible: Visible
+        matches_visible: visible
         recorded: Recorded
         recorder: Recorder
         retrieved: Impounded

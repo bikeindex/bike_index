@@ -133,7 +133,7 @@ export default class BinxAppOrgAbandonedRecords {
     if (user !== undefined) {
       user = user.name;
     } else {
-      user = "";
+      user = "?";
     }
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
