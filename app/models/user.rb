@@ -111,8 +111,8 @@ class User < ApplicationRecord
     end
 
     def from_auth(auth)
-      return nil unless auth && auth.kind_of?(Array)
-      self.where(id: auth[0], auth_token: auth[1]).first
+      return nil unless auth&.kind_of?(Array)
+      where(id: auth[0], auth_token: auth[1]).first
     end
   end
 
