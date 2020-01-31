@@ -56,7 +56,7 @@ RSpec.describe Organized::BikesController, type: :request do
             ownership = bike.ownerships.first
             expect(ownership.send_email).to be_falsey
             expect(ownership.claimed?).to be_truthy
-            expect(ownership.owner_email).to eq current_user.email
+            expect(ownership.owner_email).to eq auto_user.email
 
             creation_state = bike.creation_state
             expect(creation_state.origin).to eq "embed"

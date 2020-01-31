@@ -59,6 +59,17 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         end
       end
     end
+    context "with searched bike" do
+      let!(:abandoned_record1) { FactoryBot.create(:abandoned_record, organization: current_organization) }
+      let(:abandoned_record2) { FactoryBot.create(:abandoned_record, organization: current_organization) }
+      let(:bike) { abandoned_record2.bike }
+      it "renders" do
+        get base_url, params: { search_bike_id: bike.id }, headers: json_headers
+        expect(response.status).to eq(200)
+        expect(json_result["abandoned_records"].count).to eq 1
+        expect(json_result["abandoned_records"].first.dig("bike", "id")).to eq bike.id
+      end
+    end
   end
 
   describe "show" do

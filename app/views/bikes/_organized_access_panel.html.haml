@@ -191,7 +191,7 @@
         - if @bike.state_abandoned?
           .col-xl-9.ml-md-2
             %h5
-              = t(".existing_abandoned_records", bike_type: @bike.type)
+              = link_to t(".existing_abandoned_records", bike_type: @bike.type), organization_abandoned_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
             %table.table.table-sm.table-bordered
               %thead
                 %th= t(".recorded")

@@ -18,9 +18,13 @@ export default class BinxAppOrgAbandonedRecords {
   }
 
   fetchRecords(opts) {
+    let urlParams = new URLSearchParams(window.location.search);
+    for (const param of opts) {
+      urlParams.append(param[0], param[1]);
+    }
     // lazy parameter to query string
     let queryString = opts.map(i => `${i[0]}=${i[1]}`);
-    let url = `${window.pageInfo.root_path}?${queryString.join("&")}`;
+    let url = `${window.pageInfo.root_path}?${urlParams.toString()}`;
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
