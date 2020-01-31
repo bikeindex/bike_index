@@ -4,7 +4,6 @@ RSpec.describe BikeCreator do
   context "legacy BikeCreatorBuilder methods" do
     describe "building" do
       it "returns a new bike object from the params with the b_param_id" do
-        bike = Bike.new
         b_param = BParam.new
         allow(b_param).to receive(:id).and_return(9)
         allow(b_param).to receive(:creator_id).and_return(6)
@@ -156,7 +155,7 @@ RSpec.describe BikeCreator do
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
-          end.to change(Ownership, :count).by -1
+          end.to change(Ownership, :count).by(-1)
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
           expect(Bike.where(id: new_bike.id)).to_not be_present
@@ -204,7 +203,7 @@ RSpec.describe BikeCreator do
           "creator" => user,
         )
         expect do
-          saved_bike = creator.send(:save_bike, new_bike)
+          creator.send(:save_bike, new_bike)
         end.to change(Bike, :count).by(1)
       end
     end

@@ -65,8 +65,8 @@ module Organized
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
-        @b_param.update_attributes(params: params.as_json) # we handle filtering & coercion in BParam
-        pp @b_param
+        # we handle filtering & coercion in BParam, just create it with whatever here
+        @b_param.update_attributes(permitted_create_params)
         @bike = BikeCreator.new(@b_param).create_bike
         if @bike.errors.any?
           @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
@@ -87,6 +87,15 @@ module Organized
       b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id, organization_id: current_organization.id)
       b_param.origin = "organization_form"
       b_param
+    end
+
+    # TODO: make this less gross
+    def permitted_create_params
+      phash = params.as_json
+      {
+        origin: "organization_form",
+        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
+      }
     end
 
     def sortable_columns

@@ -109,6 +109,8 @@ class BParam < ApplicationRecord
 
   def bike; (params && params["bike"] || {}).with_indifferent_access end
 
+  def state; state_abandoned? ? "state_abandoned" : "state_with_owner" end
+
   def state_abandoned?; bike["state"] == "state_abandoned" end
 
   # TODO: location refactor
