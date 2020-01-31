@@ -5,6 +5,48 @@ class BikeCreator
     @location = location
   end
 
+  def build_bike
+    bike_attrs =
+      @b_param
+        .bike
+        .map { |k, v| [k, v.presence] }
+        .to_h
+        .except(*BParam.skipped_bike_attrs)
+    bike = Bike.new(bike_attrs)
+    bike.b_param_id = @b_param.id
+    bike.b_param_id_token = @b_param.id_token
+    bike.creator_id = @b_param.creator_id
+    bike.updator_id = bike.creator_id
+    bike = BikeCreatorVerifier.new(@b_param, bike).verify
+    bike = add_required_attributes(bike)
+    bike = add_front_wheel_size(bike)
+    bike
+  end
+
+  def create_bike
+    add_bike_book_data
+    @bike = find_or_build_bike
+    return @bike if @bike.errors.present?
+    save_bike(@bike)
+  end
+
+  private
+
+  def creation_state_attributes
+    {
+      is_bulk: @b_param.is_bulk,
+      is_pos: @b_param.is_pos,
+      is_new: @b_param.is_new,
+      origin: @b_param.origin,
+      bulk_import_id: @b_param.params["bulk_import_id"],
+      creator_id: @b_param.creator_id,
+      organization_id: @bike.creation_organization_id,
+    }
+  end
+
+  # Previously all of this stuff was public.
+  # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
+
   def add_bike_book_data
     return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
     return nil unless @b_param.bike["frame_model"].present? && @b_param.bike["year"].present?
@@ -35,20 +77,8 @@ class BikeCreator
     @b_param
   end
 
-  def build_new_bike
-    @bike = BikeCreatorBuilder.new(@b_param).build_new
-  end
-
-  def build_bike
-    @bike = BikeCreatorBuilder.new(@b_param).build
-  end
-
-  def create_associations(bike)
-    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
-  end
-
   def clear_bike(bike)
-    build_bike
+    find_or_build_bike
     bike.errors.messages.each do |message|
       @bike.errors.add(message[0], message[1][0])
     end
@@ -71,7 +101,7 @@ class BikeCreator
   def save_bike(bike)
     bike.set_location_info(request_location: @location)
     bike.save
-    @bike = create_associations(bike)
+    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
 
     if @bike.present? && @bike.id.present?
@@ -86,29 +116,23 @@ class BikeCreator
     @bike
   end
 
-  def new_bike
-    @bike = build_new_bike
+  def find_or_build_bike
+    if @b_param&.created_bike&.present?
+      return @bike = @b_param.created_bike
+    end
+    @bike = build_bike
     @bike
   end
 
-  def create_bike
-    add_bike_book_data
-    @bike = build_bike
-    return @bike if @bike.errors.present?
-    save_bike(@bike)
+  def add_front_wheel_size(bike)
+    return bike unless bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
+    bike.front_wheel_size_id = bike.rear_wheel_size_id
+    bike.front_tire_narrow = bike.rear_tire_narrow
+    bike
   end
 
-  private
-
-  def creation_state_attributes
-    {
-      is_bulk: @b_param.is_bulk,
-      is_pos: @b_param.is_pos,
-      is_new: @b_param.is_new,
-      origin: @b_param.origin,
-      bulk_import_id: @b_param.params["bulk_import_id"],
-      creator_id: @b_param.creator_id,
-      organization_id: @bike.creation_organization_id,
-    }
+  def add_required_attributes(bike)
+    bike.propulsion_type ||= "foot-pedal"
+    bike
   end
 end
