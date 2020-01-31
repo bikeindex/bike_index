@@ -1,7 +1,10 @@
 class AdminRestriction
   def self.matches?(req)
+    return false unless req.cookies["auth"].present?
+
     auth = Rack::Session::Cookie::Base64::Marshal.new.decode(req.cookies["auth"])
     user = User.from_auth(auth)
-    return user && user.superuser?
+
+    user&.superuser?
   end
 end
