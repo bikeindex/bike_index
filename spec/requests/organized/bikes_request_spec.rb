@@ -13,16 +13,16 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
 
     context "abandoned_bikes" do
+      it "creates b_param, redirects, but does not register"
       context "with paid_feature" do
         let(:current_organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: ["abandoned_bikes"]) }
 
         let(:bike_params) do
           {
-            serial_number: "",
+            serial_number: "unknown",
             b_param_id_token: b_param.id_token,
             cycle_type_slug: " Tricycle ",
-            origin: "organization_form",
-            state: "abandoned",
+            state: "state_abandoned",
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
             latitude: default_location[:latitude],

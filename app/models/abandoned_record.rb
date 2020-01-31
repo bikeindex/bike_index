@@ -8,6 +8,8 @@ class AbandonedRecord < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_abandoned_record
   # has_many :repeat_abandoned_records
+  belongs_to :country
+  belongs_to :state
 
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
@@ -39,10 +41,35 @@ class AbandonedRecord < ActiveRecord::Base
 
   def send_message?; owner_known? end
 
+  def show_address; !hide_address end
+
+  def address(skip_default_country: false, override_show_address: false)
+    country_string = country && country.iso
+    if skip_default_country
+      country_string = nil if country_string == "US"
+    else
+      return nil unless country
+    end
+    [
+      (override_show_address || show_address) ? street : nil,
+      city,
+      state&.abbreviation,
+      zipcode,
+      country_string,
+    ].reject(&:blank?).join(", ")
+  end
+
+  # TODO: Make this consistent, use the same attributes for all location models
   def set_calculated_attributes
+    return true if street.present? && latitude.present? && longitude.present?
     if latitude.present? && longitude.present?
-      self.address ||= Geohelper.reverse_geocode(latitude, longitude)
-    elsif address.present?
+      addy_hash = Geohelper.reverse_geocode(latitude, longitude, formatted_address_hash: true)
+      self.street = addy_hash["address"]
+      self.city = addy_hash["city"]
+      self.zipcode = addy_hash["zipcode"]
+      self.country = Country.fuzzy_find(addy_hash["country"])
+      self.state = State.fuzzy_find(addy_hash["state"])
+    else
       coordinates = Geohelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?
     end

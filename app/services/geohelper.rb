@@ -4,10 +4,11 @@
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class Geohelper
   class << self
-    def reverse_geocode(latitude, longitude)
+    def reverse_geocode(latitude, longitude, formatted_address_hash: false)
       result = Geocoder.search([latitude, longitude])
       return nil unless result&.first
-      result.first.formatted_address || result.first.address
+      addy = result.first.formatted_address || result.first.address
+      formatted_address_hash ? formatted_address_hash(addy) : addy
     end
 
     # accept 'result' parameter to skip lookup for formatted_address_hash

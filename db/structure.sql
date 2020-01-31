@@ -41,12 +41,18 @@ CREATE TABLE public.abandoned_records (
     impound_record_id integer,
     initial_abandoned_record_id integer,
     notes text,
-    address character varying,
+    street character varying,
     latitude double precision,
     longitude double precision,
     accuracy double precision,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    zipcode character varying,
+    city character varying,
+    neighborhood character varying,
+    hide_address boolean DEFAULT false,
+    country_id bigint,
+    state_id bigint
 );
 
 
@@ -3443,6 +3449,13 @@ CREATE INDEX index_abandoned_records_on_bike_id ON public.abandoned_records USIN
 
 
 --
+-- Name: index_abandoned_records_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_country_id ON public.abandoned_records USING btree (country_id);
+
+
+--
 -- Name: index_abandoned_records_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3461,6 +3474,13 @@ CREATE INDEX index_abandoned_records_on_initial_abandoned_record_id ON public.ab
 --
 
 CREATE INDEX index_abandoned_records_on_organization_id ON public.abandoned_records USING btree (organization_id);
+
+
+--
+-- Name: index_abandoned_records_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_state_id ON public.abandoned_records USING btree (state_id);
 
 
 --
@@ -4563,6 +4583,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200108232256'),
 ('20200109005657'),
 ('20200128144317'),
-('20200130220100');
+('20200130220100'),
+('20200131175543');
 
 

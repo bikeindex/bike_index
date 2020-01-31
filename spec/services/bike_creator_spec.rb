@@ -247,4 +247,42 @@ RSpec.describe BikeCreator do
       expect(response.errors[:errory]).to eq(["something"])
     end
   end
+
+  describe "creating abandoned bike" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Bikes") }
+    let(:color) { FactoryBot.create(:color) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:attrs) do
+      {
+        origin: "organization_form",
+        organization_id: organization.id,
+        bike: {
+          serial_number: "",
+          state: "state_abandoned",
+          primary_frame_color_id: color.id,
+          manufacturer_id: manufacturer.id
+          latitude: "40.7143528",
+          longitude: "-74.0059731",
+          address: "",
+          accuracy: "12"
+        }
+      }
+    end
+    it "creates" do
+      Sidekiq::Testing.inline! do
+      it "saves the bike" do
+        b_param = BParam.new(attrs)
+        expect(b_param.location_specified?).to be_truthy
+        bike = Bike.new
+        creator = BikeCreator.new(b_param)
+        expect(creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
+        expect(creator).to receive(:find_or_build_bike).at_least(1).times.and_return(bike)
+        expect(bike).to receive(:save).at_least(:once).and_return(true)
+        creator.create_bike
+      end
+    end
+    context "passed address" do
+      xit "uses the address"
+    end
+  end
 end
