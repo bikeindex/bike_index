@@ -1502,16 +1502,29 @@ RSpec.describe Bike, type: :model do
     let!(:usa) { Country.united_states }
 
     context "given a current_stolen_record and no bike location info" do
+      let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
+      let(:stolen_record) { bike.current_stolen_record }
       it "takes location from the current stolen record" do
-        bike = FactoryBot.create(:stolen_bike_in_chicago)
-        stolen_record = bike.current_stolen_record
-
         bike.set_location_info
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
         expect(bike.zipcode).to eq(stolen_record.zipcode)
         expect(bike.country).to eq(stolen_record.country)
+      end
+      context "given a abandoned record, it instead uses the abandoned record" do
+        let!(:abandoned_record) { FactoryBot.create(:abandoned_record, :in_los_angeles, bike: bike) }
+        it "takes the location from the abandoned records" do
+          expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
+          expect(bike.current_abandoned_record).to eq abandoned_record
+          bike.reload
+          bike.set_location_info
+
+          expect(bike.to_coordinates).to eq(abandoned_record.to_coordinates)
+          expect(bike.city).to eq(abandoned_record.city)
+          expect(bike.zipcode).to eq(abandoned_record.zipcode)
+          expect(bike.country).to eq(abandoned_record.country)
+        end
       end
     end
 

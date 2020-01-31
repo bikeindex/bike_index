@@ -4089,9 +4089,10 @@ en:
         bike: Bike
         impounded: Impounded
         kind: Kind
-        matches: Matches
+        matches_visible: visible
         recorded: Recorded
         recorder: Recorder
+        retrieved: Impounded
       show:
         abandoned_record: Abandoned Record
         additional_text: Additional text

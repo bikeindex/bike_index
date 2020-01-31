@@ -4,9 +4,29 @@
 .organized-records
   #map
 
-  %p#recordsCount.text-right.less-strong
-    %span.number 0
-    = t(".matches")
+  - # TODO: add translations
+  .row
+    .col-xs-12.text-center
+      = link_to "record unregistered abandoned bike", new_organization_bike_path(organization_id: current_organization, kind: "abandoned")
+
+    .col-md-8
+      = pluralize number_with_delimiter(matching_abandoned_records.count), "Abandoned record"
+
+      - if search_params_present?
+        - if params[:search_bike_id].present?
+          for
+          - searched_bike = Bike.find_by_id(params[:search_bike_id])
+          - if searched_bike.present?
+            = link_to searched_bike.title_string, bike_path(searched_bike)
+          - else
+            %em
+              unknown bike ##{params[:search_bike_id]}
+      - else
+        total
+    .col-md-4
+      %p#recordsCount.text-right.less-strong
+        %span.number 0
+        = t(".matches_visible")
 
 
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.list-table#records_table

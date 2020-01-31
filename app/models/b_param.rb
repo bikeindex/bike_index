@@ -68,7 +68,7 @@ class BParam < ApplicationRecord
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
     %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker address
-       handlebar_type_slug is_bulk is_new is_pos no_duplicate)
+       handlebar_type_slug is_bulk is_new is_pos no_duplicate accuracy abandoned_record_kind)
   end
 
   def self.email_search(str)
@@ -108,6 +108,13 @@ class BParam < ApplicationRecord
   def with_bike?; created_bike_id.present? end
 
   def bike; (params && params["bike"] || {}).with_indifferent_access end
+
+  def state; state_abandoned? ? "state_abandoned" : "state_with_owner" end
+
+  def state_abandoned?; bike["state"] == "state_abandoned" end
+
+  # TODO: location refactor
+  def location_specified?; bike["latitude"].present? && bike["longitude"].present? || bike["address"].present? end
 
   def primary_frame_color_id; bike["primary_frame_color_id"] end
 

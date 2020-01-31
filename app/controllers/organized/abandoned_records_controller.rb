@@ -21,7 +21,7 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          render json: abandoned_records.reorder(created_at: :desc),
+          render json: matching_abandoned_records.reorder(created_at: :desc),
                  root: "abandoned_records",
                  each_serializer: AbandonedRecordSerializer
         end
@@ -43,12 +43,26 @@ module Organized
        redirect_back(fallback_location: organization_abandoned_records_path(organization_id: current_organization.to_param))
     end
 
-    helper_method :abandoned_records
+    helper_method :matching_abandoned_records, :search_params_present?
 
     private
 
     def abandoned_records
       current_organization.abandoned_records
+    end
+
+    def matching_abandoned_records
+      return @matching_abandoned_records if defined?(@matching_abandoned_records)
+      @matching_abandoned_records = abandoned_records
+      if params[:search_bike_id].present?
+        @matching_abandoned_records = @matching_abandoned_records.where(bike_id: params[:search_bike_id])
+      end
+      @matching_abandoned_records
+    end
+
+    def search_params_present?
+      # Eventually, will check period select, etc
+      (params.keys & %w[search_bike_id]).any?
     end
 
     def permitted_parameters

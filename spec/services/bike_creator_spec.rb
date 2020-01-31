@@ -4,7 +4,6 @@ RSpec.describe BikeCreator do
   context "legacy BikeCreatorBuilder methods" do
     describe "building" do
       it "returns a new bike object from the params with the b_param_id" do
-        bike = Bike.new
         b_param = BParam.new
         allow(b_param).to receive(:id).and_return(9)
         allow(b_param).to receive(:creator_id).and_return(6)
@@ -156,7 +155,7 @@ RSpec.describe BikeCreator do
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
-          end.to change(Ownership, :count).by -1
+          end.to change(Ownership, :count).by(-1)
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
           expect(Bike.where(id: new_bike.id)).to_not be_present
@@ -204,7 +203,7 @@ RSpec.describe BikeCreator do
           "creator" => user,
         )
         expect do
-          saved_bike = creator.send(:save_bike, new_bike)
+          creator.send(:save_bike, new_bike)
         end.to change(Bike, :count).by(1)
       end
     end
@@ -245,6 +244,70 @@ RSpec.describe BikeCreator do
       expect(creator).to receive(:find_or_build_bike).and_return(bike)
       response = creator.create_bike
       expect(response.errors[:errory]).to eq(["something"])
+    end
+  end
+
+  describe "creating abandoned bike" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Bikes") }
+    let(:color) { FactoryBot.create(:color) }
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+    let(:auto_user) { organization.auto_user }
+    let!(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:attrs) do
+      {
+        origin: "organization_form",
+        creator_id: creator.id,
+        params: {
+          bike: {
+            creation_organization_id: organization.id,
+            serial_number: "",
+            state: "state_abandoned",
+            abandoned_record_kind: "parked_incorrectly",
+            primary_frame_color_id: color.id,
+            manufacturer_id: manufacturer.id,
+            latitude: "40.7143528",
+            longitude: "-74.0059731",
+            address: "",
+            accuracy: "12"
+          }
+        }
+      }
+    end
+    let(:b_param) { BParam.create(attrs) }
+    it "creates" do
+      Sidekiq::Testing.inline! do
+        expect(creator.id).to_not eq auto_user.id
+        expect(b_param.valid?).to be_truthy
+        expect(b_param.id).to be_present
+        expect(b_param.location_specified?).to be_truthy
+        expect(b_param.organization_id).to eq organization.id
+        bike_creator = BikeCreator.new(b_param)
+        expect(bike_creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
+        bike = bike_creator.create_bike
+        expect(bike.errors).to_not be_present
+        b_param.reload
+        expect(b_param.created_bike).to be_present
+
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.id).to be_present
+        expect(bike.serial_number).to eq "unknown"
+        expect(bike.state).to eq "state_abandoned"
+        expect(bike.latitude).to eq(40.7143528)
+        expect(bike.longitude).to eq(-74.0059731)
+        expect(bike.owner_email).to eq auto_user.email
+        expect(bike.creator).to eq creator
+
+        expect(bike.abandoned_records.count).to eq 1
+        abandoned_record = bike.current_abandoned_record
+        expect(abandoned_record.organization).to eq organization
+        expect(abandoned_record.owner_known?).to be_falsey
+        expect(abandoned_record.latitude).to eq bike.latitude
+        expect(abandoned_record.longitude).to eq bike.longitude
+        expect(abandoned_record.kind).to eq "parked_incorrectly"
+      end
+    end
+    context "passed address" do
+      xit "uses the address"
     end
   end
 end

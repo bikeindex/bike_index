@@ -30,7 +30,16 @@ module Organized
       @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
     end
 
-    def new; end
+    def new
+      @kind = params[:kind] == "abandoned" ? "abandoned" : "normal"
+    end
+
+    def new_iframe
+      @organization = current_organization
+      @b_param = find_or_new_b_param
+      @bike = BikeCreator.new(@b_param).build_bike
+      render layout: "embed_layout"
+    end
 
     def multi_serial_search; end
 
@@ -56,7 +65,44 @@ module Organized
       redirect_back(fallback_location: redirect_back_fallback_path)
     end
 
+    def create
+      @b_param = find_or_new_b_param
+      iframe_redirect_params = { organization_id: current_organization.to_param }
+      if @b_param.created_bike.present?
+        flash[:success] = "#{@bike.created_bike.type} Created"
+      else
+        # we handle filtering & coercion in BParam, just create it with whatever here
+        @b_param.update_attributes(permitted_create_params)
+        @bike = BikeCreator.new(@b_param).create_bike
+        if @bike.errors.any?
+          @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
+          flash[:error] = @b_param.bike_errors.to_sentence
+          iframe_redirect_params[:b_param_id_token] = @b_param.id_token
+        else
+          flash[:success] = "#{@bike.type} Created"
+        end
+      end
+      redirect_back(fallback_location: new_iframe_organization_bikes_path(iframe_redirect_params))
+    end
+
     private
+
+    def find_or_new_b_param
+      token = params[:b_param_token]
+      token ||= params[:bike] && params[:bike][:b_param_id_token]
+      b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id, organization_id: current_organization.id)
+      b_param.origin = "organization_form"
+      b_param
+    end
+
+    # TODO: make this less gross
+    def permitted_create_params
+      phash = params.as_json
+      {
+        origin: "organization_form",
+        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
+      }
+    end
 
     def sortable_columns
       %w[id updated_at owner_email manufacturer_id frame_model stolen]

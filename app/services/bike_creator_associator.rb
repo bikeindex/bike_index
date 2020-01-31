@@ -22,6 +22,15 @@ class BikeCreatorAssociator
     bike.save
   end
 
+  def create_abandoned_record(b_param, bike)
+    abandoned_record_attrs = b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy])
+    abandoned_record_attrs[:kind] = b_param.bike["abandoned_record_kind"]
+    abandoned_record_attrs[:bike_id] = bike.id
+    abandoned_record_attrs[:user_id] = bike.creator.id
+    abandoned_record_attrs[:organization_id] = b_param.creation_organization_id
+    AbandonedRecord.create(abandoned_record_attrs)
+  end
+
   def assign_user_attributes(bike, user = nil)
     user ||= bike.user
     return true unless user.present?
@@ -64,6 +73,7 @@ class BikeCreatorAssociator
       create_normalized_serial_segments(bike)
       assign_user_attributes(bike, ownership&.user)
       create_stolen_record(bike) if bike.stolen
+      create_abandoned_record(@b_param, bike) if @b_param.state_abandoned?
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)

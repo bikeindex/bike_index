@@ -69,7 +69,8 @@ class Bike < ApplicationRecord
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
+                :abandoned_record_kind, :skip_state_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -294,7 +295,8 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
-  def current_initial_abandoned_record; current_abandoned_records.initial_record.first end
+  # This is really current_initial_abandoned_record - but more convenient naming
+  def current_abandoned_record; current_abandoned_records.initial_records.first end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -645,6 +647,7 @@ class Bike < ApplicationRecord
     [city, state].reject(&:blank?).join(", ")
   end
 
+  # TODO: location refactor - put this method in Geocodeable
   def location_info_present?(record)
     return false if record.blank?
 
@@ -660,14 +663,21 @@ class Bike < ApplicationRecord
   # Set the bike's location data (lat/long, city, postal code, country)
   # in the following order of precedence:
   #
-  # 1. From the current stolen record, if one is present
-  # 2. From the creation organization, if one is present
-  # 3. From the bike owner's address, if available
-  # 4. From the request's IP address, if given
+  # 1. From the current abandoned record, if one is present
+  # 2. From the current stolen record, if one is present
+  # 3. From the creation organization, if one is present
+  # 4. From the bike owner's address, if available
+  # 5. From the request's IP address, if given
   def set_location_info(request_location: nil)
     find_current_stolen_record
 
-    if location_info_present?(current_stolen_record)
+    if location_info_present?(current_abandoned_record)
+      self.latitude = current_abandoned_record.latitude
+      self.longitude = current_abandoned_record.longitude
+      self.city = current_abandoned_record.city
+      self.country = current_abandoned_record.country
+      self.zipcode = current_abandoned_record.zipcode
+    elsif location_info_present?(current_stolen_record)
       self.latitude = current_stolen_record.latitude
       self.longitude = current_stolen_record.longitude
       self.city = current_stolen_record.city
@@ -731,7 +741,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
-    self.state = calculated_state
+    self.state = calculated_state unless skip_state_update
     clean_frame_size
     set_mnfg_name
     set_user_hidden

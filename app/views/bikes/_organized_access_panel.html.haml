@@ -191,7 +191,7 @@
         - if @bike.state_abandoned?
           .col-xl-9.ml-md-2
             %h5
-              = t(".existing_abandoned_records", bike_type: @bike.type)
+              = link_to t(".existing_abandoned_records", bike_type: @bike.type), organization_abandoned_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
             %table.table.table-sm.table-bordered
               %thead
                 %th= t(".recorded")
@@ -219,7 +219,7 @@
               = t(".record_again")
             - else
               = t(".record")
-          - existing_kind = @bike.current_initial_abandoned_record&.kind
+          - existing_kind = @bike.current_abandoned_record&.kind
           - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
           - abandoned_kinds.each do |kind|
             %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }

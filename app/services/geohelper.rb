@@ -4,7 +4,7 @@
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class Geohelper
   class << self
-    def reverse_geocode(latitude, longitude)
+    def reverse_geocode(latitude, longitude, formatted_address_hash: false)
       result = Geocoder.search([latitude, longitude])
       return nil unless result&.first
       result.first.formatted_address || result.first.address
@@ -31,6 +31,7 @@ class Geohelper
       address.match(/\A\d{5}\z/).present? ? "zipcode: #{address}" : address
     end
 
+    # TODO: location refactor - make this return the updated location attrs
     # Given a string, return a address hash for that location
     def formatted_address_hash(addy)
       result = Geocoder.search(formatted_address(addy))
