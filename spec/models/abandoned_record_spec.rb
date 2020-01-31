@@ -91,7 +91,7 @@ RSpec.describe AbandonedRecord, type: :model do
         expect(abandoned_record.id).to be_present
       end
     end
-  # TODO:
+  # TODO: location refactor -
   #   context "no location, but address" do
   #     let(:latitude) { 41.9202384 }
   #     let(:longitude) { -87.7158185 }

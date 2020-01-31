@@ -646,7 +646,7 @@ class Bike < ApplicationRecord
     [city, state].reject(&:blank?).join(", ")
   end
 
-  # TODO: put this method in Geocodeable
+  # TODO: location refactor - put this method in Geocodeable
   def location_info_present?(record)
     return false if record.blank?
 

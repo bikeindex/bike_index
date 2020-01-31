@@ -19,7 +19,7 @@ class AbandonedRecord < ActiveRecord::Base
 
   enum kind: KIND_ENUM
 
-  # TODO: switch to Geocodeable, make consistent across all models
+  # TODO: location refactor - switch to Geocodeable
   geocoded_by :geocode_data
 
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
