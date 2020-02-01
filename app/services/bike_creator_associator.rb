@@ -23,7 +23,7 @@ class BikeCreatorAssociator
   end
 
   def create_abandoned_record(b_param, bike)
-    AbandonedRecord.new(b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy]))
+    abandoned_record_attrs = b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy])
     abandoned_record_attrs.merge!(kind: b_param.bike["abandoned_record_kind"],
                                   bike_id: bike.id,
                                   user_id: bike.creator.id,

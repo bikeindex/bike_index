@@ -134,6 +134,8 @@ class Bike < ApplicationRecord
                          components_attributes: Component.old_attr_accessible]).freeze
     end
 
+    def states; STATE_ENUM.keys.map(&:to_s) end
+
     def text_search(query)
       query.present? ? pg_search(query) : all
     end
