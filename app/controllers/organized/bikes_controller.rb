@@ -75,7 +75,6 @@ module Organized
         @b_param.update_attributes(permitted_create_params)
         @bike = BikeCreator.new(@b_param).create_bike
         if @bike.errors.any?
-          pp @bike.errors.full_messages
           @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
           flash[:error] = @b_param.bike_errors.to_sentence
           iframe_redirect_params[:b_param_id_token] = @b_param.id_token
