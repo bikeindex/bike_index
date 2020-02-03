@@ -48,17 +48,19 @@ class AbandonedRecord < ActiveRecord::Base
 
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: false, override_show_address: false)
-    country_string = country && country.iso
-    if skip_default_country
-      country_string = nil if country_string == "US"
-    else
-      return nil unless country
-    end
+    return if country&.iso.blank?
+
+    country_string =
+      if country&.iso&.in?(%w[US USA])
+        skip_default_country ? nil : "USA"
+      else
+        country&.iso
+      end
+
     [
       (override_show_address || show_address) ? street : nil,
       city,
-      state&.abbreviation,
-      zipcode,
+      [state&.abbreviation, zipcode].reject(&:blank?).join(" "),
       country_string,
     ].reject(&:blank?).join(", ")
   end

@@ -94,6 +94,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
     end
 
     context "geolocated" do
+      before do
+        FactoryBot.create(:state_new_york)
+      end
+
       it "creates" do
         expect(current_organization.paid_for?("abandoned_bikes")).to be_truthy
         expect do
