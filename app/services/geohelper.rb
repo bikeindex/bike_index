@@ -4,7 +4,7 @@
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class Geohelper
   class << self
-    def reverse_geocode(latitude, longitude, formatted_address_hash: false)
+    def reverse_geocode(latitude, longitude)
       result = Geocoder.search([latitude, longitude])
       return nil unless result&.first
       result.first.formatted_address || result.first.address

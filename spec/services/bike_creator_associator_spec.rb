@@ -107,9 +107,8 @@ RSpec.describe BikeCreatorAssociator do
 
   describe "associate" do
     it "calls the required methods" do
-      bike = Bike.new
+      bike = Bike.new(stolen: true)
       creator = subject.new
-      allow(bike).to receive(:stolen).and_return(true)
       expect(creator).to receive(:create_ownership).and_return(bike)
       expect(creator).to receive(:create_stolen_record).and_return(bike)
       expect(creator).to receive(:create_components).and_return(bike)

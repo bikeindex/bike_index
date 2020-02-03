@@ -13,6 +13,7 @@ class CreationState < ApplicationRecord
 
   attr_accessor :can_edit_claimed
 
+  # Probably should be switched to enum at some point
   def self.origins
     %w[embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form].freeze
   end

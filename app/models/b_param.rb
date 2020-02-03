@@ -109,7 +109,7 @@ class BParam < ApplicationRecord
 
   def bike; (params && params["bike"] || {}).with_indifferent_access end
 
-  def state; state_abandoned? ? "state_abandoned" : "state_with_owner" end
+  def state; Bike.states.include?(bike["state"]) ? bike["state"] : Bike.states.first end
 
   def state_abandoned?; bike["state"] == "state_abandoned" end
 

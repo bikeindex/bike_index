@@ -267,7 +267,6 @@ RSpec.describe BikeCreator do
             manufacturer_id: manufacturer.id,
             latitude: "40.7143528",
             longitude: "-74.0059731",
-            address: "",
             accuracy: "12"
           }
         }
