@@ -4658,7 +4658,6 @@ nl:
         recorded: opgenomen
         recorder: opnemer
         matches_visible: Zichtbaar
-        retrieved: In beslag genomen bij
       show:
         abandoned_record: Verlaten record
         additional_text: Aanvullende tekst
