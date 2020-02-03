@@ -46,10 +46,10 @@ RSpec.describe AbandonedRecord, type: :model do
                                              state_id: state.id,
                                              zipcode: "60647",
                                              country_id: country.id)
-      expect(abandoned_record.address).to eq("Chicago, XXX, 60647, NEVVVV")
-      expect(abandoned_record.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(abandoned_record.address).to eq("Chicago, XXX 60647, NEVVVV")
+      expect(abandoned_record.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
       abandoned_record.hide_address = false
-      expect(abandoned_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(abandoned_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
     end
     it "is ok with missing information" do
       abandoned_record = AbandonedRecord.new(street: "2200 N Milwaukee Ave",
