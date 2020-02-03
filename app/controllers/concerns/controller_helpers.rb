@@ -319,6 +319,7 @@ module ControllerHelpers
     if current_organization.present?
       @start_time = current_organization.created_at
       @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
+      @start_time
     else
       @start_time = Time.at(1134972000) # Earliest bike created at
     end
