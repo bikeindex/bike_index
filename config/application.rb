@@ -1,6 +1,19 @@
 require_relative "boot"
 
-require "rails/all"
+require "rails"
+
+# Pick the frameworks you want:
+require "active_model/railtie"
+# require "active_job/railtie"
+require "active_record/railtie"
+require "active_storage/engine"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require "action_view/railtie"
+# require "action_cable/engine"
+require "sprockets/railtie"
+# require "rails/test_unit/railtie"
+
 require "rack/throttle"
 
 # Require the gems listed in Gemfile, including any gems
@@ -62,6 +75,7 @@ module Bikeindex
       g.serializer nil
       g.assets nil
       g.test_framework :rspec, view_specs: false, routing_specs: false, controller_specs: false
+      g.system_tests nil
     end
   end
 end
