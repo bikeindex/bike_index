@@ -1,3 +1,3 @@
 # Running puma with 4,16 threads and 3 workers
-custom_web: bundle exec unicorn_rails -c config/unicorn.rb -E $RAILS_ENV -D
+custom_web: bundle exec puma -e $RACK_ENV -b unix:///tmp/web_server.sock --pidfile /tmp/web_server.pid -d
 hard_worker: bundle exec sidekiq

@@ -62,6 +62,7 @@ gem "omniauth-strava"
 gem "omniauth-twitter"
 gem "paranoia"
 gem "pg_search"
+gem "puma", "~> 3.11"
 gem "rack-contrib"
 gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
@@ -69,8 +70,6 @@ gem "rqrcode", "0.10.1"
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3"
 gem "sitemap_generator", "~> 6"
 gem "stripe", "~> 3.3.2"
-gem "unicorn" # Use Puma as the app server
-gem "unicorn-worker-killer"
 
 # Making other files
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
