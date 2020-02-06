@@ -190,9 +190,9 @@ module ControllerHelpers
     # Set time period
     @period ||= params[:period]
     if @period == "custom"
-      if params[:start_time].present? && params[:end_time].present?
+      if params[:start_time].present?
         @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone)
+        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
         if @start_time > @end_time
           new_end_time = @start_time
           @start_time = @end_time

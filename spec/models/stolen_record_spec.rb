@@ -408,6 +408,7 @@ RSpec.describe StolenRecord, type: :model do
     end
     before do
       expect(bike.stolen).to be_truthy
+      bike.reload
       expect(bike.state).to eq "state_stolen"
       stolen_record.add_recovery_information(recovery_request.as_json)
       bike.reload

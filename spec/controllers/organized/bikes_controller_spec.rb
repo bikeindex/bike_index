@@ -158,7 +158,11 @@ RSpec.describe Organized::BikesController, type: :controller do
         end
         it "renders, assigns search_query_present and stolenness all" do
           expect(recovered_record2.recovered_at.to_date).to eq Date.parse("2016-01-10")
-          get :recoveries, params: { organization_id: organization.to_param }
+          get :recoveries, params: {
+            organization_id: organization.to_param,
+            period: "custom",
+            start_time: Time.parse("2016-01-01").to_i,
+          }
           expect(response.status).to eq(200)
           expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
           expect(response).to render_template :recoveries
