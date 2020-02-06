@@ -51,7 +51,7 @@ class ApplicationController < ActionController::Base
 
   def default_url_options(options = {})
     # forward locale param when provided
-    params.slice(:locale).merge(options)
+    params.permit(:locale).merge(options)
   end
 
   def locale_from_request_header
