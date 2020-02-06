@@ -19,10 +19,16 @@ module Organized
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
-      @matching_recoveries = current_organization.recovered_records.order(recovered_at: :desc)
-                                        .where(recovered_at: @time_range)
+      # Default to showing regional recoveries
+      @search_only_organization = ParamsNormalizer.boolean(params[:search_only_organization])
+      # ... but if organization isn't regional, we can't show regional
+      @search_only_organization = true unless current_organization.regional?
+      recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
+
+      @matching_recoveries = recovered_records.order(recovered_at: :desc)
+                                                 .where(recovered_at: @time_range)
       @recoveries = @matching_recoveries.page(@page).per(@per_page)
+      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     end
 
     def incompletes

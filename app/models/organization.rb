@@ -227,6 +227,12 @@ class Organization < ApplicationRecord
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
+  def nearby_recovered_records
+    return StolenRecord.none unless regional? && search_coordinates_set?
+    # Don't use recovered scope because it orders them
+    StolenRecord.unscoped.where(current: false).within_bounding_box(bounding_box)
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
