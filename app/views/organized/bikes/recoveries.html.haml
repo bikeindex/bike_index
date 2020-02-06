@@ -37,8 +37,8 @@
             %a.convertTime{ href: bike_path(bike) }
               = l recovered_record.recovered_at, format: :convert_time
           - if display_recovery_ids
-            %small.less-strong
-              = recovered_record.id
+            %small
+              = link_to recovered_record.id, admin_recovery_path(recovered_record.id), class: "less-strong", style: "color: #6c757d"
         %td.hidden-xs-down
           - recovery_display = recovered_record.recovery_display
           - if recovery_display && recovery_display.quote.present?
