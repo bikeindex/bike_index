@@ -139,7 +139,8 @@ RSpec.describe StolenRecord, type: :model do
       expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.unscoped.where(current: true).where("tsved_at IS NULL").to_sql)
     end
     it "scopes recovered" do
-      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
+      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).to_sql)
+      expect(StolenRecord.recovered_ordered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
     end
     it "scopes displayable" do
       expect(StolenRecord.displayable.to_sql).to eq(StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("recovered_at desc").to_sql)

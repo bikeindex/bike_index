@@ -27,7 +27,8 @@ module Organized
 
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
       @recoveries = @matching_recoveries.reorder(recovered_at: :desc).page(@page).per(@per_page)
-      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+      # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
+      @render_chart = !@search_only_organization && ParamsNormalizer.boolean(params[:render_chart])
     end
 
     def incompletes

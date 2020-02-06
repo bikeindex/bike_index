@@ -7,10 +7,11 @@
 
 .mb-2{ style: "margin-top: 50px;" }
   - if current_organization.regional?
-    %a.btn.btn-outline-primary.btn-sm.period-select-standard{ href: recoveries_organization_bikes_path(sortable_search_params.merge(search_only_organization: !@search_only_organization)), class: ("active" if @search_only_organization) }
+    %a.btn.btn-outline-primary.btn-sm.mb-2{ href: recoveries_organization_bikes_path(sortable_search_params.merge(search_only_organization: !@search_only_organization)), class: ("active" if @search_only_organization) }
       = t(".show_only_organization_recoveries", org_short_name: current_organization.short_name)
-  %a.btn.btn-outline-primary.btn-sm.period-select-standard{ href: recoveries_organization_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: ("active" if @render_chart) }
-    = t(".render_chart")
+  - unless @search_only_organization
+    %a.btn.btn-outline-primary.btn-sm.mb-2{ href: recoveries_organization_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: ("active" if @render_chart) }
+      = t(".render_chart")
   = render partial: "/shared/period_select"
 
 %p
