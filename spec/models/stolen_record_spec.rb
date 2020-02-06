@@ -185,20 +185,6 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "scopes" do
-    it "only includes current records" do
-      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
-    end
-
-    it "only includes non-current in recovered" do
-      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
-    end
-
-    it "only includes sharable unapproved in recovery_waiting_share_approval" do
-      expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
-    end
-  end
-
   describe "tsv_row" do
     it "returns the tsv row" do
       stolen_record = FactoryBot.create(:stolen_record)

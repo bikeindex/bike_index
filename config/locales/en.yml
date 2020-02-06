@@ -2091,7 +2091,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2117,7 +2117,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4235,8 +4235,8 @@ en:
         owner: Owner
         recovered_at: Date Recovered
         recovery: recovery
-        show_only_organization_recoveries: Show only %{org_short_name} bikes
         render_chart: Show chart
+        show_only_organization_recoveries: Show only %{org_short_name} bikes
       search:
         all: All
         bike: bike
