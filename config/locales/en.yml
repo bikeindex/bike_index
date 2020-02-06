@@ -4235,6 +4235,7 @@ en:
         owner: Owner
         recovered_at: Date Recovered
         recovery: recovery
+        show_only_organization_recoveries: Show only %{org_short_name} recoveries
       search:
         all: All
         bike: bike

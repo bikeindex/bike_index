@@ -16,9 +16,13 @@ module Organized
 
     def recoveries
       redirect_to current_index_path and return unless current_organization.paid_for?("show_recoveries")
+      set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @recoveries = current_organization.recovered_records.order(recovered_at: :desc).page(@page).per(@per_page)
+      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+      @matching_recoveries = current_organization.recovered_records.order(recovered_at: :desc)
+                                        .where(recovered_at: @time_range)
+      @recoveries = @matching_recoveries.page(@page).per(@per_page)
     end
 
     def incompletes

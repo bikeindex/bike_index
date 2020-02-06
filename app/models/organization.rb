@@ -221,7 +221,7 @@ class Organization < ApplicationRecord
   end
 
   # Bikes geolocated within `search_radius` miles.
-  def bikes_nearby
+  def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
     # Need to unscope it so that we can call group-by on it
     Bike.unscoped.current.within_bounding_box(bounding_box)

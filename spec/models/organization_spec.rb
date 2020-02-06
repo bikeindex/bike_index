@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organization, type: :model do
-  describe "#bikes_nearby" do
+  describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)
       nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
@@ -10,8 +10,8 @@ RSpec.describe Organization, type: :model do
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
 
-      expect(chi_org.bikes_nearby.pluck(:id)).to be_empty
-      expect(nyc_org.bikes_nearby.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
+      expect(chi_org.nearby_bikes.pluck(:id)).to be_empty
+      expect(nyc_org.nearby_bikes.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
     end
   end
 
@@ -28,7 +28,7 @@ RSpec.describe Organization, type: :model do
       bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
       unaffiliated_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
 
-      expect(nyc_org1.bikes_nearby.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bike_ids)
+      expect(nyc_org1.nearby_bikes.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bike_ids)
 
       # Make sure we're getting the bike from the org
       expect(Bike.organization(nyc_org1).pluck(:id)).to match_array([bike1.id])
