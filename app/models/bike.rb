@@ -50,7 +50,7 @@ class Bike < ApplicationRecord
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
-  has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
+  has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :abandoned_records
   has_many :current_abandoned_records, -> { current }, class_name: "AbandonedRecord"
@@ -837,7 +837,7 @@ class Bike < ApplicationRecord
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_state
-    return "state_stolen" if current_stolen_record.present?
+    return "state_stolen" if stolen
     return "state_impounded" if current_impound_record.present?
     return "state_abandoned" if abandoned? || current_abandoned_records.any?
     "state_with_owner"

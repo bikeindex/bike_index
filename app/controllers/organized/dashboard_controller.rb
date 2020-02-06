@@ -18,7 +18,7 @@ module Organized
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
 
       if current_organization.regional?
-        @bikes_not_in_organizations = current_organization.bikes_nearby.where.not(id: @bikes_in_organizations.pluck(:id)).where(created_at: @time_range)
+        @bikes_not_in_organizations = current_organization.nearby_bikes.where.not(id: @bikes_in_organizations.pluck(:id)).where(created_at: @time_range)
 
         @bikes_in_child_organizations_count = Bike.organization(@child_organizations.pluck(:id)).where(created_at: @time_range).count
         @bikes_in_nearby_organizations_count = Bike.organization(current_organization.nearby_organizations.pluck(:id)).where(created_at: @time_range).count

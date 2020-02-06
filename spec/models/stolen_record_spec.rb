@@ -139,7 +139,8 @@ RSpec.describe StolenRecord, type: :model do
       expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.unscoped.where(current: true).where("tsved_at IS NULL").to_sql)
     end
     it "scopes recovered" do
-      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
+      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).to_sql)
+      expect(StolenRecord.recovered_ordered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
     end
     it "scopes displayable" do
       expect(StolenRecord.displayable.to_sql).to eq(StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("recovered_at desc").to_sql)
@@ -181,20 +182,6 @@ RSpec.describe StolenRecord, type: :model do
     it "returns nil if there is no country" do
       stolen_record = StolenRecord.new(street: "302666 Richmond Blvd")
       expect(stolen_record.address).to be_nil
-    end
-  end
-
-  describe "scopes" do
-    it "only includes current records" do
-      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
-    end
-
-    it "only includes non-current in recovered" do
-      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
-    end
-
-    it "only includes sharable unapproved in recovery_waiting_share_approval" do
-      expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
     end
   end
 
@@ -408,11 +395,14 @@ RSpec.describe StolenRecord, type: :model do
     end
     before do
       expect(bike.stolen).to be_truthy
+      bike.reload
+      expect(bike.state).to eq "state_stolen"
       stolen_record.add_recovery_information(recovery_request.as_json)
       bike.reload
       stolen_record.reload
 
       expect(bike.stolen).to be_falsey
+      expect(bike.state).to eq "state_with_owner"
       expect(stolen_record.recovered?).to be_truthy
       expect(stolen_record.current).to be_falsey
       expect(bike.current_stolen_record).not_to be_present

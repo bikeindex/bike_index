@@ -44,8 +44,9 @@ class StolenRecord < ApplicationRecord
   scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
 
-  scope :recovered, -> { unscoped.where(current: false).order("recovered_at desc") }
-  scope :displayable, -> { recovered.where(can_share_recovery: true) }
+  scope :recovered, -> { unscoped.where(current: false) }
+  scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
+  scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
   scope :missing_location, -> { where(street: ["", nil]) }
 

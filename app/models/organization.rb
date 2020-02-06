@@ -221,10 +221,16 @@ class Organization < ApplicationRecord
   end
 
   # Bikes geolocated within `search_radius` miles.
-  def bikes_nearby
+  def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
     # Need to unscope it so that we can call group-by on it
     Bike.unscoped.current.within_bounding_box(bounding_box)
+  end
+
+  def nearby_recovered_records
+    return StolenRecord.none unless regional? && search_coordinates_set?
+    # Don't use recovered scope because it orders them
+    StolenRecord.recovered.within_bounding_box(bounding_box)
   end
 
   def paid_for?(feature_name)

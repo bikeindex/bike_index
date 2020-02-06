@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organization, type: :model do
-  describe "#bikes_nearby" do
+  describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)
       nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
@@ -10,12 +10,12 @@ RSpec.describe Organization, type: :model do
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
 
-      expect(chi_org.bikes_nearby.pluck(:id)).to be_empty
-      expect(nyc_org.bikes_nearby.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
+      expect(chi_org.nearby_bikes.pluck(:id)).to be_empty
+      expect(nyc_org.nearby_bikes.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
     end
   end
 
-  describe "bikes in/not nearby organizations" do
+  describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       bike0 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
@@ -26,9 +26,13 @@ RSpec.describe Organization, type: :model do
       bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
       bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
-      unaffiliated_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
+      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      # stolen record doesn't automatically set latitude on bike, because of testing skip - so use an existing bike with location set
+      unaffiliated_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: unaffiliated_bikes.last)
+      unaffiliated_stolen_record.add_recovery_information
 
-      expect(nyc_org1.bikes_nearby.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bike_ids)
+      expect(nyc_org1.nearby_bikes.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bikes.map(&:id))
+      expect(nyc_org1.nearby_recovered_records.pluck(:id)).to match_array([unaffiliated_stolen_record.id])
 
       # Make sure we're getting the bike from the org
       expect(Bike.organization(nyc_org1).pluck(:id)).to match_array([bike1.id])

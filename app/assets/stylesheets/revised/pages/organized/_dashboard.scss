@@ -79,12 +79,21 @@
 
   @include media-breakpoint-down(sm) {
     justify-content: flex-start;
+    margin: 15px 0 25px;
     .form-group {
+      justify-content: flex-end;
       margin-top: 8px;
       flex: 0 0 75%;
       max-width: 75%;
       position: relative;
-      padding-left: 15px;
+      padding-left: 0;
     }
+  }
+}
+
+// Fix little issue with button underlines
+.organized-body {
+  .active.btn.btn-outline-primary {
+    text-decoration: none;
   }
 }

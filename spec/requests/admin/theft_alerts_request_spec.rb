@@ -30,8 +30,8 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: "" }
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
-          expect(assigns(:period)).to eq "all"
-          expect(assigns(:start_time)).to be_within(1.second).of Time.at(1560805519)
+          expect(assigns(:period)).to eq "custom"
+          expect(assigns(:start_time)).to be_within(1.second).of start_time
           expect(assigns(:end_time)).to be_within(2.seconds).of Time.current
         end
       end
