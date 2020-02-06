@@ -25,9 +25,8 @@ module Organized
       @search_only_organization = true unless current_organization.regional?
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
 
-      @matching_recoveries = recovered_records.order(recovered_at: :desc)
-                                                 .where(recovered_at: @time_range)
-      @recoveries = @matching_recoveries.page(@page).per(@per_page)
+      @matching_recoveries = recovered_records.where(recovered_at: @time_range)
+      @recoveries = @matching_recoveries.reorder(recovered_at: :desc).page(@page).per(@per_page)
       @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     end
 
