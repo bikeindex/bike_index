@@ -8,12 +8,12 @@ class Bike < ApplicationRecord
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
-  # For now, prefixed with state_ so it doesn't interfere with existing attrs
-  STATE_ENUM = {
-    state_with_owner: 0,
-    state_stolen: 1,
-    state_abandoned: 2,
-    state_impound: 3
+  # For now, prefixed with status_ so it doesn't interfere with existing attrs
+  STATUS_ENUM = {
+    status_with_owner: 0,
+    status_stolen: 1,
+    status_abandoned: 2,
+    status_impound: 3
   }
 
   belongs_to :manufacturer
@@ -70,7 +70,7 @@ class Bike < ApplicationRecord
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
                 :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
-                :parking_notification_kind, :skip_state_update
+                :parking_notification_kind, :skip_status_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -78,7 +78,7 @@ class Bike < ApplicationRecord
   enum handlebar_type: HandlebarType::SLUGS
   enum cycle_type: CycleType::SLUGS
   enum propulsion_type: PropulsionType::SLUGS
-  enum state: STATE_ENUM
+  enum state: STATUS_ENUM
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
@@ -134,7 +134,7 @@ class Bike < ApplicationRecord
                          components_attributes: Component.old_attr_accessible]).freeze
     end
 
-    def states; STATE_ENUM.keys.map(&:to_s) end
+    def statuses; STATUS_ENUM.keys.map(&:to_s) end
 
     def text_search(query)
       query.present? ? pg_search(query) : all
@@ -743,7 +743,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
-    self.state = calculated_state unless skip_state_update
+    self.status = calculated_status unless skip_status_update
     clean_frame_size
     set_mnfg_name
     set_user_hidden
@@ -836,10 +836,10 @@ class Bike < ApplicationRecord
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
-  def calculated_state
-    return "state_stolen" if stolen
-    return "state_impounded" if current_impound_record.present?
-    return "state_abandoned" if abandoned? || current_parking_notifications.any?
-    "state_with_owner"
+  def calculated_status
+    return "status_stolen" if stolen
+    return "status_impounded" if current_impound_record.present?
+    return "status_abandoned" if abandoned? || current_parking_notifications.any?
+    "status_with_owner"
   end
 end

@@ -391,7 +391,7 @@ CREATE TABLE public.bikes (
     city character varying,
     latitude double precision,
     longitude double precision,
-    state integer DEFAULT 0
+    status integer DEFAULT 0
 );
 
 
@@ -654,7 +654,7 @@ CREATE TABLE public.creation_states (
     creator_id integer,
     bulk_import_id integer,
     pos_kind integer DEFAULT 0,
-    state integer DEFAULT 0
+    status integer DEFAULT 0
 );
 
 
@@ -4584,6 +4584,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200128144317'),
 ('20200130220100'),
 ('20200131175543'),
-('20200210225544');
+('20200210225544'),
+('20200210234925');
 
 

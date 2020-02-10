@@ -18,7 +18,7 @@ class BikeCreator
     bike.creator_id = @b_param.creator_id
     bike.updator_id = bike.creator_id
     bike = BikeCreatorVerifier.new(@b_param, bike).verify
-    bike.attributes = default_abandoned_attrs(@b_param, bike) if @b_param.state_abandoned?
+    bike.attributes = default_abandoned_attrs(@b_param, bike) if @b_param.status_abandoned?
     bike = add_required_attributes(bike)
     bike = add_front_wheel_size(bike)
     bike
@@ -39,7 +39,7 @@ class BikeCreator
       is_pos: @b_param.is_pos,
       is_new: @b_param.is_new,
       origin: @b_param.origin,
-      state: @b_param.state,
+      status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,
       organization_id: @bike.creation_organization_id,
@@ -139,7 +139,7 @@ class BikeCreator
   end
 
   def default_abandoned_attrs(b_param, bike)
-    attrs = { skip_state_update: true }
+    attrs = { skip_status_update: true }
     # We want to force not sending email
     if b_param.params.dig("bike", "send_email").blank?
       b_param.update_attribute :params, b_param.params.merge("bike" => b_param.params["bike"].merge("send_email" => "false"))

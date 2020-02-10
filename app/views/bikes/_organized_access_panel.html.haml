@@ -188,7 +188,7 @@
   - if passive_organization.bike_actions?
     - if passive_organization.paid_for?("abandoned_bikes")
       .row.mb-4.abandoned-record-wrap
-        - if @bike.state_abandoned?
+        - if @bike.status_abandoned?
           .col-xl-9.ml-md-2
             %h5
               = link_to t(".existing_parking_notifications", bike_type: @bike.type), organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
@@ -213,9 +213,9 @@
                     %td
                       %small
                         = parking_notification.notes
-        .text-center{ class: @bike.state_abandoned? ? "col-xl-3" : "col-xs-12" }
+        .text-center{ class: @bike.status_abandoned? ? "col-xl-3" : "col-xs-12" }
           %span
-            - if @bike.state_abandoned?
+            - if @bike.status_abandoned?
               = t(".record_again")
             - else
               = t(".record")

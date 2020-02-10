@@ -4,7 +4,7 @@ class CreationState < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :bulk_import
 
-  enum state: Bike::STATE_ENUM
+  enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
 
   before_validation :set_calculated_attributes

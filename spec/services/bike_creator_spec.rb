@@ -261,7 +261,7 @@ RSpec.describe BikeCreator do
           bike: {
             creation_organization_id: organization.id,
             serial_number: "",
-            state: "state_abandoned",
+            status: "status_abandoned",
             parking_notification_kind: "parked_incorrectly",
             primary_frame_color_id: color.id,
             manufacturer_id: manufacturer.id,
@@ -290,7 +290,7 @@ RSpec.describe BikeCreator do
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.id).to be_present
         expect(bike.serial_number).to eq "unknown"
-        expect(bike.state).to eq "state_abandoned"
+        expect(bike.status).to eq "status_abandoned"
         expect(bike.latitude).to eq(40.7143528)
         expect(bike.longitude).to eq(-74.0059731)
         expect(bike.owner_email).to eq auto_user.email
