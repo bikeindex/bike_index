@@ -140,7 +140,9 @@ export default class BinxMapping {
     if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
     } else if (binxMapping.kind == "parking_notification") {
-      popupContent = binxAppOrgAbandonedRecords.abandonedRecordMapPopup(point);
+      popupContent = binxAppOrgParkingNotifications.parkingNotificationMapPopup(
+        point
+      );
     } else {
       log.debug(binxMapping.kind);
       popupContent = "Missing template!";

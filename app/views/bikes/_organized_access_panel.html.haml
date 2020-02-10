@@ -220,7 +220,7 @@
             - else
               = t(".record")
           - existing_kind = @bike.current_parking_notification&.kind
-          - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
+          - abandoned_kinds = existing_kind.present? ? [existing_kind] : ParkingNotification.kinds
           - abandoned_kinds.each do |kind|
             %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }
               = kind.humanize
@@ -260,7 +260,7 @@
 - if passive_organization.paid_for?("abandoned_bikes")
   - modal_body = capture_haml do
     .modal-body
-      = form_for AbandonedRecord.new(bike_id: @bike.id), url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
+      = form_for ParkingNotification.new(bike_id: @bike.id), url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
         = f.hidden_field :kind, class: "modalLocation-kind"
         = f.hidden_field :latitude, class: "modalLocation-latitude"

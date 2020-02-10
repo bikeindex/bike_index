@@ -124,7 +124,7 @@ class Organization < ApplicationRecord
         .where.not(impound_records: { id: nil })
   end
 
-  def abandoned_bikes
+  def parking_notification_bikes
     Bike.includes(:parking_notifications)
         .where(parking_notifications: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
         .where.not(parking_notifications: { id: nil })

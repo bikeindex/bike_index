@@ -28,7 +28,7 @@ class BikeCreatorAssociator
                                   bike_id: bike.id,
                                   user_id: bike.creator.id,
                                   organization_id: b_param.creation_organization_id)
-    AbandonedRecord.create(parking_notification_attrs)
+    ParkingNotification.create(parking_notification_attrs)
   end
 
   def assign_user_attributes(bike, user = nil)

@@ -30,7 +30,7 @@ RSpec.describe ParkingNotification, type: :model do
         # Test that we are just getting the orgs abandoned bikes
         FactoryBot.create(:parking_notification, user: parking_notification.user)
         organization.reload
-        expect(organization.abandoned_bikes).to eq([bike])
+        expect(organization.parking_notification_bikes).to eq([bike])
       end
     end
   end
@@ -40,7 +40,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
-      parking_notification = AbandonedRecord.new(street: "2200 N Milwaukee Ave",
+      parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
                                              city: "Chicago",
                                              hide_address: true,
                                              state_id: state.id,
@@ -52,7 +52,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
     end
     it "is ok with missing information" do
-      parking_notification = AbandonedRecord.new(street: "2200 N Milwaukee Ave",
+      parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
                                              zipcode: "60647",
                                              hide_address: true,
                                              country_id: country.id)
@@ -61,7 +61,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
     it "returns nil if there is no country" do
-      parking_notification = AbandonedRecord.new(street: "302666 Richmond Blvd")
+      parking_notification = ParkingNotification.new(street: "302666 Richmond Blvd")
       expect(parking_notification.address).to be_nil
     end
   end

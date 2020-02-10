@@ -23,7 +23,7 @@ module Organized
         format.json do
           render json: matching_parking_notifications.reorder(created_at: :desc),
                  root: "parking_notifications",
-                 each_serializer: AbandonedRecordSerializer
+                 each_serializer: ParkingNotificationSerializer
         end
       end
     end
@@ -34,7 +34,7 @@ module Organized
     end
 
     def create
-      @parking_notification = AbandonedRecord.new(permitted_parameters)
+      @parking_notification = ParkingNotification.new(permitted_parameters)
       if @parking_notification.save
         flash[:success] = translation(:parking_notificationed, bike_type: @parking_notification.bike.type)
       else
