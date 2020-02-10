@@ -78,7 +78,7 @@ class Bike < ApplicationRecord
   enum handlebar_type: HandlebarType::SLUGS
   enum cycle_type: CycleType::SLUGS
   enum propulsion_type: PropulsionType::SLUGS
-  enum state: STATUS_ENUM
+  enum status: STATUS_ENUM
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
