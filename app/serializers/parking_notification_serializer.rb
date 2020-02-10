@@ -1,4 +1,4 @@
-class AbandonedRecordSerializer < ActiveModel::Serializer
+class ParkingNotificationSerializer < ActiveModel::Serializer
   attributes :id,
              :kind,
              :kind_humanized,

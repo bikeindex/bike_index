@@ -54,7 +54,7 @@
                     = link_to t(".org_impounded_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param, search_impoundedness: "only_impounded"), class: "nav-link #{on_impound_bikes_path ? 'active' : ''}"
                 - if passive_organization.paid_for?("abandoned_bikes")
                   %li
-                    = active_link t(".org_abandoned_bikes"), organization_abandoned_records_path(organization_id: passive_organization.to_param), class: "nav-link"
+                    = active_link t(".org_abandoned_bikes", org_name: passive_organization.short_name), organization_parking_notifications_path(organization_id: passive_organization.to_param), class: "nav-link"
                 %li
                   = active_link t(".add_a_bike"), new_organization_bike_path(passive_organization.to_param), class: "nav-link"
                 - if passive_organization.paid_for?("show_partial_registrations")

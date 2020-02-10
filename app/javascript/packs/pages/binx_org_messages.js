@@ -1,7 +1,7 @@
 import log from "../utils/log";
 import _ from "lodash";
 
-// BinxAppOrgAbandonedRecords is a better, more generalized version of this
+// BinxAppOrgParkingNotifications is a better, more generalized version of this
 export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;

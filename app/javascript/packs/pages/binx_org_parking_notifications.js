@@ -1,7 +1,7 @@
 import log from "../utils/log";
 import _ from "lodash";
 
-export default class BinxAppOrgAbandonedRecords {
+export default class BinxAppOrgParkingNotifications {
   constructor() {
     this.fetchedRecords = false;
     this.mapReady = false;
@@ -13,7 +13,7 @@ export default class BinxAppOrgAbandonedRecords {
   init() {
     log.debug("loading abandoned records");
     // load the maps API
-    binxMapping.loadMap("binxAppOrgAbandonedRecords.mapOrganizedRecords");
+    binxMapping.loadMap("binxAppOrgParkingNotifications.mapOrganizedRecords");
     this.fetchRecords([["per_page", 50]]);
   }
 
@@ -31,13 +31,13 @@ export default class BinxAppOrgAbandonedRecords {
       dataType: "json",
       url: url,
       success(data, textStatus, jqXHR) {
-        binxAppOrgAbandonedRecords.fetchedRecords = true;
-        binxAppOrgAbandonedRecords.renderOrganizedRecords(
-          data.abandoned_records
+        binxAppOrgParkingNotifications.fetchedRecords = true;
+        binxAppOrgParkingNotifications.renderOrganizedRecords(
+          data.parking_notifications
         );
       },
       error(data, textStatus, jqXHR) {
-        binxAppOrgAbandonedRecords.fetchedRecords = true;
+        binxAppOrgParkingNotifications.fetchedRecords = true;
         log.debug(data);
       }
     });
@@ -53,31 +53,31 @@ export default class BinxAppOrgAbandonedRecords {
   // this loops and calls itself again if we haven't finished rendering the map and the records
   mapOrganizedRecords() {
     // if we have already rendered the mapRendered, then we're done!
-    if (binxAppOrgAbandonedRecords.mapRendered) {
+    if (binxAppOrgParkingNotifications.mapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
-      if (!binxAppOrgAbandonedRecords.mapReady) {
+      if (!binxAppOrgParkingNotifications.mapReady) {
         binxMapping.render(
           window.pageInfo.map_center_lat,
           window.pageInfo.map_center_lng
         );
-        binxAppOrgAbandonedRecords.mapReady = true;
+        binxAppOrgParkingNotifications.mapReady = true;
       }
       // If the record list is rendered, it means we could be finished rendering!
       // Otherwise we haven't finished rendering and we need to loop this method
-      if (binxAppOrgAbandonedRecords.listRendered) {
+      if (binxAppOrgParkingNotifications.listRendered) {
         // The records are loaded, so process the records into markers
-        binxAppOrgAbandonedRecords.addMarkerPointsForRecords(
-          binxAppOrgAbandonedRecords.records
+        binxAppOrgParkingNotifications.addMarkerPointsForRecords(
+          binxAppOrgParkingNotifications.records
         );
         // Then render the points
-        return binxAppOrgAbandonedRecords.inititalizeMapMarkers();
+        return binxAppOrgParkingNotifications.inititalizeMapMarkers();
       }
     }
     // call this again in .5 seconds, unless we returned prematurely (because things have rendered)
     log.debug("looping mapOrganizedRecords");
-    setTimeout(binxAppOrgAbandonedRecords.mapOrganizedRecords, 500);
+    setTimeout(binxAppOrgParkingNotifications.mapOrganizedRecords, 500);
   }
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
@@ -96,7 +96,9 @@ export default class BinxAppOrgAbandonedRecords {
           "Unable to find that record!"
         );
       }
-      let record = _.find(binxAppOrgAbandonedRecords.records, function(record) {
+      let record = _.find(binxAppOrgParkingNotifications.records, function(
+        record
+      ) {
         return recordId == record.id;
       });
       let marker = _.find(binxMapping.markersRendered, function(marker) {
@@ -120,8 +122,8 @@ export default class BinxAppOrgAbandonedRecords {
       // This is grabbing the markers in viewport and logging the ids for them.
       // We actually need to rerender the the marker table
       log.debug("rerendering table because map");
-      binxAppOrgAbandonedRecords.renderRecordsTable(
-        binxAppOrgAbandonedRecords.visibleRecords()
+      binxAppOrgParkingNotifications.renderRecordsTable(
+        binxAppOrgParkingNotifications.visibleRecords()
       );
     });
     this.addTableMapLinkHandler();
@@ -155,14 +157,17 @@ export default class BinxAppOrgAbandonedRecords {
     }</em></td><td class="hidden-sm-cells">${user}</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
-  abandonedRecordMapPopup(point) {
-    let record = _.find(binxAppOrgAbandonedRecords.records, ["id", point.id]);
+  ParkingNotificationMapPopup(point) {
+    let record = _.find(binxAppOrgParkingNotifications.records, [
+      "id",
+      point.id
+    ]);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
     tableTop += `<thead class="small-header hidden-md-down">${$(
       ".list-table thead"
     ).html()}</thead>`;
-    return `${tableTop}${binxAppOrgAbandonedRecords.tableRowForRecord(
+    return `${tableTop}${binxAppOrgParkingNotifications.tableRowForRecord(
       record
     )}</tbody></table>`;
   }
@@ -170,7 +175,7 @@ export default class BinxAppOrgAbandonedRecords {
   renderRecordsTable(records) {
     let body_html = "";
     for (const record of Array.from(records)) {
-      body_html += binxAppOrgAbandonedRecords.tableRowForRecord(record);
+      body_html += binxAppOrgParkingNotifications.tableRowForRecord(record);
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records

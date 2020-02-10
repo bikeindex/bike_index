@@ -199,7 +199,7 @@ nl:
         bike_sticker:
           not_found: niet gevonden
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
-        abandoned_record:
+        parking_notification:
           address_required: "(of locatie) van deze verlaten fiets vereist"
     attributes:
       doorkeeper/application:
@@ -2022,7 +2022,6 @@ nl:
       abandoned_bike_modal_title: Record %{bike_type} verlaten
       abandoned_bike_notes_html: Aanvullende opmerkingen worden <small>niet getoond
         aan de gebruiker</small>
-      existing_abandoned_records: Bestaande verlaten records voor deze %{bike_type}
       kind: Soort
       notes: Notes
       record: Vermelding
@@ -2030,6 +2029,7 @@ nl:
       record_again: Neem opnieuw op
       recorded: opgenomen
       recorder: opnemer
+      existing_parking_notifications: Bestaande verlaten records voor deze %{bike_type}
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -2493,9 +2493,9 @@ nl:
             is.
         update:
           updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
-      abandoned_records:
+      parking_notifications:
         create:
-          abandoned_recorded: Verlaten %{bike_type} opgenomen
+          parking_notificationed: Verlaten %{bike_type} opgenomen
           unable_to_record: Kan niet opnemen - %{errors}
         ensure_access_to_abandoned_bikes!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
@@ -4651,17 +4651,17 @@ nl:
         send_invitation: Verstuur uitnodiging
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
-    abandoned_records:
+    parking_notifications:
       index:
-        abandoned_records: Verlaten records
+        parking_notifications: Verlaten records
         bike: Fiets
         impounded: In beslag genomen bij
         kind: Soort
+        matches_visible: Zichtbaar
         recorded: opgenomen
         recorder: opnemer
-        matches_visible: Zichtbaar
       show:
-        abandoned_record: Verlaten record
+        parking_notification: Verlaten record
         additional_text: Aanvullende tekst
         bike: Fiets
         none: Geen

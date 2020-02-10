@@ -1,7 +1,7 @@
 .organized-page-header
   %h1
     %em= current_organization.name
-    = t(".abandoned_record")
+    = t(".parking_notification")
 
 %table.table-list
   %tbody
@@ -9,10 +9,10 @@
       %td= t(".recorded")
       %td
         %span.convertTime
-          = l(@abandoned_record.created_at, format: :convert_time)
+          = l(@parking_notification.created_at, format: :convert_time)
     %tr
       %td= t(".recorder")
-      %td= @abandoned_record.user.display_name
+      %td= @parking_notification.user.display_name
     %tr
       %td= t(".bike")
       %td
@@ -21,8 +21,8 @@
     %tr
       %td= t(".additional_text")
       %td
-        - if @abandoned_record.notes.present?
-          = @abandoned_record.notes
+        - if @parking_notification.notes.present?
+          = @parking_notification.notes
         - else
           %em.less-strong= t(".none")
 
@@ -36,7 +36,7 @@
   <script type="text/javascript">
     var map;
     function initialize() {
-      var center = new google.maps.LatLng(#{@abandoned_record.latitude}, #{@abandoned_record.longitude});
+      var center = new google.maps.LatLng(#{@parking_notification.latitude}, #{@parking_notification.longitude});
       var myOptions = {
         zoom: 13,
         center: center,
@@ -45,7 +45,7 @@
       map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
       new google.maps.Marker({
-        position: new google.maps.LatLng(#{@abandoned_record.latitude}, #{@abandoned_record.longitude}),
+        position: new google.maps.LatLng(#{@parking_notification.latitude}, #{@parking_notification.longitude}),
         map: map
       });
     }
