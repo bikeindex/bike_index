@@ -324,7 +324,7 @@ Rails.application.routes.draw do
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
     resources :messages, only: %i[index show create]
-    resources :abandoned_records
+    resources :parking_notifications
     resources :stickers, only: %i[index show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do

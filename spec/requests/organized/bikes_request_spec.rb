@@ -73,14 +73,14 @@ RSpec.describe Organized::BikesController, type: :request do
             expect(creation_state.state).to eq "state_abandoned"
             expect(creation_state.origin).to eq "organization_form"
 
-            expect(bike.abandoned_records.count).to eq 1
-            abandoned_record = bike.abandoned_records.first
-            expect(abandoned_record.organization).to eq current_organization
-            expect(abandoned_record.latitude).to eq default_location[:latitude]
-            expect(abandoned_record.longitude).to eq default_location[:longitude]
+            expect(bike.parking_notifications.count).to eq 1
+            parking_notification = bike.parking_notifications.first
+            expect(parking_notification.organization).to eq current_organization
+            expect(parking_notification.latitude).to eq default_location[:latitude]
+            expect(parking_notification.longitude).to eq default_location[:longitude]
             # TODO: location refactor
-            # expect(abandoned_record.address).to eq default_location[:formatted_address]
-            expect(abandoned_record.accuracy).to eq 12
+            # expect(parking_notification.address).to eq default_location[:formatted_address]
+            expect(parking_notification.accuracy).to eq 12
           end
         end
       end

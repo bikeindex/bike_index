@@ -52,8 +52,8 @@ class Bike < ApplicationRecord
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
-  has_many :abandoned_records
-  has_many :current_abandoned_records, -> { current }, class_name: "AbandonedRecord"
+  has_many :parking_notifications
+  has_many :current_parking_notifications, -> { current }, class_name: "AbandonedRecord"
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -70,7 +70,7 @@ class Bike < ApplicationRecord
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
                 :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
-                :abandoned_record_kind, :skip_state_update
+                :parking_notification_kind, :skip_state_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -297,8 +297,8 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
-  # This is really current_initial_abandoned_record - but more convenient naming
-  def current_abandoned_record; current_abandoned_records.initial_records.first end
+  # This is really current_initial_parking_notification - but more convenient naming
+  def current_parking_notification; current_parking_notifications.initial_records.first end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -673,12 +673,12 @@ class Bike < ApplicationRecord
   def set_location_info(request_location: nil)
     find_current_stolen_record
 
-    if location_info_present?(current_abandoned_record)
-      self.latitude = current_abandoned_record.latitude
-      self.longitude = current_abandoned_record.longitude
-      self.city = current_abandoned_record.city
-      self.country = current_abandoned_record.country
-      self.zipcode = current_abandoned_record.zipcode
+    if location_info_present?(current_parking_notification)
+      self.latitude = current_parking_notification.latitude
+      self.longitude = current_parking_notification.longitude
+      self.city = current_parking_notification.city
+      self.country = current_parking_notification.country
+      self.zipcode = current_parking_notification.zipcode
     elsif location_info_present?(current_stolen_record)
       self.latitude = current_stolen_record.latitude
       self.longitude = current_stolen_record.longitude
@@ -839,7 +839,7 @@ class Bike < ApplicationRecord
   def calculated_state
     return "state_stolen" if stolen
     return "state_impounded" if current_impound_record.present?
-    return "state_abandoned" if abandoned? || current_abandoned_records.any?
+    return "state_abandoned" if abandoned? || current_parking_notifications.any?
     "state_with_owner"
   end
 end

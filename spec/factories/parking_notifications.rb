@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :abandoned_record do
+  factory :parking_notification do
     bike { FactoryBot.create(:bike) }
     user { FactoryBot.create(:user) }
 
@@ -14,7 +14,7 @@ FactoryBot.define do
       country { Country.united_states }
     end
 
-    factory :abandoned_record_organized do
+    factory :parking_notification_organized do
       user { FactoryBot.create(:organization_member, organization: organization) }
       organization { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
     end

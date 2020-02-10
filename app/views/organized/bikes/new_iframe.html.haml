@@ -8,9 +8,9 @@
   = f.hidden_field :state, value: "state_abandoned"
   / .input-group
   /   .control-group
-  /     = f.label :abandoned_record_kind, "Kind of abandoned record" class: "control-label"
+  /     = f.label :parking_notification_kind, "Kind of abandoned record" class: "control-label"
   /     .controls
-  /       = f.select(:abandoned_record_kind, AbandonedRecord.kinds, prompt: "Choose kind")
+  /       = f.select(:parking_notification_kind, AbandonedRecord.kinds, prompt: "Choose kind")
   .input-group
     .control-group
       = f.label :serial_number, class: "control-label"

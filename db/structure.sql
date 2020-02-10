@@ -28,55 +28,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: abandoned_records; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.abandoned_records (
-    id integer NOT NULL,
-    kind integer DEFAULT 0,
-    bike_id integer,
-    user_id integer,
-    organization_id integer,
-    retrieved_at timestamp without time zone,
-    impound_record_id integer,
-    initial_abandoned_record_id integer,
-    notes text,
-    street character varying,
-    latitude double precision,
-    longitude double precision,
-    accuracy double precision,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    zipcode character varying,
-    city character varying,
-    neighborhood character varying,
-    hide_address boolean DEFAULT false,
-    country_id bigint,
-    state_id bigint
-);
-
-
---
--- Name: abandoned_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.abandoned_records_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: abandoned_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.abandoned_records_id_seq OWNED BY public.abandoned_records.id;
-
-
---
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1895,6 +1846,54 @@ ALTER SEQUENCE public.paints_id_seq OWNED BY public.paints.id;
 
 
 --
+-- Name: parking_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.parking_notifications (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    bike_id integer,
+    user_id integer,
+    organization_id integer,
+    retrieved_at timestamp without time zone,
+    impound_record_id integer,
+    initial_record_id integer,
+    notes text,
+    street character varying,
+    latitude double precision,
+    longitude double precision,
+    accuracy double precision,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    zipcode character varying,
+    city character varying,
+    neighborhood character varying,
+    hide_address boolean DEFAULT false,
+    country_id bigint,
+    state_id bigint
+);
+
+
+--
+-- Name: parking_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.parking_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: parking_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.parking_notifications_id_seq OWNED BY public.parking_notifications.id;
+
+
+--
 -- Name: payments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2504,13 +2503,6 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
--- Name: abandoned_records id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.abandoned_records ALTER COLUMN id SET DEFAULT nextval('public.abandoned_records_id_seq'::regclass);
-
-
---
 -- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2840,6 +2832,13 @@ ALTER TABLE ONLY public.paints ALTER COLUMN id SET DEFAULT nextval('public.paint
 
 
 --
+-- Name: parking_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parking_notifications ALTER COLUMN id SET DEFAULT nextval('public.parking_notifications_id_seq'::regclass);
+
+
+--
 -- Name: payments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2935,14 +2934,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.wheel_sizes_id_seq'::regclass);
-
-
---
--- Name: abandoned_records abandoned_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.abandoned_records
-    ADD CONSTRAINT abandoned_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -3330,6 +3321,14 @@ ALTER TABLE ONLY public.paints
 
 
 --
+-- Name: parking_notifications parking_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parking_notifications
+    ADD CONSTRAINT parking_notifications_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3439,55 +3438,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
-
-
---
--- Name: index_abandoned_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_bike_id ON public.abandoned_records USING btree (bike_id);
-
-
---
--- Name: index_abandoned_records_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_country_id ON public.abandoned_records USING btree (country_id);
-
-
---
--- Name: index_abandoned_records_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_impound_record_id ON public.abandoned_records USING btree (impound_record_id);
-
-
---
--- Name: index_abandoned_records_on_initial_abandoned_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_initial_abandoned_record_id ON public.abandoned_records USING btree (initial_abandoned_record_id);
-
-
---
--- Name: index_abandoned_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_organization_id ON public.abandoned_records USING btree (organization_id);
-
-
---
--- Name: index_abandoned_records_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_state_id ON public.abandoned_records USING btree (state_id);
-
-
---
--- Name: index_abandoned_records_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_abandoned_records_on_user_id ON public.abandoned_records USING btree (user_id);
 
 
 --
@@ -3964,6 +3914,55 @@ CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (cr
 --
 
 CREATE INDEX index_ownerships_on_user_id ON public.ownerships USING btree (user_id);
+
+
+--
+-- Name: index_parking_notifications_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_bike_id ON public.parking_notifications USING btree (bike_id);
+
+
+--
+-- Name: index_parking_notifications_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_country_id ON public.parking_notifications USING btree (country_id);
+
+
+--
+-- Name: index_parking_notifications_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_impound_record_id ON public.parking_notifications USING btree (impound_record_id);
+
+
+--
+-- Name: index_parking_notifications_on_initial_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_initial_record_id ON public.parking_notifications USING btree (initial_record_id);
+
+
+--
+-- Name: index_parking_notifications_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_organization_id ON public.parking_notifications USING btree (organization_id);
+
+
+--
+-- Name: index_parking_notifications_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_state_id ON public.parking_notifications USING btree (state_id);
+
+
+--
+-- Name: index_parking_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_user_id ON public.parking_notifications USING btree (user_id);
 
 
 --
@@ -4584,6 +4583,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200109005657'),
 ('20200128144317'),
 ('20200130220100'),
-('20200131175543');
+('20200131175543'),
+('20200210225544');
 
 

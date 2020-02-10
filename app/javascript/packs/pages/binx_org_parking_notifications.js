@@ -33,7 +33,7 @@ export default class BinxAppOrgAbandonedRecords {
       success(data, textStatus, jqXHR) {
         binxAppOrgAbandonedRecords.fetchedRecords = true;
         binxAppOrgAbandonedRecords.renderOrganizedRecords(
-          data.abandoned_records
+          data.parking_notifications
         );
       },
       error(data, textStatus, jqXHR) {

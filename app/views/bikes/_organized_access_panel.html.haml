@@ -191,7 +191,7 @@
         - if @bike.state_abandoned?
           .col-xl-9.ml-md-2
             %h5
-              = link_to t(".existing_abandoned_records", bike_type: @bike.type), organization_abandoned_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
+              = link_to t(".existing_parking_notifications", bike_type: @bike.type), organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
             %table.table.table-sm.table-bordered
               %thead
                 %th= t(".recorded")
@@ -200,26 +200,26 @@
                 %th
                   %small= t(".notes")
               %tbody
-                - @bike.current_abandoned_records.each do |abandoned_record|
+                - @bike.current_parking_notifications.each do |parking_notification|
                   %tr
                     %td
-                      %a.convertTime.preciseTime{ href: organization_abandoned_record_path(abandoned_record, organization_id: passive_organization.to_param) }
-                        = l abandoned_record.created_at, format: :convert_time
+                      %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: passive_organization.to_param) }
+                        = l parking_notification.created_at, format: :convert_time
                     %td
                       %small
-                        = abandoned_record.kind.humanize
+                        = parking_notification.kind.humanize
                     %td
-                      = abandoned_record.user.display_name
+                      = parking_notification.user.display_name
                     %td
                       %small
-                        = abandoned_record.notes
+                        = parking_notification.notes
         .text-center{ class: @bike.state_abandoned? ? "col-xl-3" : "col-xs-12" }
           %span
             - if @bike.state_abandoned?
               = t(".record_again")
             - else
               = t(".record")
-          - existing_kind = @bike.current_abandoned_record&.kind
+          - existing_kind = @bike.current_parking_notification&.kind
           - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
           - abandoned_kinds.each do |kind|
             %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }
@@ -260,7 +260,7 @@
 - if passive_organization.paid_for?("abandoned_bikes")
   - modal_body = capture_haml do
     .modal-body
-      = form_for AbandonedRecord.new(bike_id: @bike.id), url: organization_abandoned_records_path(organization_id: passive_organization) do |f|
+      = form_for AbandonedRecord.new(bike_id: @bike.id), url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
         = f.hidden_field :kind, class: "modalLocation-kind"
         = f.hidden_field :latitude, class: "modalLocation-latitude"

@@ -139,7 +139,7 @@ export default class BinxMapping {
     let popupContent = "";
     if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
-    } else if (binxMapping.kind == "abandoned_records") {
+    } else if (binxMapping.kind == "parking_notification") {
       popupContent = binxAppOrgAbandonedRecords.abandonedRecordMapPopup(point);
     } else {
       log.debug(binxMapping.kind);

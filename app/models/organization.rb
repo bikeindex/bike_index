@@ -42,7 +42,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
   has_many :organization_messages
-  has_many :abandoned_records
+  has_many :parking_notifications
   has_many :b_params
   has_many :invoices
   has_many :payments
@@ -125,9 +125,9 @@ class Organization < ApplicationRecord
   end
 
   def abandoned_bikes
-    Bike.includes(:abandoned_records)
-        .where(abandoned_records: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
-        .where.not(abandoned_records: { id: nil })
+    Bike.includes(:parking_notifications)
+        .where(parking_notifications: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
+        .where.not(parking_notifications: { id: nil })
   end
 
   def to_param; slug end

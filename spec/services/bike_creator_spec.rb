@@ -262,7 +262,7 @@ RSpec.describe BikeCreator do
             creation_organization_id: organization.id,
             serial_number: "",
             state: "state_abandoned",
-            abandoned_record_kind: "parked_incorrectly",
+            parking_notification_kind: "parked_incorrectly",
             primary_frame_color_id: color.id,
             manufacturer_id: manufacturer.id,
             latitude: "40.7143528",
@@ -296,13 +296,13 @@ RSpec.describe BikeCreator do
         expect(bike.owner_email).to eq auto_user.email
         expect(bike.creator).to eq creator
 
-        expect(bike.abandoned_records.count).to eq 1
-        abandoned_record = bike.current_abandoned_record
-        expect(abandoned_record.organization).to eq organization
-        expect(abandoned_record.owner_known?).to be_falsey
-        expect(abandoned_record.latitude).to eq bike.latitude
-        expect(abandoned_record.longitude).to eq bike.longitude
-        expect(abandoned_record.kind).to eq "parked_incorrectly"
+        expect(bike.parking_notifications.count).to eq 1
+        parking_notification = bike.current_parking_notification
+        expect(parking_notification.organization).to eq organization
+        expect(parking_notification.owner_known?).to be_falsey
+        expect(parking_notification.latitude).to eq bike.latitude
+        expect(parking_notification.longitude).to eq bike.longitude
+        expect(parking_notification.kind).to eq "parked_incorrectly"
       end
     end
     context "passed address" do

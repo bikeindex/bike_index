@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe Organized::AbandonedRecordsController, type: :request do
-  let(:base_url) { "/o/#{current_organization.to_param}/abandoned_records" }
+RSpec.describe Organized::ParkingNotificationController, type: :request do
+  let(:base_url) { "/o/#{current_organization.to_param}/parking_notifications" }
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: paid_feature_slugs) }
@@ -18,14 +18,14 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
       it "returns empty" do
         get base_url, params: { format: :json }
         expect(response.status).to eq(200)
-        expect(json_result).to eq("abandoned_records" => [])
+        expect(json_result).to eq("parking_notifications" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
       end
       context "with an impound_record" do
         let(:impound_record) { FactoryBot.create(:impound_record) }
-        let!(:abandoned_record1) do
-          FactoryBot.create(:abandoned_record_organized,
+        let!(:parking_notification1) do
+          FactoryBot.create(:parking_notification_organized,
                             organization: current_organization,
                             bike: bike,
                             created_at: Time.current - 1.hour,
@@ -33,13 +33,13 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         end
         let(:target) do
           {
-            id: abandoned_record1.id,
+            id: parking_notification1.id,
             kind: "appears_forgotten",
             kind_humanized: "Appears forgotten",
-            created_at: abandoned_record1.created_at.to_i,
-            lat: abandoned_record1.latitude,
-            lng: abandoned_record1.longitude,
-            user_id: abandoned_record1.user_id,
+            created_at: parking_notification1.created_at.to_i,
+            lat: parking_notification1.latitude,
+            lng: parking_notification1.longitude,
+            user_id: parking_notification1.user_id,
             impound_record_id: impound_record.id,
             impound_record_at: impound_record.created_at.to_i,
             bike: {
@@ -51,38 +51,38 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         it "renders json, no cors present" do
           get base_url, params: { format: :json }
           expect(response.status).to eq(200)
-          abandoned_records = json_result["abandoned_records"]
-          expect(abandoned_records.count).to eq 1
-          expect(abandoned_records.first).to eq target.as_json
+          parking_notifications = json_result["parking_notifications"]
+          expect(parking_notifications.count).to eq 1
+          expect(parking_notifications.first).to eq target.as_json
           expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
           expect(response.headers["Access-Control-Request-Method"]).not_to be_present
         end
       end
     end
     context "with searched bike" do
-      let!(:abandoned_record1) { FactoryBot.create(:abandoned_record, organization: current_organization) }
-      let(:abandoned_record2) { FactoryBot.create(:abandoned_record, organization: current_organization) }
-      let(:bike) { abandoned_record2.bike }
+      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization) }
+      let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization) }
+      let(:bike) { parking_notification2.bike }
       it "renders" do
         get base_url, params: { search_bike_id: bike.id }, headers: json_headers
         expect(response.status).to eq(200)
-        expect(json_result["abandoned_records"].count).to eq 1
-        expect(json_result["abandoned_records"].first.dig("bike", "id")).to eq bike.id
+        expect(json_result["parking_notifications"].count).to eq 1
+        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
       end
     end
   end
 
   describe "show" do
-    let(:abandoned_record) { FactoryBot.create(:abandoned_record, organization: current_organization) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
     it "renders" do
-      get "#{base_url}/#{abandoned_record.to_param}"
+      get "#{base_url}/#{parking_notification.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template :show
     end
   end
 
   describe "create" do
-    let(:abandoned_record_params) do
+    let(:parking_notification_params) do
       {
         kind: "parked_incorrectly",
         notes: "some details about the abandoned thing",
@@ -103,22 +103,22 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         expect do
           post base_url, params: {
             organization_id: current_organization.to_param,
-            abandoned_record: abandoned_record_params,
+            parking_notification: parking_notification_params,
           }
-          expect(response).to redirect_to organization_abandoned_records_path(organization_id: current_organization.to_param)
+          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
         end.to change(AbandonedRecord, :count).by(1)
-        abandoned_record = AbandonedRecord.last
+        parking_notification = AbandonedRecord.last
 
-        expect(abandoned_record.user).to eq current_user
-        expect(abandoned_record.organization).to eq current_organization
-        expect(abandoned_record.bike).to eq bike
-        expect(abandoned_record.notes).to eq abandoned_record_params[:notes]
-        expect(abandoned_record.latitude).to eq abandoned_record_params[:latitude]
-        expect(abandoned_record.longitude).to eq abandoned_record_params[:longitude]
+        expect(parking_notification.user).to eq current_user
+        expect(parking_notification.organization).to eq current_organization
+        expect(parking_notification.bike).to eq bike
+        expect(parking_notification.notes).to eq parking_notification_params[:notes]
+        expect(parking_notification.latitude).to eq parking_notification_params[:latitude]
+        expect(parking_notification.longitude).to eq parking_notification_params[:longitude]
         # TODO: location refactor
-        # expect(abandoned_record.address).to eq default_location[:formatted_address]
-        expect(abandoned_record.accuracy).to eq 12
+        # expect(parking_notification.address).to eq default_location[:formatted_address]
+        expect(parking_notification.accuracy).to eq 12
       end
 
       context "user without organization membership" do
@@ -128,7 +128,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
-              abandoned_record: abandoned_record_params,
+              parking_notification: parking_notification_params,
             }
             expect(response).to redirect_to user_root_url
             expect(flash[:error]).to be_present
@@ -141,7 +141,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
-              abandoned_record: abandoned_record_params.except(:latitude),
+              parking_notification: parking_notification_params.except(:latitude),
             }
             expect(flash[:error]).to match(/address/i)
           end.to_not change(AbandonedRecord, :count)
@@ -159,7 +159,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect(current_organization.paid_for?("abandoned_bikes")).to be_falsey
           expect do
             post base_url, params: {
-              organization_id: current_organization.to_param, abandoned_record: abandoned_record_params
+              organization_id: current_organization.to_param, parking_notification: parking_notification_params
             }
             expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present

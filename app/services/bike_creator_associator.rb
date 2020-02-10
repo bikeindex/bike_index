@@ -22,13 +22,13 @@ class BikeCreatorAssociator
     bike.save
   end
 
-  def create_abandoned_record(b_param, bike)
-    abandoned_record_attrs = b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy])
-    abandoned_record_attrs.merge!(kind: b_param.bike["abandoned_record_kind"],
+  def create_parking_notification(b_param, bike)
+    parking_notification_attrs = b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy])
+    parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
                                   bike_id: bike.id,
                                   user_id: bike.creator.id,
                                   organization_id: b_param.creation_organization_id)
-    AbandonedRecord.create(abandoned_record_attrs)
+    AbandonedRecord.create(parking_notification_attrs)
   end
 
   def assign_user_attributes(bike, user = nil)
@@ -73,7 +73,7 @@ class BikeCreatorAssociator
       create_normalized_serial_segments(bike)
       assign_user_attributes(bike, ownership&.user)
       create_stolen_record(bike) if bike.stolen
-      create_abandoned_record(@b_param, bike) if @b_param&.state_abandoned?
+      create_parking_notification(@b_param, bike) if @b_param&.state_abandoned?
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)

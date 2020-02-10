@@ -1,5 +1,5 @@
 .organized-page-header
-  %h1= t(".abandoned_records")
+  %h1= t(".parking_notifications")
 
 .organized-records
   #map
@@ -10,7 +10,7 @@
       = link_to "record unregistered abandoned bike", new_organization_bike_path(organization_id: current_organization, kind: "abandoned")
 
     .col-md-8
-      = pluralize number_with_delimiter(matching_abandoned_records.count), "Abandoned record"
+      = pluralize number_with_delimiter(matching_parking_notifications.count), "Abandoned record"
 
       - if search_params_present?
         - if params[:search_bike_id].present?
