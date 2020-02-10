@@ -759,8 +759,6 @@ en:
           has_many: Cannot delete record because dependent %{record} exist
           has_one: Cannot delete record because a dependent %{record} exists
       models:
-        parking_notification:
-          address_required: "(or location) of this abandoned bike required"
         bike:
           not_found: not found
           suspended: suspended and can't be used
@@ -776,6 +774,8 @@ en:
         organization_message:
           latlon_required: latitude and longitude required
           required: required
+        parking_notification:
+          address_required: "(or location) of this abandoned bike required"
         payment:
           requires_email_or_org: Requires an email address or organization
         recovery_display:
@@ -1604,14 +1604,6 @@ en:
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
     organized:
-      parking_notifications:
-        create:
-          parking_notificationed: Abandoned %{bike_type} recorded
-          unable_to_record: Unable to record - %{errors}
-        ensure_access_to_abandoned_bikes!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       ambassador_task_assignments:
         update:
           could_not_update: Could not update activity status. Please try again later.
@@ -1683,6 +1675,14 @@ en:
           message_sent: "%{message_kind} message sent"
           unable_to_send: Unable to send message - %{errors}
         ensure_permitted_message_kind!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+      parking_notifications:
+        create:
+          parking_notificationed: Abandoned %{bike_type} recorded
+          unable_to_record: Unable to record - %{errors}
+        ensure_access_to_abandoned_bikes!:
           your_org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
@@ -2091,7 +2091,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2117,7 +2117,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4083,22 +4083,6 @@ en:
         Your current account (<strong>%{user_email}</strong>) will be a member of
         the organization you create.
   organized:
-    parking_notifications:
-      index:
-        parking_notifications: Abandoned Records
-        bike: Bike
-        impounded: Impounded
-        kind: Kind
-        matches_visible: visible
-        recorded: Recorded
-        recorder: Recorder
-      show:
-        parking_notification: Abandoned Record
-        additional_text: Additional text
-        bike: Bike
-        none: none
-        recorded: Recorded
-        recorder: Recorder
     ambassador_dashboards:
       getting_started:
         10_tips_for_getting_started_in_your_town: 10 tips for getting started in your
@@ -4434,6 +4418,22 @@ en:
         sender: Sender
         subject: Subject
         success: Success
+    parking_notifications:
+      index:
+        bike: Bike
+        impounded: Impounded
+        kind: Kind
+        matches_visible: visible
+        parking_notifications: Abandoned Records
+        recorded: Recorded
+        recorder: Recorder
+      show:
+        additional_text: Additional text
+        bike: Bike
+        none: none
+        parking_notification: Abandoned Record
+        recorded: Recorded
+        recorder: Recorder
     stickers:
       edit:
         bike: Bike

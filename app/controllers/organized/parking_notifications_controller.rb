@@ -1,5 +1,5 @@
 module Organized
-  class ParkingNotificationController < Organized::BaseController
+  class ParkingNotificationsController < Organized::BaseController
     before_action :ensure_access_to_abandoned_bikes!, only: %i[index create]
 
     def index

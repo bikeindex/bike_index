@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Organized::ParkingNotificationController, type: :request do
+RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/parking_notifications" }
   include_context :request_spec_logged_in_as_organization_member
 
@@ -107,8 +107,8 @@ RSpec.describe Organized::ParkingNotificationController, type: :request do
           }
           expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
-        end.to change(AbandonedRecord, :count).by(1)
-        parking_notification = AbandonedRecord.last
+        end.to change(ParkingNotification, :count).by(1)
+        parking_notification = ParkingNotification.last
 
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
@@ -132,7 +132,7 @@ RSpec.describe Organized::ParkingNotificationController, type: :request do
             }
             expect(response).to redirect_to user_root_url
             expect(flash[:error]).to be_present
-          end.to_not change(AbandonedRecord, :count)
+          end.to_not change(ParkingNotification, :count)
         end
       end
 
@@ -144,7 +144,7 @@ RSpec.describe Organized::ParkingNotificationController, type: :request do
               parking_notification: parking_notification_params.except(:latitude),
             }
             expect(flash[:error]).to match(/address/i)
-          end.to_not change(AbandonedRecord, :count)
+          end.to_not change(ParkingNotification, :count)
         end
       end
 
@@ -163,7 +163,7 @@ RSpec.describe Organized::ParkingNotificationController, type: :request do
             }
             expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
-          end.to_not change(AbandonedRecord, :count)
+          end.to_not change(ParkingNotification, :count)
         end
       end
     end
