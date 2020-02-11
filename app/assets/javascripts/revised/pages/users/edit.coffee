@@ -7,8 +7,8 @@ class BikeIndex.UsersEdit extends BikeIndex
     @initializePersonalSharing() if $('.sharing-collapser').length > 0
     @initializeAdditionalEmails() if $('#additional-email-template').length > 0
 
-    united_stated_id = $('#stolen_record_us_id').data('usid')
-    new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
+    united_states_id = $('#us_id_data').data('usid')
+    new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   initializePersonalSharing: ->
     $personal_fields = $('.sharing-collapser')

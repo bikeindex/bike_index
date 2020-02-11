@@ -124,7 +124,7 @@ class Bike < ApplicationRecord
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
           rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
           primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-          propulsion_type zipcode country_id belt_drive
+          propulsion_type zipcode country_id city belt_drive
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
