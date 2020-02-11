@@ -144,18 +144,16 @@
         margin-bottom: 0.5rem;
       }
     }
-    .abandoned-record-wrap {
-      padding: 0 15px 8px;
-    }
-    .organized-actions-wrap {
-      padding: 8px 15px;
-      background: #fdfdfd;
-      border-top: 1px solid $gray-lightish;
-
-      span {
-        display: inline-block;
-        padding-right: 1rem;
-      }
+  }
+  .parking-notifications-wrap {
+    background: #fdfdfd;
+    border: 1px solid $gray-lightish;
+    border-radius: 0.25rem;
+    position: relative;
+    padding: 8px 15px 14px;
+    margin: -28px -15px 40px;
+    .btn {
+      @extend .uncap;
     }
   }
 }
@@ -200,6 +198,11 @@
 
     .tab-content {
       border: none;
+    }
+
+    .parking-notifications-wrap {
+      border-left: 0;
+      border-right: 0;
     }
   }
 }

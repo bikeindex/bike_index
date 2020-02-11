@@ -1270,7 +1270,6 @@ en:
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
-      existing_parking_notifications: Existing abandoned records for this %{bike_type}
       geomessage: GeoMessage
       impound: Impound
       impound_are_you_sure: Are you sure you want to %{bike_type}?
@@ -4433,6 +4432,7 @@ en:
         by: By
         created: Created
         impounded: Impounded
+        notes: Notes
         kind: Kind
         bike: Bike
 

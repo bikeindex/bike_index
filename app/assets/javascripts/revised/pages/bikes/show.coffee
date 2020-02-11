@@ -1,12 +1,12 @@
 # These two functions are required by getCurrentPosition
-window.fillInModalLocation = (position) ->
-  $(".modalLocation-latitude").val(position.coords.latitude)
-  $(".modalLocation-longitude").val(position.coords.longitude)
-  $(".modalLocation-accuracy").val(position.coords.accuracy)
-  $(".modalLocation-submit-btn").attr("disabled", false)
+window.fillInParkingLocation = (position) ->
+  $(".parkingLocation-latitude").val(position.coords.latitude)
+  $(".parkingLocation-longitude").val(position.coords.longitude)
+  $(".parkingLocation-accuracy").val(position.coords.accuracy)
+  $(".parkingLocation-submit-btn").attr("disabled", false)
   $(".waitingOnLocationText").slideUp()
 
-window.modalLocationError = (err) ->
+window.parkingLocationError = (err) ->
   # Not sure what the error will say. Might as well put it in the text to make diagnosing problems easier
   $(".waitingOnLocationText").text(err)
 
@@ -63,12 +63,11 @@ class BikeIndex.BikesShow extends BikeIndex
 
   showOrganizedAccessPanel: ->
     # If it's an organization message modal, clicking the button opens the modal and fills in the kind
-    $(".openOrganizedBikeActionModal").on "click", (e) ->
-      $target = $(e.target)
-      modal_id = $target.attr("data-modalid")
-      $("##{modal_id}").modal("show")
-      $("##{modal_id} .modalLocation-kind").val($target.attr("data-kind"))
-      navigator.geolocation.getCurrentPosition(window.fillInModalLocation, window.modalLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
+    $("#openNewParkingNotification a").on "click", (e) ->
+      event.preventDefault()
+      $("#openNewParkingNotification").collapse("hide")
+      $("#newParkingNotificationFields").collapse("show")
+      navigator.geolocation.getCurrentPosition(window.fillInParkingLocation, window.parkingLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos

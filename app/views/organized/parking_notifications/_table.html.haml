@@ -1,10 +1,10 @@
+- skip_map_cell ||= false
 - skip_bike ||= false
 
-- # TODO: add translations
-
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.list-table#records_table
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#records_table
   %thead.small-header.hidden-md-down
-    %th.map-cell
+    - unless skip_map_cell
+      %th.map-cell
     %th
       = t(".created")
       %small.convertTimezone
@@ -12,17 +12,24 @@
       %th=t(".bike")
     %th=t(".kind")
     %th=t(".by")
+    %th=t(".notes")
     %th=t(".impounded")
   %tbody
     - parking_notifications.each do |parking_notification|
       %tr
+        - unless skip_map_cell
+          %td
         %td
-          Created
+          %span.convertTime.preciseTime
+            = l(parking_notification.created_at, format: :convert_time)
         - unless skip_bike
           %td
-            Bike
+            - if bike.present?
+              = link_to organized_bike_text(@bike), bike_path(@bike)
         %td
-          Kind
+          = parking_notification.kind_humanized
         %td
-          By
+          = parking_notification.user&.display_name
+        %td
+          = parking_notification.notes
         %td

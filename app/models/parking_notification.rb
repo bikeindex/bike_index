@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
-  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1 }.freeze
+  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, other: 2, impounded: 3 }.freeze
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
@@ -82,6 +82,10 @@ class ParkingNotification < ActiveRecord::Base
       self.attributes = coordinates if coordinates.present?
     end
   end
+
+  # def is_initial_record=(val)
+  #   if val
+  # end
 
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present
