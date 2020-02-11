@@ -34,7 +34,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:target) do
           {
             id: parking_notification1.id,
-            kind: "appears_forgotten",
+            kind: "appears_abandoned",
             kind_humanized: "Appears forgotten",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,

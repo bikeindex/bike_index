@@ -30,10 +30,6 @@ class ParkingNotificationSerializer < ActiveModel::Serializer
     object.impound_record&.created_at&.to_i
   end
 
-  def kind_humanized
-    kind.humanize
-  end
-
   def bike
     bike_obj = object.bike
     {

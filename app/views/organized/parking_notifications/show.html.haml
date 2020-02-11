@@ -1,18 +1,21 @@
 .organized-page-header
   %h1
-    %em= current_organization.name
     = t(".parking_notification")
 
+- # TODO: add translations
 %table.table-list
   %tbody
     %tr
-      %td= t(".recorded")
+      %td= t(".created")
       %td
         %span.convertTime
           = l(@parking_notification.created_at, format: :convert_time)
     %tr
-      %td= t(".recorder")
+      %td= t(".by")
       %td= @parking_notification.user.display_name
+    %tr
+      %td Kind
+      %td= @parking_notification.kind.humanize
     %tr
       %td= t(".bike")
       %td

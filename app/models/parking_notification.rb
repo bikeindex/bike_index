@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
-  KIND_ENUM = { appears_forgotten: 0, parked_incorrectly: 1 }.freeze
+  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1 }.freeze
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
@@ -45,6 +45,8 @@ class ParkingNotification < ActiveRecord::Base
   def send_message?; owner_known? end
 
   def show_address; !hide_address end
+
+  def kind_humanized; kind.gsub("_", " ") end # This might become more sophisticated...
 
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: false, override_show_address: false)
