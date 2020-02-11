@@ -5,7 +5,7 @@
   .form-group.row.fancy-select.unfancy
     %label.form-well-label
       = t(".where_was_it_stolen_type", stolen_type: stolen_type)
-    .form-well-input#stolen_record_us_id{ data: { usid: Country.united_states.id } }
+    .form-well-input#us_id_data{ data: { usid: Country.united_states.id } }
       = srecord.select(:country_id, Country.select_options,
         { required: true, prompt: t(".choose_country") },
         { class: 'country-select-input form-control' } )
