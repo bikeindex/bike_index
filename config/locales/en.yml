@@ -2091,7 +2091,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2117,7 +2117,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4421,19 +4421,19 @@ en:
     parking_notifications:
       index:
         bike: Bike
+        by: By
+        created: Created
         impounded: Impounded
         kind: Kind
         matches_visible: visible
         parking_notifications: Abandoned Records
-        created: Created
-        by: By
       show:
         additional_text: Additional text
         bike: Bike
+        by: Created by
+        created: Created at
         none: none
         parking_notification: Parking Notification
-        created: Created at
-        by: Created by
     stickers:
       edit:
         bike: Bike
