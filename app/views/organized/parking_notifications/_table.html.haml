@@ -1,0 +1,28 @@
+- skip_bike ||= false
+
+- # TODO: add translations
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.list-table#records_table
+  %thead.small-header.hidden-md-down
+    %th.map-cell
+    %th
+      = t(".created")
+      %small.convertTimezone
+    - unless skip_bike
+      %th=t(".bike")
+    %th=t(".kind")
+    %th=t(".by")
+    %th=t(".impounded")
+  %tbody
+    - parking_notifications.each do |parking_notification|
+      %tr
+        %td
+          Created
+        - unless skip_bike
+          %td
+            Bike
+        %td
+          Kind
+        %td
+          By
+        %td
