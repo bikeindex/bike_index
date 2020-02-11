@@ -35,6 +35,63 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "initial" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization) }
+    it "is false" do
+      expect(parking_notification.likely_repeat?).to be_falsey
+      expect(parking_notification.can_be_repeat?).to be_falsey
+      expect(parking_notification.save)
+      expect(parking_notification.repeat_record?).to be_falsey
+    end
+    context "existing" do
+      let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.year) }
+      let(:initial_organization) { FactoryBot.create(:organization) }
+      it "is false" do
+        expect(parking_notification_initial.current?).to be_truthy
+        expect(parking_notification_initial.initial_record?).to be_truthy
+        expect(parking_notification.likely_repeat?).to be_falsey
+        expect(parking_notification.can_be_repeat?).to be_falsey
+        expect(parking_notification.save)
+        expect(parking_notification.repeat_record?).to be_falsey
+      end
+      context "same organization" do
+        let(:initial_organization) { organization }
+        it "can be assigned" do
+          expect(parking_notification.potential_initial_record).to eq parking_notification_initial
+          expect(parking_notification.likely_repeat?).to be_falsey
+          expect(parking_notification.can_be_repeat?).to be_truthy
+          expect(parking_notification.save)
+          expect(parking_notification.repeat_record?).to be_truthy
+          expect(parking_notification.initial_record).to eq parking_notification_initial
+          expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
+
+          parking_notification_initial.update_attribute :retrieved_at, Time.current
+          parking_notification_initial.reload
+          parking_notification.reload
+          expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
+          expect(parking_notification.likely_repeat?).to be_falsey
+          expect(parking_notification.can_be_repeat?).to be_truthy
+          expect(parking_notification.potential_initial_record).to eq parking_notification_initial
+        end
+        context "additional parking_notification" do
+          let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
+          it "can be assigned" do
+            pp parking_notification2.created_at, parking_notification2.repeat_record?, parking_notification2.likely_repeat?
+            expect(parking_notification.likely_repeat?).to be_truthy
+            expect(parking_notification.can_be_repeat?).to be_truthy
+            expect(parking_notification.save)
+            expect(parking_notification.repeat_record?).to be_truthy
+            expect(parking_notification.initial_record).to eq parking_notification_initial
+            expect(parking_notification2.initial_record).to eq parking_notification_initial
+            expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id, parking_notification2.id])
+          end
+        end
+      end
+    end
+  end
+
   describe "address" do
     # Copies StolenRecord, needs to be moved to a concern
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }

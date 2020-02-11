@@ -6,8 +6,8 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :user
   belongs_to :organization
   belongs_to :impound_record
-  belongs_to :initial_record
-  # has_many :repeat_parking_notifications
+  belongs_to :initial_record, class_name: "ParkingNotification"
+  has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
   belongs_to :country
   belongs_to :state
 
@@ -22,9 +22,11 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor - switch to Geocodeable
   geocoded_by :geocode_data
 
+  attr_accessor :is_repeat
+
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
-  scope :repeat_record, -> { where.not(initial_record_id: nil) }
+  scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :impounded, -> { where.not(impound_record_id: nil) }
   scope :retrieved, -> { where.not(retrieved_at: nil) }
 
@@ -48,6 +50,26 @@ class ParkingNotification < ActiveRecord::Base
 
   def kind_humanized; kind.gsub("_", " ") end # This might become more sophisticated...
 
+  def can_be_repeat?; potential_initial_record.present? end
+
+  def earlier_bike_notifications
+    notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
+    id.present? ? notifications.where("id < ?", id) : notifications
+  end
+
+  def potential_initial_record
+    return earlier_bike_notifications.initial_records.order(:id).last unless id.blank?
+    # If this is a new record, we the record needs to be current
+    earlier_bike_notifications.current.initial_records.order(:id).last
+  end
+
+  def likely_repeat?
+    return false unless can_be_repeat?
+    # We know there has to be a potential initial record if can_be_repeat,
+    # so it doesn't matter if we scope to current on new records or not
+    earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
+  end
+
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: false, override_show_address: false)
     return if country&.iso.blank?
@@ -69,6 +91,7 @@ class ParkingNotification < ActiveRecord::Base
 
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
+    self.initial_record_id ||= potential_initial_record&.id if is_repeat
     return true if street.present? && latitude.present? && longitude.present?
     if latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))

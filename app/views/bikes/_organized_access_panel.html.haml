@@ -201,21 +201,30 @@
           = link_to "view on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
 
     - parking_notification_open = params[:parking_notification].present?
+
     .text-center#openNewParkingNotification.collapse{ class: (parking_notification_open ? "" : "in") }
       %a.btn.btn-primary.btn-lg{ href: "#newParkingNotificationFields" }
         New parking notification
 
     #newParkingNotificationFields.collapse{ class: (parking_notification_open ? "in" : "")  }
-      = form_for ParkingNotification.new(bike_id: @bike.id), url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
+      %hr
+      - parking_notification_built unless @parking_notification.present?
+      - @parking_notification = ParkingNotification.new(bike_id: @bike.id, organization: organization)
+      - if parking_notification_built
+        / We only want to assign is_repeat if creating a new parking notification
+        - @parking_notification.is_repeat = @parking_notification.likely_repeat
+        - @parking_notification.kind = @parking_notification.potential_repeat_record&.kind
+
+      = form_for @parking_notification, url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
         = f.hidden_field :latitude, class: "parkingLocation-latitude"
         = f.hidden_field :longitude, class: "parkingLocation-longitude"
         = f.hidden_field :accuracy, class: "parkingLocation-accuracy"
         .form-group
-          = f.label :notes, t(".abandoned_bike_notes_html")
+          = f.label :notes, t(".parking_notification_bike_notes_html")
           = f.text_area :notes, class: 'form-control'
         .form-group
-          = submit_tag "Create parking notification", class: "btn btn-success parkingLocation-submit-btn", disabled: true
+          = submit_tag "Send parking notification", class: "btn btn-success parkingLocation-submit-btn", disabled: true
           %span.less-strong.waitingOnLocationText
             = t(".waiting_on_device_location")
 
