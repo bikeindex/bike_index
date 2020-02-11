@@ -1207,6 +1207,8 @@ RSpec.describe BikesController, type: :controller do
             handlebar_type: other_handlebar_type,
             handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
+            city: "Rotterdam",
+            zipcode: "3035",
             country_id: Country.netherlands.id,
             components_attributes: {
               "0" => {
@@ -1227,6 +1229,9 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
           expect(bike.country&.name).to eq(Country.netherlands.name)
+          expect(bike.zipcode).to eq "3035"
+          expect(bike.city).to eq "Rotterdam"
+
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey
