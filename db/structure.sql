@@ -1855,7 +1855,6 @@ CREATE TABLE public.parking_notifications (
     bike_id integer,
     user_id integer,
     organization_id integer,
-    retrieved_at timestamp without time zone,
     impound_record_id integer,
     initial_record_id integer,
     internal_notes text,

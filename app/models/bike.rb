@@ -13,7 +13,7 @@ class Bike < ApplicationRecord
     status_with_owner: 0,
     status_stolen: 1,
     status_abandoned: 2,
-    status_impound: 3
+    status_impounded: 3
   }
 
   belongs_to :manufacturer

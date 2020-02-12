@@ -26,11 +26,10 @@ class ParkingNotification < ActiveRecord::Base
 
   attr_accessor :is_repeat, :use_entered_address
 
-  scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
+  scope :current, -> { where(impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :impounded, -> { where.not(impound_record_id: nil) }
-  scope :retrieved, -> { where.not(retrieved_at: nil) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
@@ -42,9 +41,7 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
-  def current?; !retrieved? && !impounded? end
-
-  def retrieved?; retrieved_at.present? end
+  def current?; !impounded? end
 
   def impounded?; impound_record_id.present? end
 
