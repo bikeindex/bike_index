@@ -123,7 +123,7 @@
                 - sticker_information_link = link_to t(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
                 = t(".add_a_sticker_label_html", sticker_information_link: sticker_information_link)
               .form-well-input
-                - bike_code_from_org = @bike.organizations.with_paid_feature_slugs("bike_stickers").last&.bike_stickers&.claimed&.reorder(:code_integer)&.second&.pretty_code
+                - bike_code_from_org = @bike.organizations.with_enabled_feature_slugs("bike_stickers").last&.bike_stickers&.claimed&.reorder(:code_integer)&.second&.pretty_code
                 = text_field_tag :bike_sticker, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
 
             = render "shared/form_well_footer_save"

@@ -254,7 +254,7 @@ RSpec.describe Organized::UsersController, type: :controller do
             # and the organization needs to have the paid feature after the first membership is created
             Sidekiq::Testing.inline! do
               invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-              expect(organization.reload.paid_feature_slugs).to eq(["passwordless_users"])
+              expect(organization.reload.enabled_feature_slugs).to eq(["passwordless_users"])
 
               ActionMailer::Base.deliveries = []
               expect(organization.remaining_invitation_count).to eq 4

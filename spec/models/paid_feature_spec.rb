@@ -14,36 +14,36 @@ RSpec.describe PaidFeature, type: :model do
   end
 
   describe "child organization" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, kind: "law_enforcement", paid_feature_slugs: ["bike_stickers"]) }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, kind: "law_enforcement", enabled_feature_slugs: ["bike_stickers"]) }
     let(:invoice) { organization.current_invoices.first }
-    let(:organization_child) { FactoryBot.create(:organization_with_paid_features, parent_organization: organization, kind: "bike_shop", paid_feature_slugs: "bike_search") }
-    context "without child_paid_feature_slugs" do
+    let(:organization_child) { FactoryBot.create(:organization_with_paid_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
+    context "without child_enabled_feature_slugs" do
       it "does not inherit from the parent" do
         Sidekiq::Testing.inline! do
-          expect(invoice.child_paid_feature_slugs).to eq([])
+          expect(invoice.child_enabled_feature_slugs).to eq([])
           expect(organization_child.current_invoices.pluck(:id)).to match_array([organization_child.invoices.first.id])
 
           expect(organization.kind).to eq "law_enforcement"
           expect(organization_child.kind).to eq "bike_shop"
-          expect(organization.paid_feature_slugs).to eq %w[bike_stickers]
+          expect(organization.enabled_feature_slugs).to eq %w[bike_stickers]
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.paid_feature_slugs).to eq %w[bike_search]
+          expect(organization_child.enabled_feature_slugs).to eq %w[bike_search]
         end
       end
     end
-    context "with child_paid_feature_slugs" do
+    context "with child_enabled_feature_slugs" do
       it "inherits from the parent organization, not other way around" do
         Sidekiq::Testing.inline! do
-          invoice.update_attributes(child_paid_feature_slugs_string: "bike_stickers")
+          invoice.update_attributes(child_enabled_feature_slugs_string: "bike_stickers")
 
-          expect(organization.paid_feature_slugs).to eq(["bike_stickers"])
+          expect(organization.enabled_feature_slugs).to eq(["bike_stickers"])
           expect(organization_child.current_invoices.pluck(:id)).to match_array([organization_child.invoices.first.id])
           expect(organization.kind).to eq "law_enforcement"
           expect(organization_child.kind).to eq "bike_shop"
-          expect(organization.paid_feature_slugs).to eq %w[bike_stickers]
+          expect(organization.enabled_feature_slugs).to eq %w[bike_stickers]
 
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.paid_feature_slugs).to match_array(%w[bike_stickers bike_search])
+          expect(organization_child.enabled_feature_slugs).to match_array(%w[bike_stickers bike_search])
         end
       end
     end

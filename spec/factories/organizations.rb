@@ -28,8 +28,8 @@ FactoryBot.define do
 
     factory :organization_with_paid_features do
       transient do
-        paid_feature_slugs { ["csv_export"] }
-        paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(paid_feature_slugs)) }
+        enabled_feature_slugs { ["csv_export"] }
+        paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(enabled_feature_slugs)) }
       end
 
       after(:create) do |organization, evaluator|
@@ -41,7 +41,7 @@ FactoryBot.define do
       end
 
       factory :organization_with_regional_bike_counts do
-        paid_feature_slugs { ["regional_bike_counts"] }
+        enabled_feature_slugs { ["regional_bike_counts"] }
       end
     end
 

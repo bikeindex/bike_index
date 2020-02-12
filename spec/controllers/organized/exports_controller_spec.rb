@@ -43,13 +43,13 @@ RSpec.describe Organized::ExportsController, type: :controller do
   context "organization with csv_exports" do
     let!(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    before { organization.update_column :paid_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
+    before { organization.update_column :enabled_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
 
     describe "index" do
       it "renders" do
         expect(export).to be_present # So that we're actually rendering an export
         organization.reload
-        expect(organization.paid_for?("csv_exports")).to be_truthy
+        expect(organization.enabled?("csv_exports")).to be_truthy
         get :index, params: { organization_id: organization.to_param }
         expect(response.code).to eq("200")
         expect(response).to render_template(:index)
@@ -95,7 +95,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       end
       context "organization has all feature slugs" do
         it "renders still" do
-          organization.update_column :paid_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
+          organization.update_column :enabled_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
           get :new, params: { organization_id: organization.to_param }
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)
@@ -172,10 +172,10 @@ RSpec.describe Organized::ExportsController, type: :controller do
         end
       end
       context "organization with avery export" do
-        before { organization.update_columns(paid_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_stickers]) } # Stub organization having features
+        before { organization.update_columns(enabled_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_stickers]) } # Stub organization having features
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
-          expect(organization.paid_for?("avery_export")).to be_truthy
+          expect(organization.enabled?("avery_export")).to be_truthy
           expect do
             post :create, params: {
                             export: export_params.merge(bike_code_start: 1, custom_bike_ids: "1222, https://bikeindex.org/bikes/999"),

@@ -59,7 +59,7 @@ module Organized
     private
 
     def create_avery_export
-      if current_organization.paid_for?("avery_export")
+      if current_organization.enabled?("avery_export")
         @export = Export.new(avery_export_parameters)
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
         if bike_sticker.present? && bike_sticker.claimed?
@@ -88,7 +88,7 @@ module Organized
     end
 
     def ensure_access_to_exports!
-      return true if current_organization.paid_for?("csv_exports") || current_user.superuser?
+      return true if current_organization.enabled?("csv_exports") || current_user.superuser?
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end

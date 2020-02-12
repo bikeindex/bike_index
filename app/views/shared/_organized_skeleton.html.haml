@@ -30,13 +30,13 @@
         - on_impound_bikes_path = on_bikes_path && params[:search_impoundedness] == "only_impounded"
         %li
           = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{(on_bikes_path && !on_impound_bikes_path) ? 'active' : ''}"
-        - if current_organization.paid_for?("impound_bikes")
+        - if current_organization.enabled?("impound_bikes")
           %li
             = link_to t(".impounded_bikes"), organization_bikes_path(organization_id: current_organization.to_param, search_impoundedness: "only_impounded"), class: "menu-item #{on_impound_bikes_path ? 'active' : ''}"
         %li
           = active_link t(".add_a_bike"), new_organization_bike_path(current_organization), class: "menu-item"
         %li
-          - if current_organization.paid_for?("show_partial_registrations")
+          - if current_organization.enabled?("show_partial_registrations")
             = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization), class: "menu-item"
           - elsif !current_organization.bike_shop?
             %span.disabled-menu-item.menu-item
@@ -44,7 +44,7 @@
         - if current_organization.show_multi_serial?
           %li
             = active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(current_organization), class: "menu-item"
-        - if current_organization.paid_for?("show_recoveries") # I don't want to show a grayed link for this
+        - if current_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this
           %li
             = active_link t(".recoveries"), recoveries_organization_bikes_path(current_organization), class: "menu-item"
 
@@ -55,12 +55,12 @@
         - if current_organization.lightspeed_pos?
           = active_link t(".lightspeed_integration_panel"), lightspeed_interface_path, class: "menu-item"
         %li.divider-above
-          - if current_organization.paid_for?("bike_stickers")
+          - if current_organization.enabled?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           - else
             %span.disabled-menu-item.menu-item
               = t(".registration_stickers")
-        - if current_organization.paid_for?("csv_exports")
+        - if current_organization.enabled?("csv_exports")
           %li
             = active_link t(".exports"), organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
 
@@ -77,7 +77,7 @@
           %li.divider-above
             %span.disabled-menu-item.menu-item
               = t(".geomessaging")
-        - if current_organization.paid_for?("parking_notifications")
+        - if current_organization.enabled?("parking_notifications")
           %li
             = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         - if current_user.admin_of?(current_organization) || current_user.superuser?

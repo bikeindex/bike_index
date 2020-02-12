@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-# In reality, this should be OrganizationFeatures - non-paid organizations can have access to features - e.g. police or ambassadors
+# In reality, this should be something like OrganizationFeatures. Initially everything was paid though
 class PaidFeature < ApplicationRecord
   include Amountable
   KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
-  # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
+  # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[

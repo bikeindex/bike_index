@@ -156,7 +156,7 @@ class User < ApplicationRecord
 
   def paid_org?; organizations.paid.any? end
 
-  def can_impound?; superuser? || organizations.any? { |o| o.paid_for?("impound_bikes") } end
+  def can_impound?; superuser? || organizations.any? { |o| o.enabled?("impound_bikes") } end
 
   def authorized?(obj)
     return true if superuser?
@@ -167,7 +167,7 @@ class User < ApplicationRecord
   end
 
   def send_unstolen_notifications?
-    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
+    superuser || organizations.any? { |o| o.enabled?("unstolen_notifications") }
   end
 
   def auth_token_time(auth_token_type)

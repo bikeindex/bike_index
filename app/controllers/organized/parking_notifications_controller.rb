@@ -71,7 +71,7 @@ module Organized
     end
 
     def ensure_access_to_abandoned_bikes!
-      return true if current_organization.paid_for?("abandoned_bikes")
+      return true if current_organization.enabled?("abandoned_bikes")
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param)
       return

@@ -69,7 +69,7 @@ module Organized
     end
 
     def ensure_access_to_bike_stickers!
-      return true if current_organization.paid_for?("bike_stickers") || current_user.superuser?
+      return true if current_organization.enabled?("bike_stickers") || current_user.superuser?
       flash[:error] = translation(:org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end

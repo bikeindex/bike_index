@@ -65,9 +65,9 @@ class Organization < ApplicationRecord
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
+  scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
   # Regional orgs have to have the paid feature slug AND the search location set
-  scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("paid_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
+  scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
   before_validation :set_calculated_attributes
   before_save :set_search_coordinates
@@ -104,7 +104,7 @@ class Organization < ApplicationRecord
   def self.admin_text_search(n)
     return nil unless n.present?
     # Only search for paid features if the text is paid features
-    return with_paid_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
+    return with_enabled_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -112,10 +112,10 @@ class Organization < ApplicationRecord
       .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), { str: str })
   end
 
-  def self.with_paid_feature_slugs(slugs)
+  def self.with_enabled_feature_slugs(slugs)
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
-    where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
+    where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
   def impounded_bikes
@@ -167,9 +167,9 @@ class Organization < ApplicationRecord
 
   def message_kinds # Matches organization_message kinds
     [
-      paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      enabled?("geolocated_messages") ? "geolocated_messages" : nil,
       # TODO: make this based on abandoned_bikes
-      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
+      enabled?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
   end
 
@@ -178,7 +178,7 @@ class Organization < ApplicationRecord
   end
 
   def additional_registration_fields
-    PaidFeature::REG_FIELDS.select { |f| paid_for?(f) }
+    PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
   def include_field_reg_affiliation?(user = nil)
@@ -211,11 +211,11 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    PaidFeature::BIKE_ACTIONS.detect { |f| paid_for?(f) }.present?
+    PaidFeature::BIKE_ACTIONS.detect { |f| enabled?(f) }.present?
   end
 
   def law_enforcement_missing_verified_features?
-    law_enforcement? && !paid_for?("unstolen_notifications")
+    law_enforcement? && !enabled?("unstolen_notifications")
   end
 
   def bike_shop_display_integration_alert?
@@ -240,15 +240,12 @@ class Organization < ApplicationRecord
       Array(feature_name)
         .map { |name| name.strip.downcase.gsub(/\s/, "_") }
 
-    return false unless features.present? && paid_feature_slugs.is_a?(Array)
+    return false unless features.present? && enabled_feature_slugs.is_a?(Array)
     features.all? do |feature|
-      paid_feature_slugs.include?(feature) ||
+      enabled_feature_slugs.include?(feature) ||
       (ambassador? && feature == "unstolen_notifications")
     end
   end
-
-  # Deprecated: will replace paid_for? with enabled? after PR#1504
-  def paid_for?(feature_name); enabled?(feature_name) end
 
   def set_calculated_attributes
     return true unless name.present?
@@ -259,7 +256,7 @@ class Organization < ApplicationRecord
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = calculated_paid_feature_slugs
+    self.enabled_feature_slugs = calculated_enabled_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -293,9 +290,9 @@ class Organization < ApplicationRecord
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_imports? end
 
-  def show_multi_serial?; paid_for?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+  def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
@@ -361,7 +358,7 @@ class Organization < ApplicationRecord
   end
 
   def regional?
-    paid_for?("regional_bike_counts")
+    enabled?("regional_bike_counts")
   end
 
   def overview_dashboard?
@@ -380,14 +377,14 @@ class Organization < ApplicationRecord
     self.location_longitude = search_location&.longitude
   end
 
-  def calculated_paid_feature_slugs
+  def calculated_enabled_feature_slugs
     fslugs = current_invoices.feature_slugs
     # If part of a region with regional_stickers, the organization receives the stickers paid feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.paid_for?("regional_stickers") }
+      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("regional_stickers") }
     end
     return fslugs unless parent_organization_id.present?
-    (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq
+    (fslugs + current_parent_invoices.map(&:child_enabled_feature_slugs).flatten).uniq
   end
 
   def set_ambassador_organization_defaults

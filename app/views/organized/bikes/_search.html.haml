@@ -67,7 +67,7 @@
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
   }
-  optional_columns = current_organization.paid_for?("bike_stickers") ? ["sticker_cell"] : []
+  optional_columns = current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
   optional_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
   default_columns = %w[created_at_cell
@@ -89,7 +89,7 @@
           %label
             = check_box_tag cell_name, cell_name
             = column_renames[cell_name]
-  - if current_organization.paid_for?("bike_stickers")
+  - if current_organization.enabled?("bike_stickers")
     %p.stickers-sort-btns
       = t(".stickers")
       = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
@@ -126,7 +126,7 @@
         - current_organization.additional_registration_fields.each do |field_name|
           %th.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
             = column_renames["#{field_name}_cell"]
-        - if current_organization.paid_for?("bike_stickers")
+        - if current_organization.enabled?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
             - if @bike_sticker.present?
@@ -142,7 +142,7 @@
 
 
         / I don't know how to do this in a performant way :/
-        / - if current_organization.paid_for?("avery_export")
+        / - if current_organization.enabled?("avery_export")
         /   %th{ class: "avery_export_cell" }
         /     Export
         - if @impoundedness == "only_impounded"
@@ -192,9 +192,9 @@
                   = bike.phone
                 - elsif field_name == "reg_affiliation"
                   = bike.organization_affiliation
-            / - if current_organization.paid_for?("avery_export")
+            / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }
-            - if current_organization.paid_for?("bike_stickers")
+            - if current_organization.enabled?("bike_stickers")
               %td.hidden-xs-down{ class: "sticker_cell" }
                 - if @bike_sticker.present?
                   %small

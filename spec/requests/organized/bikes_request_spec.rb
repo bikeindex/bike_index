@@ -16,7 +16,7 @@ RSpec.describe Organized::BikesController, type: :request do
     context "abandoned_bikes" do
       it "creates b_param, redirects, but does not register"
       context "with paid_feature" do
-        let(:current_organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: ["abandoned_bikes"]) }
+        let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["abandoned_bikes"]) }
 
         let(:bike_params) do
           {

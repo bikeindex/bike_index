@@ -3,13 +3,13 @@ require "rails_helper"
 RSpec.describe ImpoundRecord, type: :model do
   describe "validations" do
     let!(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     it "marks the bike impounded only once" do
       expect(Bike.impounded.pluck(:id)).to eq([])
-      expect(organization.paid_for?("impound_bikes")).to be_truthy
+      expect(organization.enabled?("impound_bikes")).to be_truthy
       organization.reload
-      expect(organization.paid_for?("impound_bikes")).to be_truthy
+      expect(organization.enabled?("impound_bikes")).to be_truthy
       expect(user.can_impound?).to be_truthy
       expect(bike.impounded?).to be_falsey
       bike.impound_records.create(user: user, bike: bike, organization: organization)
@@ -39,7 +39,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:organization2) { FactoryBot.create(:organization, kind: "bike_shop") }
       let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
       it "does not impound" do
-        expect(organization2.paid_for?("impound_bikes")).to be_falsey
+        expect(organization2.enabled?("impound_bikes")).to be_falsey
         expect(user2.can_impound?).to be_falsey
         expect(user.can_impound?).to be_truthy
         expect(bike.impounded?).to be_falsey

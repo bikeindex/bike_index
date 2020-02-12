@@ -58,7 +58,7 @@ RSpec.describe Invoice, type: :model do
       let(:paid_feature) { FactoryBot.create(:paid_feature, kind: "standard") }
       let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time) }
       it "returns invoice" do
-        expect(organization.paid_feature_slugs).to eq([])
+        expect(organization.enabled_feature_slugs).to eq([])
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature_one_time.id])
         expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature.id, paid_feature_one_time.id])
         invoice2 = invoice.create_following_invoice
@@ -74,11 +74,11 @@ RSpec.describe Invoice, type: :model do
     end
   end
 
-  describe "child_paid_feature_slugs" do
+  describe "child_enabled_feature_slugs" do
     let(:invoice) { FactoryBot.create(:invoice) }
     it "rejects unmatching feature slugs" do
-      invoice.update_attributes(child_paid_feature_slugs_string: ["passwordless_users"])
-      expect(invoice.child_paid_feature_slugs).to eq([])
+      invoice.update_attributes(child_enabled_feature_slugs_string: ["passwordless_users"])
+      expect(invoice.child_enabled_feature_slugs).to eq([])
     end
     context "with paid features" do
       let(:paid_feature) { FactoryBot.create(:paid_feature, feature_slugs: %w[passwordless_users reg_phone reg_address]) }
@@ -86,12 +86,12 @@ RSpec.describe Invoice, type: :model do
         invoice.paid_feature_ids = [paid_feature.id]
         invoice.reload
         expect(invoice.feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
-        expect(invoice.child_paid_feature_slugs).to be_blank
-        invoice.update_attributes(child_paid_feature_slugs_string: %w[passwordless_users reg_phone reg_address])
+        expect(invoice.child_enabled_feature_slugs).to be_blank
+        invoice.update_attributes(child_enabled_feature_slugs_string: %w[passwordless_users reg_phone reg_address])
         invoice.reload
-        expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
-        invoice.update_attributes(child_paid_feature_slugs_string: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
-        expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_address])
+        expect(invoice.child_enabled_feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
+        invoice.update_attributes(child_enabled_feature_slugs_string: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
+        expect(invoice.child_enabled_feature_slugs).to eq(%w[passwordless_users reg_address])
       end
     end
   end
@@ -116,7 +116,7 @@ RSpec.describe Invoice, type: :model do
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature2.id, paid_feature_one_time.id])
 
       expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
-      expect(organization.paid_feature_slugs).to eq([])
+      expect(organization.enabled_feature_slugs).to eq([])
     end
   end
 
@@ -129,12 +129,12 @@ RSpec.describe Invoice, type: :model do
     it "adds the paid features" do
       invoice1.update_attributes(paid_feature_ids: [paid_feature1.id])
       organization.save
-      expect(organization.paid_feature_slugs).to eq(["bike_search"])
+      expect(organization.enabled_feature_slugs).to eq(["bike_search"])
 
       invoice2.save
       invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
       organization.update_attributes(updated_at: Time.current)
-      expect(organization.paid_feature_slugs).to match_array %w[bike_search reg_secondary_serial]
+      expect(organization.enabled_feature_slugs).to match_array %w[bike_search reg_secondary_serial]
     end
   end
 end

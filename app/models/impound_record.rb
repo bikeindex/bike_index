@@ -17,7 +17,7 @@ class ImpoundRecord < ApplicationRecord
   def user_authorized
     return true if id.present? # Already authorized, doesn't matter if still is
     return true if user.present? && user.can_impound? && organization.present? &&
-                   user.authorized?(organization) && organization.paid_for?("impound_bikes")
+                   user.authorized?(organization) && organization.enabled?("impound_bikes")
     errors.add(:user_id, :user_not_authorized)
   end
 

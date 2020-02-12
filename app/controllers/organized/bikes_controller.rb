@@ -7,7 +7,7 @@ module Organized
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
-      if current_organization.paid_for?("bike_search")
+      if current_organization.enabled?("bike_search")
         search_organization_bikes
       else
         @bikes = organization_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
@@ -15,7 +15,7 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_index_path and return unless current_organization.paid_for?("show_recoveries")
+      redirect_to current_index_path and return unless current_organization.enabled?("show_recoveries")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -32,7 +32,7 @@ module Organized
     end
 
     def incompletes
-      redirect_to current_index_path and return unless current_organization.paid_for?("show_partial_registrations")
+      redirect_to current_index_path and return unless current_organization.enabled?("show_partial_registrations")
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
@@ -55,7 +55,7 @@ module Organized
 
     def update
       if params.dig(:bike, :impound)
-        if current_organization.paid_for?("impound_bikes")
+        if current_organization.enabled?("impound_bikes")
           bike = Bike.find(params[:id])
           impound_record = bike.impound(current_user, organization: current_organization)
           if impound_record.valid?

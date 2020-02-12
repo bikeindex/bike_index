@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Organized::MessagesController, type: :controller do
-  let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: paid_feature_slugs) }
+  let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:root_path) { organization_messages_path(organization_id: organization.to_param, kind: kind_slug) }
   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
   let(:bike) { FactoryBot.create(:bike, owner_email: "party_time@stuff.com") }
   let(:kind_slug) { "geolocated_messages" }
-  let(:paid_feature_slugs) { %w[messages geolocated_messages] }
+  let(:enabled_feature_slugs) { %w[messages geolocated_messages] }
 
   before { set_current_user(user) if user.present? }
 
@@ -25,14 +25,14 @@ RSpec.describe Organized::MessagesController, type: :controller do
     context "geolocated" do
       context "organization without geolocated messages" do
         let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-        let(:paid_feature_slugs) { [] }
+        let(:enabled_feature_slugs) { [] }
 
         it "does not create" do
           organization.reload
           invoice = organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
           expect(organization.is_paid).to be_truthy
-          expect(organization.paid_for?(kind_slug)).to be_falsey
+          expect(organization.enabled?(kind_slug)).to be_falsey
           expect do
             post :create, params: { organization_id: organization.to_param, organization_message: message_params }
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
@@ -45,7 +45,7 @@ RSpec.describe Organized::MessagesController, type: :controller do
         context "user without organization membership" do
           let(:user) { FactoryBot.create(:user_confirmed) }
           it "does not create" do
-            expect(organization.paid_for?(kind_slug)).to be_truthy
+            expect(organization.enabled?(kind_slug)).to be_truthy
             expect do
               post :create, params: { organization_id: organization.to_param, organization_message: message_params }
               expect(response).to redirect_to user_home_url
@@ -66,7 +66,7 @@ RSpec.describe Organized::MessagesController, type: :controller do
         end
 
         it "creates" do
-          expect(organization.paid_for?(kind_slug)).to be_truthy
+          expect(organization.enabled?(kind_slug)).to be_truthy
           expect do
             post :create, params: { organization_id: organization.to_param, organization_message: message_params }
             expect(response).to redirect_to organization_messages_path(organization_id: organization.to_param, kind: [kind_slug])
@@ -92,16 +92,16 @@ RSpec.describe Organized::MessagesController, type: :controller do
   describe "index" do
     context "organization without geolocated messages" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-      let(:paid_feature_slugs) { [] }
+      let(:enabled_feature_slugs) { [] }
       it "redirects" do
-        expect(organization.paid_for?(kind_slug)).to be_falsey
+        expect(organization.enabled?(kind_slug)).to be_falsey
         get :index, params: { organization_id: organization.to_param }
         expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
         expect(flash[:error]).to be_present
       end
     end
     it "renders" do
-      expect(organization.paid_for?(kind_slug)).to be_truthy
+      expect(organization.enabled?(kind_slug)).to be_truthy
       get :index, params: { organization_id: organization.to_param, kind: "geolocated_messages" }
       expect(response.status).to eq(200)
       expect(response).to render_template :index

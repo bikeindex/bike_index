@@ -134,12 +134,6 @@
               False
           %em.less-strong
             Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
-          - if @organization.paid_feature_slugs.any? && current_user.developer?
-            %br
-            %small
-              Features:
-              - @organization.paid_feature_slugs.each do |slug|
-                %code=slug
       %tr
         %td
           Parent
@@ -234,7 +228,7 @@
             %td
               Bike Search
             %td
-              - if @organization.paid_for?("bike_search")
+              - if @organization.enabled?("bike_search")
                 Yes
               - else
                 %small.less-strong
@@ -291,16 +285,16 @@
             %td
               Stickers
             %td
-              - if @organization.paid_for?("bike_stickers")
+              - if @organization.enabled?("bike_stickers")
                 = link_to "Has stickers", admin_bike_stickers_path(organization_id: @organization.to_param)
               - else
                 %small.less-strong
                   no
           %tr
             %td
-              Features
-            %td{ style: "font-size: 80%" }
-              = safe_join(@organization.paid_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
+              Enabled features
+            %td.small
+              = safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
 .row.mt-4
   .col-sm-6
     %h2

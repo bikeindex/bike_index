@@ -49,6 +49,6 @@ class Ownership < ApplicationRecord
     return false if !send_email || bike.blank? || bike.example?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     return true unless bike.creation_organization.present? && first?
-    !bike.creation_organization.paid_for?("skip_ownership_email")
+    !bike.creation_organization.enabled?("skip_ownership_email")
   end
 end

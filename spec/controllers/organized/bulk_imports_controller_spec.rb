@@ -61,7 +61,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
 
   context "organization with show_bulk_import" do
     let!(:organization) { FactoryBot.create(:organization) }
-    before { organization.update_column :paid_feature_slugs, ["show_bulk_import"] } # Stub organization having paid feature
+    before { organization.update_column :enabled_feature_slugs, ["show_bulk_import"] } # Stub organization having paid feature
 
     context "logged in as organization member" do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }

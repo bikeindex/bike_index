@@ -582,7 +582,6 @@ nl:
         memberships: lidmaatschappen
         name: Naam
         organization_messages: Organisatie berichten
-        paid_feature_slugs: Betaalde naaktslakken
         payments: Betalingen
         pos_kind: Pos soort
         previous_slug: Vorige slak
@@ -595,6 +594,7 @@ nl:
         users: Gebruikers
         website: Website
         bike_stickers: Fietscodes
+        enabled_feature_slugs: Ingeschakelde functie naaktslakken
       organization_message:
         accuracy: Nauwkeurigheid
         address: Adres

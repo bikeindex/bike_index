@@ -127,20 +127,20 @@ RSpec.describe Organization, type: :model do
         end
       end
     end
-    describe "with_paid_feature_slugs" do
+    describe "with_enabled_feature_slugs" do
       let(:organization1) { FactoryBot.create(:organization) }
       let(:organization2) { FactoryBot.create(:organization) }
       before do
-        organization1.update_column :paid_feature_slugs, %w[show_bulk_import reg_phone]
-        organization2.update_column :paid_feature_slugs, %w[show_bulk_import show_recoveries]
+        organization1.update_column :enabled_feature_slugs, %w[show_bulk_import reg_phone]
+        organization2.update_column :enabled_feature_slugs, %w[show_bulk_import show_recoveries]
       end
       it "finds the organizations" do
         organization1.reload
         organization2.reload
-        expect(Organization.with_paid_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
-        expect(Organization.with_paid_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
-        expect(Organization.with_paid_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
-        expect(Organization.with_paid_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
+        expect(Organization.with_enabled_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
+        expect(Organization.with_enabled_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
+        expect(Organization.with_enabled_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
+        expect(Organization.with_enabled_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
         expect(Organization.admin_text_search(" show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.admin_text_search(" show_bulk_import show_recoveries").pluck(:id)).to eq([organization2.id])
       end
@@ -205,42 +205,42 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "#paid_for?" do
+  describe "#enabled?" do
     context "given an ambassador organization and 'unstolen_notifications'" do
       it "returns true" do
         ambassador_org = FactoryBot.create(:organization_ambassador)
 
-        enabled = ambassador_org.paid_for?("unstolen_notifications")
+        enabled = ambassador_org.enabled?("unstolen_notifications")
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?(["unstolen_notifications"])
+        enabled = ambassador_org.enabled?(["unstolen_notifications"])
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?("unstolen notifications")
+        enabled = ambassador_org.enabled?("unstolen notifications")
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?("invalid feature name")
+        enabled = ambassador_org.enabled?("invalid feature name")
         expect(enabled).to eq(false)
       end
     end
   end
 
-  describe "is_paid and paid_for? calculations" do
+  describe "is_paid and enabled? calculations" do
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
     it "uses associations to determine is_paid" do
-      expect(organization.paid_for?("csv_exports")).to be_falsey
+      expect(organization.enabled?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-      invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
+      invoice.update_attributes(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
 
       expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
 
       expect(organization.is_paid).to be_truthy
-      expect(organization.paid_feature_slugs).to eq(["csv_exports"])
-      expect(organization.paid_for?("csv_exports")).to be_truthy
+      expect(organization.enabled_feature_slugs).to eq(["csv_exports"])
+      expect(organization.enabled?("csv_exports")).to be_truthy
       expect(organization_child.is_paid).to be_falsey
 
       organization_child.update_attributes(parent_organization: organization)
@@ -249,8 +249,8 @@ RSpec.describe Organization, type: :model do
       expect(organization.parent?).to be_truthy
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoices.first).to be_blank
-      expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
-      expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
+      expect(organization_child.enabled_feature_slugs).to eq(["csv_exports"])
+      expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
@@ -259,23 +259,23 @@ RSpec.describe Organization, type: :model do
       let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
         expect(organization.message_kinds).to eq([])
-        expect(organization.paid_for?(nil)).to be_falsey
-        expect(organization.paid_for?("messages")).to be_falsey
-        expect(organization.paid_for?("geolocated_messages")).to be_falsey
+        expect(organization.enabled?(nil)).to be_falsey
+        expect(organization.enabled?("messages")).to be_falsey
+        expect(organization.enabled?("geolocated_messages")).to be_falsey
         expect(user.send_unstolen_notifications?).to be_falsey
 
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
         organization.save
 
-        expect(organization.paid_for?("messages")).to be_truthy
-        expect(organization.paid_for?("geolocated_messages")).to be_falsey
-        expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
+        expect(organization.enabled?("messages")).to be_truthy
+        expect(organization.enabled?("geolocated_messages")).to be_falsey
+        expect(organization.enabled?("abandoned_bike_messages")).to be_truthy
         expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
         expect(organization.message_kinds_except_abandoned).to eq([])
-        expect(organization.paid_for?("unstolen_notifications")).to be_truthy
-        expect(organization.paid_for?("weird_type")).to be_falsey
+        expect(organization.enabled?("unstolen_notifications")).to be_truthy
+        expect(organization.enabled?("weird_type")).to be_falsey
         expect(organization.bike_actions?).to be_truthy
-        expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
+        expect(organization.enabled?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
 
         expect(user.reload.send_unstolen_notifications?).to be_truthy
@@ -283,17 +283,17 @@ RSpec.describe Organization, type: :model do
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, paid_feature_slugs: %w[regional_bike_counts regional_stickers]) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
       it "sets on the regional organization" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
-        expect(regional_parent.paid_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
+        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
         regional_child.reload
         # It's private, so, gotta send
-        expect(regional_child.send(:calculated_paid_feature_slugs)).to eq(["bike_stickers"])
+        expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(["bike_stickers"])
       end
     end
   end
@@ -304,7 +304,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.show_bulk_import?).to be_falsey
     end
     context "paid_for" do
-      let(:organization) { Organization.new(paid_feature_slugs: ["show_bulk_import"]) }
+      let(:organization) { Organization.new(enabled_feature_slugs: ["show_bulk_import"]) }
       it "is truthy" do
         expect(organization.show_bulk_import?).to be_truthy
       end
@@ -480,7 +480,7 @@ RSpec.describe Organization, type: :model do
 
   describe "law_enforcement_missing_verified_features?" do
     let(:law_enforcement_organization) { Organization.new(kind: "law_enforcement") }
-    let(:law_enforcement_organization_with_unstolen) { Organization.new(kind: "law_enforcement", paid_feature_slugs: ["unstolen_notifications"]) }
+    let(:law_enforcement_organization_with_unstolen) { Organization.new(kind: "law_enforcement", enabled_feature_slugs: ["unstolen_notifications"]) }
     let(:bike_shop_organization) { Organization.new(kind: "bike_shop") }
     it "is true for law_enforcement, false for shop, false for law_enforcement with unstolen_notifications" do
       expect(law_enforcement_organization.law_enforcement_missing_verified_features?).to be_truthy
@@ -613,7 +613,7 @@ RSpec.describe Organization, type: :model do
     end
     context "with paid_features" do
       let(:labels) { { reg_phone: "You have to put this in, jerk", reg_secondary_serial: "XXXZZZZ" }.as_json }
-      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation], registration_field_labels: labels) }
+      let(:organization) { Organization.new(enabled_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do
         expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_truthy
