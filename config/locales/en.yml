@@ -451,6 +451,7 @@ en:
         created_bikes: Created bikes
         creation_states: Creation states
         deleted_at: Deleted at
+        enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
         is_paid: Is paid
         is_suspended: Is suspended
@@ -462,7 +463,6 @@ en:
         memberships: Memberships
         name: Name
         organization_messages: Organization messages
-        enabled_feature_slugs: Enabled feature slugs
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
         pos_kind: Pos kind
@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
