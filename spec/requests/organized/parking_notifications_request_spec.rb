@@ -35,7 +35,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           {
             id: parking_notification1.id,
             kind: "appears_abandoned",
-            kind_humanized: "Appears forgotten",
+            kind_humanized: "abandoned",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
             lng: parking_notification1.longitude,
@@ -85,10 +85,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     let(:parking_notification_params) do
       {
         kind: "parked_incorrectly",
-        notes: "some details about the abandoned thing",
+        internal_notes: "some details about the abandoned thing",
         bike_id: bike.to_param,
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
+        message: "Some message to the user",
         accuracy: 12,
       }
     end
@@ -113,7 +114,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.bike).to eq bike
-        expect(parking_notification.notes).to eq parking_notification_params[:notes]
+        expect(parking_notification.internal_notes).to eq parking_notification_params[:internal_notes]
+        expect(parking_notification.message).to eq "Some message to the user"
         expect(parking_notification.latitude).to eq parking_notification_params[:latitude]
         expect(parking_notification.longitude).to eq parking_notification_params[:longitude]
         # TODO: location refactor

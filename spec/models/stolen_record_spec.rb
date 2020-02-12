@@ -166,7 +166,7 @@ RSpec.describe StolenRecord, type: :model do
                                        zipcode: "60647",
                                        country_id: country.id)
       expect(stolen_record.address).to eq("Chicago, XXX, 60647, NEVVVV")
-      expect(stolen_record.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       stolen_record.show_address = true
       expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       expect(stolen_record.display_checklist?).to be_truthy

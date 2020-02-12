@@ -12,7 +12,7 @@
       %th=t(".bike")
     %th=t(".kind")
     %th=t(".by")
-    %th=t(".notes")
+    %th=t(".internal_notes")
     %th=t(".impounded")
   %tbody
     - parking_notifications.each do |parking_notification|
@@ -31,5 +31,5 @@
         %td
           = parking_notification.user&.display_name
         %td
-          = parking_notification.notes
+          = parking_notification.internal_notes
         %td

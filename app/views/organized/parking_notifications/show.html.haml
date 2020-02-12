@@ -22,12 +22,12 @@
         - if @bike.present?
           = link_to organized_bike_text(@bike), bike_path(@bike)
     %tr
-      %td= t(".additional_text")
-      %td
-        - if @parking_notification.notes.present?
-          = @parking_notification.notes
-        - else
-          %em.less-strong= t(".none")
+      %td= t(".message")
+      %td= @parking_notification.message
+    %tr
+      %td= t(".internal_notes_html")
+      %td= @parking_notification.internal_notes
+
 
 #map_canvas{ style: "height: 400px;" }
 

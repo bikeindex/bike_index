@@ -1858,7 +1858,7 @@ CREATE TABLE public.parking_notifications (
     retrieved_at timestamp without time zone,
     impound_record_id integer,
     initial_record_id integer,
-    notes text,
+    internal_notes text,
     street character varying,
     latitude double precision,
     longitude double precision,
@@ -1870,7 +1870,8 @@ CREATE TABLE public.parking_notifications (
     neighborhood character varying,
     hide_address boolean DEFAULT false,
     country_id bigint,
-    state_id bigint
+    state_id bigint,
+    message text
 );
 
 
@@ -4585,6 +4586,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200130220100'),
 ('20200131175543'),
 ('20200210225544'),
-('20200210234925');
+('20200210234925'),
+('20200212000416');
 
 

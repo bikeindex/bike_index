@@ -819,7 +819,7 @@ class Bike < ApplicationRecord
 
     @geocode_data =
       current_stolen_record
-        &.address(override_show_address: true)
+        &.address(force_show_address: true)
         .presence ||
       [city, zipcode, country&.name]
         .select(&:present?)

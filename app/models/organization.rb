@@ -73,7 +73,7 @@ class Organization < ApplicationRecord
   before_save :set_search_coordinates
   after_commit :update_associations
 
-  delegate :city, :country, :zipcode, to: :search_location, allow_nil: true
+  delegate :city, :country, :zipcode, :state, to: :search_location, allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
   after_validation :geocode, if: -> { false } # never geocode, use search_location lat/long

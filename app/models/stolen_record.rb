@@ -90,7 +90,7 @@ class StolenRecord < ApplicationRecord
 
   def missing_location?; street.blank? end
 
-  def address(skip_default_country: false, override_show_address: false)
+  def address(skip_default_country: false, force_show_address: false)
     country_string = country && country.iso
     if skip_default_country
       country_string = nil if country_string == "US"
@@ -98,7 +98,7 @@ class StolenRecord < ApplicationRecord
       return nil unless country
     end
     [
-      (override_show_address || show_address) ? street : nil,
+      (force_show_address || show_address) ? street : nil,
       city,
       state&.abbreviation,
       zipcode,

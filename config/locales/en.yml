@@ -969,10 +969,10 @@ en:
         address_or_intersection: Address or intersection
         choose_country: Choose country
         city: City
-        publicly_display_exact_address: Publicly display exact address theft occurred
         state: State
-        where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
+        publicly_display_exact_address: Publicly display exact address theft occurred
+        where_was_it_stolen_type: Where was it %{stolen_type}?
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
@@ -1249,9 +1249,8 @@ en:
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organized_access_panel:
-      parking_notification_bike_notes_html: Additional notes <small>not shown to user</small>
+      parking_notification_notes_html: '%{org_name} internal notes <small>not shown to user</small>'
       access_panel: Access Panel
-      additional_message: Additional message
       address: 'Address:'
       already_impounded: This %{bike_type} is already impounded by %{organization_name}
       as_a_bikeindex_ambassador_html: >-
@@ -1284,7 +1283,7 @@ en:
       message_owner: Message %{bike_type} owner
       missing_address: missing address
       missing_owner_name: missing user name
-      notes: Notes
+      internal_notes: Internal Notes
       or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
       org_cannot_edit: "%{org_name} can not edit"
@@ -1305,6 +1304,11 @@ en:
       sticker: Sticker
       sticker_code: Sticker Code
       support_email: support@bikeindex.org
+      address_or_intersection: Address or intersection
+      choose_country: Choose country
+      city: City
+      state: State
+      zipcode: Postal code
       unable_to_display_additional_information: >-
         Unable to display additional information because %{bike_type} is not registered
         with %{org_name}
@@ -4421,7 +4425,8 @@ en:
         matches_visible: visible
         parking_notifications: Abandoned Records
       show:
-        additional_text: Additional text
+        message: Message
+        internal_notes_html: '%{org_name} internal notes <small>not shown to user</small>'
         bike: Bike
         by: Created by
         created: Created at
@@ -4431,7 +4436,7 @@ en:
         by: By
         created: Created
         impounded: Impounded
-        notes: Notes
+        internal_notes: Internal Notes
         kind: Kind
         bike: Bike
 

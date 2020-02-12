@@ -104,7 +104,7 @@ RSpec.describe ParkingNotification, type: :model do
                                              zipcode: "60647",
                                              country_id: country.id)
       expect(parking_notification.address).to eq("Chicago, XXX 60647, NEVVVV")
-      expect(parking_notification.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
+      expect(parking_notification.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
       parking_notification.hide_address = false
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
     end
@@ -117,9 +117,9 @@ RSpec.describe ParkingNotification, type: :model do
       parking_notification.hide_address = false
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
-    it "returns nil if there is no country" do
+    it "returns even if no country" do
       parking_notification = ParkingNotification.new(street: "302666 Richmond Blvd")
-      expect(parking_notification.address).to be_nil
+      expect(parking_notification.address).to eq parking_notification.street
     end
   end
 
@@ -133,7 +133,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.save
         expect(parking_notification.valid?).to be_falsey
         expect(parking_notification.errors.messages.to_s).to match(/address/)
-        expect(parking_notification.kind_humanized).to eq "appears abandoned"
+        expect(parking_notification.kind_humanized).to eq "abandoned"
       end
     end
     context "no address" do
@@ -149,43 +149,32 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.id).to be_present
       end
     end
-  # TODO: location refactor -
-  #   context "no location, but address" do
-  #     let(:latitude) { 41.9202384 }
-  #     let(:longitude) { -87.7158185 }
-  #     let(:parking_notification) { FactoryBot.build(:parking_notification, latitude: nil, longitude: nil, street: "3554 W Shakespeare Ave, 60647") }
-  #     include_context :geocoder_real
-  #     it "sets location" do
-  #       VCR.use_cassette("parking_notification-address_lookup") do
-  #         parking_notification.save
-  #         expect(parking_notification.latitude).to eq latitude
-  #         expect(parking_notification.longitude).to eq longitude
-  #         expect(parking_notification.valid?).to be_truthy
-  #         expect(parking_notification.id).to be_present
-  #       end
-  #     end
-  #   end
-  #   context "with only one or the other attribute (in case of geocoder fail)" do
-  #     let(:bike) { FactoryBot.create(:bike) }
-  #     let(:user) { FactoryBot.create(:user) }
-  #     let(:parking_notification_address) { FactoryBot.build(:parking_notification, bike: bike, user: user, latitude: nil, longitude: nil, street: "Some cool place") }
-  #     let(:parking_notification_position) { FactoryBot.build(:parking_notification, bike: bike, user: user, address: nil) }
-  #     it "still creates" do
-  #       allow(Geohelper).to receive(:reverse_geocode) { nil }
-  #       allow(Geohelper).to receive(:coordinates_for) { nil }
-  #       expect(parking_notification_address.save).to be_truthy
-  #       expect(parking_notification_position.save).to be_truthy
-  #       parking_notification_address.reload
-  #       parking_notification_position.reload
 
-  #       expect(parking_notification_position.latitude).to be_present
-  #       expect(parking_notification_position.longitude).to be_present
-  #       expect(parking_notification_position.address).to be_blank
-
-  #       expect(parking_notification_address.latitude).to be_blank
-  #       expect(parking_notification_address.longitude).to be_blank
-  #       expect(parking_notification_address.address).to be_present
-  #     end
-  #   end
+    context "address set" do
+      let(:latitude) { 41.9202384 }
+      let(:longitude) { -87.7158185 }
+      let(:parking_notification) { FactoryBot.build(:parking_notification, latitude: nil, longitude: nil, street: "3554 W Shakespeare Ave, 60647") }
+      include_context :geocoder_real
+      it "falls back to address" do
+        VCR.use_cassette("parking_notification-address_lookup") do
+          parking_notification.save
+          expect(parking_notification.latitude).to eq latitude
+          expect(parking_notification.longitude).to eq longitude
+          expect(parking_notification.valid?).to be_truthy
+          expect(parking_notification.id).to be_present
+        end
+      end
+      context "use_entered_address and lat/long set" do
+        it "uses address" do
+          VCR.use_cassette("parking_notification-address_lookup") do
+            parking_notification.update_attributes(use_entered_address: true, latitude: 34.05223, longitude: -118.24368)
+            expect(parking_notification.latitude).to eq latitude
+            expect(parking_notification.longitude).to eq longitude
+            expect(parking_notification.valid?).to be_truthy
+            expect(parking_notification.id).to be_present
+          end
+        end
+      end
+    end
   end
 end

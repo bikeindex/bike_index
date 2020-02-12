@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
-  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, other: 2, impounded: 3 }.freeze
+  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, impounded: 2 }.freeze
+  DEFAULT_SHOW_ADDRESS = true
+
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
@@ -22,7 +24,7 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor - switch to Geocodeable
   geocoded_by :geocode_data
 
-  attr_accessor :is_repeat
+  attr_accessor :is_repeat, :use_entered_address
 
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
@@ -31,6 +33,15 @@ class ParkingNotification < ActiveRecord::Base
   scope :retrieved, -> { where.not(retrieved_at: nil) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  def self.kinds_humanized
+    {
+      appears_abandoned: "abandoned",
+      parked_incorrectly: "parked incorrectly",
+      other: "other",
+      impounded: "impounded",
+    }
+  end
 
   def current?; !retrieved? && !impounded? end
 
@@ -48,7 +59,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def show_address; !hide_address end
 
-  def kind_humanized; kind.gsub("_", " ") end # This might become more sophisticated...
+  def kind_humanized; self.class.kinds_humanized[kind.to_sym] end
 
   def can_be_repeat?; potential_initial_record.present? end
 
@@ -71,9 +82,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   # TODO: location refactor - copied method from stolen
-  def address(skip_default_country: false, override_show_address: false)
-    return if country&.iso.blank?
-
+  def address(skip_default_country: true, force_show_address: false)
     country_string =
       if country&.iso&.in?(%w[US USA])
         skip_default_country ? nil : "USA"
@@ -82,18 +91,26 @@ class ParkingNotification < ActiveRecord::Base
       end
 
     [
-      (override_show_address || show_address) ? street : nil,
+      (force_show_address || show_address) ? street : nil,
       city,
       [state&.abbreviation, zipcode].reject(&:blank?).join(" "),
       country_string,
     ].reject(&:blank?).join(", ")
   end
 
+  def set_location_from_organization
+    self.country_id = organization&.country&.id
+    self.city = organization&.city
+    self.zipcode = organization&.zipcode
+    self.state_id = organization&.state&.id
+  end
+
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
-    return true if street.present? && latitude.present? && longitude.present?
-    if latitude.present? && longitude.present?
+    #We still need geocode on creation, even if all the attributes are present
+    return true if id.present? && street.present? && latitude.present? && longitude.present?
+    if !use_entered_address && latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
       self.street = addy_hash["address"]
       self.city = addy_hash["city"]
@@ -105,10 +122,6 @@ class ParkingNotification < ActiveRecord::Base
       self.attributes = coordinates if coordinates.present?
     end
   end
-
-  # def is_initial_record=(val)
-  #   if val
-  # end
 
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present

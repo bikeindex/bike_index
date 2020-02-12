@@ -152,6 +152,13 @@
     position: relative;
     padding: 8px 15px 14px;
     margin: -28px -15px 40px;
+    hr {
+      border-top-color: $gray-lightish;
+    }
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
     .btn {
       @extend .uncap;
     }
@@ -231,6 +238,10 @@
           margin: 24px 0 12px;
         }
       }
+    }
+
+    .use-entered-address-radios {
+      margin-top: 32px;
     }
 
     // more space for ad
