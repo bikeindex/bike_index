@@ -1669,8 +1669,8 @@ en:
             support.
       parking_notifications:
         create:
-          parking_notificationed: Abandoned %{bike_type} recorded
-          unable_to_record: Unable to record - %{errors}
+          successfully_created: Parking Notification %{bike_type} created
+          unable_to_create: Unable to create - %{errors}
         ensure_access_to_abandoned_bikes!:
           your_org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -4417,12 +4417,15 @@ en:
         created: Created at
         internal_notes_html: "%{org_name} internal notes"
         message: Message
+        address: Address
+        repeat: Repeat?
         parking_notification: Parking Notification
       table:
         bike: Bike
         by: By
         created: Created
         impounded: Impounded
+        repeat: Repeat
         internal_notes: Internal Notes
         kind: Kind
     stickers:

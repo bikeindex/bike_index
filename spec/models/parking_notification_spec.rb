@@ -85,6 +85,9 @@ RSpec.describe ParkingNotification, type: :model do
             expect(parking_notification.initial_record).to eq parking_notification_initial
             expect(parking_notification2.initial_record).to eq parking_notification_initial
             expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id, parking_notification2.id])
+            expect(parking_notification_initial.repeat_number).to eq 0
+            expect(parking_notification2.repeat_number).to eq 1
+            expect(parking_notification.repeat_number).to eq 2
           end
         end
       end
@@ -132,7 +135,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.save
         expect(parking_notification.valid?).to be_falsey
         expect(parking_notification.errors.messages.to_s).to match(/address/)
-        expect(parking_notification.kind_humanized).to eq "abandoned"
+        expect(parking_notification.kind_humanized).to eq "Abandoned"
       end
     end
     context "no address" do

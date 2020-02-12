@@ -3,31 +3,45 @@
     = t(".parking_notification")
 
 - # TODO: add translations
-%table.table-list
-  %tbody
-    %tr
-      %td= t(".created")
-      %td
-        %span.convertTime
-          = l(@parking_notification.created_at, format: :convert_time)
-    %tr
-      %td= t(".by")
-      %td= @parking_notification.user.display_name
-    %tr
-      %td Kind
-      %td= @parking_notification.kind_humanized
-    %tr
-      %td= t(".bike")
-      %td
-        - if @bike.present?
-          = link_to organized_bike_text(@bike), bike_path(@bike)
-    %tr
-      %td= t(".message")
-      %td= @parking_notification.message
-    %tr
-      %td= t(".internal_notes_html", org_name: current_organization.short_name)
-      %td= @parking_notification.internal_notes
-
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td= t(".created")
+          %td
+            %span.convertTime
+              = l(@parking_notification.created_at, format: :convert_time)
+        %tr
+          %td= t(".by")
+          %td= @parking_notification.user.display_name
+        %tr
+          %td Kind
+          %td= @parking_notification.kind_humanized
+        %tr
+          %td= t(".bike")
+          %td
+            - if @bike.present?
+              = link_to organized_bike_text(@bike), bike_path(@bike)
+        %tr
+          %td= t(".address")
+          %td= address_formatted(@parking_notification)
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td= t(".repeat")
+          %td
+            - if @parking_notification.initial_record?
+              Initial notification
+            - else
+              Repeat #{@parking_notification.repeat_number}
+        %tr
+          %td= t(".message")
+          %td= @parking_notification.message
+        %tr
+          %td= t(".internal_notes_html", org_name: current_organization.short_name)
+          %td= @parking_notification.internal_notes
 
 #map_canvas{ style: "height: 400px;" }
 
@@ -56,3 +70,20 @@
       google.maps.event.addDomListener(window, "load", initialize);
     });
   </script>
+
+
+/ %h4
+/   - if @parking_notification.initial_record?
+/     - initial_parking_notification = @parking_notification
+/     Initial notification
+/   - else
+/     - initial_parking_notification = @parking_notification.initial_record
+/     Repeat notification
+
+/ - if @parking_notification != initial_parking_notification
+
+/   Initial record
+
+/ - if initial_parking_notification.repeat_records.conut > 1
+
+/   Render repeats

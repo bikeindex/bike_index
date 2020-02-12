@@ -195,8 +195,8 @@
       = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.limit(4), skip_bike: true, skip_map_cell: true, organization: passive_organization }
 
       %p{ style: "margin-top: -12px;" }
-        = number_with_delimiter(parking_notifications.count)
-        total notifications for #{@bike.type} -
+        = pluralize number_with_delimiter(parking_notifications.count), "total notification"
+        for #{@bike.type} -
         %em
           = link_to "view all on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
 
@@ -213,8 +213,8 @@
       - unless parking_notification_present
         / We only want to assign is_repeat if creating a new parking notification
         - @parking_notification.is_repeat = @parking_notification.likely_repeat?
-        - @parking_notification.kind = @parking_notification.potential_initial_record&.kind
         - @parking_notification.set_location_from_organization
+      - @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first
 
       = form_for @parking_notification, url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
@@ -229,7 +229,7 @@
                 First notice
               %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
                 = f.radio_button :is_repeat, true
-                Follows the
+                Repeat of
                 = pluralize @parking_notification.earlier_bike_notifications.count, "earlier notification"
 
         .row.mt-4

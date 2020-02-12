@@ -36,10 +36,9 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.kinds_humanized
     {
-      appears_abandoned: "abandoned",
-      parked_incorrectly: "parked incorrectly",
-      other: "other",
-      impounded: "impounded",
+      appears_abandoned: "Abandoned",
+      parked_incorrectly: "Parked incorrectly",
+      impounded: "Impounded",
     }
   end
 
@@ -79,6 +78,12 @@ class ParkingNotification < ActiveRecord::Base
     # We know there has to be a potential initial record if can_be_repeat,
     # so it doesn't matter if we scope to current on new records or not
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
+  end
+
+  def repeat_number
+    return 0 unless repeat_record?
+    ParkingNotification.where(initial_record_id: initial_record_id)
+                       .where("id < ?", id).count + 1
   end
 
   # TODO: location refactor - copied method from stolen

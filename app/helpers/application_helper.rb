@@ -177,6 +177,11 @@ module ApplicationHelper
     end
   end
 
+  # TODO: location refactor - do something more sophisticated
+  def address_formatted(obj)
+    obj.address
+  end
+
   def websiteable(user)
     if user.show_website and user.website
       link_to "Website", user.website

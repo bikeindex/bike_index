@@ -64,21 +64,8 @@
           %li
             = active_link t(".exports"), organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
 
-        - if current_organization.message_kinds.any?
-          - current_organization.message_kinds.each_with_index do |message_kind, index|
-            %li{ class: index == 0 ? "divider-above" : "" }
-              / (params[:kind] == message_kind ? "active" : "")
-              - if message_kind == "geolocated_messages"
-                = active_link t(".geomessaging"), organization_messages_path(organization_id: current_organization.to_param, kind: message_kind), class: "menu-item"
-              - else
-                - link_title = message_kind.gsub("_messages", "").titleize
-                = active_link link_title, organization_messages_path(organization_id: current_organization.to_param, kind: message_kind), class: "menu-item"
-        - else
-          %li.divider-above
-            %span.disabled-menu-item.menu-item
-              = t(".geomessaging")
         - if current_organization.enabled?("parking_notifications")
-          %li
+          %li.divider-above
             = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         - if current_user.admin_of?(current_organization) || current_user.superuser?
           %li.divider-above

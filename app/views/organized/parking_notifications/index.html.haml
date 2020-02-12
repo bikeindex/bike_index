@@ -1,18 +1,20 @@
 .organized-page-header
-  %h1= t(".parking_notifications")
+  %h1
+    = t(".parking_notifications")
+
+- # TODO: add translations
 
 .organized-records
+  .text-right.mb-4
+    = link_to "Record unregistered abandoned bike", new_organization_bike_path(organization_id: current_organization, kind: "abandoned"), class: "btn btn-sm btn-outline-primary"
+
   #map
 
-  - # TODO: add translations
   .row
-    .col-xs-12.text-center
-      = link_to "record unregistered abandoned bike", new_organization_bike_path(organization_id: current_organization, kind: "abandoned")
-
-    .col-md-8
-      = pluralize number_with_delimiter(matching_parking_notifications.count), "Abandoned record"
-
+    .col-md-12
       - if search_params_present?
+        = pluralize number_with_delimiter(matching_parking_notifications.count), "parking notification"
+
         - if params[:search_bike_id].present?
           for
           - searched_bike = Bike.find_by_id(params[:search_bike_id])
@@ -21,9 +23,8 @@
           - else
             %em
               unknown bike ##{params[:search_bike_id]}
-      - else
-        total
-    .col-md-4
+
+    .col-xs-12
       %p#recordsCount.text-right.less-strong
         %span.number 0
         = t(".matches_visible")

@@ -1,5 +1,6 @@
 - skip_map_cell ||= false
 - skip_bike ||= false
+- skip_repeat ||= false
 - organization ||= current_organization
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#records_table
@@ -13,7 +14,8 @@
       %th=t(".bike")
     %th=t(".kind")
     %th=t(".by")
-    %th=t(".internal_notes")
+    - unless skip_repeat
+      %th=t(".repeat")
     %th=t(".impounded")
   %tbody
     - parking_notifications.each do |parking_notification|
@@ -32,6 +34,9 @@
           = parking_notification.kind_humanized
         %td
           = parking_notification.user&.display_name
-        %td
-          = parking_notification.internal_notes
+        - unless skip_repeat
+          %td
+            - if parking_notification.repeat_record?
+              Repeat
+              = parking_notification.repeat_number
         %td

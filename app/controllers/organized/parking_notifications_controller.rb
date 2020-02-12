@@ -36,9 +36,9 @@ module Organized
     def create
       @parking_notification = ParkingNotification.new(permitted_parameters)
       if @parking_notification.save
-        flash[:success] = translation(:parking_notificationed, bike_type: @parking_notification.bike.type)
+        flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
       else
-        flash[:error] = translation(:unable_to_record, errors: @parking_notification.errors.full_messages.to_sentence)
+        flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
       end
        redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
     end

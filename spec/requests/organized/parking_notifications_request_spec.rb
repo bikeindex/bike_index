@@ -35,14 +35,14 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           {
             id: parking_notification1.id,
             kind: "appears_abandoned",
-            kind_humanized: "abandoned",
+            kind_humanized: "Abandoned",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
             lng: parking_notification1.longitude,
             user_id: parking_notification1.user_id,
             impound_record_id: impound_record.id,
             impound_record_at: impound_record.created_at.to_i,
-            internal_notes: nil,
+            repeat_number: 0,
             bike: {
               id: bike.id,
               title: bike.title_string,
