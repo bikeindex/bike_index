@@ -96,33 +96,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
 
     context "geolocated" do
-      before do
-        FactoryBot.create(:state_new_york)
-      end
-
-      it "creates" do
-        expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
-        expect do
-          post base_url, params: {
-            organization_id: current_organization.to_param,
-            parking_notification: parking_notification_params,
-          }
-          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-          expect(flash[:success]).to be_present
-        end.to change(ParkingNotification, :count).by(1)
-        parking_notification = ParkingNotification.last
-
-        expect(parking_notification.user).to eq current_user
-        expect(parking_notification.organization).to eq current_organization
-        expect(parking_notification.bike).to eq bike
-        expect(parking_notification.internal_notes).to eq parking_notification_params[:internal_notes]
-        expect(parking_notification.message).to eq "Some message to the user"
-        expect(parking_notification.latitude).to eq parking_notification_params[:latitude]
-        expect(parking_notification.longitude).to eq parking_notification_params[:longitude]
-        # TODO: location refactor
-        # expect(parking_notification.address).to eq default_location[:formatted_address]
-        expect(parking_notification.accuracy).to eq 12
-      end
+      # before do
+      #   FactoryBot.create(:state_new_york)
+      # end
 
       context "user without organization membership" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
@@ -167,6 +143,46 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
           end.to_not change(ParkingNotification, :count)
+        end
+      end
+
+      it "creates" do
+        FactoryBot.create(:state_new_york)
+        expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
+        expect do
+          post base_url, params: {
+            organization_id: current_organization.to_param,
+            parking_notification: parking_notification_params,
+          }
+          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+          expect(flash[:success]).to be_present
+        end.to change(ParkingNotification, :count).by(1)
+        parking_notification = ParkingNotification.last
+
+        expect_attrs_to_match_hash(parking_notification, parking_notification_params)
+        expect(parking_notification.user).to eq current_user
+        expect(parking_notification.organization).to eq current_organization
+        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+      end
+
+      context "manual address, repeat" do
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year) }
+        xit "creates" do
+          expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
+          expect do
+            post base_url, params: {
+              organization_id: current_organization.to_param,
+              parking_notification: parking_notification_params,
+            }
+            expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+            expect(flash[:success]).to be_present
+          end.to change(ParkingNotification, :count).by(1)
+          parking_notification = ParkingNotification.last
+
+          expect_attrs_to_match_hash(parking_notification, parking_notification_params)
+          expect(parking_notification.user).to eq current_user
+          expect(parking_notification.organization).to eq current_organization
+          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
         end
       end
     end

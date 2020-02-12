@@ -19,6 +19,10 @@ class ParkingNotificationSerializer < ActiveModel::Serializer
     object.user_id
   end
 
+  def user_display_name
+    object.user&.display_name
+  end
+
   def lat
     object.latitude
   end

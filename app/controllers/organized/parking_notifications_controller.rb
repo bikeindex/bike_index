@@ -66,7 +66,9 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:parking_notification).permit(:message, :internal_notes, :bike_id, :latitude, :longitude, :accuracy, :kind)
+      params.require(:parking_notification)
+            .permit(:message, :internal_notes, :bike_id, :latitude, :longitude, :accuracy,
+                    :kind, :is_repeat, :use_entered_address)
             .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 

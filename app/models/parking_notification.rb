@@ -125,6 +125,7 @@ class ParkingNotification < ActiveRecord::Base
     else
       coordinates = Geohelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?
+      self.location_from_address = true
     end
   end
 

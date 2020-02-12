@@ -30,12 +30,20 @@
     %table.table-list
       %tbody
         %tr
+          %td Accuracy
+          %td
+            - if @parking_notification.accuracy.present?
+              = @parking_notification.accuracy
+            - if @parking_notification.location_from_address
+              From address
+            %small.less-strong developer info
+        %tr
           %td= t(".repeat")
           %td
             - if @parking_notification.initial_record?
               Initial notification
             - else
-              Repeat #{@parking_notification.repeat_number}
+              = @parking_notification.repeat_number
         %tr
           %td= t(".message")
           %td= @parking_notification.message

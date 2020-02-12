@@ -5,6 +5,7 @@ RSpec.shared_context :geocoder_default_location do
       longitude: -74.0059731,
       address: "New York, NY, USA",
       formatted_address: "278 Broadway, New York, NY 10007, USA",
+      formatted_address_no_country: "278 Broadway, New York, NY 10007",
       city: "New York",
       state: "New York",
       state_code: "NY",

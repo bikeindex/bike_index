@@ -1,7 +1,7 @@
 - skip_map_cell ||= false
 - skip_bike ||= false
 - skip_repeat ||= false
-- organization ||= current_organization
+- render_address ||= false
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#records_table
   %thead.small-header.hidden-md-down
@@ -12,10 +12,13 @@
       %small.convertTimezone
     - unless skip_bike
       %th=t(".bike")
+    - if render_address
+      %th=t(".address")
     %th=t(".kind")
     %th=t(".by")
     - unless skip_repeat
-      %th=t(".repeat")
+      %th
+        %small=t(".repeat")
     %th=t(".impounded")
   %tbody
     - parking_notifications.each do |parking_notification|
@@ -23,9 +26,11 @@
         - unless skip_map_cell
           %td
         %td
-          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: organization.to_param) }
+          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
-
+        - if render_address
+          %td.small
+            = address_formatted(parking_notification)
         - unless skip_bike
           %td
             - if bike.present?
@@ -35,7 +40,7 @@
         %td
           = parking_notification.user&.display_name
         - unless skip_repeat
-          %td
+          %td.small
             - if parking_notification.repeat_record?
               Repeat
               = parking_notification.repeat_number

@@ -1871,7 +1871,8 @@ CREATE TABLE public.parking_notifications (
     hide_address boolean DEFAULT false,
     country_id bigint,
     state_id bigint,
-    message text
+    message text,
+    location_from_address boolean DEFAULT false
 );
 
 
@@ -4588,6 +4589,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200210225544'),
 ('20200210234925'),
 ('20200212000416'),
-('20200212022845');
+('20200212022845'),
+('20200212203304');
 
 

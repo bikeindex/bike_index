@@ -4418,14 +4418,15 @@ en:
         internal_notes_html: "%{org_name} internal notes"
         message: Message
         address: Address
-        repeat: Repeat?
+        repeat: Notification#
         parking_notification: Parking Notification
       table:
         bike: Bike
         by: By
         created: Created
         impounded: Impounded
-        repeat: Repeat
+        repeat: Notification#
+        address: Address
         internal_notes: Internal Notes
         kind: Kind
     stickers:

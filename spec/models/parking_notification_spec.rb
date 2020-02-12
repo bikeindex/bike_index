@@ -149,6 +149,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.address).to be_present
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.id).to be_present
+        expect(parking_notification.location_from_address).to be_falsey
       end
     end
 
@@ -164,6 +165,7 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.longitude).to eq longitude
           expect(parking_notification.valid?).to be_truthy
           expect(parking_notification.id).to be_present
+          expect(parking_notification.location_from_address).to be_truthy
         end
       end
       context "use_entered_address and lat/long set" do
@@ -174,6 +176,7 @@ RSpec.describe ParkingNotification, type: :model do
             expect(parking_notification.longitude).to eq longitude
             expect(parking_notification.valid?).to be_truthy
             expect(parking_notification.id).to be_present
+            expect(parking_notification.location_from_address).to be_truthy
           end
         end
       end
