@@ -192,13 +192,13 @@
       Parking notifications
 
     - if parking_notifications.any?
-      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications, skip_bike: true, skip_map_cell: true }
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.limit(4), skip_bike: true, skip_map_cell: true, organization: passive_organization }
 
       %p{ style: "margin-top: -12px;" }
         = number_with_delimiter(parking_notifications.count)
-        notifications for #{@bike.type} -
+        total notifications for #{@bike.type} -
         %em
-          = link_to "view on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
+          = link_to "view all on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
 
     - parking_notification_open = params[:parking_notification].present?
 
@@ -229,7 +229,7 @@
                 First notice
               %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
                 = f.radio_button :is_repeat, true
-                Follow up to
+                Follows the
                 = pluralize @parking_notification.earlier_bike_notifications.count, "earlier notification"
 
         .row.mt-4

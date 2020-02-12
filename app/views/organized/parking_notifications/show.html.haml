@@ -25,7 +25,7 @@
       %td= t(".message")
       %td= @parking_notification.message
     %tr
-      %td= t(".internal_notes_html")
+      %td= t(".internal_notes_html", org_name: current_organization.short_name)
       %td= @parking_notification.internal_notes
 
 

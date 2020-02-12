@@ -77,9 +77,9 @@
           %li.divider-above
             %span.disabled-menu-item.menu-item
               = t(".geomessaging")
-        - if current_organization.paid_for?("abandoned_bikes")
+        - if current_organization.paid_for?("parking_notifications")
           %li
-            = active_link t(".abandoned_bikes"), organization_parking_notifications_path(organization_id: current_organization.to_param), class: "menu-item"
+            = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         - if current_user.admin_of?(current_organization) || current_user.superuser?
           %li.divider-above
             = active_link t(".users"), organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"

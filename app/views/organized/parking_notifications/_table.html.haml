@@ -1,5 +1,6 @@
 - skip_map_cell ||= false
 - skip_bike ||= false
+- organization ||= current_organization
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#records_table
   %thead.small-header.hidden-md-down
@@ -20,8 +21,9 @@
         - unless skip_map_cell
           %td
         %td
-          %span.convertTime.preciseTime
+          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: organization.to_param) }
             = l(parking_notification.created_at, format: :convert_time)
+
         - unless skip_bike
           %td
             - if bike.present?
