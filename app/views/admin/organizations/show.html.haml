@@ -134,12 +134,6 @@
               False
           %em.less-strong
             Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
-          - if @organization.paid_feature_slugs.any? && current_user.developer?
-            %br
-            %small
-              Features:
-              - @organization.paid_feature_slugs.each do |slug|
-                %code=slug
       %tr
         %td
           Parent
@@ -298,8 +292,8 @@
                   no
           %tr
             %td
-              Features
-            %td{ style: "font-size: 80%" }
+              Enabled features
+            %td.small
               = safe_join(@organization.paid_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
 .row.mt-4
   .col-sm-6
