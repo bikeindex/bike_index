@@ -462,7 +462,7 @@ en:
         memberships: Memberships
         name: Name
         organization_messages: Organization messages
-        paid_feature_slugs: Paid feature slugs
+        enabled_feature_slugs: Enabled feature slugs
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
         pos_kind: Pos kind
@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

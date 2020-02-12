@@ -76,15 +76,15 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def child_paid_feature_slugs_string; (child_paid_feature_slugs || []).join(", ") end
+  def child_enabled_feature_slugs_string; (child_enabled_feature_slugs || []).join(", ") end
 
-  def child_paid_feature_slugs_string=(val)
+  def child_enabled_feature_slugs_string=(val)
     return true if val.blank?
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end
     valid_slugs = (val & feature_slugs)
-    self.child_paid_feature_slugs = valid_slugs
+    self.child_enabled_feature_slugs = valid_slugs
   end
 
   # So that we can read and write
@@ -144,7 +144,7 @@ class Invoice < ApplicationRecord
                                                first_invoice_id: subscription_first_invoice_id)
     new_invoice.paid_feature_ids = paid_features.recurring.pluck(:id)
     new_invoice.reload
-    new_invoice.update_attributes(child_paid_feature_slugs: child_paid_feature_slugs)
+    new_invoice.update_attributes(child_enabled_feature_slugs: child_enabled_feature_slugs)
     new_invoice
   end
 
@@ -154,7 +154,7 @@ class Invoice < ApplicationRecord
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end
     self.is_active = !expired? && (force_active || paid_in_full?)
-    self.child_paid_feature_slugs ||= []
+    self.child_enabled_feature_slugs ||= []
   end
 
   def update_organization

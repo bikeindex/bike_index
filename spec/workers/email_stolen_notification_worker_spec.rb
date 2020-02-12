@@ -11,7 +11,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
   let!(:stolen_notification) { FactoryBot.create(:stolen_notification, bike: bike, sender: user) }
   let(:organization) do
     o = FactoryBot.create(:organization)
-    o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
+    o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
     o
   end
   before { ActionMailer::Base.deliveries = [] }

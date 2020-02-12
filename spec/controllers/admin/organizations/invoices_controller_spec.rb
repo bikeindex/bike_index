@@ -5,7 +5,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:paid_feature1) { FactoryBot.create(:paid_feature, feature_slugs: ["abandoned_bike_messages"]) }
   let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["passwordless_users"]) }
-  let(:paid_feature_slugs) { %w[abandoned_bike_messages passwordless_users] }
+  let(:enabled_feature_slugs) { %w[abandoned_bike_messages passwordless_users] }
   let(:params) do
     {
       paid_feature_ids: [paid_feature1.id, paid_feature2.id].join(","),
@@ -59,7 +59,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         invoice = organization.invoices.last
         expect(invoice.active?).to be_falsey
         expect(organization.is_paid).to be_falsey
-        expect(organization.paid_feature_slugs).to eq([])
+        expect(organization.enabled_feature_slugs).to eq([])
         expect(invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
         expect(invoice.amount_due).to eq 1220
         # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
@@ -72,7 +72,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
             invoice_params = params.merge(
               amount_due: "0",
               end_at: "2020-09-05T23:00:00",
-              child_paid_feature_slugs: %[abandoned_bike_messages passwordless_users],
+              child_enabled_feature_slugs: %[abandoned_bike_messages passwordless_users],
             )
 
             expect do
@@ -86,7 +86,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
             invoice = organization.invoices.last
             expect(invoice.active?).to be_truthy
             expect(organization.reload.is_paid).to be_truthy
-            expect(organization.paid_feature_slugs).to eq(%w[abandoned_bike_messages passwordless_users])
+            expect(organization.enabled_feature_slugs).to eq(%w[abandoned_bike_messages passwordless_users])
             expect(invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
             expect(invoice.amount_due).to eq 0
             # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
@@ -101,9 +101,9 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
     describe "update" do
       let(:paid_feature3) { FactoryBot.create(:paid_feature) }
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, amount_due: 10) }
-      let(:update_params) { params.merge(end_at: "2019-07-05T23:00:00", child_paid_feature_slugs_string: "stufffff,#{paid_feature1.feature_slugs.first}, #{paid_feature2.feature_slugs.first}\n") }
-      it "updates, removes paid_features that aren't matching, sets child_paid_feature_slugs" do
-        expect(paid_feature_slugs.count).to eq 2
+      let(:update_params) { params.merge(end_at: "2019-07-05T23:00:00", child_enabled_feature_slugs_string: "stufffff,#{paid_feature1.feature_slugs.first}, #{paid_feature2.feature_slugs.first}\n") }
+      it "updates, removes paid_features that aren't matching, sets child_enabled_feature_slugs" do
+        expect(enabled_feature_slugs.count).to eq 2
         invoice.paid_feature_ids = [paid_feature3.id]
         invoice.reload
         expect(invoice.paid_features.pluck(:id)).to eq([paid_feature3.id])
@@ -115,15 +115,15 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
         expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
         expect(invoice.notes).to eq params[:notes]
-        expect(invoice.child_paid_feature_slugs).to eq paid_feature_slugs
+        expect(invoice.child_enabled_feature_slugs).to eq enabled_feature_slugs
       end
       context "create_following_invoice" do
         let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.current - 2.years, force_active: true) }
         it "creates following invoice" do
           invoice.paid_feature_ids = [paid_feature1.id, paid_feature2.id]
-          invoice.update_attributes(child_paid_feature_slugs: ["passwordless_users"])
+          invoice.update_attributes(child_enabled_feature_slugs: ["passwordless_users"])
           invoice.reload
-          expect(invoice.child_paid_feature_slugs).to eq(["passwordless_users"])
+          expect(invoice.child_enabled_feature_slugs).to eq(["passwordless_users"])
           expect do
             put :update, params: { organization_id: organization.to_param, id: invoice.to_param, create_following_invoice: true }
           end.to change(Invoice, :count).by 1
@@ -132,7 +132,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
           expect(following_invoice.previous_invoice).to eq invoice
           expect(following_invoice.notes).to be_nil
           expect(following_invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
-          expect(following_invoice.child_paid_feature_slugs).to eq(["passwordless_users"])
+          expect(following_invoice.child_enabled_feature_slugs).to eq(["passwordless_users"])
         end
       end
     end

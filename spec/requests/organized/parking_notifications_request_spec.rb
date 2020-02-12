@@ -4,9 +4,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/parking_notifications" }
   include_context :request_spec_logged_in_as_organization_member
 
-  let(:current_organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: paid_feature_slugs) }
+  let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike) }
-  let(:paid_feature_slugs) { ["abandoned_bikes"] }
+  let(:enabled_feature_slugs) { ["abandoned_bikes"] }
 
   describe "index" do
     it "renders" do
@@ -152,7 +152,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       context "organization without abandoned_bikes" do
-        let(:paid_feature_slugs) { [] }
+        let(:enabled_feature_slugs) { [] }
 
         it "does not create" do
           current_organization.reload

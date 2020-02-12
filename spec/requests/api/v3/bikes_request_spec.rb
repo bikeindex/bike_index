@@ -522,7 +522,7 @@ RSpec.describe "Bikes API V3", type: :request do
         context "non-matching email" do
           let(:email) { "another_email@example.com" }
           it "creates a bike for organization with v3_accessor, doesn't send email because skip_email" do
-            organization.update_attribute :paid_feature_slugs, ["skip_ownership_email"]
+            organization.update_attribute :enabled_feature_slugs, ["skip_ownership_email"]
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
             expect(ownership.claimed).to be_falsey

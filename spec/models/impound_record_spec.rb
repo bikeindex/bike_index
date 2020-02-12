@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe ImpoundRecord, type: :model do
   describe "validations" do
     let!(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     it "marks the bike impounded only once" do
       expect(Bike.impounded.pluck(:id)).to eq([])

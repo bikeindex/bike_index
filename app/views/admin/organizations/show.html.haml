@@ -294,7 +294,7 @@
             %td
               Enabled features
             %td.small
-              = safe_join(@organization.paid_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
+              = safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
 .row.mt-4
   .col-sm-6
     %h2

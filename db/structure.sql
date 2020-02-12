@@ -1157,7 +1157,7 @@ CREATE TABLE public.invoices (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notes text,
-    child_paid_feature_slugs jsonb,
+    child_enabled_feature_slugs jsonb,
     currency character varying DEFAULT 'USD'::character varying NOT NULL
 );
 
@@ -1666,7 +1666,7 @@ CREATE TABLE public.organizations (
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text,
-    paid_feature_slugs jsonb,
+    enabled_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
     ascend_name character varying,
@@ -4587,6 +4587,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200131175543'),
 ('20200210225544'),
 ('20200210234925'),
-('20200212000416');
+('20200212000416'),
+('20200212022845');
 
 

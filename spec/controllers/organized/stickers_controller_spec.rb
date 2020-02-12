@@ -41,7 +41,7 @@ RSpec.describe Organized::StickersController, type: :controller do
   context "organization with bike_stickers" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    before { organization.update_column :paid_feature_slugs, ["bike_stickers"] }
+    before { organization.update_column :enabled_feature_slugs, ["bike_stickers"] }
 
     context "logged in as organization member" do
       describe "index" do

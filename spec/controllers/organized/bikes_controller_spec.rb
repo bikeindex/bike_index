@@ -73,8 +73,8 @@ RSpec.describe Organized::BikesController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      let(:paid_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-      before { organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) } # Stub organization having paid feature
+      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having paid feature
       describe "index" do
         context "with params" do
           let(:query_params) do
@@ -190,7 +190,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id) }, origin: "embed_partial") }
           it "renders" do
             organization.save
-            organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) # Continue paid feature stubbing
+            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue paid feature stubbing
             expect(partial_registration.organization).to eq organization_child
 
             get :incompletes, params: { organization_id: organization.to_param }
@@ -259,7 +259,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(bike.impounded?).to be_falsey
       end
       context "organization has impound_bikes" do
-        let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+        let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
         it "impounds the bike" do
           expect(bike.impounded?).to be_falsey
           request.env["HTTP_REFERER"] = bike_path(bike)

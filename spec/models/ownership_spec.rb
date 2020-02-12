@@ -117,7 +117,7 @@ RSpec.describe Ownership, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership2) { FactoryBot.build(:ownership_organization_bike, organization: organization, bike: bike) }
       it "returns false" do
-        organization.update_attribute :paid_feature_slugs, ["skip_ownership_email"]
+        organization.update_attribute :enabled_feature_slugs, ["skip_ownership_email"]
         ownership.reload
         expect(ownership.first?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey

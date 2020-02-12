@@ -82,7 +82,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
       let(:email) { "rock@hardplace.com" }
       let(:organization) { FactoryBot.create(:organization) }
       let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: email) }
-      before { organization.update_attribute :paid_feature_slugs, ["passwordless_users"] }
+      before { organization.update_attribute :enabled_feature_slugs, ["passwordless_users"] }
       it "creates a user, does not send an email" do
         Sidekiq::Worker.clear_all
         expect do

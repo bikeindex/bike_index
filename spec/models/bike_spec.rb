@@ -281,7 +281,7 @@ RSpec.describe Bike, type: :model do
         let(:user) { FactoryBot.create(:organization_member) }
         let(:organization) { user.organizations.first }
         it "is phoneable_by" do
-          organization.update_attribute :paid_feature_slugs, ["unstolen_notifications"]
+          organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"]
           user.reload
           expect(bike.phoneable_by?(user)).to be_truthy
           expect(bike.contact_owner?(user)).to be_truthy
@@ -641,7 +641,7 @@ RSpec.describe Bike, type: :model do
 
   describe "impound" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     it "impounds the bike, returns record" do
       expect(bike.impound(user, organization: organization)).to be_truthy
@@ -661,7 +661,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "passed organization user isn't permitted for" do
-      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
       it "returns with an error" do
         impound_record = bike.impound(user, organization: organization2)
         expect(impound_record.valid?).to be_falsey
@@ -671,7 +671,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "bike impounded by different organization" do
-      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
       let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
       let!(:impound_record) { bike.impound(user2) }
       it "returns with an error" do
@@ -747,7 +747,7 @@ RSpec.describe Bike, type: :model do
       let(:owner) { User.new }
       let(:organization_unstolen) do
         o = FactoryBot.create(:organization)
-        o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
+        o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
         o
       end
       it "is truthy for the organization with unstollen" do
