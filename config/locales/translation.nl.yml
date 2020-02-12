@@ -1962,7 +1962,6 @@ nl:
       manufacturer: Fabrikant
     organized_access_panel:
       access_panel: Toegangspaneel
-      additional_message: Extra bericht
       address: 'Adres:'
       as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Als ambassadeur
         van Bike Index kunt</span> u deze markeren als hersteld:</em>
@@ -1978,7 +1977,6 @@ nl:
       creator: Schepper
       edit: Bewerken
       email_to_deal_with_this_html: E-mail %{support_link} om dit aan te pakken.
-      geomessage: GeoMessage
       is_false: vals
       is_not_registered_html: "<em>niet</em> bespaard met %{org_name}"
       is_registered: reged met %{org_name}
@@ -1986,7 +1984,6 @@ nl:
       link_sticker: Link sticker
       link_url_for_online_sighting: Link-URL voor online waarneming
       mark_bike_recovered: Mark fiets hersteld
-      message_owner: Bericht %{bike_type} eigenaar
       missing_address: adres ontbreekt
       missing_owner_name: gebruikersnaam ontbreekt
       or_call_owner_html: "<em>Of bel</em> <strong>het telefoonnummer van de eigenaar:</strong>"
@@ -1998,7 +1995,6 @@ nl:
       owner_name: Eigenaar naam
       permission: Toestemming
       registered: 'Geregistreerd:'
-      send: Sturen
       send_message: Verstuur bericht
       sticker: Sticker
       sticker_code: Stickercode
@@ -2013,23 +2009,15 @@ nl:
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
-      already_impounded: Deze %{bike_type} is al in beslag genomen door %{organization_name}
-      impound: confisqueren
-      impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
-      impounded_by: Door
       organization_child: Child organisatie
       organization_registered: Organisatie
-      abandoned_bike_modal_title: Record %{bike_type} verlaten
-      abandoned_bike_notes_html: Aanvullende opmerkingen worden <small>niet getoond
-        aan de gebruiker</small>
-      kind: Soort
-      notes: Notes
-      record: Vermelding
-      record_abandoned: Record verlaten
-      record_again: Neem opnieuw op
-      recorded: opgenomen
-      recorder: opnemer
-      existing_parking_notifications: Bestaande verlaten records voor deze %{bike_type}
+      address_or_intersection: Adres of kruispunt
+      choose_country: Kies land
+      city: City
+      parking_notification_notes_html: "%{org_name} interne notities worden <small>niet
+        getoond aan de gebruiker</small>"
+      state: Staat
+      zipcode: Postcode
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -4654,19 +4642,21 @@ nl:
     parking_notifications:
       index:
         parking_notifications: Verlaten records
-        bike: Fiets
-        impounded: In beslag genomen bij
-        kind: Soort
         matches_visible: Zichtbaar
-        recorded: opgenomen
-        recorder: opnemer
       show:
         parking_notification: Verlaten record
-        additional_text: Aanvullende tekst
         bike: Fiets
-        none: Geen
-        recorded: opgenomen
-        recorder: opnemer
+        by: Gemaakt door
+        created: Gemaakt op
+        internal_notes_html: "%{org_name} interne notities"
+        message: Bericht
+      table:
+        bike: Fiets
+        by: Door
+        created: Gemaakt
+        impounded: In beslag genomen bij
+        internal_notes: Interne notities
+        kind: Soort
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5067,7 +5057,7 @@ nl:
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
       overview_dashboard: Dashboard
-      abandoned_bikes: Verlaten fietsen
+      parking_notifications: Verlaten records
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
