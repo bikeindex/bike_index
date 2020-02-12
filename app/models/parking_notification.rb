@@ -36,7 +36,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.kinds_humanized
     {
-      appears_abandoned: "Abandoned",
+      appears_abandoned: "Appears abandoned",
       parked_incorrectly: "Parked incorrectly",
       impounded: "Impounded",
     }

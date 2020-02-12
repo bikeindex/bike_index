@@ -3,7 +3,7 @@
 - skip_repeat ||= false
 - render_address ||= false
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#records_table
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#notificationsTable
   %thead.small-header.hidden-md-down
     - unless skip_map_cell
       %th.map-cell
@@ -19,7 +19,8 @@
     - unless skip_repeat
       %th
         %small=t(".repeat")
-    %th=t(".impounded")
+    %th
+      %small=t(".impounded")
   %tbody
     - parking_notifications.each do |parking_notification|
       %tr
@@ -28,20 +29,31 @@
         %td
           %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
+          %span.extended-col-info.small
+            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}</span>
+          - unless skip_repeat
+            - if parking_notification.repeat_number > 0
+              %strong.extended-col-info
+                Notification ##{parking_notification.repeat_number}
+          - unless skip_bike
+            %span.extended-col-info
+              %br
+              = link_to organized_bike_text(@bike), bike_path(@bike)
+
         - if render_address
-          %td.small
-            = address_formatted(parking_notification)
+          %td.hidden-sm-cells
+            %small= address_formatted(parking_notification)
         - unless skip_bike
-          %td
+          %td.hidden-sm-cells
             - if bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike)
-        %td
-          = parking_notification.kind_humanized
-        %td
+        %td.hidden-sm-cells
+          %em
+            = parking_notification.kind_humanized
+        %td.hidden-sm-cells
           = parking_notification.user&.display_name
         - unless skip_repeat
-          %td.small
+          %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?
-              Repeat
               = parking_notification.repeat_number
-        %td
+        %td.hidden-sm-cells

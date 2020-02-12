@@ -23,6 +23,9 @@
           %td
             - if @bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike)
+              %br
+              %small
+                = link_to "view all notifications for #{@bike.type}", organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link"
         %tr
           %td= t(".address")
           %td= address_formatted(@parking_notification)
@@ -43,6 +46,7 @@
             - if @parking_notification.initial_record?
               Initial notification
             - else
+              Repeat
               = @parking_notification.repeat_number
         %tr
           %td= t(".message")

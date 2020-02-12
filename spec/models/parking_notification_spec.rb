@@ -135,7 +135,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.save
         expect(parking_notification.valid?).to be_falsey
         expect(parking_notification.errors.messages.to_s).to match(/address/)
-        expect(parking_notification.kind_humanized).to eq "Abandoned"
+        expect(parking_notification.kind_humanized).to eq "Appears abandoned"
       end
     end
     context "no address" do

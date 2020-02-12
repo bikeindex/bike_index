@@ -2,14 +2,14 @@
 
 # Define a way to check if an update hash matches an object. Particularly useful for request specs
 def expect_attrs_to_match_hash(obj, hash)
-  unmatched_hash = {}
+  unmatched_obj_attrs = {}
   hash.each do |key, value|
     # Just in case there are some type issues
     next if obj.send(key).to_s == value.to_s
-    unmatched_hash[key] = obj.send(key)
+    unmatched_obj_attrs[key] = obj.send(key)
   end
-  return true unless unmatched_hash.present?
-  expect(hash.slice(*unmatched_hash.keys)).to eq unmatched_hash
+  return true unless unmatched_obj_attrs.present?
+  expect(unmatched_obj_attrs).to eq hash.slice(*unmatched_obj_attrs.keys)
 end
 
 # Define a hash matchers to display better results and match more loosely (not on type, indifferent access)

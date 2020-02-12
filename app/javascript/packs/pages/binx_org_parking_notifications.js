@@ -82,7 +82,7 @@ export default class BinxAppOrgParkingNotifications {
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
-    $("#records_table").on("click", ".map-cell a", e => {
+    $("#notificationsTable").on("click", ".map-cell a", e => {
       e.preventDefault();
       let recordId = parseInt(
         $(e.target)
@@ -131,12 +131,6 @@ export default class BinxAppOrgParkingNotifications {
 
   tableRowForRecord(record) {
     const showCellUrl = `${window.pageInfo.root_path}/${record.id}`;
-    let user = window.pageInfo.members[record.user_id];
-    if (user !== undefined) {
-      user = user.name;
-    } else {
-      user = "?";
-    }
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
     const impoundLink =
@@ -151,11 +145,17 @@ export default class BinxAppOrgParkingNotifications {
       record.created_at
     }</a> <span class="extended-col-info small"> - <em>${
       record.kind_humanized
-    }</em> - by ${user}</span> <span class="extended-col-info"><br>${bikeLink}</span>
+    }</em> - by ${record.user_display_name}<strong>${
+      record.repeat_number > 0 ? "- notification #" + record.repeat_number : ""
+    }</strong></span> <span class="extended-col-info"><br>${bikeLink}
+    ${impoundLink.length ? "<br>Impounded: " + impoundLink : ""}
+    </span>
       </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${user}</td><td>${
-      record.internal_notes
+    }</em></td><td class="hidden-sm-cells">${
+      record.user_display_name
+    }</td><td class="hidden-sm-cells">${
+      record.repeat_number > 0 ? record.repeat_number : ""
     }</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
@@ -186,7 +186,7 @@ export default class BinxAppOrgParkingNotifications {
     }
 
     // Render the body - whether it says no records or records
-    $("#records_table tbody").html(body_html);
+    $("#notificationsTable tbody").html(body_html);
     // And localize the times since we added times to the table
     window.timeParser.localize();
 

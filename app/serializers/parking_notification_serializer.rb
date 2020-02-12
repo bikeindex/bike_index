@@ -6,6 +6,7 @@ class ParkingNotificationSerializer < ActiveModel::Serializer
              :lat,
              :lng,
              :user_id,
+             :user_display_name,
              :bike,
              :repeat_number,
              :impound_record_id,

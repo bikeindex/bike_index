@@ -229,7 +229,8 @@
                 First notice
               %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
                 = f.radio_button :is_repeat, true
-                Repeat ##{@parking_notification.repeat_number} of earlier notification
+                -# We have to add 1 on the repeat because this hasn't been created yet
+                Repeat ##{@parking_notification.earlier_bike_notifications.count} of earlier notification
 
         .row.mt-4
           .col-md-6
@@ -238,14 +239,14 @@
               = f.text_area :message, placeholder: "Optional", class: 'form-control'
           .col-md-6
             .form-group
-              %p{ style: "margin-bottom: 0;" } Notification Kind
+              %p{ style: "margin-bottom: 0;" } Notification because
               - passive_organization.parking_notification_kinds.each do |kind|
                 %label.radio-inline.mr-2
                   = f.radio_button :kind, kind
                   = ParkingNotification.kinds_humanized[kind.to_sym]
 
         .form-group.text-center.mt-4
-          = submit_tag "Create parking notification", class: "btn btn-success parkingLocation-submit-btn", disabled: true
+          = submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true
 
         .row.mt-4
           .col-md-6#choseLocationMethod

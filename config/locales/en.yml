@@ -4428,7 +4428,7 @@ en:
         repeat: Notification#
         address: Address
         internal_notes: Internal Notes
-        kind: Kind
+        kind: Because
     stickers:
       edit:
         bike: Bike

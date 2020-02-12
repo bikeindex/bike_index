@@ -35,11 +35,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           {
             id: parking_notification1.id,
             kind: "appears_abandoned",
-            kind_humanized: "Abandoned",
+            kind_humanized: "Appears abandoned",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
             lng: parking_notification1.longitude,
             user_id: parking_notification1.user_id,
+            user_display_name: parking_notification1.user.display_name,
             impound_record_id: impound_record.id,
             impound_record_at: impound_record.created_at.to_i,
             repeat_number: 0,
@@ -91,15 +92,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
         message: "Some message to the user",
-        accuracy: 12,
+        accuracy: 12.0,
       }
     end
 
     context "geolocated" do
-      # before do
-      #   FactoryBot.create(:state_new_york)
-      # end
-
       context "user without organization membership" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
@@ -165,24 +162,36 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
       end
 
-      context "manual address, repeat" do
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year) }
-        xit "creates" do
-          expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
+      context "manual address and repeat" do
+        let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state) }
+        let(:repeat_params) do
+          parking_notification_params.merge(is_repeat: true,
+                                            use_entered_address: "true",
+                                            street: "300 Lakeside Dr",
+                                            city: "Oakland",
+                                            zipcode: "94612",
+                                            state_id: state.id.to_s,
+                                            country_id: Country.united_states.id)
+        end
+        include_context :geocoder_real
+        it "creates", vcr: true do
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
-              parking_notification: parking_notification_params,
+              parking_notification: repeat_params,
             }
             expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
           end.to change(ParkingNotification, :count).by(1)
           parking_notification = ParkingNotification.last
 
-          expect_attrs_to_match_hash(parking_notification, parking_notification_params)
+          expect_attrs_to_match_hash(parking_notification, repeat_params.except(:use_entered_address, :is_repeat, :latitude, :longitude))
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.initial_record).to eq parking_notification_initial
+          expect(parking_notification.latitude).to eq(37.8087498)
+          expect(parking_notification.longitude).to eq(-122.263705)
         end
       end
     end
