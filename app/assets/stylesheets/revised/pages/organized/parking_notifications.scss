@@ -1,10 +1,6 @@
 // NOTES: "messages" should be renamed to "records", since that is generic and will work for both
 .organized-messages,
 .organized-records {
-  @include media-breakpoint-down(md) {
-    line-height: 1.25;
-  }
-
   #map {
     width: 100%;
     height: 400px;
@@ -35,6 +31,13 @@
       }
     }
   }
+
+  table {
+    @include media-breakpoint-down(md) {
+      line-height: 1.25;
+    }
+  }
+
   #placeSearch {
     max-width: 60%;
     display: none;
