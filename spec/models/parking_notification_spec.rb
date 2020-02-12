@@ -78,7 +78,6 @@ RSpec.describe ParkingNotification, type: :model do
         context "additional parking_notification" do
           let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
           it "can be assigned" do
-            pp parking_notification2.created_at, parking_notification2.repeat_record?, parking_notification2.likely_repeat?
             expect(parking_notification.likely_repeat?).to be_truthy
             expect(parking_notification.can_be_repeat?).to be_truthy
             expect(parking_notification.save)
