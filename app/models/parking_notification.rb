@@ -108,7 +108,7 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
-    #We still need geocode on creation, even if all the attributes are present
+    # We still need geocode on creation, even if all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
