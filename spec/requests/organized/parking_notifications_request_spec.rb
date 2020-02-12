@@ -101,7 +101,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       it "creates" do
-        expect(current_organization.paid_for?("abandoned_bikes")).to be_truthy
+        expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
         expect do
           post base_url, params: {
             organization_id: current_organization.to_param,
@@ -127,7 +127,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "user without organization membership" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
-          expect(current_organization.paid_for?("abandoned_bikes")).to be_truthy
+          expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
@@ -159,7 +159,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           invoice = current_organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
           expect(current_organization.is_paid).to be_truthy
-          expect(current_organization.paid_for?("abandoned_bikes")).to be_falsey
+          expect(current_organization.enabled?("abandoned_bikes")).to be_falsey
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param, parking_notification: parking_notification_params

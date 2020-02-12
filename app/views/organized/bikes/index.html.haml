@@ -29,7 +29,7 @@
     = t(".search_org_bikes_html", org_name: org_name, bike_sticker_kind: @bike_sticker.kind)
 
   %hr.mt-4.mb-4.less-strong
-- if current_organization.paid_for?("bike_search")
+- if current_organization.enabled?("bike_search")
   = render "organized/bikes/search"
 - else
   = render "organized/bikes/list"

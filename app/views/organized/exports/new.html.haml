@@ -7,7 +7,7 @@
 
   = form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
     = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-    - if current_organization.paid_for?("avery_export")
+    - if current_organization.enabled?("avery_export")
       .form-group.row
         = f.label :avery_export, "Avery Label Export", class: "org-form-label"
         .col-sm-4

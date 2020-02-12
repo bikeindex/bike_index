@@ -387,7 +387,7 @@ class Bike < ApplicationRecord
   end
 
   def impound(passed_user, organization: nil)
-    organization ||= passed_user.organizations.detect { |o| o.paid_for?("impound_bikes") }
+    organization ||= passed_user.organizations.detect { |o| o.enabled?("impound_bikes") }
     impound_record = impound_records.where(organization_id: organization&.id).first
     impound_record ||= impound_records.create(user: passed_user, organization: organization)
   end
@@ -405,7 +405,7 @@ class Bike < ApplicationRecord
     return true if stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
-    organization.paid_for?("unstolen_notifications") && u.member_of?(organization)
+    organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?

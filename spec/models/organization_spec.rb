@@ -205,33 +205,33 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "#paid_for?" do
+  describe "#enabled?" do
     context "given an ambassador organization and 'unstolen_notifications'" do
       it "returns true" do
         ambassador_org = FactoryBot.create(:organization_ambassador)
 
-        enabled = ambassador_org.paid_for?("unstolen_notifications")
+        enabled = ambassador_org.enabled?("unstolen_notifications")
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?(["unstolen_notifications"])
+        enabled = ambassador_org.enabled?(["unstolen_notifications"])
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?("unstolen notifications")
+        enabled = ambassador_org.enabled?("unstolen notifications")
         expect(enabled).to eq(true)
 
-        enabled = ambassador_org.paid_for?("invalid feature name")
+        enabled = ambassador_org.enabled?("invalid feature name")
         expect(enabled).to eq(false)
       end
     end
   end
 
-  describe "is_paid and paid_for? calculations" do
+  describe "is_paid and enabled? calculations" do
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
     it "uses associations to determine is_paid" do
-      expect(organization.paid_for?("csv_exports")).to be_falsey
+      expect(organization.enabled?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
@@ -240,7 +240,7 @@ RSpec.describe Organization, type: :model do
 
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])
-      expect(organization.paid_for?("csv_exports")).to be_truthy
+      expect(organization.enabled?("csv_exports")).to be_truthy
       expect(organization_child.is_paid).to be_falsey
 
       organization_child.update_attributes(parent_organization: organization)
@@ -250,7 +250,7 @@ RSpec.describe Organization, type: :model do
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoices.first).to be_blank
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
-      expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
+      expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
@@ -259,23 +259,23 @@ RSpec.describe Organization, type: :model do
       let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
         expect(organization.message_kinds).to eq([])
-        expect(organization.paid_for?(nil)).to be_falsey
-        expect(organization.paid_for?("messages")).to be_falsey
-        expect(organization.paid_for?("geolocated_messages")).to be_falsey
+        expect(organization.enabled?(nil)).to be_falsey
+        expect(organization.enabled?("messages")).to be_falsey
+        expect(organization.enabled?("geolocated_messages")).to be_falsey
         expect(user.send_unstolen_notifications?).to be_falsey
 
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
         organization.save
 
-        expect(organization.paid_for?("messages")).to be_truthy
-        expect(organization.paid_for?("geolocated_messages")).to be_falsey
-        expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
+        expect(organization.enabled?("messages")).to be_truthy
+        expect(organization.enabled?("geolocated_messages")).to be_falsey
+        expect(organization.enabled?("abandoned_bike_messages")).to be_truthy
         expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
         expect(organization.message_kinds_except_abandoned).to eq([])
-        expect(organization.paid_for?("unstolen_notifications")).to be_truthy
-        expect(organization.paid_for?("weird_type")).to be_falsey
+        expect(organization.enabled?("unstolen_notifications")).to be_truthy
+        expect(organization.enabled?("weird_type")).to be_falsey
         expect(organization.bike_actions?).to be_truthy
-        expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
+        expect(organization.enabled?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
 
         expect(user.reload.send_unstolen_notifications?).to be_truthy

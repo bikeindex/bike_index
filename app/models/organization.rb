@@ -167,9 +167,9 @@ class Organization < ApplicationRecord
 
   def message_kinds # Matches organization_message kinds
     [
-      paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      enabled?("geolocated_messages") ? "geolocated_messages" : nil,
       # TODO: make this based on abandoned_bikes
-      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
+      enabled?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
   end
 
@@ -178,7 +178,7 @@ class Organization < ApplicationRecord
   end
 
   def additional_registration_fields
-    PaidFeature::REG_FIELDS.select { |f| paid_for?(f) }
+    PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
   def include_field_reg_affiliation?(user = nil)
@@ -211,11 +211,11 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    PaidFeature::BIKE_ACTIONS.detect { |f| paid_for?(f) }.present?
+    PaidFeature::BIKE_ACTIONS.detect { |f| enabled?(f) }.present?
   end
 
   def law_enforcement_missing_verified_features?
-    law_enforcement? && !paid_for?("unstolen_notifications")
+    law_enforcement? && !enabled?("unstolen_notifications")
   end
 
   def bike_shop_display_integration_alert?
@@ -246,9 +246,6 @@ class Organization < ApplicationRecord
       (ambassador? && feature == "unstolen_notifications")
     end
   end
-
-  # Deprecated: will replace paid_for? with enabled? after PR#1504
-  def paid_for?(feature_name); enabled?(feature_name) end
 
   def set_calculated_attributes
     return true unless name.present?
@@ -293,9 +290,9 @@ class Organization < ApplicationRecord
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_imports? end
 
-  def show_multi_serial?; paid_for?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+  def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
@@ -361,7 +358,7 @@ class Organization < ApplicationRecord
   end
 
   def regional?
-    paid_for?("regional_bike_counts")
+    enabled?("regional_bike_counts")
   end
 
   def overview_dashboard?
@@ -384,7 +381,7 @@ class Organization < ApplicationRecord
     fslugs = current_invoices.feature_slugs
     # If part of a region with regional_stickers, the organization receives the stickers paid feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.paid_for?("regional_stickers") }
+      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("regional_stickers") }
     end
     return fslugs unless parent_organization_id.present?
     (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq
