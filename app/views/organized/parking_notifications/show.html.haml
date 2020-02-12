@@ -44,15 +44,21 @@
           %td= t(".repeat")
           %td
             - if @parking_notification.initial_record?
-              Initial notification
+              %span.less-strong Initial notification
             - else
-              Repeat
               = @parking_notification.repeat_number
+              %em.small.less-strong.ml-2
+                first notification sent
+                %a.convertTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
+                  - if @parking_notification.initial_record.present?
+                    = l(@parking_notification.initial_record.created_at, format: :convert_time)
+                  - else
+                    = @parking_notification.initial_record_id
         %tr
           %td= t(".message")
           %td= @parking_notification.message
         %tr
-          %td= t(".internal_notes_html", org_name: current_organization.short_name)
+          %td= t(".internal_notes")
           %td= @parking_notification.internal_notes
 
 #map_canvas{ style: "height: 400px;" }
@@ -84,18 +90,8 @@
   </script>
 
 
-/ %h4
-/   - if @parking_notification.initial_record?
-/     - initial_parking_notification = @parking_notification
-/     Initial notification
-/   - else
-/     - initial_parking_notification = @parking_notification.initial_record
-/     Repeat notification
+- if @related_notifications.any?
+  %h3{ style: "margin-top: 60px;" }
+    Related Notifications
+  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: @related_notifications, skip_bike: true, skip_map_cell: true }
 
-/ - if @parking_notification != initial_parking_notification
-
-/   Initial record
-
-/ - if initial_parking_notification.repeat_records.conut > 1
-
-/   Render repeats

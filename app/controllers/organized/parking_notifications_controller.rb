@@ -14,7 +14,6 @@ module Organized
         google_maps_key: ENV["GOOGLE_MAPS"],
         map_center_lat: current_organization.map_focus_coordinates[:latitude],
         map_center_lng: current_organization.map_focus_coordinates[:longitude],
-        members: members,
         root_path: organization_parking_notifications_path(organization_id: current_organization.to_param),
       }
 
@@ -30,6 +29,10 @@ module Organized
 
     def show
       @parking_notification = parking_notifications.find(params[:id])
+      related_ids = [@parking_notification, @parking_notification.initial_record_id].compact
+      @related_notifications = parking_notifications.where(id: related_ids)
+                                .or(parking_notifications.where(initial_record_id: related_ids))
+                                .where.not(id: @parking_notification.id)
       @bike = @parking_notification.bike
     end
 

@@ -4415,10 +4415,10 @@ en:
         bike: Bike
         by: Created by
         created: Created at
-        internal_notes_html: "%{org_name} internal notes"
+        internal_notes: Internal notes
         message: Message
         address: Address
-        repeat: Notification#
+        repeat: Repeat#
         parking_notification: Parking Notification
       table:
         bike: Bike
