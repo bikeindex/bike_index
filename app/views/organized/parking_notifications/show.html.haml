@@ -1,30 +1,33 @@
 .organized-page-header
   %h1
-    %em= current_organization.name
     = t(".parking_notification")
 
+- # TODO: add translations
 %table.table-list
   %tbody
     %tr
-      %td= t(".recorded")
+      %td= t(".created")
       %td
         %span.convertTime
           = l(@parking_notification.created_at, format: :convert_time)
     %tr
-      %td= t(".recorder")
+      %td= t(".by")
       %td= @parking_notification.user.display_name
+    %tr
+      %td Kind
+      %td= @parking_notification.kind_humanized
     %tr
       %td= t(".bike")
       %td
         - if @bike.present?
           = link_to organized_bike_text(@bike), bike_path(@bike)
     %tr
-      %td= t(".additional_text")
-      %td
-        - if @parking_notification.notes.present?
-          = @parking_notification.notes
-        - else
-          %em.less-strong= t(".none")
+      %td= t(".message")
+      %td= @parking_notification.message
+    %tr
+      %td= t(".internal_notes_html", org_name: current_organization.short_name)
+      %td= @parking_notification.internal_notes
+
 
 #map_canvas{ style: "height: 400px;" }
 

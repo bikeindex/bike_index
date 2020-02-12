@@ -391,7 +391,7 @@ CREATE TABLE public.bikes (
     city character varying,
     latitude double precision,
     longitude double precision,
-    state integer DEFAULT 0
+    status integer DEFAULT 0
 );
 
 
@@ -654,7 +654,7 @@ CREATE TABLE public.creation_states (
     creator_id integer,
     bulk_import_id integer,
     pos_kind integer DEFAULT 0,
-    state integer DEFAULT 0
+    status integer DEFAULT 0
 );
 
 
@@ -1858,7 +1858,7 @@ CREATE TABLE public.parking_notifications (
     retrieved_at timestamp without time zone,
     impound_record_id integer,
     initial_record_id integer,
-    notes text,
+    internal_notes text,
     street character varying,
     latitude double precision,
     longitude double precision,
@@ -1870,7 +1870,8 @@ CREATE TABLE public.parking_notifications (
     neighborhood character varying,
     hide_address boolean DEFAULT false,
     country_id bigint,
-    state_id bigint
+    state_id bigint,
+    message text
 );
 
 
@@ -4584,6 +4585,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200128144317'),
 ('20200130220100'),
 ('20200131175543'),
-('20200210225544');
+('20200210225544'),
+('20200210234925'),
+('20200212000416');
 
 

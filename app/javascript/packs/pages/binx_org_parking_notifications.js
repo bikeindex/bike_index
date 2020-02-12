@@ -154,10 +154,12 @@ export default class BinxAppOrgParkingNotifications {
     }</em> - by ${user}</span> <span class="extended-col-info"><br>${bikeLink}</span>
       </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${user}</td><td class="hidden-sm-cells">${impoundLink}</td>`;
+    }</em></td><td class="hidden-sm-cells">${user}</td><td>${
+      record.internal_notes
+    }</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
-  ParkingNotificationMapPopup(point) {
+  mapPopup(point) {
     let record = _.find(binxAppOrgParkingNotifications.records, [
       "id",
       point.id

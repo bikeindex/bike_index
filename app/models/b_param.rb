@@ -109,9 +109,9 @@ class BParam < ApplicationRecord
 
   def bike; (params && params["bike"] || {}).with_indifferent_access end
 
-  def state; Bike.states.include?(bike["state"]) ? bike["state"] : Bike.states.first end
+  def status; Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first end
 
-  def state_abandoned?; bike["state"] == "state_abandoned" end
+  def status_abandoned?; bike["status"] == "status_abandoned" end
 
   # TODO: location refactor
   def location_specified?; bike["latitude"].present? && bike["longitude"].present? || bike["address"].present? end

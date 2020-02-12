@@ -307,6 +307,10 @@ body {
   margin-top: $vertical-height;
 }
 
+.mt-0 {
+  margin-top: 0;
+}
+
 .mb-4 {
   margin-bottom: 2 * $vertical-height;
 }
@@ -315,11 +319,32 @@ body {
   margin-bottom: $vertical-height;
 }
 
-.mt-0 {
-  margin-top: 0;
-}
 .mb-0 {
   margin-bottom: 0;
+}
+
+.ml-4 {
+  margin-left: 2 * $vertical-height;
+}
+
+.ml-2 {
+  margin-left: $vertical-height;
+}
+
+.ml-0 {
+  margin-left: 0;
+}
+
+.mr-4 {
+  margin-right: 2 * $vertical-height;
+}
+
+.mr-2 {
+  margin-right: $vertical-height;
+}
+
+.mr-0 {
+  margin-right: 0;
 }
 
 .small {

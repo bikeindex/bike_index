@@ -73,7 +73,7 @@ class Organization < ApplicationRecord
   before_save :set_search_coordinates
   after_commit :update_associations
 
-  delegate :city, :country, :zipcode, to: :search_location, allow_nil: true
+  delegate :city, :country, :zipcode, :state, to: :search_location, allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
   after_validation :geocode, if: -> { false } # never geocode, use search_location lat/long
@@ -163,6 +163,8 @@ class Organization < ApplicationRecord
     snippet&.body
   end
 
+  def parking_notification_kinds; ParkingNotification.kinds end
+
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
@@ -233,7 +235,7 @@ class Organization < ApplicationRecord
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
 
-  def paid_for?(feature_name)
+  def enabled?(feature_name)
     features =
       Array(feature_name)
         .map { |name| name.strip.downcase.gsub(/\s/, "_") }
@@ -244,6 +246,9 @@ class Organization < ApplicationRecord
       (ambassador? && feature == "unstolen_notifications")
     end
   end
+
+  # Deprecated: will replace paid_for? with enabled? after PR#1504
+  def paid_for?(feature_name); enabled?(feature_name) end
 
   def set_calculated_attributes
     return true unless name.present?

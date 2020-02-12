@@ -24,7 +24,7 @@
                 = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
-        - display_unstolen_notification_form = !@bike.stolen? && passive_organization.paid_for?("unstolen_notifications")
+        - display_unstolen_notification_form = !@bike.stolen? && passive_organization.enabled?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
@@ -47,7 +47,7 @@
                   - else
                     %em.small.less-strong
                       = t(".org_cannot_edit", org_name: passive_organization.short_name)
-              - if passive_organization.paid_for?("bike_stickers") # Always display stickers if org has paid for them
+              - if passive_organization.enabled?("bike_stickers") # Always display stickers if org has paid for them
                 %tr
                   %td
                     = t(".sticker")
@@ -116,7 +116,6 @@
                           %span.text-warning
                             %small invalid address
 
-
                   - else
                     %tr
                       %td
@@ -129,7 +128,7 @@
                         - elsif reg_field == "reg_affiliation"
                           = @bike.organization_affiliation
 
-                - if passive_organization.paid_for?("avery_export")
+                - if passive_organization.enabled?("avery_export")
                   %tr
                     %td= t(".avery_exportable")
                     %td
@@ -185,115 +184,106 @@
                 = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
                 = t(".email_to_deal_with_this_html", support_link: support_link)
 
-  - if passive_organization.bike_actions?
-    - if passive_organization.paid_for?("abandoned_bikes")
-      .row.mb-4.abandoned-record-wrap
-        - if @bike.state_abandoned?
-          .col-xl-9.ml-md-2
-            %h5
-              = link_to t(".existing_parking_notifications", bike_type: @bike.type), organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
-            %table.table.table-sm.table-bordered
-              %thead
-                %th= t(".recorded")
-                %th= t(".kind")
-                %th= t(".recorder")
-                %th
-                  %small= t(".notes")
-              %tbody
-                - @bike.current_parking_notifications.each do |parking_notification|
-                  %tr
-                    %td
-                      %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: passive_organization.to_param) }
-                        = l parking_notification.created_at, format: :convert_time
-                    %td
-                      %small
-                        = parking_notification.kind.humanize
-                    %td
-                      = parking_notification.user.display_name
-                    %td
-                      %small
-                        = parking_notification.notes
-        .text-center{ class: @bike.state_abandoned? ? "col-xl-3" : "col-xs-12" }
-          %span
-            - if @bike.state_abandoned?
-              = t(".record_again")
-            - else
-              = t(".record")
-          - existing_kind = @bike.current_parking_notification&.kind
-          - abandoned_kinds = existing_kind.present? ? [existing_kind] : ParkingNotification.kinds
-          - abandoned_kinds.each do |kind|
-            %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }
-              = kind.humanize
+- # TODO: add translations
+- if passive_organization.enabled?("parking_notifications")
+  - parking_notifications = passive_organization.parking_notifications.where(bike_id: @bike.id).order(id: :desc)
+  .parking-notifications-wrap
+    %h3.mt-2.mb-2
+      Parking notifications
 
+    - if parking_notifications.any?
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.limit(4), skip_bike: true, skip_map_cell: true, organization: passive_organization }
 
-    - if passive_organization.paid_for?("impound_bikes") || passive_organization.message_kinds_except_abandoned.any?
-      .organized-actions-wrap
-        .row
-          .col-sm-6
-            - if passive_organization.paid_for?("impound_bikes")
-              - impound_record = @bike.impound_records.current.first
-              - if @bike.impounded?
-                %em
-                  = t(".already_impounded", bike_type: @bike.type, organization_name: impound_record.organization.short_name)
-                - if impound_record.organization == passive_organization
-                  %br
-                  = t(".impounded_by")
-                  %em
-                    #{impound_record.user.display_name},
-                  %span.convertTime
-                    = l impound_record.created_at, format: :convert_time
+      %p{ style: "margin-top: -12px;" }
+        = number_with_delimiter(parking_notifications.count)
+        total notifications for #{@bike.type} -
+        %em
+          = link_to "view all on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
 
-              - else
-                = link_to t(".impound"), organization_bike_path(@bike.to_param, organization_id: passive_organization.to_param, bike: { impound: true }), method: "PUT", class: "btn btn-outline-warning", data: { confirm: t(".impound_are_you_sure", bike_type: @bike.type) }
+    - parking_notification_open = params[:parking_notification].present?
 
-          .col-sm-6.text-right
-            - if passive_organization.message_kinds_except_abandoned.any?
-              %span
-                = t(".send")
-              - passive_organization.message_kinds_except_abandoned.each do |kind|
-                %a.btn.btn-secondary.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationMessageModal" }
-                  - if kind == "geolocated_messages"
-                    = t(".geomessage")
-                  - else
-                    = kind.humanize
+    .text-center#openNewParkingNotification.collapse{ class: (parking_notification_open ? "" : "in") }
+      %a.btn.btn-primary.btn-lg{ href: "#newParkingNotificationFields" }
+        New parking notification
 
-- if passive_organization.paid_for?("abandoned_bikes")
-  - modal_body = capture_haml do
-    .modal-body
-      = form_for ParkingNotification.new(bike_id: @bike.id), url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
+    #newParkingNotificationFields.collapse{ class: (parking_notification_open ? "in" : "")  }
+      %hr
+      - parking_notification_present = @parking_notification.present?
+      - @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: passive_organization, use_entered_address: false)
+      - unless parking_notification_present
+        / We only want to assign is_repeat if creating a new parking notification
+        - @parking_notification.is_repeat = @parking_notification.likely_repeat?
+        - @parking_notification.kind = @parking_notification.potential_initial_record&.kind
+        - @parking_notification.set_location_from_organization
+
+      = form_for @parking_notification, url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
-        = f.hidden_field :kind, class: "modalLocation-kind"
-        = f.hidden_field :latitude, class: "modalLocation-latitude"
-        = f.hidden_field :longitude, class: "modalLocation-longitude"
-        = f.hidden_field :accuracy, class: "modalLocation-accuracy"
-        .form-group
-          = f.label :notes, t(".abandoned_bike_notes_html")
-          = f.text_area :notes, class: 'form-control'
-        .modal-btn-footer
-          = submit_tag t(".record_abandoned"), class: "btn btn-success modalLocation-submit-btn", disabled: true
-          %span.less-strong.waitingOnLocationText
-            = t(".waiting_on_device_location")
+        = f.hidden_field :latitude, class: "parkingLocation-latitude"
+        = f.hidden_field :longitude, class: "parkingLocation-longitude"
+        = f.hidden_field :accuracy, class: "parkingLocation-accuracy"
+        .mt-4.text-center
+          - if @parking_notification.can_be_repeat?
+            .btn-group{ role: "group", "aria-label" => "Repeat notice", data: { toggle: "buttons" } }
+              %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "" : "active") }
+                = f.radio_button :is_repeat, false
+                First notice
+              %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
+                = f.radio_button :is_repeat, true
+                Follows the
+                = pluralize @parking_notification.earlier_bike_notifications.count, "earlier notification"
 
-  = render partial: "shared/modal", locals: { title: t(".abandoned_bike_modal_title", bike_type: @bike.type), modal_body: modal_body, id: "organizationAbandonedModal" }
+        .row.mt-4
+          .col-md-6
+            .form-group
+              = f.label :message, "Optional message to send to user"
+              = f.text_area :message, placeholder: "Optional", class: 'form-control'
+          .col-md-6
+            .form-group
+              %p{ style: "margin-bottom: 0;" } Notification Kind
+              - passive_organization.parking_notification_kinds.each do |kind|
+                %label.radio-inline.mr-2
+                  = f.radio_button :kind, kind
+                  = ParkingNotification.kinds_humanized[kind.to_sym]
 
-- if passive_organization.message_kinds_except_abandoned.any?
-  - modal_body = capture_haml do
-    .modal-body
-      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
-        = f.hidden_field :bike_id
-        = f.hidden_field :kind_slug, class: "modalLocation-kind"
-        = f.hidden_field :latitude, class: "modalLocation-latitude"
-        = f.hidden_field :longitude, class: "modalLocation-longitude"
-        = f.hidden_field :accuracy, class: "modalLocation-accuracy"
-        .form-group
-          = f.label :body, t(".additional_message")
-          = f.text_area :body, class: 'form-control'
-        .modal-btn-footer
-          = submit_tag t(".send_message"), class: "btn btn-success modalLocation-submit-btn", disabled: true
-          %span.less-strong.waitingOnLocationText
-            = t(".waiting_on_device_location")
+        .form-group.text-center.mt-4
+          = submit_tag "Create parking notification", class: "btn btn-success parkingLocation-submit-btn", disabled: true
 
-  = render partial: "shared/modal", locals: { title: t(".message_owner", bike_type: @bike.type), modal_body: modal_body, id: "organizationMessageModal" }
+        .row.mt-4
+          .col-md-6#choseLocationMethod
+            %span.less-strong.waitingOnLocationText.hideOnLocationFind.collapse.in
+              = t(".waiting_on_device_location")
+            .use-entered-address-radios.showOnLocationFind.collapse.mb-2
+              .radio
+                %label
+                  = f.radio_button :use_entered_address, false
+                  Use current location
+              .radio
+                %label
+                  = f.radio_button :use_entered_address, true
+                  Enter address manually
+
+            .address-fields.related-fields.collapse
+              .form-group.fancy-select.unfancy.ifManualRequired#us_id_data{ data: { usid: Country.united_states.id } }
+                = f.select(:country_id, Country.select_options,
+                  { prompt: t(".choose_country") },
+                  { class: 'country-select-input form-control' } )
+
+              .form-group.ifManualRequired
+                = f.text_field :street, placeholder: t(".address_or_intersection"), class: "form-control"
+
+              .form-group.ifManualRequired
+                = f.text_field :city, placeholder: t(".city"), class: "form-control"
+
+              .form-group
+                = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
+
+              .form-group.fancy-select-placeholder.unfancy.hidden-other{ class: (@parking_notification.country_id == Country.united_states.id ? "unhidden" : "") }
+                = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+          .col-md-6
+            .form-group.less-strong
+              = f.label :internal_notes, t(".parking_notification_notes_html", org_name: passive_organization.short_name)
+              = f.text_area :internal_notes, class: "form-control"
+
 
 - if show_sticker_modal
   - sticker_modal_body = capture_haml do

@@ -29,17 +29,7 @@
         = t(".matches_visible")
 
 
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.list-table#records_table
-    %thead.small-header.hidden-md-down
-      %th.map-cell
-      %th
-        = t(".recorded")
-        %small.convertTimezone
-      %th=t(".bike")
-      %th=t(".kind")
-      %th=t(".recorder")
-      %th=t(".impounded")
-    %tbody
+  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

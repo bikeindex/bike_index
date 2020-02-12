@@ -23,7 +23,7 @@ RSpec.describe Organized::BikesController, type: :request do
             serial_number: "",
             b_param_id_token: b_param.id_token,
             cycle_type_slug: " Tricycle ",
-            state: "state_abandoned",
+            status: "status_abandoned",
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
             latitude: default_location[:latitude],
@@ -47,7 +47,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
             b_param.reload
             expect(b_param.creation_organization).to eq current_organization
-            expect(b_param.state).to eq "state_abandoned"
+            expect(b_param.status).to eq "status_abandoned"
             expect(b_param.origin).to eq "organization_form"
 
             bike = Bike.last
@@ -70,7 +70,7 @@ RSpec.describe Organized::BikesController, type: :request do
             creation_state = bike.creation_state
             expect(creation_state.organization).to eq current_organization
             expect(creation_state.creator).to eq bike.creator
-            expect(creation_state.state).to eq "state_abandoned"
+            expect(creation_state.status).to eq "status_abandoned"
             expect(creation_state.origin).to eq "organization_form"
 
             expect(bike.parking_notifications.count).to eq 1

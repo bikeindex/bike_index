@@ -73,7 +73,7 @@ class BikeCreatorAssociator
       create_normalized_serial_segments(bike)
       assign_user_attributes(bike, ownership&.user)
       create_stolen_record(bike) if bike.stolen
-      create_parking_notification(@b_param, bike) if @b_param&.state_abandoned?
+      create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)

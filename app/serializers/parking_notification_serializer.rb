@@ -7,6 +7,7 @@ class ParkingNotificationSerializer < ActiveModel::Serializer
              :lng,
              :user_id,
              :bike,
+             :internal_notes,
              :impound_record_id,
              :impound_record_at
 
@@ -28,10 +29,6 @@ class ParkingNotificationSerializer < ActiveModel::Serializer
 
   def impound_record_at
     object.impound_record&.created_at&.to_i
-  end
-
-  def kind_humanized
-    kind.humanize
   end
 
   def bike

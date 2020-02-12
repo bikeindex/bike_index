@@ -144,18 +144,23 @@
         margin-bottom: 0.5rem;
       }
     }
-    .abandoned-record-wrap {
-      padding: 0 15px 8px;
+  }
+  .parking-notifications-wrap {
+    background: #fdfdfd;
+    border: 1px solid $gray-lightish;
+    border-radius: 0.25rem;
+    position: relative;
+    padding: 8px 15px 14px;
+    margin: -28px -15px 40px;
+    hr {
+      border-top-color: $gray-lightish;
     }
-    .organized-actions-wrap {
-      padding: 8px 15px;
-      background: #fdfdfd;
-      border-top: 1px solid $gray-lightish;
-
-      span {
-        display: inline-block;
-        padding-right: 1rem;
-      }
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .btn {
+      @extend .uncap;
     }
   }
 }
@@ -201,6 +206,11 @@
     .tab-content {
       border: none;
     }
+
+    .parking-notifications-wrap {
+      border-left: 0;
+      border-right: 0;
+    }
   }
 }
 
@@ -228,6 +238,10 @@
           margin: 24px 0 12px;
         }
       }
+    }
+
+    .use-entered-address-radios {
+      margin-top: 32px;
     }
 
     // more space for ad

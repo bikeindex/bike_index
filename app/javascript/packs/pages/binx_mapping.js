@@ -139,10 +139,8 @@ export default class BinxMapping {
     let popupContent = "";
     if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
-    } else if (binxMapping.kind == "parking_notification") {
-      popupContent = binxAppOrgParkingNotifications.parkingNotificationMapPopup(
-        point
-      );
+    } else if (binxMapping.kind == "parking_notifications") {
+      popupContent = binxAppOrgParkingNotifications.mapPopup(point);
     } else {
       log.debug(binxMapping.kind);
       popupContent = "Missing template!";

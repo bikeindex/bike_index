@@ -5,7 +5,7 @@
 = form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
   = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
-  = f.hidden_field :state, value: "state_abandoned"
+  = f.hidden_field :status, value: "status_abandoned"
   / .input-group
   /   .control-group
   /     = f.label :parking_notification_kind, "Kind of abandoned record" class: "control-label"
