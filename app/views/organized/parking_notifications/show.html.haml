@@ -46,9 +46,9 @@
             - if @parking_notification.initial_record?
               %span.less-strong Initial notification
             - else
-              = @parking_notification.repeat_number
+              \ ##{@parking_notification.repeat_number}
               %em.small.less-strong.ml-2
-                first notification sent
+                first notification on
                 %a.convertTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
                   - if @parking_notification.initial_record.present?
                     = l(@parking_notification.initial_record.created_at, format: :convert_time)

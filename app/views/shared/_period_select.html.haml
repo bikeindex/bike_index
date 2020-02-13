@@ -1,4 +1,6 @@
-#timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "" }
+- skip_submission ||= false
+
+#timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{skip_submission}" }
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), data: { period: "hour" } }
     %span.d-none.d-md-inline-block= t(".past")
     = t(".hour")

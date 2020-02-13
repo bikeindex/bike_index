@@ -11,20 +11,42 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   init() {
-    log.debug("loading abandoned records");
     // load the maps API
     binxMapping.loadMap("binxAppOrgParkingNotifications.mapOrganizedRecords");
     this.fetchRecords([["per_page", 50]]);
+
+    // On period update, fetch records
+    const fetchRecords = this.fetchRecords;
+
+    $("#timeSelectionCustom").on("submit", function(e) {
+      fetchRecords();
+      return false;
+    });
+    $("#timeSelectionBtnGroup .btn").on("click", e => {
+      fetchRecords();
+      return true;
+    });
+    // $("#notificationsTable").on("click", ".map-cell a", e => {
   }
 
   fetchRecords(opts) {
-    let urlParams = new URLSearchParams(window.location.search);
+    // Use the period selector urlParams - which will use the current period
+    let urlParams = window.periodSelector.urlParamsWithNewPeriod();
+
     for (const param of opts) {
+      urlParams.delete(param[0]); // remove any matching parameters
       urlParams.append(param[0], param[1]);
     }
-    // lazy parameter to query string
-    let queryString = opts.map(i => `${i[0]}=${i[1]}`);
-    let url = `${window.pageInfo.root_path}?${urlParams.toString()}`;
+
+    // Update the address bar to include the current parameters
+    history.replaceState(
+      {},
+      "",
+      `${location.pathname}?${urlParams.toString()}`
+    );
+
+    let url = `${location.pathname}?${urlParams.toString()}`;
+    log.debug("fetching notifications: " + url);
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -130,7 +152,7 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   tableRowForRecord(record) {
-    const showCellUrl = `${window.pageInfo.root_path}/${record.id}`;
+    const showCellUrl = `${location.pathname}/${record.id}`;
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
     const impoundLink =

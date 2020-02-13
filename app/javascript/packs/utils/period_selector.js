@@ -3,21 +3,38 @@ import log from "../utils/log";
 function PeriodSelector() {
   return {
     init() {
+      this.autoSubmit = !(
+        $("#timeSelectionBtnGroup").attr("data-nosubmit") == "true"
+      );
       this.enablePeriodSelection();
     },
 
-    urlWithoutPeriod() {
-      const newUrl = location.href
-        .replace(/&?period=[^&]*/, "") // remove period
-        .replace(/&?timezone=[^&]*/, "") // remove timezone
-        .replace(/&?start_time=[^&]*/, "") // remove start_time
-        .replace(/&?end_time=[^&]*/, "") // remove start_time
-        .replace(/\?&/, "?") // replace ?& with just ?
-        .replace(/&&/g, "&") // Grab &&, replace with single
-        .replace(/(\?|&)$/, ""); // Grab ending ? or & - we don't need it
+    urlParamsWithoutPeriod() {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.delete("period");
+      urlParams.delete("timezone");
+      urlParams.delete("start_time");
+      urlParams.delete("end_time");
+      urlParams.append("timezone", window.localTimezone);
+      return urlParams;
+    },
 
-      const joiner = newUrl.match(/\?/) ? "&" : "?";
-      return newUrl + joiner;
+    urlParamsWithNewPeriod(selectedPeriod = null) {
+      // If it's null, empty, undefined or anything other than string
+      if (typeof selectedPeriod !== "string") {
+        // If not passed the period, Figure it out, defaulting to all
+        selectedPeriod =
+          $("#timeSelectionBtnGroup .btn.active").attr("data-period") || "all";
+      }
+
+      const urlParams = this.urlParamsWithoutPeriod();
+      urlParams.append("period", selectedPeriod);
+
+      if (selectedPeriod === "custom") {
+        urlParams.append("start_time", $("#start_time_selector").val());
+        urlParams.append("end_time", $("#end_time_selector").val());
+      }
+      return urlParams;
     },
 
     enableCustomSelection() {
@@ -41,48 +58,54 @@ function PeriodSelector() {
       $("#timeSelectionBtnGroup").removeClass("custom-period-selected");
     },
 
-    submitCustomPeriodSelection() {
-      const startTime = $("#start_time_selector").val();
-      const endTime = $("#end_time_selector").val();
-      return (location.href = `${this.urlWithoutPeriod()}period=custom&timezone=${
-        window.localTimezone
-      }&start_time=${startTime}&end_time=${endTime}`);
+    urlForPeriod(selectedPeriod = null) {
+      return (
+        window.location.origin +
+        location.pathname +
+        "?" +
+        this.urlParamsWithNewPeriod(selectedPeriod).toString()
+      );
     },
 
     enablePeriodSelection() {
       const self = this;
 
       $("#timeSelectionBtnGroup button").on("click", function(e) {
-        let period = $(e.target).attr("data-period");
+        let $target = $(e.target);
+        let selectedPeriod = $target.attr("data-period");
         // Sometimes, the target isn't the button, it's something inside the button. In that case, find the correct period
-        if (typeof period == "undefined") {
+        if (typeof selectedPeriod == "undefined") {
           // If we can't figure out what the target was, return false, so the user clicks again
           if (!$(e.target).parents("button").length) {
             return false;
           }
-          period = $(e.target)
-            .parents("button")
-            .attr("data-period");
+          $target = $target.parents("button");
+          selectedPeriod = $target.attr("data-period");
         }
-        if (period === "custom") {
+        if (selectedPeriod === "custom") {
           return self.enableCustomSelection();
         } else {
           // Not really necessary, but makes it a little slicker
           self.disableCustomSelection();
         }
-        return (location.href = `${self.urlWithoutPeriod()}period=${period}&timezone=${
-          window.localTimezone
-        }`);
+        $("#timeSelectionBtnGroup .period-select-standard.active").removeClass(
+          "active"
+        );
+        $target.addClass("active");
+        if (self.autoSubmit) {
+          return (location.href = self.urlForPeriod(selectedPeriod));
+        } else {
+          return true;
+        }
       });
 
-      $("#updatePeriodSelectCustom").on("click", function(e) {
-        self.submitCustomPeriodSelection();
-      });
-
-      $("#timeSelectionCustom").on("submit", function(e) {
-        self.submitCustomPeriodSelection();
-        return false;
-      });
+      // If not autosubmitting, this needs to be managed separately
+      if (self.autoSubmit) {
+        $("#timeSelectionCustom").on("submit", function(e) {
+          location.href = self.urlForPeriod("custom");
+          return false;
+        });
+      }
     }
   };
 }

@@ -10,7 +10,10 @@
 
   #map
 
-  .row
+
+  = render partial: "/shared/period_select", locals: { skip_submission: true }
+
+  .row.mt-2
     .col-md-12
       - if search_params_present?
         = pluralize number_with_delimiter(matching_parking_notifications.count), "parking notification"
@@ -28,7 +31,6 @@
       %p#recordsCount.text-right.less-strong
         %span.number 0
         = t(".matches_visible")
-
 
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
 

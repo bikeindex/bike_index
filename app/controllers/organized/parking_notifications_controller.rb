@@ -1,26 +1,23 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     before_action :ensure_access_to_abandoned_bikes!, only: %i[index create]
+    before_action :set_period, only: [:index]
 
     def index
-      members =
-        current_organization
-          .users
-          .map { |u| u && [u.id.to_s, { name: u.display_name }] }
-          .compact
-          .to_h
-
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         map_center_lat: current_organization.map_focus_coordinates[:latitude],
         map_center_lng: current_organization.map_focus_coordinates[:longitude],
-        root_path: organization_parking_notifications_path(organization_id: current_organization.to_param),
       }
 
       respond_to do |format|
         format.html
         format.json do
-          render json: matching_parking_notifications.reorder(created_at: :desc),
+          page = params[:page] || 1
+          per_page = params[:per_page] || 100
+          # TODO: add sortable here
+          records = matching_parking_notifications.reorder(created_at: :desc)
+          render json: records.page(page).per(per_page),
                  root: "parking_notifications",
                  each_serializer: ParkingNotificationSerializer
         end
@@ -56,11 +53,11 @@ module Organized
 
     def matching_parking_notifications
       return @matching_parking_notifications if defined?(@matching_parking_notifications)
-      @matching_parking_notifications = parking_notifications
+      notifications = parking_notifications
       if params[:search_bike_id].present?
-        @matching_parking_notifications = @matching_parking_notifications.where(bike_id: params[:search_bike_id])
+        notifications = notifications.where(bike_id: params[:search_bike_id])
       end
-      @matching_parking_notifications
+      @matching_parking_notifications = notifications.where(created_at: @time_range)
     end
 
     def search_params_present?

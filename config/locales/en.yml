@@ -3687,6 +3687,7 @@ en:
       org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      parking_notifications: Parking notifications
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
       registration_stickers: Registration stickers
@@ -4418,14 +4419,14 @@ en:
         internal_notes: Internal notes
         message: Message
         address: Address
-        repeat: Repeat#
+        repeat: Repeat
         parking_notification: Parking Notification
       table:
         bike: Bike
         by: By
         created: Created
         impounded: Impounded
-        repeat: Notification#
+        repeat: Repeat#
         address: Address
         internal_notes: Internal Notes
         kind: Because
