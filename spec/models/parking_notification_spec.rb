@@ -37,7 +37,7 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "initial" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[impound_bikes parking_notifications]) }
     let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization) }
     it "is false" do
       expect(parking_notification.likely_repeat?).to be_falsey
@@ -58,6 +58,7 @@ RSpec.describe ParkingNotification, type: :model do
       end
       context "same organization" do
         let(:initial_organization) { organization }
+        let(:impound_record) { FactoryBot.create(:impound_record, organization: initial_organization, bike: bike) }
         it "can be assigned" do
           expect(parking_notification.potential_initial_record).to eq parking_notification_initial
           expect(parking_notification.likely_repeat?).to be_falsey
@@ -67,7 +68,7 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.initial_record).to eq parking_notification_initial
           expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
 
-          parking_notification_initial.update_attribute :retrieved_at, Time.current
+          parking_notification_initial.update_attributes(impound_record: impound_record)
           parking_notification_initial.reload
           parking_notification.reload
           expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
@@ -85,6 +86,9 @@ RSpec.describe ParkingNotification, type: :model do
             expect(parking_notification.initial_record).to eq parking_notification_initial
             expect(parking_notification2.initial_record).to eq parking_notification_initial
             expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id, parking_notification2.id])
+            expect(parking_notification_initial.repeat_number).to eq 0
+            expect(parking_notification2.repeat_number).to eq 1
+            expect(parking_notification.repeat_number).to eq 2
           end
         end
       end
@@ -132,7 +136,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.save
         expect(parking_notification.valid?).to be_falsey
         expect(parking_notification.errors.messages.to_s).to match(/address/)
-        expect(parking_notification.kind_humanized).to eq "abandoned"
+        expect(parking_notification.kind_humanized).to eq "Appears abandoned"
       end
     end
     context "no address" do
@@ -146,6 +150,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.address).to be_present
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.id).to be_present
+        expect(parking_notification.location_from_address).to be_falsey
       end
     end
 
@@ -161,6 +166,7 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.longitude).to eq longitude
           expect(parking_notification.valid?).to be_truthy
           expect(parking_notification.id).to be_present
+          expect(parking_notification.location_from_address).to be_truthy
         end
       end
       context "use_entered_address and lat/long set" do
@@ -171,6 +177,7 @@ RSpec.describe ParkingNotification, type: :model do
             expect(parking_notification.longitude).to eq longitude
             expect(parking_notification.valid?).to be_truthy
             expect(parking_notification.id).to be_present
+            expect(parking_notification.location_from_address).to be_truthy
           end
         end
       end

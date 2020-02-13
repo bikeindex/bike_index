@@ -11,20 +11,48 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   init() {
-    log.debug("loading abandoned records");
     // load the maps API
     binxMapping.loadMap("binxAppOrgParkingNotifications.mapOrganizedRecords");
-    this.fetchRecords([["per_page", 50]]);
+    this.fetchRecords([["per_page", 100]]);
+
+    // On period update, fetch records
+    const fetchRecords = this.fetchRecords;
+    $("#timeSelectionCustom").on("submit", e => {
+      fetchRecords();
+      return false;
+    });
+    $("#timeSelectionBtnGroup .btn").on("click", e => {
+      fetchRecords();
+      return true;
+    });
+
+    // Call the existing coffeescript class that manages the bike searchbar
+    new BikeIndex.BikeSearchBar();
   }
 
-  fetchRecords(opts) {
-    let urlParams = new URLSearchParams(window.location.search);
+  fetchRecords(opts = []) {
+    // Use the period selector urlParams - which will use the current period
+    let urlParams = window.periodSelector.urlParamsWithNewPeriod();
+
     for (const param of opts) {
+      urlParams.delete(param[0]); // remove any matching parameters
       urlParams.append(param[0], param[1]);
     }
-    // lazy parameter to query string
-    let queryString = opts.map(i => `${i[0]}=${i[1]}`);
-    let url = `${window.pageInfo.root_path}?${urlParams.toString()}`;
+
+    // Update the address bar to include the current parameters
+    history.replaceState(
+      {},
+      "",
+      `${location.pathname}?${urlParams.toString()}`
+    );
+
+    let url = `${location.pathname}?${urlParams.toString()}`;
+    log.debug("fetching notifications: " + url);
+
+    // Update the bike search panel to get specific bikes
+    $("#period").val(urlParams.get("period"));
+    $("#start_time").val(urlParams.get("start_time"));
+    $("#end_time").val(urlParams.get("end_time"));
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -82,7 +110,7 @@ export default class BinxAppOrgParkingNotifications {
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
-    $("#records_table").on("click", ".map-cell a", e => {
+    $("#recordsTable").on("click", ".map-cell a", e => {
       e.preventDefault();
       let recordId = parseInt(
         $(e.target)
@@ -130,13 +158,11 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   tableRowForRecord(record) {
-    const showCellUrl = `${window.pageInfo.root_path}/${record.id}`;
-    let user = window.pageInfo.members[record.user_id];
-    if (user !== undefined) {
-      user = user.name;
-    } else {
-      user = "?";
+    if (typeof record !== "object" || typeof record.id !== "number") {
+      log.debug(record);
+      return "";
     }
+    const showCellUrl = `${location.pathname}/${record.id}`;
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
     const impoundLink =
@@ -151,11 +177,17 @@ export default class BinxAppOrgParkingNotifications {
       record.created_at
     }</a> <span class="extended-col-info small"> - <em>${
       record.kind_humanized
-    }</em> - by ${user}</span> <span class="extended-col-info"><br>${bikeLink}</span>
+    }</em> - by ${record.user_display_name}<strong>${
+      record.repeat_number > 0 ? "- notification #" + record.repeat_number : ""
+    }</strong></span> <span class="extended-col-info"><br>${bikeLink}
+    ${impoundLink.length ? "<br>Impounded: " + impoundLink : ""}
+    </span>
       </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${user}</td><td>${
-      record.internal_notes
+    }</em></td><td class="hidden-sm-cells">${
+      record.user_display_name
+    }</td><td class="hidden-sm-cells">${
+      record.repeat_number > 0 ? record.repeat_number : ""
     }</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
@@ -181,16 +213,18 @@ export default class BinxAppOrgParkingNotifications {
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records
-      body_html =
-        "<tr><td colspan=6>No matching records have been sent</td></tr>";
+      body_html = "<tr><td colspan=7>No matching notifications</td></tr>";
     }
 
     // Render the body - whether it says no records or records
-    $("#records_table tbody").html(body_html);
+    $("#recordsTable tbody").html(body_html);
     // And localize the times since we added times to the table
     window.timeParser.localize();
-
     $("#recordsCount .number").text(records.length);
+    // render the total count too
+    $("#recordsTotalCount .number").text(
+      binxAppOrgParkingNotifications.records.length
+    );
   }
 
   addMarkerPointsForRecords(records) {
@@ -204,13 +238,24 @@ export default class BinxAppOrgParkingNotifications {
     return binxMapping.markerPointsToRender;
   }
 
+  updateRecords(records) {
+    binxMapping.removeMarkersWithoutMatchingIds(records);
+    this.addMarkerPointsForRecords(records);
+    // Then render the points - fitMap false, or else it will retrigger rerendering list from the movement
+    binxMapping.addMarkers({ fitMap: false });
+    // TODO: don't just remove and rerender everything
+    this.renderRecordsTable(this.visibleRecords(records));
+  }
+
   renderOrganizedRecords(records) {
-    // Don't rerender the list if it's already rendered
-    if (this.listRendered) {
-      return true;
-    }
     // Store the records on the window class so we have them
     this.records = records;
+
+    // Don't rerender the list if it's already rendered
+    if (this.listRendered) {
+      return this.updateRecords(records);
+    }
+
     // Render the table of records
     this.renderRecordsTable(records);
     // Set the updated statuses based on what we rendered

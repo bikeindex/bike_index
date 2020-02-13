@@ -26,26 +26,22 @@ class ParkingNotification < ActiveRecord::Base
 
   attr_accessor :is_repeat, :use_entered_address
 
-  scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
+  scope :current, -> { where(impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :impounded, -> { where.not(impound_record_id: nil) }
-  scope :retrieved, -> { where.not(retrieved_at: nil) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.kinds_humanized
     {
-      appears_abandoned: "abandoned",
-      parked_incorrectly: "parked incorrectly",
-      other: "other",
-      impounded: "impounded",
+      appears_abandoned: "Appears abandoned",
+      parked_incorrectly: "Parked incorrectly",
+      impounded: "Impounded",
     }
   end
 
-  def current?; !retrieved? && !impounded? end
-
-  def retrieved?; retrieved_at.present? end
+  def current?; !impounded? end
 
   def impounded?; impound_record_id.present? end
 
@@ -79,6 +75,12 @@ class ParkingNotification < ActiveRecord::Base
     # We know there has to be a potential initial record if can_be_repeat,
     # so it doesn't matter if we scope to current on new records or not
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
+  end
+
+  def repeat_number
+    return 0 unless repeat_record?
+    ParkingNotification.where(initial_record_id: initial_record_id)
+                       .where("id < ?", id).count + 1
   end
 
   # TODO: location refactor - copied method from stolen
@@ -120,6 +122,7 @@ class ParkingNotification < ActiveRecord::Base
     else
       coordinates = Geohelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?
+      self.location_from_address = true
     end
   end
 

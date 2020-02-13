@@ -35,8 +35,8 @@ $(document).ready(function() {
   window.timeParser.localize();
   // Period selector
   if ($("#timeSelectionBtnGroup").length) {
-    const periodSelector = PeriodSelector();
-    periodSelector.init();
+    window.periodSelector = PeriodSelector();
+    window.periodSelector.init();
   }
   // Load admin, whatever
   if ($("#admin-content").length > 0) {

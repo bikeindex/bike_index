@@ -1,0 +1,254 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=300%20Lakeside%20Dr,%20Oakland,%20CA%2094612&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 12 Feb 2020 21:16:36 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=31
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Kaiser Center",
+                         "short_name" : "Kaiser Center",
+                         "types" : [ "premise" ]
+                      },
+                      {
+                         "long_name" : "300",
+                         "short_name" : "300",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Lakeside Drive",
+                         "short_name" : "Lakeside Dr",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Downtown Oakland",
+                         "short_name" : "Downtown Oakland",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Oakland",
+                         "short_name" : "Oakland",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Alameda County",
+                         "short_name" : "Alameda County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "94612",
+                         "short_name" : "94612",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "Kaiser Center, 300 Lakeside Dr, Oakland, CA 94612, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.8092277,
+                            "lng" : -122.2633498
+                         },
+                         "southwest" : {
+                            "lat" : 37.8083219,
+                            "lng" : -122.2647484
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.8087498,
+                         "lng" : -122.263705
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.8101237802915,
+                            "lng" : -122.2627001197085
+                         },
+                         "southwest" : {
+                            "lat" : 37.8074258197085,
+                            "lng" : -122.2653980802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJLX4TPk2Hj4AR3dwhAELTiz4",
+                   "types" : [ "premise" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=New%20York%2010007%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 12 Feb 2020 21:16:36 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=17
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "10007",
+                         "short_name" : "10007",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Manhattan",
+                         "short_name" : "Manhattan",
+                         "types" : [ "political", "sublocality", "sublocality_level_1" ]
+                      },
+                      {
+                         "long_name" : "New York",
+                         "short_name" : "New York",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "New York County",
+                         "short_name" : "New York County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "New York",
+                         "short_name" : "NY",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "New York, NY 10007, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 40.717076,
+                            "lng" : -74.0001781
+                         },
+                         "southwest" : {
+                            "lat" : 40.709806,
+                            "lng" : -74.01375399999999
+                         }
+                      },
+                      "location" : {
+                         "lat" : 40.7136487,
+                         "lng" : -74.0087126
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 40.717076,
+                            "lng" : -74.0001781
+                         },
+                         "southwest" : {
+                            "lat" : 40.709806,
+                            "lng" : -74.01375399999999
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJwbJsUhhawokRuCRdc8piF8c",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
+recorded_with: VCR 5.0.0

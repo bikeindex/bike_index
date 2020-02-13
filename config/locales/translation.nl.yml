@@ -2482,12 +2482,12 @@ nl:
         update:
           updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
       parking_notifications:
-        create:
-          parking_notificationed: Verlaten %{bike_type} opgenomen
-          unable_to_record: Kan niet opnemen - %{errors}
         ensure_access_to_abandoned_bikes!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
             neem contact op met Bike Index support.
+        create:
+          successfully_created: Parkeermelding %{bike_type} gemaakt
+          unable_to_create: Kan niet maken - %{errors}
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4137,7 +4137,7 @@ nl:
       users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
-      org_abandoned_bikes: "%{org_name} Verlaten fietsen"
+      parking_notifications: Verlaten records
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4643,20 +4643,26 @@ nl:
       index:
         parking_notifications: Verlaten records
         matches_visible: Zichtbaar
+        search_bike_descriptions: Zoek fietsbeschrijvingen
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
       show:
         parking_notification: Verlaten record
         bike: Fiets
         by: Gemaakt door
         created: Gemaakt op
-        internal_notes_html: "%{org_name} interne notities"
         message: Bericht
+        address: Adres
+        internal_notes: Interne notities
+        repeat: Herhaling
       table:
         bike: Fiets
         by: Door
         created: Gemaakt
         impounded: In beslag genomen bij
-        internal_notes: Interne notities
         kind: Soort
+        address: Adres
+        repeat: Herhaling#
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5030,7 +5036,6 @@ nl:
       bulk_imports: Bulkinvoer
       discuss: Bespreken
       exports: Uitvoer
-      geomessaging: GeoMessaging
       getting_started: Ermee beginnen
       how_integration_works: hoe de integratie werkt
       impounded_bikes: In beslag genomen fietsen
