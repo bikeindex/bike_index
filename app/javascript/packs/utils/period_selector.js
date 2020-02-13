@@ -70,7 +70,7 @@ function PeriodSelector() {
     enablePeriodSelection() {
       const self = this;
 
-      $("#timeSelectionBtnGroup button").on("click", function(e) {
+      $("#timeSelectionBtnGroup button").on("click", e => {
         let $target = $(e.target);
         let selectedPeriod = $target.attr("data-period");
         // Sometimes, the target isn't the button, it's something inside the button. In that case, find the correct period
@@ -95,13 +95,14 @@ function PeriodSelector() {
         if (self.autoSubmit) {
           return (location.href = self.urlForPeriod(selectedPeriod));
         } else {
+          // log.debug(self.urlForPeriod(selectedPeriod));
           return true;
         }
       });
 
       // If not autosubmitting, this needs to be managed separately
       if (self.autoSubmit) {
-        $("#timeSelectionCustom").on("submit", function(e) {
+        $("#timeSelectionCustom").on("submit", e => {
           location.href = self.urlForPeriod("custom");
           return false;
         });

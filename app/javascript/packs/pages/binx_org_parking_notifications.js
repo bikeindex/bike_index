@@ -13,12 +13,12 @@ export default class BinxAppOrgParkingNotifications {
   init() {
     // load the maps API
     binxMapping.loadMap("binxAppOrgParkingNotifications.mapOrganizedRecords");
-    this.fetchRecords([["per_page", 50]]);
+    this.fetchRecords([["per_page", 100]]);
 
     // On period update, fetch records
     const fetchRecords = this.fetchRecords;
 
-    $("#timeSelectionCustom").on("submit", function(e) {
+    $("#timeSelectionCustom").on("submit", e => {
       fetchRecords();
       return false;
     });
@@ -26,10 +26,9 @@ export default class BinxAppOrgParkingNotifications {
       fetchRecords();
       return true;
     });
-    // $("#notificationsTable").on("click", ".map-cell a", e => {
   }
 
-  fetchRecords(opts) {
+  fetchRecords(opts = []) {
     // Use the period selector urlParams - which will use the current period
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
 
@@ -47,6 +46,7 @@ export default class BinxAppOrgParkingNotifications {
 
     let url = `${location.pathname}?${urlParams.toString()}`;
     log.debug("fetching notifications: " + url);
+
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -152,6 +152,10 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   tableRowForRecord(record) {
+    if (typeof record !== "object" || typeof record.id !== "number") {
+      log.debug(record);
+      return "";
+    }
     const showCellUrl = `${location.pathname}/${record.id}`;
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
@@ -203,16 +207,18 @@ export default class BinxAppOrgParkingNotifications {
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records
-      body_html =
-        "<tr><td colspan=6>No matching records have been sent</td></tr>";
+      body_html = "<tr><td colspan=7>No matching notifications</td></tr>";
     }
 
     // Render the body - whether it says no records or records
     $("#notificationsTable tbody").html(body_html);
     // And localize the times since we added times to the table
     window.timeParser.localize();
-
     $("#recordsCount .number").text(records.length);
+    // render the total count too
+    $("#recordsTotalCount .number").text(
+      binxAppOrgParkingNotifications.records.length
+    );
   }
 
   addMarkerPointsForRecords(records) {
@@ -226,13 +232,29 @@ export default class BinxAppOrgParkingNotifications {
     return binxMapping.markerPointsToRender;
   }
 
+  updateRecords(records) {
+    // TODO: don't just remove and rerender everything
+    binxMapping.clearMarkers();
+    this.addMarkerPointsForRecords(this.records);
+    log.debug({
+      rendered: binxMapping.markersRendered.length,
+      to: binxMapping.markerPointsToRender.length
+    });
+    // Then render the points - fitMap false, or else it will retrigger rerendering list from the movement
+    binxMapping.addMarkers({ fitMap: false });
+
+    this.renderRecordsTable(records);
+  }
+
   renderOrganizedRecords(records) {
-    // Don't rerender the list if it's already rendered
-    if (this.listRendered) {
-      return true;
-    }
     // Store the records on the window class so we have them
     this.records = records;
+
+    // Don't rerender the list if it's already rendered
+    if (this.listRendered) {
+      return this.updateRecords(records);
+    }
+
     // Render the table of records
     this.renderRecordsTable(records);
     // Set the updated statuses based on what we rendered

@@ -27,7 +27,11 @@
             %em
               unknown bike ##{params[:search_bike_id]}
 
-    .col-xs-12
+    .col-xs-6
+      %p#recordsTotalCount
+        %span.number 0
+        total matches
+    .col-xs-6
       %p#recordsCount.text-right.less-strong
         %span.number 0
         = t(".matches_visible")
