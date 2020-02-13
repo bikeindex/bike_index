@@ -4776,7 +4776,7 @@ en:
     donation_modal:
       header: Help support our efforts!
       is_a_nonprofit_html: >-
-        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforst to fight
+        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforts to fight
         bike theft!
       nonprofit_501c3: 501(c)(3) nonprofit
       skip: No donation
