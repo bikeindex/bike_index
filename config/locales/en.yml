@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -3681,7 +3681,6 @@ en:
       log_in: log in
       logout: Logout
       multi_serial_search: Multi serial search
-      org_abandoned_bikes: "%{org_name} Abandoned Bikes"
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_impounded_bikes: "%{org_name} Impounded Bikes"
@@ -4412,24 +4411,26 @@ en:
       index:
         matches_visible: visible
         parking_notifications: Parking notifications
+        search_bike_descriptions: Search bike descriptions
+        search_for_serial_number: Search for serial number
+        search_owner_email: Search owner email
       show:
+        address: Address
         bike: Bike
         by: Created by
         created: Created at
         internal_notes: Internal notes
         message: Message
-        address: Address
-        repeat: Repeat
         parking_notification: Parking Notification
+        repeat: Repeat
       table:
+        address: Address
         bike: Bike
         by: By
         created: Created
         impounded: Impounded
-        repeat: Repeat#
-        address: Address
-        internal_notes: Internal Notes
         kind: Because
+        repeat: Repeat#
     stickers:
       edit:
         bike: Bike
@@ -4986,7 +4987,6 @@ en:
       bulk_imports: Bulk Imports
       discuss: Discuss
       exports: Exports
-      geomessaging: GeoMessaging
       getting_started: Getting started
       how_integration_works: how the integration works
       impounded_bikes: Impounded Bikes

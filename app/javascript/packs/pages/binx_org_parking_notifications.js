@@ -17,7 +17,6 @@ export default class BinxAppOrgParkingNotifications {
 
     // On period update, fetch records
     const fetchRecords = this.fetchRecords;
-
     $("#timeSelectionCustom").on("submit", e => {
       fetchRecords();
       return false;
@@ -26,6 +25,9 @@ export default class BinxAppOrgParkingNotifications {
       fetchRecords();
       return true;
     });
+
+    // Call the existing coffeescript class that manages the bike searchbar
+    new BikeIndex.BikeSearchBar();
   }
 
   fetchRecords(opts = []) {
@@ -47,6 +49,10 @@ export default class BinxAppOrgParkingNotifications {
     let url = `${location.pathname}?${urlParams.toString()}`;
     log.debug("fetching notifications: " + url);
 
+    // Update the bike search panel to get specific bikes
+    $("#period").val(urlParams.get("period"));
+    $("#start_time").val(urlParams.get("start_time"));
+    $("#end_time").val(urlParams.get("end_time"));
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -104,7 +110,7 @@ export default class BinxAppOrgParkingNotifications {
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
-    $("#notificationsTable").on("click", ".map-cell a", e => {
+    $("#recordsTable").on("click", ".map-cell a", e => {
       e.preventDefault();
       let recordId = parseInt(
         $(e.target)
@@ -211,7 +217,7 @@ export default class BinxAppOrgParkingNotifications {
     }
 
     // Render the body - whether it says no records or records
-    $("#notificationsTable tbody").html(body_html);
+    $("#recordsTable tbody").html(body_html);
     // And localize the times since we added times to the table
     window.timeParser.localize();
     $("#recordsCount .number").text(records.length);
@@ -233,17 +239,12 @@ export default class BinxAppOrgParkingNotifications {
   }
 
   updateRecords(records) {
-    // TODO: don't just remove and rerender everything
-    binxMapping.clearMarkers();
-    this.addMarkerPointsForRecords(this.records);
-    log.debug({
-      rendered: binxMapping.markersRendered.length,
-      to: binxMapping.markerPointsToRender.length
-    });
+    binxMapping.removeMarkersWithoutMatchingIds(records);
+    this.addMarkerPointsForRecords(records);
     // Then render the points - fitMap false, or else it will retrigger rerendering list from the movement
     binxMapping.addMarkers({ fitMap: false });
-
-    this.renderRecordsTable(records);
+    // TODO: don't just remove and rerender everything
+    this.renderRecordsTable(this.visibleRecords(records));
   }
 
   renderOrganizedRecords(records) {

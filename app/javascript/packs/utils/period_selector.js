@@ -54,6 +54,9 @@ function PeriodSelector() {
     disableCustomSelection() {
       if (typeof $().collapse == "function") {
         $("#timeSelectionCustom").collapse("hide");
+      } else {
+        $("#timeSelectionCustom").removeClass("in");
+        $("#timeSelectionCustom").css("display", "none");
       }
       $("#timeSelectionBtnGroup").removeClass("custom-period-selected");
     },

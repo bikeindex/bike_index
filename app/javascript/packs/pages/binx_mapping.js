@@ -110,6 +110,40 @@ export default class BinxMapping {
     });
   }
 
+  removeMarkersWithoutMatchingIds(markers) {
+    if (!binxMapping.markersRendered) {
+      binxMapping.markersRendered = [];
+    }
+
+    const newIds = markers.map(m => m.id);
+
+    if (window.infoWindow != null) {
+      window.infoWindow.close();
+    }
+
+    let markersToKeep = [];
+
+    while (binxMapping.markersRendered.length > 0) {
+      const marker = binxMapping.markersRendered.pop();
+      // If marker isn't around, ignore it
+      if (marker != null) {
+        // If the id is a match, move it to the new array, otherwise remove it from the map
+        if (
+          typeof marker.binxId != "undefined" &&
+          newIds.includes(marker.binxId)
+        ) {
+          markersToKeep.push(marker);
+        } else {
+          marker.setMap(null);
+        }
+      }
+    }
+    binxMapping.markersRendered = markersToKeep;
+
+    // Ids make sure we aren't double rendering
+    return (window.renderedMarkerIds = newIds);
+  }
+
   clearMarkers() {
     if (!binxMapping.markersRendered) {
       binxMapping.markersRendered = [];
@@ -124,6 +158,8 @@ export default class BinxMapping {
         i != null && i.setMap(null);
       }
     }
+    // Empty the array
+    binxMapping.markersRendered = [];
     // Ids make sure we aren't double rendering
     return (window.renderedMarkerIds = []);
   }
@@ -182,9 +218,8 @@ export default class BinxMapping {
     while (binxMapping.markerPointsToRender.length > 0) {
       let point = binxMapping.markerPointsToRender.shift();
       let markerId = point.id;
-      if (_.find(binxMapping.markersRendered, ["id", point.id])) {
-        log.debug(`already rendered point: ${point.id}`);
-      } else {
+      // Only render if the point isn't already rendered
+      if (!_.find(binxMapping.markersRendered, ["binxId", point.id])) {
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(point.lat, point.lng),
           map: window.binxMap,
