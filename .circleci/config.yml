@@ -260,6 +260,267 @@ jobs:
       - store_artifacts:
           path: test-artifacts
 
+  "build-rails-next":
+    working_directory: ~/bikeindex/bike_index
+    parallelism: 2
+    shell: /bin/bash --login
+    environment:
+      RAILS_ENV: test
+      NODE_ENV: test
+      RACK_ENV: test
+      COVERAGE: true
+      DISABLE_SPRING: true
+      TRANSLATION_BRANCH: master
+      BUNDLE_GEMFILE: Gemfile.next
+      TZ: /usr/share/zoneinfo/America/Chicago
+
+    docker:
+      - image: circleci/ruby:2.5.5-stretch-node
+        environment:
+          PGHOST: 127.0.0.1
+          PGUSER: root
+      - image: circleci/postgres:10.4-alpine-postgis
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: bikeindex_test
+      - image: redis:4.0.9
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b7:01:89:de:d8:f8:77:cc:9e:5a:ca:ee:0c:24:57:13"
+
+      - checkout
+
+      - run:
+          name: "Apt: install system / build dependencies"
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install \
+              curl \
+              gettext \
+              imagemagick \
+              libcurl4-gnutls-dev \
+              libexpat1-dev \
+              libssl-dev \
+              libz-dev \
+              postgresql-client
+
+      - type: cache-restore
+        name: "Dockerize: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+
+      - run:
+          name: "Dockerize: install"
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+          command: |
+            dockerize_tar=dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz
+            if [[ ! -f ~/.cache/dockerize/${dockerize_tar} ]]; then
+              wget https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/${dockerize_tar}
+            fi
+            sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
+
+      - type: cache-save
+        name: "Dockerize: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        paths:
+          - ~/.cache/dockerize
+
+
+      - type: cache-restore
+        name: "Git: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+
+      - run:
+          name: "Git: install"
+          environment:
+            GIT_VERSION: 2.22.0
+          command: |
+            set -x
+
+            git_binary=~/.cache/git/git-${GIT_VERSION}/git
+
+            if [[ ! -f $git_binary ]]; then
+              rm -rf ~/.cache/git
+              mkdir -p ~/.cache/git
+              cd ~/.cache/git
+
+              wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+              tar -xzf git.tgz
+              cd git-${GIT_VERSION}
+
+              export DEFAULT_HELP_FORMAT="man"
+              autoconf
+              ./configure
+
+              sudo make man
+              sudo make install-man
+            fi
+
+            cd ~/.cache/git/git-${GIT_VERSION}
+            sudo make prefix=/usr/local all
+            sudo make install
+            sudo cp ${git_binary} /usr/local/bin/git
+
+      - type: cache-save
+        name: "Git: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        paths:
+          - ~/.cache/git/git-2.22.0
+
+      - type: cache-restore
+        name: "Hub: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+
+      - run:
+          name: "Hub: install"
+          environment:
+            HUB_VERSION: 2.12.3
+          command: |
+            set -x
+
+            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
+
+            if [[ ! -f ${hub_binary} ]]; then
+              rm -rf ~/.cache/hub
+              mkdir -p ~/.cache/hub
+              cd ~/.cache/hub
+
+              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+              tar -xzf hub.tgz
+            fi
+
+            sudo cp ${hub_binary} /usr/local/bin/hub
+
+      - type: cache-restore
+        name: "Hub: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        paths:
+          - ~/.cache/hub
+
+
+      - run:
+          name: "Bundler: install"
+          command: gem install bundler -v 1.17.3
+
+
+      - type: cache-restore
+        name: "Ruby dependencies: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.next.lock" }}
+
+      - run:
+          name: "Ruby dependencies: install"
+          command: |
+            set -x
+            bundle check --path=~/.cache/bundle && use_local="--local"
+            bundle install --deployment --frozen --path=~/.cache/bundle $use_local
+
+      - type: cache-save
+        name: "Ruby dependencies: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.next.lock" }}
+        paths:
+          - ~/.cache/bundle
+
+
+      - run:
+          name: Sync translations (only on master by default)
+          command: bin/check_translations
+
+
+      - type: cache-restore
+        name: "Node dependencies: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: "Node dependencies: install"
+          command: |
+            set -x
+            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
+            yarn install --cache-folder ~/.cache/yarn $use_local
+
+      - type: cache-save
+        name: "Node dependencies: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        paths:
+          - ~/.cache/yarn
+
+
+      - type: cache-restore
+        name: "Assets: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+
+      - run:
+          name: "Assets: precompile"
+          command: |
+            set -x
+            node --version
+            bin/webpack
+            bundle exec rails assets:precompile assets:clean --trace
+
+      - type: cache-save
+        name: "Assets: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+          - .sass-cache
+          - public/assets
+          - public/packs
+          - public/packs-test
+          - tmp/cache/assets
+          - tmp/cache/webpacker
+
+
+      - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
+      - run:
+          name: Wait for PostgreSQL to start
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Setup Database
+          command: |
+            bundle exec rails db:structure:load --trace
+
+      - run:
+          name: RSpec
+          command: |
+            mkdir -p test-results/rspec test-artifacts
+            ./cc-test-reporter before-build
+            TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+            bundle exec rspec --profile 10 \
+                              --color \
+                              --order random \
+                              --require rails_helper \
+                              --format RspecJunitFormatter \
+                              --out test-results/rspec/rspec.xml \
+                              --format progress \
+                              -- ${TESTFILES}
+      - run:
+          name: "Jest: Tests"
+          command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+
+      - run:
+          name: Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+
+      - persist_to_workspace:
+          root: coverage
+          paths:
+            - codeclimate.*.json
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-artifacts
+
   upload-coverage:
     docker:
       - image: circleci/ruby:2.5.5-stretch-node
@@ -295,6 +556,7 @@ workflows:
   commit:
     jobs:
       - build
+      - "build-rails-next"
       - upload-coverage:
           requires:
             - build
