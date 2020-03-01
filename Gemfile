@@ -1,3 +1,6 @@
+def next?
+  File.basename(__FILE__) == "Gemfile.next"
+end
 # frozen_string_literal: true
 
 source "https://rubygems.org"
@@ -8,9 +11,26 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 # Update Vagrantfile and CircleCI config if Ruby version is bumped
 ruby "2.5.5"
 gem "rack", "2.0.8"
-gem "rails", "5.2.4"
 
-gem "active_model_serializers", "~> 0.9.3"
+if next?
+  gem 'rails', '~> 6.0', '>= 6.0.2.1'
+else
+  gem "rails", "5.2.4"
+end
+
+# Ten Years Rails is for Dual Booting your Upgrade
+if next?
+  gem 'ten_years_rails'
+else
+  gem 'ten_years_rails', '~> 1.0', '>= 1.0.2'
+end
+
+if next?
+  gem "active_model_serializers"
+else
+  gem "active_model_serializers", "~> 0.9.3"
+end
+
 gem "bcrypt", "~> 3.1.7"
 gem "bootsnap"
 gem "jquery-rails"
@@ -112,7 +132,12 @@ gem "memory_profiler", require: false
 gem "rack-mini-profiler", require: false # If you can't see it you can't make it better
 gem "stackprof", require: false
 
-gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
+if next?
+  gem "responders"
+else
+  gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
+end
+
 gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
