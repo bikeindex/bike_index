@@ -7,34 +7,34 @@ class AfterUserCreateWorker < ApplicationWorker
     user ||= User.find(user_id)
     email ||= user.email
     if job_stage == "new"
-      perform_create_tasks(user, email)
+      perform_create_jobs(user, email)
     elsif job_stage == "confirmed"
-      perform_confirmed_tasks(user, email)
+      perform_confirmed_jobs(user, email)
     elsif job_stage == "merged"
-      perform_merged_tasks(user, email)
+      perform_merged_jobs(user, email)
     elsif job_stage == "async"
-      perform_async_tasks(user, email)
+      perform_async_jobs(user, email)
     end
     # We want to run async after every job
     AfterUserCreateWorker.perform_async(user.id, "async") unless job_stage == "async"
   end
 
-  def perform_create_tasks(user, email)
+  def perform_create_jobs(user, email)
     # This may confirm the user. We auto-confirm users that belong to orgs.
-    # Auto confirming the user actually ends up running perform_confirmed_tasks.
+    # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_membership_invites(user, email)
     send_welcoming_email(user)
   end
 
-  def perform_merged_tasks(user, email)
+  def perform_merged_jobs(user, email)
     associate_membership_invites(user, email, without_confirm: true)
   end
 
-  def perform_confirmed_tasks(user, email)
+  def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
   end
 
-  def perform_async_tasks(user, email)
+  def perform_async_jobs(user, email)
     # These jobs don't need to happen immediately
     import_user_attributes(user)
     associate_ownerships(user, email)
