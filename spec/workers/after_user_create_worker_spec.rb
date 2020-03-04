@@ -45,11 +45,11 @@ RSpec.describe AfterUserCreateWorker, type: :job do
 
     context "stage: merged" do
       it "associates" do
+        expect(instance).to receive(:associate_ownerships)
         expect(instance).to receive(:associate_membership_invites)
         expect do
           instance.perform(user.id, "merged", user: user)
-        end.to change(AfterUserCreateWorker.jobs, :count).by 1
-        expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+        end.to_not change(AfterUserCreateWorker.jobs, :count)
       end
     end
 

@@ -15,8 +15,6 @@ class AfterUserCreateWorker < ApplicationWorker
     elsif job_stage == "async"
       perform_async_jobs(user, email)
     end
-    # We want to run async after every job
-    AfterUserCreateWorker.perform_async(user.id, "async") unless job_stage == "async"
   end
 
   def perform_create_jobs(user, email)
@@ -24,14 +22,19 @@ class AfterUserCreateWorker < ApplicationWorker
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_membership_invites(user, email)
     send_welcoming_email(user)
+    AfterUserCreateWorker.perform_async(user.id, "async")
   end
 
   def perform_merged_jobs(user, email)
+    # This is already performing in a background job, so we don't need to run async
+    # Also, we we need to process with the previous email, not the user's current email
     associate_membership_invites(user, email, without_confirm: true)
+    associate_ownerships(user, email)
   end
 
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
+    AfterUserCreateWorker.perform_async(user.id, "async")
   end
 
   def perform_async_jobs(user, email)
