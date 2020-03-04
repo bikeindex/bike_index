@@ -54,12 +54,22 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
 
     context "stage: async" do
-      it "calls import and associate_ownerships" do
-        expect(instance).to receive(:associate_ownerships)
+      it "calls import" do
+        expect(instance).to_not receive(:associate_ownerships)
         expect(instance).to receive(:import_user_attributes)
         expect do
           instance.perform(user.id, "async")
         end.to_not change(AfterUserCreateWorker.jobs, :count)
+      end
+      context "confirmed user" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        it "calls import and associate_ownerships" do
+          expect(instance).to receive(:associate_ownerships)
+          expect(instance).to receive(:import_user_attributes)
+          expect do
+            instance.perform(user.id, "async")
+          end.to_not change(AfterUserCreateWorker.jobs, :count)
+        end
       end
     end
   end

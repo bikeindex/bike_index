@@ -37,7 +37,7 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_async_jobs(user, email)
     # These jobs don't need to happen immediately
     import_user_attributes(user)
-    associate_ownerships(user, email)
+    associate_ownerships(user, email) if user.confirmed?
   end
 
   def send_welcoming_email(user)
