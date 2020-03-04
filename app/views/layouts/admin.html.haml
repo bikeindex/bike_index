@@ -47,8 +47,8 @@
         = link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block"
     = render 'layouts/revised_messages'
 
-    %section#admin-content
-      .container-fluid.mt-4.mb-4
+    %section#admin-content.pb-4.mb-4
+      .container-fluid.mt-4.pb-4
         = yield
 
-    = render 'shared/footer_revised'
+
