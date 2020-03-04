@@ -3,33 +3,40 @@ class AfterUserCreateWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
-  def perform(user_id, user_state, user: nil, email: nil)
+  def perform(user_id, job_stage, user: nil, email: nil)
     user ||= User.find(user_id)
     email ||= user.email
-    if user_state == "new"
-      perform_create_jobs(user, email)
-    elsif user_state == "confirmed"
-      perform_confirmed_jobs(user, email)
-    elsif user_state == "merged"
-      perform_merged_jobs(user, email)
+    if job_stage == "new"
+      perform_create_tasks(user, email)
+    elsif job_stage == "confirmed"
+      perform_confirmed_tasks(user, email)
+    elsif job_stage == "merged"
+      perform_merged_tasks(user, email)
+    elsif job_stage == "async"
+      perform_async_tasks(user, email)
     end
+    # We want to run async after every job
+    AfterUserCreateWorker.perform_async(user.id, "async") unless job_stage == "async"
   end
 
-  def perform_create_jobs(user, email)
+  def perform_create_tasks(user, email)
     # This may confirm the user. We auto-confirm users that belong to orgs.
-    # Auto confirming the user actually ends up running perform_confirmed_jobs.
+    # Auto confirming the user actually ends up running perform_confirmed_tasks.
     associate_membership_invites(user, email)
-    import_user_attributes(user)
     send_welcoming_email(user)
   end
 
-  def perform_merged_jobs(user, email)
-    associate_ownerships(user, email)
+  def perform_merged_tasks(user, email)
     associate_membership_invites(user, email, without_confirm: true)
   end
 
-  def perform_confirmed_jobs(user, email)
+  def perform_confirmed_tasks(user, email)
     UserEmail.create_confirmed_primary_email(user)
+  end
+
+  def perform_async_tasks(user, email)
+    # These jobs don't need to happen immediately
+    import_user_attributes(user)
     associate_ownerships(user, email)
   end
 
@@ -73,13 +80,13 @@ class AfterUserCreateWorker < ApplicationWorker
       address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
       if address.present?
         user.attributes = { skip_geocoding: true,
-                           street: address["address"],
-                           zipcode: address["zipcode"],
-                           city: address["city"],
-                           state: State.fuzzy_find(address["state"]),
-                           country: Country.fuzzy_find(address["country"]),
-                           latitude: address["latitude"],
-                           longitude: address["longitude"] }
+                            street: address["address"],
+                            zipcode: address["zipcode"],
+                            city: address["city"],
+                            state: State.fuzzy_find(address["state"]),
+                            country: Country.fuzzy_find(address["country"]),
+                            latitude: address["latitude"],
+                            longitude: address["longitude"] }
       end
     end
     user.save if user.changed?

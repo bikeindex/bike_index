@@ -66,11 +66,10 @@ class User < ApplicationRecord
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
-  before_validation :normalize_attributes
+  before_validation :set_calculated_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
-  before_save :set_calculated_attributes
 
   attr_accessor :skip_create_jobs
 
@@ -275,17 +274,9 @@ class User < ApplicationRecord
     ows.reject(&:blank?)
   end
 
+  # Just check a couple, to avoid blocking save
   def stolen_bikes_without_locations
-    @stolen_bikes_without_locations ||= rough_approx_bikes.select { |b| b.current_stolen_record&.missing_location? }
-  end
-
-  def current_subscription
-    subscriptions.current.first
-  end
-
-  def delay_subscription_request
-    update_attribute :make_subscription_request, false
-    MarkForSubscriptionRequestWorker.perform_in(1.days, id)
+    @stolen_bikes_without_locations ||= rough_approx_bikes.limit(10).select { |b| b.current_stolen_record&.missing_location? }
   end
 
   def render_donation_request
@@ -294,6 +285,9 @@ class User < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.phone = Phonifyer.phonify(phone) if phone
+    self.username = Slugifyer.slugify(username) if username
+    self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
     self.website = Urlifyer.urlify(website) if website.present?
     if my_bikes_link_target.present? || my_bikes_link_title.present?
@@ -302,7 +296,9 @@ class User < ApplicationRecord
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end
-    self.has_stolen_bikes_without_locations = calculated_has_stolen_bikes_without_locations
+    unless skip_create_jobs || skip_geocoding # Don't run if we're resaving user
+      self.has_stolen_bikes_without_locations = calculated_has_stolen_bikes_without_locations
+    end
     true
   end
 
@@ -312,12 +308,6 @@ class User < ApplicationRecord
 
   def mb_link_title
     (my_bikes_hash && my_bikes_hash["link_title"]) || mb_link_target
-  end
-
-  def normalize_attributes
-    self.phone = Phonifyer.phonify(phone) if phone
-    self.username = Slugifyer.slugify(username) if username
-    self.email = EmailNormalizer.normalize(email)
   end
 
   def userlink

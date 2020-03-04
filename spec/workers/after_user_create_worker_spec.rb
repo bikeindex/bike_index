@@ -7,37 +7,59 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }
 
+  before { Sidekiq::Worker.clear_all }
+
   describe "perform" do
-    context "state: new" do
+    context "stage: new" do
       let(:user) { User.new(id: 69, email: "owner@jess.com") }
       it "sends confirmation email" do
         expect(instance).to receive(:associate_membership_invites).and_return(true)
-        instance.perform(user.id, "new", user: user)
-        expect(EmailConfirmationWorker).to have_enqueued_sidekiq_job(69)
+        expect do
+          instance.perform(user.id, "new", user: user)
+        end.to change(AfterUserCreateWorker.jobs, :count).by 1
+        expect(EmailConfirmationWorker.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+        expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
 
       context "confirmed user" do
         it "sends welcome email" do
           allow(user).to receive(:confirmed?) { true }
-          instance.perform(user.id, "new", user: user)
-          expect(EmailWelcomeWorker).to have_enqueued_sidekiq_job(69)
+          expect do
+            instance.perform(user.id, "new", user: user)
+          end.to change(AfterUserCreateWorker.jobs, :count).by 1
+          expect(EmailWelcomeWorker.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+          expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
       end
     end
 
-    context "state: confirmed" do
+    context "stage: confirmed" do
       it "associates" do
         expect(UserEmail).to receive(:create_confirmed_primary_email).with(user)
-        expect(instance).to receive(:associate_ownerships)
-        instance.perform(user.id, "confirmed", user: user)
+        expect do
+          instance.perform(user.id, "confirmed", user: user)
+        end.to change(AfterUserCreateWorker.jobs, :count).by 1
+        expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
     end
 
-    context "state: merged" do
+    context "stage: merged" do
       it "associates" do
-        expect(instance).to receive(:associate_ownerships)
         expect(instance).to receive(:associate_membership_invites)
-        instance.perform(user.id, "merged", user: user)
+        expect do
+          instance.perform(user.id, "merged", user: user)
+        end.to change(AfterUserCreateWorker.jobs, :count).by 1
+        expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+      end
+    end
+
+    context "stage: async" do
+      it "calls import and associate_ownerships" do
+        expect(instance).to receive(:associate_ownerships)
+        expect(instance).to receive(:import_user_attributes)
+        expect do
+          instance.perform(user.id, "async")
+        end.to_not change(AfterUserCreateWorker.jobs, :count)
       end
     end
   end
@@ -81,7 +103,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
-        instance.perform(user.id, "new")
+        Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         ownership.reload
         user.reload
         expect(user.phone).to eq "1112223333"
@@ -157,7 +179,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       it "enques welcome email" do
         allow(user).to receive(:confirmed?) { true }
         instance.send_welcoming_email(user)
-        expect(EmailWelcomeWorker).to have_enqueued_sidekiq_job(69)
+        expect(EmailWelcomeWorker.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
       end
     end
   end

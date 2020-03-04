@@ -309,6 +309,31 @@ RSpec.describe User, type: :model do
         expect(user.twitter).to eq("http://somewhere.com")
       end
     end
+    it "doesn't let you overwrite usernames" do
+      target = "coolname"
+      user1 = FactoryBot.create(:user)
+      user1.update_attribute :username, target
+      expect(user1.reload.username).to eq(target)
+      user2 = FactoryBot.create(:user)
+      user2.username = "#{target}'"
+      expect(user2.save).to be_falsey
+      expect(user2.errors.full_messages.to_s).to match("Username has already been taken")
+      expect(user2.reload.username).not_to eq(target)
+      expect(user1.reload.username).to eq(target)
+    end
+  end
+
+  describe "email and phone" do
+    let(:user) { FactoryBot.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
+    before(:each) { user.set_calculated_attributes }
+
+    it "strips the non-digit numbers from the phone input" do
+      expect(user.phone).to eq("7738383887")
+    end
+
+    it "normalizes the email" do
+      expect(user.email).to eq("something@example.com")
+    end
   end
 
   describe "bikes" do
@@ -556,38 +581,6 @@ RSpec.describe User, type: :model do
           expect(user.render_donation_request).to be_nil
         end
       end
-    end
-  end
-
-  describe "normalize_attributes" do
-    it "doesn't let you overwrite usernames" do
-      target = "coolname"
-      user1 = FactoryBot.create(:user)
-      user1.update_attribute :username, target
-      expect(user1.reload.username).to eq(target)
-      user2 = FactoryBot.create(:user)
-      user2.username = "#{target}'"
-      expect(user2.save).to be_falsey
-      expect(user2.errors.full_messages.to_s).to match("Username has already been taken")
-      expect(user2.reload.username).not_to eq(target)
-      expect(user1.reload.username).to eq(target)
-    end
-
-    it "has before validation callback for normalizing" do
-      expect(User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
-    end
-  end
-
-  describe "normalize_attributes" do
-    let(:user) { FactoryBot.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
-    before(:each) { user.normalize_attributes }
-
-    it "strips the non-digit numbers from the phone input" do
-      expect(user.phone).to eq("7738383887")
-    end
-
-    it "normalizes the email" do
-      expect(user.email).to eq("something@example.com")
     end
   end
 
