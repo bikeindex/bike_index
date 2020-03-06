@@ -4816,8 +4816,10 @@ nl:
     search_bikes_in_organization: Zoek fietsen in organisatieaccount
     social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
     staff_accounts: Personeelsrekeningen
-    supporting_our_nonprofit: Ondersteuning van onze non-profit
-    welcome_campaign: Welkomstcampagne op Facebook, Twitter en Instagram
+    abandoned_bike_suite: Verlaten fietssuite - neem contact op met fietsbezitters
+      en logverlaten en in beslag genomen fietsrecords
+    organization_dashboard: Stads- en politie-dashboard - analyseer statistieken over
+      lokale registratie op basis van postcode
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een
