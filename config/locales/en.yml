@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -4668,8 +4668,8 @@ en:
     search_bikes_in_organization: Search bikes in organization account
     social_media_and_email_marketing: Social Media and Email marketing campaign assets
     staff_accounts: Staff accounts
-    supporting_our_nonprofit: Supporting our nonprofit
-    welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+    abandoned_bike_suite: Abandoned bike suite - contact bike owners and log abandonment and impound bike records
+    organization_dashboard: City and Police dashboard - analyze statistics on local registration based on zip code
   public_images:
     edit:
       editing_bike_html: "<span>Back Arrow</span>Back to <em>Editing Bike</em>"
