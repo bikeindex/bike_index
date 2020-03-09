@@ -4,7 +4,7 @@ module Api
       before_action :verify_organizations_token
 
       def show
-        info = { name: @organization.name, can_add_bikes: false }
+        info = { name: @organization.name, can_add_bikes: false, id: @organization.id }
         info[:can_add_bikes] = true if @organization.auto_user_id.present?
         render json: info
       end
