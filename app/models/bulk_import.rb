@@ -94,8 +94,7 @@ class BulkImport < ApplicationRecord
     org = Organization.where(ascend_name: ascend_name).first
     return org if org.present?
     regex_matcher = ascend_name.gsub(/-|_|\s/, "")
-    Organization.where.not(ascend_name: nil).select do |org|
-      next false unless org.ascend_imports?
+    Organization.ascend_pos.select do |org|
       org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
     end.first
   end

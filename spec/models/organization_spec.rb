@@ -546,6 +546,11 @@ RSpec.describe Organization, type: :model do
         expect(organization.calculated_pos_kind).to eq "broken_pos"
       end
     end
+    context "ascend_name" do
+      it "returns ascend_pos" do
+        fail
+      end
+    end
     context "recent bikes" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
       it "no_pos, does_not_need_pos if older organization" do

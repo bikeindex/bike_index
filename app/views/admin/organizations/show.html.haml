@@ -178,25 +178,16 @@
           %td
             POS integration:
           %td
-            = @organization.pos_kind.humanize
-            %br
-            - if @organization.ascend_imports?
-              Ascend
+            - if @organization.lightspeed_pos?
+              = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
+            - elsif @organization.ascend_pos?
+              = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
+              %small
+                Ascend name:
+                %em
+                  = @organization.ascend_name
             - else
-              %small.less-strong
-                Unknown
-        - if @organization.ascend_imports?
-          %tr
-            %td
-              Ascend name
-            %td
-              %code
-                = @organization.ascend_name
-        %tr
-          %td
-            Info
-          %td
-            More to come soon
+              = @organization.pos_kind.humanize
 .row.mt-4
   .col-md-6
     %p

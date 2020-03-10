@@ -136,8 +136,6 @@ class Organization < ApplicationRecord
 
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
-  def ascend_imports?; ascend_name.present? end
-
   def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
@@ -290,7 +288,7 @@ class Organization < ApplicationRecord
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; enabled?("show_bulk_import") || ascend_imports? end
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
 
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
 
@@ -320,7 +318,7 @@ class Organization < ApplicationRecord
   def calculated_pos_kind
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-    return "ascend_pos" if recent_bikes.ascend_pos.count > 0
+    return "ascend_pos" if recent_bikes.ascend_pos.count > 0 || ascend_name.present?
     return "other_pos" if recent_bikes.any_pos.count > 0
     if bike_shop? && created_at < Time.current - 1.week
       return "does_not_need_pos" if recent_bikes.count > 2
