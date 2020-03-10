@@ -41,7 +41,7 @@
         %p
           = link_to t(".learn_more"), lightspeed_path
           = t(".or")
-          = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path
+          = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path(organization_id: passive_organization&.id)
 
         %h3= t(".ascend_retail")
 
