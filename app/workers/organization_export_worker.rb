@@ -113,6 +113,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
     when "additional_registration_number" then bike.additional_registration
+    when "organization_affiliation" then bike.organization_affiliation
     when "phone" then bike.phone
     when "is_stolen" then bike.stolen ? "true" : nil
     when "address" then bike.registration_address["address"] # These are the expanded values for bike registration address

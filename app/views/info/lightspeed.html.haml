@@ -13,7 +13,7 @@
       = t(".we_believe_that_bicycle_registration")
 
     - if current_user.present? && current_user.memberships.present?
-      - link = link_to 'bikeindex.org/lightspeed_interface', lightspeed_interface_path
+      - link = link_to 'bikeindex.org/lightspeed_interface', lightspeed_interface_path(organization_id: passive_organization&.id)
       %p= t(".all_you_have_to_do_is_go_to_html", link: link)
     - else
       %p= t(".the_first_step_is_to_create_an_account_html")
