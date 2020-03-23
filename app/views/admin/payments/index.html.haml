@@ -28,9 +28,8 @@
   %h4.mt-2 Amounts
   = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data_money] } }, stacked: true, thousands: ",", prefix: "$", round: 2, defer: true
 
-.col-12.mb-4.mt-2
-  .row.justify-content-end
-    = render partial: "/shared/period_select"
+
+= render partial: "/shared/period_select"
 
 .row.mb-4
   .col-sm

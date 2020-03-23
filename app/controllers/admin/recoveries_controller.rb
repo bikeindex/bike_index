@@ -1,10 +1,13 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
+  before_action :set_period, only: [:index]
+
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @recoveries = matching_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+    @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
                                      .page(page).per(per_page)
   end
 
@@ -37,7 +40,7 @@ class Admin::RecoveriesController < Admin::BaseController
     end
   end
 
-  helper_method :recovery_display_status_searched
+  helper_method :recovery_display_status_searched, :available_recoveries
 
   private
 
@@ -52,9 +55,9 @@ class Admin::RecoveriesController < Admin::BaseController
     "waiting_on_decision"
   end
 
-  def matching_recoveries
+  def available_recoveries
     recoveries = StolenRecord.recovered.where(recovery_display_status: recovery_display_status_searched)
-    recoveries.includes(:bike)
+    recoveries.includes(:bike).where(created_at: @time_range)
   end
 
   def permitted_parameters
