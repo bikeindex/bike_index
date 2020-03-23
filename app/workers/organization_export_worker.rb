@@ -105,6 +105,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "owner_name" then bike.owner_name
     when "owner_name_or_email" then bike.owner_name_or_email
     when "registration_method" then bike.creation_description
+    when "registration_id" then bike.id
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name
