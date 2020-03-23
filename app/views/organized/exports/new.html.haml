@@ -30,7 +30,10 @@
               %label.checkbox
                 = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
                 -# This will break when a new reg field is added - which is a plus ☺️
-                = header.titleize
+                - if header == "registration_id" # humanizing registration_id becomes "registration", which isn't what we want
+                  Registration ID
+                - else
+                  = header.titleize
     .form-group.row.mt-4
       = f.label :custom_bike_ids, "Specific bikes list", class: "org-form-label"
       .col-sm-8
