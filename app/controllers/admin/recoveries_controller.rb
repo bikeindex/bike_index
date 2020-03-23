@@ -46,10 +46,10 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def recovery_display_status_searched
-    return StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM.values if params[:search_recovery_display_status] == "all"
-    # TODO: Refactor to incorporate Rails 5 enum changes
-    recovery_display_status_parameter = (params[:search_recovery_display_status] || "waiting_on_decision").to_sym
-    StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM[recovery_display_status_parameter.to_sym] || 1
+    return StolenRecord.recovery_display_statuses if params[:search_recovery_display_status] == "all"
+    return params[:search_recovery_display_status] if StolenRecord.recovery_display_statuses.include?(params[:search_recovery_display_status])
+    # default to waiting_on_decision
+    "waiting_on_decision"
   end
 
   def matching_recoveries

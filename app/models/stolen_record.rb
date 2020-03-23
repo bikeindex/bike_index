@@ -71,6 +71,8 @@ class StolenRecord < ApplicationRecord
     ].flatten.compact.uniq
   end
 
+  def self.recovery_display_statuses; RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s) end
+
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first

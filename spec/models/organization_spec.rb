@@ -299,18 +299,13 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "show_bulk_import?" do
+    # Note: the show_bulk_import? for ascend shops is tested by the ascend_pos test
     let(:organization) { Organization.new }
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
     context "paid_for" do
       let(:organization) { Organization.new(enabled_feature_slugs: ["show_bulk_import"]) }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-    context "with ascend name" do
-      let(:organization) { Organization.new(ascend_name: "xxxzzaz") }
       it "is truthy" do
         expect(organization.show_bulk_import?).to be_truthy
       end
@@ -541,14 +536,22 @@ RSpec.describe Organization, type: :model do
         organization.reload
         expect(organization.pos_kind).to eq "no_pos"
         expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
         bike_pos.update_attribute :created_at, Time.current - 2.weeks
         expect(organization.calculated_pos_kind).to eq "broken_pos"
       end
     end
     context "ascend_name" do
+      let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
       it "returns ascend_pos" do
-        fail
+        expect(organization.calculated_pos_kind).to eq "ascend_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.pos_kind).to eq "ascend_pos"
+        expect(organization.show_bulk_import?).to be_truthy
       end
     end
     context "recent bikes" do

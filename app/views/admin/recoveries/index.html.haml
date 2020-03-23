@@ -8,8 +8,8 @@
       %li.nav-item
         - all_recoveries_active = params[:search_recovery_display_status] == "all"
         = link_to "All", admin_recoveries_path(sortable_search_params.merge(search_recovery_display_status: "all")), class: "nav-link #{all_recoveries_active ? "active" : ""}"
-      - StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM.each do |recovery_display_status, enum|
-        - active = recovery_display_status_searched == enum
+      - StolenRecord::recovery_display_statuses.each do |recovery_display_status|
+        - active = recovery_display_status_searched == recovery_display_status
         %li.nav-item
           = link_to recovery_display_status.to_s.humanize, admin_recoveries_path(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), class: "nav-link #{active ? "active" : ""}"
 
