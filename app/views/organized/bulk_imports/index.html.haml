@@ -1,6 +1,6 @@
 .organized-page-header.mb-4
   %h1
-    - if current_organization.ascend_imports?
+    - if current_organization.ascend_pos?
       = t(".org_ascend_imports_html", org_name: current_organization.name)
     - else
       = t(".org_bulk_imports_html", org_name: current_organization.name)
