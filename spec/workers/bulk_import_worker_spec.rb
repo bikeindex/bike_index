@@ -129,7 +129,7 @@ RSpec.describe BulkImportWorker, type: :job do
       end
       context "ascend import" do
         let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop") }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
         it "resolves error, assigns organization and processes" do
           bulk_import.check_ascend_import_processable!
           bulk_import.reload

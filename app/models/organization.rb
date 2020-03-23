@@ -84,6 +84,8 @@ class Organization < ApplicationRecord
 
   def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
 
+  def self.no_pos_kinds; %w[no_pos does_not_need_pos] end
+
   def self.admin_required_kinds; %w[ambassador bike_depot].freeze end
 
   def self.user_creatable_kinds; kinds - admin_required_kinds end
@@ -135,8 +137,6 @@ class Organization < ApplicationRecord
   def sent_invitation_count; memberships.count end
 
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
-
-  def ascend_imports?; ascend_name.present? end
 
   def parent?; child_ids.present? end
 
@@ -290,9 +290,11 @@ class Organization < ApplicationRecord
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; enabled?("show_bulk_import") || ascend_imports? end
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
 
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
+  def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
@@ -319,8 +321,8 @@ class Organization < ApplicationRecord
 
   def calculated_pos_kind
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
+    return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-    return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
     if bike_shop? && created_at < Time.current - 1.week
       return "does_not_need_pos" if recent_bikes.count > 2

@@ -17,7 +17,10 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       ascend_bike.reload
       expect(organization.bikes).to eq([ascend_bike])
       expect(organization.pos_kind).to eq "no_pos"
-      described_class.new.perform
+      expect do
+        described_class.new.perform
+      end.to change(described_class.jobs, :count).by(1)
+      described_class.drain
       organization.reload
       expect(organization.pos_kind).to eq "ascend_pos"
     end

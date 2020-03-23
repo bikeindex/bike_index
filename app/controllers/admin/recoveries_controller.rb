@@ -1,10 +1,13 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
+  before_action :set_period, only: [:index]
+
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @recoveries = matching_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+    @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
                                      .page(page).per(per_page)
   end
 
@@ -37,7 +40,7 @@ class Admin::RecoveriesController < Admin::BaseController
     end
   end
 
-  helper_method :recovery_display_status_searched
+  helper_method :recovery_display_status_searched, :available_recoveries
 
   private
 
@@ -46,15 +49,15 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def recovery_display_status_searched
-    return StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM.values if params[:search_recovery_display_status] == "all"
-    # TODO: Refactor to incorporate Rails 5 enum changes
-    recovery_display_status_parameter = (params[:search_recovery_display_status] || "waiting_on_decision").to_sym
-    StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM[recovery_display_status_parameter.to_sym] || 1
+    return StolenRecord.recovery_display_statuses if params[:search_recovery_display_status] == "all"
+    return params[:search_recovery_display_status] if StolenRecord.recovery_display_statuses.include?(params[:search_recovery_display_status])
+    # default to waiting_on_decision
+    "waiting_on_decision"
   end
 
-  def matching_recoveries
+  def available_recoveries
     recoveries = StolenRecord.recovered.where(recovery_display_status: recovery_display_status_searched)
-    recoveries.includes(:bike)
+    recoveries.includes(:bike).where(created_at: @time_range)
   end
 
   def permitted_parameters

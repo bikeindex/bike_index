@@ -60,19 +60,19 @@ RSpec.describe BulkImport, type: :model do
       expect(bulk_import.organization_for_ascend_name).to be_nil
     end
     context "exact name" do
-      let!(:organization) { FactoryBot.create(:organization, ascend_name: "BIKE_LANE_CHIC") }
+      let!(:organization) { FactoryBot.create(:organization, pos_kind: "ascend_pos", ascend_name: "BIKE_LANE_CHIC") }
       it "returns the organization" do
         expect(bulk_import.organization_for_ascend_name).to eq organization
       end
     end
     context "close name" do
-      let!(:organization) { FactoryBot.create(:organization, kind: "bike_shop", ascend_name: "bike lane chic") }
+      let!(:organization) { FactoryBot.create(:organization, pos_kind: "ascend_pos", kind: "bike_shop", ascend_name: "bike lane chic") }
       it "returns the organization" do
         expect(bulk_import.organization_for_ascend_name).to eq organization
       end
     end
     context "close but not name" do
-      let!(:organization) { FactoryBot.create(:organization, kind: "bike_shop", ascend_name: "bike laning") }
+      let!(:organization) { FactoryBot.create(:organization, pos_kind: "ascend_pos", kind: "bike_shop", ascend_name: "bike laning") }
       it "returns the organization" do
         expect(bulk_import.organization_for_ascend_name).to be_nil
       end
