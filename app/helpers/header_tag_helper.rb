@@ -11,7 +11,7 @@ module HeaderTagHelper
   end
 
   def page_title=(val)
-    @page_title = strip_tags(val).strip
+    @page_title = strip_tags(val).strip.gsub("&amp;", "&")
   end
 
   def page_description=(val)
