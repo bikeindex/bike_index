@@ -166,7 +166,7 @@ RSpec.describe UsersController, type: :controller do
 
             post :create, params: { user: user_attributes, partner: "bikehub" }
 
-            expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
+            expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
             expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id)
             expect(user.partner_sign_up).to eq "bikehub"
@@ -185,7 +185,7 @@ RSpec.describe UsersController, type: :controller do
               post :create, params: { user: user_attributes }
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
-            expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
+            expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
             expect(session[:partner]).to be_nil
             user = User.order(:created_at).last
             expect(user.email).to eq(user_attributes[:email])
@@ -245,7 +245,7 @@ RSpec.describe UsersController, type: :controller do
             it "logins and redirect when confirmation succeeds" do
               get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-              expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+              expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
               expect(session[:partner]).to be_nil
             end
             context "in session" do
@@ -253,7 +253,7 @@ RSpec.describe UsersController, type: :controller do
                 session[:partner] = "bikehub"
                 get :confirm, params: { id: user.id, code: user.confirmation_token }
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-                expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+                expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
               end
             end
@@ -263,7 +263,7 @@ RSpec.describe UsersController, type: :controller do
                 set_current_user(user)
                 get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-                expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+                expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
                 expect(user.confirmed?).to be_truthy
               end
@@ -284,7 +284,7 @@ RSpec.describe UsersController, type: :controller do
           expect(user.confirmed?).to be_truthy
           get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-          expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+          expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
           expect(session[:partner]).to be_nil
         end
       end

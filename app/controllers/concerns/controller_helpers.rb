@@ -281,7 +281,7 @@ module ControllerHelpers
 
   def bikehub_url(path)
     [
-      ENV["BIKEHUB_URL"].presence || "https://new.bikehub.com",
+      ENV["BIKEHUB_URL"].presence || "https://parkit.bikehub.com",
       path,
     ].join("/")
   end
