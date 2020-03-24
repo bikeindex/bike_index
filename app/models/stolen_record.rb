@@ -51,6 +51,7 @@ class StolenRecord < ApplicationRecord
   scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
+  before_validation :set_geocode_address
   after_validation :reverse_geocode
   after_save :remove_outdated_alert_images
   after_commit :update_associations
@@ -184,6 +185,10 @@ class StolenRecord < ApplicationRecord
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
     self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
+  end
+
+  def set_geocode_address
+    self.geocode_address = address(skip_default_country: true)
   end
 
   def fix_date
@@ -333,13 +338,5 @@ class StolenRecord < ApplicationRecord
 
     EmailTheftAlertNotificationWorker
       .perform_async(theft_alerts.active.last.id, :recovered)
-  end
-
-  def geocode_data
-    @geocode_data ||= address(skip_default_country: true)
-  end
-
-  def geocode_columns
-    %i[street city state_id zipcode country_id]
   end
 end
