@@ -67,6 +67,7 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :set_calculated_attributes
+  before_validation :set_geocode_address
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
@@ -302,6 +303,10 @@ class User < ApplicationRecord
     true
   end
 
+  def set_geocode_address
+    self.geocode_address = address
+  end
+
   def mb_link_target
     my_bikes_hash && my_bikes_hash["link_target"]
   end
@@ -376,10 +381,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def geocode_columns
-    %i[street city zipcode]
-  end
 
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?
