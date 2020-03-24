@@ -392,7 +392,8 @@ CREATE TABLE public.bikes (
     latitude double precision,
     longitude double precision,
     status integer DEFAULT 0,
-    address character varying
+    address character varying,
+    geocode_address character varying
 );
 
 
@@ -1244,7 +1245,8 @@ CREATE TABLE public.locations (
     shown boolean DEFAULT false,
     country_id integer,
     state_id integer,
-    address character varying
+    address character varying,
+    geocode_address character varying
 );
 
 
@@ -1356,7 +1358,8 @@ CREATE TABLE public.mail_snippets (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     organization_id integer,
-    kind integer DEFAULT 0
+    kind integer DEFAULT 0,
+    geocode_address character varying
 );
 
 
@@ -2178,7 +2181,8 @@ CREATE TABLE public.stolen_records (
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
-    address character varying
+    address character varying,
+    geocode_address character varying
 );
 
 
@@ -2343,7 +2347,8 @@ CREATE TABLE public.twitter_accounts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     last_error character varying,
-    last_error_at timestamp without time zone
+    last_error_at timestamp without time zone,
+    geocode_address character varying
 );
 
 
@@ -2451,7 +2456,8 @@ CREATE TABLE public.users (
     last_login_ip character varying,
     magic_link_token text,
     has_stolen_bikes_without_locations boolean DEFAULT false,
-    address character varying
+    address character varying,
+    geocode_address character varying
 );
 
 
