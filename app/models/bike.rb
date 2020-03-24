@@ -13,7 +13,7 @@ class Bike < ApplicationRecord
     status_with_owner: 0,
     status_stolen: 1,
     status_abandoned: 2,
-    status_impounded: 3
+    status_impounded: 3,
   }
 
   belongs_to :manufacturer
@@ -101,6 +101,7 @@ class Bike < ApplicationRecord
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
+  before_validation :set_geocode_address
   before_save :set_calculated_attributes
 
   include PgSearch::Model
@@ -534,6 +535,22 @@ class Bike < ApplicationRecord
     true
   end
 
+  # Geolocate based on the full current stolen record address, if available.
+  # Otherwise, use the data set by set_location_info.
+  def set_geocode_address
+    # Sets lat/long, will avoid a geocode API call if coordinates are found
+    set_location_info
+
+    self.geocode_address =
+      current_stolen_record
+        &.address(force_show_address: true)
+        .presence ||
+      [city, zipcode, country&.name]
+        .select(&:present?)
+        .join(" ")
+        .presence
+  end
+
   def normalize_emails
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
@@ -807,30 +824,11 @@ class Bike < ApplicationRecord
     PropulsionType.new(propulsion_type).name
   end
 
-  # Geolocate based on the full current stolen record address, if available.
-  # Otherwise, use the data set by set_location_info.
-  def geocode_data
-    return @geocode_data if defined?(@geocode_data)
-
-    # Sets lat/long, will avoid a geocode API call if coordinates are found
-    set_location_info
-
-    @geocode_data =
-      current_stolen_record
-        &.address(force_show_address: true)
-        .presence ||
-      [city, zipcode, country&.name]
-        .select(&:present?)
-        .join(" ")
-        .presence
-  end
-
   # Take lat/long from associated geocoded model
-  # Only geocode if no lat/long present and geocode data present
+  # Only geocode if lat/long are blank and geocode address present
   def should_be_geocoded?
     return false if skip_geocoding?
-    return false if latitude.present? && longitude.present?
-    geocode_data.present?
+    (latitude.blank? || longitude.blank?) && geocode_address.present?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)

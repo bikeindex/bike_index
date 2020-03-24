@@ -1335,7 +1335,7 @@ RSpec.describe Bike, type: :model do
       end
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
-        expect(bike.listing_order).to be < 10000
+        expect(bike.listing_order).to be < 1e10
         # stolen records don't actually have an after_commit hook to update
         # bikes (they probably should though). This is just checking this is
         # called correctly on save.
@@ -1513,14 +1513,13 @@ RSpec.describe Bike, type: :model do
         expect(bike.country).to eq(stolen_record.country)
       end
       context "given a abandoned record, it instead uses the abandoned record" do
-        let!(:parking_notification) { FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike) }
         it "takes the location from the abandoned records" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
-          expect(bike.current_parking_notification).to eq parking_notification
-          bike.reload
-          bike.set_location_info
 
+          parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
+          expect(bike.current_parking_notification).to eq parking_notification
           expect(bike.to_coordinates).to eq(parking_notification.to_coordinates)
+
           expect(bike.city).to eq(parking_notification.city)
           expect(bike.zipcode).to eq(parking_notification.zipcode)
           expect(bike.country).to eq(parking_notification.country)
