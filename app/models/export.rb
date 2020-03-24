@@ -28,7 +28,7 @@ class Export < ApplicationRecord
 
   # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
   def self.additional_registration_fields
-    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
+    { reg_address: "registration_address", additional_registration: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
   end
 
   def self.default_kind_options

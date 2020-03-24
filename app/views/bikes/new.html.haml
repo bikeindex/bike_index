@@ -134,10 +134,10 @@
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 
-          - if @organization&.include_field_reg_secondary_serial?(current_user)
+          - if @organization&.include_field_additional_registration?(current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :additional_registration,
-                @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number"),
+                @organization.registration_field_label("additional_registration") || t(".additional_serial_sticker_number"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :additional_registration,

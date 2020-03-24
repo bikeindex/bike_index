@@ -9,7 +9,7 @@ class PaidFeature < ApplicationRecord
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[
     reg_affiliation
-    reg_secondary_serial
+    additional_registration
     reg_phone
     reg_address
   ].freeze

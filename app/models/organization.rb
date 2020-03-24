@@ -202,8 +202,8 @@ class Organization < ApplicationRecord
     additional_registration_fields.include?("reg_address")
   end
 
-  def include_field_reg_secondary_serial?(user = nil)
-    additional_registration_fields.include?("reg_secondary_serial")
+  def include_field_additional_registration?(user = nil)
+    additional_registration_fields.include?("additional_registration")
   end
 
   def registration_field_label(field_slug)

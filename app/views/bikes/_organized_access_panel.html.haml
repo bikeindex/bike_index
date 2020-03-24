@@ -121,7 +121,7 @@
                       %td
                         = "#{(bike_attr || reg_field).humanize}:"
                       %td
-                        - if reg_field == "reg_secondary_serial"
+                        - if reg_field == "additional_registration"
                           = @bike.additional_registration
                         - elsif reg_field == "phone"
                           = @bike.phone
