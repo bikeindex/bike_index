@@ -67,7 +67,7 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :set_calculated_attributes
-  before_validation :set_geocode_address
+  before_validation :set_address
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
@@ -303,8 +303,8 @@ class User < ApplicationRecord
     true
   end
 
-  def set_geocode_address
-    self.geocode_address = [
+  def set_address
+    self.address = [
       street,
       city,
       (state&.abbreviation),
@@ -332,7 +332,7 @@ class User < ApplicationRecord
   end
 
   def address_hash
-    return if geocode_address.blank?
+    return if address.blank?
     {
       address: street,
       city: city,

@@ -51,7 +51,7 @@ class StolenRecord < ApplicationRecord
   scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
-  before_validation :set_geocode_address
+  before_validation :set_address
   after_validation :reverse_geocode
   after_save :remove_outdated_alert_images
   after_commit :update_associations
@@ -187,8 +187,8 @@ class StolenRecord < ApplicationRecord
     self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
   end
 
-  def set_geocode_address
-    self.geocode_address = display_address(skip_default_country: true)
+  def set_address
+    self.address = display_address(skip_default_country: true)
   end
 
   def fix_date

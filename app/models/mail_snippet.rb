@@ -18,7 +18,6 @@ class MailSnippet < ApplicationRecord
   after_commit :update_organization
 
   before_validation :set_calculated_attributes
-  before_validation :set_geocode_address
 
   def self.organization_snippets
     {
@@ -46,14 +45,10 @@ class MailSnippet < ApplicationRecord
     end
   end
 
-  def set_geocode_address
-    self.geocode_address = address
-  end
-
   def update_organization
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.current)
+    organization && organization.update(updated_at: Time.current)
   end
 
   private
@@ -61,7 +56,7 @@ class MailSnippet < ApplicationRecord
   def should_be_geocoded?
     return false if skip_geocoding?
     return true if is_location_triggered?
-    return false if geocode_address.blank?
-    geocode_address_changed?
+    return false if address.blank?
+    address_changed?
   end
 end

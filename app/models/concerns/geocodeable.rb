@@ -4,7 +4,7 @@ module Geocodeable
   extend ActiveSupport::Concern
 
   included do
-    geocoded_by :geocode_address
+    geocoded_by :address
     after_validation :geocode, if: :should_be_geocoded?
 
     attr_accessor :skip_geocoding
@@ -22,7 +22,7 @@ module Geocodeable
     # Overwrite in model to customize skip-geocoding logic.
     def should_be_geocoded?
       return false if skip_geocoding?
-      geocode_address.blank? || geocode_address_changed?
+      address.blank? || address_changed?
     end
   end
 end

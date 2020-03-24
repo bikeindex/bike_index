@@ -101,7 +101,7 @@ class Bike < ApplicationRecord
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
-  before_validation :set_geocode_address, if: :should_be_geocoded?
+  before_validation :set_address, if: :should_be_geocoded?
   before_save :set_calculated_attributes
 
   include PgSearch::Model
@@ -537,14 +537,12 @@ class Bike < ApplicationRecord
 
   # Geolocate based on the full current stolen record address, if available.
   # Otherwise, use the data set by set_location_info.
-  def set_geocode_address
+  def set_address
     # Sets lat/long, will avoid a geocode API call if coordinates are found
     set_location_info
 
-    self.geocode_address =
-      current_stolen_record
-        &.address(force_show_address: true)
-        .presence ||
+    self.address =
+      current_stolen_record&.display_address(force_show_address: true).presence ||
       [city, zipcode, country&.name]
         .select(&:present?)
         .join(" ")
@@ -829,7 +827,7 @@ class Bike < ApplicationRecord
   def should_be_geocoded?
     return false if skip_geocoding?
     return false if latitude.present? && longitude.present?
-    geocode_address.present?
+    address.present?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
