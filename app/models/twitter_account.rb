@@ -13,6 +13,7 @@ class TwitterAccount < ApplicationRecord
 
   validates :screen_name, uniqueness: true
 
+  before_validation :set_geocode_address
   before_save :reverse_geocode, if: -> { !skip_geocoding? && latitude.present? && (state.blank? || state_changed?) }
   before_save :fetch_account_info
 
@@ -58,6 +59,10 @@ class TwitterAccount < ApplicationRecord
       user_token: info["credentials"]["token"],
       user_secret: info["credentials"]["secret"],
     }
+  end
+
+  def set_geocode_address
+    self.geocode_address = address
   end
 
   def twitter_account_url
@@ -127,10 +132,6 @@ class TwitterAccount < ApplicationRecord
   end
 
   private
-
-  def geocode_columns
-    %i[address]
-  end
 
   def twitter_client
     @twitter_client ||= Twitter::REST::Client.new do |config|
