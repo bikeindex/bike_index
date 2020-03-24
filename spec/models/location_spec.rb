@@ -16,9 +16,11 @@ RSpec.describe Location, type: :model do
     it "creates an address, ignoring blank fields" do
       c = Country.create(name: "Neverland", iso: "XXX")
       s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
-      location = Location.new(street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
+
+      location = Location.create(street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
       expect(location.address).to eq("300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland")
-      location.street = " "
+
+      location.update(street: " ")
       expect(location.address).to eq("Lancaster, XXX, 17601, Neverland")
     end
   end
