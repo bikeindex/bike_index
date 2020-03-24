@@ -13,7 +13,7 @@ class TwitterAccount < ApplicationRecord
 
   validates :screen_name, uniqueness: true
 
-  before_save :reverse_geocode, if: :should_be_geocoded?
+  before_save :reverse_geocode, if: :should_be_reverse_geocoded?
   before_save :fetch_account_info
 
   scope :active, -> { where(active: true) }
@@ -126,7 +126,7 @@ class TwitterAccount < ApplicationRecord
     return
   end
 
-  def should_be_geocoded?
+  def should_be_reverse_geocoded?
     !skip_geocoding? &&
       latitude.present? &&
       (state.blank? || state_changed?)

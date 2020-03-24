@@ -18,12 +18,14 @@ module Geocodeable
     #
     # By default:
     #  - we skip geocoding if the `skip_geocoding` flag is set.
-    #  - geocode if address is blank or has changed
+    #  - geocode if address is present and changed
     #
     # Overwrite this method in inheriting models to customize skip-geocoding
     # logic.
     def should_be_geocoded?
-      !skip_geocoding? && (address.blank? || address_changed?)
+      return false if skip_geocoding?
+      return false if address.blank?
+      address_changed?
     end
   end
 end

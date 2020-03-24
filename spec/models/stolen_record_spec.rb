@@ -550,6 +550,43 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "#should_be_geocoded?" do
+    context "given the skip geocoding flag" do
+      it "returns false" do
+        stolen_record = FactoryBot.build(:stolen_record, skip_geocoding: true)
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+        expect(stolen_record).to_not be_geocoded
+      end
+    end
+
+    context "given a missing address" do
+      it "returns false and prevents geocoding" do
+        stolen_record = FactoryBot.build(
+          :stolen_record,
+          address: nil,
+          skip_geocoding: false,
+        )
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+        expect(stolen_record).to_not be_geocoded
+      end
+    end
+
+    context "given an address change" do
+      it "returns false unless there has been an address change" do
+        stolen_record = FactoryBot.create(
+          :stolen_record,
+          :in_los_angeles,
+          skip_geocoding: false,
+        )
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+
+        stolen_record.city = "New York"
+        stolen_record.valid? # triggers an update to address
+        expect(stolen_record.should_be_geocoded?).to eq(true)
+      end
+    end
+  end
+
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
