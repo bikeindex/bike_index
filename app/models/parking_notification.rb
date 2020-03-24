@@ -134,6 +134,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def update_associations
     # repeat_parking_notifications.map(&:update)
-    bike&.update_attributes(updated_at: Time.current)
+    bike&.update(updated_at: Time.current)
+    bike.set_geocode_address
   end
 end
