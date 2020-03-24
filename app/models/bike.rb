@@ -823,7 +823,7 @@ class Bike < ApplicationRecord
   end
 
   # Take lat/long from associated geocoded model
-  # Only geocode if lat/long are blank and geocode address present
+  # Only geocode if lat/long are blank and address present
   def should_be_geocoded?
     return false if skip_geocoding?
     return false if latitude.present? && longitude.present?
