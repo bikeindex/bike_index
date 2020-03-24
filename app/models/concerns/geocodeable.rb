@@ -4,7 +4,7 @@ module Geocodeable
   extend ActiveSupport::Concern
 
   included do
-    geocoded_by :geocode_data
+    geocoded_by :geocode_address
     after_validation :geocode, if: :should_be_geocoded?
 
     attr_accessor :skip_geocoding
@@ -13,25 +13,16 @@ module Geocodeable
       !!skip_geocoding
     end
 
-    # Customize by overwriting in the Geocodeable model.
-    def geocode_data
-      @geocode_data ||= address
-    end
-
-    # An array of symbols of the db columns upon which `geocode_data`
-    # depends.These are checked for changes before geocoding using
-    # `should_be_geocoded?`. By default, empty, so we don't check for changes.
-    def geocode_columns; []; end
-
-    def any_geocode_columns_changed?
-      return true if geocode_columns.blank?
-      geocode_columns.any? { |col| public_send("#{col}_changed?") }
-    end
-
+    # Should the receiving object be geocoded?
+    #
+    # By default:
+    #  - we skip geocoding if the `skip_geocoding` flag is set.
+    #  - geocode if geocode address is blank or has changed
+    #
     # Overwrite in model to customize skip-geocoding logic.
     def should_be_geocoded?
       return false if skip_geocoding?
-      geocode_data.present? && any_geocode_columns_changed?
+      geocode_address.blank? || geocode_address_changed?
     end
   end
 end
