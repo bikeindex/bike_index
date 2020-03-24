@@ -28,18 +28,13 @@ class Location < ApplicationRecord
   end
 
   def set_address
-    self.address =
-      if country.blank?
-        ""
-      else
-        [
-          street,
-          city,
-          state.present? ? state.abbreviation : nil,
-          zipcode,
-          country.name,
-        ].reject(&:blank?).join(", ")
-      end
+    self.address = country.blank? ? "" : [
+      street,
+      city,
+      state&.abbreviation,
+      zipcode,
+      country.name,
+    ].reject(&:blank?).join(", ")
   end
 
   def org_location_id
@@ -49,7 +44,7 @@ class Location < ApplicationRecord
   def update_organization
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
-    organization&.reload&.update_attributes(updated_at: Time.current)
+    organization&.reload&.update(updated_at: Time.current)
   end
 
   def display_name

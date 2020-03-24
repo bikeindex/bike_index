@@ -307,7 +307,7 @@ class User < ApplicationRecord
     self.address = [
       street,
       city,
-      (state&.abbreviation),
+      state&.abbreviation,
       zipcode,
       country&.iso,
     ].reject(&:blank?).join(", ")
