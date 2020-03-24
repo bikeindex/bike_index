@@ -101,7 +101,7 @@ class Bike < ApplicationRecord
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
-  before_validation :set_geocode_address
+  before_validation :set_geocode_address, if: :should_be_geocoded?
   before_save :set_calculated_attributes
 
   include PgSearch::Model
