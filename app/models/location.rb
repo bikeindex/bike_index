@@ -30,7 +30,7 @@ class Location < ApplicationRecord
   def set_address
     self.address =
       if country.blank?
-        nil
+        ""
       else
         [
           street,
@@ -38,7 +38,7 @@ class Location < ApplicationRecord
           state.present? ? state.abbreviation : nil,
           zipcode,
           country.name,
-        ].compact.reject(&:blank?).join(", ")
+        ].reject(&:blank?).join(", ")
       end
   end
 

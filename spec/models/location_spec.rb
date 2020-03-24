@@ -9,10 +9,6 @@ RSpec.describe Location, type: :model do
   end
 
   describe "address" do
-    it "strips the non-digit numbers from the phone input" do
-      location = FactoryBot.create(:location)
-      expect(location.address).to be_a(String)
-    end
     it "creates an address, ignoring blank fields" do
       c = Country.create(name: "Neverland", iso: "XXX")
       s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
