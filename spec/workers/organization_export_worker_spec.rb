@@ -130,7 +130,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
                           year: 2001,
                           manufacturer_other: "Sweet manufacturer <><>><\\",
                           primary_frame_color: Color.black,
-                          additional_registration: "cool extra serial",
+                          extra_registration_number: "cool extra serial",
                           secondary_frame_color: secondary_color,
                           owner_email: email)
       end
@@ -181,17 +181,17 @@ RSpec.describe OrganizationExportWorker, type: :job do
           "",
         ]
       end
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone additional_registration_number registration_id registration_address organization_affiliation], bike_code_start: "8z" }) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone extra_registration_number registration_id registration_address organization_affiliation], bike_code_start: "8z" }) }
       let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
       let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { { bike: { address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member" } } }
-      let(:target_headers) { %w[owner_name_or_email link phone additional_registration_number registration_id organization_affiliation address city state zipcode sticker] }
-      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
+      let(:target_headers) { %w[owner_name_or_email link phone extra_registration_number registration_id organization_affiliation address city state zipcode sticker] }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do
         expect(bike.phone).to eq "717.742.3423"
-        expect(bike.additional_registration).to eq "cool extra serial"
+        expect(bike.extra_registration_number).to eq "cool extra serial"
         expect(bike.organization_affiliation).to eq "community_member"
         VCR.use_cassette("geohelper-formatted_address_hash") do
           instance.perform(export.id)

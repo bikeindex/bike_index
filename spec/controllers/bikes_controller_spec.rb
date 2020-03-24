@@ -539,7 +539,7 @@ RSpec.describe BikesController, type: :controller do
           b_param_id_token: b_param.id_token,
           creation_organization_id: organization.id,
           embeded: true,
-          additional_registration: "Testly secondary",
+          extra_registration_number: "Testly secondary",
           cycle_type_slug: " Tricycle ",
           manufacturer_id: manufacturer.id,
           manufacturer_other: "",
@@ -920,7 +920,7 @@ RSpec.describe BikesController, type: :controller do
                                 manufacturer_id: manufacturer.slug,
                                 b_param_id_token: b_param.id_token,
                                 address: default_location[:address],
-                                additional_registration: "XXXZZZ",
+                                extra_registration_number: "XXXZZZ",
                                 organization_affiliation: "employee",
                                 phone: "888.777.6666",
                               },
@@ -938,7 +938,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.creation_state.origin).to eq "embed_partial"
             expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.registration_address).to eq target_address.as_json
-            expect(bike.additional_registration).to eq "XXXZZZ"
+            expect(bike.extra_registration_number).to eq "XXXZZZ"
             expect(bike.organization_affiliation).to eq "employee"
             expect(bike.phone).to eq "888.777.6666"
             user.reload
@@ -958,7 +958,7 @@ RSpec.describe BikesController, type: :controller do
                                   address_city: "Chicago",
                                   address_state: "IL",
                                   address_zipcode: "60647",
-                                  additional_registration: " ",
+                                  extra_registration_number: " ",
                                   organization_affiliation: "student",
                                   phone: "8887776666",
                                 },
@@ -974,7 +974,7 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.creation_state.origin).to eq "embed_partial"
               expect(bike.creation_state.creator).to eq bike.creator
               expect(bike.registration_address).to eq target_address.as_json
-              expect(bike.additional_registration).to be_blank
+              expect(bike.extra_registration_number).to be_blank
               expect(bike.organization_affiliation).to eq "student"
               expect(bike.phone).to eq "8887776666"
               user.reload
@@ -1491,7 +1491,7 @@ RSpec.describe BikesController, type: :controller do
           frame_model: "A sweet model named things",
           frame_size: "56cm",
           name: "a sweet name for a bike",
-          additional_registration: "some weird other number",
+          extra_registration_number: "some weird other number",
           bike_organization_ids: "#{organization_2.id}, #{organization.id}",
         }
       end

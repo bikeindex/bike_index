@@ -98,24 +98,19 @@ class OrganizationExportWorker < ApplicationWorker
     @export_headers
   end
 
+  MATCHING_KEYS = %w[owner_email owner_name owner_name_or_email year phone extra_registration_number organization_affiliation].freeze
+
   def value_for_header(header, bike)
+    return bike.send(header) if MATCHING_KEYS.include?(header)
     case header
     when "link" then LINK_BASE + bike.id.to_s
-    when "owner_email" then bike.owner_email
-    when "owner_name" then bike.owner_name
-    when "owner_name_or_email" then bike.owner_name_or_email
     when "registration_method" then bike.creation_description
-    when "registration_id" then bike.id
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
-    when "year" then bike.year
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
-    when "additional_registration_number" then bike.additional_registration
-    when "organization_affiliation" then bike.organization_affiliation
-    when "phone" then bike.phone
     when "is_stolen" then bike.stolen ? "true" : nil
     when "address" then bike.registration_address["address"] # These are the expanded values for bike registration address
     when "city" then bike.registration_address["city"]

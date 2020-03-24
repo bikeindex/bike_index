@@ -79,4 +79,9 @@ class BikeV2ShowSerializer < BikeV2Serializer
     return nil unless object.frame_material.present?
     FrameMaterial.new(object.frame_material).slug
   end
+
+  # Legacy name for the extra_registration_number column
+  def additional_registration
+    object.extra_registration_number
+  end
 end

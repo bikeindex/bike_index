@@ -186,8 +186,8 @@
               %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
                 - if field_name == "reg_address"
                   = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                - elsif field_name == "additional_registration"
-                  = bike.additional_registration
+                - elsif field_name == "extra_registration_number"
+                  = bike.extra_registration_number
                 - elsif field_name == "phone"
                   = bike.phone
                 - elsif field_name == "reg_affiliation"

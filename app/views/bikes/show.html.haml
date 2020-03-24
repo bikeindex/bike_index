@@ -96,7 +96,7 @@
           = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
 
           - unless @bike.abandoned
-            = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
+            = @bike.attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
 

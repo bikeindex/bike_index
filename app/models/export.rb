@@ -5,7 +5,7 @@ class Export < ApplicationRecord
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   AVERY_HEADERS = %w[owner_name registration_address].freeze
   HIDDEN_HEADERS = %w[owner_name_or_email].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registration_id registered_by owner_email owner_name] + HIDDEN_HEADERS).freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail extra_registration_number registered_by owner_email owner_name] + HIDDEN_HEADERS).freeze
 
   mount_uploader :file, ExportUploader
 
@@ -28,7 +28,7 @@ class Export < ApplicationRecord
 
   # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
   def self.additional_registration_fields
-    { reg_address: "registration_address", additional_registration: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
+    { reg_address: "registration_address", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
   end
 
   def self.default_kind_options
