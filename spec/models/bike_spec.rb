@@ -1335,7 +1335,7 @@ RSpec.describe Bike, type: :model do
       end
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
-        expect(bike.listing_order).to be < 1e10
+        expect(bike.listing_order).to be < 10000
         # stolen records don't actually have an after_commit hook to update
         # bikes (they probably should though). This is just checking this is
         # called correctly on save.
