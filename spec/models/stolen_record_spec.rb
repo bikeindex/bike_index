@@ -156,7 +156,7 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "address" do
+  describe "#display_address" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
@@ -165,23 +165,23 @@ RSpec.describe StolenRecord, type: :model do
                                        state_id: state.id,
                                        zipcode: "60647",
                                        country_id: country.id)
-      expect(stolen_record.address).to eq("Chicago, XXX, 60647, NEVVVV")
-      expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
                                        zipcode: "60647",
                                        country_id: country.id)
-      expect(stolen_record.address).to eq("60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("60647, NEVVVV")
       stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
     it "returns nil if there is no country" do
       stolen_record = StolenRecord.new(street: "302666 Richmond Blvd")
-      expect(stolen_record.address).to be_nil
+      expect(stolen_record.display_address).to be_nil
     end
   end
 

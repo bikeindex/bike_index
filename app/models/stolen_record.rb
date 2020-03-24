@@ -89,11 +89,11 @@ class StolenRecord < ApplicationRecord
   def pre_recovering_user?; recovered_at.present? && recovered_at < self.class.recovering_user_recording_start end
 
   # Only display if they have put in an address - so that we don't show on initial creation
-  def display_checklist?; address.present? end
+  def display_checklist?; display_address.present? end
 
   def missing_location?; street.blank? end
 
-  def address(skip_default_country: false, force_show_address: false)
+  def display_address(skip_default_country: false, force_show_address: false)
     country_string = country && country.iso
     if skip_default_country
       country_string = nil if country_string == "US"
@@ -188,7 +188,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def set_geocode_address
-    self.geocode_address = address(skip_default_country: true)
+    self.geocode_address = display_address(skip_default_country: true)
   end
 
   def fix_date
