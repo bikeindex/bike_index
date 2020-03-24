@@ -97,7 +97,6 @@ en:
         params: Params
       bike:
         abandoned: Abandoned
-        extra_registration_number: Extra registration number
         all_description: All description
         approved_stolen: Approved stolen
         b_params: B params
@@ -117,6 +116,7 @@ en:
         description: Description
         duplicate_bike_groups: Duplicate bike groups
         example: Example
+        extra_registration_number: Extra registration number
         frame_material: Frame material
         frame_model: Frame model
         frame_size: Frame size
@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
