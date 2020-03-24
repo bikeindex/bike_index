@@ -15,6 +15,7 @@ class Location < ApplicationRecord
 
   before_save :shown_from_organization
   before_save :set_phone
+  before_validation :set_geocode_address
   after_commit :update_organization
 
   def shown_from_organization
@@ -37,6 +38,10 @@ class Location < ApplicationRecord
     self.phone = Phonifyer.phonify(self.phone) if self.phone
   end
 
+  def set_geocode_address
+    self.geocode_address = address
+  end
+
   def org_location_id
     "#{self.organization_id}_#{self.id}"
   end
@@ -52,11 +57,5 @@ class Location < ApplicationRecord
     return name if name == organization.name
 
     "#{organization.name} - #{name}"
-  end
-
-  private
-
-  def geocode_columns
-    %i[street city state_id zipcode country_id]
   end
 end

@@ -21,10 +21,6 @@ RSpec.describe Location, type: :model do
       location.street = " "
       expect(location.address).to eq("Lancaster, XXX, 17601, Neverland")
     end
-    context "empty things" do
-      it "still returns what we want" do
-      end
-    end
   end
 
   describe "org_location_id" do
