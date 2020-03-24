@@ -828,7 +828,8 @@ class Bike < ApplicationRecord
   # Only geocode if lat/long are blank and geocode address present
   def should_be_geocoded?
     return false if skip_geocoding?
-    (latitude.blank? || longitude.blank?) && geocode_address.present?
+    return false if latitude.present? && longitude.present?
+    geocode_address.present?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
