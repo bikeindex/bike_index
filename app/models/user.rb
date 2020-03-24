@@ -304,7 +304,13 @@ class User < ApplicationRecord
   end
 
   def set_geocode_address
-    self.geocode_address = address
+    self.geocode_address = [
+      street,
+      city,
+      (state&.abbreviation),
+      zipcode,
+      country&.iso,
+    ].reject(&:blank?).join(", ")
   end
 
   def mb_link_target
@@ -325,20 +331,8 @@ class User < ApplicationRecord
     end
   end
 
-  def address(skip_default_country: false)
-    country_string = country&.iso
-    country_string = nil if skip_default_country && country_string == "US"
-    [
-      street,
-      city,
-      (state&.abbreviation),
-      zipcode,
-      country_string,
-    ].reject(&:blank?).join(", ")
-  end
-
   def address_hash
-    return nil unless address.present?
+    return if geocode_address.blank?
     {
       address: street,
       city: city,
