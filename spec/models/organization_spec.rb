@@ -613,32 +613,32 @@ RSpec.describe Organization, type: :model do
       expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
-      expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_falsey
+      expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_falsey
       expect(organization.include_field_reg_phone?).to be_falsey
       expect(organization.include_field_reg_address?).to be_falsey
       expect(organization.include_field_extra_registration_number?).to be_falsey
-      expect(organization.include_field_reg_affiliation?).to be_falsey
+      expect(organization.include_field_organization_affiliation?).to be_falsey
     end
     context "with paid_features" do
       let(:labels) { { reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ" }.as_json }
-      let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone reg_affiliation], registration_field_labels: labels) }
+      let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone organization_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do
         expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
-        expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_truthy
+        expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_truthy
         expect(organization.include_field_reg_phone?).to be_truthy
         expect(organization.include_field_reg_phone?(user)).to be_truthy
         expect(organization.include_field_reg_address?).to be_truthy
         expect(organization.include_field_reg_address?(user)).to be_truthy
         expect(organization.include_field_extra_registration_number?).to be_truthy
-        expect(organization.include_field_reg_affiliation?(user)).to be_truthy
+        expect(organization.include_field_organization_affiliation?(user)).to be_truthy
         # And test the lables
         expect(organization.registration_field_label("extra_registration_number")).to eq "XXXZZZZ"
         expect(organization.registration_field_label("reg_address")).to be_nil
         expect(organization.registration_field_label("reg_phone")).to eq labels["reg_phone"]
-        expect(organization.registration_field_label("reg_affiliation")).to be_nil
+        expect(organization.registration_field_label("organization_affiliation")).to be_nil
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }

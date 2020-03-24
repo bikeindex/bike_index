@@ -28,7 +28,7 @@ class Export < ApplicationRecord
 
   # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
   def self.additional_registration_fields
-    { reg_address: "registration_address", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
+    { reg_address: "registration_address", reg_phone: "phone", organization_affiliation: "organization_affiliation" }
   end
 
   def self.default_kind_options
@@ -52,6 +52,7 @@ class Export < ApplicationRecord
     return PERMITTED_HEADERS unless organization.present?
     additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
+    # PERMITTED_HEADERS + additional_headers - ["extra_registration_number"].map { |f| additional_registration_fields.gsub("reg_") }
   end
 
   # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too

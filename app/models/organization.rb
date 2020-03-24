@@ -181,11 +181,11 @@ class Organization < ApplicationRecord
     PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
-  def include_field_reg_affiliation?(user = nil)
-    additional_registration_fields.include?("reg_affiliation")
+  def include_field_organization_affiliation?(user = nil)
+    additional_registration_fields.include?("organization_affiliation")
   end
 
-  def reg_affiliation_options
+  def organization_affiliation_options
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 

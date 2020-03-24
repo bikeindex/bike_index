@@ -183,7 +183,7 @@ RSpec.describe Export, type: :model do
   describe "permitted_headers_for" do
     let(:organization) { Organization.new }
     let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
-    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_affiliation]) }
+    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone organization_affiliation]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 13

@@ -145,14 +145,14 @@ RSpec.describe OrganizationExportWorker, type: :job do
           bike.serial_number,
           nil,
           nil,
-          "#{bike.id}",
+          "cool extra serial",
           nil, # Since user isn't part of organization. TODO: Currently not implemented
           email,
           "George Smith",
           "George Smith", # Because of user_name_with_fallback
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"#{bike.id}\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
       it "exports with all the header values" do
         instance.perform(export.id)
         export.reload
@@ -172,7 +172,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
           "http://test.host/bikes/#{bike.id}",
           "717.742.3423",
           "cool extra serial",
-          "#{bike.id}",
           "community_member",
           "717 Market St",
           "San Francisco",
@@ -186,7 +185,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { { bike: { address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member" } } }
-      let(:target_headers) { %w[owner_name_or_email link phone extra_registration_number registration_id organization_affiliation address city state zipcode sticker] }
+      let(:target_headers) { %w[owner_name_or_email link phone extra_registration_number organization_affiliation address city state zipcode sticker] }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do

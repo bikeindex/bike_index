@@ -60,7 +60,7 @@
     "color_cell" => "Color",
     "owner_email_cell" => "Sent to",
     "owner_name_cell" => "Owner name",
-    "reg_affiliation_cell" => "Affiliation",
+    "organization_affiliation_cell" => "Affiliation",
     "additional_registration_cell" => "Secondary#",
     "reg_phone_cell" => "Phone",
     "reg_address_cell" => "Address",
@@ -190,7 +190,7 @@
                   = bike.extra_registration_number
                 - elsif field_name == "phone"
                   = bike.phone
-                - elsif field_name == "reg_affiliation"
+                - elsif field_name == "organization_affiliation"
                   = bike.organization_affiliation
             / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }

@@ -99,12 +99,12 @@
       = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
-  - if @organization&.include_field_reg_affiliation?
-    - label_affiliation = @organization.registration_field_label("reg_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
+  - if @organization&.include_field_organization_affiliation?
+    - label_affiliation = @organization.registration_field_label("organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
     .input-group
       = f.label :organization_affiliation, label_affiliation
       .controls
-        = f.select :organization_affiliation, @organization.reg_affiliation_options, class: "form-control"
+        = f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control"
   - if @organization.enabled?("bike_stickers")
     .input-group
       .control-group
