@@ -464,7 +464,7 @@ class Bike < ApplicationRecord
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. ",
+      current_stolen_record.display_address && "from #{current_stolen_record.display_address}. ",
     ].compact.join(" ")
   end
 

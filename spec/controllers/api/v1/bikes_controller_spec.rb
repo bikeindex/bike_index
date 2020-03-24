@@ -105,7 +105,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         end.to change(Ownership, :count).by 0
       end
 
-
       context "new pos_integrator format" do
         # We're switching to use numeric id rather than slug, because the slugs change :(
         it "creates correctly" do
@@ -312,7 +311,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           expect(bike.creation_state.organization).to eq @organization
           expect(bike.rear_wheel_size.iso_bsd).to eq 559
           csr = bike.find_current_stolen_record
-          expect(csr.address).to be_present
+          expect(csr.display_address).to be_present
           expect(csr.phone).to eq("9999999")
           # No longer support this date format :/
           # expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
