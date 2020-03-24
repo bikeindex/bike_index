@@ -86,8 +86,8 @@ class OrganizationExportWorker < ApplicationWorker
   def export_headers
     return @export_headers if defined?(@export_headers)
     @export_headers = @export.headers
-    if @export_headers.include?("registration_address")
-      @export_headers = @export_headers.reject { |v| v == "registration_address" } + %w[address city state zipcode]
+    if @export_headers.include?("address")
+      @export_headers = @export_headers + %w[city state zipcode]
     end
     if @export.assign_bike_codes?
       @export_headers << "sticker"

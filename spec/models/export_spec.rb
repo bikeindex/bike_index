@@ -185,12 +185,14 @@ RSpec.describe Export, type: :model do
     let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
     let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone organization_affiliation]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
+    let(:all_headers) { permitted_headers + %w[organization_affiliation phone address] }
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 13
       expect(Export.permitted_headers).to eq permitted_headers
+      expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(Export.permitted_headers(organization_reg_phone)).to eq permitted_headers + ["phone"]
-      expect(Export.permitted_headers(organization_full)).to eq permitted_headers + %w[organization_affiliation phone registration_address]
+      expect(Export.permitted_headers(organization_full)).to eq all_headers
     end
   end
 end

@@ -26,11 +26,6 @@ class Export < ApplicationRecord
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
   end
 
-  # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
-  def self.additional_registration_fields
-    { reg_address: "registration_address", reg_phone: "phone", organization_affiliation: "organization_affiliation" }
-  end
-
   def self.default_kind_options
     {
       stolen: {
@@ -48,11 +43,16 @@ class Export < ApplicationRecord
     }.as_json.freeze
   end
 
-  def self.permitted_headers(organization = nil)
-    return PERMITTED_HEADERS unless organization.present?
-    additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
-    PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
-    # PERMITTED_HEADERS + additional_headers - ["extra_registration_number"].map { |f| additional_registration_fields.gsub("reg_") }
+  def self.permitted_headers(organization_or_overide = nil)
+    return PERMITTED_HEADERS unless organization_or_overide.present?
+    if organization_or_overide == "include_paid" # passing include_paid overrides
+      additional_headers = PaidFeature::REG_FIELDS.dup
+    else
+      additional_headers = organization_or_overide.additional_registration_fields
+    end
+    additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
+    # We always give the option to export extra_registration_number, don't double up if org can add too
+    (PERMITTED_HEADERS + additional_headers).uniq
   end
 
   # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
