@@ -13,7 +13,7 @@ class TwitterAccount < ApplicationRecord
 
   validates :screen_name, uniqueness: true
 
-  before_save :reverse_geocode, if: -> { !skip_geocoding? && latitude.present? && (state.blank? || state_changed?) }
+  before_save :reverse_geocode, if: :should_be_geocoded?
   before_save :fetch_account_info
 
   scope :active, -> { where(active: true) }
@@ -124,6 +124,12 @@ class TwitterAccount < ApplicationRecord
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     return
+  end
+
+  def should_be_geocoded?
+    !skip_geocoding? &&
+      latitude.present? &&
+      (state.blank? || state_changed?)
   end
 
   private

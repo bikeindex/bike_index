@@ -52,7 +52,7 @@ class StolenRecord < ApplicationRecord
 
   before_save :set_calculated_attributes
   before_validation :set_address
-  after_validation :reverse_geocode
+  after_validation :reverse_geocode, unless: :skip_geocoding?
   after_save :remove_outdated_alert_images
   after_commit :update_associations
 
