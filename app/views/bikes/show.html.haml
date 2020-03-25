@@ -52,7 +52,7 @@
           %small.convertTimezone
           %strong
             = t(".at")
-          = @stolen_record.address(skip_default_country: true)
+          = @stolen_record.display_address(skip_default_country: true)
 
       - if @bike.should_show_other_bikes
         %h4
@@ -138,7 +138,7 @@
               = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
+                = @bike.attr_list_item(@stolen_record.display_address(skip_default_country: true), t(".location"))
                 = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
                 - stolen_type = @bike.abandoned ? 'abandoned' : 'stolen'

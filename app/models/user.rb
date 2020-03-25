@@ -67,6 +67,7 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :set_calculated_attributes
+  before_validation :set_address
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
@@ -302,6 +303,16 @@ class User < ApplicationRecord
     true
   end
 
+  def set_address
+    self.address = [
+      street,
+      city,
+      state&.abbreviation,
+      zipcode,
+      country&.iso,
+    ].reject(&:blank?).join(", ")
+  end
+
   def mb_link_target
     my_bikes_hash && my_bikes_hash["link_target"]
   end
@@ -320,20 +331,8 @@ class User < ApplicationRecord
     end
   end
 
-  def address(skip_default_country: false)
-    country_string = country&.iso
-    country_string = nil if skip_default_country && country_string == "US"
-    [
-      street,
-      city,
-      (state&.abbreviation),
-      zipcode,
-      country_string,
-    ].reject(&:blank?).join(", ")
-  end
-
   def address_hash
-    return nil unless address.present?
+    return if address.blank?
     {
       address: street,
       city: city,
@@ -376,10 +375,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def geocode_columns
-    %i[street city zipcode]
-  end
 
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?

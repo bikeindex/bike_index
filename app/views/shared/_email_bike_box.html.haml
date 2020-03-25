@@ -30,7 +30,7 @@
       %li
         %strong
           = @bike.abandoned ? t(".found") : t(".stolen_from")
-        = stolen_record.address(skip_default_country: true)
+        = stolen_record.display_address(skip_default_country: true)
       %li
         %strong
           = t(".date")

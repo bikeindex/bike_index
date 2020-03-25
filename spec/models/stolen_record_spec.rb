@@ -156,7 +156,7 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "address" do
+  describe "#display_address" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
@@ -165,23 +165,23 @@ RSpec.describe StolenRecord, type: :model do
                                        state_id: state.id,
                                        zipcode: "60647",
                                        country_id: country.id)
-      expect(stolen_record.address).to eq("Chicago, XXX, 60647, NEVVVV")
-      expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
                                        zipcode: "60647",
                                        country_id: country.id)
-      expect(stolen_record.address).to eq("60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("60647, NEVVVV")
       stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
+      expect(stolen_record.display_address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
     it "returns nil if there is no country" do
       stolen_record = StolenRecord.new(street: "302666 Richmond Blvd")
-      expect(stolen_record.address).to be_nil
+      expect(stolen_record.display_address).to be_nil
     end
   end
 
@@ -546,6 +546,43 @@ RSpec.describe StolenRecord, type: :model do
       it "returns nil" do
         stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
         expect(stolen_record.address_location).to eq(nil)
+      end
+    end
+  end
+
+  describe "#should_be_geocoded?" do
+    context "given the skip geocoding flag" do
+      it "returns false" do
+        stolen_record = FactoryBot.build(:stolen_record, skip_geocoding: true)
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+        expect(stolen_record).to_not be_geocoded
+      end
+    end
+
+    context "given a missing address" do
+      it "returns false and prevents geocoding" do
+        stolen_record = FactoryBot.build(
+          :stolen_record,
+          address: nil,
+          skip_geocoding: false,
+        )
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+        expect(stolen_record).to_not be_geocoded
+      end
+    end
+
+    context "given an address change" do
+      it "returns false unless there has been an address change" do
+        stolen_record = FactoryBot.create(
+          :stolen_record,
+          :in_los_angeles,
+          skip_geocoding: false,
+        )
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+
+        stolen_record.city = "New York"
+        stolen_record.valid? # triggers an update to address
+        expect(stolen_record.should_be_geocoded?).to eq(true)
       end
     end
   end

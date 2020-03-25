@@ -17,28 +17,40 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
-      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      bike0 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
+      # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1)
+      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1)
+
+      # a chicago-org bike in nyc
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
-      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
-      # stolen record doesn't automatically set latitude on bike, because of testing skip - so use an existing bike with location set
-      unaffiliated_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: unaffiliated_bikes.last)
-      unaffiliated_stolen_record.add_recovery_information
+      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
 
-      expect(nyc_org1.nearby_bikes.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bikes.map(&:id))
-      expect(nyc_org1.nearby_recovered_records.pluck(:id)).to match_array([unaffiliated_stolen_record.id])
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
+
+      nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+
+      # stolen record doesn't automatically set latitude on bike,
+      # because of testing skip - so use an existing bike with location set
+      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: nonorg_bikes.last)
+      nonorg_stolen_record.add_recovery_information
+
+      expect(nyc_org1.nearby_bikes.pluck(:id))
+        .to(match_array [nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id))
+
+      expect(nyc_org1.nearby_recovered_records.pluck(:id))
+        .to(match_array [nonorg_stolen_record.id])
 
       # Make sure we're getting the bike from the org
-      expect(Bike.organization(nyc_org1).pluck(:id)).to match_array([bike1.id])
+      expect(Bike.organization(nyc_org1).pluck(:id))
+        .to(match_array [chi_bike1.id])
 
       # Make sure we get the bikes from the org or from nearby
-      expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids)).to match_array([bike1, bike2, bike3])
+      expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
+        .to(match_array [chi_bike1, nyc_bike2, nyc_bike3])
     end
   end
 
