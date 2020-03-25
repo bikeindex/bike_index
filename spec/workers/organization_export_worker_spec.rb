@@ -150,11 +150,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil, # Since user isn't part of organization. TODO: Currently not implemented
           email,
           "George Smith",
-          "George Smith", # Because of user_name_with_fallback
           nil, # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         instance.perform(export.id)
         export.reload
@@ -180,7 +179,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "assigning stickers" do
         let(:export_options) { { headers: %w[link phone extra_registration_number address organization_affiliation], bike_code_start: "ff333333" } }
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
-        let(:bike_values) { [bike.owner_email, "http://test.host/bikes/#{bike.id}", "717.742.3423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "717.742.3423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_falsey
@@ -198,6 +197,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           bike_line = generated_csv_string.split("\n").last
           expect(bike_line.split(",").count).to eq target_headers.count
           expect(bike_line).to eq instance.comma_wrapped_string(bike_values).strip
+
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_truthy
           expect(bike_sticker.bike).to eq bike
