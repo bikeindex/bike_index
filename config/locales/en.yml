@@ -97,7 +97,6 @@ en:
         params: Params
       bike:
         abandoned: Abandoned
-        additional_registration: Additional registration
         all_description: All description
         approved_stolen: Approved stolen
         b_params: B params
@@ -117,6 +116,7 @@ en:
         description: Description
         duplicate_bike_groups: Duplicate bike groups
         example: Example
+        extra_registration_number: Extra registration number
         frame_material: Frame material
         frame_model: Frame model
         frame_size: Frame size
@@ -913,7 +913,7 @@ en:
         water_bottle_cage: water bottle cage
         wheel: wheel
       organization:
-        reg_affiliation_options:
+        organization_affiliation_options:
           community_member: Community Member
           employee: Employee
           student: Student

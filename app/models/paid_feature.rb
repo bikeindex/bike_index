@@ -8,8 +8,8 @@ class PaidFeature < ApplicationRecord
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[
-    reg_affiliation
-    reg_secondary_serial
+    organization_affiliation
+    extra_registration_number
     reg_phone
     reg_address
   ].freeze

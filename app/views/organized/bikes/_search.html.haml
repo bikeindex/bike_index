@@ -60,8 +60,8 @@
     "color_cell" => "Color",
     "owner_email_cell" => "Sent to",
     "owner_name_cell" => "Owner name",
-    "reg_affiliation_cell" => "Affiliation",
-    "reg_secondary_serial_cell" => "Secondary#",
+    "organization_affiliation_cell" => "Affiliation",
+    "additional_registration_cell" => "Secondary#",
     "reg_phone_cell" => "Phone",
     "reg_address_cell" => "Address",
     "sticker_cell" => "Sticker",
@@ -186,11 +186,11 @@
               %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
                 - if field_name == "reg_address"
                   = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                - elsif field_name == "reg_secondary_serial"
-                  = bike.additional_registration
+                - elsif field_name == "extra_registration_number"
+                  = bike.extra_registration_number
                 - elsif field_name == "phone"
                   = bike.phone
-                - elsif field_name == "reg_affiliation"
+                - elsif field_name == "organization_affiliation"
                   = bike.organization_affiliation
             / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }

@@ -17,11 +17,11 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization.include_field_reg_secondary_serial?
-        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial")
-        = f.label :additional_registration, label_secondary_serial, class: "control-label"
+      - if @organization.include_field_extra_registration_number?
+        - label_secondary_serial = @organization.registration_field_label("extra_registration_number") || t(".additional_serial")
+        = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
         .controls
-          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+          = f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
         = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1

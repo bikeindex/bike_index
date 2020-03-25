@@ -118,7 +118,7 @@ class Bike < ApplicationRecord
   class << self
     def old_attr_accessible
       (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized made_without_serial additional_registration
+          serial_normalized made_without_serial extra_registration_number
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
@@ -334,8 +334,6 @@ class Bike < ApplicationRecord
     return nil if creation_organization.present? && owner&.member_of?(creation_organization)
     owner&.name
   end
-
-  def owner_name_or_email; owner_name || owner_email end
 
   def first_ownership; ownerships.reorder(:id).first end
 
@@ -787,7 +785,7 @@ class Bike < ApplicationRecord
       frame_model,
       (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
       (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
-      additional_registration,
+      extra_registration_number,
       (type == "bike" ? nil : type),
       components_cache_string,
     ].flatten.reject(&:blank?).join(" ")
