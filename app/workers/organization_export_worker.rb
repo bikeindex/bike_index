@@ -1,7 +1,7 @@
 class OrganizationExportWorker < ApplicationWorker
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
 
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: "low_priority"
   attr_accessor :export # Only necessary for testing
 
   def perform(export_id)
