@@ -1880,6 +1880,7 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
