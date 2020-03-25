@@ -20,7 +20,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
     ]
   end
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
-  let(:csv_lines) { [export.headers, bike_values] }
+  let(:csv_lines) { [export.written_headers, bike_values] }
 
   describe "perform" do
     context "success" do
@@ -64,8 +64,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
-            %w[owner_name address city state zipcode sticker],
-            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"],
+            %w[owner_name address city state zipcode assigned_sticker],
+            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A 111 1"],
           ]
         end
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a1111") }
@@ -85,8 +85,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.progress).to eq "finished"
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
-          expect(export.written_headers).to eq(%w[owner_name address city state zipcode sticker])
-          expect(export.bike_stickers).to eq(["A1111"])
+          expect(export.written_headers).to eq(%w[owner_name address city state zipcode assigned_sticker])
+          expect(export.bike_stickers_assigned).to eq(["A1111"])
           expect(export.bike_codes_removed?).to be_falsey
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_truthy
@@ -117,9 +117,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
     end
 
-    context "all headers" do
+    context "all unpaid headers" do
       # Setting up what we have, rather than waiting on everything
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
+      # Also - test that it doesn't explode if unable to assign stickers
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS, bike_code_start: "fff" }) }
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
       let(:bike) do
@@ -150,9 +151,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
           email,
           "George Smith",
           "George Smith", # Because of user_name_with_fallback
+          nil, # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         instance.perform(export.id)
         export.reload
@@ -166,42 +168,91 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
     end
     context "special headers" do
-      let(:special_bike_values) do
-        [
-          bike.owner_email,
-          "http://test.host/bikes/#{bike.id}",
-          "717.742.3423",
-          "cool extra serial",
-          "community_member",
-          "717 Market St",
-          "San Francisco",
-          "CA",
-          "94103",
-          "",
-        ]
-      end
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone extra_registration_number registration_id registration_address organization_affiliation], bike_code_start: "8z" }) }
-      let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
-      let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
+      let(:user) { FactoryBot.create(:organization_member) }
+      let(:organization) { user.organizations.first }
+      let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { { bike: { address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member" } } }
-      let(:target_headers) { %w[owner_name_or_email link phone extra_registration_number organization_affiliation address city state zipcode sticker] }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       include_context :geocoder_real
-      it "returns the expected values" do
-        expect(bike.phone).to eq "717.742.3423"
-        expect(bike.extra_registration_number).to eq "cool extra serial"
-        expect(bike.organization_affiliation).to eq "community_member"
-        VCR.use_cassette("geohelper-formatted_address_hash") do
-          instance.perform(export.id)
+
+      context "assigning stickers" do
+        let(:export_options) { { headers: %w[link phone extra_registration_number address organization_affiliation], bike_code_start: "ff333333" } }
+        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
+        let(:bike_values) { [bike.owner_email, "http://test.host/bikes/#{bike.id}", "717.742.3423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        it "returns the expected values" do
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_falsey
+          expect(bike.phone).to eq "717.742.3423"
+          expect(bike.extra_registration_number).to eq "cool extra serial"
+          expect(bike.organization_affiliation).to eq "community_member"
+          expect(export.assign_bike_codes?).to be_truthy
+          VCR.use_cassette("geohelper-formatted_address_hash") do
+            instance.perform(export.id)
+          end
+          export.reload
+          expect(instance.export_headers).to eq target_headers
+          expect(export.progress).to eq "finished"
+          generated_csv_string = export.file.read
+          bike_line = generated_csv_string.split("\n").last
+          expect(bike_line.split(",").count).to eq target_headers.count
+          expect(bike_line).to eq instance.comma_wrapped_string(bike_values).strip
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike).to eq bike
+          expect(bike_sticker.user).to eq user
         end
-        export.reload
-        expect(instance.export_headers).to eq target_headers
-        expect(export.progress).to eq "finished"
-        generated_csv_string = export.file.read
-        bike_line = generated_csv_string.split("\n").last
-        expect(bike_line.split(",").count).to eq target_headers.count
-        expect(bike_line).to eq instance.comma_wrapped_string(special_bike_values).strip
+      end
+      context "including every available field stickers" do
+        before { organization.update_column :enabled_feature_slugs, PaidFeature::REG_FIELDS + ["bike_stickers"] } # Stub organization having all the meaningful paid feature
+        let(:export_options) { { headers: Export.permitted_headers(organization) } }
+        let(:target_row) do
+          {
+            link: "http://test.host/bikes/#{bike.id}",
+            registered_at: bike.created_at.utc,
+            manufacturer: bike.mnfg_name,
+            model: nil,
+            color: "Black",
+            serial: bike.serial_number,
+            is_stolen: nil,
+            thumbnail: nil,
+            extra_registration_number: "cool extra serial",
+            registered_by: nil,
+            owner_email: bike.owner_email,
+            owner_name: nil,
+            organization_affiliation: "community_member",
+            phone: "717.742.3423",
+            sticker: "FF 333 333",
+            address: "717 Market St",
+            city: "San Francisco",
+            state: "CA",
+            zipcode: "94103",
+          }
+        end
+        it "returns the expected values" do
+          bike_sticker.claim(user, bike)
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike).to eq bike
+          expect(bike_sticker.user).to eq user
+          expect(export.assign_bike_codes?).to be_falsey
+          expect(export.headers).to eq Export.permitted_headers("include_paid")
+          expect(bike.phone).to eq "717.742.3423"
+          expect(bike.extra_registration_number).to eq "cool extra serial"
+          expect(bike.organization_affiliation).to eq "community_member"
+          VCR.use_cassette("geohelper-formatted_address_hash") do
+            instance.perform(export.id)
+          end
+          export.reload
+          expect(instance.export_headers).to eq export.written_headers
+          expect(instance.export_headers).to match_array target_row.keys.map(&:to_s)
+          expect(export.progress).to eq "finished"
+          generated_csv_string = export.file.read
+          bike_line = generated_csv_string.split("\n").last
+          expect(bike_line.split(",").count).to eq target_row.keys.count
+          expect(bike_line).to eq instance.comma_wrapped_string(target_row.values).strip
+        end
       end
     end
   end

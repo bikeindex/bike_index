@@ -87,10 +87,11 @@ class OrganizationExportWorker < ApplicationWorker
     return @export_headers if defined?(@export_headers)
     @export_headers = @export.headers
     if @export_headers.include?("address")
-      @export_headers = @export_headers + %w[city state zipcode]
+      # Remove address and readd, because we want to keep them in line
+      @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
     end
     if @export.assign_bike_codes?
-      @export_headers << "sticker"
+      @export_headers << "assigned_sticker"
       @bike_stickers = []
       @bike_sticker = BikeSticker.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
@@ -98,7 +99,7 @@ class OrganizationExportWorker < ApplicationWorker
     @export_headers
   end
 
-  MATCHING_KEYS = %w[owner_email owner_name owner_name_or_email year phone extra_registration_number organization_affiliation].freeze
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation].freeze
 
   def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)
@@ -116,17 +117,19 @@ class OrganizationExportWorker < ApplicationWorker
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
-    when "sticker" then assign_bike_code_and_increment(bike)
+    when "sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
+    when "assigned_sticker" then assign_bike_code_and_increment(bike)
     end
   end
 
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_sticker.present?
     code = @bike_sticker.code
+    pretty_code = @bike_sticker.pretty_code
     @bike_sticker.claim(@export.user, bike)
     @bike_stickers << code
     @bike_sticker = @bike_sticker.next_unclaimed_code
-    code
+    pretty_code
   end
 
   # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying

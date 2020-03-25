@@ -3,9 +3,8 @@ class Export < ApplicationRecord
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name registration_address].freeze
-  HIDDEN_HEADERS = %w[owner_name_or_email].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail extra_registration_number registered_by owner_email owner_name] + HIDDEN_HEADERS).freeze
+  AVERY_HEADERS = %w[owner_name address].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
 
   mount_uploader :file, ExportUploader
 
@@ -46,9 +45,10 @@ class Export < ApplicationRecord
   def self.permitted_headers(organization_or_overide = nil)
     return PERMITTED_HEADERS unless organization_or_overide.present?
     if organization_or_overide == "include_paid" # passing include_paid overrides
-      additional_headers = PaidFeature::REG_FIELDS.dup
+      additional_headers = PaidFeature::REG_FIELDS + ["sticker"]
     else
       additional_headers = organization_or_overide.additional_registration_fields
+      additional_headers += ["sticker"] if organization_or_overide.enabled?("bike_stickers")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too
@@ -78,7 +78,7 @@ class Export < ApplicationRecord
   def exported_bike_ids; options["exported_bike_ids"] end
 
   # 'options' is a weird place to put the assigned bike_stickers - but whatever, it's there, just using it
-  def bike_stickers; options["bike_codes_assigned"] || [] end
+  def bike_stickers_assigned; options["bike_codes_assigned"] || [] end
 
   def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?

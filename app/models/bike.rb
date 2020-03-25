@@ -335,8 +335,6 @@ class Bike < ApplicationRecord
     owner&.name
   end
 
-  def owner_name_or_email; owner_name || owner_email end
-
   def first_ownership; ownerships.reorder(:id).first end
 
   def organized?(org = nil)
