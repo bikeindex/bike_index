@@ -25,15 +25,11 @@
       .col-lg-8
         .row
           - Export.permitted_headers(current_organization).each do |header|
-            - next if Export::HIDDEN_HEADERS.include?(header)
             .form-group.col-xs-6.col-md-4
               %label.checkbox
                 = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
                 -# This will break when a new reg field is added - which is a plus ☺️
-                - if header == "registration_id" # humanizing registration_id becomes "registration", which isn't what we want
-                  Registration ID
-                - else
-                  = header.titleize
+                = header.titleize
     .form-group.row.mt-4
       = f.label :custom_bike_ids, "Specific bikes list", class: "org-form-label"
       .col-sm-8
