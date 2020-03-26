@@ -178,16 +178,20 @@
           %td
             POS integration:
           %td
-            - if @organization.lightspeed_pos?
-              = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
-            - elsif @organization.ascend_pos?
+            - if @organization.ascend_pos?
               = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
               %small
                 Ascend name:
                 %em
                   = @organization.ascend_name
-            - else
+            - elsif @organization.broken_pos?
+              %span.text-danger
+                POS Integration broken!
               = @organization.pos_kind.humanize
+
+            -# Show link if it's lightspeed - or if it used to be lightspeed
+            - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
+              = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
 .row.mt-4
   .col-md-6
     %p

@@ -21,6 +21,7 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     broken_pos: 4,
     does_not_need_pos: 5,
+    not_set: 6, # Only for use with manual_pos_kind
   }.freeze
 
   acts_as_paranoid
@@ -54,6 +55,7 @@ class Organization < ApplicationRecord
 
   enum kind: KIND_ENUM
   enum pos_kind: POS_KIND_ENUM
+  # enum manual_pos_kind: POS_KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
