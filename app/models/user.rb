@@ -289,7 +289,7 @@ class User < ApplicationRecord
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
-    self.website = Urlifyer.urlify(website) if website.present?
+    self.website = Urlifyer.urlify(website)
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
       mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?

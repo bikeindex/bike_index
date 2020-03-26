@@ -5,6 +5,8 @@ RSpec.describe Urlifyer do
     it "does nothing if no website is present" do
       website = Urlifyer.urlify(nil)
       expect(website).to be_nil
+      website = Urlifyer.urlify("  ")
+      expect(website).to be_nil
       website = Urlifyer.urlify("i")
       expect(website).to be_nil
     end
