@@ -86,6 +86,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :show_on_map,
         :slug,
         :website,
+        :manual_pos_kind,
         [locations_attributes: permitted_locations_params],
       ).merge(kind: approved_kind)
   end

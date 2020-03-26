@@ -257,7 +257,7 @@ Rails.application.routes.draw do
       resources :frame_materials, only: [:index]
       resources :manufacturers, only: %i[index show]
       resources :notifications, only: [:create]
-      resources :organizations, only: [:show]
+      resources :organizations, only: [:show, :update]
       resources :users do
         collection do
           get :current

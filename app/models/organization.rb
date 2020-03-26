@@ -54,6 +54,7 @@ class Organization < ApplicationRecord
 
   enum kind: KIND_ENUM
   enum pos_kind: POS_KIND_ENUM
+  enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
@@ -320,6 +321,7 @@ class Organization < ApplicationRecord
   end
 
   def calculated_pos_kind
+    return manual_pos_kind if manual_pos_kind.present?
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
     return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
