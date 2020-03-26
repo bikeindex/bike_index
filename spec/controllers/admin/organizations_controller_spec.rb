@@ -87,6 +87,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
         parent_organization_id: parent_organization.id,
         ascend_name: "party on",
         previous_slug: "partied-on",
+        manual_pos_kind: "lightspeed_pos",
         locations_attributes: {
           "0" => {
             id: location1.id,
@@ -127,11 +128,14 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
       expect do
         put :update, params: { organization_id: organization.to_param, id: organization.to_param, organization: update_attributes }
       end.to change(Location, :count).by 1
+      UpdateOrganizationPosKindWorker.new.perform(organization.id)
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
       expect(organization.ascend_name).to eq "party on"
       expect(organization.previous_slug).to eq "partied-on"
+      expect(organization.manual_pos_kind).to eq "lightspeed_pos"
+      expect(organization.pos_kind).to eq "lightspeed_pos"
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization

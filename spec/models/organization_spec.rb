@@ -562,8 +562,26 @@ RSpec.describe Organization, type: :model do
         expect(organization.calculated_pos_kind).to eq "ascend_pos"
         UpdateOrganizationPosKindWorker.new.perform(organization.id)
         organization.reload
+        expect(organization.manual_pos_kind?).to be_blank
         expect(organization.pos_kind).to eq "ascend_pos"
         expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+    context "manual_pos_kind" do
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "overrides everything" do
+        expect(organization.manual_lightspeed_pos?).to be_truthy
+        expect(organization.pos_kind).to eq "no_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.manual_pos_kind).to eq "lightspeed_pos"
+        expect(organization.pos_kind).to eq "lightspeed_pos"
+        organization.update_attribute :manual_pos_kind, "broken_pos"
+
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.manual_pos_kind).to eq "broken_pos"
+        expect(organization.pos_kind).to eq "broken_pos"
       end
     end
     context "recent bikes" do
