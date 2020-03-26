@@ -115,31 +115,45 @@ RSpec.describe Blog, type: :model do
   end
 
   describe "canonical_url validation" do
-    context "given a blank value" do
+    let(:blog) { FactoryBot.build(:blog, canonical_url: canonical_url) }
+    before { blog.set_calculated_attributes }
+    context "blank" do
+      let(:canonical_url) { " " }
       it "is valid" do
-        blog = FactoryBot.build(:blog, canonical_url: "")
         expect(blog).to be_valid
-
-        blog = FactoryBot.build(:blog, canonical_url: nil)
+        expect(blog.canonical_url).to be_nil
+      end
+    end
+    context "nil" do
+      let(:canonical_url) { nil }
+      it "is valid" do
         expect(blog).to be_valid
+        expect(blog.canonical_url).to be_nil
       end
     end
 
-    context "given a minimally complete url" do
-      it "is valid" do
-        blog = FactoryBot.build(:blog, canonical_url: "http://blogger.com/myblog")
-        expect(blog).to be_valid
-
-        blog = FactoryBot.build(:blog, canonical_url: "https://blogger.com/myblog")
-        expect(blog).to be_valid
+    context "given a complete url" do
+      context "http" do
+        let(:canonical_url) { "http://blogger.com/myblog" }
+        it "is valid" do
+          expect(blog).to be_valid
+          expect(blog.canonical_url).to eq canonical_url
+        end
+      end
+      context "https" do
+        let(:canonical_url) { "https://www.usacycling.org/article/in-our-own-words-lily-williams-olympic-postponement" }
+        it "is valid" do
+          expect(blog).to be_valid
+          expect(blog.canonical_url).to eq canonical_url
+        end
       end
     end
 
     context "given an incomplete url" do
+      let(:canonical_url) { "blogger.com/myblog" }
       it "is invalid" do
-        blog = FactoryBot.build(:blog, canonical_url: "blogger.com/myblog")
-        expect(blog).to be_invalid
-        expect(blog.errors[:canonical_url]).to include("is invalid")
+        expect(blog).to be_valid
+        expect(blog.canonical_url).to eq "http://#{canonical_url}"
       end
     end
   end
