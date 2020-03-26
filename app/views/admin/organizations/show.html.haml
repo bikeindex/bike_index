@@ -192,6 +192,9 @@
             -# Show link if it's lightspeed - or if it used to be lightspeed
             - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
               = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
+
+            - if current_user.developer? && @organization.manual_pos_kind.present?
+              %small.em.less-strong manual POS kind set
 .row.mt-4
   .col-md-6
     %p
