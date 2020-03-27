@@ -542,7 +542,7 @@ class Bike < ApplicationRecord
     set_location_info
 
     self.address =
-      current_stolen_record&.display_address(force_show_address: true).presence ||
+      # current_stolen_record&.display_address(force_show_address: true).presence ||
       [city, zipcode, country&.name]
         .select(&:present?)
         .join(" ")
