@@ -4,8 +4,7 @@ class TemporarySetLocationWorker < ApplicationWorker
   def perform(klass, id)
     if klass == "Bike"
       bike = Bike.unscoped.find(id)
-      bike.set_address
-      bike.save
+      bike.update_column :address, [bike.city, bike.zipcode, bike.country&.name].select(&:present?).join(" ").presence
     elsif klass == "Location"
       location = Location.unscoped.find(id)
       location.set_address
