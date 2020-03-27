@@ -69,7 +69,7 @@ class Bike < ApplicationRecord
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
+                :b_param_id_token, :address_city, :address_state, :address_zipcode,
                 :parking_notification_kind, :skip_status_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
@@ -542,7 +542,7 @@ class Bike < ApplicationRecord
     set_location_info
 
     self.address =
-      # current_stolen_record&.display_address(force_show_address: true).presence ||
+      current_stolen_record&.display_address(force_show_address: true).presence ||
       [city, zipcode, country&.name]
         .select(&:present?)
         .join(" ")
@@ -654,9 +654,9 @@ class Bike < ApplicationRecord
   end
 
   def registration_location
-    address = registration_address.with_indifferent_access
-    city = address[:city]&.titleize
-    state = address[:state]&.upcase
+    reg_location = registration_address.with_indifferent_access
+    city = reg_location[:city]&.titleize
+    state = reg_location[:state]&.upcase
     return "" if state.blank?
 
     [city, state].reject(&:blank?).join(", ")
