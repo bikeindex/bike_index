@@ -93,18 +93,15 @@
                     %em.small.less-strong
                       = @bike.creation_description
                 - passive_organization.additional_registration_fields.each do |reg_field|
-                  - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
+                  - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
                   - if bike_attr == "registration_address"
                     %tr
                       %td= t(".address")
                       %td
                         - address = @bike.registration_address
                         - if @bike.valid_registration_address_present?
-                          %br
-                          &nbsp;&nbsp;&nbsp;
                           = address["address"]
                           %br
-                          &nbsp;&nbsp;&nbsp;
                           = [address['city'], address['state']].reject(&:blank?).join(", ")
                           = address['zipcode']
                         - else
@@ -115,18 +112,12 @@
                             %br
                           %span.text-warning
                             %small invalid address
-
                   - else
                     %tr
                       %td
-                        = "#{(bike_attr || reg_field).humanize}:"
+                        = "#{(bike_attr || reg_field).humanize}"
                       %td
-                        - if reg_field == "extra_registration_number"
-                          = @bike.extra_registration_number
-                        - elsif reg_field == "phone"
-                          = @bike.phone
-                        - elsif reg_field == "organization_affiliation"
-                          = @bike.organization_affiliation
+                        = @bike.send(bike_attr)
 
                 - if passive_organization.enabled?("avery_export")
                   %tr

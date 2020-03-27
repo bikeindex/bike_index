@@ -48,4 +48,17 @@ RSpec.describe PaidFeature, type: :model do
       end
     end
   end
+
+  describe "additional_reg_field_bike_attrs" do
+    let(:bike) { Bike.new }
+    let(:additional_reg_fields) { %w[organization_affiliation extra_registration_number reg_phone reg_address] }
+
+    it "maps REG_FIELDS to bike attrs" do
+      expect(additional_reg_fields).to match_array PaidFeature::REG_FIELDS
+      additional_reg_fields.each do |reg_field|
+        bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
+        expect(bike.send(bike_attr)).to be_blank
+      end
+    end
+  end
 end

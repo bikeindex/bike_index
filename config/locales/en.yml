@@ -1250,7 +1250,7 @@ en:
       zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
-      address: 'Address:'
+      address: Registration Address
       address_or_intersection: Address or intersection
       as_a_bikeindex_ambassador_html: >-
         <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can

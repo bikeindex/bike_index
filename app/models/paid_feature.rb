@@ -58,6 +58,15 @@ class PaidFeature < ApplicationRecord
     matching_slugs.any? ? matching_slugs : nil
   end
 
+  def self.reg_field_bike_attrs
+    {
+      organization_affiliation: "organization_affiliation",
+      extra_registration_number: "extra_registration_number",
+      reg_phone: "phone",
+      reg_address: "registration_address",
+    }
+  end
+
   def one_time?; standard_one_time? || custom_one_time? end
 
   def recurring?; !one_time? end
