@@ -93,7 +93,7 @@
                     %em.small.less-strong
                       = @bike.creation_description
                 - passive_organization.additional_registration_fields.each do |reg_field|
-                  - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
+                  - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
                   - if bike_attr == "registration_address"
                     %tr
                       %td= t(".address")
@@ -121,12 +121,7 @@
                       %td
                         = "#{(bike_attr || reg_field).humanize}:"
                       %td
-                        - if reg_field == "extra_registration_number"
-                          = @bike.extra_registration_number
-                        - elsif reg_field == "phone"
-                          = @bike.phone
-                        - elsif reg_field == "organization_affiliation"
-                          = @bike.organization_affiliation
+                        = @bike.send(bike_attr)
 
                 - if passive_organization.enabled?("avery_export")
                   %tr
