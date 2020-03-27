@@ -123,9 +123,9 @@
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
           %small
             = t(".owner_name")
-        - current_organization.additional_registration_fields.each do |field_name|
-          %th.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
-            = column_renames["#{field_name}_cell"]
+        - current_organization.additional_registration_fields.each do |reg_field|
+          %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+            = column_renames["#{reg_field}_cell"]
         - if current_organization.enabled?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
@@ -182,16 +182,14 @@
               - if bike.owner_name.present?
                 %em
                   = bike.owner_name
-            - current_organization.additional_registration_fields.each do |field_name|
-              %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
-                - if field_name == "reg_address"
-                  = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                - elsif field_name == "extra_registration_number"
-                  = bike.extra_registration_number
-                - elsif field_name == "phone"
-                  = bike.phone
-                - elsif field_name == "organization_affiliation"
-                  = bike.organization_affiliation
+            - current_organization.additional_registration_fields.each do |reg_field|
+              %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+                - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
+                - if bike_attr == "registration_address"
+                  %small
+                    = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
+                - else
+                  = bike.send(bike_attr)
             / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }
             - if current_organization.enabled?("bike_stickers")
