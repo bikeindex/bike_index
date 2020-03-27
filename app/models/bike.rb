@@ -655,11 +655,11 @@ class Bike < ApplicationRecord
 
   def registration_location
     reg_location = registration_address.with_indifferent_access
-    city = reg_location[:city]&.titleize
-    state = reg_location[:state]&.upcase
-    return "" if state.blank?
+    reg_city = reg_location[:city]&.titleize
+    reg_state = reg_location[:state]&.upcase
+    return "" if reg_state.blank?
 
-    [city, state].reject(&:blank?).join(", ")
+    [reg_city, reg_state].reject(&:blank?).join(", ")
   end
 
   # TODO: location refactor - put this method in Geocodeable
