@@ -117,7 +117,10 @@
                       %td
                         = "#{(bike_attr || reg_field).humanize}"
                       %td
-                        = @bike.send(bike_attr)
+                        - if bike_attr == "organization_affiliation"
+                          = @bike.organization_affiliation.humanize
+                        - else
+                          = @bike.send(bike_attr)
 
                 - if passive_organization.enabled?("avery_export")
                   %tr

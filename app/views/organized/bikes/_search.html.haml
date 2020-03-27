@@ -188,6 +188,8 @@
                 - if bike_attr == "registration_address"
                   %small
                     = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
+                - elsif bike_attr == "organization_affiliation"
+                  = bike.organization_affiliation.humanize
                 - else
                   = bike.send(bike_attr)
             / - if current_organization.enabled?("avery_export")
