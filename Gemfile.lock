@@ -72,12 +72,6 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airborne (0.2.13)
-      activesupport
-      rack
-      rack-test (~> 0.6, >= 0.6.2)
-      rest-client (>= 1.7.3, < 3.0)
-      rspec (~> 3.1)
     api-pagination (4.8.2)
     arel (9.0.0)
     ast (2.4.0)
@@ -125,7 +119,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.1.5)
+    concurrent-ruby (1.1.6)
     connection_pool (2.2.2)
     coolline (0.5.0)
       unicode_utils (~> 1.4)
@@ -261,7 +255,6 @@ GEM
       http-cookie (~> 1.0)
       http-form_data (~> 2.0)
       http_parser.rb (~> 0.6.0)
-    http-accept (1.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     http-form_data (2.1.1)
@@ -366,7 +359,6 @@ GEM
       mustermann (~> 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    netrc (0.11.0)
     nio4r (2.5.2)
     nokogiri (1.10.7)
       mini_portile2 (~> 2.4.0)
@@ -512,11 +504,6 @@ GEM
     responders (2.4.1)
       actionpack (>= 4.2.0, < 6.0)
       railties (>= 4.2.0, < 6.0)
-    rest-client (2.1.0)
-      http-accept (>= 1.7.0, < 2.0)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     rmagick (4.0.0)
     rqrcode (0.10.1)
       chunky_png (~> 1.0)
@@ -684,7 +671,6 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (~> 0.9.3)
-  airborne
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt (~> 3.1.7)

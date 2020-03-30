@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe OrganizedMessageSerializer, type: :lib do
   let(:subject) { described_class }
-  let(:obj) { FactoryGirl.create(:organization_message) }
+  let(:obj) { FactoryBot.create(:organization_message) }
   let(:serializer) { subject.new(obj, root: false) }
 
   describe "caching" do
