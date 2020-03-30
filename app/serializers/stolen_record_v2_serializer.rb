@@ -1,4 +1,4 @@
-class StolenRecordV2Serializer < ActiveModel::Serializer
+class StolenRecordV2Serializer < ApplicationSerializer
   attributes :date_stolen,
              :location,
              :latitude,

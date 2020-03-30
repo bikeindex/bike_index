@@ -10,14 +10,14 @@ ruby "2.5.5"
 gem "rack", "2.0.8"
 gem "rails", "5.2.4"
 
-gem "active_model_serializers", "~> 0.9.3"
-gem "bcrypt", "~> 3.1.7"
-gem "bootsnap"
-gem "jquery-rails"
-gem "pg", "~> 1.0"
+gem "bcrypt", "~> 3.1.7" # encryption
+gem "bootsnap" # Faster bootup
+gem "pg", "~> 1.0" # Postgres
 
 # Speed
 gem "fast_blank", "~> 1.0"
+gem "dalli" # memcached client
+gem "active_model_serializers", "~> 0.9.3" # Use active model serializers to serialize JSON.
 
 # Feature flagging
 gem "flipper"
@@ -39,7 +39,6 @@ gem "soulheart", "~> 0.3.0"
 
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder", "~> 0.4.2"
-gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
 gem "faraday_middleware"
@@ -94,6 +93,7 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
+gem "jquery-rails" # Javascript framework?
 gem "bootstrap", "4.0.0.alpha4" # Bootstrap 4 - used for revised stylesheets (locked to current version)
 gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
@@ -174,7 +174,6 @@ group :development, :test do
 end
 
 group :test do
-  gem "airborne"
   gem "factory_bot_rails"
   gem "rails-controller-testing"
   gem "rspec-sidekiq"

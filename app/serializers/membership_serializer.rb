@@ -1,4 +1,4 @@
-class MembershipSerializer < ActiveModel::Serializer
+class MembershipSerializer < ApplicationSerializer
   attributes :organization_name,
     :organization_id,
     :short_name,

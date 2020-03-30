@@ -1,3 +1,3 @@
-class StolenNotificationSerializer < ActiveModel::Serializer
+class StolenNotificationSerializer < ApplicationSerializer
   attributes :message
 end
