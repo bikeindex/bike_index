@@ -1,3 +1,3 @@
-class FrameMaterialSerializer < ActiveModel::Serializer
+class FrameMaterialSerializer < ApplicationSerializer
   attributes :name, :slug
 end

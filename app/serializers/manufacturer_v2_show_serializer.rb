@@ -1,4 +1,4 @@
-class ManufacturerV2ShowSerializer < ActiveModel::Serializer
+class ManufacturerV2ShowSerializer < ApplicationSerializer
   attributes :name,
     :company_url,
     :id,

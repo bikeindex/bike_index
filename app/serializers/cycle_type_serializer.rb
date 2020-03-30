@@ -1,3 +1,3 @@
-class CycleTypeSerializer < ActiveModel::Serializer
+class CycleTypeSerializer < ApplicationSerializer
   attributes :name, :slug
 end

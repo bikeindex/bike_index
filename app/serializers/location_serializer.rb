@@ -1,4 +1,4 @@
-class LocationSerializer < ActiveModel::Serializer
+class LocationSerializer < ApplicationSerializer
   attributes :address, :name, :phone, :street, :city, :country, :state, :zipcode
 
   def country

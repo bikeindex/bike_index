@@ -1,4 +1,4 @@
-class PublicImageSerializer < ActiveModel::Serializer
+class PublicImageSerializer < ApplicationSerializer
   self.root = "images"
   attributes :name,
     :full,

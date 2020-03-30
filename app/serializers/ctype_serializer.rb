@@ -1,4 +1,4 @@
-class CtypeSerializer < ActiveModel::Serializer
+class CtypeSerializer < ApplicationSerializer
   attributes :name,
     :slug,
     :has_multiple

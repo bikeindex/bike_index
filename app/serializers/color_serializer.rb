@@ -1,4 +1,4 @@
-class ColorSerializer < ActiveModel::Serializer
+class ColorSerializer < ApplicationSerializer
   attributes :name, :slug
 
   def slug
