@@ -1679,7 +1679,8 @@ CREATE TABLE public.organizations (
     search_radius integer DEFAULT 50 NOT NULL,
     location_latitude double precision,
     location_longitude double precision,
-    regional_ids jsonb
+    regional_ids jsonb,
+    manual_pos_kind integer
 );
 
 
@@ -4595,6 +4596,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200212022845'),
 ('20200212203304'),
 ('20200311160107'),
-('20200324221906');
+('20200324221906'),
+('20200326192650');
 
 
