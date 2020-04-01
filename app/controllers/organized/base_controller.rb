@@ -52,7 +52,7 @@ module Organized
       if current_organization.enabled?("appointments")
         return true if current_organization_location.present?
         flash[:error] = "Organization must have a location to enable appointments"
-        redirect_to locations_organization_manage_index_path and return
+        redirect_to locations_organization_manage_path and return
       else
         flash[:error] = "Appointments are not enabled for this organization"
         redirect_to organization_root_path and return

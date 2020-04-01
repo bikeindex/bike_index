@@ -13,7 +13,7 @@
   %p
     - if current_organization.auto_user.present?
       = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
-      =  link_to t(".update_email"), organization_manage_index_path(organization_id: current_organization.to_param)
+      =  link_to t(".update_email"), organization_manage_path(organization_id: current_organization.to_param)
 
 .paginate-container
   = paginate @memberships

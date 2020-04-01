@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Organized::ManageController, type: :request do
+RSpec.describe Organized::ManagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/manage" }
 
   context "given an authenticated ambassador" do
@@ -10,8 +10,8 @@ RSpec.describe Organized::ManageController, type: :request do
     it "redirects to the organization root" do
       expect(get(base_url)).to redirect_to(org_root_path)
       expect(get("#{base_url}/locations")).to redirect_to(org_root_path)
-      expect(put("#{base_url}/#{current_organization.id}")).to redirect_to(org_root_path)
-      expect(delete("#{base_url}/#{current_organization.id}")).to redirect_to(org_root_path)
+      expect(put(base_url)).to redirect_to(org_root_path)
+      expect(delete(base_url)).to redirect_to(org_root_path)
     end
   end
 
@@ -92,7 +92,7 @@ RSpec.describe Organized::ManageController, type: :request do
         let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["appointments"]) }
         it "redirects" do
           get "#{base_url}/schedule"
-          expect(response).to redirect_to(locations_organization_manage_index_path)
+          expect(response).to redirect_to(locations_organization_manage_path)
           expect(flash[:error]).to match "location"
         end
         context "with a location" do
@@ -103,6 +103,18 @@ RSpec.describe Organized::ManageController, type: :request do
             expect(response).to render_template :schedule
             expect(assigns(:current_organization)).to eq current_organization
             expect(assigns(:current_organization_location)).to eq location
+          end
+          context "with multiple locations" do
+            let!(:location2) { FactoryBot.create(:location, organization: current_organization) }
+            it "renders" do
+              current_organization.reload
+              expect(current_organization.default_location).to eq location
+              get "#{base_url}/schedule", params: { organization_location_id: location2.id }
+              expect(response.status).to eq(200)
+              expect(response).to render_template :schedule
+              expect(assigns(:current_organization)).to eq current_organization
+              expect(assigns(:current_organization_location)).to eq location2
+            end
           end
         end
       end
@@ -150,8 +162,8 @@ RSpec.describe Organized::ManageController, type: :request do
           current_organization.update_attributes(org_attributes)
         end
         it "updates, sends message about maps" do
-          put "#{base_url}/#{current_organization.to_param}", params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
-          expect(response).to redirect_to organization_manage_index_path(organization_id: current_organization.to_param)
+          put base_url, params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
+          expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can
@@ -221,7 +233,7 @@ RSpec.describe Organized::ManageController, type: :request do
           it "updates and adds the locations and shows on map" do
             expect(current_organization.kind).to_not eq "ambassador"
             expect do
-              put "#{base_url}/#{current_organization.to_param}", params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
+              put base_url, params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
             end.to change(Location, :count).by 1
             current_organization.reload
             expect(current_organization.show_on_map).to be_truthy
@@ -253,7 +265,7 @@ RSpec.describe Organized::ManageController, type: :request do
         context "matching short_name" do
           let!(:organization2) { FactoryBot.create(:organization, short_name: "cool short name") }
           it "doesn't update" do
-            put "#{base_url}/#{current_organization.to_param}",
+            put base_url,
                 params: {
                   organization_id: current_organization.to_param,
                   id: current_organization.to_param,
@@ -272,7 +284,7 @@ RSpec.describe Organized::ManageController, type: :request do
             update_attributes[:locations_attributes]["0"][:_destroy] = 1
 
             expect do
-              put "#{base_url}/#{current_organization.to_param}",
+              put base_url,
                   params: {
                     organization_id: current_organization.to_param,
                     id: current_organization.to_param,
@@ -293,7 +305,7 @@ RSpec.describe Organized::ManageController, type: :request do
         it "destroys" do
           expect_any_instance_of(AdminNotifier).to receive(:for_organization).with(organization: current_organization, user: current_user, type: "organization_destroyed")
           expect do
-            delete "#{base_url}/#{current_organization.id}"
+            delete base_url
           end.to change(Organization, :count).by(-1)
           expect(response).to redirect_to user_root_url
           expect(flash[:info]).to be_present
@@ -303,9 +315,9 @@ RSpec.describe Organized::ManageController, type: :request do
         it "does not destroy" do
           current_organization.update_attribute :is_paid, true
           expect do
-            delete "#{base_url}/#{current_organization.id}"
+            delete base_url
           end.to change(Organization, :count).by(0)
-          expect(response).to redirect_to organization_manage_index_path(organization_id: current_organization.to_param)
+          expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:info]).to be_present
         end
       end

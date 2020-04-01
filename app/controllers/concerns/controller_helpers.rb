@@ -229,8 +229,8 @@ module ControllerHelpers
 
   def current_organization_location
     return @current_organization_location if defined?(@current_organization_location)
-    if params[:current_organization_location].present?
-      @current_organization_location = current_organization.locations.friendly_find(params[:current_organization_location])
+    if params[:organization_location_id].present?
+      @current_organization_location = current_organization.locations.friendly_find(params[:organization_location_id])
     else
       @current_organization_location = current_organization.default_location
     end

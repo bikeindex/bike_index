@@ -1651,7 +1651,7 @@ en:
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
-      manage:
+      manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
             %{org_name}.
@@ -4359,8 +4359,8 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
-    manage:
-      index:
+    manages:
+      show:
         abbreviation: Abbreviation
         choose_file: Choose file...
         delete_organization: Delete organization

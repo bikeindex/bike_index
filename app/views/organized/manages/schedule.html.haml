@@ -1,0 +1,14 @@
+.mb-4
+  %h1 Appointment scheduling
+
+- if current_organization.locations.count > 1
+  %ul.nav.nav-tabs
+    - current_organization.locations.each do |location|
+      %li.nav-item
+        - if location == current_organization_location
+          %a.nav-link.active{ href: "#" }
+            = location.name
+        - else
+          %a.nav-link{ href: schedule_organization_manage_path(organization_id: current_organization.to_param, organization_location_id: location.id) }
+            = location.name
+

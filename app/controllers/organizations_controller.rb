@@ -30,7 +30,7 @@ class OrganizationsController < ApplicationController
       notify_admins("organization_created")
       flash[:success] = translation(:organization_created)
       if current_user.present?
-        redirect_to organization_manage_index_path(organization_id: @organization.to_param)
+        redirect_to organization_manage_path(organization_id: @organization.to_param)
       end
     else
       render action: :new and return

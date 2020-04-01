@@ -1,9 +1,9 @@
 module Organized
-  class ManageController < Organized::AdminController
-    before_action :assign_organization, only: [:index, :update, :locations]
+  class ManagesController < Organized::AdminController
+    before_action :assign_organization, only: [:show, :update, :locations]
     before_action :ensure_appointments_enabled!, only: [:schedule]
 
-    def index
+    def show
       @organization.ensure_auto_user
     end
 
@@ -16,12 +16,12 @@ module Organized
     def update
       if @organization.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
-        redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
+        redirect_path = params[:locations_page] ? locations_organization_manage_path(organization_id: current_organization.to_param) : current_root_path
         redirect_to redirect_path
       else
         @page_errors = @organization.errors
         flash[:error] = translation(:could_not_update, org_name: current_organization.name)
-        render :index
+        render :show
       end
     end
 
@@ -29,7 +29,7 @@ module Organized
       organization_name = current_organization.name
       if current_organization.is_paid
         flash[:info] = translation(:contact_support_to_delete, org_name: organization_name)
-        redirect_to current_index_path and return
+        redirect_to current_root_path and return
       end
       notify_admins("organization_destroyed")
       current_organization.destroy
@@ -47,8 +47,8 @@ module Organized
       @organization = current_organization
     end
 
-    def current_index_path
-      organization_manage_index_path(organization_id: current_organization.to_param)
+    def current_root_path
+      organization_manage_path(organization_id: current_organization.to_param)
     end
 
     def permitted_parameters

@@ -336,7 +336,7 @@ Rails.application.routes.draw do
     resources :ambassador_task_assignments, only: %i[update]
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
-    resources :manage, only: %i[index update destroy] do
+    resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
         get :schedule
