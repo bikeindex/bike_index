@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -3672,6 +3672,7 @@ en:
     application:
       about: About
       add_a_bike: Add a bike
+      appointments: Appointments
       blog: Blog
       discuss: Discuss
       donate: Donate
@@ -3682,6 +3683,7 @@ en:
       lightspeed_integration_panel: Lightspeed Integration Panel
       log_in: log in
       logout: Logout
+      manage_schedule: Manage scheduling
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
@@ -3692,8 +3694,6 @@ en:
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
       registration_stickers: Registration stickers
-      appointments: Appointments
-      manage_schedule: Manage scheduling
       resources: Resources
       search_bikes: Search bikes
       sign_up: Sign up
@@ -4360,23 +4360,6 @@ en:
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
     manages:
-      show:
-        abbreviation: Abbreviation
-        choose_file: Choose file...
-        delete_organization: Delete organization
-        i_would_like_to_terminate_my_account: I would like to terminate my account
-          with Bike Index
-        name: Name
-        org_email_address_html: Email address <em>%{org_name}</em> bike registrations
-          will be sent from
-        org_settings_html: "<em>%{org_name}</em> settings"
-        organization_logo: Organization logo
-        organization_type: Organization type
-        registration_email: Registration email
-        removal_confirmation: Are you positive you want to remove %{org_name} from
-          Bike Index?
-        select_email: Select email
-        update: Update
       location_fields:
         address: Address
         choose_country: Choose country
@@ -4394,6 +4377,23 @@ en:
         display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
         location_settings_html: "<em>%{org_name}</em> location settings"
         save: Save
+      show:
+        abbreviation: Abbreviation
+        choose_file: Choose file...
+        delete_organization: Delete organization
+        i_would_like_to_terminate_my_account: I would like to terminate my account
+          with Bike Index
+        name: Name
+        org_email_address_html: Email address <em>%{org_name}</em> bike registrations
+          will be sent from
+        org_settings_html: "<em>%{org_name}</em> settings"
+        organization_logo: Organization logo
+        organization_type: Organization type
+        registration_email: Registration email
+        removal_confirmation: Are you positive you want to remove %{org_name} from
+          Bike Index?
+        select_email: Select email
+        update: Update
     messages:
       index:
         bike: Bike
@@ -4990,6 +4990,7 @@ en:
         Bike Index provides additional features for verified Law Enforcement organizations.
         Please contact %{email_link} to get them enabled.
       admin_panel: Admin Panel
+      appointments: Appointments
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports
@@ -5005,6 +5006,7 @@ en:
       link_to_register_html: >-
         <strong>%{link}</strong> to automatically register the bikes you sell to your
         customers.
+      manage_schedule: Manage scheduling
       multi_serial_search: Multi serial search
       organization_locations: "%{org_name} locations"
       organization_profile: "%{org_name} profile"
@@ -5015,8 +5017,6 @@ en:
       recoveries: Recoveries
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       registration_stickers: Registration stickers
-      appointments: Appointments
-      manage_schedule: Manage scheduling
       resources: Resources
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
         page
