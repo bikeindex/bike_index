@@ -231,9 +231,16 @@ module ControllerHelpers
     return @current_organization_location if defined?(@current_organization_location)
     if params[:organization_location_id].present?
       @current_organization_location = current_organization.locations.friendly_find(params[:organization_location_id])
+      session[:passive_organization_location_id] = @current_organization_location&.id || "0"
     else
+      if session[:passive_organization_location_id].present? && session[:passive_organization_location_id] != "0"
+        location = current_organization.locations.friendly_find(session[:passive_organization_location_id])
+        return @current_organization_location = location if location.present?
+      end
       @current_organization_location = current_organization.default_location
+      session[:passive_organization_location_id] = "0" # Don't set passive organization if just on default
     end
+    @current_organization_location
   end
 
   def current_user

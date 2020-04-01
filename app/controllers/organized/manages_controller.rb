@@ -1,6 +1,6 @@
 module Organized
   class ManagesController < Organized::AdminController
-    before_action :assign_organization, only: [:show, :update, :locations]
+    before_action :assign_organization, except: [:landing]
     before_action :ensure_appointments_enabled!, only: [:schedule]
 
     def show
@@ -10,7 +10,7 @@ module Organized
     def locations; end
 
     def schedule
-
+      @location = current_organization_location
     end
 
     def update

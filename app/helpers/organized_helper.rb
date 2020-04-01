@@ -22,4 +22,10 @@ module OrganizedHelper
     return "text-danger" if export.calculated_progress == "errored"
     export.calculated_progress == "finished" ? "text-success" : "text-warning"
   end
+
+  def organized_container
+    return "container-fluid" if %w[parking_notifications appointments].include?(controller_name)
+    return "container-fluid" if action_name == "schedule"
+    controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
+  end
 end

@@ -44,7 +44,7 @@ RSpec.describe Organized::ManagesController, type: :request do
     describe "standard organization" do
       it "does not destroy" do
         expect do
-          delete "#{base_url}/#{current_organization.id}"
+          delete base_url
         end.to change(Organization, :count).by(0)
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
@@ -54,11 +54,11 @@ RSpec.describe Organized::ManagesController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    describe "index" do
+    describe "show" do
       it "renders, sets active organization" do
         get base_url
         expect(response.status).to eq(200)
-        expect(response).to render_template :index
+        expect(response).to render_template :show
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
       end

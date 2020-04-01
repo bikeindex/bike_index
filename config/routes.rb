@@ -312,7 +312,7 @@ Rails.application.routes.draw do
   resources :organizations, only: [], path: "o", module: "organized" do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: [:index]
-    get "landing", to: "manage#landing", as: :landing
+    get "landing", to: "manages#landing", as: :landing
     resources :bikes, only: %i[index new create show update] do
       collection do
         get :recoveries

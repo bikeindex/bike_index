@@ -83,9 +83,7 @@
               = active_link t(".manage_schedule"), schedule_organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
-  - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
-
-  %div{ class: orgcontainer || "container" }
+  %div{ class: organized_container }
     - if current_organization.law_enforcement_missing_verified_features?
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
