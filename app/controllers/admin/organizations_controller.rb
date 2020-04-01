@@ -32,8 +32,10 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
+    run_update_pos_kind = permitted_parameters[:manual_pos_kind].present? && @organization.manual_pos_kind != permitted_parameters[:manual_pos_kind]
     if @organization.update_attributes(permitted_parameters)
       flash[:success] = "Organization Saved!"
+      UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit

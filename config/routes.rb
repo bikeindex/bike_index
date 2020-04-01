@@ -326,6 +326,7 @@ Rails.application.routes.draw do
     resources :messages, only: %i[index show create]
     resources :parking_notifications
     resources :stickers, only: %i[index show edit update]
+    resources :appointments
     resource :ambassador_dashboard, only: %i[show] do
       collection do
         get :resources
@@ -338,6 +339,7 @@ Rails.application.routes.draw do
     resources :manage, only: %i[index update destroy] do
       collection do
         get :locations
+        get :schedule
       end
     end
     resources :users, except: [:show]

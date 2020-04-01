@@ -2080,7 +2080,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2106,7 +2106,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3692,6 +3692,8 @@ en:
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
       registration_stickers: Registration stickers
+      appointments: Appointments
+      manage_schedule: Manage scheduling
       resources: Resources
       search_bikes: Search bikes
       sign_up: Sign up
@@ -4382,7 +4384,7 @@ en:
         location_name: Location name
         name: Name
         phone_number: Phone number
-        remove: Remove
+        remove: Remove location
         state: State
         street: Street
         zipcode: Postal code
@@ -5013,6 +5015,8 @@ en:
       recoveries: Recoveries
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       registration_stickers: Registration stickers
+      appointments: Appointments
+      manage_schedule: Manage scheduling
       resources: Resources
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
         page

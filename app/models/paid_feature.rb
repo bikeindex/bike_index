@@ -34,6 +34,7 @@ class PaidFeature < ApplicationRecord
     show_partial_registrations
     show_recoveries
     skip_ownership_email
+    appointments
   ] + BIKE_ACTIONS + REG_FIELDS).freeze
 
   has_many :invoice_paid_features

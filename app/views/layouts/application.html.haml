@@ -75,6 +75,10 @@
                   %li.divider-nav-item
                   %li
                     = active_link t(".registration_stickers"), organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.enabled?("appointments")
+                  %li.divider-nav-item
+                  %li
+                    = active_link t(".appointments"), organization_appointments_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                 - if passive_organization.enabled?("csv_exports")
                   %li
                     = active_link t(".exports"), organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
@@ -86,6 +90,9 @@
                     = active_link t(".org_profile", org_name: passive_organization.short_name), organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
                   %li
                     = active_link t(".org_locations", org_name: passive_organization.short_name), locations_organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  - if current_organization.enabled?("appointments")
+                    %li
+                      = active_link t(".manage_schedule"), schedule_organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
               - if current_user&.superuser?
                 %li.divider-nav-item
                 %li

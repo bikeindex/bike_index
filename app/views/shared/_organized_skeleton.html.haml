@@ -58,11 +58,16 @@
           %li.divider-above
             = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         %li.divider-above
+          - if current_organization.enabled?("appointments")
+            = active_link t(".appointments"), organization_appointments_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           - if current_organization.enabled?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
-          - else
+          - unless current_organization.enabled?("appointments") || current_organization.enabled?("bike_stickers")
             %span.disabled-menu-item.menu-item
-              = t(".registration_stickers")
+              - if current_organization.bike_shop?
+                = t(".appointments")
+              - else
+                = t(".registration_stickers")
         - if current_organization.enabled?("csv_exports")
           %li
             = active_link t(".exports"), organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
@@ -73,6 +78,9 @@
             = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
           %li
             = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+          - if current_organization.enabled?("appointments")
+            %li
+              = active_link t(".manage_schedule"), schedule_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
   - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
