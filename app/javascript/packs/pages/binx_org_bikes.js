@@ -1,6 +1,6 @@
 import log from "../utils/log";
 
-function BinxOrgBikes() {
+function BinxAppOrgBikes() {
   return {
     init() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
@@ -61,4 +61,4 @@ function BinxOrgBikes() {
   };
 }
 
-export default BinxOrgBikes;
+export default BinxAppOrgBikes;

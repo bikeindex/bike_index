@@ -1,7 +1,9 @@
 .mb-4
   %h1 Appointment scheduling
 
-- if current_organization.locations.count > 1
+- multiple_locations = current_organization.locations.count > 1
+
+- if multiple_locations
   %ul.nav.nav-tabs
     - current_organization.locations.each do |location|
       %li.nav-item
@@ -14,7 +16,41 @@
 
 = form_for @location, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
-  = hidden_field_tag :organization_location_id, current_organization_location.id
+  = hidden_field_tag :id, current_organization_location.id
 
+  .row.mt-4
+    .col-lg-6.offset-lg-3
+      %table.table-list
+        %tbody
+          - if multiple_locations
+            %tr
+              %td Name
+              %td= @location.name
+          %tr
+            %td Phone
+            %td= @location.phone
+          %tr
+            %td Address
+            %td
+              = [@location.street, @location.city, "#{@location.state.abbreviation} #{@location.zipcode}"].join(", ")
+          %tr
+            %td Timezone
+            %td
+              = @location.timezone
 
-
+  .mt-4
+  - days_of_week = Location::WEEKDAYS
+  - days_of_week.each do |day|
+    - starts_closed = @location.closed_on?(day)
+    .row
+      .col-lg-10.offset-lg-1
+        .scheduling-day.mt-2{ id: "schedulingDay-#{day}", "data-day" => day }
+          .row
+            .col-xs-8
+              %h3.header-font-uncap
+                = day.titleize
+            .col-xs-4.text-right
+              = label_tag "closed_#{day}" do
+                = check_box_tag "closed_#{day}", day, starts_closed, { class: "dayClosedCheckbox ml-2" }
+                Closed #{day.titleize}s
+          .dayOpen.collapse{ class: (starts_closed ? "" : "in show") }

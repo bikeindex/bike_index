@@ -165,6 +165,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/sections/side_boxes";
 @import "revised/sections/tables";
 @import "revised/sections/embeded_tweet";
+@import "revised/sections/appointments";
 
 // Shared organized styles
 @import "revised/pages/organized/forms";
@@ -173,6 +174,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/organized/exports";
 @import "revised/pages/organized/bikes";
 @import "revised/pages/organized/dashboard";
+@import "revised/pages/organized/appointment_management";
 @import "revised/sections/organized_menu";
 
 // left hand organized menu

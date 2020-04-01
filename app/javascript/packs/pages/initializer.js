@@ -6,6 +6,7 @@ import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAppOrgParkingNotifications from "./binx_org_parking_notifications.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
+import BinxAppOrgManageSchedule from "./binx_org_manage_schedule.js";
 import BinxAppOrgUserForm from "./binx_org_user_form";
 import PeriodSelector from "../utils/period_selector.js";
 
@@ -61,6 +62,9 @@ $(document).ready(function() {
   } else if (bodyId === "organized_bikes_index") {
     const binxAppOrgBikes = BinxAppOrgBikes();
     binxAppOrgBikes.init();
+  } else if (bodyId === "organized_manages_schedule") {
+    const binxAppOrgManageSchedule = new BinxAppOrgManageSchedule();
+    binxAppOrgManageSchedule.init();
   }
   // This can be new, edit, create or update, so just checking for the element
   if ($("#multipleUserSelect").length) {

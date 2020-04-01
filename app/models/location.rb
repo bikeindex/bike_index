@@ -1,6 +1,8 @@
 class Location < ApplicationRecord
   include Geocodeable
 
+  WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
+
   acts_as_paranoid
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
@@ -21,6 +23,10 @@ class Location < ApplicationRecord
   # Just stubbing now, but eventually could be more complicated
   def self.friendly_find(str)
     find_by_id(str)
+  end
+
+  def self.weekday?(str)
+    WEEKDAYS.include?(str.downcase)
   end
 
   def shown_from_organization
@@ -57,5 +63,11 @@ class Location < ApplicationRecord
     return name if name == organization.name
 
     "#{organization.name} - #{name}"
+  end
+
+  def closed_on?(day_or_date)
+    if self.class.weekday?(day_or_date)
+      false
+    end
   end
 end
