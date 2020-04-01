@@ -18,6 +18,11 @@ class Location < ApplicationRecord
   before_save :set_phone
   after_commit :update_organization
 
+  # Just stubbing now, but eventually could be more complicated
+  def self.friendly_find(str)
+    find_by_id(str)
+  end
+
   def shown_from_organization
     self.shown = organization && organization.allowed_show
     true

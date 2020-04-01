@@ -81,7 +81,7 @@
           Search Location
         %td
           %span
-            = @organization.search_location&.address
+            = @organization.default_location&.address
       %tr
         %td
           Search Radius (mi)
@@ -194,6 +194,7 @@
               = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
 
             - if current_user.developer? && @organization.manual_pos_kind.present?
+              %br
               %small
                 %em.less-strong manual POS kind set:
                 = @organization.manual_pos_kind

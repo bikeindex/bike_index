@@ -150,6 +150,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       location2_update_attributes = update_attributes[:locations_attributes][update_attributes[:locations_attributes].keys.last]
       expect_attrs_to_match_hash(location2, location2_update_attributes.except(:latitude, :longitude, :organization_id, :created_at))
     end
+    context "setting to not_set" do
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "updates the organization" do
+        expect do
+          put "#{base_url}/#{organization.to_param}", params: { organization: { manual_pos_kind: "not_set" } }
+        end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
+        organization.reload
+        expect(organization.manual_pos_kind).to be_blank
+      end
+    end
     context "not updating manual_pos_kind" do
       it "updates and doesn't enqueue worker" do
         expect do

@@ -1,12 +1,16 @@
 module Organized
   class ManageController < Organized::AdminController
     before_action :assign_organization, only: [:index, :update, :locations]
+    before_action :ensure_appointments_enabled!, only: [:schedule]
 
     def index
       @organization.ensure_auto_user
     end
 
-    def locations
+    def locations; end
+
+    def schedule
+
     end
 
     def update

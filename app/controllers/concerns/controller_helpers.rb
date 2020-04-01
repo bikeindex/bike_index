@@ -6,8 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path, :bikehub_url, :show_missing_location_alert
+                  :user_root_bike_search?, :current_organization, :passive_organization, :current_organization_location,
+                  :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_missing_location_alert
     before_action :enable_rack_profiler
 
     before_action do
@@ -225,6 +225,15 @@ module ControllerHelpers
     # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
     return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
     set_passive_organization(@current_organization)
+  end
+
+  def current_organization_location
+    return @current_organization_location if defined?(@current_organization_location)
+    if params[:current_organization_location].present?
+      @current_organization_location = current_organization.locations.friendly_find(params[:current_organization_location])
+    else
+      @current_organization_location = current_organization.default_location
+    end
   end
 
   def current_user
