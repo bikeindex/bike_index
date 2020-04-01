@@ -312,7 +312,7 @@ Rails.application.routes.draw do
   resources :organizations, only: [], path: "o", module: "organized" do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: [:index]
-    get "landing", to: "manage#landing", as: :landing
+    get "landing", to: "manages#landing", as: :landing
     resources :bikes, only: %i[index new create show update] do
       collection do
         get :recoveries
@@ -326,6 +326,7 @@ Rails.application.routes.draw do
     resources :messages, only: %i[index show create]
     resources :parking_notifications
     resources :stickers, only: %i[index show edit update]
+    resources :appointments
     resource :ambassador_dashboard, only: %i[show] do
       collection do
         get :resources
@@ -335,7 +336,7 @@ Rails.application.routes.draw do
     resources :ambassador_task_assignments, only: %i[update]
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
-    resources :manage, only: %i[index update destroy] do
+    resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
       end

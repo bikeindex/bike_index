@@ -1,6 +1,6 @@
 import log from "../utils/log";
 
-function BinxOrgBikes() {
+function BinxAppOrgBikes() {
   return {
     init() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
@@ -37,7 +37,7 @@ function BinxOrgBikes() {
         visibleCells = defaultCells;
       }
 
-      visibleCells.forEach(cellClass =>
+      visibleCells.forEach((cellClass) =>
         $(`input#${cellClass}`).prop("checked", true)
       );
     },
@@ -48,8 +48,8 @@ function BinxOrgBikes() {
       );
       let enabledCells = $("#organizedSearchSettings input:checked")
         .get()
-        .map(cellClass => cellClass.value);
-      enabledCells.forEach(cellClass =>
+        .map((cellClass) => cellClass.value);
+      enabledCells.forEach((cellClass) =>
         $(`.${cellClass}`).removeClass("hiddenColumn")
       );
       // Then store the enabled columns
@@ -57,8 +57,8 @@ function BinxOrgBikes() {
         "organizationBikeColumns",
         JSON.stringify(enabledCells)
       );
-    }
+    },
   };
 }
 
-export default BinxOrgBikes;
+export default BinxAppOrgBikes;

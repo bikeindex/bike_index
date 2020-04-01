@@ -60,7 +60,7 @@
         %li.divider-above
           - if current_organization.enabled?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
-          - else
+          - unless current_organization.enabled?("bike_stickers")
             %span.disabled-menu-item.menu-item
               = t(".registration_stickers")
         - if current_organization.enabled?("csv_exports")
@@ -70,14 +70,12 @@
           %li.divider-above
             = active_link t(".users"), organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           %li
-            = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+            = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
           %li
-            = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+            = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
-  - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
-
-  %div{ class: orgcontainer || "container" }
+  %div{ class: organized_container }
     - if current_organization.law_enforcement_missing_verified_features?
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
@@ -115,3 +113,7 @@
                 = t(".register_bikes_with_link_html", link: link)
 
     = yield
+
+- if organized_include_javascript_pack?
+  -# Important that this is below yield, sometimes important page data is added to the dom in there
+  = javascript_pack_tag "application"

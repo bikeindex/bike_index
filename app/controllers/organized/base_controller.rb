@@ -40,7 +40,7 @@ module Organized
       return true unless current_organization&.ambassador?
       flash[:error] = translation(:must_be_an_admin,
                                   scope: [:controllers, :organized, :base, __method__])
-      redirect_to organization_root_path
+      redirect_to organization_root_path and return
     end
 
     def ensure_current_organization!

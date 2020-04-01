@@ -15,7 +15,7 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_index_path and return unless current_organization.enabled?("show_recoveries")
+      redirect_to current_root_path and return unless current_organization.enabled?("show_recoveries")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -32,7 +32,7 @@ module Organized
     end
 
     def incompletes
-      redirect_to current_index_path and return unless current_organization.enabled?("show_partial_registrations")
+      redirect_to current_root_path and return unless current_organization.enabled?("show_partial_registrations")
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
@@ -122,7 +122,7 @@ module Organized
       current_organization.bikes.reorder("bikes.created_at desc")
     end
 
-    def current_index_path
+    def current_root_path
       organization_bikes_path(organization_id: current_organization.to_param)
     end
 

@@ -88,13 +88,13 @@
         %span.text-danger
           Warning - you can break things here!
       .form-check.form-check-inline
-        = f.radio_button "manual_pos_kind", nil, class: "form-check-input"
+        = f.radio_button "manual_pos_kind", "not_set", class: "form-check-input"
         %strong
-          = f.label "manual_pos_kind", "not set", class: "form-check-label"
+          = f.label "manual_pos_kind_not_set", "not set", class: "form-check-label"
       - Organization.pos_kinds.each do |pos_kind|
         .form-check.form-check-inline.small
           = f.radio_button "manual_pos_kind", pos_kind, class: "form-check-input"
-          = f.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize, class: "form-check-label"
+          = f.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label"
       .mb-4
 
 .row
