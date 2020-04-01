@@ -121,3 +121,8 @@
                 = t(".register_bikes_with_link_html", link: link)
 
     = yield
+
+- if organized_include_javascript_pack?
+  -# Important that this is below yield, sometimes important page data is added to the dom in there
+  = javascript_pack_tag "application"
+

@@ -13,8 +13,10 @@ RSpec.describe OrganizedHelper, type: :helper do
   end
 
   describe "organized_container" do
-    before { allow(view).to receive(:controller_name) { controller_name } }
-    before { allow(view).to receive(:action_name) { action_name } }
+    before do
+      allow(view).to receive(:controller_name) { controller_name }
+      allow(view).to receive(:action_name) { action_name }
+    end
     let(:action_name) { "index" }
     context "locations" do
       let(:controller_name) { "manage" }
@@ -52,6 +54,38 @@ RSpec.describe OrganizedHelper, type: :helper do
       let(:controller_name) { "appointments" }
       it "is container-fluid" do
         expect(organized_container).to eq "container-fluid"
+      end
+    end
+  end
+
+  describe "include_javascript_pack?" do
+    before do
+      allow(view).to receive(:controller_name) { controller_name }
+      allow(view).to receive(:action_name) { action_name }
+    end
+    let(:controller_name) { "users" }
+    let(:action_name) { "index" }
+    it "is falsey" do
+      expect(organized_include_javascript_pack?).to be_falsey
+    end
+    context "appointments" do
+      let(:controller_name) { "appointments" }
+      it "is truthy" do
+        expect(organized_container).to eq "container-fluid"
+        expect(organized_include_javascript_pack?).to be_truthy
+      end
+    end
+    context "bikes" do
+      let(:controller_name) { "bikes" }
+      it "is truthy" do
+        expect(organized_include_javascript_pack?).to be_truthy
+      end
+      context "recoveries" do
+        let(:action_name) { "recoveries" }
+        it "is truthy" do
+          expect(organized_container).to eq "container"
+          expect(organized_include_javascript_pack?).to be_truthy
+        end
       end
     end
   end
