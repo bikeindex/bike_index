@@ -41,26 +41,54 @@
   .mt-4
   - @location.fetch_reference_location_schedules.each do |location_schedule|
     - day = location_schedule.day
-    - starts_closed = location_schedule.closed_on?(day)
+    - starts_closed = location_schedule.set_closed
     .row
-      .col-lg-10.offset-lg-1
+      .col-lg-8.offset-lg-1
         .scheduling-day.mt-2{ id: "schedulingDay-#{day}", "data-day" => day }
-          .row
-            .col-xs-8
-              %h3.header-font-uncap
-                #{day.titleize}s
-            .col-xs-4.text-right
-              = label_tag "closed_#{day}" do
-                = check_box_tag "closed_#{day}", day, starts_closed, { class: "dayClosedCheckbox ml-2" }
-                Closed #{day.titleize}s
+          / .col-xs-6
+          %h3.header-font-uncap.d-inline-block.mr-2
+            #{day.titleize}s
+          / .col-xs-6.text-right
+          = label_tag "set_closed_#{day}", class: "d-inline-block text-right" do
+            = check_box_tag "set_closed_#{day}", day, location_schedule.set_closed, { class: "dayClosedCheckbox ml-2" }
+            Closed #{day.titleize}s
           .dayOpen.collapse{ class: (starts_closed ? "" : "in show") }
             .row
-              - location_schedule.hours.each_with_index do |time_block, i|
+              - open_hours = location_schedule.open_hours
+              - open_hours = [[9, 5]] unless open_hours.any?
+              - open_hours.each_with_index do |time_block, i|
                 .col-xs-3.text-right
-                  = label_tag "location_hours_block_#{i}_open", "Open from"
+                  = label_tag "location_open_hours_block_#{i}_open", "Open from"
                 .col-xs-4
-                  = number_field_tag "location_hours_block_#{i}_open", time_block[0], class: "form-control mr-2", step: 1, min: 0
-                .col-xs-1.text-center
-                  = label_tag "location_hours_block_#{i}_closed", "to"
+                  = number_field_tag "location_open_hours_block_#{i}_open", time_block[0], class: "form-control mr-2", step: 1, min: 0
+                .col-xs-1.text-right
+                  = label_tag "location_open_hours_block_#{i}_closed", "to"
                 .col-xs-4
-                  = number_field_tag "location_hours_block_#{i}_to", time_block[1], class: "form-control mr-2", step: 1, min: 0
+                  = number_field_tag "location_open_hours_block_#{i}_closed", time_block[1], class: "form-control mr-2", step: 1, min: 0
+
+            %hr.mt-4.mb-2
+
+            .row
+              - appointment_hours = location_schedule.appointment_hours
+              - appointment_hours = [[9, 5]] unless appointment_hours.any?
+              - appointment_hours.each_with_index do |time_block, i|
+                .col-xs-3.text-right
+                  = label_tag "location_appointment_hours_block_#{i}_open", "Appointments from"
+                .col-xs-4
+                  = number_field_tag "location_appointment_hours_block_#{i}_open", time_block[0], class: "form-control mr-2", step: 1, min: 0
+                .col-xs-1.text-right
+                  = label_tag "location_appointment_hours_block_#{i}_closed", "to"
+                .col-xs-4
+                  = number_field_tag "location_appointment_hours_block_#{i}_closed", time_block[1], class: "form-control mr-2", step: 1, min: 0
+            .row.mt-4
+              .col-xs-8.col-sm-6.text-right
+                = label_tag "location_appointments_simultaneous", "Simultaneous appointments"
+              .col-xs-4
+                = number_field_tag "location_appointments_simultaneous", 1, class: "form-control mr-2", step: 1, min: 0
+            .row.mt-2
+              .col-xs-8.col-sm-6.text-right
+                = label_tag "location_appointments_every_minutes", "Appointments every X minutes"
+              .col-xs-4
+                = number_field_tag "location_appointments_every_minutes", 30, class: "form-control mr-2", step: 1, min: 0
+
+

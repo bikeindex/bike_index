@@ -41,9 +41,14 @@ class LocationSchedule < ApplicationRecord
 
   def open?; !closed? end
 
-  def hours
+  def open_hours
     return [] if set_closed? # Because we don't wipe hours necessarily
-    schedule.dig("hours") || []
+    schedule.dig("open_hours") || []
+  end
+
+  def appointment_hours
+    return [] if set_closed? # Because we don't wipe hours necessarily
+    schedule.dig("appointment_hours") || []
   end
 
   def set_calculated_attributes

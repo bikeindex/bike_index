@@ -65,7 +65,7 @@ class Location < ApplicationRecord
     unless reference_location_schedules.count == 7
       LocationSchedule.days_of_week.each { |day| location_schedules.where(day: day).first_or_create }
     end
-    reference_location_schedules.reorder(:day)
+    reference_location_schedules
   end
 
   def closed_on?(day_or_date)

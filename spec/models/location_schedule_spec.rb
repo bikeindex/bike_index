@@ -21,12 +21,12 @@ RSpec.describe LocationSchedule, type: :model do
       end
       it "is true when reference_location_schedule has no hours" do
         location_schedule_wednesday = location.reference_location_schedules.wednesday.first
-        location_schedule_wednesday.update_attributes(schedule: { hours: [9,16] })
+        location_schedule_wednesday.update_attributes(schedule: { open_hours: [9,16] })
         expect(location_schedule_wednesday.closed?).to be_falsey
         expect(LocationSchedule.to_weekday("Wednesday")).to eq "wednesday"
         expect(LocationSchedule.to_weekday(next_wednesday)).to eq "wednesday"
         expect(LocationSchedule.to_weekday(next_wednesday.beginning_of_day + 4.hours)).to eq "wednesday"
-        next_wednesday_schedule = location.location_schedules.create(date: next_wednesday, set_closed: true, schedule: { hours: [22, 16] })
+        next_wednesday_schedule = location.location_schedules.create(date: next_wednesday, set_closed: true, schedule: { open_hours: [22, 16] })
         expect(next_wednesday_schedule.closed?).to be_truthy
         expect(location.closed_on?("Wednesday ")).to be_falsey
         expect(location.closed_on?(next_wednesday)).to be_truthy
