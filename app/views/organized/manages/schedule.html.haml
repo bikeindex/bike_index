@@ -39,18 +39,28 @@
               = @location.timezone
 
   .mt-4
-  - days_of_week = Location::WEEKDAYS
-  - days_of_week.each do |day|
-    - starts_closed = @location.closed_on?(day)
+  - @location.fetch_reference_location_schedules.each do |location_schedule|
+    - day = location_schedule.day
+    - starts_closed = location_schedule.closed_on?(day)
     .row
       .col-lg-10.offset-lg-1
         .scheduling-day.mt-2{ id: "schedulingDay-#{day}", "data-day" => day }
           .row
             .col-xs-8
               %h3.header-font-uncap
-                = day.titleize
+                #{day.titleize}s
             .col-xs-4.text-right
               = label_tag "closed_#{day}" do
                 = check_box_tag "closed_#{day}", day, starts_closed, { class: "dayClosedCheckbox ml-2" }
                 Closed #{day.titleize}s
           .dayOpen.collapse{ class: (starts_closed ? "" : "in show") }
+            .row
+              - location_schedule.hours.each_with_index do |time_block, i|
+                .col-xs-3.text-right
+                  = label_tag "location_hours_block_#{i}_open", "Open from"
+                .col-xs-4
+                  = number_field_tag "location_hours_block_#{i}_open", time_block[0], class: "form-control mr-2", step: 1, min: 0
+                .col-xs-1.text-center
+                  = label_tag "location_hours_block_#{i}_closed", "to"
+                .col-xs-4
+                  = number_field_tag "location_hours_block_#{i}_to", time_block[1], class: "form-control mr-2", step: 1, min: 0

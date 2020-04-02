@@ -1,13 +1,13 @@
 class Location < ApplicationRecord
   include Geocodeable
 
-  WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
-
   acts_as_paranoid
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
   belongs_to :state
   has_many :bikes
+  has_many :location_schedules
+  has_many :reference_location_schedules, -> { reference }, class_name: "LocationSchedule"
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -23,10 +23,6 @@ class Location < ApplicationRecord
   # Just stubbing now, but eventually could be more complicated
   def self.friendly_find(str)
     find_by_id(str)
-  end
-
-  def self.weekday?(str)
-    WEEKDAYS.include?(str.downcase)
   end
 
   def shown_from_organization
@@ -65,9 +61,14 @@ class Location < ApplicationRecord
     "#{organization.name} - #{name}"
   end
 
-  def closed_on?(day_or_date)
-    if self.class.weekday?(day_or_date)
-      false
+  def fetch_reference_location_schedules
+    unless reference_location_schedules.count == 7
+      LocationSchedule.days_of_week.each { |day| location_schedules.where(day: day).first_or_create }
     end
+    reference_location_schedules.reorder(:day)
+  end
+
+  def closed_on?(day_or_date)
+    location_schedules.closed_on?(day_or_date)
   end
 end
