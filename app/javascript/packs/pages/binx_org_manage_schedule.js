@@ -15,6 +15,7 @@ export default class BinxAppOrgExport {
 
   collapseEl($el, showOrHide) {
     // Fuck this lack of bootstrap in here
+    // Added some things to make classes/fix flex display - but it doesn't work
     if (typeof $().collapse == "function") {
       $el.collapse(showOrHide);
     } else {

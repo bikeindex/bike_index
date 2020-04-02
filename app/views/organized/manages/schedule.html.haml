@@ -53,6 +53,8 @@
             = check_box_tag "set_closed_#{day}", day, location_schedule.set_closed, { class: "dayClosedCheckbox ml-2" }
             Closed #{day.titleize}s
           .dayOpen.collapse{ class: (starts_closed ? "" : "in show") }
+            %p.text-center
+              %small.less-strong Hours are in a 24 hour clock
             .row
               - open_hours = location_schedule.open_hours
               - open_hours = [[9, 5]] unless open_hours.any?
