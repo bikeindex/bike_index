@@ -5,9 +5,12 @@ RSpec.describe LocationSchedule, type: :model do
     let(:location) { FactoryBot.create(:location) }
     before { location.fetch_reference_location_schedules }
     it "is true when no location_schedule" do
+      location.reload
       expect(location.closed_on?("Tuesday")).to be_truthy
       next_tuesday = (Date.today..(Date.today + 1.week)).find { |d| d.wday == 2 }
       expect(LocationSchedule.to_weekday(next_tuesday)).to eq "tuesday"
+
+      expect(location.location_schedules.closed_on?(next_tuesday)).to be_truthy
       expect(location.closed_on?(next_tuesday)).to be_truthy
     end
     describe "with reference_location_schedule" do

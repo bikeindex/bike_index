@@ -33,8 +33,7 @@ class LocationSchedule < ApplicationRecord
       else
         date = TimeParser.parse(day_or_date, timezone).to_date
       end
-      location_schedule = specific.where(date: date).first || reference.where(day: day).first
-      location_schedule&.closed?
+      (specific.where(date: date).first || reference.where(day: to_weekday(date)).first).closed?
     end
   end
 
