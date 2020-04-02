@@ -37,7 +37,7 @@ class LocationSchedule < ApplicationRecord
     end
   end
 
-  def closed?; hours.none? end
+  def closed?; open_hours.none? end
 
   def open?; !closed? end
 
