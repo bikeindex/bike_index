@@ -83,6 +83,15 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
   end
 
+  describe "email" do
+    let(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
+    it "renders" do
+      get "#{base_url}/#{parking_notification.to_param}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :show
+    end
+  end
+
   describe "create" do
     let(:parking_notification_params) do
       {
