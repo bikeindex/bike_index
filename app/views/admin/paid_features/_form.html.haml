@@ -32,8 +32,7 @@
         = f.label :amount
         .input-group.mb-2
           .input-group-prepend
-            .input-group-text
-              = f.select :currency, options_for_select(currency_symbols.zip(available_currencies))
+            = f.select :currency, options_for_select(currency_symbols.zip(available_currencies)), {}, class: "form-control small"
           = f.number_field :amount, step: 1, min: 0, class: "form-control"
 
     .col-md-6.col-xs-12
