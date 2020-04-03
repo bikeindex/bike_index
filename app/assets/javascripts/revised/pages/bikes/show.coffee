@@ -1,5 +1,6 @@
 # These two functions are required by getCurrentPosition
 window.fillInParkingLocation = (position) ->
+  console.log(position)
   window.waitingOnLocation = false
   $(".parkingLocation-latitude").val(position.coords.latitude)
   $(".parkingLocation-longitude").val(position.coords.longitude)

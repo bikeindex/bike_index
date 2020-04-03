@@ -2,7 +2,6 @@
 
 class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, impounded: 2 }.freeze
-  DEFAULT_SHOW_ADDRESS = true
 
   belongs_to :bike
   belongs_to :user

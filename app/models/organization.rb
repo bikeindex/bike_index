@@ -166,10 +166,9 @@ class Organization < ApplicationRecord
 
   def parking_notification_kinds; ParkingNotification.kinds end
 
-  def message_kinds # Matches organization_message kinds
+  def message_kinds # Matches organization_message kinds - TODO: remove this
     [
       enabled?("geolocated_messages") ? "geolocated_messages" : nil,
-      # TODO: make this based on abandoned_bikes
       enabled?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
   end

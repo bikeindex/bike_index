@@ -29,10 +29,15 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.custom_message(OrganizationMessage.geolocated.last)
   end
 
+  def parking_notification
+    OrganizedMailer.parking_notification(ParkingNotification.last)
+  end
+
   private
 
   def render_finished_registration(bikes)
-    bike = bikes.order(:created_at).last
+    bike = Organization.friendly_find("psu").created_bikes.order(:created_at).last
+    bike ||= bikes.order(:created_at).last
     OrganizedMailer.finished_registration(bike.current_ownership)
   end
 end

@@ -1,0 +1,11 @@
+Your #{@bike.type} #{@parking_notification.appears_abandoned? ? "" : "is "}#{@parking_notification.kind_humanized}!
+
+This is for your #{@bike.title_string}.
+
+It is located at: #{@parking_notification.address}
+
+This was sent to you by: #{@parking_notification.user.display_name}
+
+---
+
+= @parking_notification.body

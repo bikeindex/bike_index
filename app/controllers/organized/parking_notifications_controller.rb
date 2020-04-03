@@ -1,7 +1,8 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
-    before_action :ensure_access_to_abandoned_bikes!, only: %i[index create]
+    before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
+    skip_before_action :set_x_frame_options_header, only: [:email]
 
     def index
       @page_data = {
@@ -34,6 +35,14 @@ module Organized
                                 .or(parking_notifications.where(initial_record_id: related_ids))
                                 .where.not(id: @parking_notification.id)
       @bike = @parking_notification.bike
+    end
+
+    def email
+      @organization = current_organization
+      @email_preview = true
+      @parking_notification = parking_notifications.find(params[:id])
+      @bike = @parking_notification.bike
+      render template: "/organized_mailer/parking_notification", layout: "email"
     end
 
     def create
@@ -72,14 +81,15 @@ module Organized
     end
 
     def permitted_parameters
+      use_entered_address = ParamsNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
       params.require(:parking_notification)
-            .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :use_entered_address,
-                    :latitude, :longitude, :accuracy, :street, :city, :zipcode, :state_id, :country_id)
-            .merge(user_id: current_user.id, organization_id: current_organization.id)
+            .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :latitude, :longitude, :accuracy,
+                    :street, :city, :zipcode, :state_id, :country_id)
+            .merge(user_id: current_user.id, organization_id: current_organization.id, use_entered_address: use_entered_address)
     end
 
-    def ensure_access_to_abandoned_bikes!
-      return true if current_organization.enabled?("abandoned_bikes")
+    def ensure_access_to_parking_notifications!
+      return true if current_organization.enabled?("parking_notifications")
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param)
       return

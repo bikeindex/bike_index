@@ -6,7 +6,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
   let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike) }
-  let(:enabled_feature_slugs) { ["abandoned_bikes"] }
+  let(:enabled_feature_slugs) { ["parking_notifications"] }
 
   describe "index" do
     it "renders" do
@@ -89,6 +89,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         kind: "parked_incorrectly",
         internal_notes: "some details about the abandoned thing",
         bike_id: bike.to_param,
+        use_entered_address: "false",
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
         message: "Some message to the user",
@@ -100,7 +101,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "user without organization membership" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
-          expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
+          expect(current_organization.enabled?("parking_notifications")).to be_truthy
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
@@ -124,7 +125,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
 
-      context "organization without abandoned_bikes" do
+      context "organization without parking_notifications" do
         let(:enabled_feature_slugs) { [] }
 
         it "does not create" do
@@ -132,7 +133,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           invoice = current_organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
           expect(current_organization.is_paid).to be_truthy
-          expect(current_organization.enabled?("abandoned_bikes")).to be_falsey
+          expect(current_organization.enabled?("parking_notifications")).to be_falsey
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param, parking_notification: parking_notification_params
@@ -145,7 +146,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       it "creates" do
         FactoryBot.create(:state_new_york)
-        expect(current_organization.enabled?("abandoned_bikes")).to be_truthy
+        expect(current_organization.enabled?("parking_notifications")).to be_truthy
         expect do
           post base_url, params: {
             organization_id: current_organization.to_param,
@@ -156,10 +157,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end.to change(ParkingNotification, :count).by(1)
         parking_notification = ParkingNotification.last
 
-        expect_attrs_to_match_hash(parking_notification, parking_notification_params)
+        expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+        expect(parking_notification.location_from_address).to be_falsey
       end
 
       context "manual address and repeat" do
@@ -192,6 +194,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.initial_record).to eq parking_notification_initial
           expect(parking_notification.latitude).to eq(37.8087498)
           expect(parking_notification.longitude).to eq(-122.263705)
+          expect(parking_notification.location_from_address).to be_truthy
         end
       end
     end

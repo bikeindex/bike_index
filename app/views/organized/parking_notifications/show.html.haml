@@ -22,7 +22,7 @@
           %td= t(".bike")
           %td
             - if @bike.present?
-              = link_to organized_bike_text(@bike), bike_path(@bike)
+              = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
               %br
               %small
                 = link_to "view all notifications for #{@bike.type}", organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link"
@@ -33,13 +33,16 @@
     %table.table-list
       %tbody
         %tr
-          %td Accuracy
+          %td Location
           %td
-            - if @parking_notification.accuracy.present?
-              = @parking_notification.accuracy
             - if @parking_notification.location_from_address
-              From address
-            %small.less-strong developer info
+              Address entered
+            - else
+              From GPS
+            - if current_user.developer? && @parking_notification.accuracy.present?
+              %code
+                = @parking_notification.accuracy
+              %small.less-strong developer info
         %tr
           %td= t(".repeat")
           %td
@@ -95,3 +98,6 @@
     Related Notifications
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: @related_notifications, skip_bike: true, skip_map_cell: true }
 
+%h2.uncap.mt-4 Preview of email sent:
+.email-preview
+  <iframe src="#{email_organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)}"></iframe>
