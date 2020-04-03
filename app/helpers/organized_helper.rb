@@ -31,10 +31,11 @@ module OrganizedHelper
 
   def organized_include_javascript_pack?
     return true if organized_container == "container-fluid"
-    return true if controller_name == "bikes" && action_name == "recoveries"
-    return true if controller_name == "exports" && action_name == "show"
-    return true if controller_name == "users" && action_name == "new"
-    return true if controller_name == "dashboard" && action_name == "index"
-    false
+    [
+      %w[bikes recoveries],
+      %w[exports show],
+      %w[users new],
+      %w[dashboard index],
+    ].include?([controller_name, action_name])
   end
 end
