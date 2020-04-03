@@ -17,28 +17,40 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
-      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      bike0 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
+      # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1)
+      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1)
+
+      # a chicago-org bike in nyc
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
-      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
-      # stolen record doesn't automatically set latitude on bike, because of testing skip - so use an existing bike with location set
-      unaffiliated_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: unaffiliated_bikes.last)
-      unaffiliated_stolen_record.add_recovery_information
+      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
 
-      expect(nyc_org1.nearby_bikes.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bikes.map(&:id))
-      expect(nyc_org1.nearby_recovered_records.pluck(:id)).to match_array([unaffiliated_stolen_record.id])
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
+
+      nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+
+      # stolen record doesn't automatically set latitude on bike,
+      # because of testing skip - so use an existing bike with location set
+      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: nonorg_bikes.last)
+      nonorg_stolen_record.add_recovery_information
+
+      expect(nyc_org1.nearby_bikes.pluck(:id))
+        .to(match_array [nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id))
+
+      expect(nyc_org1.nearby_recovered_records.pluck(:id))
+        .to(match_array [nonorg_stolen_record.id])
 
       # Make sure we're getting the bike from the org
-      expect(Bike.organization(nyc_org1).pluck(:id)).to match_array([bike1.id])
+      expect(Bike.organization(nyc_org1).pluck(:id))
+        .to(match_array [chi_bike1.id])
 
       # Make sure we get the bikes from the org or from nearby
-      expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids)).to match_array([bike1, bike2, bike3])
+      expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
+        .to(match_array [chi_bike1, nyc_bike2, nyc_bike3])
     end
   end
 
@@ -299,18 +311,13 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "show_bulk_import?" do
+    # Note: the show_bulk_import? for ascend shops is tested by the ascend_pos test
     let(:organization) { Organization.new }
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
     context "paid_for" do
       let(:organization) { Organization.new(enabled_feature_slugs: ["show_bulk_import"]) }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-    context "with ascend name" do
-      let(:organization) { Organization.new(ascend_name: "xxxzzaz") }
       it "is truthy" do
         expect(organization.show_bulk_import?).to be_truthy
       end
@@ -541,9 +548,40 @@ RSpec.describe Organization, type: :model do
         organization.reload
         expect(organization.pos_kind).to eq "no_pos"
         expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
         bike_pos.update_attribute :created_at, Time.current - 2.weeks
         expect(organization.calculated_pos_kind).to eq "broken_pos"
+      end
+    end
+    context "ascend_name" do
+      let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
+      it "returns ascend_pos" do
+        expect(organization.calculated_pos_kind).to eq "ascend_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.manual_pos_kind?).to be_blank
+        expect(organization.pos_kind).to eq "ascend_pos"
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+    context "manual_pos_kind" do
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "overrides everything" do
+        expect(organization.manual_lightspeed_pos?).to be_truthy
+        expect(organization.pos_kind).to eq "no_pos"
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.manual_pos_kind).to eq "lightspeed_pos"
+        expect(organization.pos_kind).to eq "lightspeed_pos"
+        organization.update_attribute :manual_pos_kind, "broken_pos"
+
+        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        organization.reload
+        expect(organization.manual_pos_kind).to eq "broken_pos"
+        expect(organization.pos_kind).to eq "broken_pos"
       end
     end
     context "recent bikes" do
@@ -602,35 +640,35 @@ RSpec.describe Organization, type: :model do
   describe "additional_registration_fields" do
     let(:organization) { Organization.new }
     it "is false" do
-      expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_falsey
+      expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
-      expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_falsey
+      expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_falsey
       expect(organization.include_field_reg_phone?).to be_falsey
       expect(organization.include_field_reg_address?).to be_falsey
-      expect(organization.include_field_reg_secondary_serial?).to be_falsey
-      expect(organization.include_field_reg_affiliation?).to be_falsey
+      expect(organization.include_field_extra_registration_number?).to be_falsey
+      expect(organization.include_field_organization_affiliation?).to be_falsey
     end
     context "with paid_features" do
-      let(:labels) { { reg_phone: "You have to put this in, jerk", reg_secondary_serial: "XXXZZZZ" }.as_json }
-      let(:organization) { Organization.new(enabled_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation], registration_field_labels: labels) }
+      let(:labels) { { reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ" }.as_json }
+      let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone organization_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do
-        expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_truthy
+        expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
-        expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_truthy
+        expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_truthy
         expect(organization.include_field_reg_phone?).to be_truthy
         expect(organization.include_field_reg_phone?(user)).to be_truthy
         expect(organization.include_field_reg_address?).to be_truthy
         expect(organization.include_field_reg_address?(user)).to be_truthy
-        expect(organization.include_field_reg_secondary_serial?).to be_truthy
-        expect(organization.include_field_reg_affiliation?(user)).to be_truthy
+        expect(organization.include_field_extra_registration_number?).to be_truthy
+        expect(organization.include_field_organization_affiliation?(user)).to be_truthy
         # And test the lables
-        expect(organization.registration_field_label("reg_secondary_serial")).to eq "XXXZZZZ"
+        expect(organization.registration_field_label("extra_registration_number")).to eq "XXXZZZZ"
         expect(organization.registration_field_label("reg_address")).to be_nil
         expect(organization.registration_field_label("reg_phone")).to eq labels["reg_phone"]
-        expect(organization.registration_field_label("reg_affiliation")).to be_nil
+        expect(organization.registration_field_label("organization_affiliation")).to be_nil
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }

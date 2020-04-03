@@ -10,11 +10,11 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization&.include_field_reg_secondary_serial?
-        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial")
-        = f.label :additional_registration, label_secondary_serial, class: "control-label"
+      - if @organization&.include_field_extra_registration_number?
+        - label_secondary_serial = @organization.registration_field_label("extra_registration_number") || t(".additional_serial")
+        = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
         .controls
-          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+          = f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
         = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
@@ -99,12 +99,12 @@
       = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
-  - if @organization&.include_field_reg_affiliation?
-    - label_affiliation = @organization.registration_field_label("reg_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
+  - if @organization&.include_field_organization_affiliation?
+    - label_affiliation = @organization.registration_field_label("organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
     .input-group
       = f.label :organization_affiliation, label_affiliation
       .controls
-        = f.select :organization_affiliation, @organization.reg_affiliation_options, class: "form-control"
+        = f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control"
   - if @organization.enabled?("bike_stickers")
     .input-group
       .control-group

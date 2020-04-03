@@ -20,6 +20,16 @@ RSpec.describe "Me API V3", type: :request do
     context "fully scoped token" do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
+      let!(:membership) { FactoryBot.create(:membership_claimed, user: user) }
+      let(:target_membership) do
+        {
+          organization_name: membership.organization.name,
+          organization_slug: membership.organization.slug,
+          organization_id: membership.organization_id,
+          organization_access_token: membership.organization.access_token,
+          user_is_organization_admin: false,
+        }
+      end
       it "responds with all available attributes with full scoped token" do
         user.reload
         expect(user.secondary_emails).to eq(["d@f.co"])
@@ -31,6 +41,7 @@ RSpec.describe "Me API V3", type: :request do
         expect(json_result["user"].is_a?(Hash)).to be_truthy
         expect(json_result["bike_ids"].is_a?(Array)).to be_truthy
         expect(json_result["memberships"].is_a?(Array)).to be_truthy
+        expect(json_result["memberships"]).to eq([target_membership.as_json])
         expect(response.response_code).to eq(200)
       end
     end

@@ -1,3 +1,3 @@
-class HandlebarTypeSerializer < ActiveModel::Serializer
+class HandlebarTypeSerializer < ApplicationSerializer
   attributes :name, :slug
 end

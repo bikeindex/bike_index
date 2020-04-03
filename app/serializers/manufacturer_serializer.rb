@@ -1,4 +1,4 @@
-class ManufacturerSerializer < ActiveModel::Serializer
+class ManufacturerSerializer < ApplicationSerializer
   attributes :name,
     :company_url,
     :short_name,

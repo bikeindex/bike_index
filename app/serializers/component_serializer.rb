@@ -1,4 +1,4 @@
-class ComponentSerializer < ActiveModel::Serializer
+class ComponentSerializer < ApplicationSerializer
   attributes :id,
     :description,
     :serial_number,

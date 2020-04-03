@@ -171,32 +171,32 @@
                 %li
                   = link_to regiona_parent.name, admin_organization_path(regiona_parent)
 
-  - if @organization.bike_shop?
+  - if @organization.bike_shop? || @organization.any_pos?
     .col-md-6
       %table.table-list
         %tr
           %td
             POS integration:
           %td
-            = @organization.pos_kind.humanize
-            %br
-            - if @organization.ascend_imports?
-              Ascend
-            - else
-              %small.less-strong
-                Unknown
-        - if @organization.ascend_imports?
-          %tr
-            %td
-              Ascend name
-            %td
-              %code
-                = @organization.ascend_name
-        %tr
-          %td
-            Info
-          %td
-            More to come soon
+            - if @organization.ascend_pos?
+              = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
+              %small
+                Ascend name:
+                %em
+                  = @organization.ascend_name
+            - elsif @organization.broken_pos?
+              %span.text-danger
+                POS Integration broken!
+              = @organization.pos_kind.humanize
+
+            -# Show link if it's lightspeed - or if it used to be lightspeed
+            - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
+              = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
+
+            - if current_user.developer? && @organization.manual_pos_kind.present?
+              %small
+                %em.less-strong manual POS kind set:
+                = @organization.manual_pos_kind
 .row.mt-4
   .col-md-6
     %p

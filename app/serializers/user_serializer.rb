@@ -1,4 +1,4 @@
-class UserSerializer < ActiveModel::Serializer
+class UserSerializer < ApplicationSerializer
   attributes :user_present, :is_superuser, :is_content_admin
   has_many :memberships
 

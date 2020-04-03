@@ -1,4 +1,4 @@
-class ParkingNotificationSerializer < ActiveModel::Serializer
+class ParkingNotificationSerializer < ApplicationSerializer
   attributes :id,
              :kind,
              :kind_humanized,

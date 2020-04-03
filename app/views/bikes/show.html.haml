@@ -52,7 +52,7 @@
           %small.convertTimezone
           %strong
             = t(".at")
-          = @stolen_record.address(skip_default_country: true)
+          = @stolen_record.display_address(skip_default_country: true)
 
       - if @bike.should_show_other_bikes
         %h4
@@ -96,7 +96,7 @@
           = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
 
           - unless @bike.abandoned
-            = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
+            = @bike.attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
 
@@ -138,7 +138,7 @@
               = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
+                = @bike.attr_list_item(@stolen_record.display_address(skip_default_country: true), t(".location"))
                 = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
                 - stolen_type = @bike.abandoned ? 'abandoned' : 'stolen'

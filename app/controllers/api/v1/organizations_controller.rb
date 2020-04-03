@@ -1,12 +1,30 @@
 module Api
   module V1
     class OrganizationsController < ApiV1Controller
-      before_action :verify_organizations_token
+      before_action :verify_organizations_token, only: [:show]
 
       def show
-        info = { name: @organization.name, can_add_bikes: false }
+        info = { name: @organization.name, can_add_bikes: false, id: @organization.id }
         info[:can_add_bikes] = true if @organization.auto_user_id.present?
         render json: info
+      end
+
+      def update
+        @organization = Organization.friendly_find(params[:id])
+        if @organization.blank?
+          redirect_to api_v1_not_found_url and return
+        elsif params[:access_token] == @organization.access_token
+          if Organization.pos_kinds.include?(params[:manual_pos_kind])
+            @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
+            UpdateOrganizationPosKindWorker.perform_async(@organization.id)
+            render json: { manual_pos_kind: @organization.manual_pos_kind }
+          else
+            message = { :'406' => "Not permitted POS kind" }
+            render json: message, status: 406 and return
+          end
+        else
+          render json: message, status: :unauthorized and return
+        end
       end
 
       private

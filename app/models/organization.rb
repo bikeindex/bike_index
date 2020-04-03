@@ -54,6 +54,7 @@ class Organization < ApplicationRecord
 
   enum kind: KIND_ENUM
   enum pos_kind: POS_KIND_ENUM
+  enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
@@ -83,6 +84,8 @@ class Organization < ApplicationRecord
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
+
+  def self.no_pos_kinds; %w[no_pos does_not_need_pos] end
 
   def self.admin_required_kinds; %w[ambassador bike_depot].freeze end
 
@@ -136,8 +139,6 @@ class Organization < ApplicationRecord
 
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
-  def ascend_imports?; ascend_name.present? end
-
   def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
@@ -181,11 +182,11 @@ class Organization < ApplicationRecord
     PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
-  def include_field_reg_affiliation?(user = nil)
-    additional_registration_fields.include?("reg_affiliation")
+  def include_field_organization_affiliation?(user = nil)
+    additional_registration_fields.include?("organization_affiliation")
   end
 
-  def reg_affiliation_options
+  def organization_affiliation_options
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
@@ -202,8 +203,8 @@ class Organization < ApplicationRecord
     additional_registration_fields.include?("reg_address")
   end
 
-  def include_field_reg_secondary_serial?(user = nil)
-    additional_registration_fields.include?("reg_secondary_serial")
+  def include_field_extra_registration_number?(user = nil)
+    additional_registration_fields.include?("extra_registration_number")
   end
 
   def registration_field_label(field_slug)
@@ -290,9 +291,11 @@ class Organization < ApplicationRecord
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; enabled?("show_bulk_import") || ascend_imports? end
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
 
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
+  def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
@@ -318,9 +321,10 @@ class Organization < ApplicationRecord
   end
 
   def calculated_pos_kind
+    return manual_pos_kind if manual_pos_kind.present?
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
+    return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-    return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
     if bike_shop? && created_at < Time.current - 1.week
       return "does_not_need_pos" if recent_bikes.count > 2

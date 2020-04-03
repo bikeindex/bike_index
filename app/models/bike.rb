@@ -13,7 +13,7 @@ class Bike < ApplicationRecord
     status_with_owner: 0,
     status_stolen: 1,
     status_abandoned: 2,
-    status_impounded: 3
+    status_impounded: 3,
   }
 
   belongs_to :manufacturer
@@ -69,7 +69,7 @@ class Bike < ApplicationRecord
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
+                :b_param_id_token, :address_city, :address_state, :address_zipcode,
                 :parking_notification_kind, :skip_status_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
@@ -101,6 +101,7 @@ class Bike < ApplicationRecord
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
+  before_validation :set_address, unless: :skip_geocoding?
   before_save :set_calculated_attributes
 
   include PgSearch::Model
@@ -118,7 +119,7 @@ class Bike < ApplicationRecord
   class << self
     def old_attr_accessible
       (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized made_without_serial additional_registration
+          serial_normalized made_without_serial extra_registration_number
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
@@ -335,8 +336,6 @@ class Bike < ApplicationRecord
     owner&.name
   end
 
-  def owner_name_or_email; owner_name || owner_email end
-
   def first_ownership; ownerships.reorder(:id).first end
 
   def organized?(org = nil)
@@ -465,7 +464,7 @@ class Bike < ApplicationRecord
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. ",
+      current_stolen_record.display_address && "from #{current_stolen_record.display_address}. ",
     ].compact.join(" ")
   end
 
@@ -534,6 +533,20 @@ class Bike < ApplicationRecord
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
     true
+  end
+
+  # Geolocate based on the full current stolen record address, if available.
+  # Otherwise, use the data set by set_location_info.
+  def set_address
+    # Sets lat/long, will avoid a geocode API call if coordinates are found
+    set_location_info
+
+    self.address =
+      current_stolen_record&.display_address(force_show_address: true).presence ||
+      [city, zipcode, country&.name]
+        .select(&:present?)
+        .join(" ")
+        .presence
   end
 
   def normalize_emails
@@ -641,12 +654,12 @@ class Bike < ApplicationRecord
   end
 
   def registration_location
-    address = registration_address.with_indifferent_access
-    city = address[:city]&.titleize
-    state = address[:state]&.upcase
-    return "" if state.blank?
+    reg_location = registration_address.with_indifferent_access
+    reg_city = reg_location[:city]&.titleize
+    reg_state = reg_location[:state]&.upcase
+    return "" if reg_state.blank?
 
-    [city, state].reject(&:blank?).join(", ")
+    [reg_city, reg_state].reject(&:blank?).join(", ")
   end
 
   # TODO: location refactor - put this method in Geocodeable
@@ -787,7 +800,7 @@ class Bike < ApplicationRecord
       frame_model,
       (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
       (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
-      additional_registration,
+      extra_registration_number,
       (type == "bike" ? nil : type),
       components_cache_string,
     ].flatten.reject(&:blank?).join(" ")
@@ -809,30 +822,12 @@ class Bike < ApplicationRecord
     PropulsionType.new(propulsion_type).name
   end
 
-  # Geolocate based on the full current stolen record address, if available.
-  # Otherwise, use the data set by set_location_info.
-  def geocode_data
-    return @geocode_data if defined?(@geocode_data)
-
-    # Sets lat/long, will avoid a geocode API call if coordinates are found
-    set_location_info
-
-    @geocode_data =
-      current_stolen_record
-        &.address(force_show_address: true)
-        .presence ||
-      [city, zipcode, country&.name]
-        .select(&:present?)
-        .join(" ")
-        .presence
-  end
-
   # Take lat/long from associated geocoded model
-  # Only geocode if no lat/long present and geocode data present
+  # Only geocode if lat/long are blank and address present
   def should_be_geocoded?
     return false if skip_geocoding?
     return false if latitude.present? && longitude.present?
-    geocode_data.present?
+    address.present?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)

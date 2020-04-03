@@ -83,9 +83,9 @@
               = f.text_area :description, rows: 3, class: 'form-control', placeholder: t('.tell_us_about_your_bike')
 
           .form-group.row.unnested-field
-            = f.label :additional_registration, t(".other_serial_or_registration_number"), class: 'form-well-label'
+            = f.label :extra_registration_number, t(".other_serial_or_registration_number"), class: 'form-well-label'
             .form-well-input
-              = f.text_field :additional_registration, class: 'form-control'
+              = f.text_field :extra_registration_number, class: 'form-control'
 
           .related-fields.no-divider-row
             .form-group.row.fancy-select-placeholder.unfancy

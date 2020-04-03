@@ -1,7 +1,7 @@
 class OrganizationExportWorker < ApplicationWorker
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
 
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: "low_priority"
   attr_accessor :export # Only necessary for testing
 
   def perform(export_id)
@@ -86,11 +86,12 @@ class OrganizationExportWorker < ApplicationWorker
   def export_headers
     return @export_headers if defined?(@export_headers)
     @export_headers = @export.headers
-    if @export_headers.include?("registration_address")
-      @export_headers = @export_headers.reject { |v| v == "registration_address" } + %w[address city state zipcode]
+    if @export_headers.include?("address")
+      # Remove address and readd, because we want to keep them in line
+      @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
     end
     if @export.assign_bike_codes?
-      @export_headers << "sticker"
+      @export_headers << "assigned_sticker"
       @bike_stickers = []
       @bike_sticker = BikeSticker.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
@@ -98,38 +99,37 @@ class OrganizationExportWorker < ApplicationWorker
     @export_headers
   end
 
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation].freeze
+
   def value_for_header(header, bike)
+    return bike.send(header) if MATCHING_KEYS.include?(header)
     case header
     when "link" then LINK_BASE + bike.id.to_s
-    when "owner_email" then bike.owner_email
-    when "owner_name" then bike.owner_name
-    when "owner_name_or_email" then bike.owner_name_or_email
     when "registration_method" then bike.creation_description
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
-    when "year" then bike.year
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
-    when "additional_registration_number" then bike.additional_registration
-    when "phone" then bike.phone
     when "is_stolen" then bike.stolen ? "true" : nil
     when "address" then bike.registration_address["address"] # These are the expanded values for bike registration address
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
-    when "sticker" then assign_bike_code_and_increment(bike)
+    when "sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
+    when "assigned_sticker" then assign_bike_code_and_increment(bike)
     end
   end
 
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_sticker.present?
     code = @bike_sticker.code
+    pretty_code = @bike_sticker.pretty_code
     @bike_sticker.claim(@export.user, bike)
     @bike_stickers << code
     @bike_sticker = @bike_sticker.next_unclaimed_code
-    code
+    pretty_code
   end
 
   # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying

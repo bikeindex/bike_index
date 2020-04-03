@@ -97,12 +97,12 @@
           %td= t(".stickers")
           %td
             - if @export.assign_bike_codes?
-              %em= t(".stickers_exported", bike_stickers_count: @export.bike_stickers&.count.to_i)
-              - if @export.bike_stickers.any?
+              %em= t(".stickers_exported", bike_stickers_count: @export.bike_stickers_assigned&.count.to_i)
+              - if @export.bike_stickers_assigned.any?
                 %ul.exported-link-list
-                  - bike_code_links = @export.bike_stickers.each do |code, i|
+                  - bike_code_links = @export.bike_stickers_assigned.each do |code, i|
                     %li
-                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_stickers.count - 1) ? "" : ","}
+                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_stickers_assigned.count - 1) ? "" : ","}
 
                 - if @export.bike_codes_removed?
                   %em.text-danger= t(".stickers_have_been_unassigned")
@@ -122,5 +122,3 @@
           %ul
             - @export.written_headers.each do |header|
               %li= header.humanize
-
-  = javascript_pack_tag "application"

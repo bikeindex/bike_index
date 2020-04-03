@@ -125,7 +125,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect([bike_sticker.user_id, bike_sticker.claimed_at, bike_sticker.bike_id].reject(&:blank?).count).to eq 3
           expect(export.avery_export?).to be_truthy
           expect(export.assign_bike_codes?).to be_truthy
-          expect(export.bike_stickers).to eq(["a1111"])
+          expect(export.bike_stickers_assigned).to eq(["a1111"])
           expect do
             delete :destroy, params: { id: export.id, organization_id: organization.to_param }
           end.to change(Export, :count).by(-1)
@@ -204,7 +204,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
               timezone: "",
               file_format: "csv",
               bike_code_start: "01", # Avery export organizations always submit a number here
-              headers: %w[link registered_at] + Export.additional_registration_fields.values,
+              headers: %w[link registered_at organization_affiliation extra_registration_number phone address sticker],
             }
           end
           it "creates the expected export" do
@@ -266,7 +266,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         export.reload
         bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_stickers).to eq(["Z"])
+        expect(export.bike_stickers_assigned).to eq(["Z"])
         expect(export.bike_codes_removed?).to be_falsey
         expect(bike_sticker.claimed?).to be_truthy
         expect(bike_sticker.bike).to eq bike
@@ -274,7 +274,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         export.reload
         bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_stickers).to eq(["Z"])
+        expect(export.bike_stickers_assigned).to eq(["Z"])
         expect(export.bike_codes_removed?).to be_truthy
         expect(bike_sticker.claimed?).to be_falsey
         expect(bike_sticker.bike).to be_nil

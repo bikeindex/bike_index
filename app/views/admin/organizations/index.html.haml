@@ -13,7 +13,6 @@
             Kind
         .dropdown-menu
           - Organization.kinds.each do |kind|
-            - kind
             - kind_active = active_kind == kind
             = link_to kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
 
@@ -25,7 +24,9 @@
           - else
             POS
         .dropdown-menu
-          - Organization.pos_kinds.each do |pos_kind|
+          - (Organization.pos_kinds + %w[with_pos without_pos]).each do |pos_kind|
+            - if pos_kind == "with_pos"
+              .dropdown-divider
             - pos_kind
             - kind_active = active_pos_kind == pos_kind
             = link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: kind_active ? nil : pos_kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"

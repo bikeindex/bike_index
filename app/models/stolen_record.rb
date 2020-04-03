@@ -51,7 +51,8 @@ class StolenRecord < ApplicationRecord
   scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
-  after_validation :reverse_geocode
+  before_validation :set_address
+  after_validation :reverse_geocode, unless: :skip_geocoding?
   after_save :remove_outdated_alert_images
   after_commit :update_associations
 
@@ -71,6 +72,8 @@ class StolenRecord < ApplicationRecord
     ].flatten.compact.uniq
   end
 
+  def self.recovery_display_statuses; RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s) end
+
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
@@ -86,11 +89,11 @@ class StolenRecord < ApplicationRecord
   def pre_recovering_user?; recovered_at.present? && recovered_at < self.class.recovering_user_recording_start end
 
   # Only display if they have put in an address - so that we don't show on initial creation
-  def display_checklist?; address.present? end
+  def display_checklist?; display_address.present? end
 
   def missing_location?; street.blank? end
 
-  def address(skip_default_country: false, force_show_address: false)
+  def display_address(skip_default_country: false, force_show_address: false)
     country_string = country && country.iso
     if skip_default_country
       country_string = nil if country_string == "US"
@@ -182,6 +185,10 @@ class StolenRecord < ApplicationRecord
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
     self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
+  end
+
+  def set_address
+    self.address = display_address(skip_default_country: true)
   end
 
   def fix_date
@@ -331,13 +338,5 @@ class StolenRecord < ApplicationRecord
 
     EmailTheftAlertNotificationWorker
       .perform_async(theft_alerts.active.last.id, :recovered)
-  end
-
-  def geocode_data
-    @geocode_data ||= address(skip_default_country: true)
-  end
-
-  def geocode_columns
-    %i[street city state_id zipcode country_id]
   end
 end

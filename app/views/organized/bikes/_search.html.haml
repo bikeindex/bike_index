@@ -60,8 +60,8 @@
     "color_cell" => "Color",
     "owner_email_cell" => "Sent to",
     "owner_name_cell" => "Owner name",
-    "reg_affiliation_cell" => "Affiliation",
-    "reg_secondary_serial_cell" => "Secondary#",
+    "organization_affiliation_cell" => "Affiliation",
+    "additional_registration_cell" => "Secondary#",
     "reg_phone_cell" => "Phone",
     "reg_address_cell" => "Address",
     "sticker_cell" => "Sticker",
@@ -123,9 +123,9 @@
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
           %small
             = t(".owner_name")
-        - current_organization.additional_registration_fields.each do |field_name|
-          %th.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
-            = column_renames["#{field_name}_cell"]
+        - current_organization.additional_registration_fields.each do |reg_field|
+          %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+            = column_renames["#{reg_field}_cell"]
         - if current_organization.enabled?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
@@ -182,16 +182,16 @@
               - if bike.owner_name.present?
                 %em
                   = bike.owner_name
-            - current_organization.additional_registration_fields.each do |field_name|
-              %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
-                - if field_name == "reg_address"
-                  = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                - elsif field_name == "reg_secondary_serial"
-                  = bike.additional_registration
-                - elsif field_name == "phone"
-                  = bike.phone
-                - elsif field_name == "reg_affiliation"
-                  = bike.organization_affiliation
+            - current_organization.additional_registration_fields.each do |reg_field|
+              %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+                - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
+                - if bike_attr == "registration_address"
+                  %small
+                    = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
+                - elsif bike_attr == "organization_affiliation"
+                  = bike.organization_affiliation.humanize
+                - else
+                  = bike.send(bike_attr)
             / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }
             - if current_organization.enabled?("bike_stickers")
@@ -215,5 +215,3 @@
 
 .paginate-container.paginate-container-bottom
   = paginate @bikes
-
-= javascript_pack_tag "application"

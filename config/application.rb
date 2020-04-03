@@ -29,11 +29,6 @@ module Bikeindex
     config.exceptions_app = self.routes
     require "draper"
     Draper::Railtie.initializers.delete_if { |initializer| initializer.name == "draper.setup_active_model_serializers" }
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
-    config.autoload_paths << Rails.root.join("lib/")
-    config.autoload_paths << Rails.root.join("lib/integrations")
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]

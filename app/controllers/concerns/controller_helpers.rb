@@ -189,18 +189,13 @@ module ControllerHelpers
     @timezone ||= Time.zone
     # Set time period
     @period ||= params[:period]
-    if @period == "custom"
-      if params[:start_time].present?
-        @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
-        if @start_time > @end_time
-          new_end_time = @start_time
-          @start_time = @end_time
-          @end_time = new_end_time
-        end
-      else # use the default period
-        @period = "all"
-        set_default_period
+    if @period == "custom" && params[:start_time].present?
+      @start_time = TimeParser.parse(params[:start_time], @timezone)
+      @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
+      if @start_time > @end_time
+        new_end_time = @start_time
+        @start_time = @end_time
+        @end_time = new_end_time
       end
     else
       set_time_range_from_period
@@ -286,12 +281,13 @@ module ControllerHelpers
 
   def bikehub_url(path)
     [
-      ENV["BIKEHUB_URL"].presence || "https://new.bikehub.com",
+      ENV["BIKEHUB_URL"].presence || "https://parkit.bikehub.com",
       path,
     ].join("/")
   end
 
   def set_time_range_from_period
+    @period = default_period unless %w[hour day month year week all].include?(@period)
     case @period
     when "hour"
       @start_time = Time.current - 1.hour
@@ -303,19 +299,17 @@ module ControllerHelpers
       @start_time = Time.current.beginning_of_day - 1.year
     when "week"
       @start_time = Time.current.beginning_of_day - 1.week
-    else # Default to all
-      set_default_period
+    when "all"
+      @start_time = earliest_period_date
     end
     @end_time ||= Time.current
   end
 
-  def set_default_period # Separate method so it can be overriden
-    @period ||= "all"
-    @end_time = Time.current
-    @start_time = earliest_period_date
+  def default_period # Separate method so it can be overridden on per controller basis
+    "all"
   end
 
-  def earliest_period_date
+  def earliest_period_date # Separate method so it can be overridden on per controller basis
     if current_organization.present?
       @start_time = current_organization.created_at
       @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)

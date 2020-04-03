@@ -134,26 +134,26 @@
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 
-          - if @organization&.include_field_reg_secondary_serial?(current_user)
+          - if @organization&.include_field_extra_registration_number?(current_user)
             .form-group.row.unnested-field.no-divider-row
-              = f.label :additional_registration,
-                @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number"),
+              = f.label :extra_registration_number,
+                @organization.registration_field_label("extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label"
               .form-well-input
-                = f.text_field :additional_registration,
+                = f.text_field :extra_registration_number,
                   autocomplete: "off",
                   autocorrect: "off",
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if @organization&.include_field_reg_affiliation?(current_user)
+          - if @organization&.include_field_organization_affiliation?(current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
               = f.label :organization_affiliation,
-                @organization.registration_field_label("reg_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                @organization.registration_field_label("organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation,
-                  @organization.reg_affiliation_options,
+                  @organization.organization_affiliation_options,
                   class: "form-control"
 
           .form-group.row.unnested-field.no-divider-row

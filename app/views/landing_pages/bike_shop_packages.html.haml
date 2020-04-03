@@ -7,14 +7,12 @@
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true,  supporting: true, title: t("plan_features.supporting_our_nonprofit")},
     { free: true,  supporting: true, title: t("plan_features.create_organization_account")},
     { free: true,  supporting: true, title: t("plan_features.embed_a_registration_form")},
     { free: true,  supporting: true, title: t("plan_features.automatic_registration_through_pos")},
     { free: true,  supporting: true, title: t("plan_features.social_media_and_email_marketing")},
     { free: false, supporting: true, title: t("plan_features.search_bikes_in_organization")},
     { free: false, supporting: true, title: t("plan_features.import_csv_file")},
-    { free: false, supporting: true, title: t("plan_features.welcome_campaign")},
   ]
 
 .signup-landing-page.signup-landing-page-packages.signup-landing-page-shop-packages
@@ -45,7 +43,7 @@
                 = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
               - else
                 %th
-                  %h4 #{plan.to_s.titleize} #{lead_type}
+                  %h4 #{plan.to_s.titleize} #{lead_type.humanize.downcase}
                   %h3= number_to_currency(plan_data[:cost], precision: 0)
                   %p
                     = default_currency

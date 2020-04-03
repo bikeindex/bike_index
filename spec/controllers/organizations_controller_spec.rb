@@ -157,7 +157,13 @@ organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
       include_context :logged_in_as_organization_admin
       it "redirects to posintegration" do
         get :lightspeed_interface
-        expect(response).to redirect_to "https://posintegration.bikeindex.org"
+        expect(response).to redirect_to "https://posintegration.bikeindex.org?organization_id="
+      end
+      context "with organization_id" do
+        it "redirects to posintegration" do
+          get :lightspeed_interface, params: { organization_id: organization.id }
+          expect(response).to redirect_to "https://posintegration.bikeindex.org?organization_id=#{organization.id}"
+        end
       end
     end
     context "with user without organization" do

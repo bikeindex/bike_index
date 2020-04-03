@@ -1,3 +1,3 @@
-class PropulsionTypeSerializer < ActiveModel::Serializer
+class PropulsionTypeSerializer < ApplicationSerializer
   attributes :name, :slug
 end

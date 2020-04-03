@@ -104,7 +104,36 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           post :create, params: updated_hash.as_json
         end.to change(Ownership, :count).by 0
       end
+
+      context "new pos_integrator format" do
+        # We're switching to use numeric id rather than slug, because the slugs change :(
+        it "creates correctly" do
+          expect do
+            post :create, params: bike_hash.merge(organization_slug: organization.id).as_json
+          end.to change(Ownership, :count).by(1)
+
+          expect(response.code).to eq("200")
+          bike = Bike.where(serial_number: "SSOMESERIAL").first
+          expect(bike.manufacturer).to eq manufacturer
+          expect(bike.frame_model).to eq "Diverge Elite DSW (58)"
+          expect(bike.frame_size).to eq "58cm"
+          expect(bike.frame_size_unit).to eq "cm"
+          expect(bike.primary_frame_color).to eq black
+          expect(bike.paint_description).to eq "Black/Red"
+          creation_state = bike.creation_state
+          expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
+          expect(creation_state.organization).to eq organization
+          expect(creation_state.creator).to eq bike.creator
+          expect(creation_state.origin).to eq "api_v1"
+          expect(creation_state.pos_kind).to eq "lightspeed_pos"
+          expect do
+            updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
+            post :create, params: updated_hash.as_json
+          end.to change(Ownership, :count).by 0
+        end
+      end
     end
+
     context "legacy tests" do
       before :each do
         @organization = FactoryBot.create(:organization)
@@ -282,7 +311,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           expect(bike.creation_state.organization).to eq @organization
           expect(bike.rear_wheel_size.iso_bsd).to eq 559
           csr = bike.find_current_stolen_record
-          expect(csr.address).to be_present
+          expect(csr.display_address).to be_present
           expect(csr.phone).to eq("9999999")
           # No longer support this date format :/
           # expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))

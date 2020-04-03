@@ -1,4 +1,4 @@
-class BikeV2Serializer < ActiveModel::Serializer
+class BikeV2Serializer < ApplicationSerializer
   attributes \
     :date_stolen,
     :description,

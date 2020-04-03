@@ -126,13 +126,13 @@ RSpec.describe Export, type: :model do
       expect(export.avery_export?).to be_truthy
       expect(export.avery_export_url).to be_nil
       expect(export.assign_bike_codes?).to be_falsey
-      expect(export.bike_stickers).to eq([])
+      expect(export.bike_stickers_assigned).to eq([])
       expect(export.bike_codes_removed?).to be_falsey
       export.progress = :finished
       expect(export.avery_export_url).to eq target_url
       export.options = export.options.merge(bike_code_start: "1111")
       expect(export.assign_bike_codes?).to be_truthy
-      expect(export.bike_stickers).to eq([])
+      expect(export.bike_stickers_assigned).to eq([])
       expect(export.bike_codes_removed?).to be_falsey
     end
   end
@@ -182,15 +182,17 @@ RSpec.describe Export, type: :model do
 
   describe "permitted_headers_for" do
     let(:organization) { Organization.new }
-    let(:organization_secondary_reg) { Organization.new(enabled_feature_slugs: ["reg_secondary_serial"]) }
-    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_secondary_serial reg_address]) }
+    let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
+    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone organization_affiliation bike_stickers]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
+    let(:all_headers) { permitted_headers + %w[organization_affiliation phone address sticker] }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 13
+      expect(permitted_headers.count).to eq 12
       expect(Export.permitted_headers).to eq permitted_headers
+      expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
-      expect(Export.permitted_headers(organization_secondary_reg)).to eq permitted_headers + ["additional_registration_number"]
-      expect(Export.permitted_headers(organization_full)).to eq permitted_headers + %w[additional_registration_number registration_address]
+      expect(Export.permitted_headers(organization_reg_phone)).to eq permitted_headers + ["phone"]
+      expect(Export.permitted_headers(organization_full)).to eq all_headers
     end
   end
 end

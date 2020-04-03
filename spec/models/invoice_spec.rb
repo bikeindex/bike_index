@@ -122,7 +122,7 @@ RSpec.describe Invoice, type: :model do
 
   describe "two invoices" do
     let(:paid_feature1) { FactoryBot.create(:paid_feature, feature_slugs: ["bike_search"]) }
-    let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["reg_secondary_serial"]) }
+    let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["extra_registration_number"]) }
     let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
     let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.day, organization: organization) }
@@ -134,7 +134,7 @@ RSpec.describe Invoice, type: :model do
       invoice2.save
       invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
       organization.update_attributes(updated_at: Time.current)
-      expect(organization.enabled_feature_slugs).to match_array %w[bike_search reg_secondary_serial]
+      expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
     end
   end
 end

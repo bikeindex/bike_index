@@ -13,6 +13,7 @@ class Location < ApplicationRecord
   scope :shown, -> { where(shown: true) }
   # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
+  before_validation :set_address
   before_save :shown_from_organization
   before_save :set_phone
   after_commit :update_organization
@@ -22,19 +23,18 @@ class Location < ApplicationRecord
     true
   end
 
-  def address
-    return nil unless self.country
-    [
-      street,
-      city,
-      state.present? ? state.abbreviation : nil,
-      zipcode,
-      country.name,
-    ].compact.reject(&:blank?).join(", ")
-  end
-
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone
+  end
+
+  def set_address
+    self.address = country.blank? ? "" : [
+      street,
+      city,
+      state&.abbreviation,
+      zipcode,
+      country.name,
+    ].reject(&:blank?).join(", ")
   end
 
   def org_location_id
@@ -44,7 +44,7 @@ class Location < ApplicationRecord
   def update_organization
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
-    organization&.reload&.update_attributes(updated_at: Time.current)
+    organization&.reload&.update(updated_at: Time.current)
   end
 
   def display_name
@@ -52,11 +52,5 @@ class Location < ApplicationRecord
     return name if name == organization.name
 
     "#{organization.name} - #{name}"
-  end
-
-  private
-
-  def geocode_columns
-    %i[street city state_id zipcode country_id]
   end
 end

@@ -48,19 +48,15 @@ class MailSnippet < ApplicationRecord
   def update_organization
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.current)
+    organization && organization.update(updated_at: Time.current)
   end
 
   private
 
-  def geocode_columns
-    %i[address]
-  end
-
   def should_be_geocoded?
     return false if skip_geocoding?
     return true if is_location_triggered?
-    return false if geocode_data.blank?
-    any_geocode_columns_changed?
+    return false if address.blank?
+    address_changed?
   end
 end

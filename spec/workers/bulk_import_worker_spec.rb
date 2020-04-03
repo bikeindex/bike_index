@@ -129,7 +129,7 @@ RSpec.describe BulkImportWorker, type: :job do
       end
       context "ascend import" do
         let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop") }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
         it "resolves error, assigns organization and processes" do
           bulk_import.check_ascend_import_processable!
           bulk_import.reload
@@ -188,7 +188,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("(888) 777-6666")
           expect(bike1.registration_address).to eq default_location_registration_address
-          expect(bike1.additional_registration).to be_nil
+          expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
@@ -205,7 +205,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.frame_size_unit).to eq "ordinal"
           expect(bike2.registration_address).to_not be_present
           expect(bike2.phone).to be_nil
-          expect(bike2.additional_registration).to eq "extra serial number"
+          expect(bike2.extra_registration_number).to eq "extra serial number"
           expect(bike2.owner_name).to eq "Sally"
         end
       end
@@ -277,7 +277,7 @@ RSpec.describe BulkImportWorker, type: :job do
           frame_size: nil,
           phone: nil,
           address: nil,
-          additional_registration: nil,
+          extra_registration_number: nil,
           user_name: nil,
           send_email: true,
           creation_organization_id: nil,

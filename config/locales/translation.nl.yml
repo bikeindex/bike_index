@@ -301,7 +301,6 @@ nl:
         origin: oorsprong
         params: params
       bike:
-        additional_registration: Extra registratie
         all_description: Alle beschrijvingen
         approved_stolen: Goedgekeurd gestolen
         b_params: B params
@@ -357,6 +356,7 @@ nl:
         zipcode: Postcode
         abandoned: Verlaten
         bike_stickers: Fietscodes
+        extra_registration_number: Extra registratienummer
       bike_organization:
         can_not_edit_claimed: Kan geclaimd niet bewerken
         deleted_at: Verwijderd om
@@ -992,7 +992,7 @@ nl:
         u_lock: Beugelslot
         u_lock_and_cable: U-slot en kabel
       organization:
-        reg_affiliation_options:
+        organization_affiliation_options:
           community_member: Gemeenschap lid
           employee: Werknemer
           student: Student
@@ -3966,6 +3966,8 @@ nl:
       related_articles: 'Gerelateerde artikelen:'
       trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
       trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
+      bike_index_new_dashboard: Nieuw fietsindexdashboard handig voor het bestrijden
+        van fietscriminaliteit
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -4816,8 +4818,10 @@ nl:
     search_bikes_in_organization: Zoek fietsen in organisatieaccount
     social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
     staff_accounts: Personeelsrekeningen
-    supporting_our_nonprofit: Ondersteuning van onze non-profit
-    welcome_campaign: Welkomstcampagne op Facebook, Twitter en Instagram
+    abandoned_bike_suite: Verlaten fietssuite - neem contact op met fietsbezitters
+      en logverlaten en in beslag genomen fietsrecords
+    organization_dashboard: Stads- en politie-dashboard - analyseer statistieken over
+      lokale registratie op basis van postcode
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een

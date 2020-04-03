@@ -34,10 +34,6 @@
           = link_to admin_bikes_path(sortable_search_params.merge(search_pos: no_pos_active ? nil : "no_pos")), class: "dropdown-item #{no_pos_active ? 'active' : ''}" do
             <strong>Not</strong> POS
 
-      / <a class="dropdown-item" href="#">Separated link</a>
-      /   = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_lightspeed: nil, search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
-      / %li.nav-item
-      /   = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_ascend: nil, search_lightspeed: true)), class: "nav-link #{params[:search_lightspeed].present? ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   - if current_organization.present?

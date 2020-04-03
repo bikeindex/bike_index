@@ -3,9 +3,8 @@ class Export < ApplicationRecord
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name registration_address].freeze
-  HIDDEN_HEADERS = %w[owner_name_or_email].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name] + HIDDEN_HEADERS).freeze
+  AVERY_HEADERS = %w[owner_name address].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
 
   mount_uploader :file, ExportUploader
 
@@ -26,11 +25,6 @@ class Export < ApplicationRecord
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
   end
 
-  # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
-  def self.additional_registration_fields
-    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
-  end
-
   def self.default_kind_options
     {
       stolen: {
@@ -48,10 +42,17 @@ class Export < ApplicationRecord
     }.as_json.freeze
   end
 
-  def self.permitted_headers(organization = nil)
-    return PERMITTED_HEADERS unless organization.present?
-    additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
-    PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
+  def self.permitted_headers(organization_or_overide = nil)
+    return PERMITTED_HEADERS unless organization_or_overide.present?
+    if organization_or_overide == "include_paid" # passing include_paid overrides
+      additional_headers = PaidFeature::REG_FIELDS + ["sticker"]
+    else
+      additional_headers = organization_or_overide.additional_registration_fields
+      additional_headers += ["sticker"] if organization_or_overide.enabled?("bike_stickers")
+    end
+    additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
+    # We always give the option to export extra_registration_number, don't double up if org can add too
+    (PERMITTED_HEADERS + additional_headers).uniq
   end
 
   # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
@@ -77,7 +78,7 @@ class Export < ApplicationRecord
   def exported_bike_ids; options["exported_bike_ids"] end
 
   # 'options' is a weird place to put the assigned bike_stickers - but whatever, it's there, just using it
-  def bike_stickers; options["bike_codes_assigned"] || [] end
+  def bike_stickers_assigned; options["bike_codes_assigned"] || [] end
 
   def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
@@ -86,7 +87,7 @@ class Export < ApplicationRecord
   end
 
   def remove_bike_codes
-    (bike_stickers || []).each do |code|
+    (bike_stickers_assigned || []).each do |code|
       BikeSticker.lookup(code, organization_id: organization_id)&.unclaim!
     end
   end

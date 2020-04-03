@@ -52,8 +52,8 @@
             %td
               = link_to organization.kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: organization.kind))
             %td
-              - if organization.bike_shop?
-                = link_to organization.pos_kind.to_s.gsub("pos", "").humanize, admin_organizations_path(sortable_search_params.merge(search_pos_kind: organization.pos_kind)), class: "gray-link"
+              - if organization.bike_shop? || organization.any_pos?
+                = link_to organization.pos_kind.to_s.gsub("pos", "").humanize, admin_organizations_path(sortable_search_params.merge(search_pos: organization.pos_kind)), class: "gray-link"
             %td
               .less-strong-hold
 

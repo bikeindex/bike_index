@@ -8,8 +8,8 @@ class PaidFeature < ApplicationRecord
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[
-    reg_affiliation
-    reg_secondary_serial
+    organization_affiliation
+    extra_registration_number
     reg_phone
     reg_address
   ].freeze
@@ -56,6 +56,15 @@ class PaidFeature < ApplicationRecord
     slug_array = slugs.is_a?(Array) ? slugs : slugs.split(" ").reject(&:blank?)
     matching_slugs = EXPECTED_SLUGS & slug_array
     matching_slugs.any? ? matching_slugs : nil
+  end
+
+  def self.reg_field_bike_attrs
+    {
+      organization_affiliation: "organization_affiliation",
+      extra_registration_number: "extra_registration_number",
+      reg_phone: "phone",
+      reg_address: "registration_address",
+    }
   end
 
   def one_time?; standard_one_time? || custom_one_time? end

@@ -97,7 +97,6 @@ en:
         params: Params
       bike:
         abandoned: Abandoned
-        additional_registration: Additional registration
         all_description: All description
         approved_stolen: Approved stolen
         b_params: B params
@@ -117,6 +116,7 @@ en:
         description: Description
         duplicate_bike_groups: Duplicate bike groups
         example: Example
+        extra_registration_number: Extra registration number
         frame_material: Frame material
         frame_model: Frame model
         frame_size: Frame size
@@ -913,7 +913,7 @@ en:
         water_bottle_cage: water bottle cage
         wheel: wheel
       organization:
-        reg_affiliation_options:
+        organization_affiliation_options:
           community_member: Community Member
           employee: Employee
           student: Student
@@ -1250,7 +1250,7 @@ en:
       zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
-      address: 'Address:'
+      address: Registration Address
       address_or_intersection: Address or intersection
       as_a_bikeindex_ambassador_html: >-
         <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can
@@ -3528,6 +3528,8 @@ en:
         registration system of over 600 organizations - communities in every corner
         of the country. Join the most widely used bike registration network in the
         nation.
+      bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
+        crime
       bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
         the City of Palo Alto
       bring_together_bike_shops_schools_municip: >-
@@ -4649,6 +4651,9 @@ en:
       payment_to_bike_index: Payment to Bike Index
       select_an_amount: Select an amount
   plan_features:
+    abandoned_bike_suite: >-
+      Abandoned bike suite - contact bike owners and log abandonment and impound bike
+      records
     add_form_fields: Add specific form fields to your landing page
     add_logos: Add logos and text to Bike Index emails
     automated_migration: Automated migration of graduated bikes out of system
@@ -4664,12 +4669,13 @@ en:
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
     nest_organizations: Nest multiple organizations in one
     ongoing_programming: Ongoing programming, hosting, and support
+    organization_dashboard: >-
+      City and Police dashboard - analyze statistics on local registration based on
+      zip code
     qr_sticker: QR sticker scanning and messaging
     search_bikes_in_organization: Search bikes in organization account
     social_media_and_email_marketing: Social Media and Email marketing campaign assets
     staff_accounts: Staff accounts
-    supporting_our_nonprofit: Supporting our nonprofit
-    welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
   public_images:
     edit:
       editing_bike_html: "<span>Back Arrow</span>Back to <em>Editing Bike</em>"

@@ -359,7 +359,7 @@ CREATE TABLE public.bikes (
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    additional_registration character varying(255),
+    extra_registration_number character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
     coaster_brake boolean DEFAULT false NOT NULL,
     frame_size character varying(255),
@@ -391,7 +391,8 @@ CREATE TABLE public.bikes (
     city character varying,
     latitude double precision,
     longitude double precision,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    address character varying
 );
 
 
@@ -833,7 +834,7 @@ CREATE TABLE public.external_registry_bikes (
     serial_number character varying NOT NULL,
     serial_normalized character varying NOT NULL,
     external_id character varying NOT NULL,
-    additional_registration character varying,
+    extra_registration_number character varying,
     date_stolen timestamp without time zone,
     category character varying,
     cycle_type character varying,
@@ -1242,7 +1243,8 @@ CREATE TABLE public.locations (
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
     country_id integer,
-    state_id integer
+    state_id integer,
+    address character varying
 );
 
 
@@ -1677,7 +1679,8 @@ CREATE TABLE public.organizations (
     search_radius integer DEFAULT 50 NOT NULL,
     location_latitude double precision,
     location_longitude double precision,
-    regional_ids jsonb
+    regional_ids jsonb,
+    manual_pos_kind integer
 );
 
 
@@ -2174,7 +2177,8 @@ CREATE TABLE public.stolen_records (
     show_address boolean DEFAULT false,
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
-    neighborhood character varying
+    neighborhood character varying,
+    address character varying
 );
 
 
@@ -2446,7 +2450,8 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    has_stolen_bikes_without_locations boolean DEFAULT false
+    has_stolen_bikes_without_locations boolean DEFAULT false,
+    address character varying
 );
 
 
@@ -4589,6 +4594,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200210234925'),
 ('20200212000416'),
 ('20200212022845'),
-('20200212203304');
+('20200212203304'),
+('20200311160107'),
+('20200324221906'),
+('20200326192650');
 
 

@@ -10,7 +10,7 @@ class OrganizationsController < ApplicationController
 
   def lightspeed_interface
     if current_user && current_user.organizations.any?
-      redirect_to "https://posintegration.bikeindex.org" and return
+      redirect_to "https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}" and return
     end
 
     session[:return_to] = lightspeed_interface_path

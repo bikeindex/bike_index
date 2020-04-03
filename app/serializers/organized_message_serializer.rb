@@ -1,4 +1,4 @@
-class OrganizedMessageSerializer < ActiveModel::Serializer
+class OrganizedMessageSerializer < ApplicationSerializer
   attributes :id, :kind, :created_at, :lat, :lng, :sender_id, :bike
 
   def created_at

@@ -8,8 +8,8 @@
   .row.mt-4.mb-4
     - alert_image_versions.each do |name, image|
       .col-3.col-lg-2
-        = link_to image.url, target: "_blank" do
-          = image_tag image.url,
+        = link_to image.url.to_s, target: "_blank" do
+          = image_tag image.url.to_s,
             class: "ml-auto mr-auto",
             style: "display: block; max-width: 150px; height: auto;"
         .text-center= name
@@ -28,13 +28,13 @@
       method: :patch, class: "alert-image-regenerate-form" do |f|
       .modal-body.text-center
         .row.mt-2.mb-4
-          = image_tag first_image.image_url(:small),
+          = image_tag first_image.image_url(:small).to_s,
             class: "js-alert-image-option m-2 ml-auto mr-auto",
             style: "cursor: pointer; border: 5px solid #3498db;",
             data: { public_image_id: first_image.id }
         .row.mt-2.mb-4
           - bike_images.to_a.each do |image|
-            = image_tag image.image_url(:small),
+            = image_tag image.image_url(:small).to_s,
               class: "js-alert-image-option m-2 ml-auto mr-auto",
               style: "cursor: pointer; border: 5px solid #fff;",
               data: { public_image_id: image.id }

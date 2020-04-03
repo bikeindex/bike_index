@@ -35,6 +35,13 @@ RSpec.describe HeaderTagHelper, type: :helper do
       helper.page_title = "<script>alert();</script> title <em>stuff</em>"
       expect(helper.page_title).to eq "title stuff"
     end
+    context "with organization with &" do
+      # There are a lot of organizations with '&' in their name, so don't make it weird
+      it "returns with just amp" do
+        helper.page_title = "B&P Cycle and Sports bikes"
+        expect(helper.page_title).to eq "B&P Cycle and Sports bikes"
+      end
+    end
   end
 
   describe "page_description=" do

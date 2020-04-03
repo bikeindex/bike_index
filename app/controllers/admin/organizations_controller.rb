@@ -86,6 +86,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :show_on_map,
         :slug,
         :website,
+        :manual_pos_kind,
         [locations_attributes: permitted_locations_params],
       ).merge(kind: approved_kind)
   end
@@ -96,7 +97,7 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = Organization.unscoped
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
-    matching_organizations = matching_organizations.where(kind: kind_for_organizations) if params[:search_kind].present?
+    matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     @matching_organizations = matching_organizations
   end
@@ -105,18 +106,14 @@ class Admin::OrganizationsController < Admin::BaseController
     %w[created_at name approved pos_kind]
   end
 
-  def kind_for_organizations
-    # TODO: Refactor to incorporate Rails 5 enum changes
-    Organization::KIND_ENUM[params[:search_kind].to_sym] || 0
-  end
-
   def pos_kind_for_organizations
-    if params[:search_pos] == "no_pos"
-      # We want to return both no_pos and does_not_need_pos
-      return [Organization::POS_KIND_ENUM[:no_pos], Organization::POS_KIND_ENUM[:does_not_need_pos]]
+    if params[:search_pos] == "with_pos"
+      return Organization.pos_kinds - Organization.no_pos_kinds
+    elsif params[:search_pos] == "without_pos"
+      return Organization.no_pos_kinds
+    else
+      params[:search_pos]
     end
-    # TODO: Refactor to incorporate Rails 5 enum changes
-    Organization::POS_KIND_ENUM[params[:search_pos].to_sym] || 0
   end
 
   def permitted_locations_params
