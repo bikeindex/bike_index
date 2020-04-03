@@ -37,7 +37,7 @@ function BinxAppOrgBikes() {
         visibleCells = defaultCells;
       }
 
-      visibleCells.forEach(cellClass =>
+      visibleCells.forEach((cellClass) =>
         $(`input#${cellClass}`).prop("checked", true)
       );
     },
@@ -48,8 +48,8 @@ function BinxAppOrgBikes() {
       );
       let enabledCells = $("#organizedSearchSettings input:checked")
         .get()
-        .map(cellClass => cellClass.value);
-      enabledCells.forEach(cellClass =>
+        .map((cellClass) => cellClass.value);
+      enabledCells.forEach((cellClass) =>
         $(`.${cellClass}`).removeClass("hiddenColumn")
       );
       // Then store the enabled columns
@@ -57,7 +57,7 @@ function BinxAppOrgBikes() {
         "organizationBikeColumns",
         JSON.stringify(enabledCells)
       );
-    }
+    },
   };
 }
 
