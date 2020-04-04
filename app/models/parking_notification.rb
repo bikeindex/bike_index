@@ -62,7 +62,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def email; bike.owner_email end
 
-  def reply_to_email; organization&.auto_user&.email || user.email end
+  def reply_to_email; organization&.auto_user&.email || user&.email end
 
   def earlier_bike_notifications
     notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
