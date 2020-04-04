@@ -2482,12 +2482,12 @@ nl:
         update:
           updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
       parking_notifications:
-        ensure_access_to_abandoned_bikes!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
+        ensure_access_to_parking_notifications!:
+          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
+            neem contact op met Bike Index support.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
