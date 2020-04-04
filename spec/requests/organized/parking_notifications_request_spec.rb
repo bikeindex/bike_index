@@ -193,6 +193,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
         include_context :geocoder_real
         it "creates", vcr: true do
+          Sidekiq::Worker.clear_all
           expect do
             post base_url, params: {
               organization_id: current_organization.to_param,
