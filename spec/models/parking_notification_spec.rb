@@ -31,7 +31,18 @@ RSpec.describe ParkingNotification, type: :model do
         FactoryBot.create(:parking_notification, user: parking_notification.user)
         organization.reload
         expect(organization.parking_notification_bikes).to eq([bike])
+        expect(organization.auto_user).to be_blank
+        expect(parking_notification.reply_to_email).to eq parking_notification.user.email
       end
+    end
+  end
+
+  describe "reply_to_email" do
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+    let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
+    it "organization auto_user, because it's present" do
+      expect(parking_notification.user).to_not eq organization.auto_user
+      expect(parking_notification.reply_to_email).to eq organization.auto_user.email
     end
   end
 

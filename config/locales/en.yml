@@ -1669,9 +1669,9 @@ en:
             support.
       parking_notifications:
         create:
-          successfully_created: Parking Notification %{bike_type} created
+          successfully_created: Parking Notification for %{bike_type} created
           unable_to_create: Unable to create - %{errors}
-        ensure_access_to_abandoned_bikes!:
+        ensure_access_to_parking_notifications!:
           your_org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.

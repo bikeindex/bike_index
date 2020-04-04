@@ -1,0 +1,18 @@
+%h1
+  = @parking_notification.title
+
+
+- if @parking_notification.repeat_record?
+  %h2.uncap{ style: "margin-top: 1rem;" }
+    This is your #{@parking_notification.notification_number.ordinalize} notification!
+
+%p
+  Your #{@bike.title_string} is located at:
+  %br
+  = @parking_notification.address
+
+- if @parking_notification.message.present?
+  %p
+    %strong= @parking_notification.message
+
+<img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@parking_notification.latitude},#{@parking_notification.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@parking_notification.latitude},#{@parking_notification.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">

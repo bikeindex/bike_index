@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe EmailOrganizationMessageWorker, type: :job do
-  let(:subject) { EmailOrganizationMessageWorker }
+  let(:subject) { described_class }
   let(:instance) { subject.new }
   before { ActionMailer::Base.deliveries = [] }
 

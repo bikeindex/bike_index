@@ -48,6 +48,22 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  def parking_notification(parking_notification)
+    @parking_notification = parking_notification
+    @organization = @parking_notification.organization
+    @bike = @parking_notification.bike
+    @sender = @parking_notification.user
+
+    I18n.with_locale(@sender&.preferred_language) do
+      mail(reply_to: @parking_notification.reply_to_email,
+           to: @parking_notification.email,
+           subject: @parking_notification.title) do |format|
+        format.html { render "parking_notification" }
+        format.text { render "parking_notification" }
+      end
+    end
+  end
+
   def custom_message(organization_message)
     @organization_message = organization_message
     @organization = @organization_message.organization
