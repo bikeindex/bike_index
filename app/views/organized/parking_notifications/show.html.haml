@@ -40,9 +40,11 @@
             - else
               From GPS
             - if current_user.developer? && @parking_notification.accuracy.present?
-              %code
-                = @parking_notification.accuracy
-              %small.less-strong developer info
+              %small
+                %span.less-strong developer info:
+                %code
+                  #{@parking_notification.accuracy} accuracy
+
         %tr
           %td= t(".repeat")
           %td

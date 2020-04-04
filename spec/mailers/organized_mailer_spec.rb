@@ -169,6 +169,19 @@ RSpec.describe OrganizedMailer, type: :mailer do
     end
   end
 
+  describe "parking_notification" do
+    context "geolocation" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification, organization: organization) }
+      let(:mail) { OrganizedMailer.parking_notification(parking_notification) }
+      before { expect(header_mail_snippet).to be_present }
+      it "renders email" do
+        expect(mail.body.encoded).to match header_mail_snippet.body
+        expect(mail.body.encoded).to match "map" # includes location
+        expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+      end
+    end
+  end
+
   describe "custom_message" do
     context "geolocation" do
       let(:organization_message) { FactoryBot.create(:organization_message, organization: organization) }

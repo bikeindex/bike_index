@@ -154,23 +154,29 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       it "creates" do
-        FactoryBot.create(:state_new_york)
-        expect(current_organization.enabled?("parking_notifications")).to be_truthy
-        expect do
-          post base_url, params: {
-            organization_id: current_organization.to_param,
-            parking_notification: parking_notification_params,
-          }
-          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-          expect(flash[:success]).to be_present
-        end.to change(ParkingNotification, :count).by(1)
-        parking_notification = ParkingNotification.last
+        Sidekiq::Testing.inline! do
+          FactoryBot.create(:state_new_york)
+          expect(current_organization.enabled?("parking_notifications")).to be_truthy
+          ActionMailer::Base.deliveries = []
+          expect do
+            post base_url, params: {
+              organization_id: current_organization.to_param,
+              parking_notification: parking_notification_params,
+            }
+            expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+            expect(flash[:success]).to be_present
+          end.to change(ParkingNotification, :count).by(1)
+          parking_notification = ParkingNotification.last
 
-        expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
-        expect(parking_notification.user).to eq current_user
-        expect(parking_notification.organization).to eq current_organization
-        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
-        expect(parking_notification.location_from_address).to be_falsey
+          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
+          expect(parking_notification.user).to eq current_user
+          expect(parking_notification.organization).to eq current_organization
+          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.location_from_address).to be_falsey
+
+          expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          expect(parking_notification.delivery_status).to be_present
+        end
       end
 
       context "manual address and repeat" do
@@ -195,6 +201,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
           end.to change(ParkingNotification, :count).by(1)
+          expect(EmailParkingNotificationWorker.jobs.count).to eq 1
           parking_notification = ParkingNotification.last
 
           expect_attrs_to_match_hash(parking_notification, repeat_params.except(:use_entered_address, :is_repeat, :latitude, :longitude))
