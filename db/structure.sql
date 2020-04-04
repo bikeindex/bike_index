@@ -1224,42 +1224,6 @@ ALTER SEQUENCE public.listicles_id_seq OWNED BY public.listicles.id;
 
 
 --
--- Name: location_schedules; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.location_schedules (
-    id bigint NOT NULL,
-    location_id bigint,
-    day integer,
-    day_int integer,
-    date date,
-    schedule jsonb DEFAULT '{}'::jsonb,
-    set_closed boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: location_schedules_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.location_schedules_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: location_schedules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.location_schedules_id_seq OWNED BY public.location_schedules.id;
-
-
---
 -- Name: locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1280,8 +1244,7 @@ CREATE TABLE public.locations (
     shown boolean DEFAULT false,
     country_id integer,
     state_id integer,
-    address character varying,
-    timezone character varying
+    address character varying
 );
 
 
@@ -2764,13 +2727,6 @@ ALTER TABLE ONLY public.listicles ALTER COLUMN id SET DEFAULT nextval('public.li
 
 
 --
--- Name: location_schedules id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.location_schedules ALTER COLUMN id SET DEFAULT nextval('public.location_schedules_id_seq'::regclass);
-
-
---
 -- Name: locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3241,14 +3197,6 @@ ALTER TABLE ONLY public.invoices
 
 ALTER TABLE ONLY public.listicles
     ADD CONSTRAINT listicles_pkey PRIMARY KEY (id);
-
-
---
--- Name: location_schedules location_schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.location_schedules
-    ADD CONSTRAINT location_schedules_pkey PRIMARY KEY (id);
 
 
 --
@@ -3819,13 +3767,6 @@ CREATE INDEX index_invoices_on_first_invoice_id ON public.invoices USING btree (
 --
 
 CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (organization_id);
-
-
---
--- Name: index_location_schedules_on_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_location_schedules_on_location_id ON public.location_schedules USING btree (location_id);
 
 
 --
@@ -4658,7 +4599,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200311160107'),
 ('20200324221906'),
 ('20200326192650'),
-('20200401234047'),
 ('20200403234228');
 
 
