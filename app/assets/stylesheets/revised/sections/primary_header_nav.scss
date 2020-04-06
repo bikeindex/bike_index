@@ -162,6 +162,17 @@ $mainmenu-open-zindex: 10;
     li {
       font-size: 80%;
     }
+    .nav-link.secondary-item {
+      padding-left: 30px;
+      &:before {
+        content: "-";
+        display: block;
+        height: 0;
+        width: 15px;
+        left: 15px;
+        position: absolute;
+      }
+    }
   }
 
   // If it overflows, hide the extra text. Explicit width is set in coffeescript
