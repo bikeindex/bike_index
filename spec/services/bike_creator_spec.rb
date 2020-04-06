@@ -79,7 +79,6 @@ RSpec.describe BikeCreator do
       BikeCreator.new(b_param).send(:add_bike_book_data)
 
       b_param.reload
-      # pp b_param.params
       expect(b_param.params["components"].count).to be > 5
       expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
       expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
@@ -247,12 +246,13 @@ RSpec.describe BikeCreator do
     end
   end
 
-  describe "creating abandoned bike" do
+  describe "creating parking_notification bike" do
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Bikes") }
     let(:color) { FactoryBot.create(:color) }
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:auto_user) { organization.auto_user }
     let!(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+    let!(:state) { FactoryBot.create(:state_new_york) }
     let(:attrs) do
       {
         origin: "organization_form",
@@ -261,24 +261,30 @@ RSpec.describe BikeCreator do
           bike: {
             creation_organization_id: organization.id,
             serial_number: "",
-            status: "status_abandoned",
-            parking_notification_kind: "parked_incorrectly",
             primary_frame_color_id: color.id,
             manufacturer_id: manufacturer.id,
+          },
+          parking_notification: {
             latitude: "40.7143528",
             longitude: "-74.0059731",
-            accuracy: "12"
+            accuracy: "12",
+            kind: "parked_incorrectly",
+            internal_notes: "some details about the abandoned thing",
+            use_entered_address: "false",
+            message: "Some message to the user",
+            street: "somewhere"
           }
         }
       }
     end
     let(:b_param) { BParam.create(attrs) }
     it "creates" do
+      Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
+        ActionMailer::Base.deliveries = []
         expect(creator.id).to_not eq auto_user.id
         expect(b_param.valid?).to be_truthy
         expect(b_param.id).to be_present
-        expect(b_param.location_specified?).to be_truthy
         expect(b_param.organization_id).to eq organization.id
         bike_creator = BikeCreator.new(b_param)
         expect(bike_creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
@@ -290,7 +296,6 @@ RSpec.describe BikeCreator do
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.id).to be_present
         expect(bike.serial_number).to eq "unknown"
-        expect(bike.status).to eq "status_abandoned"
         expect(bike.latitude).to eq(40.7143528)
         expect(bike.longitude).to eq(-74.0059731)
         expect(bike.owner_email).to eq auto_user.email
@@ -302,11 +307,72 @@ RSpec.describe BikeCreator do
         expect(parking_notification.owner_known?).to be_falsey
         expect(parking_notification.latitude).to eq bike.latitude
         expect(parking_notification.longitude).to eq bike.longitude
+        expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
         expect(parking_notification.kind).to eq "parked_incorrectly"
+        expect(parking_notification.message).to eq "Some message to the user"
+        expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
+        expect(parking_notification.accuracy).to eq 12.0
+        expect(parking_notification.delivery_status).to eq("bike_unregistered")
+        # It shouldn't have sent any email
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
     context "passed address" do
-      xit "uses the address"
+      let(:updated_parking_notification_attrs) do
+        {
+          latitude: "12",
+          longitude: "-44",
+          kind: "appears_abandoned",
+          internal_notes: "some details about the abandoned thing",
+          message: "another note",
+          accuracy: "12",
+          use_entered_address: "1",
+          street: "278 Broadway",
+          city: "New York",
+          zipcode: "10007",
+          state_id: state.id.to_s,
+          country_id: Country.united_states.id
+        }
+      end
+      let(:b_param) { BParam.create(attrs.merge(params: attrs[:params].merge(parking_notification: updated_parking_notification_attrs))) }
+      it "uses the address" do
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          ActionMailer::Base.deliveries = []
+          expect(creator.id).to_not eq auto_user.id
+          expect(b_param.valid?).to be_truthy
+          expect(b_param.id).to be_present
+          expect(b_param.organization_id).to eq organization.id
+          bike_creator = BikeCreator.new(b_param)
+          expect(bike_creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
+          bike = bike_creator.create_bike
+          expect(bike.errors).to_not be_present
+          b_param.reload
+          expect(b_param.created_bike).to be_present
+
+          expect(bike.creation_organization_id).to eq organization.id
+          expect(bike.id).to be_present
+          expect(bike.serial_number).to eq "unknown"
+          expect(bike.latitude).to eq(40.7143528)
+          expect(bike.longitude).to eq(-74.0059731)
+          expect(bike.owner_email).to eq auto_user.email
+          expect(bike.creator).to eq creator
+
+          expect(bike.parking_notifications.count).to eq 1
+          parking_notification = bike.current_parking_notification
+          expect(parking_notification.organization).to eq organization
+          expect(parking_notification.owner_known?).to be_falsey
+          expect(parking_notification.latitude).to eq bike.latitude
+          expect(parking_notification.longitude).to eq bike.longitude
+          expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
+          expect(parking_notification.kind).to eq "appears_abandoned"
+          expect(parking_notification.message).to eq "another note"
+          expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
+          expect(parking_notification.accuracy).to eq 12.0
+          # It shouldn't have sent any email
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+        end
+      end
     end
   end
 end

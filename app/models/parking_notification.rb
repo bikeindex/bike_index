@@ -82,6 +82,11 @@ class ParkingNotification < ActiveRecord::Base
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
   end
 
+  def bike_unregistered?
+    return true if delivery_status == "bike_unregistered"
+    bike.b_params.last&.unregistered_parking_notification?
+  end
+
   def repeat_number
     return 0 unless repeat_record?
     ParkingNotification.where(initial_record_id: initial_record_id)
