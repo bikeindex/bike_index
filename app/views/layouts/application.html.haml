@@ -62,7 +62,7 @@
                   %li
                     = active_link t(".recoveries"), recoveries_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
 
-                - divider_below_add_bike = current_organization.show_bulk_import? || current_organization.lightspeed_pos? || current_organization.enabled?("parking_notifications")
+                - divider_below_add_bike = passive_organization.show_bulk_import? || passive_organization.lightspeed_pos? || passive_organization.enabled?("parking_notifications")
                 - new_bike_with_parking_notification = controller_name == "bikes" && action_name == "new" && @unregistered_parking_notification
                 - new_bike_active = "bikes" && action_name == "new" && !new_bike_with_parking_notification
                 %li
