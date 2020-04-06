@@ -1,11 +1,10 @@
 - # TODO: add translations
 #stolen_fields_store
 
-#root_url.hidden{data: { url: ENV['BASE_URL'] }}
+#root_url.hidden{data: { url: ENV["BASE_URL"] }}
 = form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
   = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
-  = f.hidden_field :status, value: "status_abandoned"
   / .input-group
   /   .control-group
   /     = f.label :parking_notification_kind, "Kind of abandoned record" class: "control-label"
@@ -15,7 +14,7 @@
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
-        = f.text_field :serial_number, prompt: "optional", autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+        = f.text_field :serial_number, placeholder: "optional", autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
   .input-group.with-additional-block
     .control-group.select-jsonified
@@ -28,6 +27,12 @@
       = f.label :manufacturer_other, "other manufacturer", class: "control-label"
       .controls
         = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
+
+  .input-group
+    .control-group
+      = f.label :frame_model, class: "control-label"
+      .controls
+        = f.text_field :frame_model, placeholder: "optional", autocomplete: 'off', class: "form-control"
 
   .input-group.with-optional-blocks
     .control-group.special-select-single
@@ -58,6 +63,6 @@
 
   .input-group.form-foot
     .submit-registration
-      = submit_tag "Record Abandoned", class: "button-submit"
+      = submit_tag "Record parking notification for", class: "button-submit"
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 

@@ -61,9 +61,14 @@
                 - if passive_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this
                   %li
                     = active_link t(".recoveries"), recoveries_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
+
+                - divider_below_add_bike = current_organization.show_bulk_import? || current_organization.lightspeed_pos? || current_organization.enabled?("parking_notifications")
+                - new_bike_with_parking_notification = controller_name == "bikes" && action_name == "new" && @unregistered_parking_notification
+                - new_bike_active = "bikes" && action_name == "new" && !new_bike_with_parking_notification
                 %li
-                  = active_link t(".add_a_bike"), new_organization_bike_path(passive_organization.to_param), class: "nav-link"
-                %li.divider-nav-item
+                  = link_to t(".add_a_bike"), new_organization_bike_path(passive_organization.to_param), class: "nav-link #{new_bike_active ? "active" : ""}"
+                - if divider_below_add_bike
+                  %li.divider-nav-item
 
                 - if passive_organization.show_bulk_import?
                   %li
@@ -74,6 +79,9 @@
                 - if passive_organization.enabled?("parking_notifications")
                   %li
                     = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  %li
+                    = link_to t(".parking_notification_unregistered"), new_organization_bike_path(passive_organization.to_param, parking_notification: true), class: "nav-link #{new_bike_with_parking_notification ? 'active' : ''} secondary-item"
+
                 - if passive_organization.enabled?("bike_stickers")
                   %li.divider-nav-item
                   %li

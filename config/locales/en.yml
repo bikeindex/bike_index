@@ -3688,6 +3688,7 @@ en:
       org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      parking_notification_unregistered: Notification for unregistered bike
       parking_notifications: Parking notifications
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
@@ -5008,6 +5009,7 @@ en:
       organization_profile: "%{org_name} profile"
       other_point_of_sale_system: Other Point of Sale system?
       overview_dashboard: Dashboard
+      parking_notification_unregistered: Notification for unregistered bike
       parking_notifications: Parking notifications
       read_a_full_explanation_html: Read a full explanation of %{link}.
       recoveries: Recoveries

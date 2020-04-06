@@ -41,7 +41,10 @@ module Organized
     end
 
     def new
-      @kind = params[:kind] == "abandoned" ? "abandoned" : "normal"
+      @unregistered_parking_notification = current_organization.enabled?("parking_notifications") && params[:parking_notification].present?
+      if @unregistered_parking_notification
+        @page_title = "#{current_organization.short_name} New parking notification"
+      end
     end
 
     def new_iframe
