@@ -17,7 +17,7 @@ class ParkingNotification < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
-  after_create :send_email_message
+  after_create :enqueue_email_message
 
   enum kind: KIND_ENUM
 
@@ -155,7 +155,7 @@ class ParkingNotification < ActiveRecord::Base
     bike&.set_address
   end
 
-  def send_email_message
+  def enqueue_email_message
     EmailParkingNotificationWorker.perform_async(id)
   end
 end

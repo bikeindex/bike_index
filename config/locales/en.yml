@@ -4423,8 +4423,8 @@ en:
         created: Created at
         internal_notes: Internal notes
         message: Message
+        notification_number: Notification#
         parking_notification: Parking Notification
-        repeat: Repeat
       table:
         address: Address
         bike: Bike
@@ -4432,7 +4432,7 @@ en:
         created: Created
         impounded: Impounded
         kind: Because
-        repeat: Repeat#
+        notification_number: Notification#
     stickers:
       edit:
         bike: Bike
