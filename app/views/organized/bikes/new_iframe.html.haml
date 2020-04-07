@@ -5,86 +5,118 @@
 :javascript
   window.newIframe = true;
 
-#root_url.hidden{data: { url: ENV["BASE_URL"] }}
-= form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
-  = f.hidden_field :b_param_id_token
-  = f.hidden_field :creation_organization_id
-  / = f.hidden_field :status, value: "status_abandoned"
-  / .input-group
-  /   .control-group
-  /     = label_tag :kind, "Kind of abandoned record", class: "control-label"
-  /     .controls
-  /       = select_tag(:parking_notification, :kind, ParkingNotification.kinds, prompt: "Choose kind")
-  .input-group
-    .control-group
-      = f.label :serial_number, class: "control-label"
-      .controls
-        = f.text_field :serial_number, placeholder: "optional", autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
+#root_url.hidden{ data: { url: ENV["BASE_URL"] } }
 
-  .input-group.with-additional-block
-    .control-group.select-jsonified
-      = f.label :manufacturer_id, class: "control-label"
-      .controls
-        = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name
-        %span.help-block
-          Select other if manufacture isn't listed
-    .hidden-other.control-group.manufacturer-other-input
-      = f.label :manufacturer_other, "other manufacturer", class: "control-label"
-      .controls
-        = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
+#new-unregistered-parking-notification
+  = form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
+    = f.hidden_field :b_param_id_token
+    = f.hidden_field :creation_organization_id
+    / = f.hidden_field :status, value: "status_abandoned"
+    / .input-group
+    /   .control-group
+    /     = label_tag :kind, "Kind of abandoned record", class: "control-label"
+    /     .controls
+    /       = select_tag(:parking_notification, :kind, ParkingNotification.kinds, prompt: "Choose kind")
+    .input-group
+      .control-group
+        = f.label :serial_number, class: "control-label"
+        .controls
+          = f.text_field :serial_number, placeholder: "optional", autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
-  .input-group
-    .control-group
-      = f.label :frame_model, class: "control-label"
-      .controls
-        = f.text_field :frame_model, placeholder: "optional", autocomplete: 'off', class: "form-control"
+    .input-group.with-additional-block
+      .control-group.select-jsonified
+        = f.label :manufacturer_id, class: "control-label"
+        .controls
+          = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name
+          %span.help-block
+            Select other if manufacture isn't listed
+      .hidden-other.control-group.manufacturer-other-input
+        = f.label :manufacturer_other, "other manufacturer", class: "control-label"
+        .controls
+          = f.text_field :manufacturer_other, placeholder: "Manufacturer name", class: "form-control"
 
-  .input-group.with-optional-blocks
-    .control-group.special-select-single
-      = f.label :primary_frame_color_id, "Frame color", class: "control-label"
-      .controls
-        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
-    %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
-      Add a color
-    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
-      Remove color
-    #secondary-color.hidden-other
+    .input-group
+      .control-group
+        = f.label :frame_model, class: "control-label"
+        .controls
+          = f.text_field :frame_model, placeholder: "optional", autocomplete: 'off', class: "form-control"
+
+    .input-group.with-optional-blocks
       .control-group.special-select-single
-        %label.control-label
-          secondary color
+        = f.label :primary_frame_color_id, "Frame color", class: "control-label"
         .controls
-          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
-      %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+          = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
+      %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
         Add a color
-      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
+      %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
         Remove color
-    #tertiary-color.hidden-other
-      .control-group
-        %label.control-label
-          Third color
-        .controls.special-select-single
-          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
+      #secondary-color.hidden-other
+        .control-group.special-select-single
+          %label.control-label
+            secondary color
+          .controls
+            = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
+        %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+          Add a color
+        %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
+          Remove color
+      #tertiary-color.hidden-other
+        .control-group
+          %label.control-label
+            Third color
+          .controls.special-select-single
+            = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
 
-  = fields_for "parking_notification" do |n|
-    = n.hidden_field :latitude, class: "parkingLocation-latitude"
-    = n.hidden_field :longitude, class: "parkingLocation-longitude"
-    = n.hidden_field :accuracy, class: "parkingLocation-accuracy"
+    - @parking_notification ||= ParkingNotification.new(organization: current_organization, use_entered_address: true)
+    - @parking_notification.set_location_from_organization
+    = fields_for @parking_notification do |n|
+      = n.hidden_field :latitude, class: "parkingLocation-latitude"
+      = n.hidden_field :longitude, class: "parkingLocation-longitude"
+      = n.hidden_field :accuracy, class: "parkingLocation-accuracy"
 
-    .input-group
-      .control-group
-        = n.label :internal_notes, "Optional internal notes", class: "control-label"
-        .controls
-          = n.text_area :internal_notes, placeholder: "#{current_organization.short_name} notes for this notification", autocomplete: 'off', class: "form-control"
-    .input-group
-      .control-group
+      .input-group
         %label Kind of notification
         - current_organization.parking_notification_kinds.each do |kind|
-          %label.control
-            = n.radio_button :kind, kind
+          %label.radio-inline
+            = n.radio_button :kind, kind, checked: kind == "appears_abandoned"
             = ParkingNotification.kinds_humanized[kind.to_sym]
 
-  .input-group.form-foot
-    .submit-registration
-      = submit_tag "Record parking notification for", class: "button-submit"
-      = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+      .input-group
+        .control-group.large-text
+          = n.label :internal_notes, "Optional internal notes", class: "control-label"
+          .controls
+            = n.text_area :internal_notes, placeholder: "#{current_organization.short_name} notes for this notification", autocomplete: 'off', class: "form-control"
+
+      .input-group.with-optional-blocks
+        #selectEnteredAddress
+          %label.radio-inline
+            = n.radio_button :use_entered_address, false, checked: false
+            Use current location
+          %label.radio-inline
+            = n.radio_button :use_entered_address, true, checked: true
+            Enter address
+
+        .waitingOnLocationText.hideOnLocationFind{ class: @parking_notification.use_entered_address ? "currently-hidden" : "" }
+          Waiting on device location
+
+        #address-fields.hidden-other.currently-hidden
+          .street-control.ifManualRequired
+            = n.text_field :street, placeholder: "Address or intersection", class: "form-control"
+
+          .control-group.ifManualRequired
+            = n.text_field :city, placeholder: "City", class: "form-control"
+
+          .control-group
+            = n.text_field :zipcode, placeholder: "Postal code", class: "form-control"
+
+          .control-group.fancy-select.unfancy.state-select
+            = n.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: "state" }, { class: "form-control" })
+          .control-group.fancy-select.unfancy.ifManualRequired#us_id_data{ data: { usid: Country.united_states.id } }
+            = n.select(:country_id, Country.select_options,
+              { class: 'country-select-input form-control' })
+
+    .input-group.form-foot
+      .submit-registration
+        = submit_tag "Record parking notification for", class: "button-submit"
+        = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 
