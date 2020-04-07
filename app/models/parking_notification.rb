@@ -29,7 +29,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :current, -> { where(impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
-  scope :impounded, -> { where.not(impound_record_id: nil) }
+  scope :with_impounded_record, -> { where.not(impound_record_id: nil) }
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end

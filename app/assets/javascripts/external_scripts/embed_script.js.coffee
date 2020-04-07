@@ -23,6 +23,7 @@ initializeFrameMaker = (target) ->
     getModelList(slug)
 
 setModelTypeahead = (data=[]) ->
+  return true if window.newIframe
   model_sel = $('#bike_frame_model').selectize()[0].selectize
   model_sel.destroy()
   if data.length > 0

@@ -1,15 +1,20 @@
 - # TODO: add translations
 #stolen_fields_store
 
+-# set newIframe to trigger specific behavior in coffeescript
+:javascript
+  window.newIframe = true;
+
 #root_url.hidden{data: { url: ENV["BASE_URL"] }}
 = form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
   = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
+  / = f.hidden_field :status, value: "status_abandoned"
   / .input-group
   /   .control-group
-  /     = f.label :parking_notification_kind, "Kind of abandoned record" class: "control-label"
+  /     = label_tag :kind, "Kind of abandoned record", class: "control-label"
   /     .controls
-  /       = f.select(:parking_notification_kind, ParkingNotification.kinds, prompt: "Choose kind")
+  /       = select_tag(:parking_notification, :kind, ParkingNotification.kinds, prompt: "Choose kind")
   .input-group
     .control-group
       = f.label :serial_number, class: "control-label"
@@ -60,6 +65,23 @@
         .controls.special-select-single
           = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
 
+  = fields_for "parking_notification" do |n|
+    = n.hidden_field :latitude, class: "parkingLocation-latitude"
+    = n.hidden_field :longitude, class: "parkingLocation-longitude"
+    = n.hidden_field :accuracy, class: "parkingLocation-accuracy"
+
+    .input-group
+      .control-group
+        = n.label :internal_notes, "Optional internal notes", class: "control-label"
+        .controls
+          = n.text_area :internal_notes, placeholder: "#{current_organization.short_name} notes for this notification", autocomplete: 'off', class: "form-control"
+    .input-group
+      .control-group
+        %label Kind of notification
+        - current_organization.parking_notification_kinds.each do |kind|
+          %label.control
+            = n.radio_button :kind, kind
+            = ParkingNotification.kinds_humanized[kind.to_sym]
 
   .input-group.form-foot
     .submit-registration
