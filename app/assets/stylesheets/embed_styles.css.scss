@@ -91,6 +91,7 @@ a {
 .button-blue,
 .button-submit {
   @include border-radius(4px);
+  cursor: pointer;
 
   display: block;
   padding: 0.5em 1em;
