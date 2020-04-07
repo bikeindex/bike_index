@@ -93,7 +93,6 @@ module Organized
           iframe_redirect_params[:b_param_id_token] = @b_param.id_token
         elsif @bike.parking_notifications.any? # Bike created successfully
           flash[:success] = "Parking notification created for #{@bike.type}"
-          fail
         else # Bike created successfully
           flash[:success] = "#{@bike.type.titleize} Created"
         end

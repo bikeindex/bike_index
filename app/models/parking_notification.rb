@@ -52,7 +52,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
 
-  def send_message?; owner_known? end
+  def send_message?; !bike_unregistered? && owner_known? end
 
   def show_address; !hide_address end
 

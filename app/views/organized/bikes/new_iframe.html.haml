@@ -67,7 +67,9 @@
           .controls.special-select-single
             = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
 
-    - @parking_notification ||= ParkingNotification.new(organization: current_organization, use_entered_address: true)
+    - @parking_notification ||= ParkingNotification.new(@b_param.parking_notification_params || {})
+    - @parking_notification.organization = current_organization
+    - @parking_notification.use_entered_address = true
     - @parking_notification.set_location_from_organization
     = fields_for @parking_notification do |n|
       = n.hidden_field :latitude, class: "parkingLocation-latitude"
@@ -111,9 +113,8 @@
 
           .control-group.fancy-select.unfancy.state-select
             = n.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: "state" }, { class: "form-control" })
-          .control-group.fancy-select.unfancy.ifManualRequired#us_id_data{ data: { usid: Country.united_states.id } }
-            = n.select(:country_id, Country.select_options,
-              { class: 'country-select-input form-control' })
+          .control-group.fancy-select.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
+            = n.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
 
     .input-group.form-foot
       .submit-registration

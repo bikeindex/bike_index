@@ -152,7 +152,7 @@ showOrHideEnteredAddress = ->
 
   if $("#parking_notification_use_entered_address_true").prop("checked")
     $addressFields.show().removeClass("currently-hidden")
-    $(".ifManualRequired").attr("required", true)
+    $(".ifManualRequired input").attr("required", true)
     $(".fancy-select.unfancy select").selectize
       create: false
     $(".fancy-select.unfancy").removeClass("unfancy")
