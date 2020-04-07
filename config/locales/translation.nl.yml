@@ -4140,6 +4140,7 @@ nl:
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
       parking_notifications: Verlaten records
+      parking_notification_unregistered: Niet-geregistreerde fietsmelding
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4656,7 +4657,7 @@ nl:
         message: Bericht
         address: Adres
         internal_notes: Interne notities
-        repeat: Herhaling
+        notification_number: Kennisgeving#
       table:
         bike: Fiets
         by: Door
@@ -4664,7 +4665,7 @@ nl:
         impounded: In beslag genomen bij
         kind: Soort
         address: Adres
-        repeat: Herhaling#
+        notification_number: Kennisgeving#
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5067,6 +5068,7 @@ nl:
         voor Bike Shop, die wij aanbevelen te gebruiken
       overview_dashboard: Dashboard
       parking_notifications: Verlaten records
+      parking_notification_unregistered: Niet-geregistreerde fietsmelding
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
