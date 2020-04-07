@@ -91,6 +91,7 @@ a {
 .button-blue,
 .button-submit {
   @include border-radius(4px);
+  cursor: pointer;
 
   display: block;
   padding: 0.5em 1em;
@@ -163,6 +164,14 @@ a {
   select {
     margin-top: 0.1em;
   }
+}
+
+.checkbox-inline,
+.radio-inline {
+  cursor: pointer;
+  display: inline-block;
+  padding-right: 20px;
+  font-size: 1em;
 }
 
 .with-optional-blocks {
@@ -420,6 +429,39 @@ a {
   background-color: $infoBackground;
   border-color: $infoBorder;
   color: $infoText;
+}
+
+//
+// Parking Notification fields
+//
+//
+
+#new-unregistered-parking-notification {
+  #selectEnteredAddress {
+    margin-top: 0.5rem;
+  }
+  .street-control {
+    clear: both;
+    float: none;
+    width: 100%;
+    input {
+      width: 436px;
+      max-width: 100%;
+    }
+  }
+  #address-fields {
+    .control-group {
+      margin-right: 16px;
+    }
+    .state-select {
+      clear: left;
+    }
+  }
+  .waitingOnLocationText {
+    padding: 1rem;
+    color: $infoText;
+    font-style: italic;
+  }
 }
 
 //

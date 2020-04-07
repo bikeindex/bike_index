@@ -16,7 +16,7 @@
           = active_link t(".overview_dashboard"), organization_dashboard_index_path(organization_id: current_organization.to_param), class: "menu-item"
       - if current_organization.ambassador?
         %li
-          = active_link passive_organization.short_name.to_s, organization_ambassador_dashboard_path, class: "menu-item"
+          = active_link current_organization.short_name.to_s, organization_ambassador_dashboard_path, class: "menu-item"
         %li
           = active_link t(".resources"), resources_organization_ambassador_dashboard_path(organization_id: current_organization.to_param), class: "menu-item"
         %li
@@ -32,31 +32,39 @@
           = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{(on_bikes_path && !on_impound_bikes_path) ? 'active' : ''}"
         - if current_organization.enabled?("impound_bikes")
           %li
-            = link_to t(".impounded_bikes"), organization_bikes_path(organization_id: current_organization.to_param, search_impoundedness: "only_impounded"), class: "menu-item #{on_impound_bikes_path ? 'active' : ''}"
-        %li
-          = active_link t(".add_a_bike"), new_organization_bike_path(current_organization), class: "menu-item"
+            = link_to t(".impounded_bikes"), organization_bikes_path(organization_id: current_organization.to_param, search_impoundedness: "only_impounded"), class: "menu-item #{on_impound_bikes_path ? 'active' : ''} secondary-item"
         %li
           - if current_organization.enabled?("show_partial_registrations")
-            = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization), class: "menu-item"
+            = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
           - elsif !current_organization.bike_shop?
             %span.disabled-menu-item.menu-item
               = t(".incomplete_registrations")
         - if current_organization.show_multi_serial?
           %li
-            = active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(current_organization), class: "menu-item"
+            = active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
         - if current_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this
           %li
-            = active_link t(".recoveries"), recoveries_organization_bikes_path(current_organization), class: "menu-item"
+            = active_link t(".recoveries"), recoveries_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
+
+        - divider_below_add_bike = current_organization.show_bulk_import? || current_organization.lightspeed_pos? || current_organization.enabled?("parking_notifications")
+        - new_bike_with_parking_notification = controller_name == "bikes" && action_name == "new" && @unregistered_parking_notification
+        - new_bike_active = "bikes" && action_name == "new" && !new_bike_with_parking_notification
+        %li{ class: (divider_below_add_bike ? "divider-below" : "") }
+          = link_to t(".add_a_bike"), new_organization_bike_path(current_organization.to_param), class: "menu-item #{new_bike_active ? 'active' : ''}"
 
         - if current_organization.show_bulk_import?
           %li
             - bulk_link_name = current_organization.ascend_pos? ? t(".ascend_imports") : t(".bulk_imports")
             = active_link bulk_link_name, organization_bulk_imports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         - if current_organization.lightspeed_pos?
-          = active_link t(".lightspeed_integration_panel"), lightspeed_interface_path(organization_id: passive_organization&.id), class: "menu-item"
+          %li
+            = active_link t(".lightspeed_integration_panel"), lightspeed_interface_path(organization_id: current_organization&.id), class: "menu-item"
         - if current_organization.enabled?("parking_notifications")
-          %li.divider-above
+          %li
             = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+          %li
+            = link_to t(".parking_notification_unregistered"), new_organization_bike_path(current_organization.to_param, parking_notification: true), class: "menu-item #{new_bike_with_parking_notification ? 'active' : ''} secondary-item"
+
         %li.divider-above
           - if current_organization.enabled?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"

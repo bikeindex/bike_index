@@ -14,6 +14,7 @@ class Bike < ApplicationRecord
     status_stolen: 1,
     status_abandoned: 2,
     status_impounded: 3,
+    unregistered_parking_notification: 4,
   }
 
   belongs_to :manufacturer
@@ -26,8 +27,6 @@ class Bike < ApplicationRecord
   belongs_to :front_gear_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
-  belongs_to :invoice
-  belongs_to :location
   belongs_to :country
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
@@ -101,7 +100,6 @@ class Bike < ApplicationRecord
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
-  before_validation :set_address, unless: :skip_geocoding?
   before_save :set_calculated_attributes
 
   include PgSearch::Model
@@ -832,6 +830,7 @@ class Bike < ApplicationRecord
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_status
+    return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_stolen" if stolen
     return "status_impounded" if current_impound_record.present?
     return "status_abandoned" if abandoned? || current_parking_notifications.any?

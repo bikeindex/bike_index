@@ -41,7 +41,10 @@ module Organized
     end
 
     def new
-      @kind = params[:kind] == "abandoned" ? "abandoned" : "normal"
+      @unregistered_parking_notification = current_organization.enabled?("parking_notifications") && params[:parking_notification].present?
+      if @unregistered_parking_notification
+        @page_title = "#{current_organization.short_name} New parking notification"
+      end
     end
 
     def new_iframe
@@ -88,8 +91,10 @@ module Organized
           @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
           flash[:error] = @b_param.bike_errors.to_sentence
           iframe_redirect_params[:b_param_id_token] = @b_param.id_token
-        else
-          flash[:success] = "#{@bike.type} Created"
+        elsif @bike.parking_notifications.any? # Bike created successfully
+          flash[:success] = "Parking notification created for #{@bike.type}"
+        else # Bike created successfully
+          flash[:success] = "#{@bike.type.titleize} Created"
         end
       end
       redirect_back(fallback_location: new_iframe_organization_bikes_path(iframe_redirect_params))

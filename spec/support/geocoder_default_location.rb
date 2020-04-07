@@ -24,6 +24,8 @@ RSpec.shared_context :geocoder_default_location do
       state: "NY",
       zipcode: "10007",
       country: "USA",
+      latitude: 40.7143528,
+      longitude: -74.0059731,
     }.as_json
   end
 

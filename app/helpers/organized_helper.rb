@@ -12,8 +12,12 @@ module OrganizedHelper
         concat(content_tag(:em, bike.frame_model))
       end
       if bike.creation_description.present?
-        concat(", ")
-        concat(content_tag(:small, bike.creation_description, class: "less-strong"))
+        if bike.unregistered_parking_notification?
+          concat(content_tag(:em, " unregistered, parking notification", class: "small"))
+        else
+          concat(", ")
+          concat(content_tag(:small, bike.creation_description, class: "less-strong"))
+        end
       end
     end
   end

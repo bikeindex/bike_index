@@ -20,7 +20,7 @@ module Organized
           page = params[:page] || 1
           per_page = params[:per_page] || 100
           # TODO: add sortable here
-          records = matching_parking_notifications.reorder(created_at: :desc)
+          records = matching_parking_notifications.reorder(created_at: :desc).includes(:user, :bike, :impound_record)
           render json: records.page(page).per(per_page),
                  root: "parking_notifications",
                  each_serializer: ParkingNotificationSerializer

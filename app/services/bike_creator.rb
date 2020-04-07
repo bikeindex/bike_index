@@ -20,7 +20,7 @@ class BikeCreator
     bike.creator_id = @b_param.creator_id
     bike.updator_id = bike.creator_id
     bike = BikeCreatorVerifier.new(@b_param, bike).verify
-    bike.attributes = default_abandoned_attrs(@b_param, bike) if @b_param.status_abandoned?
+    bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
     bike = add_front_wheel_size(bike)
     bike
@@ -115,6 +115,12 @@ class BikeCreator
         bike_sticker = BikeSticker.lookup(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
         bike_sticker && bike_sticker.claim(@bike.creator, @bike.id)
       end
+      if @b_param.unregistered_parking_notification?
+        ParkingNotification.create(@b_param.parking_notification_params)
+        # We skipped setting address, with default_parking_notification_attrs, set it now via the parking_notification
+        @bike.set_address
+        @bike.save
+      end
     end
 
     @bike
@@ -140,8 +146,8 @@ class BikeCreator
     bike
   end
 
-  def default_abandoned_attrs(b_param, bike)
-    attrs = { skip_status_update: true }
+  def default_parking_notification_attrs(b_param, bike)
+    attrs = { skip_status_update: true, skip_geocoding: true, status: "unregistered_parking_notification" }
     # We want to force not sending email
     if b_param.params.dig("bike", "send_email").blank?
       b_param.update_attribute :params, b_param.params.merge("bike" => b_param.params["bike"].merge("send_email" => "false"))

@@ -17,7 +17,7 @@ class ParkingNotification < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
-  after_create :send_email_message
+  after_create :enqueue_email_message
 
   enum kind: KIND_ENUM
 
@@ -29,7 +29,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :current, -> { where(impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
-  scope :impounded, -> { where.not(impound_record_id: nil) }
+  scope :with_impounded_record, -> { where.not(impound_record_id: nil) }
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
@@ -52,7 +52,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
 
-  def send_message?; owner_known? end
+  def send_message?; !bike_unregistered? && owner_known? end
 
   def show_address; !hide_address end
 
@@ -80,6 +80,11 @@ class ParkingNotification < ActiveRecord::Base
     # We know there has to be a potential initial record if can_be_repeat,
     # so it doesn't matter if we scope to current on new records or not
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
+  end
+
+  def bike_unregistered?
+    return true if delivery_status == "bike_unregistered"
+    bike.b_params.last&.unregistered_parking_notification?
   end
 
   def repeat_number
@@ -155,7 +160,7 @@ class ParkingNotification < ActiveRecord::Base
     bike&.set_address
   end
 
-  def send_email_message
+  def enqueue_email_message
     EmailParkingNotificationWorker.perform_async(id)
   end
 end

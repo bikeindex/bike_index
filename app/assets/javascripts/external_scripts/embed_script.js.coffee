@@ -23,6 +23,7 @@ initializeFrameMaker = (target) ->
     getModelList(slug)
 
 setModelTypeahead = (data=[]) ->
+  return true if window.newIframe
   model_sel = $('#bike_frame_model').selectize()[0].selectize
   model_sel.destroy()
   if data.length > 0
@@ -123,6 +124,56 @@ updateYear = ->
   else
     getModelList()
 
+
+# These two functions are required by getCurrentPosition
+window.fillInParkingLocation = (position) ->
+  window.waitingOnLocation = false
+  $(".parkingLocation-latitude").val(position.coords.latitude)
+  $(".parkingLocation-longitude").val(position.coords.longitude)
+  $(".parkingLocation-accuracy").val(position.coords.accuracy)
+  $(".submit-registration input").attr("disabled", false)
+  $(".hideOnLocationFind").slideUp()
+  $(".showOnLocationFind").slideDown()
+
+window.parkingLocationError = (err) ->
+  window.fallbackToManualAddress()
+  console.log(err)
+
+window.fallbackToManualAddress = ->
+  # if we aren't waiting on location, no need to fallback
+  return true unless window.waitingOnLocation
+  $(".waitingOnLocationText").text("Unable to determine current location automatically")
+  $("#parking_notification_use_entered_address_true").prop("checked", true)
+  showOrHideEnteredAddress()
+
+showOrHideEnteredAddress = ->
+  $addressFields = $("#address-fields")
+  console.log("showOrHideEnteredAddress triggered")
+
+  if $("#parking_notification_use_entered_address_true").prop("checked")
+    $addressFields.show().removeClass("currently-hidden")
+    $(".ifManualRequired input").attr("required", true)
+    $(".fancy-select.unfancy select").selectize
+      create: false
+    $(".fancy-select.unfancy").removeClass("unfancy")
+    $(".submit-registration input").attr("disabled", false)
+  else
+    $(".submit-registration input").attr("disabled", true)
+    $addressFields.slideUp().removeClass('unhidden')
+    $(".waitingOnLocationText").slideDown()
+    $(".ifManualRequired input").attr("required", false)
+    window.waitingOnLocation = true
+    # If we haven't gotten an address in 60 seconds, fallback to manual entry
+    setTimeout ( =>
+      window.fallbackToManualAddress()
+    ), 45000
+    navigator.geolocation.getCurrentPosition(window.fillInParkingLocation, window.parkingLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
+
+initializeUnregisteredParkingNotification = ->
+  showOrHideEnteredAddress()
+  $("#selectEnteredAddress input").change (e) ->
+    showOrHideEnteredAddress()
+
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
   initializeFrameMaker("#bike_manufacturer_id")
@@ -174,3 +225,6 @@ $(document).ready ->
     true
 
   new window.CheckEmail('#bike_owner_email')
+
+  if $("#new-unregistered-parking-notification").length
+    initializeUnregisteredParkingNotification()

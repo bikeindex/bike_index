@@ -5,6 +5,11 @@ hr.delete-organization-section {
 // This isn't actually applying styles yet, but will be
 // ... and they should be used consistently
 .organized-page-header {
+  h1,
+  h2,
+  h3 {
+    @extend .uncap;
+  }
 }
 
 .ambassador-tasks-table {

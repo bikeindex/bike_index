@@ -3688,6 +3688,7 @@ en:
       org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      parking_notification_unregistered: Unregistered bike notification
       parking_notifications: Parking notifications
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
@@ -4423,8 +4424,8 @@ en:
         created: Created at
         internal_notes: Internal notes
         message: Message
+        notification_number: Notification#
         parking_notification: Parking Notification
-        repeat: Repeat
       table:
         address: Address
         bike: Bike
@@ -4432,7 +4433,7 @@ en:
         created: Created
         impounded: Impounded
         kind: Because
-        repeat: Repeat#
+        notification_number: Notification#
     stickers:
       edit:
         bike: Bike
@@ -4995,7 +4996,7 @@ en:
       exports: Exports
       getting_started: Getting started
       how_integration_works: how the integration works
-      impounded_bikes: Impounded Bikes
+      impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations
       integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
       integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
@@ -5008,6 +5009,7 @@ en:
       organization_profile: "%{org_name} profile"
       other_point_of_sale_system: Other Point of Sale system?
       overview_dashboard: Dashboard
+      parking_notification_unregistered: Unregistered bike notification
       parking_notifications: Parking notifications
       read_a_full_explanation_html: Read a full explanation of %{link}.
       recoveries: Recoveries
