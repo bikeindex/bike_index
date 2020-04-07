@@ -300,6 +300,7 @@ RSpec.describe BikeCreator do
         expect(bike.longitude).to eq(-74.0059731)
         expect(bike.owner_email).to eq auto_user.email
         expect(bike.creator).to eq creator
+        expect(bike.status).to eq "unregistered_parking_notification"
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.current_parking_notification
