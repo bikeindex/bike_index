@@ -78,9 +78,9 @@
           %li.divider-above
             = active_link t(".users"), organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           %li
-            = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+            = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
           %li
-            = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+            = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
   %div{ class: organized_container }
@@ -122,7 +122,6 @@
 
     = yield
 
-    - if organized_include_javascript_pack?
-      -# Important that this is below yield, sometimes important page data is added to the dom in there
-      = javascript_pack_tag "application"
-
+- if organized_include_javascript_pack?
+  -# Important that this is below yield, sometimes important page data is added to the dom in there
+  = javascript_pack_tag "application"

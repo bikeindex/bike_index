@@ -22,13 +22,13 @@ module Organized
     def update
       @membership.update_attributes(permitted_update_params)
       flash[:success] = translation(:updated_membership, user_email: @membership.user.email)
-      redirect_to current_index_path
+      redirect_to current_root_path
     end
 
     def destroy
       @membership.destroy
       flash[:success] = translation(:deleted_user)
-      redirect_to current_index_path
+      redirect_to current_root_path
     end
 
     def new
@@ -39,7 +39,7 @@ module Organized
     def create
       unless current_organization.remaining_invitation_count > 0
         flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
-        redirect_to current_index_path and return
+        redirect_to current_root_path and return
       end
       @membership = Membership.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
@@ -56,14 +56,14 @@ module Organized
           multiple_emails_invited
             .each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
 
-          redirect_to current_index_path and return
+          redirect_to current_root_path and return
         end
       else
         if @membership.save
           flash[:success] = translation(:user_was_invited,
                                         invited_email: @membership.invited_email,
                                         org_name: current_organization.name)
-          redirect_to current_index_path
+          redirect_to current_root_path
         else
           render :new
         end
@@ -80,7 +80,7 @@ module Organized
       current_organization.memberships
     end
 
-    def current_index_path
+    def current_root_path
       organization_users_path(organization_id: current_organization.to_param)
     end
 

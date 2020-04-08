@@ -1651,7 +1651,7 @@ en:
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
-      manage:
+      manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
             %{org_name}.
@@ -4358,8 +4358,25 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
-    manage:
-      index:
+    manages:
+      location_fields:
+        address: Address
+        choose_country: Choose country
+        city: City
+        location_name: Location name
+        name: Name
+        phone_number: Phone number
+        remove: Remove location
+        state: State
+        street: Street
+        zipcode: Postal code
+      locations:
+        add_location: Add location
+        bike_index_partner_map: Bike Index partner map
+        display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
+        location_settings_html: "<em>%{org_name}</em> location settings"
+        save: Save
+      show:
         abbreviation: Abbreviation
         choose_file: Choose file...
         delete_organization: Delete organization
@@ -4376,23 +4393,6 @@ en:
           Bike Index?
         select_email: Select email
         update: Update
-      location_fields:
-        address: Address
-        choose_country: Choose country
-        city: City
-        location_name: Location name
-        name: Name
-        phone_number: Phone number
-        remove: Remove
-        state: State
-        street: Street
-        zipcode: Postal code
-      locations:
-        add_location: Add location
-        bike_index_partner_map: Bike Index partner map
-        display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
-        location_settings_html: "<em>%{org_name}</em> location settings"
-        save: Save
     messages:
       index:
         bike: Bike

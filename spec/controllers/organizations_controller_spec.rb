@@ -32,7 +32,7 @@ RSpec.describe OrganizationsController, type: :controller do
       post :create, params: { organization: org_attrs }
       expect(Organization.count).to eq(1)
       organization = Organization.where(name: "a new org").first
-      expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
+      expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
       expect(organization.approved).to be_truthy
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(user.id)
@@ -49,7 +49,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(ActionMailer::Base.deliveries).not_to be_empty
         expect(Organization.count).to eq(1)
         organization = Organization.where(name: "a new org").first
-        expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
+        expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
         expect(organization.approved).to be_truthy
         expect(organization.api_access_approved).to be_falsey
         expect(organization.auto_user_id).to eq(user.id)
