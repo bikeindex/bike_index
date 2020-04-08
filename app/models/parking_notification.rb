@@ -42,6 +42,9 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  # Get it unscoped
+  def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
+
   def current?; !impounded? end
 
   def impounded?; impound_record_id.present? end
@@ -156,8 +159,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def update_associations
     # repeat_parking_notifications.map(&:update)
-    bike&.update(updated_at: Time.current)
     bike&.set_address
+    bike&.update(updated_at: Time.current)
   end
 
   def enqueue_email_message

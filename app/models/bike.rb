@@ -436,12 +436,12 @@ class Bike < ApplicationRecord
     current_stolen_record.phone_for_users
   end
 
-  def visible_by(passed_user = nil)
+  def visible_by?(passed_user = nil)
     return true unless hidden || deleted?
     if passed_user.present?
       return true if passed_user.superuser?
       return false if deleted?
-      return true if owner == passed_user && user_hidden
+      return true if user_hidden && authorized?(passed_user)
     end
     false
   end
@@ -523,6 +523,7 @@ class Bike < ApplicationRecord
   end
 
   def set_user_hidden
+    return true unless current_ownership.present?
     if marked_user_hidden.present? && marked_user_hidden.to_s != "0"
       self.hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
@@ -539,12 +540,8 @@ class Bike < ApplicationRecord
     # Sets lat/long, will avoid a geocode API call if coordinates are found
     set_location_info
 
-    self.address =
-      current_stolen_record&.display_address(force_show_address: true).presence ||
-      [city, zipcode, country&.name]
-        .select(&:present?)
-        .join(" ")
-        .presence
+    # current_stolen_record&.display_address(force_show_address: true).presence ||
+    self.address = [city, zipcode, country&.name].select(&:present?).join(" ").presence
   end
 
   def normalize_emails
@@ -683,7 +680,6 @@ class Bike < ApplicationRecord
   # 5. From the request's IP address, if given
   def set_location_info(request_location: nil)
     find_current_stolen_record
-
     if location_info_present?(current_parking_notification)
       self.latitude = current_parking_notification.latitude
       self.longitude = current_parking_notification.longitude

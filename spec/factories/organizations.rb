@@ -47,9 +47,13 @@ FactoryBot.define do
 
     # before(:create) { |organization| organization.short_name ||= organization.name }
     factory :organization_with_auto_user do
-      auto_user { FactoryBot.create(:user) }
-      after(:create) do |organization|
-        FactoryBot.create(:membership_claimed, user: organization.auto_user, organization: organization)
+      # THIS DOESN'T ACTUALLY WORK! The associations aren't created in time :(
+      transient do
+        user { FactoryBot.create(:user) }
+      end
+      after(:create) do |organization, evaluator|
+        FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)
+        organization.update_attributes(auto_user: evaluator.user)
       end
     end
     factory :organization_child do

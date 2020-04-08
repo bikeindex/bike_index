@@ -1509,8 +1509,6 @@ en:
           up and you'll be able to edit it!
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
-      find_bike:
-        bike_deleted: Bike deleted
       index:
         we_dont_know_location: >-
           Sorry, we don't know the location "%{location}". Please try a different

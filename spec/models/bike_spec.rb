@@ -205,22 +205,22 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "visible_by" do
+  describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { User.new(superuser: true) }
     it "is visible if not hidden" do
       bike = Bike.new
-      expect(bike.visible_by).to be_truthy
-      expect(bike.visible_by(User.new)).to be_truthy
+      expect(bike.visible_by?).to be_truthy
+      expect(bike.visible_by?(User.new)).to be_truthy
     end
     context "hidden" do
       it "isn't visible by user or owner" do
         bike = Bike.new(hidden: true)
         allow(bike).to receive(:owner).and_return(owner)
         allow(bike).to receive(:user_hidden).and_return(false)
-        expect(bike.visible_by(owner)).to be_falsey
-        expect(bike.visible_by(User.new)).to be_falsey
-        expect(bike.visible_by(superuser)).to be_truthy
+        expect(bike.visible_by?(owner)).to be_falsey
+        expect(bike.visible_by?(User.new)).to be_falsey
+        expect(bike.visible_by?(superuser)).to be_truthy
       end
     end
     context "user hidden" do
@@ -228,9 +228,9 @@ RSpec.describe Bike, type: :model do
         bike = Bike.new(hidden: true)
         allow(bike).to receive(:owner).and_return(owner)
         allow(bike).to receive(:user_hidden).and_return(true)
-        expect(bike.visible_by(owner)).to be_truthy
-        expect(bike.visible_by(User.new)).to be_falsey
-        expect(bike.visible_by(superuser)).to be_truthy
+        expect(bike.visible_by?(owner)).to be_truthy
+        expect(bike.visible_by?(User.new)).to be_falsey
+        expect(bike.visible_by?(superuser)).to be_truthy
       end
     end
     context "deleted?" do
@@ -238,11 +238,11 @@ RSpec.describe Bike, type: :model do
         bike = Bike.new(deleted_at: Time.current)
         allow(bike).to receive(:owner).and_return(owner)
         expect(bike.deleted?).to be_truthy
-        expect(bike.visible_by(owner)).to be_falsey
-        expect(bike.visible_by(User.new)).to be_falsey
-        expect(bike.visible_by(superuser)).to be_truthy
+        expect(bike.visible_by?(owner)).to be_falsey
+        expect(bike.visible_by?(User.new)).to be_falsey
+        expect(bike.visible_by?(superuser)).to be_truthy
         bike.hidden = true
-        expect(bike.visible_by(superuser)).to be_truthy
+        expect(bike.visible_by?(superuser)).to be_truthy
       end
     end
   end
@@ -1513,10 +1513,10 @@ RSpec.describe Bike, type: :model do
         expect(bike.country).to eq(stolen_record.country)
       end
       context "given a abandoned record, it instead uses the abandoned record" do
-        it "takes the location from the abandoned records" do
+        it "takes the location from the parking notification" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
-
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
+          bike.reload
           expect(bike.current_parking_notification).to eq parking_notification
           expect(bike.to_coordinates).to eq(parking_notification.to_coordinates)
 
