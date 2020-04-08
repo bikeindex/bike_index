@@ -29,21 +29,6 @@
           .mt-2.text-center
             = name
 
-/ :coffeescript
-/   $(document).ready ->
-/     $group1 = $(".stolen-bike-image-editing-list-group").first()
-/     li1 = $group1.find("li")
-/     outer_width = li1.first().outerWidth() * li1.length + 60
-/     console.log(outer_width)
-/     $group1.css("width", "'" + li1.first().outerWidth() * li1.length + 60 + "px'")
-
-/ $(".stolen-bike-image-editing-list-group").each (index, group) ->
-/   $group = $(group)
-/   li = $group.find("li")
-/   outer_width = li.first().outerWidth() * li.length + 60
-/   console.log(outer_width)
-/   $group.css("width", "'" + li.first().outerWidth() * li.length + 60 + "px'")
-/   console.log($group.css("width", "'" + li.first().outerWidth() * li.length + 40 + "px'"))
 %hr
 
 - if @stolen_record.blank?

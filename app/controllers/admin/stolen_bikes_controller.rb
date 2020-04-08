@@ -41,6 +41,7 @@ class Admin::StolenBikesController < Admin::BaseController
         flash[:success] = "Bike was successfully updated."
         redirect_to edit_admin_stolen_bike_url(@bike)
       else
+        flash[:error] = "Unable to update!"
         render action: "edit"
       end
     end
