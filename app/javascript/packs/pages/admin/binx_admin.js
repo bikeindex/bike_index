@@ -58,12 +58,16 @@ function BinxAdmin() {
         const binxAdminImageUploader = BinxAdminImageUploader();
         binxAdminImageUploader.init();
       }
+      if ($("#stolenBikeImageEditing").length) {
+        // Set a timeout so images have a bit to load
+        setTimeout(this.fixStolenBikeImageWidth(this), 500);
+      }
     },
 
     initAdminSearchSelect() {
       window.initialValue = $("#admin_other_navigation").val();
       // On change, if the change is for something new and is an actual value, redirect to that page
-      $("#admin_other_navigation").on("change", e => {
+      $("#admin_other_navigation").on("change", (e) => {
         let newValue = $("#admin_other_navigation").val();
         if (newValue != window.initialValue && newValue.length > 0) {
           location.href = newValue;
@@ -99,7 +103,25 @@ function BinxAdmin() {
         window.toggleAllChecked = !window.toggleAllChecked;
         $(".update-mnfg-select input").prop("checked", window.toggleAllChecked);
       });
-    }
+    },
+
+    fixStolenBikeImageWidth() {
+      // This was heinous, for reasons unknown
+      let $promotedImages = $("#promoted-images-display");
+      let $promotedImagesLi = $promotedImages.find("li");
+      $promotedImages.css(
+        "width",
+        `${$promotedImagesLi.first().outerWidth() * $promotedImagesLi.length +
+          20}px`
+      );
+
+      let $imageEdit = $("#stolenBikeImageEditing");
+      let $imageEditLi = $imageEdit.find("li");
+      $imageEdit.css(
+        "width",
+        `${$imageEditLi.first().outerWidth() * $imageEditLi.length + 40}px`
+      );
+    },
   };
 }
 
