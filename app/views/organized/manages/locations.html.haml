@@ -4,15 +4,15 @@
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   = hidden_field_tag :locations_page, true
 
-  .form-group.row.locations-where-and-add
-    .col-sm-4
+  .form-group.row.locations-where-and-add{ style: "margin-top: 40px;" }
+    .col-sm-6.mt-2
       .checkbox
         %label
           = f.check_box :show_on_map
           - map_link = link_to(t(".bike_index_partner_map"), where_path, target: "_blank" )
           = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
 
-    .col-sm-4
+    .col-sm-6.text-right.mt-2
       = link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id

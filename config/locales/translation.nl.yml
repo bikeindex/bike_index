@@ -2439,15 +2439,6 @@ nl:
         update:
           unknown_update_action: Onbekende updateactie!
           bike_stickers_removed: Fietscodes verwijderd!
-      manage:
-        destroy:
-          contact_support_to_delete: Neem contact op met support@bikeindex.org om
-            %{org_name} te verwijderen.
-          deleted_org: "%{org_name} verwijderd."
-        update:
-          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
-            van %{org_name}.
-          updated_successfully: "%{org_name} is succesvol bijgewerkt."
       messages:
         create:
           message_sent: "%{message_kind} bericht verzonden"
@@ -2488,6 +2479,15 @@ nl:
         ensure_access_to_parking_notifications!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
             neem contact op met Bike Index support.
+      manages:
+        destroy:
+          contact_support_to_delete: Neem contact op met support@bikeindex.org om
+            %{org_name} te verwijderen.
+          deleted_org: "%{org_name} verwijderd."
+        update:
+          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
+            van %{org_name}.
+          updated_successfully: "%{org_name} is succesvol bijgewerkt."
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4519,40 +4519,6 @@ nl:
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
-    manage:
-      index:
-        abbreviation: Afkorting
-        choose_file: Kies bestand...
-        delete_organization: Organisatie verwijderen
-        i_would_like_to_terminate_my_account: Ik wil mijn account bij Bike Index beëindigen
-        name: Naam
-        org_email_address_html: E-mailadres <em>%{org_name} fietsregistraties</em>
-          worden verzonden vanaf
-        org_settings_html: "<em>%{org_name}</em> instellingen"
-        organization_logo: Organisatie logo
-        organization_type: Organisatie type
-        registration_email: Registratie email
-        removal_confirmation: Weet je zeker dat je %{org_name} van Bike Index wilt
-          verwijderen?
-        select_email: Selecteer e-mail
-        update: Bijwerken
-      location_fields:
-        address: Adres
-        choose_country: Kies land
-        city: City
-        location_name: Locatie naam
-        name: Naam
-        phone_number: Telefoonnummer
-        remove: Verwijderen
-        state: Staat
-        street: straat
-        zipcode: Postcode
-      locations:
-        add_location: Locatie toevoegen
-        bike_index_partner_map: Bike Index-partnerkaart
-        display_org_on_map_html: "<em>%{org_name} weergeven</em> op %{map_link}"
-        location_settings_html: "<em>%{org_name}</em> locatie-instellingen"
-        save: Opslaan
     messages:
       index:
         bike: Fiets
@@ -4666,6 +4632,40 @@ nl:
         kind: Soort
         address: Adres
         notification_number: Kennisgeving#
+    manages:
+      location_fields:
+        address: Adres
+        choose_country: Kies land
+        city: City
+        location_name: Locatie naam
+        name: Naam
+        phone_number: Telefoonnummer
+        remove: Locatie verwijderen
+        state: Staat
+        street: Straat
+        zipcode: Postcode
+      locations:
+        add_location: Locatie toevoegen
+        bike_index_partner_map: Bike Index-partnerkaart
+        display_org_on_map_html: "<em>%{org_name} weergeven</em> op %{map_link}"
+        location_settings_html: "<em>%{org_name}</em> locatie-instellingen"
+        save: Opslaan
+      show:
+        abbreviation: Afkorting
+        choose_file: Kies bestand...
+        delete_organization: Organisatie verwijderen
+        i_would_like_to_terminate_my_account: Ik wil mijn account bij Bike Index beëindigen
+        name: Naam
+        org_email_address_html: E-mailadres <em>%{org_name} fietsregistraties</em>
+          worden verzonden vanaf
+        org_settings_html: "<em>%{org_name}</em> instellingen"
+        organization_logo: Organisatie logo
+        organization_type: Organisatie type
+        registration_email: Registratie email
+        removal_confirmation: Weet je zeker dat je %{org_name} van Bike Index wilt
+          verwijderen?
+        select_email: Selecteer e-mail
+        update: Bijwerken
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"

@@ -74,10 +74,10 @@ class Organization < ApplicationRecord
   before_save :set_search_coordinates
   after_commit :update_associations
 
-  delegate :city, :country, :zipcode, :state, to: :search_location, allow_nil: true
+  delegate :city, :country, :zipcode, :state, to: :default_location, allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
-  after_validation :geocode, if: -> { false } # never geocode, use search_location lat/long
+  after_validation :geocode, if: -> { false } # never geocode, use default_location lat/long
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -348,7 +348,7 @@ class Organization < ApplicationRecord
     UpdateAssociatedOrganizationsWorker.perform_async(id)
   end
 
-  def search_location
+  def default_location
     locations.order(id: :asc).first
   end
 
@@ -376,8 +376,8 @@ class Organization < ApplicationRecord
 
   def set_search_coordinates
     return if search_coordinates_set?
-    self.location_latitude = search_location&.latitude
-    self.location_longitude = search_location&.longitude
+    self.location_latitude = default_location&.latitude
+    self.location_longitude = default_location&.longitude
   end
 
   def calculated_enabled_feature_slugs

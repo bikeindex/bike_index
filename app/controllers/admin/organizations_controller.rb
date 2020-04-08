@@ -32,8 +32,23 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
+
+    # Also, special handling because we need to be able to unset manual_pos_kind
+    manual_pos_kind = params.dig(:organization, :manual_pos_kind)
+    if manual_pos_kind.present?
+      if manual_pos_kind == "not_set"
+        if @organization.manual_pos_kind.present?
+          run_update_pos_kind = true
+          @organization.manual_pos_kind = nil
+        end
+      elsif @organization.manual_pos_kind != manual_pos_kind
+        run_update_pos_kind = true
+        @organization.manual_pos_kind = manual_pos_kind
+      end
+    end
     if @organization.update_attributes(permitted_parameters)
       flash[:success] = "Organization Saved!"
+      UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit
@@ -86,7 +101,6 @@ class Admin::OrganizationsController < Admin::BaseController
         :show_on_map,
         :slug,
         :website,
-        :manual_pos_kind,
         [locations_attributes: permitted_locations_params],
       ).merge(kind: approved_kind)
   end

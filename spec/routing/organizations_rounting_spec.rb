@@ -42,8 +42,8 @@ RSpec.describe "organizations routing", type: :routing do
     describe "manage root" do
       it "routes to manage" do
         expect(get: "/o/university/manage").to route_to(
-          controller: "organized/manage",
-          action: "index",
+          controller: "organized/manages",
+          action: "show",
           organization_id: "university",
         )
       end
@@ -51,7 +51,7 @@ RSpec.describe "organizations routing", type: :routing do
     describe "manage locations" do
       it "routes to manage" do
         expect(get: "/o/university/manage/locations").to route_to(
-          controller: "organized/manage",
+          controller: "organized/manages",
           action: "locations",
           organization_id: "university",
         )

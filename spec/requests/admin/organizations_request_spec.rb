@@ -1,21 +1,22 @@
 require "rails_helper"
 
-RSpec.describe Admin::OrganizationsController, type: :controller do
+base_url = "/admin/organizations"
+RSpec.describe Admin::OrganizationsController, type: :request do
   let(:organization) { FactoryBot.create(:organization, approved: false) }
-  include_context :logged_in_as_super_admin
+  include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
     it "renders" do
-      get :index
+      get base_url
       expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
+      expect(response).to render_template("admin/organizations/index")
     end
     context "search" do
       let!(:organization) { FactoryBot.create(:organization, name: "Cool Bikes") }
       it "renders, finds organization" do
-        get :index, params: { search_query: "cool" }
+        get base_url, params: { search_query: "cool" }
         expect(response.status).to eq 200
-        expect(response).to render_template(:index)
+        expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
       end
     end
@@ -23,13 +24,13 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, params: { id: organization.to_param }
+      get "#{base_url}/#{organization.to_param}"
       expect(response.status).to eq(200)
-      expect(response).to render_template(:show)
+      expect(response).to render_template("admin/organizations/show")
     end
     context "unknown organization" do
       it "redirects" do
-        get :show, params: { id: "d89safdf" }
+        get "#{base_url}/d89safdf"
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:admin_organizations)
       end
@@ -38,9 +39,9 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, params: { id: organization.to_param }
+      get "#{base_url}/#{organization.to_param}/edit"
       expect(response.status).to eq(200)
-      expect(response).to render_template(:edit)
+      expect(response).to render_template("admin/organizations/edit")
     end
   end
 
@@ -61,14 +62,14 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
-          post :create, params: { organization: create_attributes.merge(kind: kind) }
+          post base_url, params: { organization: create_attributes.merge(kind: kind) }
           expect(Organization.count).to eq(1)
           organization = Organization.last
           expect(organization.kind).to eq(kind)
           unless organization.ambassador? # Ambassadors have special attrs set
             expect_attrs_to_match_hash(organization, create_attributes.except(:kind))
           end
-          expect(user.organizations.count).to eq 0 # it doesn't assign the user
+          expect(current_user.organizations.count).to eq 0 # it doesn't assign the user
         end
       end
     end
@@ -125,10 +126,12 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     end
     it "updates the organization" do
       expect(location1).to be_present
+      Sidekiq::Worker.clear_all
       expect do
-        put :update, params: { organization_id: organization.to_param, id: organization.to_param, organization: update_attributes }
+        put "#{base_url}/#{organization.to_param}", params: { organization_id: organization.to_param, organization: update_attributes }
       end.to change(Location, :count).by 1
-      UpdateOrganizationPosKindWorker.new.perform(organization.id)
+      expect(UpdateOrganizationPosKindWorker.jobs.count).to eq 1
+      UpdateOrganizationPosKindWorker.drain # Run the jobs in the queue
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
@@ -146,6 +149,27 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
       location2 = organization.locations.last
       location2_update_attributes = update_attributes[:locations_attributes][update_attributes[:locations_attributes].keys.last]
       expect_attrs_to_match_hash(location2, location2_update_attributes.except(:latitude, :longitude, :organization_id, :created_at))
+    end
+    context "setting to not_set" do
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "updates the organization" do
+        expect do
+          put "#{base_url}/#{organization.to_param}", params: { organization: { manual_pos_kind: "not_set" } }
+        end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
+        organization.reload
+        expect(organization.manual_pos_kind).to be_blank
+      end
+    end
+    context "not updating manual_pos_kind" do
+      it "updates and doesn't enqueue worker" do
+        expect do
+          put "#{base_url}/#{organization.to_param}", params: { organization: { name: "new name", short_name: "something else" } }
+        end.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        organization.reload
+        expect(organization.name).to eq "new name"
+        expect(organization.short_name).to eq "something else"
+        expect(organization.slug).to eq "something-else"
+      end
     end
   end
 end
