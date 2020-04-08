@@ -17,18 +17,7 @@ class Admin::StolenBikesController < Admin::BaseController
     @bike.current_stolen_record.update_attribute :approved, true
     @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
-    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was approved."
-  end
-
-  def regenerate_alert_image
-    selected_image = PublicImage.find(params[:public_image_id])
-
-    if @bike.current_stolen_record.generate_alert_image(bike_image: selected_image)
-      flash[:notice] = "Promoted alert bike image updated."
-    else
-      flash[:error] = "Could not update promoted alert image."
-    end
-
+    flash[:success] = "Stolen Bike was approved"
     redirect_to edit_admin_stolen_bike_url(@bike)
   end
 
@@ -42,13 +31,19 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def update
-    BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
-    @bike = @bike.decorate
-    if @bike.update_attributes(permitted_parameters)
-      SerialNormalizer.new({ serial: @bike.serial_number }).save_segments(@bike.id)
-      redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was successfully updated."
+    if params[:public_image_id].present?
+      update_image
     else
-      render action: "edit"
+      BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
+      @bike = @bike.decorate
+      if @bike.update_attributes(permitted_parameters)
+        SerialNormalizer.new({ serial: @bike.serial_number }).save_segments(@bike.id)
+        flash[:success] = "Bike was successfully updated."
+        redirect_to edit_admin_stolen_bike_url(@bike)
+      else
+        flash[:error] = "Unable to update!"
+        render action: "edit"
+      end
     end
   end
 
@@ -68,5 +63,24 @@ class Admin::StolenBikesController < Admin::BaseController
     end
     @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record&.id
     @bike
+  end
+
+  def update_image
+    selected_image = @bike.public_images.find_by_id(params[:public_image_id])
+    if selected_image.blank?
+      flash[:error] = "Unable to find that image!"
+    elsif params[:update_action] == "delete"
+      selected_image.destroy
+      flash[:success] = "Image deleted"
+    elsif params[:update_action] == "regenerate_alert_image"
+      if @bike.current_stolen_record.generate_alert_image(bike_image: selected_image)
+        flash[:success] = "Promoted alert bike image updated."
+      else
+        flash[:error] = "Could not update promoted alert image."
+      end
+    else
+      flash[:error] = "Unknown action!"
+    end
+    redirect_to edit_admin_stolen_bike_url(@bike)
   end
 end

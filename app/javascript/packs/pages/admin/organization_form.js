@@ -16,7 +16,7 @@ class BinxAdminOrganizationForm {
     this.$form.on(
       "change",
       "#js-organization-type input.form-check-input",
-      e => {
+      (e) => {
         this.toggleAmbassadorFields(e.target);
       }
     );
@@ -30,19 +30,19 @@ class BinxAdminOrganizationForm {
       "organization_show_on_map",
       "organization_lock_show_on_map",
       "organization_api_access_approved",
-      "organization_approved"
-    ].map(fieldId => {
+      "organization_approved",
+    ].map((fieldId) => {
       return {
         element: this.$form.find(`#${fieldId}`),
-        label: this.$form.find(`label[for='${fieldId}']`)
+        label: this.$form.find(`label[for='${fieldId}']`),
       };
     });
 
     const selectizedFields = ["organization_parent_organization_id"].map(
-      fieldId => {
+      (fieldId) => {
         return {
           element: this.$form.find(`#${fieldId}`),
-          label: this.$form.find(`label[for='${fieldId}-selectized']`)
+          label: this.$form.find(`label[for='${fieldId}-selectized']`),
         };
       }
     );
@@ -58,23 +58,23 @@ class BinxAdminOrganizationForm {
   }
 
   disableFields({ inputFields, selectizedFields }) {
-    inputFields.forEach(field => {
+    inputFields.forEach((field) => {
       field.element.attr("disabled", true);
       field.label.addClass("text-muted");
     });
 
-    selectizedFields.forEach(field => {
+    selectizedFields.forEach((field) => {
       field.element.selectize()[0].selectize.disable();
       field.label.addClass("text-muted");
     });
   }
 
   enableFields({ inputFields, selectizedFields }) {
-    inputFields.forEach(field => {
+    inputFields.forEach((field) => {
       field.element.attr("disabled", false);
       field.label.removeClass("text-muted");
     });
-    selectizedFields.forEach(field => {
+    selectizedFields.forEach((field) => {
       field.element.selectize()[0].selectize.enable();
       field.label.removeClass("text-muted");
     });
