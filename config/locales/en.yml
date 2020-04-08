@@ -1250,6 +1250,9 @@ en:
       zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
+      added_to_track_parking_notification: >-
+        This %{bike_type} is not registered to a user. It is was added to track parking
+        notifications.
       address: Registration Address
       address_or_intersection: Address or intersection
       as_a_bikeindex_ambassador_html: >-
@@ -1298,6 +1301,7 @@ en:
       unable_to_display_additional_information: >-
         Unable to display additional information because %{bike_type} is not registered
         with %{org_name}
+      unregistered_parking_notification: "%{bike_type} created for parking notification"
       user_revoked_permission_html: >-
         This user <strong>revoked</strong> permission to contact them prior to their
         bike being marked stolen.
