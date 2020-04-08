@@ -177,6 +177,24 @@
   }
 }
 
+.stolen-bike-image-editing-list-group-wrapper {
+  overflow-x: scroll;
+}
+.stolen-bike-image-editing-list-group {
+  @extend .justify-content-center;
+  padding: 10px;
+  flex-direction: row; // override, force to be row always
+  img {
+    display: block;
+    max-width: 150px;
+    height: auto;
+    margin: 0 auto;
+  }
+  &#promoted-images-display img {
+    max-width: 300px;
+  }
+}
+
 .admin-public-image {
   img {
     max-width: 100%;
