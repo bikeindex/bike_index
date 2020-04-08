@@ -177,6 +177,19 @@
   }
 }
 
+.stolen-bike-image-editing-list-group {
+  // max-width: 100%;
+  padding: 0 10px;
+  overflow-x: scroll;
+  @extend .justify-content-center;
+  img {
+    display: block;
+    max-width: 150px;
+    height: auto;
+    margin: 0 auto;
+  }
+}
+
 .admin-public-image {
   img {
     max-width: 100%;

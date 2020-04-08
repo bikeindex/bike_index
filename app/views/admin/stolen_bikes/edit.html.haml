@@ -2,14 +2,32 @@
 
 = render partial: "/admin/twitter_accounts/errored"
 
-%h3 Public Images
+%h3 Bike Images
+%ul.list-group.list-group-horizontal-sm.stolen-bike-image-editing-list-group
+  - @bike.public_images.each do |image|
+    %li.list-group-item
+      .text-center
+        = link_to "Delete image", admin_stolen_bike_path(@bike, public_image_id: image.id, update_action: "delete"), method: :put, action: "update", data: { confirm: "Are you sure you want to delete this image? This can not be undone" }, class: "text-danger small"
+      = link_to image_tag(image.image_url(:small)), image.image_url, target: "_blank"
+      .mt-2.text-center
+        = link_to "Regenerate alert using this image", admin_stolen_bike_path(@bike, public_image_id: image.id, update_action: "regenerate_alert_image"), method: :put, action: "update", class: "btn btn-sm btn-outline-info"
 
-.row.mt-2.mb-4
-  - @bike.public_images.each do |img|
-    .col-3.mb-2.col-lg-2
-      = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
 
-= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+- alert_image_versions = @bike&.current_stolen_record&.current_alert_image&.image&.versions || []
+
+%h3.mt-4 Promoted Alert Images
+
+- if alert_image_versions.blank?
+  None
+- else
+  %ul.mb-4.list-group.list-group-horizontal-sm.stolen-bike-image-editing-list-group
+    - alert_image_versions.each do |name, image|
+      %li.list-group-item
+        = link_to image_tag(image.url.to_s), image.url.to_s, target: "_blank"
+        .mt-2.text-center
+          = name
+
+%hr
 
 - if @stolen_record.blank?
   %h1.mt-4
