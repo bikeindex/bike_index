@@ -68,7 +68,7 @@ class BParam < ApplicationRecord
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
     %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker address
-       handlebar_type_slug is_bulk is_new is_pos no_duplicate accuracy parking_notification_kind)
+       handlebar_type_slug is_bulk is_new is_pos no_duplicate accuracy)
   end
 
   def self.email_search(str)
@@ -113,8 +113,7 @@ class BParam < ApplicationRecord
 
   def status_abandoned?; bike["status"] == "status_abandoned" end
 
-  # TODO: location refactor
-  def location_specified?; bike["latitude"].present? && bike["longitude"].present? || bike["address"].present? end
+  def unregistered_parking_notification?; parking_notification_params.present? end
 
   def primary_frame_color_id; bike["primary_frame_color_id"] end
 
@@ -325,6 +324,17 @@ class BParam < ApplicationRecord
 
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
+  end
+
+  def parking_notification_params
+    return nil unless params["parking_notification"].present?
+    attrs = params["parking_notification"].with_indifferent_access
+              .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
+                     :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
+    attrs.merge(organization_id: creation_organization_id,
+                user_id: creator_id,
+                bike_id: created_bike_id,
+                use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
   end
 
   # Below here is revised setup, an attempt to make the process of upgrading rails easier

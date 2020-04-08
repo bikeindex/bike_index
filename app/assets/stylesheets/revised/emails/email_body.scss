@@ -53,6 +53,10 @@ h1 {
   font-weight: 200;
 }
 
+.uncap {
+  text-transform: none !important;
+}
+
 hr {
   display: block;
   margin: (2 * $vertical-height) 0;

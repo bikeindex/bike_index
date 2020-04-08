@@ -18,7 +18,7 @@
     %th=t(".by")
     - unless skip_repeat
       %th
-        %small=t(".repeat")
+        %small=t(".notification_number")
     %th
       %small=t(".impounded")
   %tbody
@@ -55,5 +55,5 @@
         - unless skip_repeat
           %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?
-              = parking_notification.repeat_number
+              = parking_notification.notification_number
         %td.hidden-sm-cells

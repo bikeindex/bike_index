@@ -21,12 +21,14 @@
               +
 
       .binx-body
-        - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
+        -# We only render snippets for organized messages - or if we're doing a preview
+        - render_organization_snippets = @organization.present? && (controller_path == 'organized_mailer' || @email_preview)
+        - if render_organization_snippets && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
 
         = yield
 
-        - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('footer').present?
+        - if render_organization_snippets && @organization.mail_snippet_body('footer').present?
           = @organization.mail_snippet_body('footer').html_safe
 
       .binx-pstscpt

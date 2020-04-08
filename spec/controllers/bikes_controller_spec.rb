@@ -577,6 +577,30 @@ RSpec.describe BikesController, type: :controller do
           end
         end
       end
+      context "with parking_notification" do
+        let(:parking_notification) do
+          {
+            latitude: "40.7143528",
+            longitude: "-74.0059731",
+            accuracy: "12",
+            kind: "parked_incorrectly",
+            internal_notes: "some details about the abandoned thing",
+            use_entered_address: "false",
+            message: "Some message to the user",
+            street: "whatever",
+          }
+        end
+        it "registers, doesn't create a parking_notification" do
+          expect do
+            post :create, params: { bike: bike_params, parking_notification: parking_notification }
+          end.to change(Ownership, :count).by 1
+          bike = Bike.last
+          expect(bike.country.name).to eq("United States")
+          expect(bike.creation_state.origin).to eq "embed"
+          expect(bike.creation_state.organization).to eq organization
+          expect(ParkingNotification.count).to eq 0
+        end
+      end
       context "stolen" do
         let(:target_time) { Time.current.to_i }
         let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.current - 1.day).utc, timezone: "UTC") }
@@ -903,7 +927,7 @@ RSpec.describe BikesController, type: :controller do
               owner_email: "something@stuff.com",
             }
           end
-          let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA" } }
+          let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA", latitude: 40.7143528, longitude: -74.0059731 } }
           let(:b_param) { BParam.create(params: { "bike" => bike_params.as_json }, origin: "embed_partial") }
           before do
             expect(b_param.partial_registration?).to be_truthy

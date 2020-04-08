@@ -2,7 +2,6 @@
 
 class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, impounded: 2 }.freeze
-  DEFAULT_SHOW_ADDRESS = true
 
   belongs_to :bike
   belongs_to :user
@@ -18,6 +17,7 @@ class ParkingNotification < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+  after_create :enqueue_email_message
 
   enum kind: KIND_ENUM
 
@@ -29,7 +29,8 @@ class ParkingNotification < ActiveRecord::Base
   scope :current, -> { where(impound_record_id: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
-  scope :impounded, -> { where.not(impound_record_id: nil) }
+  scope :with_impounded_record, -> { where.not(impound_record_id: nil) }
+  scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
@@ -51,13 +52,17 @@ class ParkingNotification < ActiveRecord::Base
 
   def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
 
-  def send_message?; owner_known? end
+  def send_message?; !bike_unregistered? && owner_known? end
 
   def show_address; !hide_address end
 
   def kind_humanized; self.class.kinds_humanized[kind.to_sym] end
 
   def can_be_repeat?; potential_initial_record.present? end
+
+  def email; bike.owner_email end
+
+  def reply_to_email; organization&.auto_user&.email || user&.email end
 
   def earlier_bike_notifications
     notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
@@ -77,11 +82,18 @@ class ParkingNotification < ActiveRecord::Base
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
   end
 
+  def bike_unregistered?
+    return true if delivery_status == "bike_unregistered"
+    bike.b_params.last&.unregistered_parking_notification?
+  end
+
   def repeat_number
     return 0 unless repeat_record?
     ParkingNotification.where(initial_record_id: initial_record_id)
                        .where("id < ?", id).count + 1
   end
+
+  def notification_number; repeat_number + 1 end
 
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: true, force_show_address: false)
@@ -132,9 +144,23 @@ class ParkingNotification < ActiveRecord::Base
     self.errors.add(:address, :address_required)
   end
 
+  def title
+    if appears_abandoned?
+      "Your #{bike&.type || "Bike"} appears to be abandoned"
+    elsif parked_incorrectly?
+      "Your #{bike&.type || "Bike"} is parked incorrectly"
+    elsif impounded?
+      "Your #{bike&.type || "Bike"} was impounded"
+    end
+  end
+
   def update_associations
     # repeat_parking_notifications.map(&:update)
     bike&.update(updated_at: Time.current)
     bike&.set_address
+  end
+
+  def enqueue_email_message
+    EmailParkingNotificationWorker.perform_async(id)
   end
 end

@@ -159,7 +159,6 @@ export default class BinxAppOrgParkingNotifications {
 
   tableRowForRecord(record) {
     if (typeof record !== "object" || typeof record.id !== "number") {
-      log.debug(record);
       return "";
     }
     const showCellUrl = `${location.pathname}/${record.id}`;

@@ -1,0 +1,17 @@
+= @parking_notification.title
+
+
+- if @parking_notification.repeat_record?
+  This is your #{@parking_notification.notification_number.ordinalize} notification!
+
+
+This is for your #{@bike.title_string}.
+
+
+It is located at: #{@parking_notification.address}
+
+
+\---
+
+
+= @parking_notification.message

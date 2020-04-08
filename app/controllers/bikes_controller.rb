@@ -373,7 +373,7 @@ class BikesController < ApplicationController
     { bike: params.require(:bike).permit(Bike.old_attr_accessible) }
   end
 
-  def permitted_bparams # still manually managing permission of params, skip for now
-    params.as_json
+  def permitted_bparams # still manually managing permission of params, so skip it
+    params.except(:parking_notification).as_json # We only want to include parking_notification in authorized endpoints
   end
 end

@@ -1,3 +1,16 @@
+#organized_parking_notifications_show .email-preview {
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  iframe {
+    min-height: 800px;
+    width: 100%;
+    border: none;
+  }
+}
+
 // NOTES: "messages" should be renamed to "records", since that is generic and will work for both
 .organized-messages,
 .organized-records {

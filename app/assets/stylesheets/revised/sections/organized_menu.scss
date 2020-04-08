@@ -91,6 +91,7 @@ $organized-menu-bg: $gray-lighter;
         color: $header-font-nocolor;
         text-decoration: none;
         font-size: 14px;
+        line-height: 1.5;
 
         &:hover {
           text-decoration: none;
@@ -98,6 +99,19 @@ $organized-menu-bg: $gray-lighter;
           padding-right: 0;
 
           // Because otherwise the shift to bold can break line
+        }
+
+        &.secondary-item {
+          font-size: 85%;
+          padding: 0 12px 0 24px;
+          &:before {
+            content: "-";
+            display: block;
+            height: 0;
+            width: 12px;
+            left: 12px;
+            position: absolute;
+          }
         }
       }
 
@@ -115,7 +129,7 @@ $organized-menu-bg: $gray-lighter;
         position: relative;
         font-weight: bold;
 
-        &:before {
+        &:after {
           content: "";
           display: block;
           height: 0;
