@@ -8,7 +8,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
              :user_id,
              :user_display_name,
              :bike,
-             :repeat_number,
+             :notification_number,
              :impound_record_id,
              :impound_record_at
 

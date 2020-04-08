@@ -17,11 +17,11 @@ export default class BinxAppOrgParkingNotifications {
 
     // On period update, fetch records
     const fetchRecords = this.fetchRecords;
-    $("#timeSelectionCustom").on("submit", e => {
+    $("#timeSelectionCustom").on("submit", (e) => {
       fetchRecords();
       return false;
     });
-    $("#timeSelectionBtnGroup .btn").on("click", e => {
+    $("#timeSelectionBtnGroup .btn").on("click", (e) => {
       fetchRecords();
       return true;
     });
@@ -67,14 +67,14 @@ export default class BinxAppOrgParkingNotifications {
       error(data, textStatus, jqXHR) {
         binxAppOrgParkingNotifications.fetchedRecords = true;
         log.debug(data);
-      }
+      },
     });
   }
 
   // Grabs the visible markers, looks up the records from them and returns that list
   visibleRecords() {
-    return binxMapping.markersInViewport().map(marker => {
-      return this.records.find(record => marker.binxId == record.id);
+    return binxMapping.markersInViewport().map((marker) => {
+      return this.records.find((record) => marker.binxId == record.id);
     });
   }
 
@@ -110,7 +110,7 @@ export default class BinxAppOrgParkingNotifications {
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
-    $("#recordsTable").on("click", ".map-cell a", e => {
+    $("#recordsTable").on("click", ".map-cell a", (e) => {
       e.preventDefault();
       let recordId = parseInt(
         $(e.target)
@@ -135,7 +135,7 @@ export default class BinxAppOrgParkingNotifications {
       binxMapping.openInfoWindow(marker, recordId, record);
       $("body, html").animate(
         {
-          scrollTop: $(".organized-records #map").offset().top - 60 // 60px offset
+          scrollTop: $(".organized-records #map").offset().top - 60, // 60px offset
         },
         "fast"
       );
@@ -177,7 +177,9 @@ export default class BinxAppOrgParkingNotifications {
     }</a> <span class="extended-col-info small"> - <em>${
       record.kind_humanized
     }</em> - by ${record.user_display_name}<strong>${
-      record.repeat_number > 0 ? "- notification #" + record.repeat_number : ""
+      record.notification_number > 1
+        ? "- notification #" + record.notification_number
+        : ""
     }</strong></span> <span class="extended-col-info"><br>${bikeLink}
     ${impoundLink.length ? "<br>Impounded: " + impoundLink : ""}
     </span>
@@ -186,14 +188,14 @@ export default class BinxAppOrgParkingNotifications {
     }</em></td><td class="hidden-sm-cells">${
       record.user_display_name
     }</td><td class="hidden-sm-cells">${
-      record.repeat_number > 0 ? record.repeat_number : ""
+      record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
   mapPopup(point) {
     let record = _.find(binxAppOrgParkingNotifications.records, [
       "id",
-      point.id
+      point.id,
     ]);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
@@ -231,7 +233,7 @@ export default class BinxAppOrgParkingNotifications {
       return {
         id: record.id,
         lat: record.lat,
-        lng: record.lng
+        lng: record.lng,
       };
     });
     return binxMapping.markerPointsToRender;
