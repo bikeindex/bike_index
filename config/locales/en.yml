@@ -3682,7 +3682,6 @@ en:
       lightspeed_integration_panel: Lightspeed Integration Panel
       log_in: log in
       logout: Logout
-      manage_schedule: Manage scheduling
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
@@ -5005,7 +5004,6 @@ en:
       link_to_register_html: >-
         <strong>%{link}</strong> to automatically register the bikes you sell to your
         customers.
-      manage_schedule: Manage scheduling
       multi_serial_search: Multi serial search
       organization_locations: "%{org_name} locations"
       organization_profile: "%{org_name} profile"
