@@ -68,7 +68,7 @@
         %li.divider-above
           - if current_organization.enabled?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
-          - unless current_organization.enabled?("bike_stickers")
+          - else
             %span.disabled-menu-item.menu-item
               = t(".registration_stickers")
         - if current_organization.enabled?("csv_exports")
