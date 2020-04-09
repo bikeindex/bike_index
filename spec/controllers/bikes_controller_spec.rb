@@ -209,9 +209,9 @@ RSpec.describe BikesController, type: :controller do
       context "admin hidden (fake delete)" do
         it "redirects and sets the flash" do
           ownership.bike.update_attributes(hidden: true)
-          get :show, params: { id: bike.id }
-          expect(response).to redirect_to(:root)
-          expect(flash[:error]).to be_present
+          expect do
+            get :show, params: { id: bike.id }
+          end.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
       context "user hidden bike" do
@@ -241,9 +241,9 @@ RSpec.describe BikesController, type: :controller do
         context "non-owner non-admin viewing" do
           let(:user) { FactoryBot.create(:user_confirmed) }
           it "redirects" do
-            get :show, params: { id: bike.id }
-            expect(response).to redirect_to(:root)
-            expect(flash[:error]).to be_present
+            expect do
+              get :show, params: { id: bike.id }
+            end.to raise_error(ActiveRecord::RecordNotFound)
           end
         end
       end
@@ -299,10 +299,10 @@ RSpec.describe BikesController, type: :controller do
       it "redirects the user" do
         bike.destroy
         bike.reload
-        get :show, params: { id: bike.id }
         expect(bike.deleted?).to be_truthy
-        expect(flash).to be_present
-        expect(response).to redirect_to(:root)
+        expect do
+          get :show, params: { id: bike.id }
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
       context "user is super_admin" do
         include_context :logged_in_as_super_admin

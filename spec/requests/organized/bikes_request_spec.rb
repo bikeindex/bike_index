@@ -111,7 +111,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(b_param.unregistered_parking_notification?).to be_truthy
           expect(b_param.origin).to eq "organization_form"
 
-          bike = Bike.last
+          bike = Bike.unscoped.find(b_param.created_bike_id)
           expect(bike.made_without_serial?).to be_falsey
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.cycle_type).to eq "tricycle"
