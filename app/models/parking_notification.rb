@@ -42,6 +42,9 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  # Get it unscoped
+  def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
+
   def current?; !impounded? end
 
   def impounded?; impound_record_id.present? end
@@ -52,7 +55,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
 
-  def send_message?; !bike_unregistered? && owner_known? end
+  def send_message?; !unregistered_bike? && owner_known? end
 
   def show_address; !hide_address end
 
@@ -82,11 +85,6 @@ class ParkingNotification < ActiveRecord::Base
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
   end
 
-  def bike_unregistered?
-    return true if delivery_status == "bike_unregistered"
-    bike.b_params.last&.unregistered_parking_notification?
-  end
-
   def repeat_number
     return 0 unless repeat_record?
     ParkingNotification.where(initial_record_id: initial_record_id)
@@ -112,6 +110,11 @@ class ParkingNotification < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
+  # Proxy method for now
+  def display_address(skip_default_country: true, force_show_address: false)
+    address(skip_default_country: skip_default_country, force_show_address: force_show_address)
+  end
+
   def set_location_from_organization
     self.country_id = organization&.country&.id
     self.city = organization&.city
@@ -122,7 +125,9 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
-    # We still need geocode on creation, even if all the attributes are present
+    # Only set unregistered_bike on creation
+    self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
+    # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
@@ -156,11 +161,17 @@ class ParkingNotification < ActiveRecord::Base
 
   def update_associations
     # repeat_parking_notifications.map(&:update)
-    bike&.update(updated_at: Time.current)
     bike&.set_address
+    bike&.update(updated_at: Time.current)
   end
 
   def enqueue_email_message
     EmailParkingNotificationWorker.perform_async(id)
+  end
+
+  private
+
+  def calculated_unregistered_parking_notification
+    bike.unregistered_parking_notification?
   end
 end

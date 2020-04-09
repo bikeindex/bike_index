@@ -10,6 +10,16 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(organized_bike_text).to be_nil
       expect(organized_bike_text(bike)).to eq target_text
     end
+    context "unregistered" do
+      let(:target_text) do
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike (front storage)</small><em class=\"small text-warning\"> unregistered</em></span>"
+      end
+      it "renders with unregistered" do
+        bike.cycle_type = "cargo"
+        bike.status = "unregistered_parking_notification"
+        expect(organized_bike_text(bike)).to eq target_text
+      end
+    end
   end
 
   describe "organized_container" do

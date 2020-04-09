@@ -291,7 +291,7 @@ RSpec.describe BikeCreator do
         bike = bike_creator.create_bike
         expect(bike.errors).to_not be_present
         b_param.reload
-        expect(b_param.created_bike).to be_present
+        expect(b_param.created_bike_id).to eq bike.id
 
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.id).to be_present
@@ -301,6 +301,10 @@ RSpec.describe BikeCreator do
         expect(bike.owner_email).to eq auto_user.email
         expect(bike.creator).to eq creator
         expect(bike.status).to eq "unregistered_parking_notification"
+        expect(bike.user_hidden).to be_truthy
+        expect(bike.visible_by?(User.new)).to be_falsey
+        expect(bike.visible_by?(auto_user)).to be_truthy
+        expect(bike.visible_by?(creator)).to be_truthy
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.current_parking_notification
@@ -313,7 +317,8 @@ RSpec.describe BikeCreator do
         expect(parking_notification.message).to eq "Some message to the user"
         expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
         expect(parking_notification.accuracy).to eq 12.0
-        expect(parking_notification.delivery_status).to eq("bike_unregistered")
+        expect(parking_notification.unregistered_bike).to be_truthy
+        expect(parking_notification.delivery_status).to eq("unregistered_bike")
         # It shouldn't have sent any email
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
@@ -349,7 +354,7 @@ RSpec.describe BikeCreator do
           bike = bike_creator.create_bike
           expect(bike.errors).to_not be_present
           b_param.reload
-          expect(b_param.created_bike).to be_present
+          expect(b_param.created_bike_id).to eq bike.id
 
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.id).to be_present
@@ -358,6 +363,8 @@ RSpec.describe BikeCreator do
           expect(bike.longitude).to eq(-74.0059731)
           expect(bike.owner_email).to eq auto_user.email
           expect(bike.creator).to eq creator
+          expect(bike.visible_by?(auto_user)).to be_truthy
+          expect(bike.visible_by?(creator)).to be_truthy
 
           expect(bike.parking_notifications.count).to eq 1
           parking_notification = bike.current_parking_notification

@@ -27,5 +27,10 @@ module Geocodeable
       return false if address.blank?
       address_changed?
     end
+
+    # Proxy method for now, because of the current address setup
+    def display_address(skip_default_country: true, force_show_address: false)
+      address
+    end
   end
 end

@@ -147,7 +147,12 @@ class BikeCreator
   end
 
   def default_parking_notification_attrs(b_param, bike)
-    attrs = { skip_status_update: true, skip_geocoding: true, status: "unregistered_parking_notification" }
+    attrs = {
+      skip_status_update: true,
+      skip_geocoding: true,
+      status: "unregistered_parking_notification",
+      marked_user_hidden: true
+    }
     # We want to force not sending email
     if b_param.params.dig("bike", "send_email").blank?
       b_param.update_attribute :params, b_param.params.merge("bike" => b_param.params["bike"].merge("send_email" => "false"))

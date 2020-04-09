@@ -23,7 +23,6 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
-        # I have no idea why this fails. It works really, but not in tests!
         expect do
           get "#{base_url}/STUFFFFFF/edit"
         end.to raise_error(ActiveRecord::RecordNotFound)

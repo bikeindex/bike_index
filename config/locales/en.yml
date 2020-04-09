@@ -1250,6 +1250,9 @@ en:
       zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
+      added_to_track_parking_notification: >-
+        This %{bike_type} is not registered to a user. It was added to track parking
+        notifications.
       address: Registration Address
       address_or_intersection: Address or intersection
       as_a_bikeindex_ambassador_html: >-
@@ -1298,6 +1301,7 @@ en:
       unable_to_display_additional_information: >-
         Unable to display additional information because %{bike_type} is not registered
         with %{org_name}
+      unregistered_parking_notification: created for parking notification
       user_revoked_permission_html: >-
         This user <strong>revoked</strong> permission to contact them prior to their
         bike being marked stolen.
@@ -1371,6 +1375,8 @@ en:
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
+      created_to_record_parking_notification: "%{bike_type} created by %{organization}
+        to record a Parking Notification"
       cycle_type: Cycle type
       date_stolen_type: Date %{stolen_type}
       department_city: Department & city
@@ -1397,6 +1403,7 @@ en:
       name: Name
       no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
         admins) can see it
+      not_registered: Not actually registered!
       or_call: Or call
       other: Other
       other_serial: Other serial/registration/sticker
@@ -1509,8 +1516,6 @@ en:
           up and you'll be able to edit it!
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
-      find_bike:
-        bike_deleted: Bike deleted
       index:
         we_dont_know_location: >-
           Sorry, we don't know the location "%{location}". Please try a different
@@ -3688,7 +3693,7 @@ en:
       org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
-      parking_notification_unregistered: Unregistered bike notification
+      parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
       recoveries: Recoveries
       register_a_new_bike: Register a new bike
@@ -5009,7 +5014,7 @@ en:
       organization_profile: "%{org_name} profile"
       other_point_of_sale_system: Other Point of Sale system?
       overview_dashboard: Dashboard
-      parking_notification_unregistered: Unregistered bike notification
+      parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
       read_a_full_explanation_html: Read a full explanation of %{link}.
       recoveries: Recoveries

@@ -10,7 +10,10 @@
               = passive_organization.short_name
             = t(".access_panel")
         .col-xs-6
-          - if @bike.organized?(passive_organization)
+          - if @bike.unregistered_parking_notification?
+            %p.strong.text-warning.text-right
+              = t(".unregistered_parking_notification")
+          - elsif @bike.organized?(passive_organization)
             %p.text-success.text-right
               %span.hidden-md-down
                 = t(".bike_is_registered", bike_type: @bike.type, org_name: passive_organization.short_name)
@@ -61,7 +64,11 @@
                       - show_sticker_modal = true
                       %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
                         = t(".link_sticker")
-              - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
+              - if @bike.unregistered_parking_notification?
+                %tr
+                  %td{ colspan: 2, style: "text-align: center; font-size: 1rem;" }
+                    = t(".added_to_track_parking_notification", bike_type: @bike.type)
+              - elsif @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
                 - if passive_organization.parent?
                   %tr
                     %td

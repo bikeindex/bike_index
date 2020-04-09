@@ -23,7 +23,7 @@ initializeFrameMaker = (target) ->
     getModelList(slug)
 
 setModelTypeahead = (data=[]) ->
-  return true if window.newIframe
+  return true if window.newIframe # It can slow down entry, we want simple for the unregistered bikes parking notification
   model_sel = $('#bike_frame_model').selectize()[0].selectize
   model_sel.destroy()
   if data.length > 0
@@ -148,7 +148,6 @@ window.fallbackToManualAddress = ->
 
 showOrHideEnteredAddress = ->
   $addressFields = $("#address-fields")
-  console.log("showOrHideEnteredAddress triggered")
 
   if $("#parking_notification_use_entered_address_true").prop("checked")
     $addressFields.show().removeClass("currently-hidden")
@@ -170,6 +169,7 @@ showOrHideEnteredAddress = ->
     navigator.geolocation.getCurrentPosition(window.fillInParkingLocation, window.parkingLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
 
 initializeUnregisteredParkingNotification = ->
+  window.newIframe = true
   showOrHideEnteredAddress()
   $("#selectEnteredAddress input").change (e) ->
     showOrHideEnteredAddress()

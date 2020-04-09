@@ -1,22 +1,12 @@
 - # TODO: add translations
 #stolen_fields_store
 
--# set newIframe to trigger specific behavior in coffeescript
-:javascript
-  window.newIframe = true;
-
 #root_url.hidden{ data: { url: ENV["BASE_URL"] } }
 
 #new-unregistered-parking-notification
   = form_for @bike, url: organization_bikes_path(organization_id: current_organization), multipart: true do |f|
     = f.hidden_field :b_param_id_token
     = f.hidden_field :creation_organization_id
-    / = f.hidden_field :status, value: "status_abandoned"
-    / .input-group
-    /   .control-group
-    /     = label_tag :kind, "Kind of abandoned record", class: "control-label"
-    /     .controls
-    /       = select_tag(:parking_notification, :kind, ParkingNotification.kinds, prompt: "Choose kind")
     .input-group
       .control-group
         = f.label :serial_number, class: "control-label"
@@ -108,7 +98,7 @@
           .control-group.ifManualRequired
             = n.text_field :city, placeholder: "City", class: "form-control"
 
-          .control-group
+          .control-group.ifManualRequired
             = n.text_field :zipcode, placeholder: "Postal code", class: "form-control"
 
           .control-group.fancy-select.unfancy.state-select

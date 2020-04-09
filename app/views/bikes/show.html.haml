@@ -4,7 +4,7 @@
   - if current_user&.superuser
     %p.mb-4.text-center
       = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
-    - if @bike.user_hidden
+    - if !@bike.unregistered_parking_notification? && @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
         %small.less-strong
@@ -57,6 +57,11 @@
       - if @bike.should_show_other_bikes
         %h4
           = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
+      - if @bike.unregistered_parking_notification?
+        %p
+          %strong.text-warning= t(".not_registered")
+          %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
+
     .col-md-4.ad-col
       .ad-block#top468x60
   .row

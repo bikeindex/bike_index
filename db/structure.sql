@@ -1875,7 +1875,8 @@ CREATE TABLE public.parking_notifications (
     state_id bigint,
     message text,
     location_from_address boolean DEFAULT false,
-    delivery_status character varying
+    delivery_status character varying,
+    unregistered_bike boolean DEFAULT false
 );
 
 
@@ -4599,6 +4600,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200311160107'),
 ('20200324221906'),
 ('20200326192650'),
-('20200403234228');
+('20200403234228'),
+('20200409201638');
 
 
