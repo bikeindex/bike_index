@@ -49,7 +49,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       expect(bike.impounded?).to be_truthy
 
       initial.reload
-      parking_notification3.reload
+      parking_notification2.reload
       expect(initial.impound_record).to eq impound_record
       expect(initial.kind).to eq "appears_abandoned"
       expect(parking_notification2.impound_record).to eq impound_record
