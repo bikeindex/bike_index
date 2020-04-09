@@ -59,8 +59,8 @@ RSpec.describe BikesController, type: :request do
           FactoryBot.create(:ownership_organization_bike,
                             :claimed,
                             organization: organization,
-                            can_edit_claimed: can_edit_claimed
-                            user: FactoryBot.create(:ownership_claimed))
+                            can_edit_claimed: can_edit_claimed,
+                            user: FactoryBot.create(:user))
         end
         let(:bike) { ownership.bike }
         let(:organization) { FactoryBot.create(:organization) }
