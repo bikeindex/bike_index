@@ -523,7 +523,7 @@ class Bike < ApplicationRecord
   end
 
   def set_user_hidden
-    return true unless current_ownership.present?
+    return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
     if marked_user_hidden.present? && marked_user_hidden.to_s != "0"
       self.hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
@@ -539,9 +539,6 @@ class Bike < ApplicationRecord
   def set_address
     # Sets lat/long, will avoid a geocode API call if coordinates are found
     set_location_info
-
-    # current_stolen_record&.display_address(force_show_address: true).presence ||
-    self.address = [city, zipcode, country&.name].select(&:present?).join(" ").presence
   end
 
   def normalize_emails
@@ -686,30 +683,37 @@ class Bike < ApplicationRecord
       self.city = current_parking_notification.city
       self.country = current_parking_notification.country
       self.zipcode = current_parking_notification.zipcode
+      self.address = current_parking_notification.address
     elsif location_info_present?(current_stolen_record)
       self.latitude = current_stolen_record.latitude
       self.longitude = current_stolen_record.longitude
       self.city = current_stolen_record.city
       self.country = current_stolen_record.country
       self.zipcode = current_stolen_record.zipcode
+      self.address = current_stolen_record.display_address(force_show_address: true)
     elsif location_info_present?(creation_organization)
       self.latitude = creation_organization.location_latitude
       self.longitude = creation_organization.location_longitude
       self.city = creation_organization.city
       self.country = creation_organization.country
       self.zipcode = creation_organization.zipcode
+      # This is a hack, need to fix
+      self.address = [city, zipcode, country&.name].select(&:present?).join(" ").presence
     elsif location_info_present?(owner)
       self.latitude = owner.latitude
       self.longitude = owner.longitude
       self.city = owner.city
       self.country = owner.country
       self.zipcode = owner.zipcode
+      self.address = owner.address
     elsif location_info_present?(request_location)
       self.latitude = request_location.latitude
       self.longitude = request_location.longitude
       self.city = request_location.city
       self.country = Country.fuzzy_find(request_location&.country_code)
       self.zipcode = request_location.postal_code
+      # Need to test what the responses from this look like - probably slightly different
+      # self.address = current_parking_notification.address
     end
   end
 

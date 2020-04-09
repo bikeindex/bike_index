@@ -197,57 +197,6 @@ RSpec.describe BikesController, type: :controller do
         end
       end
     end
-    context "example bike" do
-      it "shows the bike" do
-        ownership.bike.update_attributes(example: true)
-        get :show, params: { id: bike.id }
-        expect(response).to render_template(:show)
-        expect(assigns(:bike)).to be_decorated
-      end
-    end
-    context "hidden bikes" do
-      context "admin hidden (fake delete)" do
-        it "redirects and sets the flash" do
-          ownership.bike.update_attributes(hidden: true)
-          expect do
-            get :show, params: { id: bike.id }
-          end.to raise_error(ActiveRecord::RecordNotFound)
-        end
-      end
-      context "user hidden bike" do
-        before do
-          set_current_user(user)
-          ownership.bike.update_attributes(marked_user_hidden: "true")
-        end
-        context "owner of bike viewing" do
-          it "responds with success" do
-            get :show, params: { id: bike.id }
-            expect(response.status).to eq(200)
-            expect(response).to render_template(:show)
-            expect(assigns(:bike)).to be_decorated
-            expect(flash).to_not be_present
-          end
-        end
-        context "Admin viewing" do
-          let(:user) { FactoryBot.create(:admin) }
-          it "responds with success" do
-            get :show, params: { id: bike.id }
-            expect(response.status).to eq(200)
-            expect(response).to render_template(:show)
-            expect(assigns(:bike)).to be_decorated
-            expect(flash).to_not be_present
-          end
-        end
-        context "non-owner non-admin viewing" do
-          let(:user) { FactoryBot.create(:user_confirmed) }
-          it "redirects" do
-            expect do
-              get :show, params: { id: bike.id }
-            end.to raise_error(ActiveRecord::RecordNotFound)
-          end
-        end
-      end
-    end
     # Because we're doing some special stuff with organization bike viewing
     context "organized user viewing bike" do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }

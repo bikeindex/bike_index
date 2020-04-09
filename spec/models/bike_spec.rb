@@ -1506,11 +1506,14 @@ RSpec.describe Bike, type: :model do
       let(:stolen_record) { bike.current_stolen_record }
       it "takes location from the current stolen record" do
         bike.set_location_info
+        expect(stolen_record.street).to eq "1300 W 14th Pl"
+        expect(stolen_record.display_address(force_show_address: true)).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
         expect(bike.zipcode).to eq(stolen_record.zipcode)
         expect(bike.country).to eq(stolen_record.country)
+        expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
       end
       context "given a abandoned record, it instead uses the abandoned record" do
         it "takes the location from the parking notification" do

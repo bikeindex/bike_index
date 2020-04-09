@@ -303,11 +303,8 @@ class BikesController < ApplicationController
       fail e.to_s =~ /PG..NumericValueOutOfRange/ ? ActiveRecord::RecordNotFound : e
     end
     if @bike.hidden || @bike.deleted?
-      unless current_user.present? && @bike.visible_by?(current_user)
-        fail ActiveRecord::RecordNotFound
-        # flash[:error] = translation(:bike_deleted)
-        # redirect_to root_url and return
-      end
+      return @bike if current_user.present? && @bike.visible_by?(current_user)
+      fail ActiveRecord::RecordNotFound
     end
   end
 

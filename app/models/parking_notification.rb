@@ -115,6 +115,11 @@ class ParkingNotification < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
+  # Proxy method for now
+  def display_address(skip_default_country: true, force_show_address: false)
+    address(skip_default_country: skip_default_country, force_show_address: force_show_address)
+  end
+
   def set_location_from_organization
     self.country_id = organization&.country&.id
     self.city = organization&.city
