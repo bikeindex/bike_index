@@ -1251,7 +1251,7 @@ en:
     organized_access_panel:
       access_panel: Access Panel
       added_to_track_parking_notification: >-
-        This %{bike_type} is not registered to a user. It is was added to track parking
+        This %{bike_type} is not registered to a user. It was added to track parking
         notifications.
       address: Registration Address
       address_or_intersection: Address or intersection
