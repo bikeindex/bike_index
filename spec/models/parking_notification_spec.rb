@@ -2,13 +2,13 @@ require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
   describe "factory" do
-    let(:parking_notification) { FactoryBot.create(:parking_notification) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned") }
     let(:bike) { parking_notification.bike }
     it "is valid" do
       expect(parking_notification.valid?).to be_truthy
       expect(parking_notification.id).to be_present
-      expect(parking_notification.owner_known?).to be_falsey
-      expect(parking_notification.send_message?).to be_falsey
+      expect(parking_notification.owner_known?).to be_truthy
+      expect(parking_notification.send_email?).to be_truthy
       expect(bike.current_parking_notification).to eq parking_notification
       expect(bike.status_abandoned?).to be_truthy
       expect(bike.status).to eq "status_abandoned"
@@ -21,7 +21,7 @@ RSpec.describe ParkingNotification, type: :model do
       it "is valid" do
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.owner_known?).to be_truthy
-        expect(parking_notification.send_message?).to be_truthy
+        expect(parking_notification.send_email?).to be_truthy
         expect(bike.current_parking_notification).to eq parking_notification
         # expect(bike.status_abandoned?).to be_truthy
         # expect(bike.status).to eq "status_abandoned"
@@ -54,26 +54,37 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
-  describe "initial" do
+  describe "initial/repeat_record" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[impound_bikes parking_notifications]) }
-    let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization) }
-    it "is false" do
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization, kind: "parked_incorrectly") }
+    it "repeat_record is false (also, test that abandoned updates bike status)" do
+      bike.reload
+      expect(bike.status).to eq "status_with_owner"
       expect(parking_notification.likely_repeat?).to be_falsey
       expect(parking_notification.can_be_repeat?).to be_falsey
+      parking_notification.kind = "appears_abandoned" # Manually set parking notification kind
+      expect(parking_notification.associated_notifications).to eq([])
       expect(parking_notification.save)
       expect(parking_notification.repeat_record?).to be_falsey
+      bike.reload
+      expect(bike.status).to eq "status_abandoned"
     end
     context "existing" do
       let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.year) }
       let(:initial_organization) { FactoryBot.create(:organization) }
-      it "is false" do
+      it "repeat_record is false - and test that bike status isn't changed" do
+        bike.reload
+        expect(bike.status).to eq "status_with_owner"
         expect(parking_notification_initial.current?).to be_truthy
         expect(parking_notification_initial.initial_record?).to be_truthy
         expect(parking_notification.likely_repeat?).to be_falsey
         expect(parking_notification.can_be_repeat?).to be_falsey
         expect(parking_notification.save)
         expect(parking_notification.repeat_record?).to be_falsey
+        parking_notification_initial.reload
+        bike.reload
+        expect(bike.status).to eq "status_with_owner"
       end
       context "same organization" do
         let(:initial_organization) { organization }
@@ -94,6 +105,9 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.likely_repeat?).to be_falsey
           expect(parking_notification.can_be_repeat?).to be_truthy
           expect(parking_notification.potential_initial_record).to eq parking_notification_initial
+
+          expect(parking_notification_initial.associated_notifications.pluck(:id)).to eq([parking_notification.id])
+          expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
         end
         context "additional parking_notification" do
           let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
@@ -155,7 +169,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.save
         expect(parking_notification.valid?).to be_falsey
         expect(parking_notification.errors.messages.to_s).to match(/address/)
-        expect(parking_notification.kind_humanized).to eq "Appears abandoned"
+        expect(parking_notification.kind_humanized).to eq "Parked incorrectly"
       end
     end
     context "no address" do
