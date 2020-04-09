@@ -3,9 +3,13 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :user
   belongs_to :organization
 
+  has_many :parking_notifications
+
   validates_presence_of :bike_id, :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
   validate :user_authorized, on: :create
+
+  after_commit :update_associations
 
   scope :current, -> { where(retrieved_at: nil) }
   scope :retrieved, -> { where.not(retrieved_at: nil) }
@@ -23,5 +27,9 @@ class ImpoundRecord < ApplicationRecord
 
   def mark_retrieved
     update_attributes(retrieved_at: Time.current) if current?
+  end
+
+  def update_associations
+    bike.update_attributes(updated_at: Time.current)
   end
 end

@@ -36,8 +36,8 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       parking_notification3.reload
       expect(parking_notification3.delivery_status).to eq "email_success"
-      expect(parking_notification3.impund_record).to be_present
       expect(parking_notification3.kind).to eq "impounded"
+      expect(parking_notification3.impound_record).to be_present
       impound_record = parking_notification3.impound_record
       expect(impound_record.bike).to eq bike
       expect(impound_record.organization).to eq organization
@@ -50,9 +50,9 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
 
       initial.reload
       parking_notification3.reload
-      expect(initial.impounded_record).to eq impound_record
+      expect(initial.impound_record).to eq impound_record
       expect(initial.kind).to eq "appears_abandoned"
-      expect(parking_notification2.impounded_record).to eq impound_record
+      expect(parking_notification2.impound_record).to eq impound_record
       expect(parking_notification2.kind).to eq "appears_abandoned"
     end
   end

@@ -833,7 +833,7 @@ class Bike < ApplicationRecord
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_stolen" if stolen
     return "status_impounded" if current_impound_record.present?
-    return "status_abandoned" if abandoned? || current_parking_notifications.appears_abandoned.any?
+    return "status_abandoned" if abandoned? || current_parking_notifications.current.appears_abandoned.any?
     "status_with_owner"
   end
 end
