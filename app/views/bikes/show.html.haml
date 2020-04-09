@@ -57,6 +57,11 @@
       - if @bike.should_show_other_bikes
         %h4
           = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
+      - if @bike.unregistered_parking_notification?
+        %p
+          %strong.text-warning= t(".not_registered")
+          %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
+
     .col-md-4.ad-col
       .ad-block#top468x60
   .row

@@ -163,7 +163,11 @@ export default class BinxAppOrgParkingNotifications {
     }
     const showCellUrl = `${location.pathname}/${record.id}`;
     const bikeCellUrl = `/bikes/${record.bike.id}`;
-    const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
+    let bikeLink = `<a href="${bikeCellUrl}">${record.bike.title} ${
+      record.unregistered_bike
+        ? '<em class="text-warning small"> unregistered</em>'
+        : ""
+    }</a>`;
     const impoundLink =
       record.impund_record_id !== undefined
         ? `<a href="${record.impund_record_id}" class="convertTime">${

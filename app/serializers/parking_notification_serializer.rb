@@ -10,6 +10,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
              :bike,
              :notification_number,
              :impound_record_id,
+             :unregistered_bike,
              :impound_record_at
 
   def created_at

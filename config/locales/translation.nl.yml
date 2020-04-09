@@ -2018,6 +2018,9 @@ nl:
         getoond aan de gebruiker</small>"
       state: Staat
       zipcode: Postcode
+      added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
+        bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
+      unregistered_parking_notification: gemaakt voor parkeermelding
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -2134,6 +2137,9 @@ nl:
       you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
         gescand die aan deze %{bike_type} is toegewezen.
       abandoned: Verlaten
+      created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
+        om een parkeermelding op te nemen"
+      not_registered: Niet echt geregistreerd!
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -2199,8 +2205,6 @@ nl:
           het jouw %{bike_type} is, meld je dan aan en je kunt het bewerken!
         you_dont_own_that: Oh nee! Het lijkt erop dat je dat niet bezit %{bike_type}.
         you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
-      find_bike:
-        bike_deleted: Fiets verwijderd
       index:
         we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
           een andere locatie om gestolen fietsen in de buurt te zoeken.

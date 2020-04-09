@@ -43,6 +43,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             user_display_name: parking_notification1.user.display_name,
             impound_record_id: impound_record.id,
             impound_record_at: impound_record.created_at.to_i,
+            unregistered_bike: false,
             notification_number: 1,
             bike: {
               id: bike.id,

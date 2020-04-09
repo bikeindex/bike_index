@@ -1,9 +1,12 @@
 .organized-page-header
   %h1
     = t(".parking_notification")
-  - if @parking_notification.bike_unregistered?
-    %h2
-      %em Parking notification was for an unregistered #{@bike.type}
+    - if @parking_notification.unregistered_bike
+      %span.text-warning
+        for
+        %em unregistered
+        = @bike.type
+
 - # TODO: add translations
 .row
   .col-md-6
@@ -27,7 +30,10 @@
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
               %br
               %small
-                = link_to "view all notifications for #{@bike.type}", organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link"
+                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
+                  view all notifications for
+                  %em
+                    = @bike.type
         %tr
           %td= t(".address")
           %td= address_formatted(@parking_notification)

@@ -11,8 +11,8 @@
             = t(".access_panel")
         .col-xs-6
           - if @bike.unregistered_parking_notification?
-            %p.strong.text-danger.text-right
-              = t(".unregistered_parking_notification", bike_type: @bike.type, org_name: passive_organization.short_name)
+            %p.strong.text-warning.text-right
+              = t(".unregistered_parking_notification")
           - elsif @bike.organized?(passive_organization)
             %p.text-success.text-right
               %span.hidden-md-down

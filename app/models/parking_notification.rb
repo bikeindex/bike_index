@@ -55,7 +55,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
 
-  def send_message?; !bike_unregistered? && owner_known? end
+  def send_message?; !unregistered_bike? && owner_known? end
 
   def show_address; !hide_address end
 
@@ -83,11 +83,6 @@ class ParkingNotification < ActiveRecord::Base
     # We know there has to be a potential initial record if can_be_repeat,
     # so it doesn't matter if we scope to current on new records or not
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
-  end
-
-  def bike_unregistered?
-    return true if delivery_status == "bike_unregistered"
-    bike.b_params.last&.unregistered_parking_notification?
   end
 
   def repeat_number
@@ -130,7 +125,9 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
-    # We still need geocode on creation, even if all the attributes are present
+    # Only set unregistered_bike on creation
+    self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
+    # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
@@ -170,5 +167,11 @@ class ParkingNotification < ActiveRecord::Base
 
   def enqueue_email_message
     EmailParkingNotificationWorker.perform_async(id)
+  end
+
+  private
+
+  def calculated_unregistered_parking_notification
+    bike.unregistered_parking_notification?
   end
 end

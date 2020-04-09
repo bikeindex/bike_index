@@ -46,6 +46,14 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "unregistered" do
+    let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification) }
+    it "is unregistered" do
+      expect(parking_notification.unregistered_bike).to be_truthy
+      expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
+    end
+  end
+
   describe "initial" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[impound_bikes parking_notifications]) }
