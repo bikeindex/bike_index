@@ -52,7 +52,7 @@ class ParkingNotification < ActiveRecord::Base
   # Get it unscoped
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 
-  def current?; !impounded? end
+  def current?; impound_record_id.blank? end
 
   def initial_record?; initial_record_id.blank? end
 
@@ -100,6 +100,11 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def notification_number; repeat_number + 1 end
+
+  # add retrieved here when it's added
+  def status
+    current? ? "current" : "impounded"
+  end
 
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: true, force_show_address: false)
