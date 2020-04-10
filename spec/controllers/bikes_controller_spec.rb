@@ -532,7 +532,7 @@ RSpec.describe BikesController, type: :controller do
             latitude: "40.7143528",
             longitude: "-74.0059731",
             accuracy: "12",
-            kind: "parked_incorrectly",
+            kind: "parked_incorrectly_notification",
             internal_notes: "some details about the abandoned thing",
             use_entered_address: "false",
             message: "Some message to the user",

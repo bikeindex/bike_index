@@ -52,7 +52,6 @@ class Bike < ApplicationRecord
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :parking_notifications
-  has_many :current_parking_notifications, -> { current }, class_name: "ParkingNotification"
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -296,8 +295,7 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
-  # This is really current_initial_parking_notification - but more convenient naming
-  def current_parking_notification; current_parking_notifications.initial_records.first end
+  def current_parking_notification; parking_notifications.current.first end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -833,7 +831,7 @@ class Bike < ApplicationRecord
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_stolen" if stolen
     return "status_impounded" if current_impound_record.present?
-    return "status_abandoned" if abandoned? || current_parking_notifications.current.appears_abandoned.any?
+    return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     "status_with_owner"
   end
 end

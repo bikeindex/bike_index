@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
   describe "factory" do
-    let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned") }
+    let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification") }
     let(:bike) { parking_notification.bike }
     it "is valid" do
       expect(parking_notification.valid?).to be_truthy
@@ -23,8 +23,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.owner_known?).to be_truthy
         expect(parking_notification.send_email?).to be_truthy
         expect(bike.current_parking_notification).to eq parking_notification
-        # expect(bike.status_abandoned?).to be_truthy
-        # expect(bike.status).to eq "status_abandoned"
+        expect(parking_notification.retrieval_link_token).to be_present
         expect(parking_notification.organization).to eq organization
         expect(parking_notification.user.organizations).to eq([organization])
         # Test that we are just getting the orgs abandoned bikes
@@ -49,7 +48,10 @@ RSpec.describe ParkingNotification, type: :model do
   describe "unregistered" do
     let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification) }
     it "is unregistered" do
+      parking_notification.reload
+      expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.unregistered_bike).to be_truthy
+      expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
     end
   end
@@ -57,16 +59,17 @@ RSpec.describe ParkingNotification, type: :model do
   describe "initial/repeat_record" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
-    let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization, kind: "parked_incorrectly") }
+    let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization, kind: "parked_incorrectly_notification") }
     it "repeat_record is false (also, test that abandoned updates bike status)" do
       bike.reload
       expect(bike.status).to eq "status_with_owner"
       expect(parking_notification.likely_repeat?).to be_falsey
       expect(parking_notification.can_be_repeat?).to be_falsey
-      parking_notification.kind = "appears_abandoned" # Manually set parking notification kind
+      parking_notification.kind = "appears_abandoned_notification" # Manually set parking notification kind
       expect(parking_notification.associated_notifications).to eq([])
       expect(parking_notification.save)
       expect(parking_notification.repeat_record?).to be_falsey
+      expect(parking_notification.status).to eq "current"
       bike.reload
       expect(bike.status).to eq "status_abandoned"
     end

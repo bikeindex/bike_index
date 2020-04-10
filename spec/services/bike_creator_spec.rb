@@ -268,7 +268,7 @@ RSpec.describe BikeCreator do
             latitude: "40.7143528",
             longitude: "-74.0059731",
             accuracy: "12",
-            kind: "parked_incorrectly",
+            kind: "parked_incorrectly_notification",
             internal_notes: "some details about the abandoned thing",
             use_entered_address: "false",
             message: "Some message to the user",
@@ -313,7 +313,7 @@ RSpec.describe BikeCreator do
         expect(parking_notification.latitude).to eq bike.latitude
         expect(parking_notification.longitude).to eq bike.longitude
         expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
-        expect(parking_notification.kind).to eq "parked_incorrectly"
+        expect(parking_notification.kind).to eq "parked_incorrectly_notification"
         expect(parking_notification.message).to eq "Some message to the user"
         expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
         expect(parking_notification.accuracy).to eq 12.0
@@ -328,7 +328,7 @@ RSpec.describe BikeCreator do
         {
           latitude: "12",
           longitude: "-44",
-          kind: "appears_abandoned",
+          kind: "appears_abandoned_notification",
           internal_notes: "some details about the abandoned thing",
           message: "another note",
           accuracy: "12",
@@ -373,7 +373,7 @@ RSpec.describe BikeCreator do
           expect(parking_notification.latitude).to eq bike.latitude
           expect(parking_notification.longitude).to eq bike.longitude
           expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
-          expect(parking_notification.kind).to eq "appears_abandoned"
+          expect(parking_notification.kind).to eq "appears_abandoned_notification"
           expect(parking_notification.message).to eq "another note"
           expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
           expect(parking_notification.accuracy).to eq 12.0

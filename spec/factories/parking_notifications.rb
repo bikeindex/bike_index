@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :parking_notification do
     bike { FactoryBot.create(:bike) }
     user { FactoryBot.create(:user) }
-    kind { "parked_incorrectly" }
+    kind { "parked_incorrectly_notification" }
 
     latitude { 40.7143528 }
     longitude { -74.0059731 }
