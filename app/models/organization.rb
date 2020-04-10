@@ -74,7 +74,13 @@ class Organization < ApplicationRecord
   before_save :set_search_coordinates
   after_commit :update_associations
 
-  delegate :street, :city, :zipcode, :state, :country,
+  delegate :street,
+           :city,
+           :zipcode,
+           :state,
+           :country,
+           :latitude,
+           :longitude,
            to: :default_location,
            allow_nil: true
 
