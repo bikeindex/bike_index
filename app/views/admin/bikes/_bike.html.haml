@@ -116,6 +116,9 @@
       %span.text-danger
         Theft information
       - unless controller_name == "stolen_bikes"
+        %small
+          = link_to "(admin stolen page)", edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true)
+      - unless controller_name == "stolen_bikes"
         %span.float-right
           = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true) do
             - if stolen_record.approved?

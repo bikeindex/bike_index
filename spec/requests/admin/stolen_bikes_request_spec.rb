@@ -15,7 +15,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template("index")
         expect(flash).to_not be_present
-        expect(assigns(:bikes)).to match_array([bike])
+        expect(assigns(:stolen_records)).to match_array([stolen_record])
       end
     end
 

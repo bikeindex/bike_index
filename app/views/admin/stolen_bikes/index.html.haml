@@ -1,42 +1,58 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Stolen Bikes
+  .col-md-7
+    %ul
+      %li.nav-item
+        - if @verified_only
+          = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url(unapproved: true), class: "nav-link"
+        - else
+          = link_to 'Only unverified bikes', admin_stolen_bikes_url, class: "nav-link"
+      %li.nav-item
+        = link_to "graph", admin_stolen_bikes_url(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
 = render partial: "/admin/twitter_accounts/errored"
 
-.row
-  .col-sm
-    %h1
-      Stolen bikes
-  .col-sm
-  .col-sm
-  .col-sm
-    - if @verified_only
-      = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url(unapproved: true)
-    - else
-      = link_to 'Only unverified bikes', admin_stolen_bikes_url
-%p
-  = link_to "View stolen notifications sent", admin_stolen_notifications_url
+- if @render_chart
+  .col-12.mt-2.mb-4
+    %h4
+      - if sort_column == "created_at"
+        - chart_column = "stolen_records.created_at"
+        Stolen records created
 
-%h4
-  = Bike.where(stolen: true).count
-  Stolen Bikes indexed,
-  %em
-    (#{Bike.where(stolen: true).where("created_at >= ?", Time.current.beginning_of_day).count} today)
-%h4
-  - if StolenRecord.where(approved: false).count == 0
-    %h4.text-success
-      0 are unapproved
-  - else
-    = StolenRecord.where(approved: false).count
+      - else
+        - chart_column = "stolen_records.date_stolen"
+        Date stolen
+    = column_chart time_range_counts(collection: available_stolen_records, column: chart_column), stacked: true, thousands: ",", defer: true
+
+-# Show traditional counts unless viewing the default (only unapproved) scoped view
+- if !@verified_only || @render_chart
+  = render partial: "/shared/period_select"
+  %p.mt-4
+    %strong
+      = number_with_delimiter(available_stolen_records.count)
+    Matching Stolen Bikes
+    %em
+      = humanized_time_range(@time_range)
+- else
+  %p.mt-4
+    = number_with_delimiter(Bike.where(stolen: true).count)
+    Stolen Bikes indexed,
+    %em
+      (#{number_with_delimiter(Bike.where(stolen: true).where("created_at >= ?", Time.current.beginning_of_day).count)} today)
+  %p.mt-4.mb-4
+    = number_with_delimiter(StolenRecord.where(approved: false).count)
     are unapproved
 
-
-
-= paginate @bikes, views_prefix: "admin"
+= paginate @stolen_records, views_prefix: "admin"
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
+    %thead.thead-light.sortable
       %th
-        Stolen record created
+        = sortable "created_at", "Stolen record created"
       %th.small
-        Stolen at
+        = sortable "date_stolen", "Stolen at"
       %th
         Bike info
       %th
@@ -50,8 +66,8 @@
 
 
     %tbody
-      - @bikes.each do |bike|
-        - current_stolen_record = bike.current_stolen_record
+      - @stolen_records.each do |stolen_record|
+        - bike = stolen_record.bike
         %tr
           %td
             .less-strong-hold
@@ -62,36 +78,36 @@
                 - else
                   = bike.id
               %small
-                %a{ href: edit_admin_stolen_bike_url(bike) }
-                  - created_date = current_stolen_record ? current_stolen_record.created_at : bike.created_at
+                %a{ href: edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true) }
+                  - created_date = stolen_record ? stolen_record.created_at : bike.created_at
                   %span.convertTime
                     = l created_date, format: :convert_time
           %td
-            - if current_stolen_record&.date_stolen&.present?
+            - if stolen_record&.date_stolen&.present?
               %small.convertTime
-                = l current_stolen_record.date_stolen, format: :convert_time
+                = l stolen_record.date_stolen, format: :convert_time
           %td
             = bike.title_string
 
-            - if current_stolen_record && current_stolen_record.estimated_value.present?
+            - if stolen_record && stolen_record.estimated_value.present?
               %br
               %small.less-strong
-                $#{current_stolen_record.estimated_value}
+                $#{stolen_record.estimated_value}
 
-          - if current_stolen_record.present?
+          - if stolen_record.present?
             %td{ style: "width: 50%;" }
-              = current_stolen_record.theft_description
+              = stolen_record.theft_description
             %td.small
-              - if current_stolen_record.country.present?
-                - if current_stolen_record.country == Country.united_states
+              - if stolen_record.country.present?
+                - if stolen_record.country == Country.united_states
                   %small.less-strong US
                 - else
-                  %small.text-success= current_stolen_record.country.iso
+                  %small.text-success= stolen_record.country.iso
             %td
-              %span{ class: current_stolen_record.city.blank? ? "less-strong" : "" }
-                = [current_stolen_record.city, current_stolen_record.state&.abbreviation, current_stolen_record.zipcode].reject(&:blank?).first
+              %span{ class: stolen_record.city.blank? ? "less-strong" : "" }
+                = [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first
             %td.table-cell-check
-              = check_mark if current_stolen_record.approved
+              = check_mark if stolen_record.approved
               - if bike.owner&.donor?
                 <span class="donor-icon">D</span>
               - elsif bike.owner&.paid_org?
@@ -107,4 +123,4 @@
                 <span class="paid-org-icon">O</span>
 
 
-= paginate @bikes, views_prefix: "admin"
+= paginate @stolen_records, views_prefix: "admin"

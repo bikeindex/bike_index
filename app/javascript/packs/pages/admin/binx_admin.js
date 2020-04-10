@@ -59,8 +59,9 @@ function BinxAdmin() {
         binxAdminImageUploader.init();
       }
       if ($("#stolenBikeImageEditing").length) {
-        // Set a timeout so images have a bit to load
-        setTimeout(this.fixStolenBikeImageWidth(this), 500);
+        this.fixStolenBikeImageWidth(this);
+        // Rerun after a bit so images have a little time to load
+        setTimeout(this.fixStolenBikeImageWidth(this), 1500);
       }
     },
 

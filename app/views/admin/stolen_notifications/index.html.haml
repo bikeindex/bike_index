@@ -1,12 +1,13 @@
+.admin-subnav
+  .col-12
+    %h1
+      Stolen Notifications
 
-%h1
-  Stolen Notifications
-
-%h4
-  = StolenNotification.count
+%p
+  = number_with_delimiter(StolenNotification.count)
   Stolen Notifications created,
   %em
-    (#{StolenNotification.where("created_at >= ?", Time.current.beginning_of_day).count} today)
+    (#{number_with_delimiter(StolenNotification.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
 
 
 = paginate @stolen_notifications, views_prefix: "admin"

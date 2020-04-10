@@ -1,16 +1,14 @@
 class Admin::StolenBikesController < Admin::BaseController
+  include SortableTable
   before_action :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
+  before_action :set_period, only: [:index]
+  helper_method :available_stolen_records
 
   def index
-    if params[:unapproved]
-      bikes = Bike.stolen.order("created_at desc")
-    else
-      bikes = Bike.stolen.where("approved_stolen IS NOT TRUE")
-      @verified_only = true
-    end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @bikes = bikes.page(page).per(per_page)
+    @stolen_records = available_stolen_records.page(page).per(per_page).includes(:bike)
+                      .reorder("stolen_records.#{sort_column} #{sort_direction}")
   end
 
   def approve
@@ -49,6 +47,10 @@ class Admin::StolenBikesController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w[created_at date_stolen]
+  end
+
   def permitted_parameters
     params.require(:bike).permit(Bike.old_attr_accessible)
   end
@@ -82,5 +84,16 @@ class Admin::StolenBikesController < Admin::BaseController
       flash[:error] = "Unknown action!"
     end
     redirect_to edit_admin_stolen_bike_url(@bike)
+  end
+
+  def available_stolen_records
+    return @available_stolen_records if defined?(@available_stolen_records)
+    @verified_only = ParamsNormalizer.boolean(params[:unapproved])
+    if @verified_only
+      available_stolen_records = StolenRecord
+    else
+      available_stolen_records = StolenRecord.approveds
+    end
+    @available_stolen_records = available_stolen_records.where(created_at: @time_range)
   end
 end

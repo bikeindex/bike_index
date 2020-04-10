@@ -7,7 +7,6 @@ class Admin::PaymentsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @payments = matching_payments.includes(:user, :organization, :invoice)
                                  .order(sort_column + " " + sort_direction)
                                  .page(page).per(per_page)
