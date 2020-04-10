@@ -6,7 +6,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
   let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike) }
-  let(:enabled_feature_slugs) { ["parking_notifications"] }
+  let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
     it "renders" do
@@ -34,8 +34,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:target) do
           {
             id: parking_notification1.id,
-            kind: "appears_abandoned",
-            kind_humanized: "Appears abandoned",
+            kind: "parked_incorrectly",
+            kind_humanized: "Parked incorrectly",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
             lng: parking_notification1.longitude,
@@ -96,7 +96,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "create" do
     let(:parking_notification_params) do
       {
-        kind: "parked_incorrectly",
+        kind: "appears_abandoned",
         internal_notes: "some details about the abandoned thing",
         bike_id: bike.to_param,
         use_entered_address: "false",
@@ -155,64 +155,90 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       it "creates" do
-        Sidekiq::Testing.inline! do
-          FactoryBot.create(:state_new_york)
-          expect(current_organization.enabled?("parking_notifications")).to be_truthy
-          ActionMailer::Base.deliveries = []
-          expect do
-            post base_url, params: {
-              organization_id: current_organization.to_param,
-              parking_notification: parking_notification_params,
-            }
-            expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-            expect(flash[:success]).to be_present
-          end.to change(ParkingNotification, :count).by(1)
-          parking_notification = ParkingNotification.last
+        FactoryBot.create(:state_new_york)
+        expect(current_organization.enabled?("parking_notifications")).to be_truthy
+        bike.reload
+        expect(bike.status).to eq "status_with_owner"
+        ActionMailer::Base.deliveries = []
+        expect do
+          post base_url, params: {
+            organization_id: current_organization.to_param,
+            parking_notification: parking_notification_params,
+          }
+          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+          expect(flash[:success]).to be_present
+        end.to change(ParkingNotification, :count).by(1)
+        parking_notification = ParkingNotification.last
 
-          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
-          expect(parking_notification.user).to eq current_user
-          expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
-          expect(parking_notification.location_from_address).to be_falsey
+        expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
+        expect(parking_notification.user).to eq current_user
+        expect(parking_notification.organization).to eq current_organization
+        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+        expect(parking_notification.location_from_address).to be_falsey
+        expect(ProcessParkingNotificationWorker.jobs.count).to eq 1
 
-          expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-          expect(parking_notification.delivery_status).to be_present
-        end
+        bike.reload
+        expect(bike.status).to eq "status_abandoned"
       end
 
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state) }
-        let(:repeat_params) do
-          parking_notification_params.merge(is_repeat: true,
-                                            use_entered_address: "true",
-                                            street: "300 Lakeside Dr",
-                                            city: "Oakland",
-                                            zipcode: "94612",
-                                            state_id: state.id.to_s,
-                                            country_id: Country.united_states.id)
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly") }
+        let(:parking_notification_params) do
+          {
+            kind: "impounded",
+            internal_notes: "",
+            bike_id: bike.to_param,
+            use_entered_address: "true",
+            latitude: default_location[:latitude],
+            longitude: default_location[:longitude],
+            message: "Some message to the user",
+            accuracy: 12.0,
+            is_repeat: "true",
+            street: "300 Lakeside Dr",
+            city: "Oakland",
+            zipcode: "94612",
+            state_id: state.id.to_s,
+            country_id: Country.united_states.id,
+          }
         end
         include_context :geocoder_real
         it "creates", vcr: true do
           Sidekiq::Worker.clear_all
-          expect do
-            post base_url, params: {
-              organization_id: current_organization.to_param,
-              parking_notification: repeat_params,
-            }
-            expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-            expect(flash[:success]).to be_present
-          end.to change(ParkingNotification, :count).by(1)
-          expect(EmailParkingNotificationWorker.jobs.count).to eq 1
+          bike.reload
+          expect(bike.status).to eq "status_with_owner"
+          Sidekiq::Testing.inline! do
+            expect do
+              post base_url, params: {
+                organization_id: current_organization.to_param,
+                parking_notification: parking_notification_params,
+              }
+              expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+              expect(flash[:success]).to be_present
+            end.to change(ParkingNotification, :count).by(1)
+          end
+          expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           parking_notification = ParkingNotification.last
 
-          expect_attrs_to_match_hash(parking_notification, repeat_params.except(:use_entered_address, :is_repeat, :latitude, :longitude))
+          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude))
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.initial_record).to eq parking_notification_initial
           expect(parking_notification.latitude).to eq(37.8087498)
           expect(parking_notification.longitude).to eq(-122.263705)
           expect(parking_notification.location_from_address).to be_truthy
+          expect(parking_notification.delivery_status).to eq("email_success")
+          expect(parking_notification.impound_record).to be_present
+          expect(parking_notification.status).to eq "impounded"
+          expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
+          expect(parking_notification.organization).to eq current_organization
+
+          parking_notification_initial.reload
+          expect(parking_notification_initial.status).to eq "impounded"
+
+          bike.reload
+          expect(bike.status).to eq "status_impounded"
+          expect(bike.current_impound_record).to eq parking_notification_initial.impound_record
         end
       end
     end
