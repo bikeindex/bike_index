@@ -666,54 +666,48 @@ class Bike < ApplicationRecord
     end
   end
 
+  def location_info_record(location_from_ip_address = nil)
+    if location_info_present?(current_parking_notification)
+      current_parking_notification
+    elsif location_info_present?(current_stolen_record)
+      current_stolen_record
+    elsif location_info_present?(creation_organization)
+      creation_organization
+    elsif location_info_present?(owner)
+      owner
+    elsif location_info_present?(location_from_ip_address)
+      OpenStruct.new(
+        latitude: location_from_ip_address.latitude,
+        longitude: location_from_ip_address.longitude,
+        city: location_from_ip_address.city,
+        country: Country.fuzzy_find(location_from_ip_address&.country_code),
+        zipcode: location_from_ip_address.postal_code,
+        address: current_parking_notification&.address, # Need to test what the responses from this look like - probably slightly different
+      )
+    end
+  end
+
   # Set the bike's location data (lat/long, city, postal code, country)
   # in the following order of precedence:
   #
-  # 1. From the current abandoned record, if one is present
-  # 2. From the current stolen record, if one is present
-  # 3. From the creation organization, if one is present
-  # 4. From the bike owner's address, if available
-  # 5. From the request's IP address, if given
+  # 1. From the current parking notification, if one is present
+  # 2. From the current abandoned record, if one is present
+  # 3. From the current stolen record, if one is present
+  # 4. From the creation organization, if one is present
+  # 5. From the bike owner's address, if available
+  # 6. From the request's IP address, if given
   def set_location_info(request_location: nil)
     find_current_stolen_record
-    if location_info_present?(current_parking_notification)
-      self.latitude = current_parking_notification.latitude
-      self.longitude = current_parking_notification.longitude
-      self.city = current_parking_notification.city
-      self.country = current_parking_notification.country
-      self.zipcode = current_parking_notification.zipcode
-      self.address = current_parking_notification.address
-    elsif location_info_present?(current_stolen_record)
-      self.latitude = current_stolen_record.latitude
-      self.longitude = current_stolen_record.longitude
-      self.city = current_stolen_record.city
-      self.country = current_stolen_record.country
-      self.zipcode = current_stolen_record.zipcode
-      self.address = current_stolen_record.display_address(force_show_address: true)
-    elsif location_info_present?(creation_organization)
-      self.latitude = creation_organization.location_latitude
-      self.longitude = creation_organization.location_longitude
-      self.city = creation_organization.city
-      self.country = creation_organization.country
-      self.zipcode = creation_organization.zipcode
-      # This is a hack, need to fix
-      self.address = [city, zipcode, country&.name].select(&:present?).join(" ").presence
-    elsif location_info_present?(owner)
-      self.latitude = owner.latitude
-      self.longitude = owner.longitude
-      self.city = owner.city
-      self.country = owner.country
-      self.zipcode = owner.zipcode
-      self.address = owner.address
-    elsif location_info_present?(request_location)
-      self.latitude = request_location.latitude
-      self.longitude = request_location.longitude
-      self.city = request_location.city
-      self.country = Country.fuzzy_find(request_location&.country_code)
-      self.zipcode = request_location.postal_code
-      # Need to test what the responses from this look like - probably slightly different
-      # self.address = current_parking_notification.address
-    end
+
+    location_record = location_info_record(request_location)
+    return unless location_record.present?
+
+    self.address = location_record.address
+    self.city = location_record.city
+    self.country = location_record.country
+    self.latitude = location_record.latitude
+    self.longitude = location_record.longitude
+    self.zipcode = location_record.zipcode
   end
 
   def organization_affiliation

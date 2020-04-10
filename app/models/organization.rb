@@ -74,15 +74,17 @@ class Organization < ApplicationRecord
   before_save :set_search_coordinates
   after_commit :update_associations
 
-  delegate :street,
-           :city,
-           :zipcode,
-           :state,
-           :country,
-           :latitude,
-           :longitude,
-           to: :default_location,
-           allow_nil: true
+  delegate \
+    :address,
+    :city,
+    :country,
+    :latitude,
+    :longitude,
+    :state,
+    :street,
+    :zipcode,
+    to: :default_location,
+    allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
   after_validation :geocode, if: -> { false } # never geocode, use default_location lat/long
