@@ -5,7 +5,6 @@ class Admin::TheftAlertsController < Admin::BaseController
   before_action :find_theft_alert, only: [:edit, :update]
 
   def index
-    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @theft_alerts =
       matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan)

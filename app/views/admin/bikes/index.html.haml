@@ -41,13 +41,13 @@
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
       %em
         = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
-  - if @render_chart
-    .col-12.mt-2
-      - if params[:search_email] || params[:search_user_id].present?
-        %hr
-        %h2.mt-4.text-warning Can't graph with user search
-      - else
-        = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
+- if @render_chart
+  .col-12.mt-2.mb-4
+    - if params[:search_email] || params[:search_user_id].present?
+      %hr
+      %h2.mt-4.text-warning Can't graph with user search
+    - else
+      = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
 
 = render partial: "/shared/period_select"
 
