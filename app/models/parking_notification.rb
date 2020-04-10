@@ -149,9 +149,10 @@ class ParkingNotification < ActiveRecord::Base
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
     self.status = calculated_status
-    self.retrieval_link_token ||= SecurityTokenizer.new_token if send_email?
     # Only set unregistered_bike on creation
     self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
+    # generate retrieval token after checking if unregistered_bike
+    self.retrieval_link_token ||= SecurityTokenizer.new_token if send_email?
     # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?

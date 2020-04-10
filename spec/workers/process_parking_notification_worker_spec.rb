@@ -22,7 +22,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       parking_notification2.reload
       bike.reload
       expect(bike.status).to eq "status_abandoned"
-      expect(initial.status).to eq "repeated"
+      expect(initial.status).to eq "superseded"
       expect(parking_notification2.status).to eq "current"
       Sidekiq::Worker.clear_all
       expect do

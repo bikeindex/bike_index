@@ -24,8 +24,6 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.send_email?).to be_truthy
         expect(bike.current_parking_notification).to eq parking_notification
         expect(parking_notification.retrieval_link_token).to be_present
-        # expect(bike.status_abandoned?).to be_truthy
-        # expect(bike.status).to eq "status_abandoned"
         expect(parking_notification.organization).to eq organization
         expect(parking_notification.user.organizations).to eq([organization])
         # Test that we are just getting the orgs abandoned bikes
@@ -51,6 +49,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification) }
     it "is unregistered" do
       parking_notification.reload
+      expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.unregistered_bike).to be_truthy
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy

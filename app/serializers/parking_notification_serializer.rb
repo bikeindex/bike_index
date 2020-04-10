@@ -2,6 +2,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
   attributes :id,
              :kind,
              :kind_humanized,
+             :status,
              :created_at,
              :lat,
              :lng,

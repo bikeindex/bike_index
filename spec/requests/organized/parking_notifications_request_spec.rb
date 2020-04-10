@@ -36,6 +36,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             id: parking_notification1.id,
             kind: "parked_incorrectly_notification",
             kind_humanized: "Parked incorrectly",
+            status: "impounded",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
             lng: parking_notification1.longitude,
@@ -183,10 +184,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly") }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
-            kind: "impounded",
+            kind: "impound_notification",
             internal_notes: "",
             bike_id: bike.to_param,
             use_entered_address: "true",
@@ -235,10 +236,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
           parking_notification_initial.reload
           expect(parking_notification_initial.status).to eq "impounded"
+          expect(parking_notification_initial.associated_impound_record_id).to eq parking_notification.impound_record_id
 
           bike.reload
           expect(bike.status).to eq "status_impounded"
-          expect(bike.current_impound_record).to eq parking_notification_initial.impound_record
+          expect(bike.current_impound_record).to eq parking_notification.impound_record
         end
       end
     end

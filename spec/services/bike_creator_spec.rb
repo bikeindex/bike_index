@@ -313,7 +313,7 @@ RSpec.describe BikeCreator do
         expect(parking_notification.latitude).to eq bike.latitude
         expect(parking_notification.longitude).to eq bike.longitude
         expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
-        expect(parking_notification.kind).to eq "parked_incorrectly"
+        expect(parking_notification.kind).to eq "parked_incorrectly_notification"
         expect(parking_notification.message).to eq "Some message to the user"
         expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
         expect(parking_notification.accuracy).to eq 12.0
@@ -373,7 +373,7 @@ RSpec.describe BikeCreator do
           expect(parking_notification.latitude).to eq bike.latitude
           expect(parking_notification.longitude).to eq bike.longitude
           expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
-          expect(parking_notification.kind).to eq "appears_abandoned"
+          expect(parking_notification.kind).to eq "appears_abandoned_notification"
           expect(parking_notification.message).to eq "another note"
           expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
           expect(parking_notification.accuracy).to eq 12.0

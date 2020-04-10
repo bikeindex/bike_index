@@ -137,7 +137,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.parking_notifications.count).to eq 1
           parking_notification = bike.parking_notifications.first
           expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.kind).to eq "parked_incorrectly"
+          expect(parking_notification.kind).to eq "parked_incorrectly_notification"
           expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
           expect(parking_notification.message).to eq "Some message to the user"
           # TODO: location refactor
