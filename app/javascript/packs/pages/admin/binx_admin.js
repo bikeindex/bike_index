@@ -59,8 +59,7 @@ function BinxAdmin() {
         binxAdminImageUploader.init();
       }
       if ($("#stolenBikeImageEditing").length) {
-        // Set a timeout so images have a bit to load
-        setTimeout(this.fixStolenBikeImageWidth(this), 500);
+        this.fixStolenBikeImageWidth(this);
       }
     },
 
@@ -106,21 +105,14 @@ function BinxAdmin() {
     },
 
     fixStolenBikeImageWidth() {
-      // This was heinous, for reasons unknown
-      let $promotedImages = $("#promoted-images-display");
-      let $promotedImagesLi = $promotedImages.find("li");
-      $promotedImages.css(
+      const $promotedImagesLength = $("#promoted-images-display li").length;
+      $("#promoted-images-display").css(
         "width",
-        `${$promotedImagesLi.first().outerWidth() * $promotedImagesLi.length +
-          20}px`
+        `${340 * $promotedImagesLength}px`
       );
 
-      let $imageEdit = $("#stolenBikeImageEditing");
-      let $imageEditLi = $imageEdit.find("li");
-      $imageEdit.css(
-        "width",
-        `${$imageEditLi.first().outerWidth() * $imageEditLi.length + 40}px`
-      );
+      const $imageEditLength = $("#stolenBikeImageEditing li").length;
+      $("#stolenBikeImageEditing").css("width", `${190 * $imageEditLength}px`);
     },
   };
 }

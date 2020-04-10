@@ -180,18 +180,30 @@
 .stolen-bike-image-editing-list-group-wrapper {
   overflow-x: scroll;
 }
+
 .stolen-bike-image-editing-list-group {
   @extend .justify-content-center;
+  min-width: 100%;
   padding: 10px;
   flex-direction: row; // override, force to be row always
+  li {
+    padding: 20px;
+    width: 190px; // This is used in binx_admin.js - make sure to update there too
+  }
   img {
     display: block;
-    max-width: 150px;
+    width: 150px;
     height: auto;
     margin: 0 auto;
+    border: 1px solid $gray-400;
   }
-  &#promoted-images-display img {
-    max-width: 300px;
+  &#promoted-images-display {
+    li {
+      width: 340px; // This is used in binx_admin.js - make sure to update there too
+    }
+    img {
+      width: 300px;
+    }
   }
 }
 

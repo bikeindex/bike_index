@@ -200,6 +200,8 @@ module ControllerHelpers
     else
       set_time_range_from_period
     end
+    # Add this render_chart in here so we don't have to define it in all the controllers
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @time_range = @start_time..@end_time
   end
 
