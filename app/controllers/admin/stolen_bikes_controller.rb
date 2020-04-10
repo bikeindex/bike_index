@@ -88,11 +88,13 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
-    @verified_only = ParamsNormalizer.boolean(params[:unapproved])
+    @verified_only = !ParamsNormalizer.boolean(params[:unapproved])
     if @verified_only
-      available_stolen_records = StolenRecord
+      # maintain previous functionality, by gross query
+      stolen_record_ids = Bike.stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
+      available_stolen_records = StolenRecord.where(id: stolen_record_ids)
     else
-      available_stolen_records = StolenRecord.approveds
+      available_stolen_records = StolenRecord
     end
     @available_stolen_records = available_stolen_records.where(created_at: @time_range)
   end
