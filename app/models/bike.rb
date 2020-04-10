@@ -27,6 +27,7 @@ class Bike < ApplicationRecord
   belongs_to :front_gear_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
+  belongs_to :state
   belongs_to :country
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :creator, class_name: "User" # to be deprecated and removed

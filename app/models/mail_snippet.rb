@@ -4,6 +4,9 @@ class MailSnippet < ApplicationRecord
   KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned_bike: 5, location_triggered: 6 }.freeze
   validates_presence_of :name
 
+  belongs_to :state
+  belongs_to :country
+
   belongs_to :organization
   validates_uniqueness_of :organization_id, scope: [:name], allow_nil: true
   has_many :public_images, as: :imageable, dependent: :destroy
