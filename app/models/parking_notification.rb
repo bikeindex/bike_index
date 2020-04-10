@@ -2,7 +2,7 @@
 
 class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
-  STATUS_ENUM = { current: 0, repeated: 1, impounded: 2, retrieved: 3 }.freeze
+  STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3 }.freeze
   RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recoverry: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
@@ -39,9 +39,9 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
-  def self.active_statuses; %w[current repeated] end
+  def self.active_statuses; %w[current superseded] end
 
-  def self.resolved_statuses; STATUS_ENUM.keys.map(&:to_s) - %w[current repeated] end
+  def self.resolved_statuses; STATUS_ENUM.keys.map(&:to_s) - active_statuses end
 
   def self.kinds_humanized
     {
@@ -200,6 +200,6 @@ class ParkingNotification < ActiveRecord::Base
   def calculated_status
     return "impounded" if impound_notification? || associated_impound_record_id.present?
     return "retrieved" if retrieved_at.present? || associated_notifications.retrieved.any?
-    associated_notifications.where("id > ?", id).any? ? "repeated" : "current"
+    associated_notifications.where("id > ?", id).any? ? "superseded" : "current"
   end
 end
