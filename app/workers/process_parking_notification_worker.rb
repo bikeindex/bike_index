@@ -5,7 +5,7 @@ class ProcessParkingNotificationWorker < ApplicationWorker
     parking_notification = ParkingNotification.find(parking_notification_id)
 
 
-    if parking_notification.impounded? && parking_notification.impound_record.blank?
+    if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
       impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
                                              user_id: parking_notification.user_id,
                                              organization_id: parking_notification.organization_id)
@@ -14,8 +14,7 @@ class ProcessParkingNotificationWorker < ApplicationWorker
 
     # Update all of them!
     parking_notification.associated_notifications.each do |pn|
-      pn.update_attributes(updated_at: Time.current,
-                           impound_record_id: parking_notification.impound_record_id)
+      pn.update_attributes(updated_at: Time.current)
     end
 
     return true unless parking_notification.send_email? && parking_notification.delivery_status.blank?

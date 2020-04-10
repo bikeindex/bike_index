@@ -1876,7 +1876,12 @@ CREATE TABLE public.parking_notifications (
     message text,
     location_from_address boolean DEFAULT false,
     delivery_status character varying,
-    unregistered_bike boolean DEFAULT false
+    unregistered_bike boolean DEFAULT false,
+    status integer DEFAULT 0,
+    retrieved_at timestamp without time zone,
+    retrieval_kind integer,
+    retrieval_link_token text,
+    retrieved_by_id bigint
 );
 
 
@@ -3960,6 +3965,13 @@ CREATE INDEX index_parking_notifications_on_organization_id ON public.parking_no
 
 
 --
+-- Name: index_parking_notifications_on_retrieved_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_retrieved_by_id ON public.parking_notifications USING btree (retrieved_by_id);
+
+
+--
 -- Name: index_parking_notifications_on_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4601,6 +4613,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200324221906'),
 ('20200326192650'),
 ('20200403234228'),
-('20200409201638');
+('20200409201638'),
+('20200410043813');
 
 

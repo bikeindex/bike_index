@@ -62,7 +62,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
       let(:parking_notification) do
         {
-          kind: "parked_incorrectly",
+          kind: "parked_incorrectly_notification",
           internal_notes: "some details about the abandoned thing",
           use_entered_address: "false",
           latitude: default_location[:latitude],

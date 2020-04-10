@@ -34,7 +34,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:target) do
           {
             id: parking_notification1.id,
-            kind: "parked_incorrectly",
+            kind: "parked_incorrectly_notification",
             kind_humanized: "Parked incorrectly",
             created_at: parking_notification1.created_at.to_i,
             lat: parking_notification1.latitude,
@@ -96,7 +96,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "create" do
     let(:parking_notification_params) do
       {
-        kind: "appears_abandoned",
+        kind: "appears_abandoned_notification",
         internal_notes: "some details about the abandoned thing",
         bike_id: bike.to_param,
         use_entered_address: "false",

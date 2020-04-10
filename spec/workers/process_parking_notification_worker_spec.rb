@@ -9,19 +9,21 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
   # Create impound record
 
   describe "updating associated records" do
-    let(:initial) { FactoryBot.create(:parking_notification_organized, updated_at: Time.current - 4.days, kind: "appears_abandoned") }
+    let(:initial) { FactoryBot.create(:parking_notification_organized, updated_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
     let(:bike) { initial.bike }
     let(:user) { initial.user }
     let(:organization) { initial.organization }
-    let(:parking_notification2) { FactoryBot.create(:parking_notification_organized, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned", initial_record: initial) }
-    let(:parking_notification3) { FactoryBot.build(:parking_notification_organized, user: user, bike: bike, organization: organization, kind: "impounded", initial_record: initial) }
+    let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record: initial) }
+    let(:parking_notification3) { FactoryBot.build(:parking_notification_organized, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
     it "updates the other parking_notifications, creates the impound record" do
+      initial.reload
+      initial.update_attributes(updated_at: Time.current) # Because of calculated_status
       initial.reload
       parking_notification2.reload
       bike.reload
       expect(bike.status).to eq "status_abandoned"
-      expect(initial.updated_at).to be < (Time.current - 3.days)
-      expect(parking_notification2.updated_at).to be < (Time.current - 1.days)
+      expect(initial.status).to eq "repeated"
+      expect(parking_notification2.status).to eq "current"
       Sidekiq::Worker.clear_all
       expect do
         parking_notification3.save
@@ -36,13 +38,14 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       parking_notification3.reload
       expect(parking_notification3.delivery_status).to eq "email_success"
-      expect(parking_notification3.kind).to eq "impounded"
+      expect(parking_notification3.kind).to eq "impound_notification"
       expect(parking_notification3.impound_record).to be_present
+      expect(parking_notification3.status).to eq "impounded"
       impound_record = parking_notification3.impound_record
       expect(impound_record.bike).to eq bike
       expect(impound_record.organization).to eq organization
       expect(impound_record.user).to eq user
-      expect(impound_record.parking_notifications.pluck(:id)).to match_array([initial.id, parking_notification2.id, parking_notification3.id])
+      expect(impound_record.parking_notification).to eq parking_notification3
       bike.reload
       expect(bike.status).to eq "status_impounded"
       expect(bike.current_impound_record).to eq impound_record
@@ -50,10 +53,14 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
 
       initial.reload
       parking_notification2.reload
-      expect(initial.impound_record).to eq impound_record
-      expect(initial.kind).to eq "appears_abandoned"
-      expect(parking_notification2.impound_record).to eq impound_record
-      expect(parking_notification2.kind).to eq "appears_abandoned"
+      expect(initial.impound_record_id).to be_blank
+      expect(initial.associated_impound_record).to eq impound_record
+      expect(initial.kind).to eq "appears_abandoned_notification"
+      expect(initial.status).to eq "impounded"
+      expect(parking_notification2.status).to eq "impounded"
+      expect(parking_notification2.impound_record_id).to be_blank
+      expect(parking_notification2.associated_impound_record).to eq impound_record
+      expect(parking_notification2.kind).to eq "appears_abandoned_notification"
     end
   end
 

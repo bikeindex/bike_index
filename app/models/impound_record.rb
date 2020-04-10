@@ -3,7 +3,7 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :user
   belongs_to :organization
 
-  has_many :parking_notifications
+  has_one :parking_notification
 
   validates_presence_of :bike_id, :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
-  KIND_ENUM = { appears_abandoned: 0, parked_incorrectly: 1, impounded: 2 }.freeze
+  KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
+  STATUS_ENUM = { current: 0, repeated: 1, impounded: 2, retrieved: 3 }.freeze
+  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recoverry: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -19,26 +21,33 @@ class ParkingNotification < ActiveRecord::Base
   after_create :process_creation
 
   enum kind: KIND_ENUM
+  enum status: STATUS_ENUM
+  enum retrieval_kind: RETRIEVAL_KIND_ENUM
 
   # TODO: location refactor - switch to Geocodeable
   geocoded_by :geocode_data
 
   attr_accessor :is_repeat, :use_entered_address
 
-  scope :current, -> { where(impound_record_id: nil) } # Someday will need to include retrieved in here
+  scope :active, -> { where(status: active_statuses) }
+  scope :resolved, -> { where(status: resolved_statuses) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
-  scope :with_impounded_record, -> { where.not(impound_record_id: nil) }
+  scope :with_impound_record, -> { where.not(impound_record_id: nil) }
   scope :email_success, -> { where(delivery_status: "email_success") }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
+  def self.active_statuses; %w[current repeated] end
+
+  def self.resolved_statuses; STATUS_ENUM.keys.map(&:to_s) - %w[current repeated] end
+
   def self.kinds_humanized
     {
-      appears_abandoned: "Appears abandoned",
-      parked_incorrectly: "Parked incorrectly",
-      impounded: "Impounded",
+      appears_abandoned_notification: "Appears abandoned",
+      parked_incorrectly_notification: "Parked incorrectly",
+      impound_notification: "Impounded",
     }
   end
 
@@ -49,10 +58,16 @@ class ParkingNotification < ActiveRecord::Base
       .or(where(id: initial_record_id))
   end
 
+  def associated_impound_record_id; impound_record_id || associated_notifications.pluck(:impound_record_id).compact.first end
+
+  def associated_impound_record; impound_record || associated_notifications.with_impound_record.first&.impound_record end
+
   # Get it unscoped
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 
-  def current?; impound_record_id.blank? end
+  def active?; self.class.active_statuses.include?(status) end
+
+  def resolved?; !active? end
 
   def initial_record?; initial_record_id.blank? end
 
@@ -101,11 +116,6 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
-  # add retrieved here when it's added
-  def status
-    current? ? "current" : "impounded"
-  end
-
   # TODO: location refactor - copied method from stolen
   def address(skip_default_country: true, force_show_address: false)
     country_string =
@@ -138,6 +148,8 @@ class ParkingNotification < ActiveRecord::Base
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
+    self.status = calculated_status
+    self.retrieval_link_token ||= SecurityTokenizer.new_token if send_email?
     # Only set unregistered_bike on creation
     self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
     # We need to geocode on creation, unless all the attributes are present
@@ -163,9 +175,9 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def title
-    if appears_abandoned?
+    if appears_abandoned_notification?
       "Your #{bike&.type || "Bike"} appears to be abandoned"
-    elsif parked_incorrectly?
+    elsif parked_incorrectly_notification?
       "Your #{bike&.type || "Bike"} is parked incorrectly"
     elsif impounded?
       "Your #{bike&.type || "Bike"} was impounded"
@@ -183,5 +195,11 @@ class ParkingNotification < ActiveRecord::Base
 
   def calculated_unregistered_parking_notification
     bike.unregistered_parking_notification?
+  end
+
+  def calculated_status
+    return "impounded" if impound_notification? || associated_impound_record_id.present?
+    return "retrieved" if retrieved_at.present? || associated_notifications.retrieved.any?
+    associated_notifications.where("id > ?", id).any? ? "repeated" : "current"
   end
 end
