@@ -1,6 +1,9 @@
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 
+  # TODO: Migrate to using state / country foreign keys
+  # belongs_to :state
+  # belongs_to :country
   has_many :tweets, dependent: :destroy
 
   validates \
@@ -20,6 +23,7 @@ class TwitterAccount < ApplicationRecord
   scope :national, -> { active.where(national: true) }
   scope :errored, -> { where.not(last_error_at: nil) }
 
+  # TODO: Migrate to using state / country foreign keys
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
       account.country = geo.country
@@ -38,6 +42,7 @@ class TwitterAccount < ApplicationRecord
     where(default: true).first || national.first
   end
 
+  # TODO: Migrate to using state / country foreign keys
   def self.default_account_for_country(country)
     national.where(country: country).first || default_account
   end
@@ -126,6 +131,7 @@ class TwitterAccount < ApplicationRecord
     return
   end
 
+  # TODO: Migrate to using state / country foreign keys
   def should_be_reverse_geocoded?
     !skip_geocoding? &&
       latitude.present? &&
