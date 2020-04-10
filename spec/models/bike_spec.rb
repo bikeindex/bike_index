@@ -1505,15 +1505,19 @@ RSpec.describe Bike, type: :model do
       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
       let(:stolen_record) { bike.current_stolen_record }
       it "takes location from the current stolen record" do
+        street_address = "1300 W 14th Pl"
+        full_address = "#{street_address}, Chicago, IL, 60608, US"
+        expect(stolen_record.street).to eq street_address
+        expect(stolen_record.display_address(force_show_address: true)).to eq(full_address)
+        expect(stolen_record.address).to eq full_address
+
         bike.set_location_info
-        expect(stolen_record.street).to eq "1300 W 14th Pl"
-        expect(stolen_record.display_address(force_show_address: true)).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
         expect(bike.zipcode).to eq(stolen_record.zipcode)
         expect(bike.country).to eq(stolen_record.country)
-        expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
+        expect(bike.address).to eq(full_address)
       end
       context "given a abandoned record, it instead uses the abandoned record" do
         it "takes the location from the parking notification" do

@@ -188,7 +188,10 @@ class StolenRecord < ApplicationRecord
   end
 
   def set_address
-    self.address = display_address(skip_default_country: true)
+    self.address = display_address(
+      force_show_address: true,
+      skip_default_country: false
+    )
   end
 
   def fix_date
