@@ -78,6 +78,7 @@ class Organization < ApplicationRecord
     :address,
     :city,
     :country,
+    :bike_location_info?,
     :latitude,
     :longitude,
     :state,

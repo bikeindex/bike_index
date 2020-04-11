@@ -653,53 +653,38 @@ class Bike < ApplicationRecord
     [reg_city, reg_state].reject(&:blank?).join(", ")
   end
 
-  # TODO: location refactor - put this method in Geocodeable
-  def location_info_present?(record)
-    return false if record.blank?
-
-    if record.respond_to?(:country)
-      record.country.present? &&
-        (record.city.present? || record.zipcode.present?)
-    elsif record.respond_to?(:country_code)
-      record.country_code.present? &&
-        (record.city.present? || record.zipcode.present?)
-    end
-  end
-
-  def location_info_record(location_from_ip_address = nil)
-    if location_info_present?(current_parking_notification)
-      current_parking_notification
-    elsif location_info_present?(current_stolen_record)
-      current_stolen_record
-    elsif location_info_present?(creation_organization)
-      creation_organization
-    elsif location_info_present?(owner)
-      owner
-    elsif location_info_present?(location_from_ip_address)
-      OpenStruct.new(
-        latitude: location_from_ip_address.latitude,
-        longitude: location_from_ip_address.longitude,
-        city: location_from_ip_address.city,
-        country: Country.fuzzy_find(location_from_ip_address&.country_code),
-        zipcode: location_from_ip_address.postal_code,
-        address: current_parking_notification&.address, # Need to test what the responses from this look like - probably slightly different
-      )
-    end
-  end
-
-  # Set the bike's location data (lat/long, city, postal code, country)
-  # in the following order of precedence:
+  # Select the source from which to derive location data, in the following order
+  # of precedence:
   #
-  # 1. From the current parking notification, if one is present
-  # 2. From the current abandoned record, if one is present
-  # 3. From the current stolen record, if one is present
-  # 4. From the creation organization, if one is present
-  # 5. From the bike owner's address, if available
-  # 6. From the request's IP address, if given
+  # 1. The current parking notification, if one is present
+  # 2. The current abandoned record, if one is present
+  # 3. The current stolen record, if one is present
+  # 4. The creation organization, if one is present
+  # 5. The bike owner's address, if available
+  # 6. The request's IP address, if given
+  def find_location_info(geolocation = nil)
+    location_record = [
+      current_parking_notification,
+      current_stolen_record,
+      creation_organization,
+      owner,
+    ].compact.find(&:bike_location_info?)
+
+    return location_record if location_record.present?
+
+    # Need to test what the responses from this look like - probably slightly
+    # different
+    geolocation&.address = current_parking_notification&.address
+    geolocation if geolocation&.bike_location_info?
+  end
+
+  # Set the bike's location data (lat/long, city, postal code, country, etc.).
   def set_location_info(request_location: nil)
+    # ensure current_stolen_record is set if available
     find_current_stolen_record
 
-    location_record = location_info_record(request_location)
+    # select a source of location info
+    location_record = find_location_info(request_location)
     return unless location_record.present?
 
     self.address = location_record.address

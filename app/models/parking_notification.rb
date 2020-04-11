@@ -145,6 +145,11 @@ class ParkingNotification < ActiveRecord::Base
     self.state_id = organization&.state&.id
   end
 
+  # TODO: location refactor. Remove once Geocodeable is included
+  def bike_location_info?
+    Geocodeable.bike_location_info?(self)
+  end
+
   # TODO: location refactor, use the same attributes for all location models
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat

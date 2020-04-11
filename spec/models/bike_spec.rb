@@ -1566,13 +1566,16 @@ RSpec.describe Bike, type: :model do
     context "given no creation org or owner location" do
       it "takes location from the geocoded request location" do
         bike = FactoryBot.build(:bike)
-        geocoder_data = default_location.merge(postal_code: default_location.delete(:zipcode))
-        location = double(:request_location, geocoder_data)
+        geocoder_data = double(
+          :request_location,
+          default_location.merge(postal_code: default_location[:zipcode] )
+        )
+        location = RequestGeolocationInfo.decorate(geocoder_data)
 
         bike.set_location_info(request_location: location)
 
-        expect(bike.city).to eq(geocoder_data[:city])
-        expect(bike.zipcode).to eq(geocoder_data[:postal_code])
+        expect(bike.city).to eq(geocoder_data.city)
+        expect(bike.zipcode).to eq(geocoder_data.postal_code)
         expect(bike.country).to eq(usa)
       end
     end
