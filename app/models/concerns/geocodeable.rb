@@ -3,6 +3,11 @@
 module Geocodeable
   extend ActiveSupport::Concern
 
+  def self.bike_location_info?(object)
+    object&.country.present? &&
+      (object&.city.present? || object&.zipcode.present?)
+  end
+
   included do
     geocoded_by :address
     after_validation :geocode, if: :should_be_geocoded?
@@ -26,6 +31,10 @@ module Geocodeable
       return false if skip_geocoding?
       return false if address.blank?
       address_changed?
+    end
+
+    def bike_location_info?
+      Geocodeable.bike_location_info?(self)
     end
 
     # Proxy method for now, because of the current address setup
