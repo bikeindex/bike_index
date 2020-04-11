@@ -3,6 +3,8 @@
 module Geocodeable
   extend ActiveSupport::Concern
 
+  # Does the given object have enough location info to set location info on a
+  # Bike object? (see: Bike#find_location_info)
   def self.bike_location_info?(object)
     object&.country.present? &&
       (object&.city.present? || object&.zipcode.present?)
