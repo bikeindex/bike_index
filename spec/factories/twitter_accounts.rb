@@ -7,15 +7,14 @@ FactoryBot.define do
     user_secret { "ACCESS_SECRET" }
     twitter_account_info { {} }
     city { "New York" }
-    state { "NY" }
-
     address { "278 Broadway, New York, NY 10007, USA" }
     latitude { 40.7143528 }
     longitude { -74.0059731 }
 
     after(:build) do |twitter_account, _evaluator|
-      usa = Country.find_by(iso: "US") || FactoryBot.build(:country_us)
-      twitter_account.country = usa
+      new_york = State.find_by(abbreviation: "NY") || FactoryBot.build(:state_new_york)
+      twitter_account.state = new_york
+      twitter_account.country = new_york.country
     end
 
     factory :twitter_account_1 do
@@ -50,11 +49,14 @@ FactoryBot.define do
 
     trait :canadian do
       skip_geocoding { true }
-      country { "Canada" }
       city { "Vancouver" }
-      state { "BC" }
       latitude { 49.253992 }
       longitude { -123.241084 }
+
+      after(:build) do |twitter_account, _evaluator|
+        twitter_account.country =
+          Country.find_by(iso: "CA") || FactoryBot.build(:country_canada)
+      end
     end
   end
 end

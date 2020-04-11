@@ -17,9 +17,9 @@ RSpec.describe TwitterAccount, type: :model do
 
       expect(twitter_account.latitude).to be_present
       expect(twitter_account.longitude).to be_present
-      expect(twitter_account.country).to eq("United States")
+      expect(twitter_account.country&.name).to eq("United States")
       expect(twitter_account.city).to eq("New York")
-      expect(twitter_account.state).to eq("NY")
+      expect(twitter_account.state&.abbreviation).to eq("NY")
     end
   end
 
@@ -85,7 +85,8 @@ RSpec.describe TwitterAccount, type: :model do
       _default_national = FactoryBot.create(:twitter_account_1, :active, :national, :default)
       national = FactoryBot.create(:twitter_account_2, :active, :national, :canadian)
 
-      national.update_attribute(:country, "Australia")
+      australia = FactoryBot.create(:country_australia)
+      national.update_attribute(:country, australia)
 
       expect(TwitterAccount.default_account_for_country("Australia").id).to eq(national.id)
     end
@@ -94,7 +95,8 @@ RSpec.describe TwitterAccount, type: :model do
       default = FactoryBot.create(:twitter_account_1, :national, :active, :default)
       national = FactoryBot.create(:twitter_account_2, :national, :active, :canadian)
 
-      national.update_attribute(:country, "Australia")
+      australia = FactoryBot.create(:country_australia)
+      national.update_attribute(:country, australia)
 
       expect(TwitterAccount.default_account_for_country("Canada").id).to eq(default.id)
     end
