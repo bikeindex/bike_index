@@ -196,13 +196,8 @@
           %td.d-none.d-lg-table-cell
             = ownership.id
           %td
-            -# Only show ownership editing to developers
-            - if current_user.developer?
-              %a.convertTime{href: edit_admin_ownership_url(ownership.id)}
-                = l ownership.created_at, format: :convert_time
-            - else
-              %span.convertTime
-                = l ownership.created_at, format: :convert_time
+            %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
+              = l ownership.created_at, format: :convert_time
           %td
             - u = ownership.creator
             - if u.name.present?
