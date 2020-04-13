@@ -35,6 +35,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
   scope :email_success, -> { where(delivery_status: "email_success") }
+  scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
@@ -153,7 +154,7 @@ class ParkingNotification < ActiveRecord::Base
     # Only set unregistered_bike on creation
     self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
     # generate retrieval token after checking if unregistered_bike
-    self.retrieval_link_token ||= SecurityTokenizer.new_token if send_email?
+    self.retrieval_link_token ||= SecurityTokenizer.new_token if current? && send_email?
     # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
@@ -191,6 +192,14 @@ class ParkingNotification < ActiveRecord::Base
     bike&.set_address
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
+  end
+
+  def create_repeat_notification!(new_attrs)
+    attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
+                              "location_from_address", "retrieval_link_token", "delivery_status")
+                      .merge(new_attrs)
+    attrs["initial_record_id"] ||= id
+    ParkingNotification.create!(attrs)
   end
 
   private

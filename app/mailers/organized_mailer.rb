@@ -53,6 +53,11 @@ class OrganizedMailer < ApplicationMailer
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
     @sender = @parking_notification.user
+    if @parking_notification.retrieval_link_token.present?
+      @retrieval_link_url = bike_url(@bike.to_param, parking_notification_retrieved: @parking_notification.retrieval_link_token)
+    else
+      @retrieval_link_url = nil
+    end
 
     I18n.with_locale(@sender&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,

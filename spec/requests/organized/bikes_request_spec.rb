@@ -140,6 +140,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(parking_notification.street).to eq "278 Broadway"
         expect(parking_notification.city).to eq "New York"
         expect(parking_notification.accuracy).to eq 14.2
+        expect(parking_notification.retrieval_link_token).to be_blank
       end
 
       context "different auto_user, impound_notification" do

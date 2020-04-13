@@ -30,7 +30,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def parking_notification
-    OrganizedMailer.parking_notification(ParkingNotification.last)
+    OrganizedMailer.parking_notification(ParkingNotification.send_email.last)
   end
 
   private
