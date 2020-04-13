@@ -57,6 +57,7 @@ module Organized
           flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
         end
       end
+      redirect_to @redirect_location and return if @redirect_location.present?
       redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
     end
 
@@ -101,10 +102,13 @@ module Organized
         parking_notification.create_repeat_notification!(kind: kind, user_id: current_user.id)
         successes << parking_notification.id
       end
-      if successes.count == ids.count
-        flash[:success] = "Sent #{successes.count} #{kind_humanized} notifications"
+      if successes.count == ids.count && successes.count == 1 # If there is only one, redirect to that notification
+        flash[:success] = "Created #{kind_humanized} notification!"
+        @redirect_location = organization_parking_notification_path(successes.first, organization_id: current_organization.to_param)
         return true
       end
+      # I don't think there will be a failure without error, create_repeat_notification! should throw an error
+      flash[:success] = "Created #{successes.count} #{kind_humanized} notifications"
     rescue
       flash[:error] = "Unable to send notifications for #{(ids - successes).join(", ")}"
     end

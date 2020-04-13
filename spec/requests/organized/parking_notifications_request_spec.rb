@@ -273,24 +273,25 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           kind: "parked_incorrectly_notification",
           ids: parking_notification_initial.id
         }
-        expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+        expect(ParkingNotification.count).to eq 2
+        parking_notification_initial.reload
+        expect(parking_notification_initial.current?).to be_falsey
+        expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason"
+        parking_notification = ParkingNotification.last
         expect(flash[:success]).to be_present
-      end
-      expect(ParkingNotification.count).to eq 2
-      parking_notification = ParkingNotification.last
-      parking_notification_initial.reload
-      expect(parking_notification_initial.current?).to be_falsey
-      expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason"
-      expect([parking_notification.latitude, parking_notification.longitude]).to eq([parking_notification_initial.latitude, parking_notification_initial.longitude])
+        expect(response).to redirect_to organization_parking_notification_path(parking_notification, organization_id: current_organization.to_param)
 
-      expect(parking_notification.user).to eq current_user
-      expect(parking_notification.organization).to eq current_organization
-      expect(parking_notification.repeat_record?).to be_truthy
-      expect(parking_notification.current?).to be_truthy
-      expect(parking_notification.message).to be_blank
-      expect(parking_notification.retrieval_link_token).to be_present
-      expect(parking_notification.retrieval_link_token).to_not eq parking_notification_initial.retrieval_link_token
-      expect(parking_notification.delivery_status).to eq "email_success"
+        expect([parking_notification.latitude, parking_notification.longitude]).to eq([parking_notification_initial.latitude, parking_notification_initial.longitude])
+
+        expect(parking_notification.user).to eq current_user
+        expect(parking_notification.organization).to eq current_organization
+        expect(parking_notification.repeat_record?).to be_truthy
+        expect(parking_notification.current?).to be_truthy
+        expect(parking_notification.message).to be_blank
+        expect(parking_notification.retrieval_link_token).to be_present
+        expect(parking_notification.retrieval_link_token).to_not eq parking_notification_initial.retrieval_link_token
+        expect(parking_notification.delivery_status).to eq "email_success"
+      end
 
       bike.reload
       expect(bike.status).to eq "status_with_owner"
