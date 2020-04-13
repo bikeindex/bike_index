@@ -116,7 +116,7 @@ class BikeCreator
         bike_sticker && bike_sticker.claim(@bike.creator, @bike.id)
       end
       if @b_param.unregistered_parking_notification?
-        ParkingNotification.create(@b_param.parking_notification_params)
+        ParkingNotification.create!(@b_param.parking_notification_params)
         # We skipped setting address, with default_parking_notification_attrs, set it now via the parking_notification
         @bike.set_address
         @bike.save

@@ -62,7 +62,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def associated_impound_record; impound_record || associated_notifications.with_impound_record.first&.impound_record end
 
-  # Get it unscoped
+  # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 
   def active?; self.class.active_statuses.include?(status) end
@@ -117,6 +117,7 @@ class ParkingNotification < ActiveRecord::Base
   def notification_number; repeat_number + 1 end
 
   # TODO: location refactor - copied method from stolen
+  # ... however, because this has a hide_address attr, which means by default we show addresses
   def address(skip_default_country: true, force_show_address: false)
     country_string =
       if country&.iso&.in?(%w[US USA])
@@ -195,7 +196,7 @@ class ParkingNotification < ActiveRecord::Base
   private
 
   def calculated_unregistered_parking_notification
-    bike.unregistered_parking_notification?
+    bike&.unregistered_parking_notification?
   end
 
   def calculated_status
