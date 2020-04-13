@@ -30,10 +30,7 @@ module Organized
 
     def show
       @parking_notification = parking_notifications.find(params[:id])
-      related_ids = [@parking_notification, @parking_notification.initial_record_id].compact
-      @related_notifications = parking_notifications.where(id: related_ids)
-                                .or(parking_notifications.where(initial_record_id: related_ids))
-                                .where.not(id: @parking_notification.id)
+      @related_notifications = @parking_notification.associated_notifications.reorder(id: :desc)
       @bike = @parking_notification.bike
     end
 
@@ -110,7 +107,8 @@ module Organized
       # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
       flash[:success] ||= "Created #{successes.count} #{kind_humanized} notifications"
     rescue
-      flash[:error] = "Unable to send notifications for #{(ids - successes).join(", ")}"
+      error_id_message = (ids - successes).map { |i| "##{i}" }.join(", ")
+      flash[:error] = "Unable to send notifications for #{error_id_message}"
     end
 
     def ensure_access_to_parking_notifications!

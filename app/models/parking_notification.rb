@@ -213,12 +213,15 @@ class ParkingNotification < ActiveRecord::Base
     if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
       mark_retrieved!(new_attrs[:user_id], "organization_recovery")
     else
-      return self unless self.active?
+      return self unless active?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
                                 "location_from_address", "retrieval_link_token", "delivery_status")
                         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
-      ParkingNotification.create!(attrs)
+      new_notification = ParkingNotification.new(attrs)
+      new_notification.save
+      pp "ERRRRRORS: #{new_notification.errors.full_messages}"
+      new_notification.save!
     end
   end
 

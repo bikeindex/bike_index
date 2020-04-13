@@ -32,7 +32,7 @@
           %td
             - if @parking_notification.current?
               %em.less-strong
-                This is the current (most-recent) recent parking notification
+                This is the current parking notification for this #{@bike.type}
             - elsif @parking_notification.superseded?
               %em.less-strong
                 This parking notification is still active, but
@@ -49,7 +49,7 @@
                     = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
                     %small
                       %em
-                        created at
+                        created
                         %span.convertTime.preciseTime
                           = l(impound_notification.created_at, format: :convert_time)
                       by #{impound_notification.user.display_name}
@@ -59,8 +59,26 @@
             - elsif @parking_notification.retrieved?
               %span.text-warning
                 This #{@bike.type} has been retrieved!
-                %br
-                  It was marked retrieved by XXXX on YYYY
+              %br
+                - retrieved_notification = @parking_notification if @parking_notification.retrieved_at.present?
+                - retrieved_notification ||= @parking_notification.associated_notifications.where.not(retrieved_at: nil).first
+                Marked retrieved
+                %span.convertTime.preciseTime
+                  = l(retrieved_notification.created_at, format: :convert_time)
+                by
+                - if retrieved_notification.organization_recovery?
+                  #{current_organization.short_name} (<em>#{retrieved_notification.retrieved_by.display_name}</em>)
+                - else
+                  the user
+                - if current_user.developer?
+                  %br
+                  %small
+                    %span.less-strong developer info:
+                    %code
+                      #{retrieved_notification.retrieval_kind}
+                    %em.less-strong
+                      notification:
+                      = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
 
         %tr
           %td= t(".bike")
@@ -98,9 +116,10 @@
             - if @parking_notification.initial_record?
               %span.less-strong First notification
             - else
-              \ ##{@parking_notification.notification_number}
-              %em.small.less-strong.ml-2
-                first notification on
+              %strong
+                = @parking_notification.notification_number
+              %em.small.less-strong.ml-1
+                first notification sent
                 %a.convertTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
                   - if @parking_notification.initial_record.present?
                     = l(@parking_notification.initial_record.created_at, format: :convert_time)
@@ -171,8 +190,10 @@
                   = submit_tag "Create notification", class: "btn btn-success btn-md-lg"
 
 - if @related_notifications.any?
-  %h3{ style: "margin-top: 60px;" }
+  %h2.uncap{ style: "margin-top: 60px;" }
     Related Notifications
+    %em
+      (#{@related_notifications.count + 1} total)
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: @related_notifications, skip_bike: true, skip_map_cell: true }
 
 - if @parking_notification.send_email?
