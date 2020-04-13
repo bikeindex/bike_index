@@ -218,10 +218,7 @@ class ParkingNotification < ActiveRecord::Base
                                 "location_from_address", "retrieval_link_token", "delivery_status")
                         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
-      new_notification = ParkingNotification.new(attrs)
-      new_notification.save
-      pp "ERRRRRORS: #{new_notification.errors.full_messages}"
-      new_notification.save!
+      ParkingNotification.create!(attrs)
     end
   end
 
