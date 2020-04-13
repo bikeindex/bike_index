@@ -10,15 +10,17 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :organization
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
-  has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
+  belongs_to :retrieved_by, class_name: "User"
   belongs_to :country
   belongs_to :state
+
+  has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
 
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
 
   before_validation :set_calculated_attributes
-  after_create :process_creation
+  after_create :process_notification
 
   enum kind: KIND_ENUM
   enum status: STATUS_ENUM
@@ -88,6 +90,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def reply_to_email; organization&.auto_user&.email || user&.email end
 
+  def current_associated_notification; current? ? self : associated_notifications.order(:id).last end
+
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
 
@@ -116,6 +120,15 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def notification_number; repeat_number + 1 end
+
+  def mark_retrieved!(r_user_id, r_kind, r_at = nil)
+    return self if retrieved?
+    update_attributes!(retrieved_by_id: r_user_id,
+                       retrieval_kind: r_kind,
+                       retrieved_at: r_at || Time.current)
+    process_notification
+    self
+  end
 
   # TODO: location refactor - copied method from stolen
   # ... however, because this has a hide_address attr, which means by default we show addresses
@@ -187,19 +200,26 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def process_creation
+  def process_notification
     # Update the bike immediately, inline
     bike&.set_address
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
   end
 
-  def create_repeat_notification!(new_attrs)
-    attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-                              "location_from_address", "retrieval_link_token", "delivery_status")
-                      .merge(new_attrs)
-    attrs["initial_record_id"] ||= id
-    ParkingNotification.create!(attrs)
+  # new_attrs needs to include kind and user_id. It can include additional attrs if they matter
+  def retrieve_or_repeat_notification!(new_attrs)
+    new_attrs = new_attrs.with_indifferent_access
+    if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
+      mark_retrieved!(new_attrs[:user_id], "organization_recovery")
+    else
+      return self unless self.active?
+      attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
+                                "location_from_address", "retrieval_link_token", "delivery_status")
+                        .merge(new_attrs)
+      attrs["initial_record_id"] ||= id
+      ParkingNotification.create!(attrs)
+    end
   end
 
   private

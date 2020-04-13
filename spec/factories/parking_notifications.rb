@@ -15,6 +15,16 @@ FactoryBot.define do
       country { Country.united_states }
     end
 
+    trait :retrieved do
+      retrieval_kind { "organization_recovery" }
+      retrieved_by_id { user.id }
+      retrieved_at { Time.current }
+
+      after(:create) do |parking_notification, evaluator|
+        parking_notification.mark_retrieved!(evaluator.retrieval_kind, evaluator.retrieved_by_id, evaluator.retrieved_at)
+      end
+    end
+
     factory :parking_notification_organized do
       organization { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
       user { FactoryBot.create(:organization_member, organization: organization) }

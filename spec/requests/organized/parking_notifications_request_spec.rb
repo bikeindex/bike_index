@@ -277,12 +277,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
         expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason"
-        parking_notification = ParkingNotification.last
+        parking_notification = ParkingNotification.reorder(:id).last
+
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_parking_notification_path(parking_notification, organization_id: current_organization.to_param)
 
         expect([parking_notification.latitude, parking_notification.longitude]).to eq([parking_notification_initial.latitude, parking_notification_initial.longitude])
-
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.repeat_record?).to be_truthy

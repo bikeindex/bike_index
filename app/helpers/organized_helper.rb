@@ -25,6 +25,11 @@ module OrganizedHelper
     end
   end
 
+  # Used in two places, so... putting it here. Probably is a better place somewhere else
+  def parking_notification_repeat_kinds
+    ParkingNotification.kinds_humanized.map { |k, v| [v, k] } + [["Mark retrieved", "mark_retreived"]]
+  end
+
   def export_progress_class(export)
     return "text-danger" if export.calculated_progress == "errored"
     export.calculated_progress == "finished" ? "text-success" : "text-warning"

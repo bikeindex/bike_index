@@ -32,10 +32,35 @@
           %td
             - if @parking_notification.current?
               %em.less-strong
-                This is the most recent parking notification
+                This is the current (most-recent) recent parking notification
             - elsif @parking_notification.superseded?
+              %em.less-strong
+                This parking notification is still active, but
+                = link_to "notification ##{@parking_notification.current_associated_notification.notification_number}", organization_parking_notification_path(@parking_notification.current_associated_notification, organization_id: current_organization.to_param)
+                is more recent
             - elsif @parking_notification.impounded?
+              %strong.text-danger
+                This #{@bike.type} was impounded
+              %ul
+                - if !@parking_notification.impound_notification?
+                  - impound_notification = @parking_notification.associated_notifications.impound_notification.last
+                  %li
+                    View the
+                    = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
+                    %small
+                      %em
+                        created at
+                        %span.convertTime.preciseTime
+                          = l(impound_notification.created_at, format: :convert_time)
+                      by #{impound_notification.user.display_name}
+                %li
+                  View the
+                  = link_to "impound record", organization_impound_record_path(@parking_notification.associated_impound_record_id, organization_id: current_organization.to_param)
             - elsif @parking_notification.retrieved?
+              %span.text-warning
+                This #{@bike.type} has been retrieved!
+                %br
+                  It was marked retrieved by XXXX on YYYY
 
         %tr
           %td= t(".bike")
@@ -94,6 +119,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=#{ENV["GOOGLE_MAPS"]}&sensor=false" type="text/javascript">
 </script>
 
+-# TODO: Put this into the actual JS files :/
 :plain
   <script type="text/javascript">
     var map;
@@ -113,6 +139,13 @@
     }
     $(document).ready(function() {
       google.maps.event.addDomListener(window, "load", initialize);
+      $("#sendRepeatOrRetrieveFields select").on("change", function(e) {
+        var submitText =
+          $("#sendRepeatOrRetrieveFields select").val() == "mark_retreived"
+            ? "Resolve notification"
+            : "Create notification";
+        $("#sendRepeatOrRetrieveFields .btn").val(submitText);
+      });
     });
   </script>
 
@@ -126,13 +159,14 @@
             .card-title
               %h3.uncap
                 - if @parking_notification.send_email?
-                  Send repeat notification
+                  Send additional notification
                 - else
-                  Repeat notification
+                  Create additional notification
+                or mark retrieved
             .card-body
-              .row
+              .row#sendRepeatOrRetrieveFields
                 .col-xs-6
-                  = select_tag :kind, options_for_select(ParkingNotification.kinds_humanized.map { |k, v| [v, k] }, selected: @parking_notification.kind), class: "form-control"
+                  = select_tag :kind, options_for_select(parking_notification_repeat_kinds, selected: @parking_notification.kind), class: "form-control"
                 .col-xs-6.text-center
                   = submit_tag "Create notification", class: "btn btn-success btn-md-lg"
 
