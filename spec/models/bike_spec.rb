@@ -1020,15 +1020,14 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007") }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
-      let(:target_address) { default_location_registration_address.except("latitude", "longitude") }
       it "returns the user's address" do
-        expect(user.address_hash).to eq target_address
-        expect(bike.registration_address).to eq target_address
+        expect(user.address_hash).to eq default_location_registration_address
+        expect(bike.registration_address).to eq default_location_registration_address
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
         it "returns nothing" do
-          expect(user.address_hash).to eq target_address
+          expect(user.address_hash).to eq default_location_registration_address
           expect(bike.user).to_not eq user
           expect(bike.registration_address).to eq({})
         end
