@@ -1570,9 +1570,8 @@ RSpec.describe Bike, type: :model do
           :request_location,
           default_location.merge(postal_code: default_location[:zipcode] )
         )
-        location = RequestGeolocationInfo.decorate(geocoder_data)
 
-        bike.set_location_info(request_location: location)
+        bike.set_location_info(request_location: geocoder_data)
 
         expect(bike.city).to eq(geocoder_data.city)
         expect(bike.zipcode).to eq(geocoder_data.postal_code)

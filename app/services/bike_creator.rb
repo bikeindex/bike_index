@@ -2,7 +2,7 @@ class BikeCreator
   def initialize(b_param = nil, location: nil)
     @b_param = b_param
     @bike = nil
-    @location = RequestGeolocationInfo.decorate(location)
+    @location = location
   end
 
   def build_bike

@@ -663,19 +663,18 @@ class Bike < ApplicationRecord
   # 5. The bike owner's address, if available
   # 6. The request's IP address, if given
   def find_location_info(geolocation = nil)
-    location_record = [
+    location_records = [
       current_parking_notification,
       current_stolen_record,
       creation_organization,
       owner,
-    ].compact.find(&:bike_location_info?)
+      geolocation,
+    ]
 
-    return location_record if location_record.present?
-
-    # Need to test what the responses from this look like - probably slightly
-    # different
-    geolocation&.address = current_parking_notification&.address
-    geolocation if geolocation&.bike_location_info?
+    location_records
+      .compact
+      .map { |rec| Geohelper.location_from_result(rec) }
+      .find { |rec| rec[:country] && (rec[:city] || rec[:zipcode]) }
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.).
@@ -687,12 +686,12 @@ class Bike < ApplicationRecord
     location_record = find_location_info(request_location)
     return unless location_record.present?
 
-    self.address = location_record.address
-    self.city = location_record.city
-    self.country = location_record.country
-    self.latitude = location_record.latitude
-    self.longitude = location_record.longitude
-    self.zipcode = location_record.zipcode
+    self.address = location_record[:address]
+    self.city = location_record[:city]
+    self.country = location_record[:country]
+    self.latitude = location_record[:latitude]
+    self.longitude = location_record[:longitude]
+    self.zipcode = location_record[:zipcode]
   end
 
   def organization_affiliation
