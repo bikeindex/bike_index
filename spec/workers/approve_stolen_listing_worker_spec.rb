@@ -25,7 +25,7 @@ RSpec.describe ApproveStolenListingWorker, type: :job, vcr: true do
 
   context "given a bike with a current stolen record and a nearby twitter account" do
     it "creates twitter stolen bike alert" do
-      FactoryBot.create(:twitter_account_1, :active)
+      FactoryBot.create(:twitter_account_1, :active, :in_nyc)
       bike = FactoryBot.create(:stolen_bike)
       ApproveStolenListingWorker.new.perform(bike.id)
     end

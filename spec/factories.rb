@@ -206,4 +206,14 @@ FactoryBot.define do
     street { "278 Broadway" }
     zipcode { "10007" }
   end
+
+  trait :in_vancouver do
+    latitude { 49.253992 }
+    longitude { -123.241084 }
+    street { "278 Broadway" }
+    zipcode { "10007" }
+    city { "Vancouver" }
+    state
+    country { Country.canada }
+  end
 end
