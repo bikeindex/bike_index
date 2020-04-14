@@ -392,7 +392,6 @@ CREATE TABLE public.bikes (
     latitude double precision,
     longitude double precision,
     status integer DEFAULT 0,
-    address character varying,
     street character varying,
     state_id bigint
 );
@@ -1245,8 +1244,7 @@ CREATE TABLE public.locations (
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
     country_id integer,
-    state_id integer,
-    address character varying
+    state_id integer
 );
 
 
@@ -2192,8 +2190,7 @@ CREATE TABLE public.stolen_records (
     show_address boolean DEFAULT false,
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
-    neighborhood character varying,
-    address character varying
+    neighborhood character varying
 );
 
 
@@ -2469,8 +2466,7 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    has_stolen_bikes_without_locations boolean DEFAULT false,
-    address character varying
+    has_stolen_bikes_without_locations boolean DEFAULT false
 );
 
 
@@ -4662,5 +4658,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200403234228'),
 ('20200409201638'),
 ('20200410043813'),
-('20200410183949');
+('20200410183949'),
+('20200414055430');
+
 

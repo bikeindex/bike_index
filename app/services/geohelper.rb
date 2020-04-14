@@ -67,7 +67,6 @@ class Geohelper
 
       location =
         {
-          address: result.address.presence,
           city: result.city.presence,
           latitude: result.latitude.presence,
           longitude: result.longitude.presence,
@@ -75,12 +74,15 @@ class Geohelper
 
       if result.respond_to?(:country_code)
         location.merge(
+          state: State.fuzzy_find(result.state_code),
           country: Country.fuzzy_find(result.country_code),
           zipcode: result.postal_code.presence,
         )
       else
         location.merge(
-          country: result.country.presence,
+          street: result.street.presence,
+          state: result.state,
+          country: result.country,
           zipcode: result.zipcode.presence,
         )
       end

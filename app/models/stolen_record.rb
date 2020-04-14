@@ -51,7 +51,6 @@ class StolenRecord < ApplicationRecord
   scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
-  before_validation :set_address
   after_validation :reverse_geocode, unless: :skip_geocoding?
   after_save :remove_outdated_alert_images
   after_commit :update_associations
@@ -89,24 +88,16 @@ class StolenRecord < ApplicationRecord
   def pre_recovering_user?; recovered_at.present? && recovered_at < self.class.recovering_user_recording_start end
 
   # Only display if they have put in an address - so that we don't show on initial creation
-  def display_checklist?; display_address.present? end
+  def display_checklist?; address.present? end
 
   def missing_location?; street.blank? end
 
-  def display_address(skip_default_country: false, force_show_address: false)
-    country_string = country && country.iso
-    if skip_default_country
-      country_string = nil if country_string == "US"
-    else
-      return nil unless country
-    end
-    [
-      (force_show_address || show_address) ? street : nil,
-      city,
-      state&.abbreviation,
-      zipcode,
-      country_string,
-    ].reject(&:blank?).join(", ")
+  def address(skip_default_country: false, force_show_address: false)
+    Geocodeable.address(
+      self,
+      street: (force_show_address || show_address),
+      country: [(:skip_default if skip_default_country)]
+    ).presence
   end
 
   # The stolen bike's general location (city and state / city and country if non-US)
@@ -185,13 +176,6 @@ class StolenRecord < ApplicationRecord
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
     self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
-  end
-
-  def set_address
-    self.address = display_address(
-      force_show_address: true,
-      skip_default_country: false
-    )
   end
 
   def fix_date

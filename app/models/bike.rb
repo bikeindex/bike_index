@@ -461,7 +461,7 @@ class Bike < ApplicationRecord
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.display_address && "from #{current_stolen_record.display_address}. ",
+      current_stolen_record.address && "from #{current_stolen_record.address}. ",
     ].compact.join(" ")
   end
 
@@ -531,13 +531,6 @@ class Bike < ApplicationRecord
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
     true
-  end
-
-  # Geolocate based on the full current stolen record address, if available.
-  # Otherwise, use the data set by set_location_info.
-  def set_address
-    # Sets lat/long, will avoid a geocode API call if coordinates are found
-    set_location_info
   end
 
   def normalize_emails
@@ -678,16 +671,21 @@ class Bike < ApplicationRecord
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.).
+  #
+  # Geolocate based on the full current stolen record address, if available.
+  # Otherwise, use the data set by set_location_info.
+  # Sets lat/long, will avoid a geocode API call if coordinates are found
   def set_location_info(request_location: nil)
     # ensure current_stolen_record is set if available
     find_current_stolen_record
 
     # select a source of location info
     location_record = find_location_info(request_location)
-    return unless location_record.present?
+    return if location_record.blank?
 
-    self.address = location_record[:address]
+    self.street = location_record[:street]
     self.city = location_record[:city]
+    self.state = location_record[:state]
     self.country = location_record[:country]
     self.latitude = location_record[:latitude]
     self.longitude = location_record[:longitude]

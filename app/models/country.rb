@@ -34,4 +34,8 @@ class Country < ApplicationRecord
   def self.valid_names
     StatesAndCountries.countries.map { |c| c[:name] }
   end
+
+  def default?
+    name == "United States"
+  end
 end

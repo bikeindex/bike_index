@@ -116,26 +116,12 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
-  # TODO: location refactor - copied method from stolen
-  def address(skip_default_country: true, force_show_address: false)
-    country_string =
-      if country&.iso&.in?(%w[US USA])
-        skip_default_country ? nil : "USA"
-      else
-        country&.iso
-      end
-
-    [
-      (force_show_address || show_address) ? street : nil,
-      city,
-      [state&.abbreviation, zipcode].reject(&:blank?).join(" "),
-      country_string,
-    ].reject(&:blank?).join(", ")
-  end
-
-  # Proxy method for now
-  def display_address(skip_default_country: true, force_show_address: false)
-    address(skip_default_country: skip_default_country, force_show_address: force_show_address)
+  def address(force_show_address: false)
+    Geocodeable.address(
+      self,
+      street: (force_show_address || show_address),
+      country: %i[skip_default optional],
+    ).presence
   end
 
   def set_location_from_organization
@@ -187,7 +173,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def process_creation
     # Update the bike immediately, inline
-    bike&.set_address
+    bike&.set_location_info
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
   end
