@@ -6,6 +6,7 @@ RSpec.shared_context :geocoder_default_location do
       address: "New York, NY, USA",
       formatted_address: "278 Broadway, New York, NY 10007, USA",
       formatted_address_no_country: "278 Broadway, New York, NY 10007",
+      street: "278 Broadway",
       city: "New York",
       state: "New York",
       state_code: "NY",
@@ -19,11 +20,11 @@ RSpec.shared_context :geocoder_default_location do
   let(:default_location_registration_address) do
     # when passed through the registration address method, default location comes out like this
     {
-      address: "278 Broadway",
+      street: "278 Broadway",
       city: "New York",
       state: "NY",
       zipcode: "10007",
-      country: "USA",
+      country: "US",
       latitude: 40.7143528,
       longitude: -74.0059731,
     }.as_json

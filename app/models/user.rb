@@ -320,17 +320,6 @@ class User < ApplicationRecord
     end
   end
 
-  def address_hash
-    return if address.blank?
-    {
-      address: street,
-      city: city,
-      state: (state&.abbreviation),
-      zipcode: zipcode,
-      country: country&.iso,
-    }.as_json
-  end
-
   def update_auth_token(auth_token_type, time = nil)
     generate_auth_token(auth_token_type, time)
     save

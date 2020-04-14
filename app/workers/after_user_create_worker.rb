@@ -81,16 +81,7 @@ class AfterUserCreateWorker < ApplicationWorker
     # Only do address import if the user doesn't have an address present
     unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
       address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
-      if address.present?
-        user.attributes = { skip_geocoding: true,
-                            street: address["address"],
-                            zipcode: address["zipcode"],
-                            city: address["city"],
-                            state: State.fuzzy_find(address["state"]),
-                            country: Country.fuzzy_find(address["country"]),
-                            latitude: address["latitude"],
-                            longitude: address["longitude"] }
-      end
+      user.attributes = address.merge(skip_geocoding: true) if address.present?
     end
     user.save if user.changed?
   end

@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
+  it_behaves_like "geocodeable"
 
   describe "scopes" do
     it "default scopes to created_at desc" do
@@ -1020,15 +1021,15 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007") }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
-      let(:target_address) { default_location_registration_address.except("latitude", "longitude").merge("country" => "US") } # Annoying discrepancy
       it "returns the user's address" do
-        expect(user.address_hash).to eq target_address
-        expect(bike.registration_address).to eq target_address
+        expect(user.address_hash).to eq default_location_registration_address
+        expect(bike.registration_address).to eq default_location_registration_address
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
         it "returns nothing" do
-          expect(user.address_hash).to eq target_address
+          expect(user.address_hash).to eq default_location_registration_address
+          expect(bike.user).to_not eq user
           expect(bike.registration_address).to eq({})
         end
       end
@@ -1036,8 +1037,8 @@ RSpec.describe Bike, type: :model do
     context "with registration_address" do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:bike) { FactoryBot.create(:bike) }
-      let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
-      let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "USA", latitude: 41.933238, longitude: -87.71476299999999 } }
+      let(:b_param_params) { { bike: { street: "2864 Milwaukee Ave" } } }
+      let(:target) { { street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "USA", latitude: 41.933238, longitude: -87.71476299999999 } }
       include_context :geocoder_real
       it "returns the fetched address" do
         expect(bike.b_params.pluck(:id)).to eq([b_param.id])
@@ -1048,6 +1049,19 @@ RSpec.describe Bike, type: :model do
         b_param.reload
         # Just check that we stored it, since lazily not testing this anywhere else
         expect(b_param.params["formatted_address"]).to eq target.as_json
+      end
+      context "legacy address (street -> address)" do
+        let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
+        it "returns the fetched address" do
+          expect(bike.b_params.pluck(:id)).to eq([b_param.id])
+          bike.reload
+          VCR.use_cassette("bike-fetch_formatted_address") do
+            expect(bike.registration_address).to eq target.as_json
+          end
+          b_param.reload
+          # Just check that we stored it, since lazily not testing this anywhere else
+          expect(b_param.params["formatted_address"]).to eq target.as_json
+        end
       end
       context "with multiple b_params" do
         let!(:b_param_params) { { formatted_address: target, bike: { address: "2864 Milwaukee Ave" } } }
