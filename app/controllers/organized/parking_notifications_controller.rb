@@ -104,11 +104,12 @@ module Organized
         flash[:success] = "Created #{kind_humanized} notification!"
         @redirect_location = organization_parking_notification_path(successes.first, organization_id: current_organization.to_param)
       end
-      # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
+      flash[:success] ||= "Marked #{successes.count} bikes retrieved" if kind == "mark retrieved"
+
       flash[:success] ||= "Created #{successes.count} #{kind_humanized} notifications"
-    rescue
-      error_id_message = (ids - successes).map { |i| "##{i}" }.join(", ")
-      flash[:error] = "Unable to send notifications for #{error_id_message}"
+      # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
+      # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry
+      # flash[:error] = "Unable to send notifications for #{(ids - successes).map { |i| "##{i}" }.join(", ")}"
     end
 
     def ensure_access_to_parking_notifications!

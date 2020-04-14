@@ -55,13 +55,13 @@
                       by #{impound_notification.user.display_name}
                 %li
                   View the
-                  = link_to "impound record", organization_impound_record_path(@parking_notification.associated_impound_record_id, organization_id: current_organization.to_param)
+                  -# TODO: once impound controller is updated, make this link work
+                  = link_to "impound record", "#" # organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
             - elsif @parking_notification.retrieved?
               %span.text-warning
                 This #{@bike.type} has been retrieved!
               %br
-                - retrieved_notification = @parking_notification if @parking_notification.retrieved_at.present?
-                - retrieved_notification ||= @parking_notification.associated_notifications.where.not(retrieved_at: nil).first
+                - retrieved_notification = @parking_notification.associated_retrieved_notification
                 Marked retrieved
                 %span.convertTime.preciseTime
                   = l(retrieved_notification.created_at, format: :convert_time)

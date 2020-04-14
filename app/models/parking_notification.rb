@@ -3,7 +3,7 @@
 class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
   STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3 }.freeze
-  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recoverry: 1, user_recovery: 2 }.freeze
+  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -61,10 +61,6 @@ class ParkingNotification < ActiveRecord::Base
       .or(where(id: initial_record_id))
   end
 
-  def associated_impound_record_id; impound_record_id || associated_notifications.pluck(:impound_record_id).compact.first end
-
-  def associated_impound_record; impound_record || associated_notifications.with_impound_record.first&.impound_record end
-
   # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 
@@ -94,6 +90,12 @@ class ParkingNotification < ActiveRecord::Base
 
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
+
+  # All get applied
+  def associated_retrieved_notification
+    return nil unless retrieved?
+    retrieved_by_id.present? ? self : associated_notifications.where.not(retrieved_by_id: nil).first
+  end
 
   def earlier_bike_notifications
     notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
@@ -229,7 +231,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def calculated_status
-    return "impounded" if impound_notification? || associated_impound_record_id.present?
+    return "impounded" if impound_notification? || impound_record_id.present?
     return "retrieved" if retrieved_at.present? || associated_notifications.retrieved.any?
     associated_notifications.where("id > ?", id).any? ? "superseded" : "current"
   end

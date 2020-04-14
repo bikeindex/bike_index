@@ -171,9 +171,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
 
   describe "parking_notification" do
     context "geolocation" do
-      let(:parking_notification) { FactoryBot.create(:parking_notification, organization: organization) }
+      let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization) }
       let(:mail) { OrganizedMailer.parking_notification(parking_notification) }
-      let(:target_retrieval_link_url) { "http://stuff.com/bikes/#{parking_notification.bike_id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"}
+      let(:target_retrieval_link_url) { "parking_notification_retrieved=#{parking_notification.retrieval_link_token}" }
       before { expect(header_mail_snippet).to be_present }
       it "renders email" do
         expect(parking_notification.retrieval_link_token).to be_present
