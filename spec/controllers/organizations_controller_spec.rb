@@ -62,10 +62,10 @@ RSpec.describe OrganizationsController, type: :controller do
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
       post :create, params: {
-organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
+        organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
                                                   website: "<script>alert(document.cookie)</script>",
                                                   kind: "cooooooolll_software")
-}
+      }
       expect(Organization.count).to eq(1)
       user.reload
       expect(user.organizations.count).to eq 1
@@ -114,7 +114,7 @@ organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
     end
     context "with all the paid features possible" do
       # Because we render different fields for some of the paid features, make sure they all work
-      let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: PaidFeature::EXPECTED_SLUGS) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, :paid_features, enabled_feature_slugs: PaidFeature::EXPECTED_SLUGS) }
       it "renders embed without xframe block" do
         get :embed, params: { id: organization.slug, stolen: 1 }
         expect(response).to render_template(:embed)

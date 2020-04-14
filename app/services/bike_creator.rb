@@ -15,6 +15,7 @@ class BikeCreator
     bike = Bike.new(bike_attrs)
     # we're getting a null value in stolen - add this to holdover until we switchover to status
     bike.stolen = !!bike.stolen
+    bike.attributes = @b_param.address_hash
     bike.b_param_id = @b_param.id
     bike.b_param_id_token = @b_param.id_token
     bike.creator_id = @b_param.creator_id

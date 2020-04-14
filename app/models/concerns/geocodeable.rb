@@ -42,8 +42,19 @@ module Geocodeable
   def address_hash
     attributes.slice("street", "city", "zipcode")
               .merge(state: state&.abbreviation, country: country&.iso)
-              .with_indifferent_access
               .compact
+              .with_indifferent_access
+  end
+
+  # Override assignment to enable friendly finding
+  def state=(val)
+    return super unless val.is_a?(String)
+    self.state = State.fuzzy_find(val)
+  end
+
+  def country=(val)
+    return super unless val.is_a?(String)
+    self.country = Country.fuzzy_find(val)
   end
 
   # Build an address string from the given object's location data.

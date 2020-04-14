@@ -67,8 +67,8 @@ class BParam < ApplicationRecord
   end
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker address
-       handlebar_type_slug is_bulk is_new is_pos no_duplicate accuracy)
+    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
+       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country)
   end
 
   def self.email_search(str)
@@ -168,6 +168,8 @@ class BParam < ApplicationRecord
       bike[key] || bike["address_#{key}"]
     end
   end
+
+  def address_hash; %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h.compact end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
   def display_email?; true unless owner_email.present? && bike_errors.blank? end
@@ -370,7 +372,7 @@ class BParam < ApplicationRecord
       fallback_address = address("street")
       formatted_address = Geohelper.formatted_address_hash(fallback_address)
       # return at least something from legacy entries that don't have enough info to guess address
-      formatted_address = { address: fallback_address } if formatted_address.blank? && fallback_address.present?
+      formatted_address = { street: fallback_address } if formatted_address.blank? && fallback_address.present?
     end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)
