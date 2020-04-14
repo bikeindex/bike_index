@@ -2344,11 +2344,9 @@ CREATE TABLE public.twitter_accounts (
     city character varying,
     consumer_key character varying NOT NULL,
     consumer_secret character varying NOT NULL,
-    country character varying,
     language character varying,
     neighborhood character varying,
     screen_name character varying NOT NULL,
-    state character varying,
     user_secret character varying NOT NULL,
     user_token character varying NOT NULL,
     twitter_account_info jsonb DEFAULT '{}'::jsonb,
@@ -4659,6 +4657,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200409201638'),
 ('20200410043813'),
 ('20200410183949'),
-('20200414055430');
+('20200414055430'),
+('20200414055431');
 
 

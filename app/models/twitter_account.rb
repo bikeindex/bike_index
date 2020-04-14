@@ -28,8 +28,9 @@ class TwitterAccount < ApplicationRecord
     if (geo = results.first)
       account.city = geo.city
       account.neighborhood = geo.neighborhood
-      account.state = State.fuzzy_find(geo.state_code)
-      account.country = Country.fuzzy_find(geo.country)
+      country = Country.fuzzy_find(geo.country)
+      account.country = country
+      account.state = State.fuzzy_find(geo.state_code) if country&.united_states?
     end
   end
 

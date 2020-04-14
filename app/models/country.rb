@@ -35,7 +35,11 @@ class Country < ApplicationRecord
     StatesAndCountries.countries.map { |c| c[:name] }
   end
 
+  def united_states?
+    iso.upcase == "US"
+  end
+
   def default?
-    name == "United States"
+    united_states?
   end
 end
