@@ -88,6 +88,9 @@ class ParkingNotification < ActiveRecord::Base
 
   def current_associated_notification; current? ? self : associated_notifications.order(:id).last end
 
+  # Fallback to created_at because something is busted and we need this to exist sometimes
+  def impounded_at; impounded? ? impound_record&.created_at || created_at : nil end
+
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
 

@@ -72,21 +72,27 @@
 
 // We don't want to display extended-col-info except on the main table, when the screen is small
 .extended-col-info {
-  display: none;
+  &,
+  &.d-block {
+    display: none !important;
+  }
 }
 // For small tables, we want to just have two cells, so that it isn't too wide for the page
 // This is outside of the above scope because it is also shown on non-organized pages
 @include media-breakpoint-down(md) {
   .extended-col-info {
     line-height: 1.25;
-    display: inline-block;
+    display: inline-block !important;
+    &.d-block {
+      display: block !important;
+    }
   }
 
   .msgbikelink {
-    display: block;
+    display: block !important;
   }
 
   .hidden-sm-cells {
-    display: none;
+    display: none !important;
   }
 }

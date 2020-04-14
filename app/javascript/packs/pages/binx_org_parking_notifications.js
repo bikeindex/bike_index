@@ -174,6 +174,9 @@ export default class BinxAppOrgParkingNotifications {
             record.impund_record_at
           }</a>`
         : "";
+    const retrievedAtSpan = record.retrieved_at
+      ? `<span class="convertTime preciseTime">${record.retrieved_at}</span>`
+      : "";
     return `<tr class="record-row" data-recordid="${
       record.id
     }"><td class="map-cell"><a>↑</a></td><td><a href="${showCellUrl}" class="convertTime">${
@@ -184,16 +187,26 @@ export default class BinxAppOrgParkingNotifications {
       record.notification_number > 1
         ? "- notification #" + record.notification_number
         : ""
-    }</strong></span> <span class="extended-col-info"><br>${bikeLink}
-    ${impoundLink.length ? "<br>Impounded: " + impoundLink : ""}
-    </span>
+    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span>
+    ${
+      impoundLink.length
+        ? "<strong class='small extended-col-info d-block'>Impounded: " +
+          impoundLink
+        : "</strong>"
+    }
+    ${
+      retrievedAtSpan.length
+        ? "<strong class='small extended-col-info d-block'>Retrieved: " +
+          retrievedAtSpan
+        : "</strong>"
+    }
       </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
     }</em></td><td class="hidden-sm-cells">${
       record.user_display_name
     }</td><td class="hidden-sm-cells">${
       record.notification_number > 1 ? record.notification_number : ""
-    }</td><td class="hidden-sm-cells">${impoundLink}</td>`;
+    }</td><td class="hidden-sm-cells">${impoundLink}</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>`;
   }
 
   mapPopup(point) {
