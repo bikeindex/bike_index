@@ -165,4 +165,45 @@ FactoryBot.define do
       end
     end
   end
+
+  # Location traits
+  trait :in_amsterdam do
+    latitude { 52.37403 }
+    longitude { 4.88969 }
+    city { "Amsterdam" }
+    state { nil }
+    country { Country.netherlands }
+    street { "Spuistraat 134afd.Gesch." }
+    zipcode { "1012" }
+  end
+
+  trait :in_chicago do
+    latitude { 41.8624488 }
+    longitude { -87.6591502 }
+    city { "Chicago" }
+    state { State.find_or_create_by(FactoryBot.attributes_for(:state_illinois)) }
+    country { Country.united_states }
+    street { "1300 W 14th Pl" }
+    zipcode { "60608" }
+  end
+
+  trait :in_los_angeles do
+    latitude { 34.05223 }
+    longitude { -118.24368 }
+    street { "100 W 1st St" }
+    city { "Los Angeles" }
+    state { State.find_or_create_by(FactoryBot.attributes_for(:state_california)) }
+    zipcode { "90021" }
+    country { Country.united_states }
+  end
+
+  trait :in_nyc do
+    latitude { 40.7143528 }
+    longitude { -74.0059731 }
+    city { "New York" }
+    state { State.find_or_create_by(FactoryBot.attributes_for(:state_new_york)) }
+    country { Country.united_states }
+    street { "278 Broadway" }
+    zipcode { "10007" }
+  end
 end
