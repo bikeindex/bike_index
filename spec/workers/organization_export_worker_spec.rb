@@ -79,7 +79,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           VCR.use_cassette("organization_export_worker-avery") do
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place
-            expect(bike_not_avery.registration_address["address"].present?).to be_falsey
+            expect(bike_not_avery.registration_address["street"].present?).to be_falsey
           end
           export.reload
           expect(export.progress).to eq "finished"

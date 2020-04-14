@@ -362,7 +362,7 @@ class BParam < ApplicationRecord
   end
 
   def fetch_formatted_address
-    return {} unless bike["address"].present?
+    return {} unless bike["street"].present? || bike["address"].present?
     return params["formatted_address"] if params["formatted_address"].present?
     if address("city").present?
       formatted_address = { street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json

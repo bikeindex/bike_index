@@ -153,7 +153,7 @@ RSpec.describe Export, type: :model do
         VCR.use_cassette("organization_export_worker-avery") do
           ownership.reload
           expect(bike.owner_name).to eq "some name"
-          expect(bike.registration_address["address"]).to eq "102 Washington Pl"
+          expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(Export.avery_export_bike?(bike)).to be_truthy
         end
       end

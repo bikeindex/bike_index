@@ -3,6 +3,12 @@
 module Geocodeable
   extend ActiveSupport::Concern
 
+  module ClassMethods
+    def location_attributes
+      %w[street city state_id zipcode country_id]
+    end
+  end
+
   included do
     geocoded_by :address
     after_validation :geocode, if: :should_be_geocoded?
@@ -36,6 +42,12 @@ module Geocodeable
     def address(**kwargs)
       Geocodeable.address(self, **kwargs)
     end
+  end
+
+  def address_hash
+    attributes.slice("street", "city", "zipcode")
+              .merge(state: state&.abbreviation, country: country&.iso)
+              .with_indifferent_access
   end
 
   # Build an address string from the given object's location data.
