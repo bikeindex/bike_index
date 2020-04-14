@@ -82,17 +82,17 @@
   - if @organization&.include_field_reg_address?
     - label_address = @organization.registration_field_label("reg_address") || t(".owners_street_address")
     / Set all the bike address attrs
-    - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
+    - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state") }
     .input-group
-      = f.label :address, label_address
+      = f.label :street, label_address
       .controls
-        = f.text_field :address, required: true, placeholder: t(".address")
+        = f.text_field :street, required: true, placeholder: t(".address")
       .controls.extra-field
-        = f.text_field :address_city, required: true, placeholder: t(".city")
+        = f.text_field :city, required: true, placeholder: t(".city")
       .controls.extra-field
-        = f.text_field :address_zipcode, required: true, placeholder: t(".zipcode")
+        = f.text_field :zipcode, required: true, placeholder: t(".zipcode")
       #state-select.controls.extra-field.special-select-single
-        = f.collection_select(:address_state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
+        = f.collection_select(:state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
   - if @organization&.include_field_reg_phone?
     - label_phone = @organization.registration_field_label("reg_phone") || t(".owners_phone")
     .input-group

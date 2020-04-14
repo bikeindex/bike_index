@@ -38,11 +38,11 @@ module Geocodeable
     end
   end
 
-  # default address hash. Probably could be used better
+  # default address hash. Probably could be used more often/better
   def address_hash
     attributes.slice("street", "city", "zipcode")
               .merge(state: state&.abbreviation, country: country&.iso)
-              .compact
+              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
               .with_indifferent_access
   end
 

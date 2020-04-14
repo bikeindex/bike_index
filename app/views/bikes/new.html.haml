@@ -94,9 +94,9 @@
               .form-group.row
                 -# Set all the bike address attrs
                 - @bike.attributes = { street: @b_param.address("address"),
-                  address_city: @b_param.address("city"),
-                  address_zipcode: @b_param.address("zipcode"),
-                  address_state: @b_param.address("state") }
+                  city: @b_param.address("city"),
+                  zipcode: @b_param.address("zipcode"),
+                  state: @b_param.address("state") }
 
                 = f.label :street,
                   @organization.registration_field_label("reg_address") || t(".mailing_address"),
