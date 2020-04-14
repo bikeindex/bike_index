@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe TwitterAccount, type: :model do
+  it_behaves_like "geocodeable"
+
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
       twitter_account = FactoryBot.build(:twitter_account, :in_nyc)

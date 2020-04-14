@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
+  it_behaves_like "geocodeable"
 
   describe "scopes" do
     it "default scopes to created_at desc" do

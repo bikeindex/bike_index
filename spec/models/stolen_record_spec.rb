@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
+  it_behaves_like "geocodeable"
+
   describe "after_save hooks" do
     context "if bike no longer exists" do
       it "removes alert_image" do

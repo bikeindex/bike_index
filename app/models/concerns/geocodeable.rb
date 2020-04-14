@@ -46,12 +46,11 @@ module Geocodeable
               .with_indifferent_access
   end
 
-  # Override assignment to enable friendly finding
+  # Override assignment to enable friendly finding state and country
   def state=(val)
     return super unless val.is_a?(String)
     self.state = State.fuzzy_find(val)
   end
-
   def country=(val)
     return super unless val.is_a?(String)
     self.country = Country.fuzzy_find(val)
