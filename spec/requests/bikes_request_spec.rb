@@ -156,6 +156,25 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
         end
       end
+      context "with direct_link" do
+        it "marks it retrieved directly" do
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+          expect(parking_notification.retrieval_link_token).to be_present
+          expect(bike.current_parking_notification).to eq parking_notification
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}&user_recovery=true"
+          expect(response).to redirect_to(bike_path(bike.id))
+          expect(assigns(:bike)).to eq bike
+          expect(flash[:success]).to be_present
+          bike.reload
+          parking_notification.reload
+          expect(bike.current_parking_notification).to be_blank
+          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.retrieved_by).to eq current_user
+          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+          expect(parking_notification.retrieval_kind).to eq "user_recovery"
+        end
+      end
       context "not notification token" do
         it "flash errors" do
           parking_notification.reload

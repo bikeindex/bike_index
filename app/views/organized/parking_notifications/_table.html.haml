@@ -32,7 +32,7 @@
           %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
           %span.extended-col-info.small
-            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}</span>
+            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}
           - unless skip_repeat
             - if parking_notification.repeat_number > 0
               %strong.extended-col-info

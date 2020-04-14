@@ -364,8 +364,10 @@ class BikesController < ApplicationController
     matching_notification = @bike.parking_notifications.where(retrieval_link_token: retrieval_link_token).first
     if matching_notification.present?
       if matching_notification.active?
-        flash[:success] = "That #{@bike.type} has already been marked retrieved!"
-        matching_notification.mark_retrieved!(current_user&.id, "link_token_recovery")
+        flash[:success] = "#{@bike.type.titleize} marked retrieved!"
+        # Quick hack to skip making another endpoint
+        retrieval_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
+        matching_notification.mark_retrieved!(current_user&.id, retrieval_kind)
       elsif matching_notification.impounded?
         flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
       elsif matching_notification.retrieved?
