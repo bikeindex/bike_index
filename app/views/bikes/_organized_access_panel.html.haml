@@ -107,7 +107,7 @@
                       %td
                         - address = @bike.registration_address
                         - if @bike.valid_registration_address_present?
-                          = address["address"]
+                          = address["street"]
                           %br
                           = [address['city'], address['state']].reject(&:blank?).join(", ")
                           = address['zipcode']

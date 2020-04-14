@@ -93,17 +93,17 @@
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs
-                - @bike.attributes = { address: @b_param.address("address"),
-                  address_city: @b_param.address("city"),
-                  address_zipcode: @b_param.address("zipcode"),
-                  address_state: @b_param.address("state") }
+                - @bike.attributes = { street: @b_param.address("address"),
+                  city: @b_param.address("city"),
+                  zipcode: @b_param.address("zipcode"),
+                  state: @b_param.address("state") }
 
-                = f.label :address,
+                = f.label :street,
                   @organization.registration_field_label("reg_address") || t(".mailing_address"),
                   class: 'form-well-label'
 
                 .form-well-input
-                  = f.text_field :address,
+                  = f.text_field :street,
                     required: true,
                     placeholder: t(".street_address"),
                     class: 'form-control'
@@ -114,7 +114,7 @@
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_city,
+                  = f.text_field :city,
                     required: true,
                     placeholder: t(".city"),
                     class: "form-control"
@@ -122,7 +122,7 @@
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_zipcode,
+                  = f.text_field :zipcode,
                     required: true,
                     placeholder: t(".zipcode"),
                     class: "form-control"
@@ -130,7 +130,7 @@
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
-                  = f.collection_select(:address_state, State.all, :abbreviation, :name,
+                  = f.collection_select(:state, State.all, :abbreviation, :name,
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 

@@ -38,6 +38,24 @@ module Geocodeable
     end
   end
 
+  # default address hash. Probably could be used more often/better
+  def address_hash
+    attributes.slice("street", "city", "zipcode", "latitude", "longitude")
+              .merge(state: state&.abbreviation, country: country&.iso)
+              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
+              .with_indifferent_access
+  end
+
+  # Override assignment to enable friendly finding state and country
+  def state=(val)
+    return super unless val.is_a?(String)
+    self.state = State.fuzzy_find(val)
+  end
+  def country=(val)
+    return super unless val.is_a?(String)
+    self.country = Country.fuzzy_find(val)
+  end
+
   # Build an address string from the given object's location data.
   #
   # The following keyword args accept booleans for inclusion / omission in the

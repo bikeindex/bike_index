@@ -68,8 +68,7 @@ class Bike < ApplicationRecord
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address_city, :address_state, :address_zipcode,
-                :parking_notification_kind, :skip_status_update
+                :b_param_id_token, :parking_notification_kind, :skip_status_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -625,7 +624,7 @@ class Bike < ApplicationRecord
 
   def valid_registration_address_present?
     return false if registration_address.blank?
-    registration_address["address"].present? && registration_address["city"].present?
+    registration_address["street"].present? && registration_address["city"].present?
   end
 
   def registration_address # Goes along with organization additional_registration_fields

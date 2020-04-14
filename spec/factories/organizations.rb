@@ -26,7 +26,17 @@ FactoryBot.define do
       end
     end
 
-    factory :organization_with_paid_features do
+    trait :with_locations do
+      after(:create) do |organization|
+        2.times do |n|
+          FactoryBot.create(:location,
+                            name: "location #{n}",
+                            organization: organization)
+        end
+      end
+    end
+
+    trait :paid_features do
       transient do
         enabled_feature_slugs { ["csv_export"] }
         paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(enabled_feature_slugs)) }
@@ -39,7 +49,9 @@ FactoryBot.define do
           organization.reload
         end
       end
+    end
 
+    factory :organization_with_paid_features, traits: [:paid_features] do
       factory :organization_with_regional_bike_counts do
         enabled_feature_slugs { ["regional_bike_counts"] }
       end
@@ -47,10 +59,9 @@ FactoryBot.define do
 
     # before(:create) { |organization| organization.short_name ||= organization.name }
     factory :organization_with_auto_user do
-      # THIS DOESN'T ACTUALLY WORK! The associations aren't created in time :(
-      transient do
-        user { FactoryBot.create(:user) }
-      end
+      # passing in user DOESN'T ACTUALLY WORK!! TODO: make it work
+      transient { user { FactoryBot.create(:user) } }
+
       after(:create) do |organization, evaluator|
         FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)
         organization.update_attributes(auto_user: evaluator.user)
@@ -63,16 +74,6 @@ FactoryBot.define do
     factory :organization_ambassador do
       kind { "ambassador" }
       sequence(:name) { |n| "Ambassador Group #{n.to_s.rjust(3, "0")}" }
-    end
-
-    trait :with_locations do
-      after(:create) do |organization|
-        2.times do |n|
-          FactoryBot.create(:location,
-                            name: "location #{n}",
-                            organization: organization)
-        end
-      end
     end
   end
 end
