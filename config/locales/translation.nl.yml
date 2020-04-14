@@ -4628,6 +4628,7 @@ nl:
         address: Adres
         internal_notes: Interne notities
         notification_number: Kennisgeving#
+        retrieved: Opgehaald
       table:
         bike: Fiets
         by: Door
@@ -4636,6 +4637,7 @@ nl:
         kind: Soort
         address: Adres
         notification_number: Kennisgeving#
+        retrieved: Opgehaald
     manages:
       location_fields:
         address: Adres
