@@ -367,9 +367,10 @@ class BParam < ApplicationRecord
     if address("city").present?
       formatted_address = { street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json
     else # We're dealing with legacy data in the b_param
-      formatted_address = Geohelper.formatted_address_hash(bike["address"])
+      fallback_address = address("street")
+      formatted_address = Geohelper.formatted_address_hash(fallback_address)
       # return at least something from legacy entries that don't have enough info to guess address
-      formatted_address = { street: bike["address"] } if formatted_address.blank? && bike["address"].present?
+      formatted_address = { address: fallback_address } if formatted_address.blank? && fallback_address.present?
     end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)

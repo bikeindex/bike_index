@@ -1030,6 +1030,7 @@ RSpec.describe Bike, type: :model do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
         it "returns nothing" do
           expect(user.address_hash).to eq target_address
+          expect(bike.user).to_not eq user
           expect(bike.registration_address).to eq({})
         end
       end
