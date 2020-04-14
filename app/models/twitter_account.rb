@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 
+  belongs_to :state
+  belongs_to :country
   has_many :tweets, dependent: :destroy
 
   validates \
@@ -22,10 +26,10 @@ class TwitterAccount < ApplicationRecord
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
-      account.country = geo.country
       account.city = geo.city
-      account.state = geo.state_code
       account.neighborhood = geo.neighborhood
+      account.state = State.fuzzy_find(geo.state_code)
+      account.country = Country.fuzzy_find(geo.country)
     end
   end
 
@@ -38,7 +42,8 @@ class TwitterAccount < ApplicationRecord
     where(default: true).first || national.first
   end
 
-  def self.default_account_for_country(country)
+  def self.default_account_for_country(country_name)
+    country = Country.fuzzy_find(country_name)
     national.where(country: country).first || default_account
   end
 
@@ -129,7 +134,7 @@ class TwitterAccount < ApplicationRecord
   def should_be_reverse_geocoded?
     !skip_geocoding? &&
       latitude.present? &&
-      (state.blank? || state_changed?)
+      (state.blank? || state_id_changed?)
   end
 
   private

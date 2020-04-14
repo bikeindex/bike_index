@@ -23,11 +23,19 @@ class Country < ApplicationRecord
     where(name: "United States", iso: "US").first_or_create
   end
 
+  def self.canada
+    where(name: "Canada", iso: "CA").first_or_create
+  end
+
   def self.netherlands
     where(name: "Netherlands", iso: "NL").first_or_create
   end
 
   def self.valid_names
     StatesAndCountries.countries.map { |c| c[:name] }
+  end
+
+  def default?
+    name == "United States"
   end
 end

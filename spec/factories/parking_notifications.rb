@@ -7,14 +7,6 @@ FactoryBot.define do
     latitude { 40.7143528 }
     longitude { -74.0059731 }
 
-    trait :in_los_angeles do
-      latitude { 34.05223 }
-      longitude { -118.24368 }
-      city { "Los Angeles" }
-      state { State.find_or_create_by(FactoryBot.attributes_for(:state_california)) }
-      country { Country.united_states }
-    end
-
     factory :parking_notification_organized do
       organization { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
       user { FactoryBot.create(:organization_member, organization: organization) }

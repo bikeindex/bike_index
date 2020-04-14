@@ -137,11 +137,11 @@ RSpec.describe ParkingNotification, type: :model do
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
-                                             city: "Chicago",
-                                             hide_address: true,
-                                             state_id: state.id,
-                                             zipcode: "60647",
-                                             country_id: country.id)
+                                                     city: "Chicago",
+                                                     hide_address: true,
+                                                     state_id: state.id,
+                                                     zipcode: "60647",
+                                                     country_id: country.id)
       expect(parking_notification.address).to eq("Chicago, XXX 60647, NEVVVV")
       expect(parking_notification.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
       parking_notification.hide_address = false
@@ -149,9 +149,9 @@ RSpec.describe ParkingNotification, type: :model do
     end
     it "is ok with missing information" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
-                                             zipcode: "60647",
-                                             hide_address: true,
-                                             country_id: country.id)
+                                                     zipcode: "60647",
+                                                     hide_address: true,
+                                                     country_id: country.id)
       expect(parking_notification.address).to eq("60647, NEVVVV")
       parking_notification.hide_address = false
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")

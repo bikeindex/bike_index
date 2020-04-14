@@ -1505,17 +1505,23 @@ RSpec.describe Bike, type: :model do
       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
       let(:stolen_record) { bike.current_stolen_record }
       it "takes location from the current stolen record" do
+        street_address = "1300 W 14th Pl"
+        abbr_address = "Chicago, IL 60608, US"
+        full_address = "#{street_address}, #{abbr_address}"
+        expect(stolen_record.street).to eq street_address
+        expect(stolen_record.address(force_show_address: true)).to eq(full_address)
+        expect(stolen_record.address).to eq(abbr_address)
+
         bike.set_location_info
-        expect(stolen_record.street).to eq "1300 W 14th Pl"
-        expect(stolen_record.display_address(force_show_address: true)).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
+        expect(bike.street).to be_present
         expect(bike.zipcode).to eq(stolen_record.zipcode)
         expect(bike.country).to eq(stolen_record.country)
-        expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL, 60608, US"
+        expect(bike.address).to eq(full_address)
       end
-      context "given a abandoned record, it instead uses the abandoned record" do
+      context "given an abandoned record, it instead uses the abandoned record" do
         it "takes the location from the parking notification" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
@@ -1562,13 +1568,15 @@ RSpec.describe Bike, type: :model do
     context "given no creation org or owner location" do
       it "takes location from the geocoded request location" do
         bike = FactoryBot.build(:bike)
-        geocoder_data = default_location.merge(postal_code: default_location.delete(:zipcode))
-        location = double(:request_location, geocoder_data)
+        geocoder_data = double(
+          :request_location,
+          default_location.merge(postal_code: default_location[:zipcode] )
+        )
 
-        bike.set_location_info(request_location: location)
+        bike.set_location_info(request_location: geocoder_data)
 
-        expect(bike.city).to eq(geocoder_data[:city])
-        expect(bike.zipcode).to eq(geocoder_data[:postal_code])
+        expect(bike.city).to eq(geocoder_data.city)
+        expect(bike.zipcode).to eq(geocoder_data.postal_code)
         expect(bike.country).to eq(usa)
       end
     end

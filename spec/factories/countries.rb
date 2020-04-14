@@ -8,6 +8,16 @@ FactoryBot.define do
       iso { "US" }
     end
 
+    factory :country_canada do
+      name { "Canada" }
+      iso { "CA" }
+    end
+
+    factory :country_australia do
+      name { "Australia" }
+      iso { "AU" }
+    end
+
     factory :country_uk do
       name { "United Kingdom" }
       iso { "UK" }

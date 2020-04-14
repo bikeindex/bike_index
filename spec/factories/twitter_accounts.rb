@@ -6,17 +6,7 @@ FactoryBot.define do
     user_token { "ACCESS_TOKEN" }
     user_secret { "ACCESS_SECRET" }
     twitter_account_info { {} }
-    city { "New York" }
-    state { "NY" }
-
-    address { "278 Broadway, New York, NY 10007, USA" }
-    latitude { 40.7143528 }
-    longitude { -74.0059731 }
-
-    after(:build) do |twitter_account, _evaluator|
-      usa = Country.find_by(iso: "US") || FactoryBot.build(:country_us)
-      twitter_account.country = usa
-    end
+    skip_geocoding { true }
 
     factory :twitter_account_1 do
       screen_name { ENV.fetch("STOLEN_ALERT_TWITTER_1_USERNAME") }
@@ -46,15 +36,6 @@ FactoryBot.define do
 
     trait :default do
       default { true }
-    end
-
-    trait :canadian do
-      skip_geocoding { true }
-      country { "Canada" }
-      city { "Vancouver" }
-      state { "BC" }
-      latitude { 49.253992 }
-      longitude { -123.241084 }
     end
   end
 end

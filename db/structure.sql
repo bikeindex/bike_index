@@ -392,7 +392,8 @@ CREATE TABLE public.bikes (
     latitude double precision,
     longitude double precision,
     status integer DEFAULT 0,
-    address character varying
+    street character varying,
+    state_id bigint
 );
 
 
@@ -1243,8 +1244,7 @@ CREATE TABLE public.locations (
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
     country_id integer,
-    state_id integer,
-    address character varying
+    state_id integer
 );
 
 
@@ -1356,7 +1356,12 @@ CREATE TABLE public.mail_snippets (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     organization_id integer,
-    kind integer DEFAULT 0
+    kind integer DEFAULT 0,
+    street character varying,
+    city character varying,
+    zipcode character varying,
+    state_id bigint,
+    country_id bigint
 );
 
 
@@ -1890,6 +1895,7 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2184,8 +2190,7 @@ CREATE TABLE public.stolen_records (
     show_address boolean DEFAULT false,
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
-    neighborhood character varying,
-    address character varying
+    neighborhood character varying
 );
 
 
@@ -2350,7 +2355,11 @@ CREATE TABLE public.twitter_accounts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     last_error character varying,
-    last_error_at timestamp without time zone
+    last_error_at timestamp without time zone,
+    street character varying,
+    zipcode character varying,
+    state_id bigint,
+    country_id bigint
 );
 
 
@@ -2457,8 +2466,7 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    has_stolen_bikes_without_locations boolean DEFAULT false,
-    address character varying
+    has_stolen_bikes_without_locations boolean DEFAULT false
 );
 
 
@@ -3608,6 +3616,13 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 
 
 --
+-- Name: index_bikes_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_state_id ON public.bikes USING btree (state_id);
+
+
+--
 -- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3783,10 +3798,24 @@ CREATE INDEX index_locks_on_user_id ON public.locks USING btree (user_id);
 
 
 --
+-- Name: index_mail_snippets_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btree (country_id);
+
+
+--
 -- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_mail_snippets_on_organization_id ON public.mail_snippets USING btree (organization_id);
+
+
+--
+-- Name: index_mail_snippets_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_state_id ON public.mail_snippets USING btree (state_id);
 
 
 --
@@ -4091,6 +4120,13 @@ CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (tw
 
 
 --
+-- Name: index_twitter_accounts_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_country_id ON public.twitter_accounts USING btree (country_id);
+
+
+--
 -- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4102,6 +4138,13 @@ CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_
 --
 
 CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
+
+
+--
+-- Name: index_twitter_accounts_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_state_id ON public.twitter_accounts USING btree (state_id);
 
 
 --
@@ -4614,6 +4657,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200326192650'),
 ('20200403234228'),
 ('20200409201638'),
-('20200410043813');
+('20200410043813'),
+('20200410183949'),
+('20200414055430');
 
 
