@@ -46,7 +46,7 @@
           %td
             %small.less-strong= twitter_account.city
           %td
-            %small.less-strong= twitter_account.state
+            %small.less-strong= twitter_account.state&.abbreviation
           %td
-            %small.less-strong= twitter_account.country
+            %small.less-strong= twitter_account.country&.name
           %td= twitter_account.tweets.count
