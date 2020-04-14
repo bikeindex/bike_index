@@ -112,6 +112,19 @@ organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
         expect(bike.stolen).to be_truthy
       end
     end
+    context "with all the paid features possible" do
+      # Because we render different fields for some of the paid features, make sure they all work
+      let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: PaidFeature::EXPECTED_SLUGS) }
+      it "renders embed without xframe block" do
+        get :embed, params: { id: organization.slug, stolen: 1 }
+        expect(response).to render_template(:embed)
+        expect(response.code).to eq("200")
+        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(assigns(:stolen)).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.stolen).to be_truthy
+      end
+    end
     context "embed_extended" do
       it "renders embed without xframe block, not stolen" do
         get :embed_extended, params: { id: organization.slug, email: "something@example.com" }

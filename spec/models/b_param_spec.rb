@@ -247,9 +247,41 @@ RSpec.describe BParam, type: :model do
   end
 
   describe "additional_registration_fields" do
-    let(:params_hash) do
+    let(:params_hash) { { bike: bike_params } }.as_json }
+    let(:b_param) { BParam.new(params: params_hash) }
+    let(:target_address) { { address: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
+    let(:bike) { Bike.new }
+    let(:bike_params) do
       {
-        bike: {
+        serial_number: "zzz",
+        organization_affiliation: "employee",
+        external_image_urls: ["xxxxx"],
+        bike_sticker: "xxxx",
+        phone: "919929333",
+        address_street: "123 Main St",
+        address_city: "Nevernever Land",
+        address_zipcode: "11111",
+        address_state: "CA",
+      }
+    end
+    before { allow(bike).to receive(:b_params) { [b_param] } }
+    it "has the expected fields" do
+      expect(b_param.fetch_formatted_address).to eq target_address
+      expect(b_param.bike_sticker).to eq "xxxx"
+      expect(b_param.organization_affiliation).to eq "employee"
+      expect(b_param.phone).to eq "919929333"
+      expect(b_param.address("street")).to eq "123 Main St"
+      expect(b_param.address("address")).to eq "123 Main St"
+      expect(b_param.address("city")).to eq "Nevernever Land"
+      expect(b_param.address("address_zipcode")).to eq "11111"
+      expect(b_param.address("state")).to eq "CA"
+      expect(b_param.external_image_urls).to eq(["xxxxx"])
+      expect(bike.registration_address).to be_present
+      expect(bike.valid_registration_address_present?).to be_truthy
+    end
+    context "address without street" do
+      let(:bike_params) do
+        {
           serial_number: "zzz",
           organization_affiliation: "employee",
           external_image_urls: ["xxxxx"],
@@ -259,36 +291,30 @@ RSpec.describe BParam, type: :model do
           address_city: "Nevernever Land",
           address_zipcode: "11111",
           address_state: "CA",
-        },
-      }.as_json
-    end
-    let(:b_param) { BParam.new(params: params_hash) }
-    let(:target_address) { { address: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
-    let(:bike) { Bike.new }
-    before { allow(bike).to receive(:b_params) { [b_param] } }
-    it "has the expected fields" do
-      expect(b_param.fetch_formatted_address).to eq target_address
-      expect(b_param.bike_sticker).to eq "xxxx"
-      expect(b_param.organization_affiliation).to eq "employee"
-      expect(b_param.phone).to eq "919929333"
-      expect(b_param.address("address")).to eq "123 Main St"
-      expect(b_param.address("city")).to eq "Nevernever Land"
-      expect(b_param.address("address_zipcode")).to eq "11111"
-      expect(b_param.address("state")).to eq "CA"
-      expect(b_param.external_image_urls).to eq(["xxxxx"])
-      expect(bike.registration_address).to be_present
-      expect(bike.valid_registration_address_present?).to be_truthy
+        }
+      end
+      it "has the expected fields" do
+        expect(b_param.fetch_formatted_address).to eq target_address
+        expect(b_param.bike_sticker).to eq "xxxx"
+        expect(b_param.organization_affiliation).to eq "employee"
+        expect(b_param.phone).to eq "919929333"
+        expect(b_param.address("address")).to eq "123 Main St"
+        expect(b_param.address("city")).to eq "Nevernever Land"
+        expect(b_param.address("address_zipcode")).to eq "11111"
+        expect(b_param.address("state")).to eq "CA"
+        expect(b_param.external_image_urls).to eq(["xxxxx"])
+        expect(bike.registration_address).to be_present
+        expect(bike.valid_registration_address_present?).to be_truthy
+      end
     end
     context "legacy address" do
-      let(:params_hash) do
+      let(:bike_params) do
         {
-          bike: {
-            serial_number: "zzz",
-            organization_affiliation: "employee",
-            handlebar_type: nil,
-            address: "0229 HAMMOND BLDG",
-          },
-        }.as_json
+          serial_number: "zzz",
+          organization_affiliation: "employee",
+          handlebar_type: nil,
+          address: "0229 HAMMOND BLDG",
+        }
       end
       include_context :geocoder_real
       let(:b_param) { FactoryBot.create(:b_param, params: params_hash) }
