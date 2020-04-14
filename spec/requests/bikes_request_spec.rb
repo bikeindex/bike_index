@@ -116,7 +116,7 @@ RSpec.describe BikesController, type: :request do
 
     describe "parking_notification_retrieved param" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
-      let(:creator) { parking_notification.creator }
+      let(:creator) { parking_notification.user }
       it "retrieves the bike" do
         parking_notification.reload
         expect(parking_notification.current?).to be_truthy
@@ -130,7 +130,7 @@ RSpec.describe BikesController, type: :request do
         parking_notification.reload
         expect(bike.current_parking_notification).to be_blank
         expect(parking_notification.current?).to be_falsey
-        expect(parking_notification.retrieved_by).to eq user
+        expect(parking_notification.retrieved_by).to eq current_user
         expect(parking_notification.retrieved_at).to be_within(5).of Time.current
         expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
       end
@@ -174,7 +174,7 @@ RSpec.describe BikesController, type: :request do
       context "already retrieved" do
         let(:retrieval_time) { Time.current - 2.minutes }
         it "has a flash saying so" do
-          parking_notification.mark_retrieved(nil, "link_token_recovery", retrieval_time)
+          parking_notification.mark_retrieved!(nil, "link_token_recovery", retrieval_time)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieval_link_token).to be_present
@@ -190,10 +190,10 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "abandoned as well" do
-        let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "abandoned_notification", user: creator) }
+        let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
-          parking_notification_impounded.reload
+          parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
@@ -202,7 +202,7 @@ RSpec.describe BikesController, type: :request do
             get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
             expect(response).to redirect_to(bike_path(bike.id))
             expect(assigns(:bike)).to eq bike
-            expect(flash[:error]).to match(/impound/i)
+            expect(flash[:success]).to be_present
           end
           bike.reload
           parking_notification.reload
@@ -210,7 +210,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved?).to be_truthy
-          expect(parking_notification.retrieved_by).to be_blank
+          expect(parking_notification.retrieved_by).to eq current_user
           expect(parking_notification.retrieved_at).to be_within(5).of Time.current
           expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
 
@@ -223,7 +223,7 @@ RSpec.describe BikesController, type: :request do
         let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
         it "refuses" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
-          parking_notification_impounded.reload
+          parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.resolved?).to be_truthy
           Sidekiq::Worker.clear_all

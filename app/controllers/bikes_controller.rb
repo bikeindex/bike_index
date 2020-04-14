@@ -374,7 +374,7 @@ class BikesController < ApplicationController
     else
       flash[:error] = "Unable to find that Parking Notification!"
     end
-    redirect_to bike_path(params.except(:parking_notification_retrieved)) and return
+    redirect_to bike_path(@bike.id) and return
   end
 
   def render_ad
