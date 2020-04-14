@@ -4431,7 +4431,6 @@ en:
         message: Message
         notification_number: Notification#
         parking_notification: Parking Notification
-        retrieved: Retrieved
       table:
         address: Address
         bike: Bike
