@@ -40,7 +40,7 @@ module Geocodeable
 
   # default address hash. Probably could be used more often/better
   def address_hash
-    attributes.slice("street", "city", "zipcode")
+    attributes.slice("street", "city", "zipcode", "latitude", "longitude")
               .merge(state: state&.abbreviation, country: country&.iso)
               .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
               .with_indifferent_access
