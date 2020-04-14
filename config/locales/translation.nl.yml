@@ -4628,7 +4628,6 @@ nl:
         address: Adres
         internal_notes: Interne notities
         notification_number: Kennisgeving#
-        retrieved: Opgehaald
       table:
         bike: Fiets
         by: Door
