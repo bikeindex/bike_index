@@ -13,7 +13,6 @@ class Location < ApplicationRecord
   scope :shown, -> { where(shown: true) }
   # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
-  before_validation :set_address
   before_save :shown_from_organization
   before_save :set_phone
   after_commit :update_organization
@@ -27,14 +26,8 @@ class Location < ApplicationRecord
     self.phone = Phonifyer.phonify(self.phone) if self.phone
   end
 
-  def set_address
-    self.address = country.blank? ? "" : [
-      street,
-      city,
-      state&.abbreviation,
-      zipcode,
-      country.name,
-    ].reject(&:blank?).join(", ")
+  def address
+    Geocodeable.address(self, country: %i[name])
   end
 
   def org_location_id

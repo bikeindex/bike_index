@@ -7,14 +7,6 @@ FactoryBot.define do
     latitude { 40.7143528 }
     longitude { -74.0059731 }
 
-    trait :in_los_angeles do
-      latitude { 34.05223 }
-      longitude { -118.24368 }
-      city { "Los Angeles" }
-      state { State.find_or_create_by(FactoryBot.attributes_for(:state_california)) }
-      country { Country.united_states }
-    end
-
     trait :retrieved do
       retrieval_kind { "organization_recovery" }
       retrieved_by_id { user.id }

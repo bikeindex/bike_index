@@ -3,23 +3,31 @@ require "rails_helper"
 RSpec.describe TwitterAccount, type: :model do
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
-      twitter_account = FactoryBot.build(:twitter_account)
+      twitter_account = FactoryBot.build(:twitter_account, :in_nyc)
       twitter_account.geocode
       expect(twitter_account.latitude).to eq(40.7143528)
       expect(twitter_account.longitude).to eq(-74.0059731)
+      expect(twitter_account.city).to eq("New York")
+      expect(twitter_account.state&.abbreviation).to eq("NY")
+      expect(twitter_account.country&.name).to eq("United States")
     end
 
     it "should geocode and then reverse geocode on save" do
-      twitter_account = FactoryBot.build(:twitter_account, address: "3554 W Shakespeare Ave, Chicago IL 60647")
-      expect(twitter_account).to receive(:fetch_account_info).and_return(true)
+      twitter_account = FactoryBot.build(
+        :twitter_account,
+        :in_chicago,
+        skip_geocoding: false,
+        state: nil,
+      )
+      twitter_account.address = "1 New Address"
+      expect(twitter_account).to be_should_be_geocoded
+      expect(twitter_account).to be_should_be_reverse_geocoded
+
+      expect(twitter_account).to receive(:fetch_account_info)
+      expect(twitter_account).to receive(:geocode).once
+      expect(twitter_account).to receive(:reverse_geocode).once
 
       twitter_account.save
-
-      expect(twitter_account.latitude).to be_present
-      expect(twitter_account.longitude).to be_present
-      expect(twitter_account.country).to eq("United States")
-      expect(twitter_account.city).to eq("New York")
-      expect(twitter_account.state).to eq("NY")
     end
   end
 
@@ -83,18 +91,20 @@ RSpec.describe TwitterAccount, type: :model do
   describe :default_account_for_country do
     it "finds national account" do
       _default_national = FactoryBot.create(:twitter_account_1, :active, :national, :default)
-      national = FactoryBot.create(:twitter_account_2, :active, :national, :canadian)
+      national = FactoryBot.create(:twitter_account_2, :active, :national, :in_vancouver)
 
-      national.update_attribute(:country, "Australia")
+      australia = FactoryBot.create(:country_australia)
+      national.update_attribute(:country, australia)
 
       expect(TwitterAccount.default_account_for_country("Australia").id).to eq(national.id)
     end
 
     it "finds default account if no national exists for the country" do
       default = FactoryBot.create(:twitter_account_1, :national, :active, :default)
-      national = FactoryBot.create(:twitter_account_2, :national, :active, :canadian)
+      national = FactoryBot.create(:twitter_account_2, :national, :active, :in_vancouver)
 
-      national.update_attribute(:country, "Australia")
+      australia = FactoryBot.create(:country_australia)
+      national.update_attribute(:country, australia)
 
       expect(TwitterAccount.default_account_for_country("Canada").id).to eq(default.id)
     end

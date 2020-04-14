@@ -293,9 +293,11 @@ RSpec.describe BikeCreator do
         b_param.reload
         expect(b_param.created_bike_id).to eq bike.id
 
+        bike.reload
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.id).to be_present
         expect(bike.serial_number).to eq "unknown"
+        expect(bike.address).to be_present
         expect(bike.latitude).to eq(40.7143528)
         expect(bike.longitude).to eq(-74.0059731)
         expect(bike.owner_email).to eq auto_user.email
@@ -356,9 +358,11 @@ RSpec.describe BikeCreator do
           b_param.reload
           expect(b_param.created_bike_id).to eq bike.id
 
+          bike.reload
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.id).to be_present
           expect(bike.serial_number).to eq "unknown"
+          expect(bike.address).to be_present
           expect(bike.latitude).to eq(40.7143528)
           expect(bike.longitude).to eq(-74.0059731)
           expect(bike.owner_email).to eq auto_user.email
