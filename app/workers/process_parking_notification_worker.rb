@@ -14,6 +14,8 @@ class ProcessParkingNotificationWorker < ApplicationWorker
 
     # Update all of them!
     parking_notification.associated_notifications.each do |pn|
+      pn.impound_record_id = impound_record.id if impound_record.present?
+      pn.retrieved_at = parking_notification.retrieved_at if parking_notification.retrieved_at.present?
       pn.update_attributes(updated_at: Time.current)
     end
 

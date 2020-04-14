@@ -31,13 +31,18 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
+
     @bike = @bike.decorate
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
-    respond_to do |format|
-      format.html { render :show }
-      format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
+    if params[:parking_notification_retrieved].present?
+      resolve_parking_notification(params[:parking_notification_retrieved])
+    else
+      respond_to do |format|
+        format.html { render :show }
+        format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
+      end
     end
   end
 
@@ -353,6 +358,25 @@ class BikesController < ApplicationController
     else
       flash[:error] = bike_sticker.errors.full_messages
     end
+  end
+
+  def resolve_parking_notification(retrieval_link_token)
+    matching_notification = @bike.parking_notifications.where(retrieval_link_token: retrieval_link_token).first
+    if matching_notification.present?
+      if matching_notification.active?
+        flash[:success] = "#{@bike.type.titleize} marked retrieved!"
+        # Quick hack to skip making another endpoint
+        retrieval_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
+        matching_notification.mark_retrieved!(current_user&.id, retrieval_kind)
+      elsif matching_notification.impounded?
+        flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
+      elsif matching_notification.retrieved?
+        flash[:info] = "That #{@bike.type} has already been marked retrieved!"
+      end
+    else
+      flash[:error] = "Unable to find that Parking Notification!"
+    end
+    redirect_to bike_path(@bike.id) and return
   end
 
   def render_ad

@@ -21,6 +21,8 @@
         %small=t(".notification_number")
     %th
       %small=t(".impounded")
+    %th
+      %small=t(".retrieved")
   %tbody
     - parking_notifications.each do |parking_notification|
       %tr
@@ -30,15 +32,25 @@
           %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
           %span.extended-col-info.small
-            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}</span>
+            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}
           - unless skip_repeat
             - if parking_notification.repeat_number > 0
               %strong.extended-col-info
                 Notification ##{parking_notification.repeat_number}
           - unless skip_bike
-            %span.extended-col-info
-              %br
+            %span.extended-col-info.d-block
               = link_to organized_bike_text(@bike), bike_path(@bike)
+
+          - if parking_notification.impounded_at.present?
+            %strong.small.extended-col-info.d-block
+              Impounded:
+              %span.convertTime.preciseTime
+                = l(parking_notification.impounded_at, format: :convert_time)
+          - if parking_notification.retrieved_at.present?
+            %strong.small.extended-col-info.d-block
+              Retrieved:
+              %span.convertTime.preciseTime
+                = l(parking_notification.retrieved_at, format: :convert_time)
 
         - if render_address
           %td.hidden-sm-cells
@@ -57,3 +69,10 @@
             - if parking_notification.repeat_record?
               = parking_notification.notification_number
         %td.hidden-sm-cells
+          - if parking_notification.impounded_at.present?
+            %span.convertTime.preciseTime
+              = l(parking_notification.impounded_at, format: :convert_time)
+        %td.hidden-sm-cells
+          - if parking_notification.retrieved_at.present?
+            %span.convertTime.preciseTime
+              = l(parking_notification.retrieved_at, format: :convert_time)

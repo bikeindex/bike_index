@@ -66,3 +66,20 @@
   clear: both;
   float: none;
 }
+
+$alert-warning-color: #ffc107;
+.mark-retrieved-box {
+  background: lighten($alert-warning-color, 30%);
+  width: 100%;
+  border: 1px solid $alert-warning-color;
+  border-radius: 2px;
+  margin: 10px 0;
+  text-align: center;
+  a {
+    margin-top: 20px;
+  }
+  p {
+    padding: 10px;
+    margin: 10px 0 0 0;
+  }
+}

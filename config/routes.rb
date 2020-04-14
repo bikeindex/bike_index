@@ -326,6 +326,7 @@ Rails.application.routes.draw do
     resources :parking_notifications do
       member { get :email }
     end
+    resources :impound_records
     resources :stickers, only: %i[index show edit update]
     resources :appointments
     resource :ambassador_dashboard, only: %i[show] do

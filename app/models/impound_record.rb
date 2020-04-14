@@ -14,6 +14,9 @@ class ImpoundRecord < ApplicationRecord
   scope :current, -> { where(retrieved_at: nil) }
   scope :retrieved, -> { where.not(retrieved_at: nil) }
 
+  # Get it unscoped, because unregistered_bike notifications
+  def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
+
   def current?; retrieved_at.blank? end
 
   def retrieved?; !current? end
@@ -30,6 +33,6 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    bike.update_attributes(updated_at: Time.current)
+    bike&.update_attributes(updated_at: Time.current)
   end
 end

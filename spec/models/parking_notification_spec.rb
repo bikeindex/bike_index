@@ -221,4 +221,70 @@ RSpec.describe ParkingNotification, type: :model do
       end
     end
   end
+
+  describe "retrieve_or_repeat_notification!" do
+    let(:parking_notification) { FactoryBot.create(:parking_notification) }
+    let(:user) { FactoryBot.create(:user) }
+    context "mark_retrieved" do
+      it "retrieves" do
+        og_token = parking_notification.retrieval_link_token
+        expect(og_token).to be_present
+        expect(parking_notification.current?).to be_truthy
+        expect(parking_notification.retrieved?).to be_falsey
+        expect do
+          new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
+          expect(new_parking_notification.id).to eq parking_notification.id # Just checking
+        end.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        parking_notification.reload
+        expect(parking_notification.retrieved?).to be_truthy
+        expect(parking_notification.retrieved_at).to be_within(1.second).of Time.current
+        expect(parking_notification.retrieval_kind).to eq "organization_recovery"
+        expect(parking_notification.retrieved_by).to eq user
+        expect(parking_notification.retrieval_link_token).to eq og_token # Why not leave it around
+      end
+      context "impounded" do
+        let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "impound_notification") }
+        it "fails" do
+          parking_notification.reload
+          expect do
+            new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
+            expect(new_parking_notification.id).to eq parking_notification.id # Just checking
+          end.to_not change(ParkingNotification, :count)
+        end
+      end
+    end
+    context "another kind" do
+      it "creates" do
+        expect(parking_notification.kind).to eq "parked_incorrectly_notification"
+        og_token = parking_notification.retrieval_link_token
+        expect(og_token).to be_present
+        expect(parking_notification.current?).to be_truthy
+        expect(parking_notification.retrieved?).to be_falsey
+        expect do
+          parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "appears_abandoned_notification")
+        end.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+
+        new_parking_notification = ParkingNotification.last
+        expect(new_parking_notification.bike).to eq parking_notification.bike
+        expect(new_parking_notification.organization).to eq parking_notification.organization
+        expect(new_parking_notification.initial_record).to eq parking_notification
+        expect(new_parking_notification.kind).to eq "appears_abandoned_notification"
+        expect(new_parking_notification.retrieved?).to be_falsey
+        expect(new_parking_notification.current?).to be_truthy
+      end
+      context "already retrieved" do
+        let(:retrieved_at) { Time.current - 26.hours }
+        let(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, retrieved_at: retrieved_at) }
+        it "does not create" do
+          parking_notification.reload
+          expect(parking_notification.retrieved?).to be_truthy
+          expect(parking_notification.retrieved_at).to be_within(1).of retrieved_at # Testing factory functionality
+          expect do
+            new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
+            expect(new_parking_notification.id).to eq parking_notification.id
+          end.to_not change(ParkingNotification, :count)
+        end
+      end
+    end
+  end
 end

@@ -9,10 +9,21 @@
 %p
   Your #{@bike.title_string} is located at:
   %br
-  = @parking_notification.address
+  %em
+    = @parking_notification.address
 
 - if @parking_notification.message.present?
   %p
     %strong= @parking_notification.message
 
 <img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@parking_notification.latitude},#{@parking_notification.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@parking_notification.latitude},#{@parking_notification.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
+
+- if @retrieval_link_url.present?
+  .mark-retrieved-box
+    = link_to "I picked up my #{@bike.type}", @retrieval_link_url, class: "binx-button"
+    %p
+      %em
+        Let
+        %strong
+          = @organization&.name
+        know that you retrieved your #{@bike.type}! Click the button above.

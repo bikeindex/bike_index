@@ -3,22 +3,24 @@
 class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
   STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3 }.freeze
-  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recoverry: 1, user_recovery: 2 }.freeze
+  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
-  has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
+  belongs_to :retrieved_by, class_name: "User"
   belongs_to :country
   belongs_to :state
+
+  has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
 
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
 
   before_validation :set_calculated_attributes
-  after_create :process_creation
+  after_create :process_notification
 
   enum kind: KIND_ENUM
   enum status: STATUS_ENUM
@@ -35,6 +37,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
   scope :email_success, -> { where(delivery_status: "email_success") }
+  scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
@@ -58,11 +61,7 @@ class ParkingNotification < ActiveRecord::Base
       .or(where(id: initial_record_id))
   end
 
-  def associated_impound_record_id; impound_record_id || associated_notifications.pluck(:impound_record_id).compact.first end
-
-  def associated_impound_record; impound_record || associated_notifications.with_impound_record.first&.impound_record end
-
-  # Get it unscoped
+  # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 
   def active?; self.class.active_statuses.include?(status) end
@@ -87,8 +86,19 @@ class ParkingNotification < ActiveRecord::Base
 
   def reply_to_email; organization&.auto_user&.email || user&.email end
 
+  def current_associated_notification; current? ? self : associated_notifications.order(:id).last end
+
+  # Fallback to created_at because something is busted and we need this to exist sometimes
+  def impounded_at; impounded? ? impound_record&.created_at || created_at : nil end
+
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
+
+  # All get applied
+  def associated_retrieved_notification
+    return nil unless retrieved?
+    retrieved_by_id.present? ? self : associated_notifications.where.not(retrieved_by_id: nil).first
+  end
 
   def earlier_bike_notifications
     notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
@@ -116,6 +126,16 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
+  def mark_retrieved!(r_user_id, r_kind, r_at = nil)
+    return self if retrieved?
+    update_attributes!(retrieved_by_id: r_user_id,
+                       retrieval_kind: r_kind,
+                       retrieved_at: r_at || Time.current)
+    process_notification
+    self
+  end
+
+  # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
   def address(force_show_address: false)
     Geocodeable.address(
       self,
@@ -138,7 +158,7 @@ class ParkingNotification < ActiveRecord::Base
     # Only set unregistered_bike on creation
     self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
     # generate retrieval token after checking if unregistered_bike
-    self.retrieval_link_token ||= SecurityTokenizer.new_token if send_email?
+    self.retrieval_link_token ||= SecurityTokenizer.new_token if current? && send_email?
     # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
@@ -171,21 +191,36 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def process_creation
+  def process_notification
     # Update the bike immediately, inline
     bike&.set_location_info
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
   end
 
+  # new_attrs needs to include kind and user_id. It can include additional attrs if they matter
+  def retrieve_or_repeat_notification!(new_attrs)
+    new_attrs = new_attrs.with_indifferent_access
+    if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
+      mark_retrieved!(new_attrs[:user_id], "organization_recovery")
+    else
+      return self unless active?
+      attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
+                                "location_from_address", "retrieval_link_token", "delivery_status")
+                        .merge(new_attrs)
+      attrs["initial_record_id"] ||= id
+      ParkingNotification.create!(attrs)
+    end
+  end
+
   private
 
   def calculated_unregistered_parking_notification
-    bike.unregistered_parking_notification?
+    bike&.unregistered_parking_notification?
   end
 
   def calculated_status
-    return "impounded" if impound_notification? || associated_impound_record_id.present?
+    return "impounded" if impound_notification? || impound_record_id.present?
     return "retrieved" if retrieved_at.present? || associated_notifications.retrieved.any?
     associated_notifications.where("id > ?", id).any? ? "superseded" : "current"
   end

@@ -5,69 +5,98 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
   let(:instance) { subject.new }
   before { ActionMailer::Base.deliveries = [] }
 
-  # repeat_parking_notifications.map(&:update)
-  # Create impound record
-
-  describe "updating associated records" do
+  describe "perform" do
     let(:initial) { FactoryBot.create(:parking_notification_organized, updated_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
     let(:bike) { initial.bike }
     let(:user) { initial.user }
     let(:organization) { initial.organization }
-    let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record: initial) }
-    let(:parking_notification3) { FactoryBot.build(:parking_notification_organized, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
-    it "updates the other parking_notifications, creates the impound record" do
-      initial.reload
-      initial.update_attributes(updated_at: Time.current) # Because of calculated_status
-      initial.reload
-      parking_notification2.reload
-      bike.reload
-      expect(bike.status).to eq "status_abandoned"
-      expect(initial.status).to eq "superseded"
-      expect(parking_notification2.status).to eq "current"
-      Sidekiq::Worker.clear_all
-      expect do
-        parking_notification3.save
+    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record: initial, delivery_status: "email_success") }
+    context "impound record" do
+      let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
+      it "updates the other parking_notifications, creates the impound record" do
+        initial.reload
+        initial.update_attributes(updated_at: Time.current) # Because of calculated_status
+        initial.reload
+        parking_notification2.reload
+        bike.reload
+        expect(bike.status).to eq "status_abandoned"
+        expect(initial.status).to eq "superseded"
+        expect(parking_notification2.status).to eq "current"
+        expect(parking_notification2.delivery_status).to eq "email_success"
+        expect(parking_notification2.organization_id).to be_present
+        Sidekiq::Worker.clear_all
+        expect do
+          parking_notification3.save
+          parking_notification3.reload
+          expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([initial.id, parking_notification2.id])
+        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
+        expect(parking_notification3.delivery_status).to be_blank
+        # Ensure we don't accidentally reloop things
+        expect do
+          subject.drain
+        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(-1)
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
         parking_notification3.reload
-        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([initial.id, parking_notification2.id])
-      end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
-      expect(parking_notification3.delivery_status).to be_blank
-      # Ensure we don't accidentally reloop things
-      expect do
-        subject.drain
-      end.to change(ProcessParkingNotificationWorker.jobs, :size).by(-1)
-      expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-      parking_notification3.reload
-      expect(parking_notification3.delivery_status).to eq "email_success"
-      expect(parking_notification3.kind).to eq "impound_notification"
-      expect(parking_notification3.impound_record).to be_present
-      expect(parking_notification3.status).to eq "impounded"
-      impound_record = parking_notification3.impound_record
-      expect(impound_record.bike).to eq bike
-      expect(impound_record.organization).to eq organization
-      expect(impound_record.user).to eq user
-      expect(impound_record.parking_notification).to eq parking_notification3
-      bike.reload
-      expect(bike.status).to eq "status_impounded"
-      expect(bike.current_impound_record).to eq impound_record
-      expect(bike.impounded?).to be_truthy
+        expect(parking_notification3.delivery_status).to eq "email_success"
+        expect(parking_notification3.kind).to eq "impound_notification"
+        expect(parking_notification3.impound_record).to be_present
+        expect(parking_notification3.status).to eq "impounded"
+        impound_record = parking_notification3.impound_record
+        expect(impound_record.bike).to eq bike
+        expect(impound_record.organization).to eq organization
+        expect(impound_record.user).to eq user
+        expect(impound_record.parking_notification).to eq parking_notification3
+        bike.reload
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.current_impound_record).to eq impound_record
+        expect(bike.impounded?).to be_truthy
 
-      initial.reload
-      parking_notification2.reload
-      expect(initial.impound_record_id).to be_blank
-      expect(initial.associated_impound_record).to eq impound_record
-      expect(initial.kind).to eq "appears_abandoned_notification"
-      expect(initial.status).to eq "impounded"
-      expect(parking_notification2.status).to eq "impounded"
-      expect(parking_notification2.impound_record_id).to be_blank
-      expect(parking_notification2.associated_impound_record).to eq impound_record
-      expect(parking_notification2.kind).to eq "appears_abandoned_notification"
+        initial.reload
+        parking_notification2.reload
+        expect(initial.impound_record).to eq impound_record
+        expect(initial.kind).to eq "appears_abandoned_notification"
+        expect(initial.status).to eq "impounded"
+        expect(parking_notification2.delivery_status).to eq "email_success"
+        expect(parking_notification2.status).to eq "impounded"
+        expect(parking_notification2.impound_record).to eq impound_record
+        expect(parking_notification2.kind).to eq "appears_abandoned_notification"
+      end
+    end
+    context "retrieved" do
+      it "updates the other parking_notifications" do
+        initial.reload
+        initial.update_attributes(updated_at: Time.current) # Because of calculated_status
+        initial.reload
+        parking_notification2.reload
+        bike.reload
+        expect(bike.status).to eq "status_abandoned"
+        expect(initial.status).to eq "superseded"
+        expect(parking_notification2.status).to eq "current"
+        expect(initial.associated_retrieved_notification).to be_nil
+        Sidekiq::Worker.clear_all
+        expect do
+          initial.mark_retrieved!(user.id, "link_token_recovery")
+        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
+        ProcessParkingNotificationWorker.drain
+        initial.reload
+        parking_notification2.reload
+
+        expect(initial.status).to eq "retrieved"
+        expect(initial.retrieved_at).to be_within(10).of Time.current
+        expect(initial.retrieved_by).to eq user
+        expect(initial.associated_retrieved_notification).to eq initial
+
+        expect(parking_notification2.status).to eq "retrieved"
+        expect(parking_notification2.retrieved_at).to be_within(1).of initial.retrieved_at
+        expect(parking_notification2.associated_retrieved_notification).to eq initial
+      end
     end
   end
 
 
   describe "sending email" do
     let(:bike) { FactoryBot.create(:ownership).bike }
-    let(:parking_notification) { FactoryBot.create(:parking_notification, delivery_status: delivery_status, bike: bike) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, delivery_status: delivery_status, bike: bike) }
     let(:delivery_status) { nil }
 
     it "sends an email" do

@@ -1,0 +1,60 @@
+-# TODO: Add translations
+- if @bike.impounded?
+  .alert.alert-danger.mt-4.mb-4
+    %h3.uncap
+      = @bike.type
+      is currently impounded!
+- if @bike.parking_notifications.active.any?
+  - parking_notifications = @bike.parking_notifications.active.reorder(created_at: :desc)
+  .alert.alert-warning.mt-4.mb-4
+    %h3.uncap
+      = pluralize parking_notifications.count, "current notification"
+      for this #{@bike.type}!
+    %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table.text-dark{ style: "color: #666;" }
+      %thead.small-header.hidden-md-down
+        %th
+          Created
+          %small.convertTimezone
+        %th Address
+        %th Kind
+        %th By
+        %th
+          %small Notification#
+      %tbody
+        - parking_notifications.each do |parking_notification|
+          %tr
+            %td
+              %span.convertTime.preciseTime
+                = l(parking_notification.created_at, format: :convert_time)
+              %span.extended-col-info.small
+                \- <em>#{parking_notification.kind_humanized}</em> -
+                by
+                %strong= parking_notification.organization.short_name
+                %small.less-strong
+                  (#{parking_notification.user&.display_name})
+
+              - if parking_notification.repeat_number > 0
+                %strong.extended-col-info
+                  Notification ##{parking_notification.repeat_number}
+            %td.hidden-sm-cells
+              %small= address_formatted(parking_notification)
+            %td.hidden-sm-cells
+              %em
+                = parking_notification.kind_humanized
+            %td.hidden-sm-cells
+              %strong= parking_notification.organization.short_name
+              %small.less-strong
+                (#{parking_notification.user&.display_name})
+            %td.small.hidden-sm-cells
+              - if parking_notification.repeat_record?
+                = parking_notification.notification_number
+    - current_parking_notification = @bike.current_parking_notification
+    - if current_parking_notification.present?
+      %h3.uncap.text-center.mt-4.mb-2
+        %strong
+          Have you retrieved this #{@bike.type}?
+      %p.text-center
+        %em
+          Let #{current_parking_notification.organization&.short_name} know
+        = link_to "mark retrieved", bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), class: "btn btn-sm btn-success", style: "color: white;"
+

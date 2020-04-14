@@ -4439,6 +4439,7 @@ en:
         impounded: Impounded
         kind: Because
         notification_number: Notification#
+        retrieved: Retrieved
     stickers:
       edit:
         bike: Bike

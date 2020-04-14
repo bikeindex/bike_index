@@ -30,10 +30,7 @@ module Organized
 
     def show
       @parking_notification = parking_notifications.find(params[:id])
-      related_ids = [@parking_notification, @parking_notification.initial_record_id].compact
-      @related_notifications = parking_notifications.where(id: related_ids)
-                                .or(parking_notifications.where(initial_record_id: related_ids))
-                                .where.not(id: @parking_notification.id)
+      @related_notifications = @parking_notification.associated_notifications.reorder(id: :desc)
       @bike = @parking_notification.bike
     end
 
@@ -42,17 +39,23 @@ module Organized
       @email_preview = true
       @parking_notification = parking_notifications.find(params[:id])
       @bike = @parking_notification.bike
+      @retrieval_link_url = @parking_notification.retrieval_link_token.present? ? "#" : nil
       render template: "/organized_mailer/parking_notification", layout: "email"
     end
 
     def create
-      @parking_notification = ParkingNotification.new(permitted_parameters)
-      if @parking_notification.save
-        flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
+      if params[:kind].present? # It's a send_additional kind
+        create_and_send_repeats(params[:kind], params[:ids])
       else
-        flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+        @parking_notification = ParkingNotification.new(permitted_parameters)
+        if @parking_notification.save
+          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
+        else
+          flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+        end
       end
-       redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
+      redirect_to @redirect_location and return if @redirect_location.present?
+      redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
     end
 
     helper_method :matching_parking_notifications, :search_params_present?
@@ -86,6 +89,27 @@ module Organized
             .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :latitude, :longitude, :accuracy,
                     :street, :city, :zipcode, :state_id, :country_id)
             .merge(user_id: current_user.id, organization_id: current_organization.id, use_entered_address: use_entered_address)
+    end
+
+    def create_and_send_repeats(kind, ids)
+      ids = (ids.is_a?(Array) ? ids : ids.split(",")).map(&:strip).reject(&:blank?)
+      successes = []
+      kind_humanized = ParkingNotification.kinds_humanized[kind.to_sym]
+      parking_notifications.where(id: ids).each do |parking_notification|
+        new_notification = parking_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
+        successes << new_notification.id
+      end
+      # If sending only one repeat notification, redirect to that notification
+      if successes.count == ids.count && successes.count == 1 && kind != "mark_retrieved"
+        flash[:success] = "Created #{kind_humanized} notification!"
+        @redirect_location = organization_parking_notification_path(successes.first, organization_id: current_organization.to_param)
+      end
+      flash[:success] ||= "Marked #{successes.count} bikes retrieved" if kind == "mark retrieved"
+
+      flash[:success] ||= "Created #{successes.count} #{kind_humanized} notifications"
+      # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
+      # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry
+      # flash[:error] = "Unable to send notifications for #{(ids - successes).map { |i| "##{i}" }.join(", ")}"
     end
 
     def ensure_access_to_parking_notifications!
