@@ -63,12 +63,15 @@ class Geohelper
     #
     # Returns a Hash
     def location_from_result(result)
-      location = {
-        address: result.address.presence,
-        city: result.city.presence,
-        latitude: result.latitude.presence,
-        longitude: result.longitude.presence,
-      }
+      return {} if result.blank?
+
+      location =
+        {
+          address: result.address.presence,
+          city: result.city.presence,
+          latitude: result.latitude.presence,
+          longitude: result.longitude.presence,
+        }
 
       if result.respond_to?(:country_code)
         location.merge(
