@@ -159,7 +159,15 @@ class BParam < ApplicationRecord
 
   def external_image_urls; bike["external_image_urls"] || [] end
 
-  def address(field); key = field[/\Aaddress/].present? ? bike[field] : bike["address_#{field}"] end
+  # Deal with the legacy address concerns
+  def address(field)
+    key = field.gsub(/address_?/, "") # remove 'address' from the key if it's present
+    if key.blank? || key == "street" # If looking for street or address, try both street and address
+      bike["street"] || bike["address"]
+    else
+      bike[key] || bike["address_#{key}"]
+    end
+  end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
   def display_email?; true unless owner_email.present? && bike_errors.blank? end
@@ -357,11 +365,11 @@ class BParam < ApplicationRecord
     return {} unless bike["address"].present?
     return params["formatted_address"] if params["formatted_address"].present?
     if address("city").present?
-      formatted_address = { address: address("address"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json
-    else
+      formatted_address = { street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json
+    else # We're dealing with legacy data in the b_param
       formatted_address = Geohelper.formatted_address_hash(bike["address"])
       # return at least something from legacy entries that don't have enough info to guess address
-      formatted_address = { address: bike["address"] } if formatted_address.blank? && bike["address"].present?
+      formatted_address = { street: bike["address"] } if formatted_address.blank? && bike["address"].present?
     end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)

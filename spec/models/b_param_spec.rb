@@ -247,9 +247,9 @@ RSpec.describe BParam, type: :model do
   end
 
   describe "additional_registration_fields" do
-    let(:params_hash) { { bike: bike_params } }.as_json }
+    let(:params_hash) { { bike: bike_params }.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
-    let(:target_address) { { address: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
+    let(:target_address) { { street: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
     let(:bike) { Bike.new }
     let(:bike_params) do
       {
@@ -258,28 +258,29 @@ RSpec.describe BParam, type: :model do
         external_image_urls: ["xxxxx"],
         bike_sticker: "xxxx",
         phone: "919929333",
-        address_street: "123 Main St",
-        address_city: "Nevernever Land",
-        address_zipcode: "11111",
-        address_state: "CA",
+        street: "123 Main St",
+        city: "Nevernever Land",
+        zipcode: "11111",
+        state: "CA",
       }
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
-      expect(b_param.fetch_formatted_address).to eq target_address
-      expect(b_param.bike_sticker).to eq "xxxx"
-      expect(b_param.organization_affiliation).to eq "employee"
-      expect(b_param.phone).to eq "919929333"
       expect(b_param.address("street")).to eq "123 Main St"
       expect(b_param.address("address")).to eq "123 Main St"
       expect(b_param.address("city")).to eq "Nevernever Land"
       expect(b_param.address("address_zipcode")).to eq "11111"
       expect(b_param.address("state")).to eq "CA"
+
+      expect(b_param.fetch_formatted_address).to eq target_address
+      expect(b_param.bike_sticker).to eq "xxxx"
+      expect(b_param.organization_affiliation).to eq "employee"
+      expect(b_param.phone).to eq "919929333"
       expect(b_param.external_image_urls).to eq(["xxxxx"])
       expect(bike.registration_address).to be_present
       expect(bike.valid_registration_address_present?).to be_truthy
     end
-    context "address without street" do
+    context "legacy address 1 (street -> address)" do
       let(:bike_params) do
         {
           serial_number: "zzz",
@@ -307,7 +308,7 @@ RSpec.describe BParam, type: :model do
         expect(bike.valid_registration_address_present?).to be_truthy
       end
     end
-    context "legacy address" do
+    context "legacy address 2" do
       let(:bike_params) do
         {
           serial_number: "zzz",
@@ -322,7 +323,7 @@ RSpec.describe BParam, type: :model do
         b_param.reload
         expect(b_param.params).to eq params_hash
         VCR.use_cassette "b_param-fetch_formatted_address-fail" do
-          expect(b_param.fetch_formatted_address).to eq(address: "0229 HAMMOND BLDG")
+          expect(b_param.fetch_formatted_address).to eq(street: "0229 HAMMOND BLDG")
           b_param.reload
           expect(b_param.params["formatted_address"]).to be_present
           expect(bike.registration_address).to be_present

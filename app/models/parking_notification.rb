@@ -143,7 +143,7 @@ class ParkingNotification < ActiveRecord::Base
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
       addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
-      self.street = addy_hash["address"]
+      self.street = addy_hash["street"]
       self.city = addy_hash["city"]
       self.zipcode = addy_hash["zipcode"]
       self.country = Country.fuzzy_find(addy_hash["country"])

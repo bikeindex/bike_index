@@ -50,7 +50,7 @@ class Geohelper
       state, code = code_and_state.split(" ") # In case it's a full zipcode with a dash
       city = address_array.pop
       {
-        address: address_array.join(", "),
+        street: address_array.join(", "),
         city: city,
         state: state,
         zipcode: code,
