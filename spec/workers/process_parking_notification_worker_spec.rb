@@ -6,11 +6,12 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   describe "perform" do
-    let(:initial) { FactoryBot.create(:parking_notification_organized, updated_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
+    let(:initial) { FactoryBot.create(:parking_notification_organized, created_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
     let(:bike) { initial.bike }
     let(:user) { initial.user }
     let(:organization) { initial.organization }
-    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record: initial, delivery_status: "email_success") }
+    let(:initial_record_id) { initial_record.id }
+    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record_id: initial_record_id, delivery_status: "email_success") }
     context "impound record" do
       let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
       it "updates the other parking_notifications, creates the impound record" do
@@ -93,7 +94,19 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
     end
 
     context "other active notification for bike, from organization" do
-      it "associates the other notification"
+      let(:initial_record_id) { nil }
+      let(:parking_notification3) { FactoryBot.create(:parking_notification, bike: bike) }
+      it "associates the other notification" do
+        initial.reload
+        parking_notification2.reload
+        expect(initial.associated_notifications).to eq([])
+        expect(parking_notification2.associated_notifications).to eq([])
+        expect(parking_notification3.associated_notifications).to eq([])
+        instance.perform(parking_notification2.id)
+        expect(initial.associated_notifications.pluck(:id)).to match_array([parking_notification2.id])
+        expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([initial.id])
+        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
+      end
     end
   end
 
