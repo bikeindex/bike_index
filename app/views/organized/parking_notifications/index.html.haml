@@ -54,17 +54,41 @@
           - else
             %em
               unknown bike ##{params[:search_bike_id]}
-
-    .col-xs-6.mt-2
-      %p#recordsCount
+  .row.mt-2.mb-4
+    .col-md-4.col-xs-6
+      #recordsCount
         %span.number 0
         = t(".matches_visible")
-    .col-xs-6.mt-2
-      %p#recordsTotalCount.text-right.less-strong
+    .col-md-4.col-xs-6
+      #recordsTotalCount.text-right.less-strong
         %span.number 0
         total matches
+    .col-md-4.col-xs-12
+      .text-right
+        %a.gray-link#toggleSendRepeat{ href: "#sendRepeatNotifications", data: { toggle: "collapse", target: "#sendRepeatNotifications" } }
+          repeat/retrieve multiple
 
-  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
+  - # Form needs to wrap the table too
+
+  = form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: current_organization) do |f|
+    #sendRepeatNotifications.collapse
+      -# similar form on parking notification show
+      .row
+        .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
+          .card
+            .card-block
+              .card-title
+                %h3.uncap
+                  Repeat/retrieve checked notifications
+              .card-body
+                -# Matching form is on parking notification index
+                .row#sendRepeatOrRetrieveFields
+                  .col-xs-6
+                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), class: "form-control"
+                  .col-xs-6.text-center
+                    = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
+
+    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

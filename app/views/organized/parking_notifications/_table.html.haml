@@ -2,6 +2,7 @@
 - skip_bike ||= false
 - skip_repeat ||= false
 - render_address ||= false
+- skip_multiselect ||= false
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
   %thead.small-header.hidden-md-down
@@ -23,6 +24,10 @@
       %small=t(".impounded")
     %th
       %small=t(".retrieved")
+    - unless skip_multiselect
+      %th.multiselect-cell.table-cell-check.collapse
+        %a#selectAllSelector{ href: "#" }
+          = check_mark
   %tbody
     - parking_notifications.each do |parking_notification|
       %tr
@@ -76,3 +81,7 @@
           - if parking_notification.retrieved_at.present?
             %span.convertTime.preciseTime
               = l(parking_notification.retrieved_at, format: :convert_time)
+        - unless skip_multiselect
+          %td.multiselect-cell.table-cell-check.collapse
+            = check_box_tag "ids[#{parking_notification.id}]", parking_notification.id
+

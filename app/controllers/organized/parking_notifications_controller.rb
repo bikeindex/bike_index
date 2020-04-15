@@ -45,7 +45,7 @@ module Organized
 
     def create
       if params[:kind].present? # It's a send_additional kind
-        create_and_send_repeats(params[:kind], params[:ids])
+        create_and_send_repeats(params[:kind], params[:ids].as_json)
       else
         @parking_notification = ParkingNotification.new(permitted_parameters)
         if @parking_notification.save
@@ -96,7 +96,14 @@ module Organized
     end
 
     def create_and_send_repeats(kind, ids)
-      ids_array = (ids.is_a?(Array) ? ids : ids.split(",")).map { |id| id.strip.to_i }.reject(&:blank?)
+      pp "#{ids.is_a?(Hash)}, #{ids.keys}"
+      ids_array = case ids
+      when ids.is_a?(Array) then ids
+      when ids.is_a?(Hash) then ids.keys # parameters submitted look like this ids: { "12" => "12" }
+      else
+        ids.split(",")
+      end.map { |id| id.strip.to_i }.reject(&:blank?)
+      pp ids_array
 
       selected_notifications = parking_notifications.where(id: ids_array)
       # pp "ids_array #{ids_array} - #{selected_notifications.pluck(:id)} - #{selected_notifications.resolved.pluck(:id)}"

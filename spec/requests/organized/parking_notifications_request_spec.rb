@@ -380,14 +380,16 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response).to redirect_to organization_parking_notification_path(ParkingNotification.last.id, organization_id: current_organization.to_param)
       end
       context "multiple for one notification stream" do
-        xit "only sends one" do
+        # This is how the ids look, for some reason
+        let(:ids_params) { { parking_notification_initial.id.to_s => parking_notification_initial.id.to_s, parking_notification2.id.to_s => parking_notification2.id.to_s } }
+        it "only sends one" do
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
               organization_id: current_organization.to_param,
               kind: "appears_abandoned_notification",
-              ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
+              ids: ids_params,
             }
           end
           expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
@@ -397,7 +399,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
     context "impound_notification - multiple" do
       let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization) }
-      it "impounds them both" do
+      xit "impounds them both" do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
         parking_notification_initial.reload

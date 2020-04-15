@@ -17,7 +17,7 @@ window.fallbackToManualAddress = ->
   return true unless window.waitingOnLocation
   $(".waitingOnLocationText").text("Unable to determine current location automatically")
   $("#parking_notification_use_entered_address_true").prop("checked", true)
-  $(".address-fields").collapse("show")
+  $(".address-group").collapse("show")
   $(".parkingLocation-submit-btn").attr("disabled", false)
 
 class BikeIndex.BikesShow extends BikeIndex
@@ -84,10 +84,10 @@ class BikeIndex.BikesShow extends BikeIndex
     $(".use-entered-address-radios input").on "change", (e) =>
       # Make the required fields required
       if $("#parking_notification_use_entered_address_true").prop("checked")
-        $(".address-fields").collapse("show")
+        $(".address-group").collapse("show")
         $(".ifManualRequired").attr("required", true)
       else
-        $(".address-fields").collapse("hide")
+        $(".address-group").collapse("hide")
         $(".ifManualRequired input").attr("required", false)
 
 

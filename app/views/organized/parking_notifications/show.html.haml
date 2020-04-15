@@ -168,6 +168,7 @@
 
 - if @parking_notification.active?
   .row
+    -# similar form on parking notification index
     .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
       .card
         = form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: current_organization) do |f|
@@ -181,6 +182,7 @@
                   Create additional notification
                 or mark retrieved
             .card-body
+              -# Matching form is on parking notification index
               .row#sendRepeatOrRetrieveFields
                 .col-xs-6
                   = select_tag :kind, options_for_select(parking_notification_repeat_kinds, selected: @parking_notification.kind), class: "form-control"
