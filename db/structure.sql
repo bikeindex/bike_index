@@ -1884,7 +1884,7 @@ CREATE TABLE public.parking_notifications (
     unregistered_bike boolean DEFAULT false,
     status integer DEFAULT 0,
     retrieved_at timestamp without time zone,
-    retrieval_kind integer,
+    retrieved_kind integer,
     retrieval_link_token text,
     retrieved_by_id bigint
 );
@@ -1895,7 +1895,6 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4658,6 +4657,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200410043813'),
 ('20200410183949'),
 ('20200414055430'),
-('20200414055431');
+('20200414055431'),
+('20200415161915');
 
 

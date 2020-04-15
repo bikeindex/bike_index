@@ -95,10 +95,17 @@ module Organized
       ids = (ids.is_a?(Array) ? ids : ids.split(",")).map(&:strip).reject(&:blank?)
       successes = []
       kind_humanized = ParkingNotification.kinds_humanized[kind.to_sym]
-      parking_notifications.where(id: ids).each do |parking_notification|
-        new_notification = parking_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
+      selected_notifications = parking_notifications.where(id: ids)
+      @notifications_failed_resolved = selected_notifications.resolved
+      ids_repeated = []
+      selected_notifications.active.each do |parking_notification|
+        target_notification = parking_notification.current_associated_notification
+        next if ids_repeated.include?(target_notification.id)
+        ids_repeated << target_notification.id
+        new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         successes << new_notification.id
       end
+      @notifications_repeated = ParkingNotification.where(id: ids_repeated)
       # If sending only one repeat notification, redirect to that notification
       if successes.count == ids.count && successes.count == 1 && kind != "mark_retrieved"
         flash[:success] = "Created #{kind_humanized} notification!"

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
+  include Geocodeable
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
   STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3 }.freeze
-  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
+  RETRIEVED_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -24,7 +25,7 @@ class ParkingNotification < ActiveRecord::Base
 
   enum kind: KIND_ENUM
   enum status: STATUS_ENUM
-  enum retrieval_kind: RETRIEVAL_KIND_ENUM
+  enum retrieved_kind: RETRIEVED_KIND_ENUM
 
   # TODO: location refactor - switch to Geocodeable
   geocoded_by :geocode_data
@@ -60,6 +61,9 @@ class ParkingNotification < ActiveRecord::Base
     where(initial_record_id: potential_id_matches).where.not(id: id)
       .or(where(id: initial_record_id))
   end
+
+  # geocoding is managed by set_calculated_attributes
+  def should_be_geocoded?; false end
 
   # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
@@ -126,11 +130,14 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
-  def mark_retrieved!(r_user_id, r_kind, r_at = nil)
+  # DOES NOT REQUIRE a user, because of email retrieval
+  def mark_retrieved!(retrieved_kind:, retrieved_by_id: nil, retrieved_at: nil)
     return self if retrieved?
-    update_attributes!(retrieved_by_id: r_user_id,
-                       retrieval_kind: r_kind,
-                       retrieved_at: r_at || Time.current)
+    # Doesn't seem like binding.local_variable_get does anything here, but I still think it's a good practice
+    retrieved_at = binding.local_variable_get(:retrieved_at) || Time.current
+    update_attributes!(retrieved_by_id: binding.local_variable_get(:retrieved_by_id),
+                       retrieved_kind: binding.local_variable_get(:retrieved_kind),
+                       retrieved_at: retrieved_at)
     process_notification
     self
   end
@@ -202,7 +209,7 @@ class ParkingNotification < ActiveRecord::Base
   def retrieve_or_repeat_notification!(new_attrs)
     new_attrs = new_attrs.with_indifferent_access
     if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
-      mark_retrieved!(new_attrs[:user_id], "organization_recovery")
+      mark_retrieved!(retrieved_by_id: new_attrs[:user_id], retrieved_kind: "organization_recovery")
     else
       return self unless active?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",

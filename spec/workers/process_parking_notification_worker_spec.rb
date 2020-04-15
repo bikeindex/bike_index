@@ -75,7 +75,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(initial.associated_retrieved_notification).to be_nil
         Sidekiq::Worker.clear_all
         expect do
-          initial.mark_retrieved!(user.id, "link_token_recovery")
+          initial.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "link_token_recovery")
         end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
         ProcessParkingNotificationWorker.drain
         initial.reload

@@ -75,7 +75,7 @@
                   %small
                     %span.less-strong developer info:
                     %code
-                      #{retrieved_notification.retrieval_kind}
+                      #{retrieved_notification.retrieved_kind}
                     %em.less-strong
                       notification:
                       = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
