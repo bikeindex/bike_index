@@ -54,7 +54,6 @@ module Organized
           flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
         end
       end
-      # pp "repeated: #{@notifications_repeated.pluck(:id)}, failed: #{@notifications_failed_resolved.pluck(:id)}"
       if @redirect_location.present?
         redirect_to @redirect_location
       else
@@ -102,7 +101,6 @@ module Organized
       ids_array = ids_array.map { |id| id.strip.to_i }.reject(&:blank?)
 
       selected_notifications = parking_notifications.where(id: ids_array)
-      pp "ids_array #{ids_array} - #{selected_notifications.pluck(:id)} - #{selected_notifications.resolved.pluck(:id)}"
       # We can't update already resolved notifications - so add them to an ivar for displaying
       @notifications_failed_resolved = selected_notifications.resolved.includes(:user, :bike, :impound_record)
       success_ids = []
@@ -110,7 +108,6 @@ module Organized
 
       selected_notifications.active.each do |parking_notification|
         target_notification = parking_notification.current_associated_notification
-        pp "o: #{parking_notification.id} - target: #{target_notification.id}, #{ids_repeated}"
         # Don't repeat notifications already sent, or previous to ones already targeted
         next if (ids_repeated + success_ids).include?(target_notification.id)
         ids_repeated << target_notification.id
