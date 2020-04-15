@@ -3,6 +3,7 @@ module Organized
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
     skip_before_action :set_x_frame_options_header, only: [:email]
+    before_action :set_failed_and_repeated_ivars
 
     def index
       @page_data = {
@@ -102,7 +103,7 @@ module Organized
 
       selected_notifications = parking_notifications.where(id: ids_array)
       # We can't update already resolved notifications - so add them to an ivar for displaying
-      @notifications_failed_resolved = selected_notifications.resolved.includes(:user, :bike, :impound_record)
+      @notifications_failed_resolved = selected_notifications.resolved
       success_ids = []
       ids_repeated = []
 
@@ -114,15 +115,32 @@ module Organized
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         success_ids << new_notification.id
       end
-      @repeated_kind = kind
-      @notifications_repeated = ParkingNotification.where(id: ids_repeated).includes(:user, :bike, :impound_record)
+      @notifications_repeated = ParkingNotification.where(id: ids_repeated)
       # If sending only one repeat notification, redirect to that notification
       if ids_array.count == 1 && success_ids.count == 1
         @redirect_location = organization_parking_notification_path(success_ids.first, organization_id: current_organization.to_param)
       end
+      session[:notifications_failed_resolved_ids] = @notifications_failed_resolved.pluck(:id)
+      session[:notifications_repeated_ids] = @notifications_repeated.pluck(:id)
+      session[:repeated_kind] = kind
       # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
       # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry
       # flash[:error] = "Unable to send notifications for #{(ids - success_ids).map { |i| "##{i}" }.join(", ")}"
+    end
+
+    def set_failed_and_repeated_ivars
+      return true unless session[:repeated_kind].present?
+      @repeated_kind = session.delete(:repeated_kind)
+      notifications_failed_resolved_ids = session.delete(:notifications_failed_resolved_ids)
+      notifications_repeated_ids = session.delete(:notifications_repeated_ids)
+      if notifications_failed_resolved_ids.present?
+        @notifications_failed_resolved = parking_notifications.where(id: notifications_failed_resolved_ids)
+                                                              .includes(:user, :bike, :impound_record)
+      end
+      if notifications_repeated_ids.present?
+        @notifications_repeated = parking_notifications.where(id: notifications_repeated_ids)
+                                                       .includes(:user, :bike, :impound_record)
+      end
     end
 
     def ensure_access_to_parking_notifications!

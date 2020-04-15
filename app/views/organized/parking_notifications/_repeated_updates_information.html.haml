@@ -1,1 +1,44 @@
 -# There is too much information to display using a flash notification, so use this template
+- if @notifications_failed_resolved&.any?
+  .alert.alert-warning.mt-4.mb-4
+    %h3.uncap
+      Unable to
+      - if @repeated_kind == "mark_retrieved"
+        Mark
+        = pluralize @notifications_failed_resolved.count, "notification"
+        retrieved
+      - else
+        send
+        = pluralize @notifications_failed_resolved.count, "notification"
+    %ul
+      - @notifications_failed_resolved.each do |parking_notification|
+        %li.mt-2{ style: "color: #666; line-height: 1.5;" }
+          %a{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
+            %strong
+              = parking_notification.kind_humanized
+              notification
+          created
+          %span.convertTime.preciseTime
+            = l(parking_notification.created_at, format: :convert_time)
+          %span.less-strong
+            for the
+            - if parking_notification.bike.present?
+              %em
+                = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
+            - else
+              Bike
+            \- because it
+            - if parking_notification.retrieved?
+              was retrieved
+              - if parking_notification.retrieved_at.present?
+                %span.convertTime.preciseTime
+                  = l(parking_notification.retrieved_at, format: :convert_time)
+            - elsif parking_notification.impounded?
+              was impounded
+              - if parking_notification.impounded_at.present?
+                %span.convertTime.preciseTime
+                  = l(parking_notification.impounded_at, format: :convert_time)
+
+
+-# We'll probably want to do something about these in the future as well, but skipping for now
+-# @notifications_repeated

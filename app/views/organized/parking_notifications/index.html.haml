@@ -66,7 +66,7 @@
     .col-md-4.col-xs-12
       .text-right
         %a.gray-link#toggleSendRepeat{ href: "#sendRepeatNotifications", data: { toggle: "collapse", target: "#sendRepeatNotifications" } }
-          repeat/retrieve multiple
+          retrieve/send repeat notification
 
   - # Form needs to wrap the table too
 
@@ -79,12 +79,15 @@
             .card-block
               .card-title
                 %h3.uncap
-                  Repeat/retrieve checked notifications
+                  Mark retrieved or send follow up notifications
+                  %br
+                  %em.small.less-strong
+                    For table rows with checks
               .card-body
                 -# Matching form is on parking notification index
                 .row#sendRepeatOrRetrieveFields
                   .col-xs-6
-                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), class: "form-control"
+                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), { prompt: "...", class: "form-control" }
                   .col-xs-6.text-center
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
 

@@ -44,7 +44,7 @@
                 Notification ##{parking_notification.repeat_number}
           - unless skip_bike
             %span.extended-col-info.d-block
-              = link_to organized_bike_text(@bike), bike_path(@bike)
+              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
 
           - if parking_notification.impounded_at.present?
             %strong.small.extended-col-info.d-block
@@ -62,8 +62,8 @@
             %small= address_formatted(parking_notification)
         - unless skip_bike
           %td.hidden-sm-cells
-            - if bike.present?
-              = link_to organized_bike_text(@bike), bike_path(@bike)
+            - if parking_notification.bike.present?
+              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
         %td.hidden-sm-cells
           %em
             = parking_notification.kind_humanized
