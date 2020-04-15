@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
-  # it_behaves_like "geocodeable"
+  it_behaves_like "geocodeable"
 
   describe "factory" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification") }
@@ -42,6 +42,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
     it "organization auto_user, because it's present" do
+      expect(parking_notification.should_be_geocoded?).to be_falsey
       expect(parking_notification.user).to_not eq organization.auto_user
       expect(parking_notification.reply_to_email).to eq organization.auto_user.email
     end
@@ -69,6 +70,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.can_be_repeat?).to be_falsey
       parking_notification.kind = "appears_abandoned_notification" # Manually set parking notification kind
       expect(parking_notification.associated_notifications).to eq([])
+      expect(parking_notification.associated_notifications_including_self.pluck(:id)).to eq([]) # Since there is no id
       expect(parking_notification.save)
       expect(parking_notification.repeat_record?).to be_falsey
       expect(parking_notification.status).to eq "current"
@@ -113,6 +115,7 @@ RSpec.describe ParkingNotification, type: :model do
 
           expect(parking_notification_initial.associated_notifications.pluck(:id)).to eq([parking_notification.id])
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
+          expect(parking_notification.associated_notifications_including_self.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification.id])
         end
         context "additional parking_notification" do
           let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
@@ -222,6 +225,43 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "mark_retrieved!" do
+    let(:parking_notification) { FactoryBot.create(:parking_notification) }
+    let(:user) { parking_notification.user }
+    it "marks retrieved and enqueues processing, but only once" do
+      expect(parking_notification.active?).to be_truthy
+      # test setting the attrs and the overrides (because local keyword args)
+      parking_notification.retrieved_at = Time.current - 2.hours
+      parking_notification.retrieved_by_id = 12121212
+      expect do
+        parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
+      end.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+      parking_notification.reload
+      expect(parking_notification.active?).to be_falsey
+      expect(parking_notification.retrieved?).to be_truthy
+      expect(parking_notification.retrieved_by).to eq user
+      expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+      expect(parking_notification.associated_retrieved_notification).to eq parking_notification
+      expect do
+        parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
+      end.to_not change(ProcessParkingNotificationWorker.jobs, :count)
+    end
+    context "mark_retrieved without a user" do
+      it "retrieves" do
+        expect(parking_notification.active?).to be_truthy
+        expect do
+          parking_notification.mark_retrieved!(retrieved_kind: "link_token_recovery")
+        end.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        parking_notification.reload
+        expect(parking_notification.active?).to be_falsey
+        expect(parking_notification.retrieved?).to be_truthy
+        expect(parking_notification.retrieved_by).to be_blank
+        expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+        expect(parking_notification.associated_retrieved_notification).to eq parking_notification
+      end
+    end
+  end
+
   describe "retrieve_or_repeat_notification!" do
     let(:parking_notification) { FactoryBot.create(:parking_notification) }
     let(:user) { FactoryBot.create(:user) }
@@ -238,7 +278,7 @@ RSpec.describe ParkingNotification, type: :model do
         parking_notification.reload
         expect(parking_notification.retrieved?).to be_truthy
         expect(parking_notification.retrieved_at).to be_within(1.second).of Time.current
-        expect(parking_notification.retrieval_kind).to eq "organization_recovery"
+        expect(parking_notification.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification.retrieved_by).to eq user
         expect(parking_notification.retrieval_link_token).to eq og_token # Why not leave it around
       end

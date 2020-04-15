@@ -34,7 +34,7 @@ export default class BinxMapping {
       zoom: zoom,
       center: new google.maps.LatLng(lat, lng),
       gestureHandling: "cooperative",
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
     if (!window.infoWindow) {
       window.infoWindow = new google.maps.InfoWindow();
@@ -101,7 +101,7 @@ export default class BinxMapping {
             icon:
               "http://maps.google.com/mapfiles/ms/micons/purple-pushpin.png",
             title: place.name,
-            position: place.geometry.location
+            position: place.geometry.location,
           })
         );
         bounds.extend(place.geometry.location);
@@ -115,7 +115,7 @@ export default class BinxMapping {
       binxMapping.markersRendered = [];
     }
 
-    const newIds = markers.map(m => m.id);
+    const newIds = markers.map((m) => m.id);
 
     if (window.infoWindow != null) {
       window.infoWindow.close();
@@ -176,7 +176,7 @@ export default class BinxMapping {
     if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
     } else if (binxMapping.kind == "parking_notifications") {
-      popupContent = binxAppOrgParkingNotifications.mapPopup(point);
+      popupContent = binxAppOrgParkingNotificationMapping.mapPopup(point);
     } else {
       log.debug(binxMapping.kind);
       popupContent = "Missing template!";
@@ -223,7 +223,7 @@ export default class BinxMapping {
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(point.lat, point.lng),
           map: window.binxMap,
-          binxId: markerId
+          binxId: markerId,
         });
 
         google.maps.event.addListener(

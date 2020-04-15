@@ -38,6 +38,8 @@ module Geocodeable
     end
   end
 
+  def coordinates; attributes.slice("latitude", "longitude").with_indifferent_access end
+
   # default address hash. Probably could be used more often/better
   def address_hash
     attributes.slice("street", "city", "zipcode", "latitude", "longitude")
@@ -51,6 +53,7 @@ module Geocodeable
     return super unless val.is_a?(String)
     self.state = State.fuzzy_find(val)
   end
+
   def country=(val)
     return super unless val.is_a?(String)
     self.country = Country.fuzzy_find(val)

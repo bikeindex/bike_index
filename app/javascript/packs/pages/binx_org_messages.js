@@ -1,7 +1,7 @@
 import log from "../utils/log";
 import _ from "lodash";
 
-// BinxAppOrgParkingNotifications is a better, more generalized version of this
+// BinxAppOrgParkingNotificationMapping is a better, more generalized version of this
 export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;
@@ -19,7 +19,7 @@ export default class BinxAppOrgMessages {
 
   fetchMessages(opts) {
     // lazy parameter to query string
-    let queryString = opts.map(i => `${i[0]}=${i[1]}`);
+    let queryString = opts.map((i) => `${i[0]}=${i[1]}`);
     let url = `${window.pageInfo.root_path}?${queryString.join("&")}`;
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
@@ -33,14 +33,14 @@ export default class BinxAppOrgMessages {
       error(data, textStatus, jqXHR) {
         binxAppOrgMessages.fetchedMessages = true;
         log.debug(data);
-      }
+      },
     });
   }
 
   // Grabs the visible markers, looks up the messages from them and returns that list
   visibleMessages() {
-    return binxMapping.markersInViewport().map(marker => {
-      return this.messages.find(message => marker.binxId == message.id);
+    return binxMapping.markersInViewport().map((marker) => {
+      return this.messages.find((message) => marker.binxId == message.id);
     });
   }
 
@@ -76,7 +76,7 @@ export default class BinxAppOrgMessages {
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
-    $("#messages_table").on("click", ".map-cell a", e => {
+    $("#messages_table").on("click", ".map-cell a", (e) => {
       e.preventDefault();
       let messageId = parseInt(
         $(e.target)
@@ -99,7 +99,7 @@ export default class BinxAppOrgMessages {
       binxMapping.openInfoWindow(marker, messageId, message);
       $("body, html").animate(
         {
-          scrollTop: $(".organized-messages #map").offset().top - 60 // 60px offset
+          scrollTop: $(".organized-messages #map").offset().top - 60, // 60px offset
         },
         "fast"
       );
@@ -173,7 +173,7 @@ export default class BinxAppOrgMessages {
       return {
         id: message.id,
         lat: message.lat,
-        lng: message.lng
+        lng: message.lng,
       };
     });
     return binxMapping.markerPointsToRender;

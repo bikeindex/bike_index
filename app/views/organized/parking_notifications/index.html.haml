@@ -2,11 +2,13 @@
   %h1
     = t(".parking_notifications")
 
+= render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
+
 - # TODO: add translations
 
 .organized-records
   .text-right.mb-4
-    = link_to "Parking notification for unregistered bike", new_organization_bike_path(organization_id: current_organization, parking_notification: true), class: "btn btn-sm btn-outline-primary"
+    = link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: current_organization, parking_notification: true), class: "btn btn-sm btn-outline-primary"
 
   #map
 
@@ -52,17 +54,44 @@
           - else
             %em
               unknown bike ##{params[:search_bike_id]}
-
-    .col-xs-6.mt-2
-      %p#recordsTotalCount
-        %span.number 0
-        total matches
-    .col-xs-6.mt-2
-      %p#recordsCount.text-right.less-strong
+  .row.mt-2.mb-4
+    .col-md-4.col-xs-6
+      #recordsCount
         %span.number 0
         = t(".matches_visible")
+    .col-md-4.col-xs-6
+      #recordsTotalCount.text-right.less-strong
+        %span.number 0
+        total matches
+    .col-md-4.col-xs-12
+      .text-right
+        %a.gray-link#toggleSendRepeat{ href: "#sendRepeatNotifications", data: { toggle: "collapse", target: "#sendRepeatNotifications" } }
+          retrieve/send repeat notification
 
-  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
+  - # Form needs to wrap the table too
+
+  = form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: current_organization) do |f|
+    #sendRepeatNotifications.collapse
+      -# similar form on parking notification show
+      .row
+        .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
+          .card
+            .card-block
+              .card-title
+                %h3.uncap
+                  Mark retrieved or send follow up notifications
+                  %br
+                  %em.small.less-strong
+                    For table rows with checks
+              .card-body
+                -# Matching form is on parking notification index
+                .row#sendRepeatOrRetrieveFields
+                  .col-xs-6
+                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), { prompt: "...", class: "form-control" }
+                  .col-xs-6.text-center
+                    = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
+
+    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

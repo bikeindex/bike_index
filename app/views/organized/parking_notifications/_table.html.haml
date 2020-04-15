@@ -2,6 +2,7 @@
 - skip_bike ||= false
 - skip_repeat ||= false
 - render_address ||= false
+- skip_multiselect ||= false
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
   %thead.small-header.hidden-md-down
@@ -23,6 +24,10 @@
       %small=t(".impounded")
     %th
       %small=t(".retrieved")
+    - unless skip_multiselect
+      %th.multiselect-cell.table-cell-check.collapse
+        %a#selectAllSelector{ href: "#" }
+          = check_mark
   %tbody
     - parking_notifications.each do |parking_notification|
       %tr
@@ -39,7 +44,7 @@
                 Notification ##{parking_notification.repeat_number}
           - unless skip_bike
             %span.extended-col-info.d-block
-              = link_to organized_bike_text(@bike), bike_path(@bike)
+              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
 
           - if parking_notification.impounded_at.present?
             %strong.small.extended-col-info.d-block
@@ -57,8 +62,8 @@
             %small= address_formatted(parking_notification)
         - unless skip_bike
           %td.hidden-sm-cells
-            - if bike.present?
-              = link_to organized_bike_text(@bike), bike_path(@bike)
+            - if parking_notification.bike.present?
+              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
         %td.hidden-sm-cells
           %em
             = parking_notification.kind_humanized
@@ -76,3 +81,7 @@
           - if parking_notification.retrieved_at.present?
             %span.convertTime.preciseTime
               = l(parking_notification.retrieved_at, format: :convert_time)
+        - unless skip_multiselect
+          %td.multiselect-cell.table-cell-check.collapse
+            = check_box_tag "ids[#{parking_notification.id}]", parking_notification.id
+
