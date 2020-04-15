@@ -49,8 +49,12 @@ $(document).ready(function() {
     window.binxMapping = new BinxMapping("geolocated_messages");
     window.binxAppOrgMessages = new BinxAppOrgMessages();
     binxAppOrgMessages.init();
-  } else if (bodyId === "organized_parking_notifications_index") {
-    window.binxMapping = new BinxMapping("parking_notifications");
+  } else if (
+    [
+      "organized_parking_notifications_index",
+      "organized_parking_notifications_show",
+    ].includes(bodyId)
+  ) {
     window.binxAppOrgParkingNotifications = new BinxAppOrgParkingNotifications();
     binxAppOrgParkingNotifications.init();
   } else if (

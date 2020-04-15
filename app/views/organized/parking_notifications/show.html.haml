@@ -7,6 +7,8 @@
         %em unregistered
         = @bike.type
 
+= render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
+
 - # TODO: add translations
 .row
   .col-md-6
@@ -62,23 +64,26 @@
                 This #{@bike.type} has been retrieved!
               %br
                 - retrieved_notification = @parking_notification.associated_retrieved_notification
-                Marked retrieved
-                %span.convertTime.preciseTime
-                  = l(retrieved_notification.created_at, format: :convert_time)
-                by
-                - if retrieved_notification.organization_recovery?
-                  #{current_organization.short_name} (<em>#{retrieved_notification.retrieved_by.display_name}</em>)
+                - if retrieved_notification.present?
+                  Marked retrieved
+                  %span.convertTime.preciseTime
+                    = l(retrieved_notification.created_at, format: :convert_time)
+                  by
+                  - if retrieved_notification.organization_recovery?
+                    #{current_organization.short_name} (<em>#{retrieved_notification.retrieved_by.display_name}</em>)
+                  - else
+                    the user
+                  - if current_user.developer?
+                    %br
+                    %small
+                      %span.less-strong developer info:
+                      %code
+                        #{retrieved_notification.retrieved_kind}
+                      %em.less-strong
+                        notification:
+                        = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
                 - else
-                  the user
-                - if current_user.developer?
-                  %br
-                  %small
-                    %span.less-strong developer info:
-                    %code
-                      #{retrieved_notification.retrieved_kind}
-                    %em.less-strong
-                      notification:
-                      = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
+                  %em.text-danger Unable to find retrieved information!
 
         %tr
           %td= t(".bike")
@@ -158,13 +163,6 @@
     }
     $(document).ready(function() {
       google.maps.event.addDomListener(window, "load", initialize);
-      $("#sendRepeatOrRetrieveFields select").on("change", function(e) {
-        var submitText =
-          $("#sendRepeatOrRetrieveFields select").val() == "mark_retreived"
-            ? "Resolve notification"
-            : "Create notification";
-        $("#sendRepeatOrRetrieveFields .btn").val(submitText);
-      });
     });
   </script>
 

@@ -2,6 +2,8 @@
   %h1
     = t(".parking_notifications")
 
+= render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
+
 - # TODO: add translations
 
 .organized-records
@@ -54,13 +56,13 @@
               unknown bike ##{params[:search_bike_id]}
 
     .col-xs-6.mt-2
-      %p#recordsTotalCount
-        %span.number 0
-        total matches
-    .col-xs-6.mt-2
-      %p#recordsCount.text-right.less-strong
+      %p#recordsCount
         %span.number 0
         = t(".matches_visible")
+    .col-xs-6.mt-2
+      %p#recordsTotalCount.text-right.less-strong
+        %span.number 0
+        total matches
 
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
 

@@ -55,9 +55,13 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  def self.associated_notifications_including_self(id, initial_record_id)
+    potential_id_matches = [id, initial_record_id].compact
+    where(initial_record_id: potential_id_matches).or(where(id: potential_id_matches))
+  end
+
   def self.associated_notifications(id, initial_record_id)
     potential_id_matches = [id, initial_record_id].compact
-    return none unless potential_id_matches.any?
     where(initial_record_id: potential_id_matches).where.not(id: id)
       .or(where(id: initial_record_id))
   end
@@ -90,7 +94,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def reply_to_email; organization&.auto_user&.email || user&.email end
 
-  def current_associated_notification; current? ? self : associated_notifications.order(:id).last end
+  def current_associated_notification; current? ? self : associated_notifications_including_self.order(:id).last end
 
   # Fallback to created_at because something is busted and we need this to exist sometimes
   def impounded_at; impounded? ? impound_record&.created_at || created_at : nil end
@@ -98,10 +102,12 @@ class ParkingNotification < ActiveRecord::Base
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
 
+  def associated_notifications_including_self; self.class.associated_notifications_including_self(id, initial_record_id) end
+
   # All get applied
   def associated_retrieved_notification
     return nil unless retrieved?
-    retrieved_by_id.present? ? self : associated_notifications.where.not(retrieved_by_id: nil).first
+    retrieved_kind.present? ? self : associated_notifications_including_self.where.not(retrieved_kind: nil).first
   end
 
   def earlier_bike_notifications
@@ -130,7 +136,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
-  # DOES NOT REQUIRE a user, because of email retrieval
+  # Doesn't require a user because email recovery doesn't require a user
   def mark_retrieved!(retrieved_kind:, retrieved_by_id: nil, retrieved_at: nil)
     return self if retrieved?
     # Doesn't seem like binding.local_variable_get does anything here, but I still think it's a good practice

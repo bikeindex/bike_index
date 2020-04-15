@@ -54,8 +54,12 @@ module Organized
           flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
         end
       end
-      redirect_to @redirect_location and return if @redirect_location.present?
-      redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
+      # pp "repeated: #{@notifications_repeated.pluck(:id)}, failed: #{@notifications_failed_resolved.pluck(:id)}"
+      if @redirect_location.present?
+        redirect_to @redirect_location
+      else
+        redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
+      end
     end
 
     helper_method :matching_parking_notifications, :search_params_present?
@@ -92,28 +96,29 @@ module Organized
     end
 
     def create_and_send_repeats(kind, ids)
-      ids = (ids.is_a?(Array) ? ids : ids.split(",")).map(&:strip).reject(&:blank?)
+      ids_array = (ids.is_a?(Array) ? ids : ids.split(",")).map { |id| id.strip.to_i }.reject(&:blank?)
+
+      selected_notifications = parking_notifications.where(id: ids_array)
+      # pp "ids_array #{ids_array} - #{selected_notifications.pluck(:id)} - #{selected_notifications.resolved.pluck(:id)}"
+      # We can't update already resolved notifications - so add them to an ivar for displaying
+      @notifications_failed_resolved = selected_notifications.resolved.includes(:user, :bike, :impound_record)
       successes = []
-      kind_humanized = ParkingNotification.kinds_humanized[kind.to_sym]
-      selected_notifications = parking_notifications.where(id: ids)
-      @notifications_failed_resolved = selected_notifications.resolved
       ids_repeated = []
+
       selected_notifications.active.each do |parking_notification|
         target_notification = parking_notification.current_associated_notification
+        # pp "o: #{parking_notification.id} - target: #{target_notification.id}, #{ids_repeated}"
         next if ids_repeated.include?(target_notification.id)
         ids_repeated << target_notification.id
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         successes << new_notification.id
       end
-      @notifications_repeated = ParkingNotification.where(id: ids_repeated)
+      @repeated_kind = kind
+      @notifications_repeated = ParkingNotification.where(id: ids_repeated).includes(:user, :bike, :impound_record)
       # If sending only one repeat notification, redirect to that notification
-      if successes.count == ids.count && successes.count == 1 && kind != "mark_retrieved"
-        flash[:success] = "Created #{kind_humanized} notification!"
+      if ids_array.count == 1 && successes.count == 1
         @redirect_location = organization_parking_notification_path(successes.first, organization_id: current_organization.to_param)
       end
-      flash[:success] ||= "Marked #{successes.count} bikes retrieved" if kind == "mark retrieved"
-
-      flash[:success] ||= "Created #{successes.count} #{kind_humanized} notifications"
       # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
       # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry
       # flash[:error] = "Unable to send notifications for #{(ids - successes).map { |i| "##{i}" }.join(", ")}"

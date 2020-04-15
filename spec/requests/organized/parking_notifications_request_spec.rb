@@ -281,7 +281,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         parking_notification = ParkingNotification.reorder(:id).last
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
-        expect(flash[:success]).to be_present
+        expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
+        expect(assigns(:notifications_repeated).pluck(:id)).to eq([parking_notification_initial.id])
         expect(response).to redirect_to organization_parking_notification_path(parking_notification, organization_id: current_organization.to_param)
 
         expect([parking_notification.latitude, parking_notification.longitude]).to eq([parking_notification_initial.latitude, parking_notification_initial.longitude])
@@ -332,15 +333,15 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       before { ProcessParkingNotificationWorker.new.perform(parking_notification2.id) }
 
       def expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
+        expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
+        expect(assigns(:notifications_repeated).pluck(:id)).to eq([parking_notification2.id])
+
         expect(ParkingNotification.count).to eq 3
         parking_notification_initial.reload
         parking_notification = ParkingNotification.reorder(:id).last
         expect(ActionMailer::Base.deliveries.count).to eq 1
         bike.reload
         expect(bike.status_abandoned?).to be_truthy
-
-        expect(flash[:success]).to be_present
-        expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
 
         # It bases off the more recent notification
         expect(parking_notification.coordinates).to eq(parking_notification2.coordinates)
@@ -374,13 +375,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             kind: "appears_abandoned_notification",
             ids: parking_notification_initial.id,
           }
-          expect(assigns(:notifications_failed_resolved)).to eq([])
-          expect(assigns(:notifications_repeated).pluck(:id)).to eq([parking_notification2.id])
         end
         expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
+        expect(response).to redirect_to organization_parking_notification_path(ParkingNotification.last.id, organization_id: current_organization.to_param)
       end
       context "multiple for one notification stream" do
-        it "only sends one" do
+        xit "only sends one" do
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
@@ -389,57 +389,63 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
               kind: "appears_abandoned_notification",
               ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
             }
-            expect(assigns(:notifications_failed_resolved)).to eq([])
           end
           expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
+          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
         end
       end
     end
     context "impound_notification - multiple" do
-      let!(:parking_notification2) { FactoryBot.create(:parking_notification, :in_los_angeles, organization: current_organization) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization) }
       it "impounds them both" do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
         parking_notification_initial.reload
+        parking_notification2.reload
         expect(parking_notification_initial.current?).to be_truthy
         expect(parking_notification_initial.user).to_not eq current_user
-        expect(ParkingNotification.count).to eq 2
+        expect(parking_notification2.current?).to be_truthy
+        expect(parking_notification2.user).to_not eq current_user
+        expect(current_organization.parking_notifications.active.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
-        Sidekiq::Testing.inline! do
+        expect do
           post base_url, params: {
             organization_id: current_organization.to_param,
             kind: "impound_notification",
             ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
           }
-          expect(ParkingNotification.count).to eq 4
-          expect(ActionMailer::Base.deliveries.count).to eq 2
-          parking_notification_initial.reload
-          parking_notification2.reload
+        end.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
+        ProcessParkingNotificationWorker.drain
+        expect(ParkingNotification.count).to eq 4
+        expect(ActionMailer::Base.deliveries.count).to eq 2
 
-          expect(parking_notification_initial.current?).to be_falsey
-          expect(parking_notification_initial.impounded?).to be_truthy
-          expect(parking_notification_initial.impound_record_id).to be_present
-          expect(parking_notification_initial.repeat_records.count).to eq 1
-          initial_impound_notification = parking_notification_initial.repeat_records.impound_notification.first
-          expect(initial_impound_notification.delivery_status).to eq "email_success"
-          expect(initial_impound_notification.retrieval_link_token).to be_blank
-          expect(initial_impound_notification.user).to eq current_user
-          expect(parking_notification_initial.coordinates).to eq(initial_impound_notification.coordinates)
+        parking_notification_initial.reload
+        parking_notification2.reload
 
-          expect(parking_notification2.current?).to be_falsey
-          expect(parking_notification2.impounded?).to be_truthy
-          expect(parking_notification2.impound_record_id).to be_present
-          expect(parking_notification2.repeat_records.count).to eq 1
-          impound_notification2 = parking_notification2.repeat_records.impound_notification.first
-          expect(impound_notification2.delivery_status).to eq "email_success"
-          expect(impound_notification2.retrieval_link_token).to be_blank
-          expect(impound_notification2.user).to eq current_user
-          expect(parking_notification2.coordinates).to eq(impound_notification2.coordinates)
+        expect(parking_notification_initial.current?).to be_falsey
+        expect(parking_notification_initial.impounded?).to be_truthy
+        expect(parking_notification_initial.impound_record_id).to be_present
+        expect(parking_notification_initial.repeat_records.count).to eq 1
+        initial_impound_notification = parking_notification_initial.repeat_records.impound_notification.first
+        expect(initial_impound_notification.delivery_status).to eq "email_success"
+        expect(initial_impound_notification.retrieval_link_token).to be_blank
+        expect(initial_impound_notification.user).to eq current_user
+        expect(parking_notification_initial.coordinates).to eq(initial_impound_notification.coordinates)
 
-          expect(flash[:success]).to be_present
-          expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-        end
+        expect(parking_notification2.current?).to be_falsey
+        expect(parking_notification2.impounded?).to be_truthy
+        expect(parking_notification2.impound_record_id).to be_present
+        expect(parking_notification2.repeat_records.count).to eq 1
+        impound_notification2 = parking_notification2.repeat_records.impound_notification.first
+        expect(impound_notification2.delivery_status).to eq "email_success"
+        expect(impound_notification2.retrieval_link_token).to be_blank
+        expect(impound_notification2.user).to eq current_user
+        expect(parking_notification2.coordinates).to eq(impound_notification2.coordinates)
+
+        expect(assigns(:notifications_repeated).pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
+        expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
+        expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
       end
     end
   end
