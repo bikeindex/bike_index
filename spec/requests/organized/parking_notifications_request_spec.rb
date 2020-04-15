@@ -383,6 +383,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         # This is how the ids look, for some reason
         let(:ids_params) { { parking_notification_initial.id.to_s => parking_notification_initial.id.to_s, parking_notification2.id.to_s => parking_notification2.id.to_s } }
         it "only sends one" do
+          parking_notification2.reload
+          parking_notification_initial.reload
+          expect(parking_notification2.current?).to be_truthy
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
@@ -399,7 +402,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
     context "impound_notification - multiple" do
       let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization) }
-      xit "impounds them both" do
+      it "impounds them both" do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
         parking_notification_initial.reload

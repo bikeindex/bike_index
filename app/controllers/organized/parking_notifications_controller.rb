@@ -96,39 +96,36 @@ module Organized
     end
 
     def create_and_send_repeats(kind, ids)
-      pp "#{ids.is_a?(Hash)}, #{ids.keys}"
-      ids_array = case ids
-      when ids.is_a?(Array) then ids
-      when ids.is_a?(Hash) then ids.keys # parameters submitted look like this ids: { "12" => "12" }
-      else
-        ids.split(",")
-      end.map { |id| id.strip.to_i }.reject(&:blank?)
-      pp ids_array
+      ids_array = ids if ids.is_a?(Array)
+      ids_array = ids.keys if ids.is_a?(Hash) # parameters submitted look like this ids: { "12" => "12" }
+      ids_array ||= ids.to_s.split(",")
+      ids_array = ids_array.map { |id| id.strip.to_i }.reject(&:blank?)
 
       selected_notifications = parking_notifications.where(id: ids_array)
-      # pp "ids_array #{ids_array} - #{selected_notifications.pluck(:id)} - #{selected_notifications.resolved.pluck(:id)}"
+      pp "ids_array #{ids_array} - #{selected_notifications.pluck(:id)} - #{selected_notifications.resolved.pluck(:id)}"
       # We can't update already resolved notifications - so add them to an ivar for displaying
       @notifications_failed_resolved = selected_notifications.resolved.includes(:user, :bike, :impound_record)
-      successes = []
+      success_ids = []
       ids_repeated = []
 
       selected_notifications.active.each do |parking_notification|
         target_notification = parking_notification.current_associated_notification
-        # pp "o: #{parking_notification.id} - target: #{target_notification.id}, #{ids_repeated}"
-        next if ids_repeated.include?(target_notification.id)
+        pp "o: #{parking_notification.id} - target: #{target_notification.id}, #{ids_repeated}"
+        # Don't repeat notifications already sent, or previous to ones already targeted
+        next if (ids_repeated + success_ids).include?(target_notification.id)
         ids_repeated << target_notification.id
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
-        successes << new_notification.id
+        success_ids << new_notification.id
       end
       @repeated_kind = kind
       @notifications_repeated = ParkingNotification.where(id: ids_repeated).includes(:user, :bike, :impound_record)
       # If sending only one repeat notification, redirect to that notification
-      if ids_array.count == 1 && successes.count == 1
-        @redirect_location = organization_parking_notification_path(successes.first, organization_id: current_organization.to_param)
+      if ids_array.count == 1 && success_ids.count == 1
+        @redirect_location = organization_parking_notification_path(success_ids.first, organization_id: current_organization.to_param)
       end
       # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
       # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry
-      # flash[:error] = "Unable to send notifications for #{(ids - successes).map { |i| "##{i}" }.join(", ")}"
+      # flash[:error] = "Unable to send notifications for #{(ids - success_ids).map { |i| "##{i}" }.join(", ")}"
     end
 
     def ensure_access_to_parking_notifications!
