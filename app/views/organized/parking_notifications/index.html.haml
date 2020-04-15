@@ -87,7 +87,7 @@
                 -# Matching form is on parking notification index
                 .row#sendRepeatOrRetrieveFields
                   .col-xs-6
-                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), { prompt: "...", class: "form-control" }
+                    = select_tag :kind, options_for_select(parking_notification_repeat_kinds), { prompt: "...", class: "form-control", required: true }
                   .col-xs-6.text-center
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
 
