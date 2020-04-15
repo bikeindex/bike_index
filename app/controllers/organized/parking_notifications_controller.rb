@@ -100,6 +100,10 @@ module Organized
       ids_array = ids.keys if ids.is_a?(Hash) # parameters submitted look like this ids: { "12" => "12" }
       ids_array ||= ids.to_s.split(",")
       ids_array = ids_array.map { |id| id.strip.to_i }.reject(&:blank?)
+      if ids_array.empty?
+        flash[:error] = "No notifications selected!"
+        return true
+      end
 
       selected_notifications = parking_notifications.where(id: ids_array)
       # We can't update already resolved notifications - so add them to an ivar for displaying

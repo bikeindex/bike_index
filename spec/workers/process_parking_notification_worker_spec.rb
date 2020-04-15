@@ -91,6 +91,10 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification2.associated_retrieved_notification).to eq initial
       end
     end
+
+    context "other active notification for bike, from organization" do
+      it "associates the other notification"
+    end
   end
 
 
