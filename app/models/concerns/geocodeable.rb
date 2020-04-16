@@ -6,6 +6,7 @@ module Geocodeable
   included do
     geocoded_by :address
     after_validation :geocode, if: :should_be_geocoded?
+    before_save :strip_state_if_international
 
     # Skip geocoding if this flag is truthy
     attr_accessor :skip_geocoding
@@ -57,6 +58,11 @@ module Geocodeable
   def country=(val)
     return super unless val.is_a?(String)
     self.country = Country.fuzzy_find(val)
+  end
+
+  def strip_state_if_international
+    return true unless country_id.present? && state_id.present? && country_id != Country.united_states.id
+    self.state_id = nil
   end
 
   # Build an address string from the given object's location data.
