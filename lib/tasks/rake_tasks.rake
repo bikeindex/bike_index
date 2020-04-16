@@ -28,3 +28,33 @@ task prepare_translations: :environment do
   # Export JS translations to public/javascripts/translations.js
   I18n::JS.export
 end
+
+task database_size: :environment do
+  database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
+  sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"
+
+  # Get table sizes, sorted by their size
+  tables_sql = "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;"
+  tables = ActiveRecord::Base.connection.execute(tables_sql)
+  output_tables = tables.map do |table|
+    name = table['tablename']
+    pretty_size = ActiveRecord::Base.connection.execute("SELECT pg_size_pretty(pg_total_relation_size('#{name}'));")
+    size = ActiveRecord::Base.connection.execute("SELECT pg_total_relation_size('#{name}');")
+    {
+      name: name,
+      size: size[0]["pg_total_relation_size"],
+      pretty_size: pretty_size[0]["pg_size_pretty"],
+    }
+  end.sort { |x, y| y[:size] <=> x[:size] }
+
+  # Get the width the name column needs to be
+  name_col_length = output_tables.map { |t| t[:name].length }.max + 3
+
+  # Print the
+  output_tables.each do |table|
+    puts "#{table[:name].ljust(name_col_length)} | #{table[:pretty_size]}"
+  end
+
+  # Print DB size
+  puts "\n#{'Total size'.ljust(name_col_length) } | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
+end
