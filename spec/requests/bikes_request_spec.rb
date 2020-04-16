@@ -131,7 +131,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.current_parking_notification).to be_blank
         expect(parking_notification.current?).to be_falsey
         expect(parking_notification.retrieved_by).to eq current_user
-        expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+        expect(parking_notification.resolved_at).to be_within(5).of Time.current
         expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
       end
       context "user not present" do
@@ -152,7 +152,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved?).to be_truthy
           expect(parking_notification.retrieved_by).to be_blank
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
           expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
         end
       end
@@ -171,7 +171,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved_by).to eq current_user
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
           expect(parking_notification.retrieved_kind).to eq "user_recovery"
         end
       end
@@ -193,7 +193,7 @@ RSpec.describe BikesController, type: :request do
       context "already retrieved" do
         let(:retrieval_time) { Time.current - 2.minutes }
         it "has a flash saying so" do
-          parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", retrieved_at: retrieval_time)
+          parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieval_link_token).to be_present
@@ -205,7 +205,7 @@ RSpec.describe BikesController, type: :request do
           expect(flash[:info]).to match(/retrieved/)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.retrieved_at).to be_within(1).of retrieval_time
+          expect(parking_notification.resolved_at).to be_within(1).of retrieval_time
         end
       end
       context "abandoned as well" do
@@ -230,7 +230,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved?).to be_truthy
           expect(parking_notification.retrieved_by).to eq current_user
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
           expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
 
           expect(parking_notification_abandoned.retrieved?).to be_truthy

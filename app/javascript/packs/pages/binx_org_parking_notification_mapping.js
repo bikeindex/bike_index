@@ -174,11 +174,11 @@ export default class BinxAppOrgParkingNotificationMapping {
     const impoundLink =
       record.impund_record_id !== undefined
         ? `<a href="${record.impund_record_id}" class="convertTime">${
-            record.impund_record_at
+            record.resolved_at
           }</a>`
         : "";
-    const retrievedAtSpan = record.retrieved_at
-      ? `<span class="convertTime preciseTime">${record.retrieved_at}</span>`
+    const retrievedAtSpan = record.resolved_at
+      ? `<span class="convertTime preciseTime">${record.resolved_at}</span>`
       : "";
     return `<tr class="record-row" data-recordid="${
       record.id

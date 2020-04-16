@@ -231,7 +231,7 @@ RSpec.describe ParkingNotification, type: :model do
     it "marks retrieved and enqueues processing, but only once" do
       expect(parking_notification.active?).to be_truthy
       # test setting the attrs and the overrides (because local keyword args)
-      parking_notification.retrieved_at = Time.current - 2.hours
+      parking_notification.resolved_at = Time.current - 2.hours
       parking_notification.retrieved_by_id = 12121212
       expect do
         parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
@@ -240,7 +240,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.active?).to be_falsey
       expect(parking_notification.retrieved?).to be_truthy
       expect(parking_notification.retrieved_by).to eq user
-      expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+      expect(parking_notification.resolved_at).to be_within(5).of Time.current
       expect(parking_notification.associated_retrieved_notification).to eq parking_notification
       expect do
         parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
@@ -256,7 +256,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.active?).to be_falsey
         expect(parking_notification.retrieved?).to be_truthy
         expect(parking_notification.retrieved_by).to be_blank
-        expect(parking_notification.retrieved_at).to be_within(5).of Time.current
+        expect(parking_notification.resolved_at).to be_within(5).of Time.current
         expect(parking_notification.associated_retrieved_notification).to eq parking_notification
       end
     end
@@ -277,7 +277,7 @@ RSpec.describe ParkingNotification, type: :model do
         end.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
         parking_notification.reload
         expect(parking_notification.retrieved?).to be_truthy
-        expect(parking_notification.retrieved_at).to be_within(1.second).of Time.current
+        expect(parking_notification.resolved_at).to be_within(1.second).of Time.current
         expect(parking_notification.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification.retrieved_by).to eq user
         expect(parking_notification.retrieval_link_token).to eq og_token # Why not leave it around
@@ -313,12 +313,12 @@ RSpec.describe ParkingNotification, type: :model do
         expect(new_parking_notification.current?).to be_truthy
       end
       context "already retrieved" do
-        let(:retrieved_at) { Time.current - 26.hours }
-        let(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, retrieved_at: retrieved_at) }
+        let(:resolved_at) { Time.current - 26.hours }
+        let(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, resolved_at: resolved_at) }
         it "does not create" do
           parking_notification.reload
           expect(parking_notification.retrieved?).to be_truthy
-          expect(parking_notification.retrieved_at).to be_within(1).of retrieved_at # Testing factory functionality
+          expect(parking_notification.resolved_at).to be_within(1).of resolved_at # Testing factory functionality
           expect do
             new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
             expect(new_parking_notification.id).to eq parking_notification.id

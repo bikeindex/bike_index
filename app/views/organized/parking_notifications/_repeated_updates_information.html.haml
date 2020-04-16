@@ -30,14 +30,14 @@
             \- because it
             - if parking_notification.retrieved?
               was retrieved
-              - if parking_notification.retrieved_at.present?
+              - if parking_notification.resolved_at.present?
                 %span.convertTime.preciseTime
-                  = l(parking_notification.retrieved_at, format: :convert_time)
+                  = l(parking_notification.resolved_at, format: :convert_time)
             - elsif parking_notification.impounded?
               was impounded
-              - if parking_notification.impounded_at.present?
+              - if parking_notification.resolved_at.present?
                 %span.convertTime.preciseTime
-                  = l(parking_notification.impounded_at, format: :convert_time)
+                  = l(parking_notification.resolved_at, format: :convert_time)
 
 
 -# We'll probably want to do something about these in the future as well, but skipping for now

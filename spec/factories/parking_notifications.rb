@@ -10,12 +10,12 @@ FactoryBot.define do
     trait :retrieved do
       retrieved_kind { "organization_recovery" }
       retrieved_by_id { user.id }
-      retrieved_at { Time.current }
+      resolved_at { Time.current }
 
       after(:create) do |parking_notification, evaluator|
         parking_notification.mark_retrieved!(retrieved_by_id: evaluator.retrieved_by_id,
                                              retrieved_kind: evaluator.retrieved_kind,
-                                             retrieved_at: evaluator.retrieved_at)
+                                             resolved_at: evaluator.resolved_at)
       end
     end
 

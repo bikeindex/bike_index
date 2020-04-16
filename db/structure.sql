@@ -1883,7 +1883,7 @@ CREATE TABLE public.parking_notifications (
     delivery_status character varying,
     unregistered_bike boolean DEFAULT false,
     status integer DEFAULT 0,
-    retrieved_at timestamp without time zone,
+    resolved_at timestamp without time zone,
     retrieved_kind integer,
     retrieval_link_token text,
     retrieved_by_id bigint
@@ -4658,6 +4658,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200410183949'),
 ('20200414055430'),
 ('20200414055431'),
-('20200415161915');
+('20200415161915'),
+('20200416202219');
 
 
