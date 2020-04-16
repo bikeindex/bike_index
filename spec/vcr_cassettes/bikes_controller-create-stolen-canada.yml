@@ -1,0 +1,790 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=Vancouver,%20IL%20V5L1E6,%20CA&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 16 Apr 2020 21:13:41 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=668
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,h3-T050=":443"; ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "900",
+                         "short_name" : "900",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Fifth Street",
+                         "short_name" : "Fifth St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "V9R 5S5",
+                         "short_name" : "V9R 5S5",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "900 Fifth St, Nanaimo, BC V9R 5S5, Canada",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 49.1573024,
+                         "lng" : -123.9664322
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.1586513802915,
+                            "lng" : -123.9650832197085
+                         },
+                         "southwest" : {
+                            "lat" : 49.1559534197085,
+                            "lng" : -123.9677811802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJ7wZKIO2jiFQRiNJp9WBl8mI",
+                   "plus_code" : {
+                      "compound_code" : "524M+WC Nanaimo, British Columbia, Canada",
+                      "global_code" : "84XR524M+WC"
+                   },
+                   "types" : [ "establishment", "point_of_interest", "university" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 16 Apr 2020 21:13:42 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?language=en&latlng=49.1573024,-123.9664322&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 16 Apr 2020 21:13:42 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=166
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,h3-T050=":443"; ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "plus_code" : {
+                "compound_code" : "524M+WC Nanaimo, BC, Canada",
+                "global_code" : "84XR524M+WC"
+             },
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "300",
+                         "short_name" : "300",
+                         "types" : [ "premise" ]
+                      },
+                      {
+                         "long_name" : "900",
+                         "short_name" : "900",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Fifth Street",
+                         "short_name" : "Fifth St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "V9R 5S5",
+                         "short_name" : "V9R 5S5",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "300, 900 Fifth St, Nanaimo, BC V9R 5S5, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.158024,
+                            "lng" : -123.9664315
+                         },
+                         "southwest" : {
+                            "lat" : 49.1571457,
+                            "lng" : -123.967272
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.157475,
+                         "lng" : -123.9668195
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.1589338302915,
+                            "lng" : -123.9655027697085
+                         },
+                         "southwest" : {
+                            "lat" : 49.1562358697085,
+                            "lng" : -123.9682007302915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJd_Y22-yjiFQRvlk2k_l94fI",
+                   "types" : [ "premise" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "900",
+                         "short_name" : "900",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Fifth Street",
+                         "short_name" : "Fifth St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "V9R 7B4",
+                         "short_name" : "V9R 7B4",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "900 Fifth St, Nanaimo, BC V9R 7B4, Canada",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 49.15672499999999,
+                         "lng" : -123.9659843
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.1580739802915,
+                            "lng" : -123.9646353197085
+                         },
+                         "southwest" : {
+                            "lat" : 49.1553760197085,
+                            "lng" : -123.9673332802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJMxyjWJKjiFQRuH8GtZwt1kc",
+                   "plus_code" : {
+                      "compound_code" : "524M+MJ Nanaimo, British Columbia, Canada",
+                      "global_code" : "84XR524M+MJ"
+                   },
+                   "types" : [ "street_address" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "VIU Exchange Bay A",
+                         "short_name" : "VIU Exchange Bay A",
+                         "types" : [ "establishment", "point_of_interest", "transit_station" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "V9R 6C5",
+                         "short_name" : "V9R 6C5",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "VIU Exchange Bay A, Nanaimo, BC V9R 6C5, Canada",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 49.157898,
+                         "lng" : -123.966782
+                      },
+                      "location_type" : "GEOMETRIC_CENTER",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.1592469802915,
+                            "lng" : -123.9654330197085
+                         },
+                         "southwest" : {
+                            "lat" : 49.1565490197085,
+                            "lng" : -123.9681309802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJTQQjwuyjiFQRuwv-JvCvaS8",
+                   "plus_code" : {
+                      "compound_code" : "525M+57 Nanaimo, British Columbia, Canada",
+                      "global_code" : "84XR525M+57"
+                   },
+                   "types" : [ "establishment", "point_of_interest", "transit_station" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Opgaard Drive",
+                         "short_name" : "Opgaard Dr",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "V9R 7B4",
+                         "short_name" : "V9R 7B4",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "Opgaard Dr, Nanaimo, BC V9R 7B4, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.1572988,
+                            "lng" : -123.9655919
+                         },
+                         "southwest" : {
+                            "lat" : 49.1567129,
+                            "lng" : -123.9661298
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.1570863,
+                         "lng" : -123.9657331
+                      },
+                      "location_type" : "GEOMETRIC_CENTER",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.1583548302915,
+                            "lng" : -123.9645118697085
+                         },
+                         "southwest" : {
+                            "lat" : 49.1556568697085,
+                            "lng" : -123.9672098302915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJjZzgIO2jiFQRuhcOz-EbUxI",
+                   "types" : [ "route" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "V9R 7B4",
+                         "short_name" : "V9R 7B4",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Nanaimo, BC V9R 7B4, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.159033,
+                            "lng" : -123.9611069
+                         },
+                         "southwest" : {
+                            "lat" : 49.154324,
+                            "lng" : -123.971473
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.1564448,
+                         "lng" : -123.965894
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.159033,
+                            "lng" : -123.9611069
+                         },
+                         "southwest" : {
+                            "lat" : 49.154324,
+                            "lng" : -123.971473
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJaWGix5KjiFQR3NfwwahY4oI",
+                   "types" : [ "postal_code" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "V9R",
+                         "short_name" : "V9R",
+                         "types" : [ "postal_code", "postal_code_prefix" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Nanaimo, BC V9R, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.211937,
+                            "lng" : -123.9078341
+                         },
+                         "southwest" : {
+                            "lat" : 49.114589,
+                            "lng" : -124.1649329
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.165722,
+                         "lng" : -124.0001699
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.211937,
+                            "lng" : -123.9078341
+                         },
+                         "southwest" : {
+                            "lat" : 49.114589,
+                            "lng" : -124.1649329
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJuXBNzwKjiFQREhByBCo3zt0",
+                   "types" : [ "postal_code", "postal_code_prefix" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Nanaimo, BC, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.2586299,
+                            "lng" : -123.809291
+                         },
+                         "southwest" : {
+                            "lat" : 49.09737399999999,
+                            "lng" : -124.0647329
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.1658836,
+                         "lng" : -123.9400648
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.2586299,
+                            "lng" : -123.809291
+                         },
+                         "southwest" : {
+                            "lat" : 49.09737399999999,
+                            "lng" : -124.0647329
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJWxysIF6hiFQR0A97KhU1AQU",
+                   "types" : [ "locality", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Nanaimo",
+                         "short_name" : "Nanaimo",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Nanaimo, BC, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 49.471035,
+                            "lng" : -123.44887
+                         },
+                         "southwest" : {
+                            "lat" : 48.9813199,
+                            "lng" : -124.968087
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.165895,
+                         "lng" : -123.9400717
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.471035,
+                            "lng" : -123.44887
+                         },
+                         "southwest" : {
+                            "lat" : 48.9813199,
+                            "lng" : -124.968087
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJ4QybURv7iFQRUYSjcwL3PB0",
+                   "types" : [ "administrative_area_level_2", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Vancouver Island",
+                         "short_name" : "Vancouver Island",
+                         "types" : [ "establishment", "natural_feature" ]
+                      },
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Vancouver Island, British Columbia, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 50.87664729999999,
+                            "lng" : -123.2648809
+                         },
+                         "southwest" : {
+                            "lat" : 48.3089157,
+                            "lng" : -128.4318245
+                         }
+                      },
+                      "location" : {
+                         "lat" : 49.6506376,
+                         "lng" : -125.4493906
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 50.87664729999999,
+                            "lng" : -123.2648809
+                         },
+                         "southwest" : {
+                            "lat" : 48.3089157,
+                            "lng" : -128.4318245
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJD9RbwiQYiFQRtWoKQiKWmVI",
+                   "types" : [ "establishment", "natural_feature" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "British Columbia",
+                         "short_name" : "BC",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "British Columbia, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 60.0001489,
+                            "lng" : -114.054221
+                         },
+                         "southwest" : {
+                            "lat" : 48.224556,
+                            "lng" : -139.0570702
+                         }
+                      },
+                      "location" : {
+                         "lat" : 53.7266683,
+                         "lng" : -127.6476205
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 60.0001489,
+                            "lng" : -114.054221
+                         },
+                         "southwest" : {
+                            "lat" : 48.224556,
+                            "lng" : -139.0570702
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJr2prqsdmelMR-fHnN-lBG4g",
+                   "types" : [ "administrative_area_level_1", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 83.63809999999999,
+                            "lng" : -50.9766
+                         },
+                         "southwest" : {
+                            "lat" : 41.6765559,
+                            "lng" : -141.00187
+                         }
+                      },
+                      "location" : {
+                         "lat" : 56.130366,
+                         "lng" : -106.346771
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 83.63809999999999,
+                            "lng" : -50.9766
+                         },
+                         "southwest" : {
+                            "lat" : 41.6765559,
+                            "lng" : -141.00187
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJ2WrMN9MDDUsRpY9Doiq3aJk",
+                   "types" : [ "country", "political" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 16 Apr 2020 21:13:42 GMT
+recorded_with: VCR 5.0.0
