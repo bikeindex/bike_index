@@ -4,7 +4,7 @@ RSpec.describe "Organization API V3", type: :request do
   include_context :existing_doorkeeper_app
 
   describe "create" do
-    let(:country) { FactoryBot.create(:country, name: "United States") }
+    let(:country) { Country.united_states }
     let(:state) { FactoryBot.create(:state, name: "Oregon", abbreviation: "OR", country: country) }
     let(:token) { create_doorkeeper_token(scopes: :write_organizations) }
     let(:url) { "/api/v3/organizations?access_token=#{token.token}" }
