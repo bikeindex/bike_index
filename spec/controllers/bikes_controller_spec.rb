@@ -1499,6 +1499,7 @@ RSpec.describe BikesController, type: :controller do
               VCR.use_cassette("bikes_controller-create-stolen-canada", match_requests_on: [:path]) do
                 bike.update_attribute :stolen, true
                 bike.reload
+                expect(stolen_record.date_stolen).to be_present
 
                 expect(bike.find_current_stolen_record).to eq stolen_record
                 put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
