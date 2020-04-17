@@ -87,7 +87,7 @@ module Geocodeable
     self.state_id = nil if country_id.present? && state_id.present? && country_id != Country.united_states.id
     # Only geocode if there is specific location information
     if [street, city, zipcode].any?(&:present?)
-      self.attributes = Geohelper.coordinates_for(address)
+      self.attributes = Geohelper.coordinates_for(address) || {}
     else
       self.attributes = { latitude: nil, longitude: nil }
     end

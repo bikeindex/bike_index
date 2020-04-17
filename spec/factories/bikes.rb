@@ -34,11 +34,6 @@ FactoryBot.define do
         # default to NYC coordinates
         lat, long = [40.7143528, -74.0059731] unless lat && long
         csr = create(:stolen_record, bike: bike, latitude: lat, longitude: long)
-        # bike.update_attributes(updated
-        # bike.update_attributes(current_stolen_record_id: csr.id) # updates current_stolen_record
-        # bike.save
-        bike.reload # updates with current_stolen_record
-        # bike.update_attributes(current_stolen_record_id: csr.id) # updates current_stolen_record
       end
 
       factory :abandoned_bike do
@@ -51,22 +46,22 @@ FactoryBot.define do
 
       factory :stolen_bike_in_amsterdam do
         after(:create) do |bike|
-          create_and_assign_stolen_record(:in_amsterdam, bike: bike)
+          create(:stolen_record, :in_amsterdam, bike: bike)
         end
       end
       factory :stolen_bike_in_los_angeles do
         after(:create) do |bike|
-          create_and_assign_stolen_record(:in_los_angeles, bike: bike)
+          create(:stolen_record, :in_los_angeles, bike: bike)
         end
       end
       factory :stolen_bike_in_nyc do
         after(:create) do |bike|
-          create_and_assign_stolen_record(:in_nyc, bike: bike)
+          create(:stolen_record, :in_nyc, bike: bike)
         end
       end
       factory :stolen_bike_in_chicago do
         after(:create) do |bike|
-          create_and_assign_stolen_record(:in_chicago, bike: bike)
+          create(:stolen_record, :in_chicago, bike: bike)
         end
       end
     end
@@ -136,17 +131,4 @@ FactoryBot.define do
       primary_frame_color { FactoryBot.create(:color, name: "Green") }
     end
   end
-end
-
-# Create a stolen record and assign to the given bike record
-def create_and_assign_stolen_record(location, bike:)
-  csr = create(:stolen_record, location, bike: bike)
-
-  # set lat / long to prevent overriding by geocoder
-  bike.latitude = csr.latitude
-  bike.longitude = csr.longitude
-
-  # updates current_stolen_record
-  bike.save
-  bike.reload
 end

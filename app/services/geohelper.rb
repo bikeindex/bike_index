@@ -62,28 +62,28 @@ class Geohelper
     # expected to be an ActiveRecord or Geocoder::Result object.
     #
     # Returns a Hash
-    def location_from_result(result)
+    def location_attrs_from_result(result)
       return {} if result.blank?
 
       location =
         {
-          city: result.city.presence,
-          latitude: result.latitude.presence,
-          longitude: result.longitude.presence,
+          city: result.city,
+          latitude: result.latitude,
+          longitude: result.longitude,
         }
 
       if result.respond_to?(:country_code)
         location.merge(
-          state: State.fuzzy_find(result.state_code),
-          country: Country.fuzzy_find(result.country_code),
-          zipcode: result.postal_code.presence,
+          state_id: State.fuzzy_find(result.state_code)&.id,
+          country_id: Country.fuzzy_find(result.country_code)&.id,
+          zipcode: result.postal_code,
         )
       else
         location.merge(
-          street: result.street.presence,
-          state: result.state,
-          country: result.country,
-          zipcode: result.zipcode.presence,
+          street: result.street,
+          state_id: result.state_id,
+          country_id: result.country_id,
+          zipcode: result.zipcode,
         )
       end
     end

@@ -660,9 +660,7 @@ class Bike < ApplicationRecord
       creation_organization,
       owner,
       geolocation,
-    ].compact
-     .map { |rec| Geohelper.location_from_result(rec) }
-     .find { |rec| rec[:country] && (rec[:city] || rec[:zipcode]) }
+    ].compact.find { |rec| rec.latitude.present? }
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
@@ -675,17 +673,11 @@ class Bike < ApplicationRecord
   def set_location_info(request_location: nil)
     # Always use current_stolen_record is set if available - even if it's blank
     # Because we use it for searching stolen bikes, and we don't want other information leaking
-    location_record = fetch_current_stolen_record || find_location_info(request_location)
+    location_record = current_stolen_record || find_location_info(request_location)
     return if location_record.blank?
-
+    # location_record
     @location_set_by_association = true # set to skip geocoding
-    self.street = location_record[:street]
-    self.city = location_record[:city]
-    self.state = location_record[:state]
-    self.country = location_record[:country]
-    self.latitude = location_record[:latitude]
-    self.longitude = location_record[:longitude]
-    self.zipcode = location_record[:zipcode]
+    self.attributes = Geohelper.location_attrs_from_result(location_record)
   end
 
   def organization_affiliation
@@ -724,7 +716,8 @@ class Bike < ApplicationRecord
   end
 
   def set_calculated_attributes
-    set_location_info # Call first, it fetches current stolen record
+    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
+    set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     clean_frame_size
