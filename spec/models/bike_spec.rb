@@ -1518,10 +1518,10 @@ RSpec.describe Bike, type: :model do
     context "given a current_stolen_record and no bike location info" do
       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
       let(:stolen_record) { bike.current_stolen_record }
+      let(:street_address) { "1300 W 14th Pl" }
+      let(:abbr_address) { "Chicago, IL 60608, US" }
+      let(:full_address) { "#{street_address}, #{abbr_address}" }
       it "takes location from the current stolen record" do
-        street_address = "1300 W 14th Pl"
-        abbr_address = "Chicago, IL 60608, US"
-        full_address = "#{street_address}, #{abbr_address}"
         expect(stolen_record.street).to eq street_address
         expect(stolen_record.address(force_show_address: true)).to eq(full_address)
         expect(stolen_record.address).to eq(abbr_address)
@@ -1535,13 +1535,36 @@ RSpec.describe Bike, type: :model do
         expect(bike.country).to eq(stolen_record.country)
         expect(bike.address).to eq(full_address)
       end
-      context "given an abandoned record, it instead uses the abandoned record" do
+      context "removing location from the stolen_record" do
+        # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
+        # ... or else unexpected things happen
+        it "blanks the location on the bike" do
+          expect(stolen_record.address(force_show_address: true)).to eq(full_address)
+          bike.set_location_info
+          expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL 60608, US"
+          Sidekiq::Testing.inline! do
+            # pp "88888"
+            stolen_record.update_attributes(street: "", city: "", zipcode: "")
+          end
+          stolen_record.reload
+          bike.reload
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.address_hash).to eq({})
+          expect(stolen_record.address(force_show_address: true)).to eq ""
+          expect(stolen_record.should_be_geocoded?).to be_falsey
+
+          expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.address_hash).to eq({})
+          expect(bike.should_be_geocoded?).to be_falsey
+        end
+      end
+      context "given an abandoned record, it still uses the stolen_record" do
         it "takes the location from the parking notification" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
           bike.reload
           expect(bike.current_parking_notification).to eq parking_notification
-          expect(bike.to_coordinates).to eq(parking_notification.to_coordinates)
+          expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
 
           expect(bike.city).to eq(parking_notification.city)
           expect(bike.zipcode).to eq(parking_notification.zipcode)

@@ -27,9 +27,6 @@ class ParkingNotification < ActiveRecord::Base
   enum status: STATUS_ENUM
   enum retrieved_kind: RETRIEVED_KIND_ENUM
 
-  # TODO: location refactor - switch to Geocodeable
-  geocoded_by :geocode_data
-
   attr_accessor :is_repeat, :use_entered_address
 
   scope :active, -> { where(status: active_statuses) }

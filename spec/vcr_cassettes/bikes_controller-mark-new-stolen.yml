@@ -1,0 +1,536 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=US&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Fri, 17 Apr 2020 21:17:11 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=18
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,h3-T050=":443"; ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "United States",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 71.5388001,
+                            "lng" : -66.885417
+                         },
+                         "southwest" : {
+                            "lat" : 18.7763,
+                            "lng" : 170.5957
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.09024,
+                         "lng" : -95.712891
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.38,
+                            "lng" : -66.94
+                         },
+                         "southwest" : {
+                            "lat" : 25.82,
+                            "lng" : -124.39
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+                   "types" : [ "country", "political" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Fri, 17 Apr 2020 21:17:11 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?language=en&latlng=37.09024,-95.712891&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Fri, 17 Apr 2020 21:17:11 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=36
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,h3-T050=":443"; ma=2592000
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "plus_code" : {
+                "compound_code" : "37RP+3R Dearing, KS, USA",
+                "global_code" : "869637RP+3R"
+             },
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "5000",
+                         "short_name" : "5000",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Estate Enighed",
+                         "short_name" : "Estate Enighed",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Independence",
+                         "short_name" : "Independence",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Fawn Creek Township",
+                         "short_name" : "Fawn Creek Township",
+                         "types" : [ "administrative_area_level_3", "political" ]
+                      },
+                      {
+                         "long_name" : "Montgomery County",
+                         "short_name" : "Montgomery County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "67301",
+                         "short_name" : "67301",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "5000 Estate Enighed, Independence, KS 67301, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 37.0910199,
+                         "lng" : -95.71094269999999
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.0923688802915,
+                            "lng" : -95.70959371970849
+                         },
+                         "southwest" : {
+                            "lat" : 37.0896709197085,
+                            "lng" : -95.7122916802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJQ10sdeyBt4cRZHuO2F6deVg",
+                   "plus_code" : {
+                      "compound_code" : "37RQ+CJ Independence, KS, United States",
+                      "global_code" : "869637RQ+CJ"
+                   },
+                   "types" : [ "street_address" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Estate Enighed",
+                         "short_name" : "Estate Enighed",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Independence",
+                         "short_name" : "Independence",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Fawn Creek Township",
+                         "short_name" : "Fawn Creek Township",
+                         "types" : [ "administrative_area_level_3", "political" ]
+                      },
+                      {
+                         "long_name" : "Montgomery County",
+                         "short_name" : "Montgomery County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "67301",
+                         "short_name" : "67301",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "Estate Enighed, Independence, KS 67301, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.0911729,
+                            "lng" : -95.7106397
+                         },
+                         "southwest" : {
+                            "lat" : 37.0889906,
+                            "lng" : -95.7135954
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.0899941,
+                         "lng" : -95.71200809999999
+                      },
+                      "location_type" : "GEOMETRIC_CENTER",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.09143073029149,
+                            "lng" : -95.7106397
+                         },
+                         "southwest" : {
+                            "lat" : 37.08873276970849,
+                            "lng" : -95.7135954
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJzVKYeeyBt4cRMEchcPgpkj4",
+                   "types" : [ "route" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Fawn Creek Township",
+                         "short_name" : "Fawn Creek Township",
+                         "types" : [ "administrative_area_level_3", "political" ]
+                      },
+                      {
+                         "long_name" : "Montgomery County",
+                         "short_name" : "Montgomery County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Fawn Creek Township, KS, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.124356,
+                            "lng" : -95.6740411
+                         },
+                         "southwest" : {
+                            "lat" : 36.9991658,
+                            "lng" : -95.819863
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.0510372,
+                         "lng" : -95.7510475
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.124356,
+                            "lng" : -95.6740411
+                         },
+                         "southwest" : {
+                            "lat" : 36.9991658,
+                            "lng" : -95.819863
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJH1ub2rl4t4cRrGFzAfqu8z0",
+                   "types" : [ "administrative_area_level_3", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "67301",
+                         "short_name" : "67301",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Independence",
+                         "short_name" : "Independence",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Montgomery County",
+                         "short_name" : "Montgomery County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Independence, KS 67301, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.35805,
+                            "lng" : -95.58481789999999
+                         },
+                         "southwest" : {
+                            "lat" : 37.0514249,
+                            "lng" : -95.89211399999999
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.1996252,
+                         "lng" : -95.77212039999999
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.35805,
+                            "lng" : -95.58481789999999
+                         },
+                         "southwest" : {
+                            "lat" : 37.0514249,
+                            "lng" : -95.89211399999999
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJZZrAD5vTuYcRm9LpTnHMF0s",
+                   "types" : [ "postal_code" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Montgomery County",
+                         "short_name" : "Montgomery County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Montgomery County, KS, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.3866679,
+                            "lng" : -95.51796709999999
+                         },
+                         "southwest" : {
+                            "lat" : 36.99907400000001,
+                            "lng" : -95.964748
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.240253,
+                         "lng" : -95.81428849999999
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.3866679,
+                            "lng" : -95.51796709999999
+                         },
+                         "southwest" : {
+                            "lat" : 36.99907400000001,
+                            "lng" : -95.964748
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJdRuxnD7WuYcRj4OeRtXCC1Q",
+                   "types" : [ "administrative_area_level_2", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Kansas",
+                         "short_name" : "KS",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Kansas, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 40.0045419,
+                            "lng" : -94.588387
+                         },
+                         "southwest" : {
+                            "lat" : 36.9930159,
+                            "lng" : -102.0517688
+                         }
+                      },
+                      "location" : {
+                         "lat" : 39.011902,
+                         "lng" : -98.4842465
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 40.0045419,
+                            "lng" : -94.588387
+                         },
+                         "southwest" : {
+                            "lat" : 36.9930159,
+                            "lng" : -102.0517688
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJawF8cXEXo4cRXwk-S6m0wmg",
+                   "types" : [ "administrative_area_level_1", "political" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "United States",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 71.5388001,
+                            "lng" : -66.885417
+                         },
+                         "southwest" : {
+                            "lat" : 18.7763,
+                            "lng" : 170.5957
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.09024,
+                         "lng" : -95.712891
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 71.5388001,
+                            "lng" : -66.885417
+                         },
+                         "southwest" : {
+                            "lat" : 18.7763,
+                            "lng" : 170.5957
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+                   "types" : [ "country", "political" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Fri, 17 Apr 2020 21:17:11 GMT
+recorded_with: VCR 5.0.0
