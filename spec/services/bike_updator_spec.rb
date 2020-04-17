@@ -34,7 +34,7 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: { id: bike.id, bike: { date_stolen: 963205199 } }.as_json)
       updator.update_stolen_record
-      csr = bike.find_current_stolen_record
+      csr = bike.fetch_current_stolen_record
       expect(csr.date_stolen.to_i).to be_within(1).of 963205199
     end
     it "creates a stolen record if one doesn't exist" do

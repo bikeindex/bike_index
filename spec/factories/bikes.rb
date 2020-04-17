@@ -33,9 +33,12 @@ FactoryBot.define do
         lat, long = %i[latitude longitude].map { |k| evaluator.public_send(k).presence }
         # default to NYC coordinates
         lat, long = [40.7143528, -74.0059731] unless lat && long
-        create(:stolen_record, bike: bike, latitude: lat, longitude: long)
-        bike.save # updates current_stolen_record
-        bike.reload
+        csr = create(:stolen_record, bike: bike, latitude: lat, longitude: long)
+        # bike.update_attributes(updated
+        # bike.update_attributes(current_stolen_record_id: csr.id) # updates current_stolen_record
+        # bike.save
+        bike.reload # updates with current_stolen_record
+        # bike.update_attributes(current_stolen_record_id: csr.id) # updates current_stolen_record
       end
 
       factory :abandoned_bike do

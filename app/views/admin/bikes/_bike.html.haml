@@ -1,4 +1,4 @@
-- stolen_record ||= stolen_record || bike.present? && bike.find_current_stolen_record
+- stolen_record ||= stolen_record || bike.present? && bike.fetch_current_stolen_record
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
 
 .admin-bike-partial

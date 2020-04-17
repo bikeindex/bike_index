@@ -211,7 +211,6 @@ class ParkingNotification < ActiveRecord::Base
 
   def process_notification
     # Update the bike immediately, inline
-    bike&.set_location_info
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
   end

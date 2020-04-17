@@ -327,7 +327,7 @@ RSpec.describe Organization, type: :model do
   describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
-    let(:stolen_record) { bike.find_current_stolen_record }
+    let(:stolen_record) { bike.fetch_current_stolen_record }
     let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
     let!(:bike_unorganized) { FactoryBot.create(:stolen_bike) }
     let(:recovery_information) do

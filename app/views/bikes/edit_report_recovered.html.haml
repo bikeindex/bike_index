@@ -7,7 +7,7 @@
     .row
       = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
-      - if @bike.stolen? && @bike.find_current_stolen_record.present? && !@bike.abandoned?
+      - if @bike.stolen? && @bike.fetch_current_stolen_record.present? && !@bike.abandoned?
         .col-md-8.form-well#form_well_wrap
           .form-wrap
             .form-well-form-header

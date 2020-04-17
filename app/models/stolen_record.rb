@@ -317,7 +317,12 @@ class StolenRecord < ApplicationRecord
   end
 
   def update_associations
-    bike&.user&.update_attributes(updated_at: Time.current)
+    return true unless bike.present?
+    # Bump bike only if it looks like this is bike's current_stolen_record
+    if current
+      bike.update_attributes(current_stolen_record_id: id, manual_csr: true)
+    end
+    bike.user&.update_attributes(updated_at: Time.current)
   end
 
   def notify_of_promoted_alert_recovery

@@ -22,14 +22,14 @@ class StolenRecordUpdator
 
   def update_records
     if @bike.stolen
-      if @bike.find_current_stolen_record.blank?
+      if @bike.fetch_current_stolen_record.blank?
         create_new_record
         @bike.reload
       elsif @date_stolen
-        stolen_record = @bike.find_current_stolen_record
+        stolen_record = @bike.fetch_current_stolen_record
         stolen_record.update_attributes(date_stolen: @date_stolen)
       elsif @b_param && (@b_param["stolen_record"] || @b_param["bike"]["stolen_records_attributes"])
-        stolen_record = @bike.find_current_stolen_record
+        stolen_record = @bike.fetch_current_stolen_record
         update_with_params(stolen_record).save
       end
     else

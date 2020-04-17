@@ -4,7 +4,8 @@ module Geocodeable
   extend ActiveSupport::Concern
 
   included do
-    after_validation :geocode, if: :should_be_geocoded?
+    geocoded_by :address
+    after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
     # Skip geocoding if this flag is truthy
     attr_accessor :skip_geocoding
@@ -81,14 +82,12 @@ module Geocodeable
     Geocodeable.address(self, **kwargs)
   end
 
-  # Override the geocoder method with our own customized method
-  def geocode
+  def bike_index_geocode
     # remove state if it's international - we currently only handle us states
     self.state_id = nil if country_id.present? && state_id.present? && country_id != Country.united_states.id
-    pp "fffff88"
     # Only geocode if there is specific location information
     if [street, city, zipcode].any?(&:present?)
-      self.attributes = Geohelper.geocode(address)
+      self.attributes = Geohelper.coordinates_for(address)
     else
       self.attributes = { latitude: nil, longitude: nil }
     end

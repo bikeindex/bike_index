@@ -1449,7 +1449,7 @@ RSpec.describe BikesController, type: :controller do
               expect(stolen_record.proof_of_ownership).to be_falsey
               expect(stolen_record.receive_notifications).to be_truthy
 
-              expect(bike.find_current_stolen_record).to eq stolen_record
+              expect(bike.fetch_current_stolen_record).to eq stolen_record
               put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
               expect(flash[:error]).to_not be_present
               expect(response).to redirect_to edit_bike_url(page: "fancy_template")
@@ -1457,11 +1457,11 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.stolen).to be_truthy
 
               # Stupid cheat because we're creating an extra record here for fuck all reason
-              current_stolen_record = bike.find_current_stolen_record
+              current_stolen_record = bike.fetch_current_stolen_record
               expect(bike.stolen_records.count).to eq 1
-              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
               # stolen_record.reload
-              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
               expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
               expect(current_stolen_record.proof_of_ownership).to be_truthy
               expect(current_stolen_record.receive_notifications).to be_falsey
@@ -1501,18 +1501,18 @@ RSpec.describe BikesController, type: :controller do
                 bike.reload
                 expect(stolen_record.date_stolen).to be_present
 
-                expect(bike.find_current_stolen_record).to eq stolen_record
+                expect(bike.fetch_current_stolen_record).to eq stolen_record
                 put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
                 expect(flash[:error]).to_not be_present
                 expect(response).to redirect_to edit_bike_url(page: "fancy_template")
                 bike.reload
                 expect(bike.stolen).to be_truthy
                 # Stupid cheat because we're creating an extra record here for fuck all reason
-                current_stolen_record = bike.find_current_stolen_record
+                current_stolen_record = bike.fetch_current_stolen_record
                 expect(bike.stolen_records.count).to eq 1
-                expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+                expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
 
-                expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+                expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
                 expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
                 expect(current_stolen_record.proof_of_ownership).to be_truthy
                 expect(current_stolen_record.receive_notifications).to be_falsey
