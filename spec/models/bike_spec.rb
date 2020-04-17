@@ -1543,8 +1543,9 @@ RSpec.describe Bike, type: :model do
           bike.set_location_info
           expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL 60608, US"
           Sidekiq::Testing.inline! do
-            # pp "88888"
-            stolen_record.update_attributes(street: "", city: "", zipcode: "")
+            stolen_record.attributes = { street: "", city: "", zipcode: "" }
+            expect(stolen_record.should_be_geocoded?).to be_truthy
+            stolen_record.save
           end
           stolen_record.reload
           bike.reload
