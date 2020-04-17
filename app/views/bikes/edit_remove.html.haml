@@ -55,7 +55,7 @@
       .form-group
         %label{ for: :bike_delete_reason }
           = t(".reason_for_deletion")
-        = text_area_tag :bike_delete_reason, '', class: 'form-control'
+        = text_area_tag :bike_delete_reason, '', required: true, class: 'form-control'
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6

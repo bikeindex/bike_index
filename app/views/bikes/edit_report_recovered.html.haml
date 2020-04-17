@@ -33,7 +33,7 @@
       .form-group
         %label{ for: :mark_recovered_reason }
           = t(".how_did_you_get_it_back")
-        = text_area_tag :mark_recovered_reason, '', class: 'form-control'
+        = text_area_tag :mark_recovered_reason, '', required: true, class: 'form-control'
       .checkbox
         %label
           %input#mark_recovered_we_helped{ type: 'checkbox' }

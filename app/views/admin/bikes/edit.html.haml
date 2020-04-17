@@ -227,6 +227,20 @@
 #BParamsView.mt-4.collapse
   %hr
   .row
+    .col-md-6.mt-2
+      %table.table-list
+        %tbody
+          %tr
+            %td Coordinates
+            %td
+              %code
+                = @bike.coordinates
+          %tr
+            %td
+              Address
+            %td
+              = pretty_print_json(@bike.address_hash)
+  .row
     - @bike.creation_states.each do |creation_state|
       .col-md-6.mt-2
         %table.table-list
@@ -291,5 +305,5 @@
 
 .mt-4
   %a.gray-link{ href: "#BParamsView", data: { toggle: "collapse", target: "#BParamsView" } }
-    View Creation data
+    View Creation data & developer information
 
