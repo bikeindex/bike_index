@@ -343,7 +343,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status_abandoned?).to be_truthy
 
         # It bases off the more recent notification
-        expect(parking_notification.coordinates).to eq(parking_notification2.coordinates)
+        expect(parking_notification.to_coordinates).to eq(parking_notification2.to_coordinates)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.repeat_record?).to be_truthy
@@ -360,7 +360,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification2.current?).to be_truthy
         expect(parking_notification_initial.superseded?).to be_truthy
         expect(parking_notification_initial.active?).to be_truthy
-        expect(parking_notification_initial.coordinates).to_not eq(parking_notification2.coordinates)
+        expect(parking_notification_initial.to_coordinates).to_not eq(parking_notification2.to_coordinates)
         expect(parking_notification_initial.current_associated_notification).to eq parking_notification2
         expect(parking_notification2.current_associated_notification).to eq parking_notification2
         bike.reload
@@ -435,7 +435,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(initial_impound_notification.delivery_status).to eq "email_success"
         expect(initial_impound_notification.retrieval_link_token).to be_blank
         expect(initial_impound_notification.user).to eq current_user
-        expect(parking_notification_initial.coordinates).to eq(initial_impound_notification.coordinates)
+        expect(parking_notification_initial.to_coordinates).to eq(initial_impound_notification.to_coordinates)
 
         expect(parking_notification2.current?).to be_falsey
         expect(parking_notification2.impounded?).to be_truthy
@@ -445,7 +445,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(impound_notification2.delivery_status).to eq "email_success"
         expect(impound_notification2.retrieval_link_token).to be_blank
         expect(impound_notification2.user).to eq current_user
-        expect(parking_notification2.coordinates).to eq(impound_notification2.coordinates)
+        expect(parking_notification2.to_coordinates).to eq(impound_notification2.to_coordinates)
 
         expect(assigns(:notifications_repeated).pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
         # Unsure why, but this is failing. Skipping for now

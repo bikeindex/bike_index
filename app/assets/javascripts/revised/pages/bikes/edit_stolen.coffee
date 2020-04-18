@@ -2,6 +2,7 @@
 # bikes/edit_report_recovered
 # bikes/edit_report_stolen
 
+
 class BikeIndex.BikesEditStolen extends BikeIndex
   constructor: ->
     @initializeEventListeners()
@@ -13,9 +14,14 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     $('#mark-stolen-btn').click (e) =>
       e.preventDefault()
       @markStolen(e)
+
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
       @markRecovered()
+      # Safari blocks re-submission, FUCK THAT
+      setTimeout (->
+        $("#toggle-stolen input[type=submit]").attr("disabled", false)
+      ), 500
 
   markStolen: (e) ->
     $('#bike_stolen').val('true')
@@ -47,4 +53,4 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       response_callback = @recoveredRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#toggle-stolen .alert').slideDown('fast').removeClass('currently-hidden')
+      $("#toggle-stolen .alert").slideDown("fast").removeClass("currently-hidden")

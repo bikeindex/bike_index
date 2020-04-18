@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe BikesController, type: :request do
   let(:base_url) { "/bikes" }
+  let(:ownership) { FactoryBot.create(:ownership) }
+  let(:current_user) { ownership.creator }
+  let(:bike) { ownership.bike }
 
   describe "show" do
-    let(:ownership) { FactoryBot.create(:ownership) }
-    let(:current_user) { ownership.creator }
-    let(:bike) { ownership.bike }
     before { log_in(current_user) if current_user.present? }
     context "example bike" do
       it "shows the bike" do
@@ -62,7 +62,6 @@ RSpec.describe BikesController, type: :request do
                             can_edit_claimed: can_edit_claimed,
                             user: FactoryBot.create(:user))
         end
-        let(:bike) { ownership.bike }
         let(:organization) { FactoryBot.create(:organization) }
         let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
         it "404s" do
@@ -257,6 +256,50 @@ RSpec.describe BikesController, type: :request do
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.retrieved?).to be_falsey
           expect(parking_notification.retrieved?).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "update" do
+    before { log_in(current_user) if current_user.present? }
+    context "mark bike stolen, the way it's done in the app" do
+      include_context :geocoder_real # But it shouldn't make any actual calls!
+      it "marks bike stolen and doesn't set a location in Kansas!" do
+        expect(current_user.authorized?(bike)).to be_truthy
+        expect(bike.stolen?).to be_falsey
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+          expect(flash[:success]).to be_present
+        end
+        bike.reload
+        expect(bike.stolen?).to be_truthy
+        expect(bike.to_coordinates.compact).to eq([])
+
+        stolen_record = bike.current_stolen_record
+        expect(stolen_record).to be_present
+        expect(stolen_record.to_coordinates.compact).to eq([])
+        expect(stolen_record.date_stolen).to be_within(5).of Time.current
+      end
+      context "bike has coordinates" do
+        it "marks the bike stolen, doesn't set a location, blanks bike location" do
+          bike.update_attributes(country_id: Country.united_states, latitude: 40.7143528, longitude: -74.0059731)
+          expect(current_user.authorized?(bike)).to be_truthy
+          expect(bike.stolen?).to be_falsey
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+            expect(flash[:success]).to be_present
+          end
+          bike.reload
+          expect(bike.stolen?).to be_truthy
+          expect(bike.to_coordinates.compact).to eq([])
+
+          stolen_record = bike.current_stolen_record
+          expect(stolen_record).to be_present
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.current
         end
       end
     end

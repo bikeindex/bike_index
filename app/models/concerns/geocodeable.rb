@@ -5,8 +5,7 @@ module Geocodeable
 
   included do
     geocoded_by :address
-    after_validation :geocode, if: :should_be_geocoded?
-    before_save :strip_state_if_international
+    after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
     # Skip geocoding if this flag is truthy
     attr_accessor :skip_geocoding
@@ -14,55 +13,6 @@ module Geocodeable
     def skip_geocoding?
       skip_geocoding.present?
     end
-
-    # Should the receiving object be geocoded?
-    #
-    # By default:
-    #  - we skip geocoding if the `skip_geocoding` flag is set.
-    #  - geocode if address is present and changed
-    #
-    # Overwrite this method in inheriting models to customize skip-geocoding
-    # logic.
-    def should_be_geocoded?
-      return false if skip_geocoding?
-      return false if address.blank?
-      address_changed?
-    end
-
-    def address_changed?
-      %i[street city state_id zipcode country_id]
-        .any? { |col| public_send("#{col}_changed?") }
-    end
-
-    def address(**kwargs)
-      Geocodeable.address(self, **kwargs)
-    end
-  end
-
-  def coordinates; attributes.slice("latitude", "longitude").with_indifferent_access end
-
-  # default address hash. Probably could be used more often/better
-  def address_hash
-    attributes.slice("street", "city", "zipcode", "latitude", "longitude")
-              .merge(state: state&.abbreviation, country: country&.iso)
-              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
-              .with_indifferent_access
-  end
-
-  # Override assignment to enable friendly finding state and country
-  def state=(val)
-    return super unless val.is_a?(String)
-    self.state = State.fuzzy_find(val)
-  end
-
-  def country=(val)
-    return super unless val.is_a?(String)
-    self.country = Country.fuzzy_find(val)
-  end
-
-  def strip_state_if_international
-    return true unless country_id.present? && state_id.present? && country_id != Country.united_states.id
-    self.state_id = nil
   end
 
   # Build an address string from the given object's location data.
@@ -108,5 +58,59 @@ module Geocodeable
       ].reject(&:blank?).join(" "),
       country_name,
     ].reject(&:blank?).join(", ")
+  end
+
+  # Should the receiving object be geocoded?
+  #
+  # By default:
+  #  - skip geocoding if the `skip_geocoding` flag is set.
+  #  - geocode if address is changed
+  #
+  # Overwrite this method in inheriting models to customize skip-geocoding
+  # logic.
+  def should_be_geocoded?
+    return false if skip_geocoding?
+    address_changed?
+  end
+
+  def address_changed?
+    %i[street city state_id zipcode country_id]
+      .any? { |col| public_send("#{col}_changed?") }
+  end
+
+  def address(**kwargs)
+    Geocodeable.address(self, **kwargs)
+  end
+
+  def bike_index_geocode
+    # remove state if it's not for the same country - we currently only handle us states
+    if country_id.present? && state_id.present?
+      self.state_id = nil unless state&.country_id == country_id
+    end
+    # Only geocode if there is specific location information
+    if [street, city, zipcode].any?(&:present?)
+      self.attributes = Geohelper.coordinates_for(address) || {}
+    else
+      self.attributes = { latitude: nil, longitude: nil }
+    end
+  end
+
+  # default address hash. Probably could be used more often/better
+  def address_hash
+    attributes.slice("street", "city", "zipcode", "latitude", "longitude")
+              .merge(state: state&.abbreviation, country: country&.iso)
+              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
+              .with_indifferent_access
+  end
+
+  # Override assignment to enable friendly finding state and country
+  def state=(val)
+    return super unless val.is_a?(String)
+    self.state = State.fuzzy_find(val)
+  end
+
+  def country=(val)
+    return super unless val.is_a?(String)
+    self.country = Country.fuzzy_find(val)
   end
 end

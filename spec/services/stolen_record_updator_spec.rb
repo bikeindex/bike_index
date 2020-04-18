@@ -55,7 +55,7 @@ RSpec.describe StolenRecordUpdator do
     it "marks all the records not current" do
       bike = FactoryBot.create(:bike)
       stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
-      bike.save
+      bike.reload
       expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
       stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
       stolen_record1.update_attributes(current: true)

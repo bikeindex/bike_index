@@ -139,8 +139,8 @@ RSpec.describe Organized::BikesController, type: :controller do
       describe "recoveries" do
         let(:bike) { FactoryBot.create(:stolen_bike) }
         let(:bike2) { FactoryBot.create(:stolen_bike) }
-        let(:recovered_record) { bike.find_current_stolen_record }
-        let(:recovered_record2) { bike2.find_current_stolen_record }
+        let(:recovered_record) { bike.fetch_current_stolen_record }
+        let(:recovered_record2) { bike2.fetch_current_stolen_record }
         let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
         let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: organization) }
         let(:date) { "2016-01-10 13:59:59" }

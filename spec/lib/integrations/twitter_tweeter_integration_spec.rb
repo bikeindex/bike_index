@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe TwitterTweeterIntegration do
   before do
     # reverse geocode bike stolen records
-    stolen_record = bike.current_stolen_record
+    stolen_record = bike.fetch_current_stolen_record
     stolen_record.skip_geocoding = false
     stolen_record.save
   end

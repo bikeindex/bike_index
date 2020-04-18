@@ -8,6 +8,10 @@ class BikeIndex.BikesEditRemove extends BikeIndex
     $('#request-delete form').submit (e) =>
       e.preventDefault()
       @requestDelete()
+      # Safari blocks re-submission, FUCK THAT
+      setTimeout (->
+        $("#request-delete input[type=submit]").attr("disabled", false)
+      ), 500
 
   toggleHidden: (e) ->
     e.preventDefault()
@@ -33,3 +37,4 @@ class BikeIndex.BikesEditRemove extends BikeIndex
       response_callback = @requestDeleteRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
+      $("#request-delete .alert").slideDown("fast").removeClass("currently-hidden")

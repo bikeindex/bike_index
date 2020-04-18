@@ -7,7 +7,7 @@ module Api
       def create
         bike = Bike.find(params[:notification_hash][:bike_id])
         if params[:notification_hash][:notification_type].to_s.match("stolen_twitter_alerter").present?
-          if bike.find_current_stolen_record.present?
+          if bike.fetch_current_stolen_record.present?
             customer_contact = CustomerContact.new(body: "EMPTY",
                                                    bike_id: bike.id,
                                                    kind: :stolen_twitter_alerter,

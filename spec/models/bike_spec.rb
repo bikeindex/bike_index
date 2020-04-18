@@ -857,25 +857,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "find_current_stolen_record" do
-    it "returns the last current stolen record if bike is stolen" do
-      @bike = Bike.new
-      first_stolen_record = StolenRecord.new
-      second_stolen_record = StolenRecord.new
-      allow(first_stolen_record).to receive(:current).and_return(true)
-      allow(second_stolen_record).to receive(:current).and_return(true)
-      allow(@bike).to receive(:stolen).and_return(true)
-      allow(@bike).to receive(:stolen_records).and_return([first_stolen_record, second_stolen_record])
-      expect(@bike.find_current_stolen_record).to eq(second_stolen_record)
-    end
-
-    it "is false if the bike isn't stolen" do
-      @bike = Bike.new
-      allow(@bike).to receive(:stolen).and_return(false)
-      expect(@bike.find_current_stolen_record).to be_falsey
-    end
-  end
-
   describe "set_mnfg_name" do
     let(:manufacturer_other) { Manufacturer.new(name: "Other") }
     let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
@@ -1342,19 +1323,10 @@ RSpec.describe Bike, type: :model do
       expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
-    context "problem date" do
-      let(:problem_date) do
-        digits = (Time.current.year - 1).to_s[2, 3] # last two digits of last year
-        Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
-      end
+    context "stolen record date" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
-        expect(bike.listing_order).to be < 10000
-        # stolen records don't actually have an after_commit hook to update
-        # bikes (they probably should though). This is just checking this is
-        # called correctly on save.
-        bike.save
-        expect(bike.listing_order).to be > (Time.current - 13.months).to_i
+        expect(bike.listing_order).to be_within(1).of bike.current_stolen_record.date_stolen.to_i
       end
     end
   end
@@ -1518,34 +1490,65 @@ RSpec.describe Bike, type: :model do
     context "given a current_stolen_record and no bike location info" do
       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
       let(:stolen_record) { bike.current_stolen_record }
+      let(:street_address) { "1300 W 14th Pl" }
+      let(:abbr_address) { "Chicago, IL 60608, US" }
+      let(:full_address) { "#{street_address}, #{abbr_address}" }
+      before { stolen_record.skip_geocoding = false }
       it "takes location from the current stolen record" do
-        street_address = "1300 W 14th Pl"
-        abbr_address = "Chicago, IL 60608, US"
-        full_address = "#{street_address}, #{abbr_address}"
         expect(stolen_record.street).to eq street_address
         expect(stolen_record.address(force_show_address: true)).to eq(full_address)
         expect(stolen_record.address).to eq(abbr_address)
 
-        bike.set_location_info
+        bike.reload
+        allow(bike).to receive(:bike_index_geocode) { fail "should not have called geocoding" }
+        stolen_record.save
+        expect(bike.manual_csr).to be_truthy
+        bike.save
+        expect(StolenRecord.unscoped.where(bike_id: bike.id).count).to eq 1
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
         expect(bike.street).to be_present
         expect(bike.zipcode).to eq(stolen_record.zipcode)
-        expect(bike.country).to eq(stolen_record.country)
         expect(bike.address).to eq(full_address)
+        expect(bike.country).to eq(stolen_record.country)
       end
-      context "given an abandoned record, it instead uses the abandoned record" do
+      context "removing location from the stolen_record" do
+        # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
+        # ... or else unexpected things happen
+        it "blanks the location on the bike" do
+          expect(stolen_record.address(force_show_address: true)).to eq(full_address)
+          expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL 60608, US"
+          allow(bike).to receive(:bike_index_geocode) { fail "should not have called geocoding" }
+          bike.reload
+          stolen_record.reload
+          # stolen_record.skip_geocoding = false
+          Sidekiq::Testing.inline! do
+            stolen_record.attributes = { street: "", city: "", zipcode: "" }
+            expect(stolen_record.should_be_geocoded?).to be_truthy
+            stolen_record.save
+          end
+          stolen_record.reload
+          bike.reload
+          # Doesn't have coordinates, see geocodeable for additional information
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.address_hash).to eq({ country: "US", state: "IL" }.as_json)
+          expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
+          expect(stolen_record.should_be_geocoded?).to be_falsey
+
+          expect(bike.address_hash).to eq({ country: "US", state: "IL" }.as_json)
+          expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.should_be_geocoded?).to be_falsey
+        end
+      end
+      context "given an abandoned record, it still uses the stolen_record" do
         it "takes the location from the parking notification" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
           bike.reload
           expect(bike.current_parking_notification).to eq parking_notification
-          expect(bike.to_coordinates).to eq(parking_notification.to_coordinates)
-
-          expect(bike.city).to eq(parking_notification.city)
-          expect(bike.zipcode).to eq(parking_notification.zipcode)
-          expect(bike.country).to eq(parking_notification.country)
+          expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
+          expect(bike.address_hash).to eq stolen_record.address_hash
         end
       end
     end
