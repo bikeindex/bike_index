@@ -264,33 +264,43 @@ RSpec.describe BikesController, type: :request do
   describe "update" do
     before { log_in(current_user) if current_user.present? }
     context "mark bike stolen, the way it's done in the app" do
-      include_context :geocoder_real
-      xit "marks bike stolen and doesn't set a location in Kansas!" do
+      include_context :geocoder_real # But it shouldn't make any actual calls!
+      it "marks bike stolen and doesn't set a location in Kansas!" do
         expect(current_user.authorized?(bike)).to be_truthy
         expect(bike.stolen?).to be_falsey
         Sidekiq::Worker.clear_all
-        VCR.use_cassette("bikes_controller-mark-new-stolen", match_requests_on: [:path]) do
-          Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
-            expect(flash[:success]).to be_present
-          end
+        Sidekiq::Testing.inline! do
+          patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+          expect(flash[:success]).to be_present
         end
         bike.reload
         expect(bike.stolen?).to be_truthy
         expect(bike.to_coordinates.compact).to eq([])
-        expect(bike.address_hash.values.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
         expect(stolen_record.to_coordinates.compact).to eq([])
-        expect(stolen_record.address_hash.values.compact).to eq([])
         expect(stolen_record.date_stolen).to be_within(5).of Time.current
       end
       context "bike has coordinates" do
-        it "marks the bike stolen, doesn't set a location, blanks bike location"
-      end
-      context "bike has location" do
-        it "uses the existing location"
+        it "marks the bike stolen, doesn't set a location, blanks bike location" do
+          bike.update_attributes(country_id: Country.united_states, latitude: 40.7143528, longitude: -74.0059731)
+          expect(current_user.authorized?(bike)).to be_truthy
+          expect(bike.stolen?).to be_falsey
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+            expect(flash[:success]).to be_present
+          end
+          bike.reload
+          expect(bike.stolen?).to be_truthy
+          expect(bike.to_coordinates.compact).to eq([])
+
+          stolen_record = bike.current_stolen_record
+          expect(stolen_record).to be_present
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.current
+        end
       end
     end
   end
