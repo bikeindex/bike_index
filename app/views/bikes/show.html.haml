@@ -72,20 +72,21 @@
     -# Bike Photo!
     .col-md-8
       .bike-photos.horizontal-thumbnails
-        - if @bike.public_images.any?
+        - bike_image = @bike.public_images.first
+        - if bike_image.present? && bike_image.image_url.present?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
-            .current-photo{ id: "image#{@bike.public_images.first.id}"}
-              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.public_images.first.image_url })
+            .current-photo{ id: "image#{bike_image.id}"}
+              = image_tag(bike_image.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image.image_url })
           - if @bike.public_images.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r
             #thumbnail-photos.photo-list
               %ul#thumbnails
-                - @bike.public_images.each_with_index do |public_image, index|
+                - @bike.public_images.select(&:image_url).each_with_index do |public_image, index|
                   - thumb_class = index == 0 ? 'current-thumb' : '' # make the first image current
                   %li
-                    %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image.url(:large), link: public_image.image.url } }
-                      = image_tag public_image.image.url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}"
+                    %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image_url(:large), link: public_image.image.url } }
+                      = image_tag public_image.image_url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}"
             :plain
               <script id="current-photo-template" type="x-tmpl-mustache">
                 <div id="{{id}}" style="display: none;">
