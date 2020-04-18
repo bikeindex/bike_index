@@ -675,7 +675,6 @@ class Bike < ApplicationRecord
     # Because we use it for searching stolen bikes, and we don't want other information leaking
     location_record = current_stolen_record || find_location_info(request_location)
     return if location_record.blank?
-    # location_record
     @location_set_by_association = true # set to skip geocoding
     self.attributes = Geohelper.location_attrs_from_result(location_record)
   end

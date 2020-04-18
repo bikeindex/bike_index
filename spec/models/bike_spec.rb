@@ -1493,6 +1493,7 @@ RSpec.describe Bike, type: :model do
       let(:street_address) { "1300 W 14th Pl" }
       let(:abbr_address) { "Chicago, IL 60608, US" }
       let(:full_address) { "#{street_address}, #{abbr_address}" }
+      before { stolen_record.skip_geocoding = false }
       it "takes location from the current stolen record" do
         expect(stolen_record.street).to eq street_address
         expect(stolen_record.address(force_show_address: true)).to eq(full_address)
@@ -1501,9 +1502,9 @@ RSpec.describe Bike, type: :model do
         bike.reload
         allow(bike).to receive(:bike_index_geocode) { fail "should not have called geocoding" }
         stolen_record.save
-        pp stolen_record.address_hash
         expect(bike.manual_csr).to be_truthy
         bike.save
+        expect(StolenRecord.unscoped.where(bike_id: bike.id).count).to eq 1
 
         expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
@@ -1515,14 +1516,14 @@ RSpec.describe Bike, type: :model do
       context "removing location from the stolen_record" do
         # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
         # ... or else unexpected things happen
-        xit "blanks the location on the bike" do
+        it "blanks the location on the bike" do
           expect(stolen_record.address(force_show_address: true)).to eq(full_address)
           expect(bike.address).to eq "1300 W 14th Pl, Chicago, IL 60608, US"
           allow(bike).to receive(:bike_index_geocode) { fail "should not have called geocoding" }
           bike.reload
           stolen_record.reload
+          # stolen_record.skip_geocoding = false
           Sidekiq::Testing.inline! do
-            pp "saving here"
             stolen_record.attributes = { street: "", city: "", zipcode: "" }
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
@@ -1535,7 +1536,6 @@ RSpec.describe Bike, type: :model do
           expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
           expect(stolen_record.should_be_geocoded?).to be_falsey
 
-          pp bike.latitude, bike.longitude
           expect(bike.address_hash).to eq({ country: "US", state: "IL" }.as_json)
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.should_be_geocoded?).to be_falsey

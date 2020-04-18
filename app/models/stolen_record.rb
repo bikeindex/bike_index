@@ -320,7 +320,7 @@ class StolenRecord < ApplicationRecord
     return true unless bike.present?
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current
-      bike.update_attributes(current_stolen_record_id: id, manual_csr: true)
+      bike.update_attributes(current_stolen_record: self, manual_csr: true)
     end
     bike.user&.update_attributes(updated_at: Time.current)
   end

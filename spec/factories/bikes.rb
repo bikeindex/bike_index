@@ -23,17 +23,18 @@ FactoryBot.define do
       end
     end
 
-    factory :stolen_bike do
+    trait :stolen do
       transient do
-        latitude { nil }
-        longitude { nil }
+        # default to NYC coordinates
+        latitude { 40.7143528 }
+        longitude { -74.0059731 }
       end
       stolen { true }
+    end
+
+    factory :stolen_bike, traits: [:stolen] do
       after(:create) do |bike, evaluator|
-        lat, long = %i[latitude longitude].map { |k| evaluator.public_send(k).presence }
-        # default to NYC coordinates
-        lat, long = [40.7143528, -74.0059731] unless lat && long
-        csr = create(:stolen_record, bike: bike, latitude: lat, longitude: long)
+        create(:stolen_record, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
       end
 
       factory :abandoned_bike do
@@ -43,26 +44,27 @@ FactoryBot.define do
       factory :recovered_bike do
         stolen { false }
       end
+    end
 
-      factory :stolen_bike_in_amsterdam do
-        after(:create) do |bike|
-          create(:stolen_record, :in_amsterdam, bike: bike)
-        end
+    # These factories are separate from the stolen bike factory because we only want to call after create once
+    factory :stolen_bike_in_amsterdam, traits: [:stolen] do
+      after(:create) do |bike|
+        create(:stolen_record, :in_amsterdam, bike: bike)
       end
-      factory :stolen_bike_in_los_angeles do
-        after(:create) do |bike|
-          create(:stolen_record, :in_los_angeles, bike: bike)
-        end
+    end
+    factory :stolen_bike_in_los_angeles, traits: [:stolen] do
+      after(:create) do |bike|
+        create(:stolen_record, :in_los_angeles, bike: bike)
       end
-      factory :stolen_bike_in_nyc do
-        after(:create) do |bike|
-          create(:stolen_record, :in_nyc, bike: bike)
-        end
+    end
+    factory :stolen_bike_in_nyc, traits: [:stolen] do
+      after(:create) do |bike|
+        create(:stolen_record, :in_nyc, bike: bike)
       end
-      factory :stolen_bike_in_chicago do
-        after(:create) do |bike|
-          create(:stolen_record, :in_chicago, bike: bike)
-        end
+    end
+    factory :stolen_bike_in_chicago, traits: [:stolen] do
+      after(:create) do |bike|
+        create(:stolen_record, :in_chicago, bike: bike)
       end
     end
 
