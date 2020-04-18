@@ -35,6 +35,7 @@ FactoryBot.define do
     factory :stolen_bike, traits: [:stolen] do
       after(:create) do |bike, evaluator|
         create(:stolen_record, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+        bike.reload
       end
 
       factory :abandoned_bike do
@@ -50,21 +51,25 @@ FactoryBot.define do
     factory :stolen_bike_in_amsterdam, traits: [:stolen] do
       after(:create) do |bike|
         create(:stolen_record, :in_amsterdam, bike: bike)
+        bike.reload
       end
     end
     factory :stolen_bike_in_los_angeles, traits: [:stolen] do
       after(:create) do |bike|
         create(:stolen_record, :in_los_angeles, bike: bike)
+        bike.reload
       end
     end
     factory :stolen_bike_in_nyc, traits: [:stolen] do
       after(:create) do |bike|
         create(:stolen_record, :in_nyc, bike: bike)
+        bike.reload
       end
     end
     factory :stolen_bike_in_chicago, traits: [:stolen] do
       after(:create) do |bike|
         create(:stolen_record, :in_chicago, bike: bike)
+        bike.reload
       end
     end
 
