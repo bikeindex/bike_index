@@ -783,10 +783,10 @@ class Bike < ApplicationRecord
   end
 
   # Take lat/long from associated geocoded model
-  # Only geocode if lat/long are blank and address present
+  # Only geocode if lat/long haven't changed and address has
   def should_be_geocoded?
     return false if skip_geocoding? || @location_set_by_association
-    address_changed?
+    address_changed? && !latitude_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)

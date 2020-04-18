@@ -88,6 +88,8 @@ class Organization < ApplicationRecord
     to: :default_location,
     allow_nil: true
 
+  geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
+
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end

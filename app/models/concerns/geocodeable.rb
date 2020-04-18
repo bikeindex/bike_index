@@ -83,8 +83,10 @@ module Geocodeable
   end
 
   def bike_index_geocode
-    # remove state if it's international - we currently only handle us states
-    self.state_id = nil if country_id.present? && state_id.present? && country_id != Country.united_states.id
+    # remove state if it's not for the same country - we currently only handle us states
+    if country_id.present? && state_id.present?
+      self.state_id = nil unless state&.country_id == country_id
+    end
     # Only geocode if there is specific location information
     if [street, city, zipcode].any?(&:present?)
       self.attributes = Geohelper.coordinates_for(address) || {}
