@@ -120,7 +120,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         user.reload
         bike.reload
         expect(b_param.fetch_formatted_address).to eq target_address_hash.as_json
-        pp b_param.fetch_formatted_address, bike.registration_address, user.address_hash
 
         expect(user.phone).to eq "1112223333"
         expect(user.address_hash).to eq target_address_hash.as_json
