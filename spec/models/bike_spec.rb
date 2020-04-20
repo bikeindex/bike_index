@@ -1020,7 +1020,7 @@ RSpec.describe Bike, type: :model do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:bike) { FactoryBot.create(:bike) }
       let(:b_param_params) { { bike: { street: "2864 Milwaukee Ave" } } }
-      let(:target) { { street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "USA", latitude: 41.933238, longitude: -87.71476299999999 } }
+      let(:target) { { street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "US", latitude: 41.933238, longitude: -87.71476299999999 } }
       include_context :geocoder_real
       it "returns the fetched address" do
         FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)

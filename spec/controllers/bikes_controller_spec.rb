@@ -876,7 +876,7 @@ RSpec.describe BikesController, type: :controller do
               owner_email: "something@stuff.com",
             }
           end
-          let(:target_address) { { street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA", latitude: 40.7143528, longitude: -74.0059731 } }
+          let(:target_address) { { street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "US", latitude: 40.7143528, longitude: -74.0059731 } }
           let(:b_param) { BParam.create(params: { "bike" => bike_params.as_json }, origin: "embed_partial") }
           before do
             expect(b_param.partial_registration?).to be_truthy
