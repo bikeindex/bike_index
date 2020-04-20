@@ -122,7 +122,7 @@ class AlertImageGenerator
   # single-quotes
   def stolen_record_location
     return nil unless stolen_record.to_coordinates.any?
-    Geocodeable.address(stolen_record, street: false, country: [:skip_default, :name])
+    Geocodeable.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
       .gsub("'", "\\'")
   end
 

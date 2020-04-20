@@ -32,16 +32,15 @@ RSpec.describe AlertImageGenerator do
       end
     end
     context "stolen_record without street, zipcode or city" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record, *location_attrs.slice(:country, :state, :latitude, :longitude)) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.slice(:country, :state, :latitude, :longitude).merge(skip_geocoding: false)) }
       it "returns without" do
-        stolen_record.reload
-        expect(stolen_record.to_coordinates).to eq([])
+        expect(stolen_record.to_coordinates).to eq([nil, nil])
         expect(generator.stolen_record_location).to be_blank
       end
     end
     context "Edmonton" do
       let(:location_attrs) { { street: "7935 Gateway Blvd", city: "Edmonton", zipcode: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, state: nil, country: Country.canada } }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, *location_attrs) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.merge(skip_geocoding: true)) }
       it "returns edmonton" do
         stolen_record.reload
         expect(stolen_record.to_coordinates).to eq([location_attrs[:latitude], location_attrs[:longitude]])
