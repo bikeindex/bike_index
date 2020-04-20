@@ -108,7 +108,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
                         params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
     end
     let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
-    let(:target_address_hash) { { street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "USA", latitude: 37.8016649, longitude: -122.397348 } }
+    let(:target_address_hash) { { street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348 } }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
     it "assigns the extra user attributes" do
@@ -122,7 +122,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         user.reload
 
         expect(user.phone).to eq "1112223333"
-        expect(user.address_hash).to eq target_address_hash.merge(country: "US").as_json
+        expect(user.address_hash).to eq target_address_hash.as_json
         expect(user.to_coordinates).to eq([37.8016649, -122.397348])
       end
     end

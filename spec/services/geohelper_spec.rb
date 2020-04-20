@@ -23,7 +23,7 @@ RSpec.describe Geohelper do
     let(:longitude) { -87.7156846 }
 
     it "returns correct location" do
-      VCR.use_cassette("geohelper-coordinates") do
+      VCR.use_cassette("geohelper-coordinates", match_requests_on: [:path]) do
         expect(Geohelper.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
       end
     end
@@ -52,13 +52,13 @@ RSpec.describe Geohelper do
           city: "San Francisco",
           state: "CA",
           zipcode: "94103",
-          country: "USA",
-          latitude: 37.7870322,
-          longitude: -122.4039235,
+          country: "US",
+          latitude: 37.7870205,
+          longitude: -122.403928,
         }
       end
       it "returns our desires" do
-        VCR.use_cassette("geohelper-formatted_address_hash") do
+        VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
           expect(Geohelper.formatted_address_hash(address_str)).to eq target.as_json
         end
       end
@@ -69,7 +69,7 @@ RSpec.describe Geohelper do
     describe "address_hash_from_geocoder_string" do
       context "with secondary line" do
         let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
-        let(:target) { { street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "USA" } }
+        let(:target) { { street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "US" } }
         it "returns our desires" do
           expect(Geohelper.address_hash_from_geocoder_string(address_str)).to eq target.as_json
         end

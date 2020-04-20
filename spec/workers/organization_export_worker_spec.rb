@@ -174,6 +174,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:b_param_params) { { bike: { address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member" } } }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
+      let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
+      let(:target_address) { { street: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103", country: "US", latitude: 37.7870205, longitude: -122.403928 }.as_json }
       include_context :geocoder_real
 
       context "assigning stickers" do
@@ -187,7 +189,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(bike.extra_registration_number).to eq "cool extra serial"
           expect(bike.organization_affiliation).to eq "community_member"
           expect(export.assign_bike_codes?).to be_truthy
-          VCR.use_cassette("geohelper-formatted_address_hash") do
+
+          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+            expect(bike.registration_address).to eq target_address
             instance.perform(export.id)
           end
           export.reload
@@ -231,17 +235,18 @@ RSpec.describe OrganizationExportWorker, type: :job do
           }
         end
         it "returns the expected values" do
-          bike_sticker.claim(user, bike)
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_truthy
-          expect(bike_sticker.bike).to eq bike
-          expect(bike_sticker.user).to eq user
-          expect(export.assign_bike_codes?).to be_falsey
-          expect(export.headers).to eq Export.permitted_headers("include_paid")
-          expect(bike.phone).to eq "717.742.3423"
-          expect(bike.extra_registration_number).to eq "cool extra serial"
-          expect(bike.organization_affiliation).to eq "community_member"
-          VCR.use_cassette("geohelper-formatted_address_hash") do
+          VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+            bike_sticker.claim(user, bike)
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.bike).to eq bike
+            expect(bike_sticker.user).to eq user
+            expect(export.assign_bike_codes?).to be_falsey
+            expect(export.headers).to eq Export.permitted_headers("include_paid")
+            expect(bike.phone).to eq "717.742.3423"
+            expect(bike.extra_registration_number).to eq "cool extra serial"
+            expect(bike.organization_affiliation).to eq "community_member"
+            expect(bike.registration_address).to eq target_address
             instance.perform(export.id)
           end
           export.reload

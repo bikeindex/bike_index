@@ -20,8 +20,8 @@ class Geohelper
       elsif geometry && geometry["bounds"].present?
         # Google returns a box that represents the area, return just one coordinate group from that box
         location = geometry["bounds"]["northeast"]
-      elsif result.first&.data["latitude"] # This is probably a test geocoder response...
-        location = { "lat" => result.first&.data["latitude"], "lng" => result.first&.data["longitude"] }
+      elsif result.first&.data&.dig("latitude") # This is probably a test geocoder response...
+        location = { "lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"] }
       end
       return nil unless location
       { latitude: location["lat"], longitude: location["lng"] }
@@ -54,7 +54,7 @@ class Geohelper
         city: city,
         state: state,
         zipcode: code,
-        country: country,
+        country: country&.gsub("USA", "US"),
       }.with_indifferent_access
     end
 
