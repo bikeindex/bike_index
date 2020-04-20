@@ -32,7 +32,8 @@ class BikeUpdator
                          bike: @bike,
                          creator: @user,
                          send_email: true).create_ownership
-    @bike_params["bike"]["is_for_sale"] = false
+    @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
+    @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
   end
 
   def ensure_ownership!
@@ -82,7 +83,12 @@ class BikeUpdator
     update_ownership
     update_api_components if @bike_params["components"].present?
     update_attrs = @bike_params["bike"].except("stolen_records_attributes")
-    update_stolen_record if @bike.update_attributes(update_attrs)
+    if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
+      @bike.address_set_manually = true
+    end
+    if @bike.update_attributes(update_attrs)
+      update_stolen_record
+    end
     AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components
     @bike

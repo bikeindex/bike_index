@@ -1011,7 +1011,7 @@ RSpec.describe Bike, type: :model do
         it "returns nothing" do
           expect(user.address_hash).to eq default_location_registration_address
           expect(bike.user).to_not eq user
-          expect(bike.registration_address).to eq({})
+          expect(bike.registration_address.values.compact).to eq([])
         end
       end
     end
@@ -1535,7 +1535,7 @@ RSpec.describe Bike, type: :model do
           bike.reload
           # Doesn't have coordinates, see geocodeable for additional information
           expect(stolen_record.to_coordinates.compact).to eq([])
-          expect(stolen_record.address_hash).to eq({ country: "US", state: "IL" }.as_json)
+          expect(stolen_record.address_hash.compact).to eq({ country: "US", state: "IL" }.as_json)
           expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
           expect(stolen_record.should_be_geocoded?).to be_falsey
 
@@ -1544,8 +1544,8 @@ RSpec.describe Bike, type: :model do
           expect(bike.should_be_geocoded?).to be_falsey
         end
       end
-      context "given an abandoned record, it still uses the stolen_record" do
-        it "takes the location from the parking notification" do
+      context "given a parking notification" do
+        it "it still uses the stolen_record" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
           bike.reload

@@ -39,11 +39,11 @@ class Geohelper
       result = Geocoder.search(formatted_address(addy))
       return nil unless result&.first&.formatted_address.present?
       coordinates = coordinates_for(addy, result: result)
-      address_hash_from_geocoder_result(result&.first&.formatted_address)
+      address_hash_from_geocoder_string(result&.first&.formatted_address)
         .merge(coordinates.present? ? coordinates : {})
     end
 
-    def address_hash_from_geocoder_result(addy)
+    def address_hash_from_geocoder_string(addy)
       address_array = addy.split(",").map(&:strip)
       country = address_array.pop # Don't care about this rn
       code_and_state = address_array.pop
@@ -56,6 +56,18 @@ class Geohelper
         zipcode: code,
         country: country,
       }.with_indifferent_access
+    end
+
+    def address_hash_from_geocoder_result(result)
+      return {} if result.blank?
+      {
+        city: result.city,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        state_id: State.fuzzy_find(result.state_code)&.id,
+        country_id: Country.fuzzy_find(result.country_code)&.id,
+        zipcode: result.postal_code,
+      }
     end
   end
 end

@@ -66,12 +66,12 @@ RSpec.describe Geohelper do
 
     # This is an internal method, and probably shouldn't be called from elsewhere in the code
     # but it's useful to test independently so when inevitably it fails to parse an address, we can test and resolve that case
-    describe "address_hash_from_geocoder_result" do
+    describe "address_hash_from_geocoder_string" do
       context "with secondary line" do
         let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
         let(:target) { { street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "USA" } }
         it "returns our desires" do
-          expect(Geohelper.address_hash_from_geocoder_result(address_str)).to eq target.as_json
+          expect(Geohelper.address_hash_from_geocoder_string(address_str)).to eq target.as_json
         end
       end
     end

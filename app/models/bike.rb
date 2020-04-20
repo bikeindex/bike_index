@@ -122,7 +122,7 @@ class Bike < ApplicationRecord
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
           rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
           primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-          propulsion_type zipcode country_id city belt_drive
+          propulsion_type street zipcode country_id state_id city belt_drive
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
@@ -646,27 +646,6 @@ class Bike < ApplicationRecord
     [reg_city, reg_state].reject(&:blank?).join(", ")
   end
 
-  # Select the source from which to derive location data, in the following order
-  # of precedence:
-  #
-  # 1. The current stolen record - even if it has a blank location
-  #    Used it for searching and displaying stolen bikes, we don't want other information leaking
-  # 2. The current parking notification, if one is present
-  # 3. The creation organization, if one is present
-  # 4. The bike owner's address, if available
-  # 5. The request's IP address, if given
-  # 6. The registration address
-  def location_record(geolocation = nil)
-    return current_stolen_record if current_stolen_record.present?
-    location_record = [
-      current_parking_notification,
-      creation_organization,
-      owner,
-      # geolocation,
-    ].compact.find { |rec| rec.latitude.present? }
-    # location_record.present? ? location_record.address_hash : registration_address
-  end
-
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
   #
   # Geolocate based on the full current stolen record address, if available.
@@ -674,20 +653,21 @@ class Bike < ApplicationRecord
   # Sets lat/long, will avoid a geocode API call if coordinates are found
   #
   # Note: Because this is set automatically, only allow users to edit location if no locations are present
-  def set_location_info(request_location: nil)
-
+  def set_location_info
     if current_stolen_record.present?
-      pp "STOLEN RECORD PRESENT!!!"
-      location_record_address_hash = current_stolen_record.address_hash
+      # If there is a current stolen - even if it has a blank location - use it
+      # It's used for searching and displaying stolen bikes, we don't want other information leaking
+      if address_set_manually # Only set coordinates if the address is set manually
+        self.attributes = current_stolen_record.attributes.slice("latitude", "longitude")
+      else # Set the whole address from the stolen record
+        self.attributes = current_stolen_record.address_hash
+      end
     else
-      location_record = location_record_address_hash(request_location)
-      # location_record_address_hash = find_location_record_address_hash(request_location)
-      return true unless location_record_address_hash.present? # No address hash present so skip
-      # FIX THIS IN THIS PR:
-      location_record_address_hash = location_record.address_hash
+      return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
+      address_attrs = location_record_address_hash
+      return true unless l_record.present? # No address hash present so skip
+      self.attributes = address_attrs
     end
-    @location_set_by_association = true # set to skip geocoding
-    self.attributes = location_record_address_hash
   end
 
   def organization_affiliation
@@ -793,11 +773,10 @@ class Bike < ApplicationRecord
     PropulsionType.new(propulsion_type).name
   end
 
-  # Take lat/long from associated geocoded model
-  # Only geocode if lat/long haven't changed and address has
+  # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    return false if skip_geocoding? || @location_set_by_association
-    address_changed? && !latitude_changed?
+    return false if skip_geocoding? || !address_set_manually
+    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
@@ -812,5 +791,19 @@ class Bike < ApplicationRecord
 
   private
 
-
+  # Select the source from which to derive location data, in the following order
+  # of precedence:
+  #
+  # 1. The current parking notification, if one is present
+  # 2. The creation organization, if one is present
+  # 3. The bike owner's address, if available
+  # 4. The registration address
+  def location_record
+    location_record = [
+      current_parking_notification,
+      creation_organization,
+      owner,
+    ].compact.find { |rec| rec.latitude.present? }
+    location_record.present? ? location_record.address_hash : registration_address
+  end
 end
