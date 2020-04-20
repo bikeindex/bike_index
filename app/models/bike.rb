@@ -665,7 +665,7 @@ class Bike < ApplicationRecord
     else
       return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
       address_attrs = location_record_address_hash
-      return true unless l_record.present? # No address hash present so skip
+      return true unless address_attrs.present? # No address hash present so skip
       self.attributes = address_attrs
     end
   end
@@ -798,7 +798,7 @@ class Bike < ApplicationRecord
   # 2. The creation organization, if one is present
   # 3. The bike owner's address, if available
   # 4. The registration address
-  def location_record
+  def location_record_address_hash
     location_record = [
       current_parking_notification,
       creation_organization,
