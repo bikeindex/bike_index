@@ -804,6 +804,5 @@ class Bike < ApplicationRecord
       creation_organization,
       owner,
     ].compact.find { |rec| rec.latitude.present? }&.address_hash
-    # location_record.present? ? location_record.address_hash : registration_address
   end
 end

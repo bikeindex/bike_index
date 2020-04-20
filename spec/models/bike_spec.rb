@@ -1004,6 +1004,7 @@ RSpec.describe Bike, type: :model do
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
         expect(user.address_hash).to eq default_location_registration_address
+        bike.reload
         expect(bike.registration_address).to eq default_location_registration_address
       end
       context "ownership creator" do
@@ -1581,22 +1582,6 @@ RSpec.describe Bike, type: :model do
 
         expect(bike.city).to eq(city)
         expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-
-    context "given no creation org or owner location" do
-      it "takes location from the geocoded request location" do
-        bike = FactoryBot.build(:bike)
-        geocoder_data = double(
-          :request_location,
-          default_location.merge(postal_code: default_location[:zipcode] )
-        )
-
-        bike.set_location_info(request_location: geocoder_data)
-
-        expect(bike.city).to eq(geocoder_data.city)
-        expect(bike.zipcode).to eq(geocoder_data.postal_code)
         expect(bike.country).to eq(usa)
       end
     end
