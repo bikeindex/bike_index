@@ -27,12 +27,11 @@
           = active_link t(".discuss"), "https://discuss.bikeindex.org", class: "menu-item"
       - else
         - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
-        - on_impound_bikes_path = on_bikes_path && params[:search_impoundedness] == "only_impounded"
         %li
-          = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{(on_bikes_path && !on_impound_bikes_path) ? 'active' : ''}"
+          = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{on_bikes_path ? 'active' : ''}"
         - if current_organization.enabled?("impound_bikes")
           %li
-            = link_to t(".impounded_bikes"), organization_bikes_path(organization_id: current_organization.to_param, search_impoundedness: "only_impounded"), class: "menu-item #{on_impound_bikes_path ? 'active' : ''} secondary-item"
+            = active_link t(".impounded_bikes"), organization_impound_bikes_path(organization_id: current_organization.to_param), class: "menu-item secondary-item"
         %li
           - if current_organization.enabled?("show_partial_registrations")
             = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
