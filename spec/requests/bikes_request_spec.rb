@@ -267,7 +267,6 @@ RSpec.describe BikesController, type: :request do
       let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
       let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }
       let(:update_attributes) { { street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "" } }
-      # 10544 82 Ave NW, Edmonton, AB T6E 2A4, Canada
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "sets the address for the bike" do
         expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
