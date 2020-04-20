@@ -104,7 +104,8 @@ class BikeCreator
   end
 
   def save_bike(bike)
-    bike.set_location_info(request_location: @location) unless bike.latitude.present?
+    bike.set_location_info
+    bike.attributes = Geohelper.address_hash_from_geocoder_result(@location) unless bike.latitude.present?
     bike.save
     @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)

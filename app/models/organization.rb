@@ -78,16 +78,17 @@ class Organization < ApplicationRecord
     :address,
     :city,
     :country,
+    :country_id,
     :latitude,
     :longitude,
     :state,
+    :state_id,
     :street,
     :zipcode,
     to: :default_location,
     allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
-  after_validation :geocode, if: -> { false } # never geocode, use default_location lat/long
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -142,6 +143,9 @@ class Organization < ApplicationRecord
         .where(parking_notifications: { impound_record_id: nil, organization_id: id })
         .where.not(parking_notifications: { id: nil })
   end
+
+  # never geocode, use default_location lat/long
+  def should_be_geocoded?; false end
 
   def to_param; slug end
 

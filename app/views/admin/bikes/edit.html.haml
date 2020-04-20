@@ -227,11 +227,64 @@
 #BParamsView.mt-4.collapse
   %hr
   .row
-    - if @bike.b_params.any?
+    .col-md-6.mt-2
+      %table.table-list
+        %tbody
+          %tr
+            %td Coordinates
+            %td
+              %code
+                = @bike.to_coordinates
+          %tr
+            %td
+              Address
+            %td
+              = pretty_print_json(@bike.address_hash)
+  .row
+    - @bike.creation_states.each do |creation_state|
+      .col-md-6.mt-2
+        %table.table-list
+          %tbody
+            %tr
+              %td Kind
+              %td CreationState
+            %tr
+              %td
+                Created
+              %td
+                %span.convertTime
+                  = l creation_state.created_at, format: :convert_time
+            %tr
+              %td
+                Updated
+              %td
+                %span.convertTime
+                  = l creation_state.updated_at, format: :convert_time
+            %tr
+              %td
+                Organization
+              %td
+                - if creation_state.organization_id.present?
+                  - org_display_name = Organization.unscoped.find(creation_state.organization_id)&.name || creation_state.organization_id
+                  = link_to org_display_name, admin_organization_path(creation_state.organization_id)
+            %tr
+              %td
+                Creator
+              %td
+                - creator_display_name = creation_state.creator&.display_name || creation_state.creator_id
+                = link_to creator_display_name, admin_user_path(creation_state.creator_id)
+      .col-md-6.mt-2
+        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"))
+
+  - if @bike.b_params.any?
+    .row
       - @bike.b_params.each do |b_param|
-        .col-md-6
+        .col-md-6.mt-2
           %table.table-list
             %tbody
+              %tr
+                %td Kind
+                %td BParam
               %tr
                 %td
                   Created
@@ -244,10 +297,13 @@
                 %td
                   %span.convertTime
                     = l b_param.updated_at, format: :convert_time
+        .col-md-6.mt-2
           = pretty_print_json(b_param.params)
-    - else
-      %p
-        No creation records exist
+  - else
+    %p
+      No <code>BParams</code> exist
+
 .mt-4
-%a.gray-link{ href: "#BParamsView", data: { toggle: "collapse", target: "#BParamsView" } }
-  View Creation data
+  %a.gray-link{ href: "#BParamsView", data: { toggle: "collapse", target: "#BParamsView" } }
+    View Creation data & developer information
+

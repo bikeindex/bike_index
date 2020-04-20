@@ -7,7 +7,7 @@
     .row
       = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
-      - if @bike.stolen? && @bike.find_current_stolen_record.present? && !@bike.abandoned?
+      - if @bike.stolen? && @bike.fetch_current_stolen_record.present? && !@bike.abandoned?
         .col-md-8.form-well#form_well_wrap
           .form-wrap
             .form-well-form-header
@@ -33,7 +33,7 @@
       .form-group
         %label{ for: :mark_recovered_reason }
           = t(".how_did_you_get_it_back")
-        = text_area_tag :mark_recovered_reason, '', class: 'form-control'
+        = text_area_tag :mark_recovered_reason, '', required: true, class: 'form-control'
       .checkbox
         %label
           %input#mark_recovered_we_helped{ type: 'checkbox' }

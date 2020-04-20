@@ -71,7 +71,7 @@ FactoryBot.define do
   factory :state do
     sequence(:name) { |n| "State #{n}" }
     sequence(:abbreviation) { |n| "state-#{n}" }
-    country { FactoryBot.create(:country) }
+    country { Country.united_states }
 
     factory :state_new_york do
       abbreviation { "NY" }

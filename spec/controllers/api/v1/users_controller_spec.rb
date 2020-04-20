@@ -145,7 +145,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       o = FactoryBot.create(:ownership, bike: stolen_record.bike)
       user = o.creator
       bike = o.bike
-      bike.update_attribute :current_stolen_record_id, bike.find_current_stolen_record.id
+      bike.fetch_current_stolen_record.id
+      bike.save
       serial_request = {
         request_type: "serial_update_request",
         user_id: user.id,
@@ -181,7 +182,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       end
 
       before do
-        expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+        expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
         set_current_user(user)
       end
 

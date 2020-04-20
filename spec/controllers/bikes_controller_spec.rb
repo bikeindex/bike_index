@@ -876,7 +876,7 @@ RSpec.describe BikesController, type: :controller do
               owner_email: "something@stuff.com",
             }
           end
-          let(:target_address) { { street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA", latitude: 40.7143528, longitude: -74.0059731 } }
+          let(:target_address) { { street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "US", latitude: 40.7143528, longitude: -74.0059731 } }
           let(:b_param) { BParam.create(params: { "bike" => bike_params.as_json }, origin: "embed_partial") }
           before do
             expect(b_param.partial_registration?).to be_truthy
@@ -976,7 +976,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(flash[:success]).to be_present
                 bike = Bike.last
                 b_param.reload
-                expect(b_param.address_hash.except(:country)).to eq target_address.as_json
+                expect(b_param.address_hash.except("country")).to eq target_address.as_json
                 expect(b_param.created_bike_id).to eq bike.id
                 bike_params.delete(:manufacturer_id)
                 bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
@@ -1444,26 +1444,24 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attribute :stolen, true
               bike.reload
               expect(bike.stolen).to be_truthy
-              # bike.save
+
               expect(stolen_record.date_stolen).to be_present
               expect(stolen_record.proof_of_ownership).to be_falsey
               expect(stolen_record.receive_notifications).to be_truthy
-              # bike.reload
-              # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
-              bike.reload
-              expect(bike.find_current_stolen_record).to eq stolen_record
+
+              expect(bike.fetch_current_stolen_record).to eq stolen_record
               put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
               expect(flash[:error]).to_not be_present
               expect(response).to redirect_to edit_bike_url(page: "fancy_template")
               bike.reload
               expect(bike.stolen).to be_truthy
-              # expect(bike.hidden).to be_truthy
+
               # Stupid cheat because we're creating an extra record here for fuck all reason
-              current_stolen_record = bike.find_current_stolen_record
+              current_stolen_record = bike.fetch_current_stolen_record
               expect(bike.stolen_records.count).to eq 1
-              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
               # stolen_record.reload
-              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
               expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
               expect(current_stolen_record.proof_of_ownership).to be_truthy
               expect(current_stolen_record.receive_notifications).to be_falsey
@@ -1471,6 +1469,60 @@ RSpec.describe BikesController, type: :controller do
               stolen_attrs.except(*skipped_attrs).each do |key, value|
                 pp key unless current_stolen_record.send(key) == value
                 expect(current_stolen_record.send(key)).to eq value
+              end
+            end
+          end
+          context "canadian stolen record" do
+            let!(:canada) { FactoryBot.create(:country, name: "Canada", iso: "CA") }
+            let(:stolen_attrs) do
+              {
+                date_stolen: "2016-02-08 04:00:00",
+                timezone: "America/Chicago",
+                phone: "9999999999",
+                street: "2222 Cambridge St.",
+                country_id: canada.id,
+                city: "Vancouver",
+                zipcode: "V5L1E6",
+                state_id: state.id,
+                locking_description: "I locked it up!",
+                lock_defeat_description: "",
+                theft_description: "I deeply care about this bike, nefariousness!",
+                police_report_number: "#666",
+                police_report_department: "Vancouver",
+                secondary_phone: "8888888888",
+                proof_of_ownership: 1,
+                receive_notifications: 0,
+                estimated_value: "5200",
+              }
+            end
+            it "updates, ignores passed state" do
+              VCR.use_cassette("bikes_controller-create-stolen-canada", match_requests_on: [:path]) do
+                bike.update_attribute :stolen, true
+                bike.reload
+                expect(stolen_record.date_stolen).to be_present
+
+                expect(bike.fetch_current_stolen_record).to eq stolen_record
+                put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
+                expect(flash[:error]).to_not be_present
+                expect(response).to redirect_to edit_bike_url(page: "fancy_template")
+                bike.reload
+                expect(bike.stolen).to be_truthy
+                # Stupid cheat because we're creating an extra record here for fuck all reason
+                current_stolen_record = bike.fetch_current_stolen_record
+                expect(bike.stolen_records.count).to eq 1
+                expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+
+                expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+                expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+                expect(current_stolen_record.proof_of_ownership).to be_truthy
+                expect(current_stolen_record.receive_notifications).to be_falsey
+                expect(current_stolen_record.estimated_value).to eq 5200
+                expect(current_stolen_record.state_id).to be_blank # Ensure we don't do this accidentally, like we were
+                expect(current_stolen_record.to_coordinates).to eq([49.1573024, -123.9664322])
+                stolen_attrs.except(:state_id, *skipped_attrs).each do |key, value|
+                  pp key unless current_stolen_record.send(key) == value
+                  expect(current_stolen_record.send(key)).to eq value
+                end
               end
             end
           end

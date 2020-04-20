@@ -8,12 +8,14 @@ FactoryBot.define do
     longitude { -74.0059731 }
 
     trait :retrieved do
-      retrieval_kind { "organization_recovery" }
+      retrieved_kind { "organization_recovery" }
       retrieved_by_id { user.id }
-      retrieved_at { Time.current }
+      resolved_at { Time.current }
 
       after(:create) do |parking_notification, evaluator|
-        parking_notification.mark_retrieved!(evaluator.retrieval_kind, evaluator.retrieved_by_id, evaluator.retrieved_at)
+        parking_notification.mark_retrieved!(retrieved_by_id: evaluator.retrieved_by_id,
+                                             retrieved_kind: evaluator.retrieved_kind,
+                                             resolved_at: evaluator.resolved_at)
       end
     end
 

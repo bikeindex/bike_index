@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class ParkingNotification < ActiveRecord::Base
+  include Geocodeable
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
-  STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3 }.freeze
-  RETRIEVAL_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
+  STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4 }.freeze
+  RETRIEVED_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -24,10 +25,7 @@ class ParkingNotification < ActiveRecord::Base
 
   enum kind: KIND_ENUM
   enum status: STATUS_ENUM
-  enum retrieval_kind: RETRIEVAL_KIND_ENUM
-
-  # TODO: location refactor - switch to Geocodeable
-  geocoded_by :geocode_data
+  enum retrieved_kind: RETRIEVED_KIND_ENUM
 
   attr_accessor :is_repeat, :use_entered_address
 
@@ -54,12 +52,19 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  def self.associated_notifications_including_self(id, initial_record_id)
+    potential_id_matches = [id, initial_record_id].compact
+    where(initial_record_id: potential_id_matches).or(where(id: potential_id_matches))
+  end
+
   def self.associated_notifications(id, initial_record_id)
     potential_id_matches = [id, initial_record_id].compact
-    return none unless potential_id_matches.any?
     where(initial_record_id: potential_id_matches).where.not(id: id)
       .or(where(id: initial_record_id))
   end
+
+  # geocoding is managed by set_calculated_attributes
+  def should_be_geocoded?; false end
 
   # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
@@ -86,23 +91,32 @@ class ParkingNotification < ActiveRecord::Base
 
   def reply_to_email; organization&.auto_user&.email || user&.email end
 
-  def current_associated_notification; current? ? self : associated_notifications.order(:id).last end
+  def bike_notifications; ParkingNotification.where(organization_id: organization_id, bike_id: bike_id) end
 
-  # Fallback to created_at because something is busted and we need this to exist sometimes
-  def impounded_at; impounded? ? impound_record&.created_at || created_at : nil end
+  def current_associated_notification; current? ? self : associated_notifications_including_self.order(:id).last end
 
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
 
-  # All get applied
+  def associated_notifications_including_self; self.class.associated_notifications_including_self(id, initial_record_id) end
+
   def associated_retrieved_notification
-    return nil unless retrieved?
-    retrieved_by_id.present? ? self : associated_notifications.where.not(retrieved_by_id: nil).first
+    return nil unless resolved_at.present? # Used by calculated_state, so we can't use the status
+    retrieved_kind.present? ? self : associated_notifications_including_self.where.not(retrieved_kind: nil).first
+  end
+
+  # Not just associated notifications - any notifications for the bike, from the organization, closed/open in the same period
+  def notifications_from_period
+    # Give a 1 window for resolution matching, in case things happen at slightly different times
+    period_end = (resolved_at || Time.current) + 1.minute
+    notifications = bike_notifications.where("created_at < ?", period_end)
+    period_start = bike_notifications.resolved.where("resolved_at < ?", (resolved_at || Time.current) - 1.minute)
+                                     .reorder(:resolved_at).last&.resolved_at
+    period_start.present? ? notifications.where("created_at > ?", period_start) : notifications
   end
 
   def earlier_bike_notifications
-    notifications = ParkingNotification.where(organization_id: organization&.id, bike_id: bike&.id)
-    id.present? ? notifications.where("id < ?", id) : notifications
+    id.present? ? bike_notifications.where("id < ?", id) : bike_notifications
   end
 
   def potential_initial_record
@@ -126,11 +140,15 @@ class ParkingNotification < ActiveRecord::Base
 
   def notification_number; repeat_number + 1 end
 
-  def mark_retrieved!(r_user_id, r_kind, r_at = nil)
+  # Doesn't require a user because email recovery doesn't require a user
+  def mark_retrieved!(retrieved_kind:, retrieved_by_id: nil, resolved_at: nil)
     return self if retrieved?
-    update_attributes!(retrieved_by_id: r_user_id,
-                       retrieval_kind: r_kind,
-                       retrieved_at: r_at || Time.current)
+    # Doesn't seem like binding.local_variable_get does anything here, but I still think it's a good practice
+    resolved_at = binding.local_variable_get(:resolved_at) || Time.current
+    # Assign here because of calculated_state
+    self.retrieved_kind = binding.local_variable_get(:retrieved_kind)
+    update_attributes!(retrieved_by_id: binding.local_variable_get(:retrieved_by_id),
+                       resolved_at: resolved_at)
     process_notification
     self
   end
@@ -193,7 +211,6 @@ class ParkingNotification < ActiveRecord::Base
 
   def process_notification
     # Update the bike immediately, inline
-    bike&.set_location_info
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
   end
@@ -202,7 +219,7 @@ class ParkingNotification < ActiveRecord::Base
   def retrieve_or_repeat_notification!(new_attrs)
     new_attrs = new_attrs.with_indifferent_access
     if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
-      mark_retrieved!(new_attrs[:user_id], "organization_recovery")
+      mark_retrieved!(retrieved_by_id: new_attrs[:user_id], retrieved_kind: "organization_recovery")
     else
       return self unless active?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
@@ -221,7 +238,9 @@ class ParkingNotification < ActiveRecord::Base
 
   def calculated_status
     return "impounded" if impound_notification? || impound_record_id.present?
-    return "retrieved" if retrieved_at.present? || associated_notifications.retrieved.any?
+    if resolved_at.present?
+      return associated_retrieved_notification.present? ? "retrieved" : "resolved_otherwise"
+    end
     associated_notifications.where("id > ?", id).any? ? "superseded" : "current"
   end
 end

@@ -7,7 +7,7 @@
     .row
       = render partial: "bikes/edit_primary_menu"
 
-      - unless (@bike.stolen? and @bike.find_current_stolen_record.present?)
+      - unless (@bike.stolen? and @bike.fetch_current_stolen_record.present?)
         .col-md-8.form-well#form_well_wrap
           .form-wrap
             .form-well-form-header

@@ -12,8 +12,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
              :notification_number,
              :impound_record_id,
              :unregistered_bike,
-             :retrieved_at,
-             :impound_record_at
+             :resolved_at
 
   def created_at
     object.created_at.to_i
@@ -35,12 +34,8 @@ class ParkingNotificationSerializer < ApplicationSerializer
     object.longitude
   end
 
-  def retrieved_at
-    object.retrieved_at&.to_i
-  end
-
-  def impound_record_at
-    object.impound_record&.created_at&.to_i
+  def resolved_at
+    object.resolved_at&.to_i
   end
 
   def bike

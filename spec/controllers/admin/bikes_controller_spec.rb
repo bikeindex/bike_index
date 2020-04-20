@@ -68,7 +68,7 @@ RSpec.describe Admin::BikesController, type: :controller do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         bike = FactoryBot.create(:stolen_bike)
-        stolen_record = bike.find_current_stolen_record
+        stolen_record = bike.fetch_current_stolen_record
         expect(stolen_record).to be_present
         expect(stolen_record.is_a?(StolenRecord)).to be_truthy
         bike_attributes = {
@@ -87,7 +87,7 @@ RSpec.describe Admin::BikesController, type: :controller do
         expect(response).to redirect_to(:edit_admin_bike)
         bike.reload
         expect(bike.serial_number).to eq bike_attributes[:serial_number]
-        expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+        expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
         stolen_record.reload
         expect(stolen_record.street).to eq "Cortland and Ashland"
         expect(stolen_record.city).to eq "Chicago"

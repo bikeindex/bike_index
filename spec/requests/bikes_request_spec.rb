@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe BikesController, type: :request do
   let(:base_url) { "/bikes" }
+  let(:ownership) { FactoryBot.create(:ownership) }
+  let(:current_user) { ownership.creator }
+  let(:bike) { ownership.bike }
 
   describe "show" do
-    let(:ownership) { FactoryBot.create(:ownership) }
-    let(:current_user) { ownership.creator }
-    let(:bike) { ownership.bike }
     before { log_in(current_user) if current_user.present? }
     context "example bike" do
       it "shows the bike" do
@@ -62,7 +62,6 @@ RSpec.describe BikesController, type: :request do
                             can_edit_claimed: can_edit_claimed,
                             user: FactoryBot.create(:user))
         end
-        let(:bike) { ownership.bike }
         let(:organization) { FactoryBot.create(:organization) }
         let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
         it "404s" do
@@ -131,8 +130,8 @@ RSpec.describe BikesController, type: :request do
         expect(bike.current_parking_notification).to be_blank
         expect(parking_notification.current?).to be_falsey
         expect(parking_notification.retrieved_by).to eq current_user
-        expect(parking_notification.retrieved_at).to be_within(5).of Time.current
-        expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
+        expect(parking_notification.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
       end
       context "user not present" do
         let(:current_user) { nil }
@@ -152,8 +151,8 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved?).to be_truthy
           expect(parking_notification.retrieved_by).to be_blank
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
+          expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
         end
       end
       context "with direct_link" do
@@ -171,8 +170,8 @@ RSpec.describe BikesController, type: :request do
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved_by).to eq current_user
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieval_kind).to eq "user_recovery"
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
+          expect(parking_notification.retrieved_kind).to eq "user_recovery"
         end
       end
       context "not notification token" do
@@ -193,7 +192,7 @@ RSpec.describe BikesController, type: :request do
       context "already retrieved" do
         let(:retrieval_time) { Time.current - 2.minutes }
         it "has a flash saying so" do
-          parking_notification.mark_retrieved!(nil, "link_token_recovery", retrieval_time)
+          parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieval_link_token).to be_present
@@ -205,7 +204,7 @@ RSpec.describe BikesController, type: :request do
           expect(flash[:info]).to match(/retrieved/)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.retrieved_at).to be_within(1).of retrieval_time
+          expect(parking_notification.resolved_at).to be_within(1).of retrieval_time
         end
       end
       context "abandoned as well" do
@@ -230,8 +229,8 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.retrieved?).to be_truthy
           expect(parking_notification.retrieved_by).to eq current_user
-          expect(parking_notification.retrieved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieval_kind).to eq "link_token_recovery"
+          expect(parking_notification.resolved_at).to be_within(5).of Time.current
+          expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
 
           expect(parking_notification_abandoned.retrieved?).to be_truthy
           expect(parking_notification_abandoned.retrieved_by).to be_blank
@@ -257,6 +256,79 @@ RSpec.describe BikesController, type: :request do
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.retrieved?).to be_falsey
           expect(parking_notification.retrieved?).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "update" do
+    before { log_in(current_user) if current_user.present? }
+    context "setting address for bike" do
+      let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
+      let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }
+      let(:update_attributes) { { street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "" } }
+      include_context :geocoder_real # But it shouldn't make any actual calls!
+      it "sets the address for the bike" do
+        expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+        bike.update_attributes(updated_at: Time.current)
+        bike.reload
+        expect(bike.address_set_manually).to be_falsey
+        expect(bike.owner).to eq current_user
+        expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+        expect(current_user.authorized?(bike)).to be_truthy
+        VCR.use_cassette("bike_request-set_manual_address") do
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: { bike: update_attributes }
+          end
+        end
+        bike.reload
+        expect(bike.street).to eq "10544 82 Ave NW"
+        expect(bike.country).to eq Country.canada
+        expect(bike.to_coordinates).to eq([53.5183351, -113.5015663])
+        expect(bike.address_set_manually).to be_truthy
+      end
+    end
+    context "mark bike stolen, the way it's done in the app" do
+      include_context :geocoder_real # But it shouldn't make any actual calls!
+      it "marks bike stolen and doesn't set a location in Kansas!" do
+        expect(current_user.authorized?(bike)).to be_truthy
+        expect(bike.stolen?).to be_falsey
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+          expect(flash[:success]).to be_present
+        end
+        bike.reload
+        expect(bike.stolen?).to be_truthy
+        expect(bike.to_coordinates.compact).to eq([])
+
+        stolen_record = bike.current_stolen_record
+        expect(stolen_record).to be_present
+        expect(stolen_record.to_coordinates.compact).to eq([])
+        expect(stolen_record.date_stolen).to be_within(5).of Time.current
+      end
+      context "bike has location" do
+        let(:location_attrs) { { country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true } }
+        it "marks the bike stolen, doesn't set a location, blanks bike location" do
+          bike.update_attributes(location_attrs)
+          bike.reload
+          expect(bike.address_set_manually).to be_truthy
+          expect(bike.stolen?).to be_falsey
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+            expect(flash[:success]).to be_present
+          end
+          bike.reload
+          expect(bike.stolen?).to be_truthy
+          expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.address_hash).to eq({ country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil }.as_json)
+
+          stolen_record = bike.current_stolen_record
+          expect(stolen_record).to be_present
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.current
         end
       end
     end

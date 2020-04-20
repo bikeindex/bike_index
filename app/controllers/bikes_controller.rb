@@ -366,8 +366,8 @@ class BikesController < ApplicationController
       if matching_notification.active?
         flash[:success] = "#{@bike.type.titleize} marked retrieved!"
         # Quick hack to skip making another endpoint
-        retrieval_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
-        matching_notification.mark_retrieved!(current_user&.id, retrieval_kind)
+        retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
+        matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
       elsif matching_notification.impounded?
         flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
       elsif matching_notification.retrieved?

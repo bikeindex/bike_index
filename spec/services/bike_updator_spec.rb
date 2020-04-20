@@ -34,7 +34,8 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: { id: bike.id, bike: { date_stolen: 963205199 } }.as_json)
       updator.update_stolen_record
-      csr = bike.find_current_stolen_record
+      bike.reload
+      csr = bike.fetch_current_stolen_record
       expect(csr.date_stolen.to_i).to be_within(1).of 963205199
     end
     it "creates a stolen record if one doesn't exist" do
@@ -106,7 +107,7 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike, creation_organization_id: organization.id, example: true)
       ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryBot.create(:user)
+      FactoryBot.create(:user)
       expect(bike.user_hidden).to be_falsey
       bike_params = { marked_user_hidden: true }
       BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json).update_available_attributes
@@ -118,7 +119,7 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike, stolen: true)
       ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryBot.create(:user)
+      FactoryBot.create(:user)
       bike_params = { stolen: false }
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json)
       expect(update_bike).to receive(:update_ownership).and_return(true)
@@ -130,7 +131,7 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike, year: 2014)
       ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryBot.create(:user)
+      FactoryBot.create(:user)
       bike_params = { coaster_brake: true, year: nil, components_attributes: { "1387762503379" => { "ctype_id" => "", "front" => "0", "rear" => "0", "ctype_other" => "", "description" => "", "manufacturer_id" => "", "model_name" => "", "manufacturer_other" => "", "year" => "", "serial_number" => "", "_destroy" => "0" } } }
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json)
       expect(update_bike).to receive(:update_ownership).and_return(true)
@@ -140,14 +141,16 @@ RSpec.describe BikeUpdator do
       expect(bike.components.count).to eq(0)
     end
 
-    it "updates the bike sets is_for_sale to false" do
-      bike = FactoryBot.create(:bike, is_for_sale: true)
+    it "updates the bike sets is_for_sale and address_set_manually to false" do
+      bike = FactoryBot.create(:bike, is_for_sale: true, address_set_manually: true)
       ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryBot.create(:user)
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: { owner_email: new_creator.email } }.as_json)
       update_bike.update_available_attributes
-      expect(bike.reload.is_for_sale).to be_falsey
+      bike.reload
+      expect(bike.is_for_sale).to be_falsey
+      expect(bike.address_set_manually).to be_falsey
     end
   end
 

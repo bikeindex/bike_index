@@ -393,7 +393,8 @@ CREATE TABLE public.bikes (
     longitude double precision,
     status integer DEFAULT 0,
     street character varying,
-    state_id bigint
+    state_id bigint,
+    address_set_manually boolean DEFAULT false
 );
 
 
@@ -1883,8 +1884,8 @@ CREATE TABLE public.parking_notifications (
     delivery_status character varying,
     unregistered_bike boolean DEFAULT false,
     status integer DEFAULT 0,
-    retrieved_at timestamp without time zone,
-    retrieval_kind integer,
+    resolved_at timestamp without time zone,
+    retrieved_kind integer,
     retrieval_link_token text,
     retrieved_by_id bigint
 );
@@ -1895,7 +1896,6 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4658,6 +4658,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200410043813'),
 ('20200410183949'),
 ('20200414055430'),
-('20200414055431');
+('20200414055431'),
+('20200415161915'),
+('20200416202219'),
+('20200420181614');
 
 

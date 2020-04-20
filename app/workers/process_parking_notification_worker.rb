@@ -4,7 +4,6 @@ class ProcessParkingNotificationWorker < ApplicationWorker
   def perform(parking_notification_id)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
-
     if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
       impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
                                              user_id: parking_notification.user_id,
@@ -15,8 +14,15 @@ class ProcessParkingNotificationWorker < ApplicationWorker
     # Update all of them!
     parking_notification.associated_notifications.each do |pn|
       pn.impound_record_id = impound_record.id if impound_record.present?
-      pn.retrieved_at = parking_notification.retrieved_at if parking_notification.retrieved_at.present?
+      pn.resolved_at = parking_notification.resolved_at if parking_notification.resolved_at.present?
       pn.update_attributes(updated_at: Time.current)
+    end
+
+    # If there are any records from the same period and should be resolved, resolve them
+    if parking_notification.resolved?
+      parking_notification.notifications_from_period.active.each do |notification|
+        notification.update_attributes(resolved_at: parking_notification.resolved_at)
+      end
     end
 
     return true unless parking_notification.send_email? && parking_notification.delivery_status.blank?

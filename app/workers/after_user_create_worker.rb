@@ -80,7 +80,7 @@ class AfterUserCreateWorker < ApplicationWorker
     end
     # Only do address import if the user doesn't have an address present
     unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
-      address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
+      address = user_bikes_for_attrs(user.id).map { |b| b.address_hash }.reject(&:blank?).last
       user.attributes = address.merge(skip_geocoding: true) if address.present?
     end
     user.save if user.changed?

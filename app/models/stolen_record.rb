@@ -272,14 +272,6 @@ class StolenRecord < ApplicationRecord
     recovery_link_token
   end
 
-  # The stolen bike's general location (city and state, or country if non-US)
-  # Rendered on promoted alert images.
-  # Prefers the stolen record's address location, falls back to the bike's
-  # registration location, returns nil if neither yields an adequate location.
-  def bike_location
-    address_location.presence || bike.registration_location.presence
-  end
-
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
     bike&.public_images&.order(:id)&.first
@@ -317,7 +309,12 @@ class StolenRecord < ApplicationRecord
   end
 
   def update_associations
-    bike&.user&.update_attributes(updated_at: Time.current)
+    return true unless bike.present?
+    # Bump bike only if it looks like this is bike's current_stolen_record
+    if current
+      bike.update_attributes(current_stolen_record: self, manual_csr: true)
+    end
+    bike.user&.update_attributes(updated_at: Time.current)
   end
 
   def notify_of_promoted_alert_recovery

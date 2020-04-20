@@ -1,0 +1,124 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=278%20Broadway,%20Edmonton,%20AB%20T6E%202A4,%20CA&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Mon, 20 Apr 2020 19:37:06 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Edmonton
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=456
+        Alt-Svc:
+          - h3-27=":443"; ma=2592000,h3-25=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q048=":443";
+            ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443";
+            ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "T6E 2A4",
+                         "short_name" : "T6E 2A4",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "South Central Edmonton",
+                         "short_name" : "South Central Edmonton",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Edmonton",
+                         "short_name" : "Edmonton",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Division No. 11",
+                         "short_name" : "Division No. 11",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Alberta",
+                         "short_name" : "AB",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "Canada",
+                         "short_name" : "CA",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Edmonton, AB T6E 2A4, Canada",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 53.5186566,
+                            "lng" : -113.500418
+                         },
+                         "southwest" : {
+                            "lat" : 53.518095,
+                            "lng" : -113.5034652
+                         }
+                      },
+                      "location" : {
+                         "lat" : 53.51833509999999,
+                         "lng" : -113.5015663
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 53.5197247802915,
+                            "lng" : -113.500418
+                         },
+                         "southwest" : {
+                            "lat" : 53.5170268197085,
+                            "lng" : -113.5034652
+                         }
+                      }
+                   },
+                   "partial_match" : true,
+                   "place_id" : "ChIJGUbTSwUioFMRa4Fh5zf_TvQ",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Mon, 20 Apr 2020 19:37:07 GMT
+recorded_with: VCR 5.0.0

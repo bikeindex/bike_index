@@ -6,7 +6,7 @@ RSpec.describe TwitterAccount, type: :model do
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
       twitter_account = FactoryBot.build(:twitter_account, :in_nyc)
-      twitter_account.geocode
+      twitter_account.bike_index_geocode
       expect(twitter_account.latitude).to eq(40.7143528)
       expect(twitter_account.longitude).to eq(-74.0059731)
       expect(twitter_account.city).to eq("New York")
@@ -26,7 +26,7 @@ RSpec.describe TwitterAccount, type: :model do
       expect(twitter_account).to be_should_be_reverse_geocoded
 
       expect(twitter_account).to receive(:fetch_account_info)
-      expect(twitter_account).to receive(:geocode).once
+      expect(twitter_account).to receive(:bike_index_geocode).once
       expect(twitter_account).to receive(:reverse_geocode).once
 
       twitter_account.save

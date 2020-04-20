@@ -6,11 +6,13 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   describe "perform" do
-    let(:initial) { FactoryBot.create(:parking_notification_organized, updated_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
+    let(:initial) { FactoryBot.create(:parking_notification_organized, created_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
     let(:bike) { initial.bike }
     let(:user) { initial.user }
     let(:organization) { initial.organization }
-    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, updated_at: Time.current - 2.days, kind: "appears_abandoned_notification", initial_record: initial, delivery_status: "email_success") }
+    let(:initial_record_id) { initial.id }
+    let(:kind2) { "appears_abandoned_notification" }
+    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: Time.current - 2.days, kind: kind2, initial_record_id: initial_record_id, delivery_status: "email_success") }
     context "impound record" do
       let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
       it "updates the other parking_notifications, creates the impound record" do
@@ -75,20 +77,72 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(initial.associated_retrieved_notification).to be_nil
         Sidekiq::Worker.clear_all
         expect do
-          initial.mark_retrieved!(user.id, "link_token_recovery")
+          initial.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "link_token_recovery")
         end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
         ProcessParkingNotificationWorker.drain
         initial.reload
         parking_notification2.reload
 
         expect(initial.status).to eq "retrieved"
-        expect(initial.retrieved_at).to be_within(10).of Time.current
+        expect(initial.resolved_at).to be_within(10).of Time.current
         expect(initial.retrieved_by).to eq user
         expect(initial.associated_retrieved_notification).to eq initial
 
         expect(parking_notification2.status).to eq "retrieved"
-        expect(parking_notification2.retrieved_at).to be_within(1).of initial.retrieved_at
+        expect(parking_notification2.resolved_at).to be_within(1).of initial.resolved_at
         expect(parking_notification2.associated_retrieved_notification).to eq initial
+      end
+    end
+
+    context "other active notification for bike, from organization" do
+      let(:initial_record_id) { nil }
+      let(:parking_notification3) { FactoryBot.create(:parking_notification, bike: bike) }
+      it "does nothing to the other notification, closes all on retrieval" do
+        initial.reload
+        parking_notification2.reload
+        expect(initial.associated_notifications).to eq([])
+        expect(parking_notification2.associated_notifications).to eq([])
+        expect(parking_notification3.associated_notifications).to eq([])
+        expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
+        instance.perform(parking_notification2.id)
+        initial.reload
+        parking_notification2.reload
+        parking_notification3.reload
+        expect(initial.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification3.current?).to be_truthy
+        expect(parking_notification2.superseded?).to be_falsey
+        expect(parking_notification2.current?).to be_truthy
+        expect(initial.current?).to be_truthy
+        expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          parking_notification2.mark_retrieved!(retrieved_kind: "link_token_recovery", resolved_at: Time.current - 5.minutes)
+        end
+        initial.reload
+        parking_notification2.reload
+        parking_notification3.reload
+        expect(initial.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification3.current?).to be_truthy
+
+        expect(parking_notification2.associated_retrieved_notification).to eq parking_notification2
+        expect(parking_notification2.retrieved?).to be_truthy
+        expect(parking_notification2.current?).to be_falsey
+
+        expect(initial.current?).to be_falsey
+        expect(initial.associated_retrieved_notification).to be_blank
+        expect(initial.resolved_otherwise?).to be_truthy
+        expect(initial.resolved_at).to be_within(5).of parking_notification2.resolved_at
+
+        # Test the notifications_from_period here
+        new_parking_notification = FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, kind: kind2)
+        expect(new_parking_notification.notifications_from_period.pluck(:id)).to eq([new_parking_notification.id])
+
+        parking_notification2.reload
+        expect(parking_notification2.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
       end
     end
   end
