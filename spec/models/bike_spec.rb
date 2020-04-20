@@ -1030,6 +1030,9 @@ RSpec.describe Bike, type: :model do
         b_param.reload
         # Just check that we stored it, since lazily not testing this anywhere else
         expect(b_param.params["formatted_address"]).to eq target.as_json
+        # FIX THIS IN THIS PR:
+        # expect(bike.address_hash).to eq target
+        # expect(bike.to_coordinates).to eq([target[:latitude], target[:longitude]])
       end
       context "legacy address (street -> address)" do
         let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
@@ -1536,7 +1539,7 @@ RSpec.describe Bike, type: :model do
           expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
           expect(stolen_record.should_be_geocoded?).to be_falsey
 
-          expect(bike.address_hash).to eq({ country: "US", state: "IL" }.as_json)
+          expect(bike.address_hash).to eq({ country: "US", state: "IL", street: nil, city: nil, zipcode: nil, latitude: nil, longitude: nil }.as_json)
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.should_be_geocoded?).to be_falsey
         end

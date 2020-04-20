@@ -448,7 +448,6 @@ class Bike < ApplicationRecord
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
-    # self.current_stolen_record ||= stolen_records.last
   end
 
   def title_string
@@ -650,17 +649,22 @@ class Bike < ApplicationRecord
   # Select the source from which to derive location data, in the following order
   # of precedence:
   #
-  # 1. The current parking notification, if one is present
-  # 2. The creation organization, if one is present
-  # 3. The bike owner's address, if available
-  # 4. The request's IP address, if given
-  def find_location_info(geolocation = nil)
-    [
+  # 1. The current stolen record - even if it has a blank location
+  #    Used it for searching and displaying stolen bikes, we don't want other information leaking
+  # 2. The current parking notification, if one is present
+  # 3. The creation organization, if one is present
+  # 4. The bike owner's address, if available
+  # 5. The request's IP address, if given
+  # 6. The registration address
+  def location_record(geolocation = nil)
+    return current_stolen_record if current_stolen_record.present?
+    location_record = [
       current_parking_notification,
       creation_organization,
       owner,
-      geolocation,
+      # geolocation,
     ].compact.find { |rec| rec.latitude.present? }
+    # location_record.present? ? location_record.address_hash : registration_address
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
@@ -671,12 +675,19 @@ class Bike < ApplicationRecord
   #
   # Note: Because this is set automatically, only allow users to edit location if no locations are present
   def set_location_info(request_location: nil)
-    # Always use current_stolen_record is set if available - even if it's blank
-    # Because we use it for searching stolen bikes, and we don't want other information leaking
-    location_record = current_stolen_record || find_location_info(request_location)
-    return if location_record.blank?
+
+    if current_stolen_record.present?
+      pp "STOLEN RECORD PRESENT!!!"
+      location_record_address_hash = current_stolen_record.address_hash
+    else
+      location_record = location_record_address_hash(request_location)
+      # location_record_address_hash = find_location_record_address_hash(request_location)
+      return true unless location_record_address_hash.present? # No address hash present so skip
+      # FIX THIS IN THIS PR:
+      location_record_address_hash = location_record.address_hash
+    end
     @location_set_by_association = true # set to skip geocoding
-    self.attributes = Geohelper.location_attrs_from_result(location_record)
+    self.attributes = location_record_address_hash
   end
 
   def organization_affiliation
@@ -798,4 +809,8 @@ class Bike < ApplicationRecord
     return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     "status_with_owner"
   end
+
+  private
+
+
 end

@@ -99,9 +99,11 @@ module Geocodeable
   def address_hash
     attributes.slice("street", "city", "zipcode", "latitude", "longitude")
               .merge(state: state&.abbreviation, country: country&.iso)
-              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
               .with_indifferent_access
   end
+
+  # Custom compact method to skip blanks
+  def address_hash_without_blanks; address_hash.to_a.reject { |k, v| v.blank? }.to_h.with_indifferent_access end
 
   # Override assignment to enable friendly finding state and country
   def state=(val)

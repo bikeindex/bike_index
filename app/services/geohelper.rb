@@ -57,35 +57,5 @@ class Geohelper
         country: country,
       }.with_indifferent_access
     end
-
-    # Extract location info from the given result object `result`,
-    # expected to be an ActiveRecord or Geocoder::Result object.
-    #
-    # Returns a Hash
-    def location_attrs_from_result(result)
-      return {} if result.blank?
-
-      location =
-        {
-          city: result.city,
-          latitude: result.latitude,
-          longitude: result.longitude,
-        }
-
-      if result.respond_to?(:country_code)
-        location.merge(
-          state_id: State.fuzzy_find(result.state_code)&.id,
-          country_id: Country.fuzzy_find(result.country_code)&.id,
-          zipcode: result.postal_code,
-        )
-      else
-        location.merge(
-          street: result.street,
-          state_id: result.state_id,
-          country_id: result.country_id,
-          zipcode: result.zipcode,
-        )
-      end
-    end
   end
 end

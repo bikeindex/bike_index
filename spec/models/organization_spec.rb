@@ -17,7 +17,7 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes in/not nearby organizations, nearby recoveries" do
     # TODO!!!! I See the issue here, I will fix this, but shipping first because I want to
-    xit "returns bikes associated with nearby organizations" do
+    it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
       chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true)

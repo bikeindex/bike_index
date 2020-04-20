@@ -88,7 +88,7 @@
               = f.text_field :extra_registration_number, class: 'form-control'
 
           -# Only show the bike location fields if they won't be set by #set_location_info
-          - unless @bike.current_stolen_record.present? || @bike.find_location_info.present?
+          - unless @bike.current_stolen_record.present? || @bike.location_record.present?
             .related-fields.no-divider-row
               .form-group.row.fancy-select-placeholder.unfancy
                 = f.label :country_id, class: 'form-well-label'
