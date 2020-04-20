@@ -169,7 +169,7 @@ class BParam < ApplicationRecord
     end
   end
 
-  def address_hash; %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h.compact end
+  def address_hash; %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
   def display_email?; true unless owner_email.present? && bike_errors.blank? end

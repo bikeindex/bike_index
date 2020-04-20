@@ -393,7 +393,8 @@ CREATE TABLE public.bikes (
     longitude double precision,
     status integer DEFAULT 0,
     street character varying,
-    state_id bigint
+    state_id bigint,
+    address_set_manually boolean DEFAULT false
 );
 
 
@@ -4659,6 +4660,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200414055430'),
 ('20200414055431'),
 ('20200415161915'),
-('20200416202219');
+('20200416202219'),
+('20200420181614');
 
 

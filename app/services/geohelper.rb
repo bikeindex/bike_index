@@ -20,8 +20,8 @@ class Geohelper
       elsif geometry && geometry["bounds"].present?
         # Google returns a box that represents the area, return just one coordinate group from that box
         location = geometry["bounds"]["northeast"]
-      elsif result.first&.data["latitude"] # This is probably a test geocoder response...
-        location = { "lat" => result.first&.data["latitude"], "lng" => result.first&.data["longitude"] }
+      elsif result.first&.data&.dig("latitude") # This is probably a test geocoder response...
+        location = { "lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"] }
       end
       return nil unless location
       { latitude: location["lat"], longitude: location["lng"] }
@@ -39,11 +39,11 @@ class Geohelper
       result = Geocoder.search(formatted_address(addy))
       return nil unless result&.first&.formatted_address.present?
       coordinates = coordinates_for(addy, result: result)
-      address_hash_from_geocoder_result(result&.first&.formatted_address)
+      address_hash_from_geocoder_string(result&.first&.formatted_address)
         .merge(coordinates.present? ? coordinates : {})
     end
 
-    def address_hash_from_geocoder_result(addy)
+    def address_hash_from_geocoder_string(addy)
       address_array = addy.split(",").map(&:strip)
       country = address_array.pop # Don't care about this rn
       code_and_state = address_array.pop
@@ -54,38 +54,20 @@ class Geohelper
         city: city,
         state: state,
         zipcode: code,
-        country: country,
+        country: country&.gsub("USA", "US"),
       }.with_indifferent_access
     end
 
-    # Extract location info from the given result object `result`,
-    # expected to be an ActiveRecord or Geocoder::Result object.
-    #
-    # Returns a Hash
-    def location_attrs_from_result(result)
+    def address_hash_from_geocoder_result(result)
       return {} if result.blank?
-
-      location =
-        {
-          city: result.city,
-          latitude: result.latitude,
-          longitude: result.longitude,
-        }
-
-      if result.respond_to?(:country_code)
-        location.merge(
-          state_id: State.fuzzy_find(result.state_code)&.id,
-          country_id: Country.fuzzy_find(result.country_code)&.id,
-          zipcode: result.postal_code,
-        )
-      else
-        location.merge(
-          street: result.street,
-          state_id: result.state_id,
-          country_id: result.country_id,
-          zipcode: result.zipcode,
-        )
-      end
+      {
+        city: result.city,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        state_id: State.fuzzy_find(result.state_code)&.id,
+        country_id: Country.fuzzy_find(result.country_code)&.id,
+        zipcode: result.postal_code,
+      }
     end
   end
 end

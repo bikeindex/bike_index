@@ -46,7 +46,7 @@ class AlertImageGenerator
     end
 
     # Compose with caption image if a location is available
-    if bike_location.present?
+    if stolen_record_location.present?
       caption_image = MiniMagick::Image.open(LANDSCAPE_CAPTION).tap do |caption|
         caption.combine_options do |i|
           i.font caption_font
@@ -55,7 +55,7 @@ class AlertImageGenerator
           i.gravity "Center"
           i.pointsize 50
           i.size "#{caption.height}x#{caption.width}"
-          i.draw "text 0,0 '#{bike_location}'"
+          i.draw "text 0,0 '#{stolen_record_location}'"
         end
       end
 
@@ -106,22 +106,24 @@ class AlertImageGenerator
       end
 
       # Overlay bike location on RHS of top border
-      if bike_location.present?
+      if stolen_record_location.present?
         alert.gravity "Northeast"
         alert.pointsize 110
         alert.size "x#{header_height}"
-        alert.draw "text 30,30 '#{bike_location}'"
+        alert.draw "text 30,30 '#{stolen_record_location}'"
       end
     end
 
     alert_image
   end
 
-  # The bike location to be displayed on the promoted alert image
+  # The stolen location to be displayed on the promoted alert image
   # Escape single-quotes: location is passed to Imagemagick CLI inside
   # single-quotes
-  def bike_location
-    stolen_record.bike_location&.gsub("'", "\\'")
+  def stolen_record_location
+    return nil unless stolen_record.to_coordinates.any?
+    Geocodeable.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
+      .gsub("'", "\\'")
   end
 
   # The bike url to be displayed on the promoted alert image
