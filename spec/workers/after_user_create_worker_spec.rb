@@ -99,7 +99,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
-    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
+    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
     let!(:country) { Country.united_states }
     let!(:b_param) do
       FactoryBot.create(:b_param,
@@ -114,16 +114,16 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
+        bike.reload
+        bike.update_attributes(updated_at: Time.current)
+        expect(bike.send("location_record_address_hash")).to eq target_address_hash.as_json
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
-        ownership.reload
         user.reload
-        bike.reload
-        expect(b_param.fetch_formatted_address).to eq target_address_hash.as_json
 
         expect(user.phone).to eq "1112223333"
-        expect(user.address_hash).to eq target_address_hash.as_json
-        expect([user.to_coordinates]).to eq([37.8016649, -122.397348])
+        expect(user.address_hash).to eq target_address_hash.merge(country: "US").as_json
+        expect(user.to_coordinates).to eq([37.8016649, -122.397348])
       end
     end
     context "existing attributes" do
