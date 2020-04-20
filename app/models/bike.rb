@@ -651,8 +651,6 @@ class Bike < ApplicationRecord
   # Geolocate based on the full current stolen record address, if available.
   # Otherwise, use the data set by set_location_info.
   # Sets lat/long, will avoid a geocode API call if coordinates are found
-  #
-  # Note: Because this is set automatically, only allow users to edit location if no locations are present
   def set_location_info
     if current_stolen_record.present?
       # If there is a current stolen - even if it has a blank location - use it
@@ -797,9 +795,8 @@ class Bike < ApplicationRecord
   # 1. The current parking notification, if one is present
   # 2. The creation organization, if one is present
   # 3. The bike owner's address, if available
-  # 4. The registration address
   def location_record_address_hash
-    location_record = [
+    [
       current_parking_notification,
       creation_organization,
       owner,
