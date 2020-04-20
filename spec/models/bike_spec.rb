@@ -1023,21 +1023,27 @@ RSpec.describe Bike, type: :model do
       let(:target) { { street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "USA", latitude: 41.933238, longitude: -87.71476299999999 } }
       include_context :geocoder_real
       it "returns the fetched address" do
+        FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)
+        bike.reload
+        b_param.reload
         expect(bike.b_params.pluck(:id)).to eq([b_param.id])
         bike.reload
         VCR.use_cassette("bike-fetch_formatted_address") do
           expect(bike.registration_address).to eq target.as_json
+          bike.update_attributes(updated_at: Time.current) # To bump address
+
+          bike.reload
+          b_param.reload
+          # Just check that we stored it, since lazily not testing this anywhere else
+          expect(b_param.params["formatted_address"]).to eq target.as_json
+          expect(bike.registration_address).to eq target.as_json
+          expect(bike.address_hash).to eq target.merge(country: "US", longitude: -87.714763).as_json
         end
-        b_param.reload
-        # Just check that we stored it, since lazily not testing this anywhere else
-        expect(b_param.params["formatted_address"]).to eq target.as_json
-        # FIX THIS IN THIS PR:
-        # expect(bike.address_hash).to eq target
-        # expect(bike.to_coordinates).to eq([target[:latitude], target[:longitude]])
       end
       context "legacy address (street -> address)" do
         let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
         it "returns the fetched address" do
+          bike.reload
           expect(bike.b_params.pluck(:id)).to eq([b_param.id])
           bike.reload
           VCR.use_cassette("bike-fetch_formatted_address") do
@@ -1052,8 +1058,8 @@ RSpec.describe Bike, type: :model do
         let!(:b_param_params) { { formatted_address: target, bike: { address: "2864 Milwaukee Ave" } } }
         let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "" } }) }
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
-          expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           bike.reload
+          expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           expect(bike.registration_address).to eq target.as_json
         end
       end
@@ -1458,32 +1464,6 @@ RSpec.describe Bike, type: :model do
       it "returns the alert_image url" do
         bike = FactoryBot.create(:stolen_bike, :with_image)
         expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
-      end
-    end
-  end
-
-  describe "#registration_location" do
-    context "given a registration address with no state" do
-      it "returns an empty string" do
-        bike = FactoryBot.create(:bike)
-        allow(bike).to receive(:registration_address).and_return({ "city": "New Paltz" })
-        expect(bike.registration_location).to eq("")
-      end
-    end
-
-    context "given a registration address only a state" do
-      it "returns the state" do
-        bike = FactoryBot.create(:bike)
-        allow(bike).to receive(:registration_address).and_return({ "state": "ny" })
-        expect(bike.registration_location).to eq("NY")
-      end
-    end
-
-    context "given a registration address with a city and state" do
-      it "returns the city and state" do
-        bike = FactoryBot.create(:bike)
-        allow(bike).to receive(:registration_address).and_return({ "state": "ny", city: "New York" })
-        expect(bike.registration_location).to eq("New York, NY")
       end
     end
   end

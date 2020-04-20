@@ -633,17 +633,8 @@ class Bike < ApplicationRecord
     if user&.address_hash&.present?
       @registration_address = user&.address_hash
     else
-      @registration_address = b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+      @registration_address = b_params_address || {}
     end
-  end
-
-  def registration_location
-    reg_location = registration_address.with_indifferent_access
-    reg_city = reg_location[:city]&.titleize
-    reg_state = reg_location[:state]&.upcase
-    return "" if reg_state.blank?
-
-    [reg_city, reg_state].reject(&:blank?).join(", ")
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
@@ -795,11 +786,22 @@ class Bike < ApplicationRecord
   # 1. The current parking notification, if one is present
   # 2. The creation organization, if one is present
   # 3. The bike owner's address, if available
+  # 4. registration_address from b_param if available
   def location_record_address_hash
-    [
+    location_record = [
       current_parking_notification,
-      creation_organization,
+      creation_organization&.default_location,
       owner,
-    ].compact.find { |rec| rec.latitude.present? }&.address_hash
+    ].compact.find { |rec| rec.latitude.present? }
+    location_record.present? ? location_record.address_hash : b_params_address
+  end
+
+  def b_params_address
+    bp_address = {}
+    b_params.each do |b_param|
+      bp_address = b_param.fetch_formatted_address
+      break if bp_address.present?
+    end
+    bp_address
   end
 end

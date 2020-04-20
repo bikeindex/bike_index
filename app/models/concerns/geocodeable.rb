@@ -101,9 +101,6 @@ module Geocodeable
               .with_indifferent_access
   end
 
-  # Custom compact method to skip blanks
-  def address_hash_without_blanks; address_hash.to_a.reject { |k, v| v.blank? }.to_h.with_indifferent_access end
-
   # Override assignment to enable friendly finding state and country
   def state=(val)
     return super unless val.is_a?(String)

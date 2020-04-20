@@ -85,7 +85,6 @@ class Organization < ApplicationRecord
     :state_id,
     :street,
     :zipcode,
-    :address_hash,
     to: :default_location,
     allow_nil: true
 

@@ -976,7 +976,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(flash[:success]).to be_present
                 bike = Bike.last
                 b_param.reload
-                expect(b_param.address_hash.except(:country)).to eq target_address.as_json
+                expect(b_param.address_hash.except("country")).to eq target_address.as_json
                 expect(b_param.created_bike_id).to eq bike.id
                 bike_params.delete(:manufacturer_id)
                 bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
