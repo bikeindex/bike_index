@@ -37,7 +37,7 @@
           - if current_organization.enabled?("show_partial_registrations")
             = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
           - elsif !current_organization.bike_shop?
-            %span.disabled-menu-item.menu-item
+            %span.disabled-menu-item.menu-item.secondary-item
               = t(".incomplete_registrations")
         - if current_organization.show_multi_serial?
           %li
