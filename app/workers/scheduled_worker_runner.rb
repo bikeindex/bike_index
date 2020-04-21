@@ -34,7 +34,7 @@ class ScheduledWorkerRunner < ScheduledWorker
 
   def self.scheduled_workers
     [
-      UpdateExpiredInvoiceWorker,
+      UpdateInvoiceWorker,
       UpdateCountsWorker,
       UpdateOrganizationPosKindWorker,
       FileCacheMaintenanceWorker,
