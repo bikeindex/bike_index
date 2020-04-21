@@ -78,10 +78,10 @@
                        owner_name_cell]
   default_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   default_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
-  default_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
   enabled_columns = default_columns
-  # If extra_registration_number hasn't already been enabled, add it as an optional column
+  # Some optional columns
   enabled_columns += ["extra_registration_number_cell"] unless enabled_columns.include?("extra_registration_number_cell")
+  enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
 
 -# If the search_stickers param is set, start with the settings panel open
 .collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => default_columns.to_json, class: (params[:search_stickers].present? ? "in" : "") }
@@ -136,7 +136,7 @@
         %th.hiddenColumn.hidden-xs-down{ class: "extra_registration_number_cell" }
           Secondary#
         - if current_organization.enabled?("bike_stickers")
-          %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
+          %th.hiddenColumn.hidden-xs-down.sticker_cell
             = t(".sticker")
             - if @bike_sticker.present?
               %th
@@ -149,13 +149,12 @@
                   - if @search_stickers == "none"
                     = t(".only_not")
 
-
         / I don't know how to do this in a performant way :/
         / - if current_organization.enabled?("avery_export")
         /   %th{ class: "avery_export_cell" }
         /     Export
-        - if @impoundedness == "only_impounded"
-          %th.impounded_cell=t(".impounded")
+        - if current_organization.enabled?("impound_bikes")
+          %th.hiddenColumn.hidden-xs-down.impounded_cell=t(".impounded")
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -223,10 +222,11 @@
                         = bike_sticker.code
                     - if index > 0
                       %br
-          - if @impoundedness == "only_impounded"
-            %td.impounded_cell
-              %small.convertTime
-                = l bike.current_impound_record.created_at, format: :convert_time
+          - if current_organization.enabled?("impound_bikes")
+            %td.hiddenColumn.hidden-xs-down{ class: "impounded_cell" }
+              - if bike.status_impounded? && bike.current_impound_record&.created_at&.present?
+                %small.convertTime
+                  = l bike.current_impound_record.created_at, format: :convert_time
 
 .paginate-container.paginate-container-bottom
   = paginate @bikes
