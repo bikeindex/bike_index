@@ -1610,47 +1610,6 @@ ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applicatio
 
 
 --
--- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.organization_messages (
-    id integer NOT NULL,
-    kind integer DEFAULT 0,
-    organization_id integer,
-    sender_id integer,
-    bike_id integer,
-    email character varying,
-    body text,
-    delivery_status character varying,
-    address character varying,
-    latitude double precision,
-    longitude double precision,
-    accuracy double precision,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: organization_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.organization_messages_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.organization_messages_id_seq OWNED BY public.organization_messages.id;
-
-
---
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2809,13 +2768,6 @@ ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_messages_id_seq'::regclass);
-
-
---
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3289,14 +3241,6 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 ALTER TABLE ONLY public.oauth_applications
     ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
-
-
---
--- Name: organization_messages organization_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_messages
-    ADD CONSTRAINT organization_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -3891,27 +3835,6 @@ CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON public.oauth
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications USING btree (uid);
-
-
---
--- Name: index_organization_messages_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_organization_messages_on_bike_id ON public.organization_messages USING btree (bike_id);
-
-
---
--- Name: index_organization_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_organization_messages_on_organization_id ON public.organization_messages USING btree (organization_id);
-
-
---
--- Name: index_organization_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
 
 
 --
@@ -4661,6 +4584,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200414055431'),
 ('20200415161915'),
 ('20200416202219'),
-('20200420181614');
+('20200420181614'),
+('20200421191302');
 
 

@@ -46,7 +46,7 @@
       = t(".stolen_bikes_html")
       %a.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'all')), data: { stolenness: 'all' } }
         = t(".view_all_bikes")
-  %a.float-right.less-strong.hidden-xs-down{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
+  %a.float-right.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
     = t(".settings")
 
 :ruby
@@ -67,9 +67,7 @@
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
   }
-  optional_columns = current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
-  optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
-  optional_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
+  # Most columns are enabled by default, including organization specific registration columns
   default_columns = %w[created_at_cell
                        stolen_cell
                        manufacturer_cell
@@ -78,8 +76,15 @@
                        owner_email_cell
                        updated_at_cell
                        owner_name_cell]
-  enabled_columns = (default_columns + optional_columns)
-.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => enabled_columns.to_json }
+  default_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
+  default_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
+  default_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
+  enabled_columns = default_columns
+  # If extra_registration_number hasn't already been enabled, add it as an optional column
+  enabled_columns += ["extra_registration_number_cell"] unless enabled_columns.include?("extra_registration_number_cell")
+
+-# If the search_stickers param is set, start with the settings panel open
+.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => default_columns.to_json, class: (params[:search_stickers].present? ? "in" : "") }
   %h3.header-font-alt
     = t(".visible_columns")
   .row
@@ -124,8 +129,12 @@
           %small
             = t(".owner_name")
         - current_organization.additional_registration_fields.each do |reg_field|
+          - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
           %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
             = column_renames["#{reg_field}_cell"]
+        -# All organizations can see additional serial#
+        %th.hiddenColumn.hidden-xs-down{ class: "extra_registration_number_cell" }
+          Secondary#
         - if current_organization.enabled?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
@@ -183,6 +192,7 @@
                 %em
                   = bike.owner_name
             - current_organization.additional_registration_fields.each do |reg_field|
+              - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
                 - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
                 - if bike_attr == "registration_address"
@@ -194,6 +204,11 @@
                   = bike.send(bike_attr)
             / - if current_organization.enabled?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }
+
+            -# All organizations can see additional serial#
+            %td.hiddenColumn.hidden-xs-down{ class: "extra_registration_number_cell" }
+              = bike.extra_registration_number
+
             - if current_organization.enabled?("bike_stickers")
               %td.hidden-xs-down{ class: "sticker_cell" }
                 - if @bike_sticker.present?

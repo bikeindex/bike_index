@@ -15,7 +15,6 @@ class PaidFeature < ApplicationRecord
   ].freeze
   BIKE_ACTIONS = %w[
     parking_notifications
-    geolocated_messages
     impound_bikes
     unstolen_notifications
   ].freeze
@@ -24,7 +23,6 @@ class PaidFeature < ApplicationRecord
     bike_search
     bike_stickers
     csv_exports
-    messages
     passwordless_users
     regional_bike_counts
     regional_stickers

@@ -257,15 +257,6 @@
                   no landing page
           %tr
             %td
-              Org Emails
-            %td
-              - if @organization.message_kinds.any?
-                = @organization.message_kinds.to_sentence
-              - else
-                %small.less-strong
-                  None
-          %tr
-            %td
               Additional Fields
             %td
               - additional_fields = @organization.additional_registration_fields.map(&:titleize)

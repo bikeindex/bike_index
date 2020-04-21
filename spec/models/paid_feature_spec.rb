@@ -6,8 +6,8 @@ RSpec.describe PaidFeature, type: :model do
   describe "feature_slugs_string" do
     let(:paid_feature) { PaidFeature.new }
     it "updates only including the expected ones" do
-      paid_feature.feature_slugs_string = "messAGES, GEOLOCATED_MESSAGES, Stuff"
-      expect(paid_feature.feature_slugs).to eq(%w[messages geolocated_messages])
+      paid_feature.feature_slugs_string = "REG_Phone,, PARKING_NOTIFICATIONs, Stuff"
+      expect(paid_feature.feature_slugs).to eq(%w[reg_phone parking_notifications])
       paid_feature.feature_slugs_string = " \n"
       expect(paid_feature.feature_slugs).to eq([])
     end

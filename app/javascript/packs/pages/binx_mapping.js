@@ -173,9 +173,7 @@ export default class BinxMapping {
 
   renderMarker(point) {
     let popupContent = "";
-    if (binxMapping.kind == "geolocated_messages") {
-      popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
-    } else if (binxMapping.kind == "parking_notifications") {
+    if (binxMapping.kind == "parking_notifications") {
       popupContent = binxAppOrgParkingNotificationMapping.mapPopup(point);
     } else {
       log.debug(binxMapping.kind);
