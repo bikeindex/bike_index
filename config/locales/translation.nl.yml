@@ -581,7 +581,6 @@ nl:
         mail_snippets: E-mailfragmenten
         memberships: lidmaatschappen
         name: Naam
-        organization_messages: Organisatie berichten
         payments: Betalingen
         pos_kind: Pos soort
         previous_slug: Vorige slak
@@ -595,15 +594,6 @@ nl:
         website: Website
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
-      organization_message:
-        accuracy: Nauwkeurigheid
-        address: Adres
-        body: Lichaam
-        delivery_status: Aflever status
-        email: E-mailadres
-        kind: Soort
-        latitude: Breedte
-        longitude: Lengte
       other_listing:
         listing_type: Soort vermelding
         url: URL
@@ -4520,23 +4510,6 @@ nl:
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
-    messages:
-      index:
-        bike: Fiets
-        matches: lucifers
-        sender: Verzender
-        sent: verzonden
-      show:
-        additional_text: Aanvullende tekst
-        bike: Fiets
-        created: Gemaakt
-        delivered: geleverd
-        none: Geen
-        organization_message: "%{org_kind} Bericht"
-        pending_delivery: In afwachting van levering
-        sender: Verzender
-        subject: Onderwerp
-        success: Succes
     stickers:
       edit:
         bike: Fiets
@@ -4762,14 +4735,6 @@ nl:
           Bike Index
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
-    geolocated_message:
-      html:
-        is_located_at_html: 'Is gelegen op: <strong>%{address}</strong>'
-        sent_by: 'Verzonden door: %{sender_name} om %{org_name}'
-        your_bike: Uw %{bike_title}
-      text:
-        sent_you: "%{org_name} heeft u een bericht gestuurd over uw %{bike_title}"
-        your_bike_is_at: 'Je %{bike} staat op: %{address}'
     organization_invitation:
       html:
         hello: Hallo %{name},
