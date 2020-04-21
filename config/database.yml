@@ -1,5 +1,7 @@
 development:
   adapter: postgresql
+  host: <%= ENV['PGHOST'] || 'localhost' %>
+  username: <%= ENV["PGUSER"] || 'root' %>
   database: bikeindex_development
   pool: 20
 
