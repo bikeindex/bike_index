@@ -43,6 +43,7 @@ class Organization < ApplicationRecord
   has_many :mail_snippets
   has_many :organization_messages
   has_many :parking_notifications
+  has_many :impound_records
   has_many :b_params
   has_many :invoices
   has_many :payments
