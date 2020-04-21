@@ -15,7 +15,7 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
     let(:organization1) { invoice_active.organization }
     let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.current - 2.weeks) }
     let(:organization2) { invoice_expired.organization }
-    let(:invoice_to_activate)  { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.1) }
+    let(:invoice_to_activate)  { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.2) }
     let(:organization3) { invoice_to_activate.organization }
     it "schedules all the workers" do
       expect(invoice_to_activate.future?).to be_truthy
@@ -38,7 +38,7 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
       expect(organization2.is_paid).to be_truthy
       expect(organization2.current_invoices.first.paid_in_full?).to be_truthy
       expect(organization2.current_invoices.first.active?).to be_truthy
-      # sleep 0.5 # Ensure time has passed to make invoice_to_activate no longer future
+      sleep 0.2 # Ensure time has passed to make invoice_to_activate no longer future
       expect(invoice_to_activate.future?).to be_falsey
       expect(Invoice.should_activate.pluck(:id)).to eq([invoice_to_activate.id])
       Sidekiq::Worker.clear_all
