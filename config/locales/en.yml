@@ -462,7 +462,6 @@ en:
         mail_snippets: Mail snippets
         memberships: Memberships
         name: Name
-        organization_messages: Organization messages
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
         pos_kind: Pos kind
@@ -475,18 +474,6 @@ en:
         slug: Slug
         users: Users
         website: Website
-      organization_message:
-        accuracy: Accuracy
-        address: Address
-        bike: :activerecord.models.bike
-        body: Body
-        delivery_status: Delivery status
-        email: Email
-        kind: Kind
-        latitude: Latitude
-        longitude: Longitude
-        organization: :activerecord.models.organization
-        sender: :activerecord.models.sender
       other_listing:
         bike: :activerecord.models.bike
         listing_type: Listing type
@@ -3290,9 +3277,6 @@ en:
         Bike Index helps people recover their stolen bikes, educates on the prevention
         of theft, and builds a community through its website.  And it's a non-profit
         organization that released its software as open source.
-      bike_index_isnt_the_only_internet_bike_re: >-
-        Bike Index isn't the only internet bike registry, but it's the only one that
-        works and I firmly believe it's a direct result of how it was designed.
       bike_index_provides_ease_of_use_and_secur: >-
         Bike Index provides ease of use and security of mind. The simplicity of design
         makes it effective.
@@ -4398,23 +4382,6 @@ en:
           Bike Index?
         select_email: Select email
         update: Update
-    messages:
-      index:
-        bike: Bike
-        matches: matches
-        sender: Sender
-        sent: Sent
-      show:
-        additional_text: Additional text
-        bike: Bike
-        created: Created
-        delivered: Delivered
-        none: none
-        organization_message: "%{org_kind} Message"
-        pending_delivery: Pending delivery
-        sender: Sender
-        subject: Subject
-        success: Success
     parking_notifications:
       index:
         matches_visible: visible
@@ -4605,14 +4572,6 @@ en:
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
     finished_stolen_registration:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
-    geolocated_message:
-      html:
-        is_located_at_html: 'Is located at: <strong>%{address}</strong>'
-        sent_by: 'Sent by: %{sender_name} at %{org_name}'
-        your_bike: Your %{bike_title}
-      text:
-        sent_you: "%{org_name} sent you a message about your %{bike_title}"
-        your_bike_is_at: 'Your %{bike} is at: %{address}'
     organization_invitation:
       html:
         hello: Hello %{name},

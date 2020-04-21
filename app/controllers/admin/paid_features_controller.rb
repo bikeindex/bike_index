@@ -38,8 +38,11 @@ class Admin::PaidFeaturesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at kind name amount_cents]
+    %w[name created_at kind amount_cents]
   end
+
+  # Because we start with alpha ordering
+  def default_direction; "asc" end
 
   def permitted_update_parameters
     permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)

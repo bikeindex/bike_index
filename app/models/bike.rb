@@ -630,7 +630,7 @@ class Bike < ApplicationRecord
 
   def registration_address # Goes along with organization additional_registration_fields
     return @registration_address if defined?(@registration_address)
-    if user&.address_hash&.present?
+    if user&.address_present?
       @registration_address = user&.address_hash
     else
       @registration_address = b_params_address || {}

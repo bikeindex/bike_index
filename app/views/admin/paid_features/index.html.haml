@@ -28,12 +28,13 @@
               = l paid_feature.created_at, format: :convert_time
           %td
             = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
+            - if paid_feature.description.present?
+              %br
+              %small= paid_feature.description
+            - if paid_feature.details_link.present?
+              %br
+              %small= link_to paid_feature.details_link, paid_feature.details_link
             %br
-              %small
-                = paid_feature.description
-                - if paid_feature.details_link.present?
-                  %br
-                  = link_to paid_feature.details_link, paid_feature.details_link
             %small.less-strong
               %span
                 Feature slugs:

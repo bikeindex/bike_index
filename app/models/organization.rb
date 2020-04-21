@@ -41,7 +41,6 @@ class Organization < ApplicationRecord
 
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
-  has_many :organization_messages
   has_many :parking_notifications
   has_many :impound_records
   has_many :b_params
@@ -67,7 +66,7 @@ class Organization < ApplicationRecord
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
+  scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
   # Regional orgs have to have the paid feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
@@ -180,17 +179,6 @@ class Organization < ApplicationRecord
   end
 
   def parking_notification_kinds; ParkingNotification.kinds end
-
-  def message_kinds # Matches organization_message kinds - TODO: remove this
-    [
-      enabled?("geolocated_messages") ? "geolocated_messages" : nil,
-      enabled?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
-    ].compact
-  end
-
-  def message_kinds_except_abandoned # abandoned_bike_messages are going to be assigned dynamically and have different behavior
-    message_kinds - ["abandoned_bike_messages"]
-  end
 
   def additional_registration_fields
     PaidFeature::REG_FIELDS.select { |f| enabled?(f) }

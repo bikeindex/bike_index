@@ -69,27 +69,6 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  def custom_message(organization_message)
-    @organization_message = organization_message
-    @organization = @organization_message.organization
-    @bike = @organization_message.bike
-    @sender = @organization_message.sender
-
-    subject = default_i18n_subject(
-      org_name: @organization.short_name,
-      mnfg_name: @bike.mnfg_name,
-    )
-
-    I18n.with_locale(@sender&.preferred_language) do
-      mail(reply_to: @organization_message.sender.email,
-           to: @organization_message.email,
-           subject: subject) do |format|
-        format.html { render "geolocated_message" }
-        format.text { render "geolocated_message" }
-      end
-    end
-  end
-
   private
 
   def finished_registration_type

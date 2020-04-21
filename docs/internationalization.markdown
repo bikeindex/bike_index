@@ -112,23 +112,23 @@ Mailers are namespaced by mailer name, email name, and email format as follows
 ```yaml
 # config/locales/en.yml
 
-geolocated_message:
+organization_invitation:
   html:
-    is_located_at_html: 'Is located at: <strong>%{address}</strong>'
+    you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
   text:
-    your_bike_is_at: 'Your %{bike} is at: %{address}'
+    you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
 ```
 
 ```haml
--# app/views/organized_mailer/geolocated_message.html.haml
+-# app/views/organized_mailer/organization_invitation.html.haml
 
-%p= t(".html.is_located_at_html", address: @organization_message.address)
+%p= t(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 ```
 
 ```haml
--# app/views/organized_mailer/geolocated_message.text.haml
+-# app/views/organized_mailer/organization_invitation.text.haml
 
-= t(".text.your_bike_is_at", bike: @bike.type, address: @organization_message.address)
+= t(".text.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 ```
 
 ### Controllers

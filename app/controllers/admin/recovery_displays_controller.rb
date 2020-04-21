@@ -62,14 +62,16 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def permitted_parameters
     params.require(:recovery_display)
-          .permit(%i(stolen_record_id quote quote_by recovered_at link image
-                     remote_image_url date_input remove_image))
+          .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link, :image,
+                  :remote_image_url, :date_input, :remove_image)
   end
 
   def clear_index_wrap_cache
-    I18n.available_locales.each do |locale|
-      expire_fragment(["root_recovery_stories", "locale", locale])
-    end
+    # TODO: Make this actually clear the index cache, rather than everything. It wasn't doing it before :/
+    # I18n.available_locales.each do |locale|
+    #   expire_fragment(["root_recovery_stories", "locale", locale])
+    # end
+    Rails.cache.clear
   end
 
   def find_recovery_displays
