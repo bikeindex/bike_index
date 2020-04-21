@@ -80,13 +80,15 @@ module Geocodeable
       .any? { |col| public_send("#{col}_changed?") }
   end
 
+  def address_present?; [street, city, zipcode].any?(&:present?) end
+
   def bike_index_geocode
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
     end
     # Only geocode if there is specific location information
-    if [street, city, zipcode].any?(&:present?)
+    if address_present?
       self.attributes = Geohelper.coordinates_for(address) || {}
     else
       self.attributes = { latitude: nil, longitude: nil }
