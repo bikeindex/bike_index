@@ -38,7 +38,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at kind name amount_cents]
+    %w[name created_at kind amount_cents]
   end
 
   def permitted_update_parameters

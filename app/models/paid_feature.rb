@@ -15,7 +15,6 @@ class PaidFeature < ApplicationRecord
   ].freeze
   BIKE_ACTIONS = %w[
     parking_notifications
-    geolocated_messages
     impound_bikes
     unstolen_notifications
   ].freeze

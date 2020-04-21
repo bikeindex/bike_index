@@ -172,7 +172,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         end
       end
       context "organization with avery export" do
-        before { organization.update_columns(enabled_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_stickers]) } # Stub organization having features
+        before { organization.update_columns(enabled_feature_slugs: %w[csv_exports avery_export parking_notifications bike_stickers]) } # Stub organization having features
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.enabled?("avery_export")).to be_truthy
