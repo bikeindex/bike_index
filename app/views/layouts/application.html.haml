@@ -50,7 +50,7 @@
                   = link_to t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}"
                 - if passive_organization.enabled?("impound_bikes")
                   %li
-                    = active_link t(".org_impounded_bikes", org_name: passive_organization.short_name), organization_impound_records_path(organization_id: passive_organization.to_param), class: "nav-link secondary-item"
+                    = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: passive_organization.to_param), class: "nav-link secondary-item"
                 - if passive_organization.enabled?("show_partial_registrations")
                   %li
                     = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
