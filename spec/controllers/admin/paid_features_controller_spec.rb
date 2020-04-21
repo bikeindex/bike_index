@@ -49,10 +49,10 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       context "developer" do
         let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
-          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,parking_notifications, blarg") }
+          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, ,pARKinG_notifications, blarg") }
           subject.reload
           passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-          expect(subject.feature_slugs).to eq(%w[csv_exports messages parking_notifications])
+          expect(subject.feature_slugs).to eq(%w[csv_exports parking_notifications])
         end
       end
     end
@@ -67,10 +67,10 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       context "developer" do
         let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
-          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,parking_notifications, blarg") }
+          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, parkiNG_NOTifications, blarg") }
           subject.reload
           passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-          expect(subject.feature_slugs).to eq(%w[csv_exports messages parking_notifications])
+          expect(subject.feature_slugs).to eq(%w[csv_exports parking_notifications])
         end
       end
     end
