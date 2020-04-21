@@ -23,7 +23,6 @@ class PaidFeature < ApplicationRecord
     bike_search
     bike_stickers
     csv_exports
-    messages
     passwordless_users
     regional_bike_counts
     regional_stickers
