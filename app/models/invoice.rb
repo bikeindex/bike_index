@@ -19,10 +19,11 @@ class Invoice < ApplicationRecord
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
   scope :active, -> { where(is_active: true) }
   scope :inactive, -> { where(is_active: false) }
-  scope :current, -> { active.where("subscription_end_at > ?", Time.current) }
+  scope :current, -> { active.where("subscription_end_at > ? AND subscription_start_at < ?", Time.current, Time.current) }
   scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
+  scope :future, -> { where("subscription_start_at > ?", Time.current) }
   scope :should_expire, -> { where(is_active: true).where("subscription_end_at < ?", Time.current) }
-  scope :should_activate, -> { where(is_active: false).where("subscription_start_at > ?", Time.current) }
+  scope :should_activate, -> { where(is_active: false).where("subscription_start_at < ? AND subscription_end_at > ?", Time.current, Time.current) }
 
   attr_accessor :timezone
 

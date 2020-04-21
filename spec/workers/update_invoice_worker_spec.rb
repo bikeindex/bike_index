@@ -15,10 +15,11 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
     let(:organization1) { invoice_active.organization }
     let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.current - 2.weeks) }
     let(:organization2) { invoice_expired.organization }
-    let!(:invoice_to_activate)  { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.5) }
+    let(:invoice_to_activate)  { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.1) }
     let(:organization3) { invoice_to_activate.organization }
     it "schedules all the workers" do
       expect(invoice_to_activate.future?).to be_truthy
+      expect(Invoice.future.pluck(:id)).to eq([invoice_to_activate.id])
       invoice_active.update_column :updated_at, invoice_active_updated_at
       organization1.save
       organization2.save
@@ -37,14 +38,20 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
       expect(organization2.is_paid).to be_truthy
       expect(organization2.current_invoices.first.paid_in_full?).to be_truthy
       expect(organization2.current_invoices.first.active?).to be_truthy
-      sleep 0.5 # Ensure time has passed to make invoice_to_activate no longer future
+      # sleep 0.5 # Ensure time has passed to make invoice_to_activate no longer future
       expect(invoice_to_activate.future?).to be_falsey
-      described_class.new.perform
+      expect(Invoice.should_activate.pluck(:id)).to eq([invoice_to_activate.id])
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        described_class.new.perform
+      end
 
       organization1.save
       organization2.save
+      organization3.reload
       invoice_active.reload
       invoice_expired.reload
+      invoice_to_activate.reload
 
       expect(organization1.is_paid).to be_truthy
       expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
@@ -56,8 +63,10 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
       expect(organization2.is_paid).to be_falsey
       expect(organization2.current_invoices.first).to_not be_present
 
-      invoice_to_activate.reload
+      # And the invoice to active has been activated
       expect(invoice_to_activate.active?).to be_truthy
+      expect(invoice_to_activate.current?).to be_truthy
+      expect(invoice_to_activate.future?).to be_falsey
       expect(organization3.is_paid).to be_truthy
     end
   end
