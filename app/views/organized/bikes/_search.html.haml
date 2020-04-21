@@ -46,7 +46,7 @@
       = t(".stolen_bikes_html")
       %a.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'all')), data: { stolenness: 'all' } }
         = t(".view_all_bikes")
-  %a.float-right.less-strong.hidden-xs-down{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
+  %a.float-right.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
     = t(".settings")
 
 :ruby
@@ -79,7 +79,7 @@
                        updated_at_cell
                        owner_name_cell]
   enabled_columns = (default_columns + optional_columns)
-.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => enabled_columns.to_json }
+.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => enabled_columns.to_json, class: (params[:search_stickers].present? ? "in" : "") }
   %h3.header-font-alt
     = t(".visible_columns")
   .row
