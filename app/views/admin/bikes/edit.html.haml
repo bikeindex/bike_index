@@ -271,8 +271,9 @@
               %td
                 Creator
               %td
-                - creator_display_name = creation_state.creator&.display_name || creation_state.creator_id
-                = link_to creator_display_name, admin_user_path(creation_state.creator_id)
+                - if creation_state.creator_id.present?
+                  - creator_display_name = creation_state.creator&.display_name || creation_state.creator_id
+                  = link_to creator_display_name, admin_user_path(creation_state.creator_id)
       .col-md-6.mt-2
         = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"))
 
