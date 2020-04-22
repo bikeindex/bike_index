@@ -131,7 +131,8 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def permitted_locations_params
-    %w(name zipcode city state_id _destroy id country_id street phone email shown).map(&:to_sym)
+    %w(name zipcode city state_id _destroy id country_id street phone email publicly_visible
+       impound_location default_impound_location).map(&:to_sym)
   end
 
   def find_organization

@@ -155,8 +155,6 @@ class User < ApplicationRecord
 
   def paid_org?; organizations.paid.any? end
 
-  def can_impound?; superuser? || organizations.any? { |o| o.enabled?("impound_bikes") } end
-
   def authorized?(obj)
     return true if superuser?
     return obj.authorized?(self) if obj.is_a?(Bike)

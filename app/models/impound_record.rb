@@ -10,7 +10,6 @@ class ImpoundRecord < ApplicationRecord
 
   validates_presence_of :bike_id, :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
-  validate :user_authorized, on: :create
 
   before_save :set_calculated_attributes
   after_commit :update_associations
@@ -34,13 +33,6 @@ class ImpoundRecord < ApplicationRecord
   def current?; resolved_at.blank? end
 
   def resolved?; resolved_at.present? end
-
-  def user_authorized
-    return true if id.present? # Already authorized, doesn't matter if still is
-    return true if user.present? && user.can_impound? && organization.present? &&
-                   user.authorized?(organization) && organization.enabled?("impound_bikes")
-    errors.add(:user_id, :user_not_authorized)
-  end
 
   def update_associations
     bike&.update_attributes(updated_at: Time.current)

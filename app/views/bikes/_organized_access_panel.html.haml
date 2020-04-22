@@ -241,7 +241,7 @@
           .col-md-6
             .form-group
               %p{ style: "margin-bottom: 0;" } Notification because
-              - passive_organization.parking_notification_kinds.each do |kind|
+              - ParkingNotification.kinds.each do |kind|
                 %label.radio-inline.mr-2
                   = f.radio_button :kind, kind
                   = ParkingNotification.kinds_humanized[kind.to_sym]

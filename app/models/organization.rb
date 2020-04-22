@@ -61,7 +61,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
 
   default_scope { order(:name) }
-  scope :shown_on_map, -> { includes(:locations).where(show_on_map: true, approved: true) }
+  scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
@@ -71,7 +71,6 @@ class Organization < ApplicationRecord
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
   before_validation :set_calculated_attributes
-  before_save :set_search_coordinates
   after_commit :update_associations
 
   delegate \
@@ -141,6 +140,23 @@ class Organization < ApplicationRecord
 
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
+  # Enable this if they have paid for showing it, or if they use ascend
+  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
+
+  def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
+  def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
+
+  def allowed_show?; show_on_map && approved end
+
+  def display_avatar?; is_paid && avatar.present? end
+
+  def suspended?; is_suspended? end
+
+  def current_invoices; invoices.active end
+
+  def current_parent_invoices; Invoice.where(organization_id: parent_organization_id).active end
+
   def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
@@ -149,6 +165,20 @@ class Organization < ApplicationRecord
 
   def regional_parents; self.class.regional.where("regional_ids @> ?", [id].to_json) end
 
+  def default_impound_location; enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil end
+
+  # Try for publicly_visible, fall back to whatever
+  def default_location; locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first end
+
+  def search_coordinates; [location_latitude, location_longitude] end
+
+  def search_coordinates_set?; search_coordinates.all?(&:present?) end
+
+  # Many, many things are triggered off of this, so using a method, since we'll probably change logic later
+  def regional?; enabled?("regional_bike_counts") end
+
+  def overview_dashboard?; parent? || regional? end
+
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
     @nearby_organizations ||= self.class.within_bounding_box(bounding_box)
@@ -156,7 +186,7 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def nearby_and_partner_organization_ids
+  def nearby_and_partner_organization_ids;
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
@@ -165,8 +195,6 @@ class Organization < ApplicationRecord
     snippet = mail_snippets.enabled.where(name: type).first
     snippet&.body
   end
-
-  def parking_notification_kinds; ParkingNotification.kinds end
 
   def additional_registration_fields
     PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
@@ -262,6 +290,8 @@ class Organization < ApplicationRecord
     self.child_ids = calculated_children.pluck(:id) || []
     self.regional_ids = nearby_organizations.pluck(:id) || []
     set_auto_user
+    self.location_latitude = default_location&.latitude
+    self.location_longitude = default_location&.longitude
     set_ambassador_organization_defaults if ambassador?
   end
 
@@ -271,33 +301,15 @@ class Organization < ApplicationRecord
     save
   end
 
-  def current_invoices; invoices.active end
-
-  def current_parent_invoices; Invoice.where(organization_id: parent_organization_id).active end
-
   def incomplete_b_params
     BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations.without_bike
   end
 
-  # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
-
-  def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
-
-  def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
-
-  def allowed_show?; show_on_map && approved end
-
-  def display_avatar?; is_paid && avatar.present? end
-
-  def suspended?; is_suspended? end
-
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
-    location = locations&.first
     {
-      latitude: location&.latitude || 37.7870322,
-      longitude: location&.longitude || -122.4061122,
+      latitude: default_location&.latitude || 37.7870322,
+      longitude: default_location&.longitude || -122.4061122,
     }
   end
 
@@ -329,29 +341,13 @@ class Organization < ApplicationRecord
 
   def update_associations
     return true if skip_update
+    # If there is isn't a default impound bikes location and there should be, set one
+    if enabled?("impound_bikes_locations") && locations.default_impound_locations.blank?
+      locations.impound_locations.first.update(default_impound_location: true, skip_update: true)
+    end
     # Critical that locations update after skip_update, so we don't loop
-    locations.each { |l| l.update(updated_at: Time.current) }
+    locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
     UpdateAssociatedOrganizationsWorker.perform_async(id)
-  end
-
-  def default_location
-    locations.order(id: :asc).first
-  end
-
-  def search_coordinates
-    [location_latitude, location_longitude]
-  end
-
-  def search_coordinates_set?
-    search_coordinates.all?(&:present?)
-  end
-
-  def regional?
-    enabled?("regional_bike_counts")
-  end
-
-  def overview_dashboard?
-    parent? || regional?
   end
 
   private
@@ -360,17 +356,15 @@ class Organization < ApplicationRecord
     strip_tags(name).gsub("&amp;", "&")
   end
 
-  def set_search_coordinates
-    return if search_coordinates_set?
-    self.location_latitude = default_location&.latitude
-    self.location_longitude = default_location&.longitude
-  end
-
   def calculated_enabled_feature_slugs
     fslugs = current_invoices.feature_slugs
     # If part of a region with regional_stickers, the organization receives the stickers paid feature
     if regional_parents.any?
       fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("regional_stickers") }
+    end
+    # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
+    if fslugs.include?("impound_bikes") && locations.impound_locations.any?
+      fslugs += ["impound_bikes_locations"]
     end
     return fslugs unless parent_organization_id.present?
     (fslugs + current_parent_invoices.map(&:child_enabled_feature_slugs).flatten).uniq
