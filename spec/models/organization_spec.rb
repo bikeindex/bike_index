@@ -16,21 +16,20 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "bikes in/not nearby organizations, nearby recoveries" do
-    # TODO!!!! I See the issue here, I will fix this, but shipping first because I want to
-    xit "returns bikes associated with nearby organizations" do
+    it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true)
+      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org, skip_geocoding: true)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org, skip_geocoding: true, address_set_manually: true)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2, skip_geocoding: true)
+      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
 
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3, skip_geocoding: true)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
 
@@ -269,33 +268,6 @@ RSpec.describe Organization, type: :model do
       expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
-    end
-    context "messages" do
-      let!(:paid_feature2) { FactoryBot.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages unstolen_notifications]) }
-      let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      it "returns empty for non-geolocated_emails" do
-        expect(organization.message_kinds).to eq([])
-        expect(organization.enabled?(nil)).to be_falsey
-        expect(organization.enabled?("messages")).to be_falsey
-        expect(organization.enabled?("geolocated_messages")).to be_falsey
-        expect(user.send_unstolen_notifications?).to be_falsey
-
-        invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
-        organization.save
-
-        expect(organization.enabled?("messages")).to be_truthy
-        expect(organization.enabled?("geolocated_messages")).to be_falsey
-        expect(organization.enabled?("abandoned_bike_messages")).to be_truthy
-        expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
-        expect(organization.message_kinds_except_abandoned).to eq([])
-        expect(organization.enabled?("unstolen_notifications")).to be_truthy
-        expect(organization.enabled?("weird_type")).to be_falsey
-        expect(organization.bike_actions?).to be_truthy
-        expect(organization.enabled?(%w[geolocated abandoned_bike weird_type])).to be_falsey
-        expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
-
-        expect(user.reload.send_unstolen_notifications?).to be_truthy
-      end
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }

@@ -1,0 +1,54 @@
+- # TODO: add translations
+
+.organized-page-header
+  %h1
+    Impound Record
+    - if @bike.unregistered_parking_notification?
+      %span.text-warning
+        for
+        %em unregistered
+        = @bike.type
+
+- # TODO: add translations
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime
+              = l(@impound_record.created_at, format: :convert_time)
+        %tr
+          %td By
+          %td= @impound_record.user.display_name
+        %tr
+          %td Status
+          %td
+            %strong
+              = @impound_record.status
+        %tr
+          %td Bike
+          %td
+            - if @bike.present?
+              = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
+              %br
+              %small
+                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
+                  view parking notifications for
+                  %em
+                    = @bike.type
+        - if @impound_record.resolved?
+          %tr
+            %td Resolved
+            %td
+              %span.convertTime
+                = l(@impound_record.resolved_at, format: :convert_time)
+
+- if @parking_notification.present?
+  %hr
+  %h2.uncap
+    Record created by
+    = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+
+  = render partial: "/organized/parking_notifications/show_details"

@@ -25,10 +25,6 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.organization_invitation(OrganizationInvitation.last)
   end
 
-  def geolocated_message
-    OrganizedMailer.custom_message(OrganizationMessage.geolocated.last)
-  end
-
   def parking_notification
     OrganizedMailer.parking_notification(ParkingNotification.send_email.last)
   end

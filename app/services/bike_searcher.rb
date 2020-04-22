@@ -1,3 +1,5 @@
+# THIS IS DEPRECATED!!!
+# Use BikeSearchable instead
 class BikeSearcher
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params

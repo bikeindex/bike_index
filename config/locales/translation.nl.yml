@@ -581,7 +581,6 @@ nl:
         mail_snippets: E-mailfragmenten
         memberships: lidmaatschappen
         name: Naam
-        organization_messages: Organisatie berichten
         payments: Betalingen
         pos_kind: Pos soort
         previous_slug: Vorige slak
@@ -595,15 +594,6 @@ nl:
         website: Website
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
-      organization_message:
-        accuracy: Nauwkeurigheid
-        address: Adres
-        body: Lichaam
-        delivery_status: Aflever status
-        email: E-mailadres
-        kind: Soort
-        latitude: Breedte
-        longitude: Lengte
       other_listing:
         listing_type: Soort vermelding
         url: URL
@@ -3711,9 +3701,6 @@ nl:
         fietsen terug te vinden, leert over het voorkomen van diefstal en bouwt een
         community op via haar website. En het is een non-profit organisatie die haar
         software als open source heeft uitgegeven.
-      bike_index_isnt_the_only_internet_bike_re: Bike Index is niet het enige internetfietsregister,
-        maar het is de enige die werkt en ik ben ervan overtuigd dat het een direct
-        gevolg is van hoe het is ontworpen.
       bike_index_provides_ease_of_use_and_secur: Bike Index biedt gebruiksgemak en
         gemoedsrust. De eenvoud van het ontwerp maakt het effectief.
       current_ambassadors: Huidige ambassadeurs
@@ -4128,7 +4115,6 @@ nl:
       multi_serial_search: Multi-serieel zoeken
       org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
-      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
       org_locations: "%{org_name} locaties"
       org_profile: "%{org_name} profiel"
       recoveries: terugvorderingen
@@ -4145,6 +4131,7 @@ nl:
       your_bikes: Je fietsen
       parking_notifications: Verlaten records
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
+      impounded_bikes: In beslag genomen fietsen
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4523,23 +4510,6 @@ nl:
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
-    messages:
-      index:
-        bike: Fiets
-        matches: lucifers
-        sender: Verzender
-        sent: verzonden
-      show:
-        additional_text: Aanvullende tekst
-        bike: Fiets
-        created: Gemaakt
-        delivered: geleverd
-        none: Geen
-        organization_message: "%{org_kind} Bericht"
-        pending_delivery: In afwachting van levering
-        sender: Verzender
-        subject: Onderwerp
-        success: Succes
     stickers:
       edit:
         bike: Fiets
@@ -4619,15 +4589,6 @@ nl:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
-      show:
-        parking_notification: Verlaten record
-        bike: Fiets
-        by: Gemaakt door
-        created: Gemaakt op
-        message: Bericht
-        address: Adres
-        internal_notes: Interne notities
-        notification_number: Kennisgeving#
       table:
         bike: Fiets
         by: Door
@@ -4637,6 +4598,14 @@ nl:
         address: Adres
         notification_number: Kennisgeving#
         retrieved: Opgehaald
+      show_details:
+        address: Adres
+        bike: Fiets
+        by: Gemaakt door
+        created: Gemaakt op
+        internal_notes: Interne notities
+        message: Bericht
+        notification_number: Kennisgeving#
     manages:
       location_fields:
         address: Adres
@@ -4671,6 +4640,11 @@ nl:
           verwijderen?
         select_email: Selecteer e-mail
         update: Bijwerken
+    impound_records:
+      index:
+        search_bike_descriptions: Zoek fietsbeschrijvingen
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -4765,14 +4739,6 @@ nl:
           Bike Index
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
-    geolocated_message:
-      html:
-        is_located_at_html: 'Is gelegen op: <strong>%{address}</strong>'
-        sent_by: 'Verzonden door: %{sender_name} om %{org_name}'
-        your_bike: Uw %{bike_title}
-      text:
-        sent_you: "%{org_name} heeft u een bericht gestuurd over uw %{bike_title}"
-        your_bike_is_at: 'Je %{bike} staat op: %{address}'
     organization_invitation:
       html:
         hello: Hallo %{name},

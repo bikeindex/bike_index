@@ -123,18 +123,6 @@ RSpec.describe Organized::BikesController, type: :controller do
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
           end
         end
-        context "with search_impoundedness only_impounded" do
-          let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, user: user) }
-          let!(:impounded_bike) { impound_record.bike }
-          it "returns only impounded" do
-            get :index, params: { organization_id: organization.to_param, search_impoundedness: "only_impounded" }
-            expect(response.status).to eq(200)
-            expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-            expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_query_present)).to be_falsey
-            expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
-          end
-        end
       end
       describe "recoveries" do
         let(:bike) { FactoryBot.create(:stolen_bike) }

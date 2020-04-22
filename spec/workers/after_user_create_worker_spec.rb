@@ -99,7 +99,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
-    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
+    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
     let!(:country) { Country.united_states }
     let!(:b_param) do
       FactoryBot.create(:b_param,
@@ -108,21 +108,22 @@ RSpec.describe AfterUserCreateWorker, type: :job do
                         params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
     end
     let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
+    let(:target_address_hash) { { street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348 } }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
+        bike.reload
+        bike.update_attributes(updated_at: Time.current)
+        expect(bike.send("location_record_address_hash")).to eq target_address_hash.as_json
+
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
-        ownership.reload
         user.reload
+
         expect(user.phone).to eq "1112223333"
-        expect(user.street).to eq "Pier 15, The Embarcadero"
-        expect(user.city).to eq "San Francisco"
-        expect(user.zipcode).to eq "94111"
-        expect(user.state).to eq state
-        expect(user.country).to eq country
-        expect([user.latitude, user.longitude]).to eq([37.8016649, -122.397348])
+        expect(user.address_hash).to eq target_address_hash.as_json
+        expect(user.to_coordinates).to eq([37.8016649, -122.397348])
       end
     end
     context "existing attributes" do

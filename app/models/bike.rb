@@ -89,7 +89,7 @@ class Bike < ApplicationRecord
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
-  scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
+  scope :impounded, -> { includes(:impound_records).where(impound_records: { resolved_at: nil }).where.not(impound_records: { id: nil }) }
   scope :non_abandoned, -> { where(abandoned: false) }
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
@@ -122,7 +122,7 @@ class Bike < ApplicationRecord
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
           rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
           primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-          propulsion_type zipcode country_id city belt_drive
+          propulsion_type street zipcode country_id state_id city belt_drive
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
@@ -448,7 +448,6 @@ class Bike < ApplicationRecord
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
-    # self.current_stolen_record ||= stolen_records.last
   end
 
   def title_string
@@ -631,36 +630,11 @@ class Bike < ApplicationRecord
 
   def registration_address # Goes along with organization additional_registration_fields
     return @registration_address if defined?(@registration_address)
-    if user&.address_hash&.present?
+    if user&.address_present?
       @registration_address = user&.address_hash
     else
-      @registration_address = b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+      @registration_address = b_params_address || {}
     end
-  end
-
-  def registration_location
-    reg_location = registration_address.with_indifferent_access
-    reg_city = reg_location[:city]&.titleize
-    reg_state = reg_location[:state]&.upcase
-    return "" if reg_state.blank?
-
-    [reg_city, reg_state].reject(&:blank?).join(", ")
-  end
-
-  # Select the source from which to derive location data, in the following order
-  # of precedence:
-  #
-  # 1. The current parking notification, if one is present
-  # 2. The creation organization, if one is present
-  # 3. The bike owner's address, if available
-  # 4. The request's IP address, if given
-  def find_location_info(geolocation = nil)
-    [
-      current_parking_notification,
-      creation_organization,
-      owner,
-      geolocation,
-    ].compact.find { |rec| rec.latitude.present? }
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
@@ -668,15 +642,21 @@ class Bike < ApplicationRecord
   # Geolocate based on the full current stolen record address, if available.
   # Otherwise, use the data set by set_location_info.
   # Sets lat/long, will avoid a geocode API call if coordinates are found
-  #
-  # Note: Because this is set automatically, only allow users to edit location if no locations are present
-  def set_location_info(request_location: nil)
-    # Always use current_stolen_record is set if available - even if it's blank
-    # Because we use it for searching stolen bikes, and we don't want other information leaking
-    location_record = current_stolen_record || find_location_info(request_location)
-    return if location_record.blank?
-    @location_set_by_association = true # set to skip geocoding
-    self.attributes = Geohelper.location_attrs_from_result(location_record)
+  def set_location_info
+    if current_stolen_record.present?
+      # If there is a current stolen - even if it has a blank location - use it
+      # It's used for searching and displaying stolen bikes, we don't want other information leaking
+      if address_set_manually # Only set coordinates if the address is set manually
+        self.attributes = current_stolen_record.attributes.slice("latitude", "longitude")
+      else # Set the whole address from the stolen record
+        self.attributes = current_stolen_record.address_hash
+      end
+    else
+      return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
+      address_attrs = location_record_address_hash
+      return true unless address_attrs.present? # No address hash present so skip
+      self.attributes = address_attrs
+    end
   end
 
   def organization_affiliation
@@ -782,11 +762,10 @@ class Bike < ApplicationRecord
     PropulsionType.new(propulsion_type).name
   end
 
-  # Take lat/long from associated geocoded model
-  # Only geocode if lat/long haven't changed and address has
+  # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    return false if skip_geocoding? || @location_set_by_association
-    address_changed? && !latitude_changed?
+    return false if skip_geocoding? || !address_set_manually
+    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
@@ -797,5 +776,32 @@ class Bike < ApplicationRecord
     return "status_impounded" if current_impound_record.present?
     return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     "status_with_owner"
+  end
+
+  private
+
+  # Select the source from which to derive location data, in the following order
+  # of precedence:
+  #
+  # 1. The current parking notification, if one is present
+  # 2. The creation organization, if one is present
+  # 3. The bike owner's address, if available
+  # 4. registration_address from b_param if available
+  def location_record_address_hash
+    location_record = [
+      current_parking_notification,
+      creation_organization&.default_location,
+      owner,
+    ].compact.find { |rec| rec.latitude.present? }
+    location_record.present? ? location_record.address_hash : b_params_address
+  end
+
+  def b_params_address
+    bp_address = {}
+    b_params.each do |b_param|
+      bp_address = b_param.fetch_formatted_address
+      break if bp_address.present?
+    end
+    bp_address
   end
 end

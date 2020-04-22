@@ -31,7 +31,6 @@ module Organized
 
     def show
       @parking_notification = parking_notifications.find(params[:id])
-      @related_notifications = @parking_notification.associated_notifications.reorder(id: :desc)
       @bike = @parking_notification.bike
     end
 

@@ -3,8 +3,8 @@ import TimeParser from "../utils/time_parser.js";
 import BinxMapping from "./binx_mapping.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
-import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAppOrgParkingNotifications from "./binx_org_parking_notifications.js";
+import BinxAppOrgImpoundRecords from "./binx_org_impound_records.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
 import BinxAppOrgUserForm from "./binx_org_user_form";
 import PeriodSelector from "../utils/period_selector.js";
@@ -45,11 +45,7 @@ $(document).ready(function() {
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
-  if (bodyId === "organized_messages_index") {
-    window.binxMapping = new BinxMapping("geolocated_messages");
-    window.binxAppOrgMessages = new BinxAppOrgMessages();
-    binxAppOrgMessages.init();
-  } else if (
+  if (
     [
       "organized_parking_notifications_index",
       "organized_parking_notifications_show",
@@ -65,6 +61,14 @@ $(document).ready(function() {
   } else if (bodyId === "organized_bikes_index") {
     const binxAppOrgBikes = BinxAppOrgBikes();
     binxAppOrgBikes.init();
+  } else if (
+    [
+      "organized_impound_records_index",
+      "organized_impound_records_show",
+    ].includes(bodyId)
+  ) {
+    window.binxAppOrgImpoundRecords = new BinxAppOrgImpoundRecords();
+    binxAppOrgImpoundRecords.init();
   }
   // This can be new, edit, create or update, so just checking for the element
   if ($("#multipleUserSelect").length) {

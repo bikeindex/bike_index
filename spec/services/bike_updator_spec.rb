@@ -141,14 +141,16 @@ RSpec.describe BikeUpdator do
       expect(bike.components.count).to eq(0)
     end
 
-    it "updates the bike sets is_for_sale to false" do
-      bike = FactoryBot.create(:bike, is_for_sale: true)
+    it "updates the bike sets is_for_sale and address_set_manually to false" do
+      bike = FactoryBot.create(:bike, is_for_sale: true, address_set_manually: true)
       ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryBot.create(:user)
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: { owner_email: new_creator.email } }.as_json)
       update_bike.update_available_attributes
-      expect(bike.reload.is_for_sale).to be_falsey
+      bike.reload
+      expect(bike.is_for_sale).to be_falsey
+      expect(bike.address_set_manually).to be_falsey
     end
   end
 

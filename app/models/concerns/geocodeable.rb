@@ -60,6 +60,8 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
+  def address(**kwargs); Geocodeable.address(self, **kwargs) end
+
   # Should the receiving object be geocoded?
   #
   # By default:
@@ -78,9 +80,7 @@ module Geocodeable
       .any? { |col| public_send("#{col}_changed?") }
   end
 
-  def address(**kwargs)
-    Geocodeable.address(self, **kwargs)
-  end
+  def address_present?; [street, city, zipcode].any?(&:present?) end
 
   def bike_index_geocode
     # remove state if it's not for the same country - we currently only handle us states
@@ -88,7 +88,7 @@ module Geocodeable
       self.state_id = nil unless state&.country_id == country_id
     end
     # Only geocode if there is specific location information
-    if [street, city, zipcode].any?(&:present?)
+    if address_present?
       self.attributes = Geohelper.coordinates_for(address) || {}
     else
       self.attributes = { latitude: nil, longitude: nil }
@@ -99,7 +99,7 @@ module Geocodeable
   def address_hash
     attributes.slice("street", "city", "zipcode", "latitude", "longitude")
               .merge(state: state&.abbreviation, country: country&.iso)
-              .to_a.reject { |k, v| v.blank? }.to_h # Custom compact method to skip blanks
+              .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
               .with_indifferent_access
   end
 

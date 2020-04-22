@@ -1,0 +1,56 @@
+-# TODO: add translations
+
+.organized-page-header
+  %h1
+    Impound Records
+
+= render partial: "/shared/period_select"
+
+.mt-4
+  = form_tag organization_impound_records_path(organization_id: current_organization.to_param), id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
+    .query-field-wrap.nojs
+      - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
+      = select_tag :query_items,                                      |
+        options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
+        placeholder: t(".search_bike_descriptions"),                  |
+        class: 'form-control query-field',                            |
+        multiple: true
+
+      = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
+      .sidebyside-queries
+        = text_field_tag :email, params[:email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
+        = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
+
+    .search-button-wrap
+      = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+        :plain
+          <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+    = hidden_field_tag :stolenness, @stolenness
+    = hidden_field_tag :organization_id, passive_organization&.to_param
+
+    = hidden_field_tag :period, params[:period]
+    = hidden_field_tag :start_time, params[:start_time]
+    = hidden_field_tag :end_time, params[:end_time]
+
+    = hidden_field_tag :search_status, @search_status
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = pluralize(number_with_delimiter(@impound_records.total_count), "Matching impound record")
+  .col-sm-6.offset-lg-4.col-lg-2
+    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
+      = @search_status.humanize
+    .dropdown-menu
+      - (%w[active all] + ImpoundRecord.statuses).each do |kind|
+        - kind_active = @search_status == kind
+        - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
+        = link_to kind.humanize, organization_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+        - if kind == "all" # Add a divider after all
+          .dropdown-divider
+
+
+- skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)
+= render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved }
+
+.paginate-container.paginate-container-bottom
+  = paginate @impound_records

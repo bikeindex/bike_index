@@ -19,7 +19,18 @@ RSpec.describe Invoice, type: :model do
         invoice.set_calculated_attributes
         expect(invoice.expired?).to be_truthy
         expect(invoice.paid_in_full?).to be_truthy
+        expect(invoice.future?).to be_falsey
         expect(invoice.was_active?).to be_truthy
+      end
+    end
+    context "future" do
+      let(:invoice) { Invoice.new(subscription_start_at: Time.current + 1.hour, amount_due: 0) }
+      it "is not active" do
+        invoice.set_calculated_attributes
+        expect(invoice.expired?).to be_falsey
+        expect(invoice.paid_in_full?).to be_truthy
+        expect(invoice.future?).to be_truthy
+        expect(invoice.was_active?).to be_falsey
       end
     end
   end
