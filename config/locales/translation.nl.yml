@@ -4115,7 +4115,6 @@ nl:
       multi_serial_search: Multi-serieel zoeken
       org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
-      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
       org_locations: "%{org_name} locaties"
       org_profile: "%{org_name} profiel"
       recoveries: terugvorderingen
@@ -4132,6 +4131,7 @@ nl:
       your_bikes: Je fietsen
       parking_notifications: Verlaten records
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
+      impounded_bikes: In beslag genomen fietsen
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4589,15 +4589,6 @@ nl:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
-      show:
-        parking_notification: Verlaten record
-        bike: Fiets
-        by: Gemaakt door
-        created: Gemaakt op
-        message: Bericht
-        address: Adres
-        internal_notes: Interne notities
-        notification_number: Kennisgeving#
       table:
         bike: Fiets
         by: Door
@@ -4607,6 +4598,14 @@ nl:
         address: Adres
         notification_number: Kennisgeving#
         retrieved: Opgehaald
+      show_details:
+        address: Adres
+        bike: Fiets
+        by: Gemaakt door
+        created: Gemaakt op
+        internal_notes: Interne notities
+        message: Bericht
+        notification_number: Kennisgeving#
     manages:
       location_fields:
         address: Adres
@@ -4641,6 +4640,11 @@ nl:
           verwijderen?
         select_email: Selecteer e-mail
         update: Bijwerken
+    impound_records:
+      index:
+        search_bike_descriptions: Zoek fietsbeschrijvingen
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"

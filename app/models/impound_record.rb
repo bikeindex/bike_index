@@ -32,6 +32,8 @@ class ImpoundRecord < ApplicationRecord
 
   def current?; resolved_at.blank? end
 
+  def resolved?; resolved_at.present? end
+
   def user_authorized
     return true if id.present? # Already authorized, doesn't matter if still is
     return true if user.present? && user.can_impound? && organization.present? &&

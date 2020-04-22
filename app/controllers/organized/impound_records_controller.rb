@@ -15,6 +15,8 @@ module Organized
 
     def show
       @impound_record = impound_records.find(params[:id])
+      @bike = @impound_record.bike
+      @parking_notification = @impound_record.parking_notification
     end
 
     private

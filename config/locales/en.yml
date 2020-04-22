@@ -2072,7 +2072,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2098,7 +2098,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -4394,7 +4394,7 @@ en:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email
-      show:
+      show_details:
         address: Address
         bike: Bike
         by: Created by
@@ -4402,7 +4402,6 @@ en:
         internal_notes: Internal notes
         message: Message
         notification_number: Notification#
-        parking_notification: Parking Notification
       table:
         address: Address
         bike: Bike
