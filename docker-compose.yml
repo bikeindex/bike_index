@@ -11,8 +11,6 @@ services:
       REDIS_URL: redis://redis:6379
       PGHOST: postgres
       PGUSER: postgres
-    env_file:
-    - docker.env
     ports:
       - 3001:3001
     volumes:
