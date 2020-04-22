@@ -22,6 +22,11 @@ class ImpoundRecord < ApplicationRecord
 
   def self.active_statuses; %w[current] end
 
+  def self.bikes
+    Bike.unscoped.includes(:impound_records)
+        .where(impound_records: { id: pluck(:id) })
+  end
+
   # Get it unscoped, because unregistered_bike notifications
   def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
 

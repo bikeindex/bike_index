@@ -50,12 +50,15 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "unregistered" do
     let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification) }
+    let(:organization) { parking_notification.organization }
+    let(:bike) { parking_notification.bike }
     it "is unregistered" do
       parking_notification.reload
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.unregistered_bike).to be_truthy
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
+      expect(organization.parking_notifications.bikes.pluck(:id)).to eq([bike.id])
     end
   end
 

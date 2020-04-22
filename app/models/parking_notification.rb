@@ -65,6 +65,11 @@ class ParkingNotification < ActiveRecord::Base
       .or(where(id: initial_record_id))
   end
 
+  def self.bikes
+    Bike.unscoped.includes(:parking_notifications)
+        .where(parking_notifications: { id: pluck(:id) })
+  end
+
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?; false end
 

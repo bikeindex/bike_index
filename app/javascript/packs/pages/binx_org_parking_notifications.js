@@ -21,6 +21,8 @@ export default class BinxAppOrgParkingNotifications {
     window.binxAppOrgParkingNotificationMapping = new BinxAppOrgParkingNotificationMapping();
     binxAppOrgParkingNotificationMapping.init();
     this.initializeRepeatSubmit();
+    // Call the existing coffeescript class that manages the bike searchbar
+    new BikeIndex.BikeSearchBar();
   }
 
   initializeRepeatSubmit() {

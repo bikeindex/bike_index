@@ -20,8 +20,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       let!(:impound_record2) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike2) }
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
       let!(:impound_record_retrieved) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
+      let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
+        expect(current_organization.impound_records.active.bikes.pluck(:id)).to eq([bike2.id])
         expect(impound_record).to be_present
+        expect(current_organization.impound_records.bikes.count).to eq 2
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)

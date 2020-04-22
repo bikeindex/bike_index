@@ -27,9 +27,6 @@ export default class BinxAppOrgParkingNotificationMapping {
       fetchRecords();
       return true;
     });
-
-    // Call the existing coffeescript class that manages the bike searchbar
-    new BikeIndex.BikeSearchBar();
   }
 
   fetchRecords(opts = []) {
