@@ -21,7 +21,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.user).to eq user
       expect(impound_record.current?).to be_truthy
       expect(Bike.impounded.pluck(:id)).to eq([bike.id])
-      expect(organization.impound_records_bikes.pluck(:id)).to eq([bike.id])
+      expect(organization.impound_records.bikes.pluck(:id)).to eq([bike.id])
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }

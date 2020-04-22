@@ -42,9 +42,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
   has_many :parking_notifications
-  has_many :parking_notifications_bikes, through: :parking_notifications, source: :bike
   has_many :impound_records
-  has_many :impound_records_bikes, through: :impound_records, source: :bike
   has_many :b_params
   has_many :invoices
   has_many :payments
