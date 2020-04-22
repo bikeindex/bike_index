@@ -341,9 +341,15 @@ class Organization < ApplicationRecord
 
   def update_associations
     return true if skip_update
-    # If there is isn't a default impound bikes location and there should be, set one
-    if enabled?("impound_bikes_locations") && locations.default_impound_locations.blank?
-      locations.impound_locations.first.update(default_impound_location: true, skip_update: true)
+    if enabled?("impound_bikes_locations")
+      # If there is isn't a default impound bikes location and there should be, set one
+      if locations.default_impound_locations.blank?
+        locations.impound_locations.first.update(default_impound_location: true, skip_update: true)
+      elsif locations.impound_locations.where(default_impound_location: true).count > 1
+        # If there are more than one default locations, remove some
+        locations.impound_locations.where(default_impound_location: true).where.not(id: default_impound_location.id)
+          .each { |l| l.update(default_impound_location: false, skip_update: true) }
+      end
     end
     # Critical that locations update after skip_update, so we don't loop
     locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }

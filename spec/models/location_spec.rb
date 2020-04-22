@@ -58,7 +58,7 @@ RSpec.describe Location, type: :model do
       organization.update(updated_at: Time.current, skip_update: false)
       location.reload
       expect(location.default_impound_location).to be_truthy
-      # organization.reload
+      organization.reload
       expect(organization.default_impound_location).to eq location
       expect(organization.enabled_feature_slugs).to eq(%w[impound_bikes impound_bikes_locations])
       location2.update(impound_location: true, default_impound_location: true, skip_update: false)

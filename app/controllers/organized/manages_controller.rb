@@ -11,7 +11,7 @@ module Organized
     def update
       if @organization.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
-        redirect_to current_root_path
+        redirect_back(fallback_location: current_root_path)
       else
         @page_errors = @organization.errors
         flash[:error] = translation(:could_not_update, org_name: current_organization.name)
@@ -66,7 +66,8 @@ module Organized
     end
 
     def permitted_locations_params
-      %w(name zipcode city state_id country_id street phone email id _destroy)
+      %i(name zipcode city state_id country_id street phone email id _destroy publicly_visible
+         impound_location default_impound_location)
     end
 
     def notify_admins(type)

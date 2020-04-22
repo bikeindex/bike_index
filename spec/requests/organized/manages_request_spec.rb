@@ -136,7 +136,7 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "with locations and normal show_on_map" do
         let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
-        let(:location_1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name") }
+        let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name") }
         let(:update_attributes) do
           {
             name: current_organization.name,
@@ -145,7 +145,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             kind: "ambassador",
             locations_attributes: {
               "0" => {
-                id: location_1.id,
+                id: location1.id,
                 name: "First shop",
                 zipcode: "2222222",
                 city: "First city",
@@ -158,6 +158,9 @@ RSpec.describe Organized::ManagesController, type: :request do
                 longitude: 11_111,
                 organization_id: 844,
                 shown: false,
+                publicly_visible: "1",
+                impound_location: "false",
+                default_impound_location: "0",
                 _destroy: 0,
               },
               Time.current.to_i.to_s => {
@@ -173,7 +176,9 @@ RSpec.describe Organized::ManagesController, type: :request do
                 latitude: 22_222,
                 longitude: 11_111,
                 organization_id: 844,
-                shown: false,
+                publicly_visible: "0",
+                impound_location: "true",
+                default_impound_location: "0",
               },
             },
           }
@@ -193,25 +198,27 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.show_on_map).to be_truthy
             expect(current_organization.kind).to_not eq "ambassador"
             # Existing location is updated
-            location_1.reload
-            expect(location_1.organization).to eq current_organization
-            update_attributes[:locations_attributes]["0"].except(:latitude, :longitude, :organization_id, :shown, :created_at, :_destroy).each do |k, v|
-              expect(location_1.send(k)).to eq v
-            end
+            location1.reload
+            expect(location1.organization).to eq current_organization
+            skipped_location_attrs = %i(latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location)
+            expect_attrs_to_match_hash(location1, update_attributes[:locations_attributes]["0"].except(*skipped_location_attrs))
+            expect(location1.publicly_visible).to be_truthy
+            expect(location1.impound_location).to be_falsey
             # ensure we are not permitting crazy assignment for first location
             update_attributes[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-              expect(location_1.send(k)).to_not eq v
+              expect(location1.send(k)).to_not eq v
             end
 
             # second location
-            location_2 = current_organization.locations.last
+            location2 = current_organization.locations.last
             key = update_attributes[:locations_attributes].keys.last
-            update_attributes[:locations_attributes][key].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
-              expect(location_2.send(k)).to eq v
-            end
+            expect_attrs_to_match_hash(location2, update_attributes[:locations_attributes][key].except(*skipped_location_attrs))
+            expect(location2.publicly_visible).to be_falsey
+            expect(location2.impound_location).to be_truthy
+            expect(location2.default_impound_location).to be_falsey
             # ensure we are not permitting crazy assignment for created location
             update_attributes[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-              expect(location_1.send(k)).to_not eq v
+              expect(location1.send(k)).to_not eq v
             end
           end
         end
@@ -247,7 +254,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             end.to change(Location, :count).by 0
 
             current_organization.reload
-            expect(Location.where(id: location_1.id).count).to eq 0
+            expect(Location.where(id: location1.id).count).to eq 0
             expect(current_organization.short_name).to eq "cool other name"
           end
         end

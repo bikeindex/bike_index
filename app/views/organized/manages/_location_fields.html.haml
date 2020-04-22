@@ -1,4 +1,8 @@
-.col-md-6
+-# Note - this has to have a separate div with collapse, because the fieldset breaks styles
+-# The collapse class is what the slideup is called on
+- f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states.id
+- f.object.state_id ||= @organization.locations.first&.state_id
+.col-md-6.collapse.in
   %fieldset.card
     .card-block
       .row
@@ -22,7 +26,23 @@
             = f.collection_select(:state_id, State.all, :id, :name, { prompt: t(".state") }, { include_blank: true, class: "form-control" } )
           .col-sm-4
             = f.text_field :zipcode, placeholder: t(".zipcode"), class: 'form-control'
-
-      .remove-control
-        = f.check_box :_destroy
-        = f.label :_destroy, t(".remove"), class: 'remove_fields'
+      .row
+        .col-xs-6
+          .collapse.publiclyVisibilyCheck{ class: (current_organization.show_on_map ? "in" : "") }
+            .checkbox
+              = f.check_box :publicly_visible
+              = f.label :publicly_visible
+        .col-xs-6
+          .remove-control
+            = f.check_box :_destroy, class: "removeFieldsCheck"
+            = f.label :_destroy, t(".remove"), class: 'remove_fields'
+      - if current_organization.enabled?("impound_bikes")
+        .checkbox.mb-0.mt-2
+          = f.check_box :impound_location, class: "impoundLocationCheck"
+          = f.label :impound_location, class: "d-inline" do
+            Impound location
+            %em.small.less-strong
+              &nbsp;If #{current_organization.short_name} has multiple locations where impounded bikes go and wants to track them
+        .checkbox.mb-0.defaultImpoundLocationCheckWrapper.collapse
+          = f.check_box :default_impound_location, class: "defaultImpoundLocationCheck"
+          = f.label :default_impound_location
