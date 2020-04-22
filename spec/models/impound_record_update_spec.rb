@@ -25,7 +25,19 @@ RSpec.describe ImpoundRecordUpdate, type: :model do
     end
     context "removed_from_bike_index" do
       it "deletes" do
-
+        # is deleted from bike index and impound_record is resolved
+      end
+    end
+    context "sold" do
+      it "sends to a new owner" do
+        # is sold, etc
+      end
+      context "unregistered_parking_notification" do
+        let(:parking_notification)
+        it "sends to a new owner, ensures mark user hidden is off" do
+          # parking_notification.reload
+          # expect(parking_notification.unregistered_bike).to be_truthy
+        end
       end
     end
   end

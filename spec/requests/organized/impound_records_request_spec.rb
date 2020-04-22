@@ -54,4 +54,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(response).to render_template(:show)
     end
   end
+
+  describe "update" do
+    it "updates" do
+      # adds a note
+    end
+    context "with locations" do
+      it "updates, moves to a new location"
+    end
+  end
 end

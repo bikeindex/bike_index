@@ -17,8 +17,6 @@ class ImpoundRecordUpdate < ApplicationRecord
   scope :resolved, -> { where(kind: resolved_kinds) }
   scope :with_location, -> { where.not(location_id: nil) }
 
-  # delegate :bike, :organization, :parking_notification, to: :impound_record, allow_nil: true
-
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.active_kinds; %w[note move_location] end
