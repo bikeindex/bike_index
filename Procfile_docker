@@ -1,0 +1,4 @@
+web: bundle exec puma -C config/puma.rb -e development -p 3001
+webpacker: ./bin/webpack-dev-server # Live update webpack js
+log: tail -f log/development.log
+hard_worker: bundle exec sidekiq
