@@ -1,0 +1,61 @@
+- impound_records ||= @impound_records
+- skip_bike ||= false
+- render_sortable ||= false
+- render_resolved_at ||= false
+
+- # TODO: add translations
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      - if render_sortable
+        = sortable "display_id", "ID"
+      - else
+        ID
+    %th
+      - if render_sortable
+        = sortable "created_at"
+      - else
+        Created
+        %small.convertTimezone
+    - unless skip_bike
+      %th Bike
+    %th
+      - if render_sortable
+        = sortable "status"
+      - else
+        Status
+    %th
+      - if render_sortable
+        = sortable "user_id"
+      - else
+        User
+    - if render_resolved_at
+      %th
+        - if render_sortable
+          = sortable "resolved_at"
+        - else
+          Resolved
+  %tbody
+    - impound_records.each do |impound_record|
+      %tr
+        %td
+          %a{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+            = impound_record.display_id
+        %td
+          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+            = l(impound_record.created_at, format: :convert_time)
+        - unless skip_bike
+          %td
+            - if impound_record.bike.present?
+              = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike)
+        %td
+          %em
+            = impound_record.status
+        %td
+          = impound_record.user&.display_name
+        - if render_resolved_at
+          %td
+            - if impound_record.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_record.resolved_at, format: :convert_time)

@@ -40,6 +40,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
+  def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+
   def self.active_statuses; %w[current superseded] end
 
   def self.resolved_statuses; STATUS_ENUM.keys.map(&:to_s) - active_statuses end
@@ -61,6 +63,11 @@ class ParkingNotification < ActiveRecord::Base
     potential_id_matches = [id, initial_record_id].compact
     where(initial_record_id: potential_id_matches).where.not(id: id)
       .or(where(id: initial_record_id))
+  end
+
+  def self.bikes
+    Bike.unscoped.includes(:parking_notifications)
+        .where(parking_notifications: { id: pluck(:id) })
   end
 
   # geocoding is managed by set_calculated_attributes

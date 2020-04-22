@@ -42,6 +42,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
   has_many :parking_notifications
+  has_many :impound_records
   has_many :b_params
   has_many :invoices
   has_many :payments
@@ -129,18 +130,6 @@ class Organization < ApplicationRecord
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
-  end
-
-  def impounded_bikes
-    Bike.includes(:impound_records)
-        .where(impound_records: { retrieved_at: nil, organization_id: id })
-        .where.not(impound_records: { id: nil })
-  end
-
-  def parking_notification_bikes
-    Bike.includes(:parking_notifications)
-        .where(parking_notifications: { impound_record_id: nil, organization_id: id })
-        .where.not(parking_notifications: { id: nil })
   end
 
   # never geocode, use default_location lat/long

@@ -89,7 +89,7 @@ class Bike < ApplicationRecord
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
-  scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
+  scope :impounded, -> { includes(:impound_records).where(impound_records: { resolved_at: nil }).where.not(impound_records: { id: nil }) }
   scope :non_abandoned, -> { where(abandoned: false) }
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
