@@ -2,10 +2,10 @@ FROM ruby:2.5.5
 WORKDIR /src
 
 RUN apt-get update -yq \
+    && apt-get install curl gnupg -yq \
 
     # imagemagick
     && apt-get install imagemagick \
-    && apt-get install curl gnupg -yq \
 
     # node js
     && curl -sL https://deb.nodesource.com/setup_10.x | bash \
