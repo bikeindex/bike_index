@@ -9,7 +9,6 @@
         %em unregistered
         = @bike.type
 
-- # TODO: add translations
 .row
   .col-md-6
     %table.table-list
@@ -17,11 +16,34 @@
         %tr
           %td Created
           %td
-            %span.convertTime
+            %span.convertTime.preciseTime
               = l(@impound_record.created_at, format: :convert_time)
         %tr
-          %td By
-          %td= @impound_record.user.display_name
+          %td Impounded by
+          %td= @impound_record.creator&.display_name
+        - if @impound_record.resolved?
+          %tr
+            %td Resolved
+            %td
+              %span.convertTime
+                = l(@impound_record.resolved_at, format: :convert_time)
+        - if @impound_record_updates.any?
+          %tr
+            %td Updated
+            %td
+              %span.convertTime.preciseTime
+                = l(@impound_record.updated_at, format: :convert_time)
+          %tr
+            %td By
+            %td= @impound_record.user&.display_name
+        - if current_organization.enabled?("impound_bikes_locations")
+          %tr
+            %td Location
+            %td= @impound_record.location&.display_name
+
+  .col-md-6
+    %table.table-list
+      %tbody
         %tr
           %td Status
           %td
@@ -32,23 +54,12 @@
           %td
             - if @bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
-              %br
-              %small
-                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
-                  view parking notifications for
-                  %em
-                    = @bike.type
-        - if @impound_record.resolved?
-          %tr
-            %td Resolved
-            %td
-              %span.convertTime
-                = l(@impound_record.resolved_at, format: :convert_time)
 
 - if @parking_notification.present?
-  %hr
+  %hr.mt-4
   %h2.uncap
-    Record created by
-    = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+    Impounded by
+    %em
+      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
 
-  = render partial: "/organized/parking_notifications/show_details"
+  = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }

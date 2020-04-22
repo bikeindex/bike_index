@@ -381,12 +381,6 @@ class Bike < ApplicationRecord
     true
   end
 
-  def impound(passed_user, organization: nil)
-    organization ||= passed_user.organizations.detect { |o| o.enabled?("impound_bikes") }
-    impound_record = impound_records.where(organization_id: organization&.id).first
-    impound_record ||= impound_records.create(user: passed_user, organization: organization)
-  end
-
   def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
     bike_stickers.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end

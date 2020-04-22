@@ -233,36 +233,5 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(assigns(:current_organization)).to eq organization
       end
     end
-
-    describe "impound bike" do
-      let(:ownership) { FactoryBot.create(:ownership) }
-      let(:bike) { ownership.bike }
-      it "renders flash message about not permitted" do
-        expect(bike.impounded?).to be_falsey
-        request.env["HTTP_REFERER"] = bike_path(bike)
-        put :update, params: { organization_id: organization.to_param, id: bike.id, bike: { impound: true } }
-        expect(flash[:error]).to be_present
-        expect(response).to redirect_to(bike_path(bike))
-        bike.reload
-        expect(bike.impounded?).to be_falsey
-      end
-      context "organization has impound_bikes" do
-        let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: "impound_bikes") }
-        it "impounds the bike" do
-          expect(bike.impounded?).to be_falsey
-          request.env["HTTP_REFERER"] = bike_path(bike)
-          expect do
-            put :update, params: { organization_id: organization.to_param, id: bike.id, bike: { impound: true } }
-          end.to change(ImpoundRecord, :count).by 1
-          expect(flash[:success]).to be_present
-          expect(response).to redirect_to(bike_path(bike))
-          bike.reload
-          expect(bike.impounded?).to be_truthy
-          impound_record = bike.impound_records.last
-          expect(impound_record.user).to eq user
-          expect(impound_record.organization).to eq organization
-        end
-      end
-    end
   end
 end

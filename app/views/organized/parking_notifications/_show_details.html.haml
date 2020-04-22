@@ -1,4 +1,5 @@
 - related_notifications ||= @parking_notification.associated_notifications.reorder(id: :desc)
+- viewing_impound_record ||= false
 
 - # TODO: add translations
 .row
@@ -34,22 +35,22 @@
             - elsif @parking_notification.impounded?
               %strong.text-danger
                 This #{@bike.type} was impounded
-              %ul
-                - if !@parking_notification.impound_notification?
-                  - impound_notification = @parking_notification.associated_notifications.impound_notification.last
+              - unless viewing_impound_record
+                %ul
+                  - if !@parking_notification.impound_notification?
+                    - impound_notification = @parking_notification.associated_notifications.impound_notification.last
+                    %li
+                      View the
+                      = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
+                      %small
+                        %em
+                          created
+                          %span.convertTime.preciseTime
+                            = l(impound_notification.created_at, format: :convert_time)
+                        by #{impound_notification.user.display_name}
                   %li
                     View the
-                    = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
-                    %small
-                      %em
-                        created
-                        %span.convertTime.preciseTime
-                          = l(impound_notification.created_at, format: :convert_time)
-                      by #{impound_notification.user.display_name}
-                %li
-                  View the
-                  -# TODO: once impound controller is updated, make this link work
-                  = link_to "impound record", "#" # organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
+                    = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
             - elsif @parking_notification.retrieved?
               %span.text-warning
                 This #{@bike.type} has been retrieved!
@@ -66,7 +67,7 @@
                     the user
                   - if current_user.developer?
                     %br
-                    %small
+                    %small.only-dev-visible
                       %span.less-strong developer info:
                       %code
                         #{retrieved_notification.retrieved_kind}
@@ -101,7 +102,7 @@
             - else
               From GPS
             - if current_user.developer? && @parking_notification.accuracy.present?
-              %small
+              %small.only-dev-visible
                 %span.less-strong developer info:
                 %code
                   #{@parking_notification.accuracy} accuracy

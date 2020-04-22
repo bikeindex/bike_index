@@ -15,6 +15,7 @@ module Organized
 
     def show
       @impound_record = impound_records.find(params[:id])
+      @impound_record_updates = @impound_record.impound_record_updates.reorder(created_at: :desc)
       @bike = @impound_record.bike
       @parking_notification = @impound_record.parking_notification
     end

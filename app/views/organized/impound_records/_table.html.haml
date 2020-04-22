@@ -40,8 +40,7 @@
     - impound_records.each do |impound_record|
       %tr
         %td
-          %a{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
-            = impound_record.display_id
+          = impound_record.display_id
         %td
           %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
             = l(impound_record.created_at, format: :convert_time)
