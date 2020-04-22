@@ -1052,9 +1052,11 @@ CREATE TABLE public.impound_records (
     bike_id integer,
     user_id integer,
     organization_id integer,
-    retrieved_at timestamp without time zone,
+    resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    display_id bigint,
+    status integer DEFAULT 0
 );
 
 
@@ -4585,6 +4587,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200415161915'),
 ('20200416202219'),
 ('20200420181614'),
-('20200421191302');
+('20200421191302'),
+('20200421230336');
 
 

@@ -40,6 +40,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
+  def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+
   def self.active_statuses; %w[current superseded] end
 
   def self.resolved_statuses; STATUS_ENUM.keys.map(&:to_s) - active_statuses end

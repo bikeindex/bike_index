@@ -6,8 +6,11 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+
       @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-                                                  .page(@page).per(@per_page)
+                          .page(@page).per(@per_page)
     end
 
     def show
@@ -21,11 +24,38 @@ module Organized
     end
 
     def sortable_columns
-      %w[created_at]
+      %w[display_id created_at status user_id resolved_at]
+    end
+
+    def bike_search_params_present?
+      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:email].present?
+    end
+
+    def searched_bikes
+      bikes = current_organization.impound_records_bikes
+      bikes = bikes.search(@interpreted_params)
+      bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
+      bikes
     end
 
     def available_impound_records
-      impound_records
+      return @available_impound_records if defined?(@available_impound_records)
+      if params[:search_status].blank? || params[:search_status] == "active"
+        @search_status = "active"
+        a_impound_records = impound_records.active
+      elsif params[:search_status] == "all"
+        @search_status = "all"
+        a_impound_records = impound_records
+      else
+        @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "all"
+        a_impound_records = impound_records.where(status: @search_status)
+      end
+
+      if bike_search_params_present?
+        a_impound_records = a_impound_records.where(bike_id: searched_bikes.pluck(:id))
+      end
+
+      @available_impound_records = a_impound_records.where(created_at: @time_range)
     end
   end
 end

@@ -21,6 +21,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.user).to eq user
       expect(impound_record.current?).to be_truthy
       expect(Bike.impounded.pluck(:id)).to eq([bike.id])
+      expect(organization.impound_records_bikes.pluck(:id)).to eq([bike.id])
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
@@ -80,17 +81,17 @@ RSpec.describe ImpoundRecord, type: :model do
       end
     end
     context "retrieved bike" do
-      let(:retrieved_at) { Time.current - 1.minute }
+      let(:resolved_at) { Time.current - 1.minute }
       let!(:impound_record) do
         FactoryBot.create(:impound_record, user: user,
                                            bike: bike,
                                            organization: organization,
-                                           retrieved_at: retrieved_at)
+                                           resolved_at: resolved_at)
       end
       it "re-retrieving doesn't alter time, can be re-impounded" do
         impound_record.mark_retrieved
         impound_record.reload
-        expect(impound_record.retrieved_at).to be_within(1.second).of retrieved_at
+        expect(impound_record.resolved_at).to be_within(1.second).of resolved_at
         bike.reload
         expect(bike.impounded?).to be_falsey
         bike.impound_records.create(user: user, bike: bike, organization: organization)

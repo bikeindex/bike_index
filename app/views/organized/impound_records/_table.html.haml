@@ -1,87 +1,61 @@
-- skip_map_cell ||= false
+- impound_records ||= @impound_records
 - skip_bike ||= false
-- skip_repeat ||= false
-- render_address ||= false
-- skip_multiselect ||= false
+- render_sortable ||= false
+- render_resolved_at ||= false
+
+- # TODO: add translations
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
   %thead.small-header.hidden-md-down
-    - unless skip_map_cell
-      %th.map-cell
     %th
-      = t(".created")
-      %small.convertTimezone
+      - if render_sortable
+        = sortable "display_id", "ID"
+      - else
+        ID
+    %th
+      - if render_sortable
+        = sortable "created_at"
+      - else
+        Created
+        %small.convertTimezone
     - unless skip_bike
-      %th=t(".bike")
-    - if render_address
-      %th=t(".address")
-    %th=t(".kind")
-    %th=t(".by")
-    - unless skip_repeat
+      %th Bike
+    %th
+      - if render_sortable
+        = sortable "status"
+      - else
+        Status
+    %th
+      - if render_sortable
+        = sortable "user_id"
+      - else
+        User
+    - if render_resolved_at
       %th
-        %small=t(".notification_number")
-    %th
-      %small=t(".impounded")
-    %th
-      %small=t(".retrieved")
-    - unless skip_multiselect
-      %th.multiselect-cell.table-cell-check.collapse
-        %a#selectAllSelector{ href: "#" }
-          = check_mark
+        - if render_sortable
+          = sortable "resolved_at"
+        - else
+          Resolved
   %tbody
-    - parking_notifications.each do |parking_notification|
+    - impound_records.each do |impound_record|
       %tr
-        - unless skip_map_cell
-          %td
         %td
-          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
-            = l(parking_notification.created_at, format: :convert_time)
-          %span.extended-col-info.small
-            \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}
-          - unless skip_repeat
-            - if parking_notification.repeat_number > 0
-              %strong.extended-col-info
-                Notification ##{parking_notification.repeat_number}
-          - unless skip_bike
-            %span.extended-col-info.d-block
-              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
-
-          - if parking_notification.resolved_at.present?
-            %strong.small.extended-col-info.d-block
-              Impounded:
-              %span.convertTime.preciseTime
-                = l(parking_notification.resolved_at, format: :convert_time)
-          - if parking_notification.resolved_at.present?
-            %strong.small.extended-col-info.d-block
-              Retrieved:
-              %span.convertTime.preciseTime
-                = l(parking_notification.resolved_at, format: :convert_time)
-
-        - if render_address
-          %td.hidden-sm-cells
-            %small= address_formatted(parking_notification)
+          %a{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+            = impound_record.display_id
+        %td
+          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+            = l(impound_record.created_at, format: :convert_time)
         - unless skip_bike
-          %td.hidden-sm-cells
-            - if parking_notification.bike.present?
-              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
-        %td.hidden-sm-cells
+          %td
+            - if impound_record.bike.present?
+              = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike)
+        %td
           %em
-            = parking_notification.kind_humanized
-        %td.hidden-sm-cells
-          = parking_notification.user&.display_name
-        - unless skip_repeat
-          %td.small.hidden-sm-cells
-            - if parking_notification.repeat_record?
-              = parking_notification.notification_number
-        %td.hidden-sm-cells
-          - if parking_notification.resolved_at.present?
-            %span.convertTime.preciseTime
-              = l(parking_notification.resolved_at, format: :convert_time)
-        %td.hidden-sm-cells
-          - if parking_notification.resolved_at.present?
-            %span.convertTime.preciseTime
-              = l(parking_notification.resolved_at, format: :convert_time)
-        - unless skip_multiselect
-          %td.multiselect-cell.table-cell-check.collapse
-            = check_box_tag "ids[#{parking_notification.id}]", parking_notification.id
-
+            = impound_record.status
+        %td
+          = impound_record.user&.display_name
+        - if render_resolved_at
+          %td
+            - if impound_record.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_record.resolved_at, format: :convert_time)
