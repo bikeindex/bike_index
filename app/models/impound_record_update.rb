@@ -1,0 +1,2 @@
+class ImpoundRecordUpdate < ApplicationRecord
+end

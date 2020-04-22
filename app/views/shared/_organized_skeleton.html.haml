@@ -3,7 +3,7 @@
 %nav.organized-left-menu
   .organized-menu-wrapper
     %header{ class: show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" }
-      - if current_organization.display_avatar
+      - if current_organization.display_avatar?
         = image_tag current_organization.avatar.url(:medium)
       %h3
         = t(".admin_panel")

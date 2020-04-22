@@ -263,7 +263,6 @@ class Organization < ApplicationRecord
     self.regional_ids = nearby_organizations.pluck(:id) || []
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
-    locations.each { |l| l.save unless l.shown == allowed_show }
   end
 
   def ensure_auto_user
@@ -286,6 +285,12 @@ class Organization < ApplicationRecord
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
 
   def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
+
+  def allowed_show?; show_on_map && approved end
+
+  def display_avatar?; is_paid && avatar.present? end
+
+  def suspended?; is_suspended? end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
@@ -322,20 +327,10 @@ class Organization < ApplicationRecord
     bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
   end
 
-  def allowed_show
-    show_on_map && approved
-  end
-
-  def display_avatar
-    is_paid && avatar.present?
-  end
-
-  def suspended?
-    is_suspended?
-  end
-
   def update_associations
     return true if skip_update
+    # Critical that locations update after skip_update, so we don't loop
+    locations.each { |l| l.update(updated_at: Time.current) }
     UpdateAssociatedOrganizationsWorker.perform_async(id)
   end
 

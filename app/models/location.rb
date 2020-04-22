@@ -13,17 +13,12 @@ class Location < ApplicationRecord
   scope :shown, -> { where(shown: true) }
   # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
-  before_save :shown_from_organization
-  before_save :set_phone
+  before_save :set_calculated_attributes
   after_commit :update_organization
 
-  def shown_from_organization
-    self.shown = organization && organization.allowed_show
-    true
-  end
-
-  def set_phone
+  def set_calculated_attributes
     self.phone = Phonifyer.phonify(self.phone) if self.phone
+    self.shown = organization&.allowed_show?
   end
 
   def address
@@ -37,13 +32,11 @@ class Location < ApplicationRecord
   def update_organization
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
-    organization&.reload&.update(updated_at: Time.current)
+    organization&.reload&.update(updated_at: Time.current, skip_update: true)
   end
 
   def display_name
     return "" if organization.blank?
-    return name if name == organization.name
-
-    "#{organization.name} - #{name}"
+    name == organization.name ? name : "#{organization.name} - #{name}"
   end
 end

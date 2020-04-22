@@ -1,5 +1,6 @@
 class ImpoundRecord < ApplicationRecord
-  STATUS_ENUM = { current: 0, retrieved: 1 }.freeze
+  # These statuses overlap with impound_record_updates
+  STATUS_ENUM = { current: 0, retrieved_by_user: 1 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -39,10 +40,6 @@ class ImpoundRecord < ApplicationRecord
     return true if user.present? && user.can_impound? && organization.present? &&
                    user.authorized?(organization) && organization.enabled?("impound_bikes")
     errors.add(:user_id, :user_not_authorized)
-  end
-
-  def mark_retrieved
-    update_attributes(resolved_at: Time.current) if current?
   end
 
   def update_associations

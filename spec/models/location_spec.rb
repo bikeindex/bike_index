@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Location, type: :model do
   it_behaves_like "geocodeable"
 
-  describe "set_phone" do
+  describe "set_calculated_attributes" do
     it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")
       expect(location.phone).to eq("7738383887")
@@ -28,5 +28,18 @@ RSpec.describe Location, type: :model do
       location = FactoryBot.create(:location)
       expect(location.org_location_id).to eq("#{location.organization_id}_#{location.id}")
     end
+  end
+
+  describe "shown, not_publicly_visible" do
+    let(:organization) { FactoryBot.create(:organization, shown_on_map: true, approved: false) }
+    let(:location) { FactoryBot.create(:location, organization: organization) }
+    it "sets based on organization and not_publicly_visible" do
+      expect(organization.allowed_show?)
+    end
+  end
+
+  describe "impound_location, default_impound_location, organization setting" do
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["impound_bikes"]) }
+    it "sets the "
   end
 end

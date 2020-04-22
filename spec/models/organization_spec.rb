@@ -385,7 +385,7 @@ RSpec.describe Organization, type: :model do
       let(:location) { Location.create(country_id: country.id, city: "Chicago", name: "stuff", organization_id: organization.id, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
-          expect(organization.allowed_show).to be_truthy
+          expect(organization.allowed_show?).to be_truthy
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_truthy
         end
@@ -394,7 +394,7 @@ RSpec.describe Organization, type: :model do
         it "sets not shown" do
           organization.update_attribute :approved, false
           organization.reload
-          expect(organization.allowed_show).to be_falsey
+          expect(organization.allowed_show?).to be_falsey
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_falsey
         end
@@ -472,19 +472,19 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "display_avatar" do
+  describe "display_avatar?" do
     context "unpaid" do
       it "does not display" do
         organization = Organization.new(is_paid: false)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_falsey
+        expect(organization.display_avatar?).to be_falsey
       end
     end
     context "paid" do
       it "displays" do
         organization = Organization.new(is_paid: true)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_truthy
+        expect(organization.display_avatar?).to be_truthy
       end
     end
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# In reality, this should be something like OrganizationFeatures. Initially everything was paid though
+# In reality, this should be something like OrganizationFeatures. Initially all features were paid though
 class PaidFeature < ApplicationRecord
   include Amountable
   KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
@@ -26,6 +26,7 @@ class PaidFeature < ApplicationRecord
     passwordless_users
     regional_bike_counts
     regional_stickers
+    impound_bikes_locations
     show_bulk_import
     show_multi_serial
     show_partial_registrations
