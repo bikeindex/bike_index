@@ -51,18 +51,27 @@
                     %em.small.less-strong
                       = t(".org_cannot_edit", org_name: passive_organization.short_name)
               - if passive_organization.enabled?("bike_stickers") # Always display stickers if org has paid for them
+                - show_sticker_modal = true
                 %tr
                   %td
                     = t(".sticker")
                   %td
-                    - @bike.bike_stickers.each do |bike_sticker|
-                      - if bike_sticker.organization.present?
-                        = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param)
-                      - else
-                        = bike_sticker.code
-                    - if @bike.bike_stickers.none?
-                      - show_sticker_modal = true
-                      %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
+                    - stickers = @bike.bike_stickers.reorder(claimed_at: :desc)
+                    - if stickers.any?
+                      %ul
+                        - stickers.each do |bike_sticker|
+                          %li
+                            - if bike_sticker.organization.present?
+                              = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param)
+                            - else
+                              = bike_sticker.code
+                            - if bike_sticker.claimed_at.present?
+                              %small.less-strong
+                                claimed
+                                %em.convertTime.preciseTime
+                                  = l bike_sticker.claimed_at, format: :convert_time
+                    .small.text-right
+                      %a.less-strong{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
                         = t(".link_sticker")
               - if @bike.unregistered_parking_notification?
                 %tr

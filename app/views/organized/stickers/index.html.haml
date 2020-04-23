@@ -3,13 +3,16 @@
     %em= current_organization.name
     = t(".stickers")
 
-- claimedness = "claimed" if params[:claimedness] == "claimed"
-- claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
+- claimedness = "claimed" if params[:search_claimedness] == "claimed"
+- claimedness ||= "unclaimed" if params[:search_claimedness] == "unclaimed"
 - claimedness ||= "all"
 
 = form_tag organization_stickers_path(organization_id: current_organization.to_param),
   method: :get,
   class: "stickers-form" do
+
+  = hidden_field_tag :sort, sort_column
+  = hidden_field_tag :direction, sort_direction
 
   .row
     .col-md-4
@@ -18,8 +21,8 @@
         class: "form-control"
 
     .col-md-4
-      = text_field_tag :bike_query,
-        params[:bike_query],
+      = text_field_tag :search_bike,
+        params[:search_bike],
         placeholder: t(".search_bike_url_or_id"),
         class: "form-control"
 
@@ -29,15 +32,15 @@
     .col-md-12
       .btn-group#organized-bike-code-claimedness{ role: "group", "aria-label" => "Claimedness", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "all") }
-          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
+          %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
           = t(".all")
 
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "claimed") }
-          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "claimed", value: "claimed" }
+          %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "claimed", value: "claimed" }
           = t(".claimed")
 
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "unclaimed") }
-          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
+          %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
           = t(".unclaimed")
 
 .full-screen-table.mt-4
