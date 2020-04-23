@@ -49,8 +49,12 @@
                             = l(impound_notification.created_at, format: :convert_time)
                         by #{impound_notification.user.display_name}
                   %li
-                    View the
-                    = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
+                    - if @parking_notification.impound_record_id.present?
+                      View the
+                      = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
+                    - else
+                      %small.less-strong
+                        Impound record not found. Try reloading the page?
             - elsif @parking_notification.retrieved?
               %span.text-warning
                 This #{@bike.type} has been retrieved!

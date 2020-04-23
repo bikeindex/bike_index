@@ -39,7 +39,7 @@
         - if current_organization.enabled?("impound_bikes_locations")
           %tr
             %td Location
-            %td= @impound_record.location&.display_name
+            %td= @impound_record.location&.name
 
   .col-md-6
     %table.table-list
