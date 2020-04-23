@@ -64,7 +64,6 @@
                   %small= bike_sticker_batch.notes
 
 - if @render_chart
-  %h4.mt-2 Counts
   = column_chart time_range_counts(collection: matching_bike_stickers, column: @chart_column), stacked: true, thousands: ",", defer: true
 
 .mt-2
