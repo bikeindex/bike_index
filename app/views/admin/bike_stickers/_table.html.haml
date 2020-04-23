@@ -1,5 +1,6 @@
 - render_sortable ||= false
 - bike_code_batch_organizations = BikeStickerBatch.all.map { |b| [b.id.to_s, b.organization&.short_name] }.to_h
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
@@ -19,7 +20,10 @@
         - else
           Batch
       %th
-        Linked
+        - if render_sortable && @search_claimed
+          = sortable "claimed_at"
+        - else
+          Claimed
       %th
         Bike
       %th
