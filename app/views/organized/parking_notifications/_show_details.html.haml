@@ -105,11 +105,14 @@
               Address entered
             - else
               From GPS
-            - if current_user.developer? && @parking_notification.accuracy.present?
-              %small.only-dev-visible
+            - if current_user.developer?
+              %small.only-dev-visible.ml-2
                 %span.less-strong developer info:
-                %code
-                  #{@parking_notification.accuracy} accuracy
+                #{@parking_notification.to_coordinates}
+
+                - if @parking_notification.accuracy.present?
+                  %code
+                    #{@parking_notification.accuracy} accuracy
 
         %tr
           %td= t(".notification_number")

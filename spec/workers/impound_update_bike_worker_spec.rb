@@ -1,0 +1,73 @@
+require "rails_helper"
+
+RSpec.describe ImpoundUpdateBikeWorker, type: :job do
+  let(:instance) { subject.new }
+
+  let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
+  let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+  let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, resolved: false, kind: kind) }
+  let(:kind) { "note" }
+
+  it "resolves the impound_record_update" do
+    bike.reload
+    expect(bike.status_impounded?).to be_falsey
+    expect(bike.updated_at).to be < Time.current - 1.minute
+
+    impound_record_update.save
+    described_class.new.perform(impound_record.id)
+
+    impound_record_update.reload
+    expect(impound_record_update.resolved).to be_truthy
+
+    bike.reload
+    expect(bike.status_impounded?).to be_truthy
+    expect(bike.updated_at).to be_within(1).of Time.current
+  end
+
+  context "retrieved by owner" do
+    let(:kind) { "retrieved_by_owner" }
+    it "marks the impound_record resolved" do
+      bike.update(updated_at: Time.current)
+      expect(bike.status_impounded?).to be_truthy
+
+      impound_record_update.save
+      described_class.new.perform(impound_record.id)
+
+      impound_record_update.reload
+      expect(impound_record_update.resolved).to be_truthy
+
+      impound_record.reload
+      expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at
+      expect(impound_record.status).to eq kind
+
+      bike.reload
+      expect(bike.status_impounded?).to be_falsey
+      expect(bike.updated_at).to be_within(1).of Time.current
+    end
+  end
+
+  context "removed_from_index" do
+    let(:kind) { "removed_from_bike_index" }
+    it "deletes the bike" do
+      impound_record_update.save
+      described_class.new.perform(impound_record.id)
+
+      impound_record_update.reload
+      expect(impound_record_update.resolved).to be_truthy
+
+      impound_record.reload
+      expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at
+      expect(impound_record.status).to eq kind
+      expect(impound_record.bike).to be_present # Because we still want to show information about the bike
+
+      expect(Bike.unscoped.find(bike.id).deleted?).to be_truthy
+    end
+  end
+
+  context "transferred" do
+    let(:kind) { "transferred" }
+    it "creates 2 new ownerships, transfers it to the user, then to the new email, only sends one email" do
+      # impound_record_update.update(sold_to_email: "something@party.com")
+    end
+  end
+end

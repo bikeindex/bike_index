@@ -1,6 +1,6 @@
 class ImpoundRecordUpdate < ApplicationRecord
   # These statuses overlap with impound_records! The resolved statuses need to match up
-  KIND_ENUM = { note: 0, move_location: 1, retrieved_by_owner: 2, removed_from_bike_index: 3, sold: 4 }.freeze
+  KIND_ENUM = { note: 0, move_location: 1, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred: 4 }.freeze
 
   belongs_to :impound_record
   belongs_to :user
@@ -8,7 +8,6 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   validates_presence_of :impound_record_id, :user_id
 
-  before_save :set_calculated_attributes
   after_commit :update_associations
 
   enum kind: KIND_ENUM
@@ -16,6 +15,7 @@ class ImpoundRecordUpdate < ApplicationRecord
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }
   scope :with_location, -> { where.not(location_id: nil) }
+  scope :unresolved, -> { where(resolved: false) } # Means the update worker hasn't taken care of them
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
@@ -31,7 +31,7 @@ class ImpoundRecordUpdate < ApplicationRecord
       move_location: "move location",
       retrieved_by_owner: "retrieved by owner",
       removed_from_bike_index: "removed from Bike Index",
-      sold: "sold",
+      transferred: "transferred to new owner",
     }
   end
 
@@ -40,9 +40,6 @@ class ImpoundRecordUpdate < ApplicationRecord
   def resolved?; !active? end
 
   def kind_humanized; self.class.kinds_humanized[kind.to_sym] end
-
-  def set_calculated_attributes
-  end
 
   def update_associations
     impound_record&.update(updated_at: Time.current)

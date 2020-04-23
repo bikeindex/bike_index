@@ -1054,6 +1054,8 @@ CREATE TABLE public.impound_record_updates (
     location_id bigint,
     kind integer,
     note text,
+    transfer_to_email character varying,
+    resolved boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

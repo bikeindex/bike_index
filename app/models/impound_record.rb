@@ -47,7 +47,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    bike&.update_attributes(updated_at: Time.current)
+    ImpoundUpdateBikeWorker.perform_async(id)
   end
 
   def set_calculated_attributes
