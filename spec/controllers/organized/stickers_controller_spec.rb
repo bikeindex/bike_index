@@ -56,7 +56,7 @@ RSpec.describe Organized::StickersController, type: :controller do
           let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
           before { bike_sticker_claimed.claim(user, FactoryBot.create(:bike).id) }
           it "renders" do
-            get :index, params: { organization_id: organization.to_param, claimedness: "unclaimed", query: "part" }
+            get :index, params: { organization_id: organization.to_param, search_claimedness: "unclaimed", query: "part" }
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
@@ -68,7 +68,7 @@ RSpec.describe Organized::StickersController, type: :controller do
           before { bike_sticker_claimed.claim(user, bike.id) }
           it "renders" do
             expect(BikeSticker.where(bike_id: bike.id).pluck(:id)).to eq([bike_sticker_claimed.id])
-            get :index, params: {organization_id: organization.to_param, bike_query: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"}
+            get :index, params: {organization_id: organization.to_param, search_bike: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"}
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
