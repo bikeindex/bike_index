@@ -64,9 +64,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "update" do
     let(:kind) { "note" }
     let(:update_params) { { notes: "OK boomer", kind: kind } }
-    let(:ownership_original) { FactoryBot.create(:ownership, bike: bike) }
+    let!(:ownership_original) { FactoryBot.create(:ownership, bike: bike) }
     before do
-      expect(ownership_original).to be_present
       expect(impound_record).to be_present
       ImpoundUpdateBikeWorker.new.perform(impound_record.id)
       ActionMailer::Base.deliveries = []
@@ -189,26 +188,31 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "unregistered_parking_notification" do
         let(:parking_notification) do
           pn = FactoryBot.create(:unregistered_parking_notification,
-                            created_at: Time.current - 1.hour,
-                            organization: current_organization,
-                            user: current_user,
-                            kind: "impound_notification")
+                                 created_at: Time.current - 1.hour,
+                                 organization: current_organization,
+                                 user: current_user,
+                                 kind: "impound_notification")
           # Process parking_notification in the actual code path that creates the impound record
           ProcessParkingNotificationWorker.new.perform(pn.id)
           pn.reload
           pn
         end
-        let(:impound_record) { parking_notification.impound_record }
-        xit "sends to a new owner, ensures mark user hidden is off" do
+        let(:bike) { parking_notification.bike }
+        let!(:impound_record) { parking_notification.impound_record }
+        let!(:ownership_original) { nil }
+        it "sends to a new owner, ensures mark user hidden is off" do
           parking_notification.reload
           bike.reload
           impound_record.reload
+          expect(parking_notification.impound_record_id).to eq impound_record.id
+          expect(parking_notification.bike_id).to eq impound_record.bike_id
+          expect(parking_notification.bike_id).to eq bike.id
           expect(parking_notification.unregistered_bike).to be_truthy
-          expect(bike.unregistered_parking_notification?).to be_truthy
+          expect(bike.created_for_parking_notification).to be_truthy
+          expect(bike.status).to eq "unregistered_parking_notification"
           expect(bike.current_impound_record).to eq impound_record
           expect(impound_record.current?).to be_truthy
-          bike.reload
-          expect(bike.status_impounded?).to be_truthy
+          expect(bike.ownerships.count).to eq 1
           expect do
             put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params_with_email }
           end.to change(ImpoundRecordUpdate, :count).by 1

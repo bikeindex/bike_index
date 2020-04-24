@@ -12,7 +12,7 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
                     address_set_manually: false)
         ownership = bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
                                             impound_record_id: impound_record.id,
-                                            creator_id: impound_record.user_id,
+                                            creator_id: impound_record_update.user_id,
                                             current: true)
         bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
       elsif impound_record_update.kind == "removed_from_bike_index"
@@ -20,7 +20,7 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
       end
       impound_record_update.update(resolved: true)
     end
-
     impound_record.bike&.update(updated_at: Time.current)
+    impound_record.bike.reload
   end
 end

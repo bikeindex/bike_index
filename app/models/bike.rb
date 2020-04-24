@@ -692,6 +692,8 @@ class Bike < ApplicationRecord
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     set_location_info
     self.listing_order = calculated_listing_order
+    # Quick hack to store the fact that it was creation for parking notification
+    self.created_for_parking_notification = true if unregistered_parking_notification?
     self.status = calculated_status unless skip_status_update
     clean_frame_size
     set_mnfg_name

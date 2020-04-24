@@ -55,6 +55,7 @@ RSpec.describe ParkingNotification, type: :model do
     it "is unregistered" do
       parking_notification.reload
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
+      expect(parking_notification.bike.created_for_parking_notification).to be_truthy
       expect(parking_notification.unregistered_bike).to be_truthy
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
