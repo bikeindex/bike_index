@@ -8,7 +8,6 @@
 .organized-page-header
   %h1
     Impound Record
-    %em ##{@impound_record.display_id}
     - if @bike.present? && @bike.created_by_parking_notification
       %small.text-warning
         %em for
@@ -22,6 +21,9 @@
           %td ID
           %td
             %code= @impound_record.display_id
+            - if current_user.developer?
+              %small.only-dev-visible
+                %span.less-strong global ID: #{@impound_record.id}
         %tr
           %td Created
           %td
@@ -34,7 +36,7 @@
           %tr
             %td Resolved
             %td
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l(@impound_record.resolved_at, format: :convert_time)
           %tr
             %td By

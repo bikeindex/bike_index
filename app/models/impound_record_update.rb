@@ -32,8 +32,8 @@ class ImpoundRecordUpdate < ApplicationRecord
       note: "Add internal note",
       move_location: "Update location",
       retrieved_by_owner: "Owner retrieved bike",
-      removed_from_bike_index: "Remove from Bike Index",
-      transferred_to_new_owner: "Transfer to new owner",
+      removed_from_bike_index: "Removed from Bike Index",
+      transferred_to_new_owner: "Transferred to new owner",
     }
   end
 

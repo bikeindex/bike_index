@@ -300,7 +300,7 @@ CREATE TABLE public.bike_stickers (
     claimed_at timestamp without time zone,
     previous_bike_id integer,
     bike_sticker_batch_id integer,
-    code_integer integer,
+    code_integer bigint,
     code_prefix character varying
 );
 
@@ -4683,6 +4683,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200421191302'),
 ('20200421230336'),
 ('20200422161944'),
-('20200422171902');
+('20200422171902'),
+('20200424222002');
 
 

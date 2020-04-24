@@ -180,7 +180,7 @@ Rails.application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
-              :ctypes
+              :ctypes, :parking_notifications, :impound_records
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
@@ -326,7 +326,7 @@ Rails.application.routes.draw do
     resources :parking_notifications do
       member { get :email }
     end
-    resources :impound_records
+    resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do

@@ -186,7 +186,7 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def nearby_and_partner_organization_ids;
+  def nearby_and_partner_organization_ids
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
