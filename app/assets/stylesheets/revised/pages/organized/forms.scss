@@ -67,6 +67,10 @@
     fieldset {
       display: flex;
     }
+    // For some reason, after uncollapsing, the checkbox margin gets messed up
+    .checkbox label {
+      margin-left: 0.25rem;
+    }
   }
 
   .remove-control {

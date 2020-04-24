@@ -20,6 +20,16 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(organized_bike_text(bike)).to eq target_text
       end
     end
+    context "deleted" do
+      let!(:bike) { FactoryBot.create(:bike, deleted_at: Time.current) }
+      let(:target_text) do
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"small text-danger\"> removed from Bike Index</em></span>"
+      end
+      it "renders with deleted" do
+        expect(bike.deleted?).to be_truthy
+        expect(organized_bike_text(bike)).to eq target_text
+      end
+    end
   end
 
   describe "organized_container" do

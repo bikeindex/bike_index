@@ -38,6 +38,10 @@ class ParkingNotificationSerializer < ApplicationSerializer
     object.resolved_at&.to_i
   end
 
+  def impound_record_id
+    object.impound_record&.display_id
+  end
+
   def bike
     bike_obj = object.bike
     {

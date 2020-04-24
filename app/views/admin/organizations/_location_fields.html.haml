@@ -1,6 +1,6 @@
 - f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states.id
 - f.object.name ||= @organization.name
-.col-md-6
+.col-md-6.mt-4
   %fieldset.mr-2.ml-2
     .card.bg-light
       .card-body
@@ -33,6 +33,19 @@
             .form-group.text-center
               = f.check_box :_destroy, class: "d-none"
               = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
+        .row
+          .form-check
+            = f.check_box :publicly_visible
+            = f.label :publicly_visible, class: "ml-1" do
+              Publicly visible
+              - unless @organization.allowed_show?
+                %small.text-warning.ml-1 org not shown on map, checking this won't change that
+          - if @organization.enabled?("impound_bikes")
+            .form-check
+              = f.check_box :impound_location
+              = f.label :impound_location
+            .form-check
+              = f.check_box :default_impound_location
+              = f.label :default_impound_location
 
 
-  %hr

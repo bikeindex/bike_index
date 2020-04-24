@@ -491,7 +491,6 @@ RSpec.describe "Bikes API V3", type: :request do
       before do
         FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
         organization.save
-        ActionMailer::Base.deliveries = []
       end
 
       context "duplicated serial" do
@@ -504,7 +503,8 @@ RSpec.describe "Bikes API V3", type: :request do
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
 
             expect(ownership.claimed).to be_falsey
-
+            ActionMailer::Base.deliveries = []
+            Sidekiq::Worker.clear_all
             expect {
               post tokenized_url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
             }.to change(Bike, :count).by 0
@@ -526,6 +526,8 @@ RSpec.describe "Bikes API V3", type: :request do
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
             expect(ownership.claimed).to be_falsey
+            ActionMailer::Base.deliveries = []
+            Sidekiq::Worker.clear_all
             expect do
               post tokenized_url, params: bike_attrs.to_json, headers: json_headers
             end.to change(Bike, :count).by 1

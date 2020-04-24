@@ -2,6 +2,7 @@
 - skip_bike ||= false
 - render_sortable ||= false
 - render_resolved_at ||= false
+- skip_location ||= !current_organization.enabled?("impound_bikes_locations")
 
 - # TODO: add translations
 
@@ -17,7 +18,17 @@
         = sortable "created_at"
       - else
         Created
-        %small.convertTimezone
+    %th
+      - if render_sortable
+        = sortable "updated_at"
+      - else
+        Updated
+    - unless skip_location
+      %th
+        - if render_sortable
+          = sortable "location_id"
+        - else
+          Location
     - unless skip_bike
       %th Bike
     %th
@@ -27,9 +38,10 @@
         Status
     %th
       - if render_sortable
-        = sortable "user_id"
+        = sortable "user_id", "last updator"
       - else
-        User
+        last updator
+
     - if render_resolved_at
       %th
         - if render_sortable
@@ -40,18 +52,24 @@
     - impound_records.each do |impound_record|
       %tr
         %td
-          %a{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
-            = impound_record.display_id
+          = impound_record.display_id
         %td
-          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) }
             = l(impound_record.created_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(impound_record.updated_at, format: :convert_time)
+        - unless skip_location
+          %td
+            %small
+              = impound_record.location&.name
         - unless skip_bike
           %td
             - if impound_record.bike.present?
               = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike)
         %td
           %em
-            = impound_record.status
+            = impound_record.status_humanized
         %td
           = impound_record.user&.display_name
         - if render_resolved_at

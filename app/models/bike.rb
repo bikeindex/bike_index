@@ -381,12 +381,6 @@ class Bike < ApplicationRecord
     true
   end
 
-  def impound(passed_user, organization: nil)
-    organization ||= passed_user.organizations.detect { |o| o.enabled?("impound_bikes") }
-    impound_record = impound_records.where(organization_id: organization&.id).first
-    impound_record ||= impound_records.create(user: passed_user, organization: organization)
-  end
-
   def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
     bike_stickers.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
@@ -698,6 +692,8 @@ class Bike < ApplicationRecord
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     set_location_info
     self.listing_order = calculated_listing_order
+    # Quick hack to store the fact that it was creation for parking notification
+    self.created_by_parking_notification = true if unregistered_parking_notification?
     self.status = calculated_status unless skip_status_update
     clean_frame_size
     set_mnfg_name

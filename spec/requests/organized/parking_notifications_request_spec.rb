@@ -42,7 +42,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             lng: parking_notification1.longitude,
             user_id: parking_notification1.user_id,
             user_display_name: parking_notification1.user.display_name,
-            impound_record_id: impound_record.id,
+            impound_record_id: impound_record&.display_id,
             resolved_at: parking_notification1.resolved_at&.to_i,
             unregistered_bike: false,
             notification_number: 1,

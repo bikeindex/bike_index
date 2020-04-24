@@ -107,12 +107,6 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "scopes" do
-    it "Shown on map is shown on map *and* validated" do
-      expect(Organization.shown_on_map.to_sql).to eq(Organization.where(show_on_map: true).where(approved: true).order(:name).to_sql)
-    end
-  end
-
   describe "admin text search" do
     context "by name" do
       let!(:organization) { FactoryBot.create(:organization, name: "University of Maryland") }
@@ -212,9 +206,20 @@ RSpec.describe Organization, type: :model do
       expect(Organization.new.map_focus_coordinates).to eq(latitude: 37.7870322, longitude: -122.4061122)
     end
     context "organization with a location" do
-      let(:location) { FactoryBot.create(:location) }
-      let!(:organization) { location.organization }
-      it "is the locations coordinates" do
+      let(:organization) { FactoryBot.create(:organization, approved: true, show_on_map: true) }
+      let!(:location) { FactoryBot.create(:location, organization: organization) }
+      let!(:location2) { FactoryBot.create(:location, organization: organization, latitude: 12, longitude: -111, skip_geocoding: true) }
+      it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
+        expect(organization.default_location).to eq location
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        location.update_attributes(publicly_visible: false, skip_update: false)
+        organization.reload
+        expect(organization.default_location.id).to eq location2.id
+        expect(organization.map_focus_coordinates).to eq(latitude: 12, longitude: -111)
+        location2.update_attributes(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
+        organization.reload
+        # Now get the first location
+        expect(organization.default_location).to eq location
         expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
       end
     end
@@ -385,7 +390,7 @@ RSpec.describe Organization, type: :model do
       let(:location) { Location.create(country_id: country.id, city: "Chicago", name: "stuff", organization_id: organization.id, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
-          expect(organization.allowed_show).to be_truthy
+          expect(organization.allowed_show?).to be_truthy
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_truthy
         end
@@ -394,7 +399,7 @@ RSpec.describe Organization, type: :model do
         it "sets not shown" do
           organization.update_attribute :approved, false
           organization.reload
-          expect(organization.allowed_show).to be_falsey
+          expect(organization.allowed_show?).to be_falsey
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_falsey
         end
@@ -472,19 +477,19 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "display_avatar" do
+  describe "display_avatar?" do
     context "unpaid" do
       it "does not display" do
         organization = Organization.new(is_paid: false)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_falsey
+        expect(organization.display_avatar?).to be_falsey
       end
     end
     context "paid" do
       it "displays" do
         organization = Organization.new(is_paid: true)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_truthy
+        expect(organization.display_avatar?).to be_truthy
       end
     end
   end

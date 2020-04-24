@@ -56,28 +56,6 @@ module Organized
 
     def multi_serial_search; end
 
-    def update
-      if params.dig(:bike, :impound)
-        if current_organization.enabled?("impound_bikes")
-          bike = Bike.find(params[:id])
-          impound_record = bike.impound(current_user, organization: current_organization)
-          if impound_record.valid?
-            flash[:success] = translation(:bike_impounded, bike_type: bike.type)
-          else
-            flash[:error] = translation(:unable_to_impound,
-                                        bike_type: bike.type,
-                                        errors: impound_record.errors.full_messages.to_sentence)
-          end
-        else
-          flash[:error] = translation(:your_org_not_permitted_to_impound)
-        end
-      else
-        flash[:error] = translation(:unknown_update_action)
-      end
-
-      redirect_back(fallback_location: redirect_back_fallback_path)
-    end
-
     def create
       @b_param = find_or_new_b_param
       iframe_redirect_params = { organization_id: current_organization.to_param }

@@ -1321,7 +1321,7 @@ RSpec.describe BikesController, type: :controller do
         context "owner email changes" do
           let(:email) { "originalemail@example.com" }
           let(:new_email) { "new@email.com" }
-          let(:ownership) { FactoryBot.create(:ownership, creator: user, owner_email: email) }
+          let(:ownership) { FactoryBot.create(:ownership, creator: user, owner_email: "otheroriginal@email.com") }
           let(:user) { FactoryBot.create(:user_confirmed, email: email) }
           before do
             bike.reload
@@ -1349,9 +1349,7 @@ RSpec.describe BikesController, type: :controller do
             expect(mail.from).to eq(["contact@bikeindex.org"])
             expect(mail.to).to eq([new_email])
           end
-
           it "creates a new ownership and emails the new owner" do
-            expect(bike.owner_email).to eq email
             expect(bike.claimed?).to be_falsey
             expect(bike.user).to be_nil
             expect(bike.authorized?(user)).to be_truthy

@@ -328,7 +328,6 @@ Rails.application.routes.draw do
     end
     resources :impound_records
     resources :stickers, only: %i[index show edit update]
-    resources :appointments
     resource :ambassador_dashboard, only: %i[show] do
       collection do
         get :resources
