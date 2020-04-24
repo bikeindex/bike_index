@@ -42,7 +42,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(second_membership).to be_present
         expect(user_email.confirmed).to be_truthy
         old_user_ownership.mark_claimed
-        expect(old_user.ownerships.first).to eq old_user_ownership
+        expect(old_user.ownerships.pluck(:id)).to eq([ownership.id, old_user_ownership.id])
         expect(membership.user).to eq old_user
         expect(old_membership.user).to eq old_user
         expect(new_membership.user).to eq user

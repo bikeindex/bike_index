@@ -1,13 +1,16 @@
 - # TODO: add translations
+- bike = @impound_record.bike
+- impound_record_updates = @impound_record.impound_record_updates.reorder(created_at: :desc)
+- parking_notification = @impound_record.parking_notification
 
 .organized-page-header
   %h1
     Impound Record
-    - if @bike.unregistered_parking_notification?
+    - if bike.present? && bike.unregistered_parking_notification?
       %span.text-warning
         for
         %em unregistered
-        = @bike.type
+        = bike.type
 
 .row
   .col-md-6
@@ -27,7 +30,7 @@
             %td
               %span.convertTime
                 = l(@impound_record.resolved_at, format: :convert_time)
-        - if @impound_record_updates.any?
+        - if impound_record_updates.any?
           %tr
             %td Updated
             %td
@@ -52,14 +55,14 @@
         %tr
           %td Bike
           %td
-            - if @bike.present?
-              = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
+            - if bike.present?
+              = link_to organized_bike_text(bike), bike_path(bike, organization_id: current_organization.to_param)
 
-- if @parking_notification.present?
+- if parking_notification.present?
   %hr.mt-4
   %h2.uncap
     Impounded by
     %em
-      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+      = link_to "this notification", organization_parking_notification_path(parking_notification, organization_id: current_organization.to_param)
 
   = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }

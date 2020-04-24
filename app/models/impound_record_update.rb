@@ -7,6 +7,7 @@ class ImpoundRecordUpdate < ApplicationRecord
   belongs_to :location
 
   validates_presence_of :impound_record_id, :user_id
+  validates_presence_of :transfer_email, if: :transferred_to_new_owner?
 
   after_commit :update_associations
 

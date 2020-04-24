@@ -15,14 +15,16 @@ module Organized
                           .includes(:user, :bike, :location)
     end
 
-    def show
-      @impound_record_updates = @impound_record.impound_record_updates.reorder(created_at: :desc)
-      @bike = @impound_record.bike
-      @parking_notification = @impound_record.parking_notification
-    end
+    def show; end
 
     def update
-      impound_record_update = @impound_record.impound_record_updates.create(permitted_parameters)
+      impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
+      if impound_record_update.save
+        redirect_to organization_impound_records_path(organization_id: current_organization.to_param)
+      else
+        flash[:error] = impound_record_update.errors.full_messages
+        render :show
+      end
     end
 
     private
