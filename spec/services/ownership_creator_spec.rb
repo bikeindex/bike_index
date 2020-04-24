@@ -19,7 +19,7 @@ RSpec.describe OwnershipCreator do
       ownership = Ownership.new
       allow(ownership).to receive(:id).and_return(2)
       expect do
-        OwnershipCreator.new.send_notification_email(ownership)
+        ownership.send_notification
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
@@ -28,7 +28,7 @@ RSpec.describe OwnershipCreator do
       allow(ownership).to receive(:id).and_return(2)
       allow(ownership).to receive(:example).and_return(true)
       expect do
-        OwnershipCreator.new.send_notification_email(ownership)
+        ownership.send_notification
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
@@ -37,7 +37,7 @@ RSpec.describe OwnershipCreator do
       allow(ownership).to receive(:id).and_return(2)
       allow(ownership).to receive(:send_email).and_return(false)
       expect do
-        OwnershipCreator.new.send_notification_email(ownership)
+        ownership.send_notification
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
   end
@@ -85,7 +85,6 @@ RSpec.describe OwnershipCreator do
       new_params = { bike_id: 1, user_id: 69, owner_email: "f@f.com", creator_id: 69, claimed: true, current: true }
       allow(ownership_creator).to receive(:mark_other_ownerships_not_current).and_return(true)
       allow(ownership_creator).to receive(:new_ownership_params).and_return(new_params)
-      expect(ownership_creator).to receive(:send_notification_email).and_return(true)
       expect(ownership_creator).to receive(:current_is_hidden).and_return(true)
       expect { ownership_creator.create_ownership }.to change(Ownership, :count).by(1)
     end

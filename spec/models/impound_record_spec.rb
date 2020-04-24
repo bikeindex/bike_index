@@ -43,6 +43,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       it "updates the record and the user" do
+        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.status_impounded?).to be_truthy
@@ -58,6 +59,16 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record.resolved_at).to be_within(1).of Time.current
         expect(impound_record.user_id).to eq user2.id
       end
+    end
+  end
+
+  describe "resolved factory" do
+    let!(:impound_record) { FactoryBot.create(:impound_record_resolved, status: "removed_from_bike_index") }
+    it "creates with resolved issue" do
+      impound_record.reload
+      expect(impound_record.status).to eq "removed_from_bike_index"
+      expect(impound_record.impound_record_updates.count).to eq 1
+      expect(impound_record.resolving_update.kind).to eq "removed_from_bike_index"
     end
   end
 

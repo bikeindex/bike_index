@@ -22,6 +22,7 @@ class BikeUpdator
   end
 
   def update_ownership
+    # Because this is a mess, managed independently in ImpoundUpdateBikeWorker
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
@@ -31,7 +32,7 @@ class BikeUpdator
     OwnershipCreator.new(owner_email: new_owner_email,
                          bike: @bike,
                          creator: @user,
-                         send_email: true).create_ownership
+                         send_email: true)
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
     @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
   end

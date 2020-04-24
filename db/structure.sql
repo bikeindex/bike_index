@@ -1054,7 +1054,7 @@ CREATE TABLE public.impound_record_updates (
     location_id bigint,
     kind integer,
     note text,
-    transfer_to_email character varying,
+    transfer_email character varying,
     resolved boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -1760,7 +1760,8 @@ CREATE TABLE public.ownerships (
     claimed boolean,
     example boolean DEFAULT false NOT NULL,
     send_email boolean DEFAULT true,
-    user_hidden boolean DEFAULT false NOT NULL
+    user_hidden boolean DEFAULT false NOT NULL,
+    impound_record_id bigint
 );
 
 
@@ -3956,6 +3957,13 @@ CREATE INDEX index_ownerships_on_bike_id ON public.ownerships USING btree (bike_
 --
 
 CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (creator_id);
+
+
+--
+-- Name: index_ownerships_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_impound_record_id ON public.ownerships USING btree (impound_record_id);
 
 
 --

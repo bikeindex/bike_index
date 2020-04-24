@@ -19,11 +19,17 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike2) }
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
-      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
+      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
       let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
+        [impound_record2, impound_record_retrieved, impound_record_unorganized].each do |ir|
+          ImpoundUpdateBikeWorker.new.perform(ir.id)
+        end
+        # Test that impound_record.active.bikes scopes correctly
+        expect(current_organization.impound_records.active.pluck(:id)).to eq([impound_record2.id])
         expect(current_organization.impound_records.active.bikes.pluck(:id)).to eq([bike2.id])
         expect(impound_record).to be_present
+        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
         expect(current_organization.impound_records.bikes.count).to eq 2
         get base_url
         expect(response.status).to eq(200)
@@ -60,7 +66,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       # adds a note
     end
     context "with locations" do
-      it "updates, moves to a new location"
+      it "updates, moves to a new location" do
+        # Moves locations
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 class ImpoundRecord < ApplicationRecord
   # These statuses overlap with impound_record_updates
-  STATUS_ENUM = { current: 0, retrieved_by_owner: 2, removed_from_bike_index: 3, sold: 4 }.freeze
+  STATUS_ENUM = { current: 0, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred_to_new_owner: 4 }.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -19,6 +19,8 @@ class ImpoundRecord < ApplicationRecord
   enum status: STATUS_ENUM
 
   scope :active, -> { where(status: active_statuses) }
+
+  attr_accessor :skip_update
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 
@@ -47,6 +49,8 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
+    # We call this job inline in ProcessParkingNotificationWorker
+    return true if skip_update
     ImpoundUpdateBikeWorker.perform_async(id)
   end
 

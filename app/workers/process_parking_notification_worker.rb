@@ -7,7 +7,9 @@ class ProcessParkingNotificationWorker < ApplicationWorker
     if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
       impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
                                              user_id: parking_notification.user_id,
-                                             organization_id: parking_notification.organization_id)
+                                             organization_id: parking_notification.organization_id,
+                                             skip_update: true)
+      ImpoundUpdateBikeWorker.new.perform(impound_record.id)
       parking_notification.update_attributes(impound_record_id: impound_record.id)
     end
 
