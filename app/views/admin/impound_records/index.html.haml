@@ -71,7 +71,7 @@
           %em
             = impound_record.status_humanized
         %td
-          = impound_record.user&.display_name
+          = impound_record.user&.display_name&.truncate(20)
         %td
           - if impound_record.resolved_at.present?
             %span.convertTime.preciseTime

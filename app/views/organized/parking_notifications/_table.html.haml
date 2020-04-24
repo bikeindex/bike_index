@@ -68,7 +68,7 @@
           %em
             = parking_notification.kind_humanized
         %td.hidden-sm-cells
-          = parking_notification.user&.display_name
+          = parking_notification.user&.display_name&.truncate(20)
         - unless skip_repeat
           %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?

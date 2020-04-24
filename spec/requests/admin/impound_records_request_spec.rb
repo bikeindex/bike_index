@@ -1,7 +1,7 @@
 require "rails_helper"
 
 base_url = "/admin/impound_records"
-RSpec.describe Admin::ImpoundRecordController, type: :request do
+RSpec.describe Admin::ImpoundRecordsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do

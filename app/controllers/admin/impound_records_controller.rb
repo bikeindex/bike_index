@@ -2,7 +2,6 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   include SortableTable
 
   before_action :set_period, only: [:index]
-  before_action :find_payment, only: %i[edit update]
 
   def index
     page = params[:page] || 1
