@@ -16,7 +16,6 @@ class Ownership < ApplicationRecord
   scope :current, -> { where(current: true) }
 
   before_validation :set_calculated_attributes
-  before_create :set_initial_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end
@@ -62,16 +61,16 @@ class Ownership < ApplicationRecord
 
   def set_calculated_attributes
     self.owner_email = EmailNormalizer.normalize(owner_email)
-  end
-
-  def set_initial_attributes
-    self.claimed ||= self_made?
-    self.user_id ||= User.fuzzy_email_find(owner_email)&.id
+    if id.blank? # Some things to set only on create
+      self.user_id ||= User.fuzzy_email_find(owner_email)&.id
+      self.claimed ||= self_made?
+    end
   end
 
   def send_notification_and_update_other_ownerships
-    return false unless bike.present?
-    bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
+    if bike.present?
+      bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
+    end
     EmailOwnershipInvitationWorker.perform_async(id)
   end
 end

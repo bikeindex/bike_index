@@ -5,7 +5,7 @@ class CreateImpoundRecordUpdates < ActiveRecord::Migration[5.2]
       t.references :user, index: true
       t.references :location, index: true
       t.integer :kind
-      t.text :note
+      t.text :notes
       t.string :transfer_email
       t.boolean :resolved, default: false
 

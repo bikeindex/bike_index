@@ -1,19 +1,6 @@
 require "rails_helper"
 
 RSpec.describe OwnershipCreator do
-  describe "user_id" do
-    let(:subject) { OwnershipCreator.new(bike: Bike.new(owner_email: "foo@email.com")) }
-    it "returns nil if the user doesn't exist" do
-      expect(subject.user_id).to be_nil
-    end
-    context "user exists" do
-      let!(:user) { FactoryBot.create(:user_confirmed, email: "foo@email.com") }
-      it "finds the user" do
-        expect(subject.user_id).to eq(user.id)
-      end
-    end
-  end
-
   describe "send_notification_email" do
     it "sends a notification email" do
       ownership = Ownership.new

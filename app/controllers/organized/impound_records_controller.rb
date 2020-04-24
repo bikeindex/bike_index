@@ -2,6 +2,7 @@ module Organized
   class ImpoundRecordsController < Organized::BaseController
     include SortableTable
     before_action :set_period, only: [:index]
+    before_action :find_impound_record, except: [:index]
 
     def index
       @page = params[:page] || 1
@@ -15,10 +16,13 @@ module Organized
     end
 
     def show
-      @impound_record = impound_records.find(params[:id])
       @impound_record_updates = @impound_record.impound_record_updates.reorder(created_at: :desc)
       @bike = @impound_record.bike
       @parking_notification = @impound_record.parking_notification
+    end
+
+    def update
+      impound_record_update = @impound_record.impound_record_updates.create(permitted_parameters)
     end
 
     private
@@ -55,6 +59,16 @@ module Organized
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)
+    end
+
+    def find_impound_record
+      @impound_record = impound_records.find(params[:id])
+    end
+
+    def permitted_parameters
+      params.require(:impound_record_update)
+            .permit(:kind, :notes, :location_id, :transfer_email)
+            .merge(user_id: current_user.id)
     end
   end
 end

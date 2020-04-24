@@ -1053,7 +1053,7 @@ CREATE TABLE public.impound_record_updates (
     user_id bigint,
     location_id bigint,
     kind integer,
-    note text,
+    notes text,
     transfer_email character varying,
     resolved boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
