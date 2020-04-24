@@ -61,33 +61,45 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
   end
 
-  describe "update" do
-    it "updates" do
-      # adds a note
-    end
-    context "with locations" do
-      it "updates, moves to a new location" do
-        # Moves locations
-      end
-    end
-    context "removed_from_bike_index" do
-      let(:kind) { "removed_from_bike_index"}
-      it "deletes" do
+  # describe "update" do
+  #   let(:update_params) { { notes: "OK boomer", kind: kind } }
+  #   let(:kind) { "note" }
+  #   it "updates" do
+  #     expect do
+  #       put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params }
+  #     end.to change(ImpoundRecordUpdate, :count).by 1
+  #     impound_record.reload
+  #     expect(impound_record.impound_record_updates.count).to eq 1
+  #     expect(impound_record.current?).to be_truthy
+  #     impound_record_update = impound_record.impound_record_updates.last
+  #     expect(impound_record_update.kind).to eq "note"
+  #     expect(impound_record_update.notes).to eq "OK boomer"
+  #     expect(impound_record_update.user).to eq current_user
+  #   end
+  #   context "with locations" do
+  #     let(:kind) { "move_location" }
+  #     it "updates, moves to a new location" do
+  #       # Moves locations
+  #     end
+  #   end
+  #   context "removed_from_bike_index" do
+  #     let(:kind) { "removed_from_bike_index"}
+  #     it "deletes" do
 
-      end
-    end
-    context "transfered" do
-      let(:kind) { "transfered"}
-      it "sends to a new owner" do
-        # is sold, etc
-      end
-      context "unregistered_parking_notification" do
-        # let(:parking_notification)
-        it "sends to a new owner, ensures mark user hidden is off" do
-          # parking_notification.reload
-          # expect(parking_notification.unregistered_bike).to be_truthy
-        end
-      end
-    end
-  end
+  #     end
+  #   end
+  #   context "transfered" do
+  #     let(:kind) { "transfered"}
+  #     it "sends to a new owner" do
+  #       # is sold, etc
+  #     end
+  #     context "unregistered_parking_notification" do
+  #       # let(:parking_notification)
+  #       it "sends to a new owner, ensures mark user hidden is off" do
+  #         # parking_notification.reload
+  #         # expect(parking_notification.unregistered_bike).to be_truthy
+  #       end
+  #     end
+  #   end
+  # end
 end

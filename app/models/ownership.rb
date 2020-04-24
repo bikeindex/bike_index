@@ -15,8 +15,8 @@ class Ownership < ApplicationRecord
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
 
-  before_create :set_initial_claimed_status
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
+  before_create :set_initial_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end
@@ -47,18 +47,16 @@ class Ownership < ApplicationRecord
   end
 
   def organization
-    if first?
-      bike.creation_organization
-    else
-      impound_record&.organization
-    end
+    # If this is the first ownership, use the creation organization
+    return bike.creation_organization if first?
+    # Otherwise, this is only an organization ownership if it's an impound transfer
+    impound_record&.organization
   end
 
   def calculated_send_email
     return false if !send_email || bike.blank? || bike.example?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     return true unless organization.present?
-    #
     !organization.enabled?("skip_ownership_email")
   end
 
@@ -66,14 +64,14 @@ class Ownership < ApplicationRecord
     self.owner_email = EmailNormalizer.normalize(owner_email)
   end
 
-  def set_initial_claimed_status
+  def set_initial_attributes
     self.claimed ||= self_made?
+    self.user_id ||= User.fuzzy_email_find(owner_email)&.id
   end
 
   def send_notification_and_update_other_ownerships
-    if bike.present?
-      bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
-    end
+    return false unless bike.present?
+    bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
     EmailOwnershipInvitationWorker.perform_async(id)
   end
 end

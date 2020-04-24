@@ -16,14 +16,10 @@ class OwnershipCreator
     @bike.ownerships.count > 0 ? @creator.id : @bike.creator&.id
   end
 
-  def user_id
-    @user_id ||= User.fuzzy_email_find(@bike.owner_email)&.id
-  end
 
   def new_ownership_params
     {
       bike_id: @bike.id,
-      user_id: user_id,
       owner_email: @bike.owner_email,
       creator_id: creator_id,
       example: @bike.example,

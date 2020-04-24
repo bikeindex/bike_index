@@ -349,7 +349,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           post :create, params: { bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token }
         end.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
-        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
         expect(bike.creation_state.origin).to eq "api_v1"
