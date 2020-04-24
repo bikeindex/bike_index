@@ -47,7 +47,7 @@ RSpec.describe OwnershipCreator do
       ownership1 = FactoryBot.create(:ownership)
       bike = ownership1.bike
       ownership2 = FactoryBot.create(:ownership, bike: bike)
-      ownership_creator = OwnershipCreator.new(bike: bike).mark_other_ownerships_not_current
+      OwnershipCreator.new(bike: bike).mark_other_ownerships_not_current
       expect(ownership1.reload.current).to be_falsey
       expect(ownership2.reload.current).to be_falsey
     end
