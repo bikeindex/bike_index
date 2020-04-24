@@ -18,6 +18,8 @@
 %h4
   = number_with_delimiter(@recoveries.total_count)
   matching recoveries
+  %em
+    = humanized_time_range(@time_range)
 
 - if @render_chart
   = column_chart time_range_counts(collection: available_recoveries), stacked: true, thousands: ",", defer: true

@@ -17,6 +17,8 @@ module AdminHelper
       { title: "Payments", path: admin_payments_path, match_controller: true },
       { title: "Paid Features", path: admin_paid_features_path, match_controller: true },
       { title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true },
+      { title: "Impound Records", path: admin_impound_records_path },
+      { title: "Parking Notifications", path: admin_parking_notifications_path },
       { title: "Recoveries", path: admin_recoveries_path, match_controller: true },
       { title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true },
       { title: "Memberships", path: admin_memberships_path, match_controller: true },
