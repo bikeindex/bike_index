@@ -395,7 +395,7 @@ CREATE TABLE public.bikes (
     street character varying,
     state_id bigint,
     address_set_manually boolean DEFAULT false,
-    created_for_parking_notification boolean DEFAULT false
+    created_by_parking_notification boolean DEFAULT false
 );
 
 

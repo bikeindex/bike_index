@@ -51,7 +51,7 @@
                   %li
                     - if @parking_notification.impound_record_id.present?
                       View the
-                      = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record_id, organization_id: current_organization.to_param)
+                      = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: current_organization.to_param)
                     - else
                       %small.less-strong
                         Impound record not found. Try reloading the page?
@@ -165,6 +165,7 @@
     });
   </script>
 
+-# Never will show on impound record page, because it will never be active.
 - if @parking_notification.active?
   .row
     -# similar form on parking notification index
@@ -197,12 +198,12 @@
 
 - if @parking_notification.send_email?
   %h2.uncap.mt-4 Preview of email sent:
-  .email-preview
+  .email-preview.parking-notification-email-preview
     <iframe src="#{email_organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)}"></iframe>
 - else
   %p.text-warning.mt-4
     %em
       - if @parking_notification.unregistered_bike?
-        No email sent because this #{@bike.type} isn't registered
+        No email sent because this #{@bike.type} wasn't registered
       - else
         No email sent because we were unable to determine who to send the email to

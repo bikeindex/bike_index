@@ -8,6 +8,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   validates_presence_of :impound_record_id, :user_id
   validates_presence_of :transfer_email, if: :transferred_to_new_owner?
+  validates_presence_of :location_id, if: :move_location?
 
   after_commit :update_associations
 
@@ -28,11 +29,11 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def self.kinds_humanized
     {
-      note: "note",
-      move_location: "move location",
-      retrieved_by_owner: "retrieved by owner",
-      removed_from_bike_index: "removed from Bike Index",
-      transferred_to_new_owner: "transferred to new owner",
+      note: "Add internal note",
+      move_location: "Update location",
+      retrieved_by_owner: "Owner retrieved bike",
+      removed_from_bike_index: "Remove from Bike Index",
+      transferred_to_new_owner: "Transfer to new owner",
     }
   end
 

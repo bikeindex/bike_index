@@ -28,6 +28,8 @@ class ImpoundRecord < ApplicationRecord
 
   def self.resolved_statuses; statuses - active_statuses end
 
+  def self.statuses_humanized; ImpoundRecordUpdate.kinds_humanized.merge(current: "Current") end
+
   def self.bikes
     Bike.unscoped.includes(:impound_records)
         .where(impound_records: { id: pluck(:id) })
@@ -43,6 +45,8 @@ class ImpoundRecord < ApplicationRecord
   def resolved?; !active? end
 
   def resolving_update; impound_record_updates.resolved.order(:id).first end
+
+  def status_humanized; self.class.statuses_humanized[status.to_sym] end
 
   def update_kinds
     organization.enabled?("impound_bikes_locations") ? ImpoundRecordUpdate.kinds : ImpoundRecordUpdate.kinds_without_location

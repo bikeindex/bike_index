@@ -7,7 +7,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com") }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike) }
+  let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
 
   describe "index" do
     it "renders" do
@@ -55,9 +55,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
   describe "show" do
     it "renders" do
-      get "#{base_url}/#{impound_record.id}"
+      impound_record.reload
+      expect(impound_record.display_id).to eq 1111
+      get "#{base_url}/1111"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(assigns(:impound_record)).to eq impound_record
     end
   end
 
@@ -75,9 +78,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     after { Sidekiq::Testing.fake! }
     it "updates" do
       expect do
-        put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params }
+        patch "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params }
       end.to change(ImpoundRecordUpdate, :count).by 1
-      expect(response).to redirect_to base_url
+      expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
       expect(ActionMailer::Base.deliveries.count).to eq 0
       impound_record.reload
       expect(impound_record.impound_record_updates.count).to eq 1
@@ -94,9 +97,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         bike.reload
         expect(bike.status_impounded?).to be_truthy
         expect do
-          put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params }
+          patch "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params }
         end.to change(ImpoundRecordUpdate, :count).by 1
-        expect(response).to redirect_to base_url
+        expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
         expect(ActionMailer::Base.deliveries.count).to eq 0
         impound_record.reload
         expect(impound_record.impound_record_updates.count).to eq 1
@@ -121,10 +124,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       it "deletes, updates user on the impound_record" do
         expect(impound_record.user).to_not eq current_user
         expect do
-          put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params }
+          patch "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params }
         end.to change(ImpoundRecordUpdate, :count).by 1
         expect(flash).to be_blank
-        expect(response).to redirect_to base_url
+        expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
         expect(ActionMailer::Base.deliveries.count).to eq 0
         impound_record.reload
         expect(impound_record.impound_record_updates.count).to eq 1
@@ -141,17 +144,17 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(impound_record.bike.deleted?).to be_truthy
       end
     end
-    context "transfered" do
+    context "transferred_to_new_owner" do
       let(:kind) { "transferred_to_new_owner" }
       let(:update_params_with_email) { update_params.merge(transfer_email: "a@b.c") }
       it "sends to a new owner" do
         bike.reload
         expect(bike.status_impounded?).to be_truthy
         expect do
-          put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params_with_email }
+          patch "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params_with_email }
         end.to change(ImpoundRecordUpdate, :count).by 1
         expect(flash).to be_blank
-        expect(response).to redirect_to base_url
+        expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
         expect(ActionMailer::Base.deliveries.count).to eq 1
         impound_record.reload
         expect(impound_record.impound_record_updates.count).to eq 1
@@ -176,7 +179,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "without a transfer_email" do
         it "returns with a flash error" do
           expect do
-            put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params }
+            put "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params }
           end.to_not change(ImpoundRecordUpdate, :count)
           expect(flash[:error]).to be_present
           expect(response).to render_template(:show)
@@ -208,16 +211,16 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.bike_id).to eq impound_record.bike_id
           expect(parking_notification.bike_id).to eq bike.id
           expect(parking_notification.unregistered_bike).to be_truthy
-          expect(bike.created_for_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification).to be_truthy
           expect(bike.status).to eq "unregistered_parking_notification"
           expect(bike.current_impound_record).to eq impound_record
           expect(impound_record.current?).to be_truthy
           expect(bike.ownerships.count).to eq 1
           expect do
-            put "#{base_url}/#{impound_record.id}", params: { impound_record_update: update_params_with_email }
+            put "#{base_url}/#{impound_record.display_id}", params: { impound_record_update: update_params_with_email }
           end.to change(ImpoundRecordUpdate, :count).by 1
           expect(flash).to be_blank
-          expect(response).to redirect_to base_url
+          expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
           expect(ActionMailer::Base.deliveries.count).to eq 1
           impound_record.reload
           expect(impound_record.impound_record_updates.count).to eq 1
@@ -242,14 +245,45 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
     end
-    # context "with locations" do
-    #   let(:kind) { "move_location" }
-    #   it "updates, moves to a new location" do
-    #     current_organization.reload
-    #     expect(current_organization.enabled?("impound_bikes_locations")).to be_truthy
-    #     expect(impound_record.location).to eq location
-    #     # Moves locations
-    #   end
-    # end
+    context "with locations" do
+      let(:kind) { "move_location" }
+      let!(:location) { FactoryBot.create(:location, organization: current_organization, impound_location: true, default_impound_location: true) }
+      let!(:location2) do
+        # Need to do this here, to ensure the current location is set in before block
+        current_organization.reload
+        expect(current_organization.default_impound_location).to eq location
+        FactoryBot.create(:location, organization: current_organization, impound_location: true)
+      end
+      it "updates, moves to a new location" do
+        expect(current_organization.enabled?("impound_bikes_locations")).to be_truthy
+        impound_record.update(updated_at: Time.current)
+        expect(impound_record.location).to eq location
+        bike.reload
+        expect(bike.status).to eq "status_impounded"
+        expect do
+          put "#{base_url}/#{impound_record.display_id}", params: {
+            impound_record_update: {
+              kind: kind,
+              location_id: location2.id
+            }
+          }
+        end.to change(ImpoundRecordUpdate, :count).by 1
+        expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        impound_record.reload
+        expect(impound_record.impound_record_updates.count).to eq 1
+        expect(impound_record.status).to eq "current"
+        expect(impound_record.location).to eq location2
+        impound_record_update = impound_record.impound_record_updates.last
+        expect(impound_record_update.kind).to eq "move_location"
+        expect(impound_record_update.location).to eq location2
+        expect(impound_record_update.notes).to be_blank
+        expect(impound_record_update.user).to eq current_user
+        expect(impound_record_update.resolved).to be_truthy
+
+        bike.reload
+        expect(bike.status).to eq "status_impounded"
+      end
+    end
   end
 end

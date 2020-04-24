@@ -38,9 +38,10 @@
         Status
     %th
       - if render_sortable
-        = sortable "user_id"
+        = sortable "user_id", "last updator"
       - else
-        User
+        last updator
+
     - if render_resolved_at
       %th
         - if render_sortable
@@ -53,7 +54,7 @@
         %td
           = impound_record.display_id
         %td
-          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record, organization_id: impound_record.organization_id) }
+          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) }
             = l(impound_record.created_at, format: :convert_time)
         %td
           %span.convertTime.preciseTime
@@ -68,7 +69,7 @@
               = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike)
         %td
           %em
-            = impound_record.status
+            = impound_record.status_humanized
         %td
           = impound_record.user&.display_name
         - if render_resolved_at

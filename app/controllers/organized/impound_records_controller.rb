@@ -18,11 +18,11 @@ module Organized
     def show; end
 
     def update
-      impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
-      if impound_record_update.save
-        redirect_to organization_impound_records_path(organization_id: current_organization.to_param)
+      @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
+      if @impound_record_update.save
+        redirect_to organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.to_param)
       else
-        flash[:error] = impound_record_update.errors.full_messages
+        flash[:error] = @impound_record_update.errors.full_messages
         render :show
       end
     end
@@ -64,7 +64,8 @@ module Organized
     end
 
     def find_impound_record
-      @impound_record = impound_records.find(params[:id])
+      # NOTE: Uses display_id, not normal id
+      @impound_record = impound_records.find_by_display_id(params[:id])
     end
 
     def permitted_parameters
