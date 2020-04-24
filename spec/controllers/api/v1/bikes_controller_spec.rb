@@ -206,10 +206,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           "http://i.imgur.com/lybYl1l.jpg",
           "http://i.imgur.com/3BGQeJh.jpg",
         ]
-        expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
-        expect do
-          post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos }
-        end.to change(Ownership, :count).by(1)
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          expect do
+            post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos }
+          end.to change(Ownership, :count).by(1)
+        end
+        expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "69 non-example").first
         expect(bike.example).to be_falsey
@@ -299,8 +303,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             locking_description: "some locking description",
             lock_defeat_description: "broken in some crazy way",
           }
-          expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
-
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Worker.clear_all
           expect do
             post :create, params: { bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
           end.to change(Ownership, :count).by(1)
@@ -340,11 +344,12 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           owner_email: "fun_times@examples.com",
         }
         ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
         expect do
           post :create, params: { bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token }
         end.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
-        expect(ActionMailer::Base.deliveries).to eq([])
+        expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
         expect(bike.creation_state.origin).to eq "api_v1"
@@ -373,6 +378,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         }
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
         expect do
           post :create, params: options
         end.to change(Ownership, :count).by(1)
@@ -398,6 +404,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
         expect do
           post :create, params: options
         end.to change(Ownership, :count).by(1)
