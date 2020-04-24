@@ -67,7 +67,7 @@ class Ownership < ApplicationRecord
   end
 
   def set_initial_claimed_status
-    self.claimed = self_made?
+    self.claimed ||= self_made?
   end
 
   def send_notification_and_update_other_ownerships

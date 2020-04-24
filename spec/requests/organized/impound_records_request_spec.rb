@@ -70,5 +70,24 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         # Moves locations
       end
     end
+    context "removed_from_bike_index" do
+      let(:kind) { "removed_from_bike_index"}
+      it "deletes" do
+
+      end
+    end
+    context "transfered" do
+      let(:kind) { "transfered"}
+      it "sends to a new owner" do
+        # is sold, etc
+      end
+      context "unregistered_parking_notification" do
+        # let(:parking_notification)
+        it "sends to a new owner, ensures mark user hidden is off" do
+          # parking_notification.reload
+          # expect(parking_notification.unregistered_bike).to be_truthy
+        end
+      end
+    end
   end
 end
