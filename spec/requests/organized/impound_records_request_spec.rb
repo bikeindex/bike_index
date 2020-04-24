@@ -156,7 +156,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         impound_record_update = impound_record.impound_record_updates.last
         expect(impound_record.resolving_update).to eq impound_record_update
         expect(impound_record_update.kind).to eq "transferred_to_new_owner"
-        expect(impound_record_update.notes).to be_blank
+        expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
         expect(impound_record_update.resolved).to be_truthy
 
