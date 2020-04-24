@@ -75,7 +75,9 @@ class ImpoundRecord < ApplicationRecord
   private
 
   def calculated_display_id
-    last_display_id + 1
+    default_display_id = last_display_id + 1
+    return default_display_id unless ImpoundRecord.where(organization_id: organization_id, display_id: default_display_id)
+    ImpoundRecord.where(organization_id: organization_id).maximum(:display_id).to_i + 1
   end
 
   def calculated_status

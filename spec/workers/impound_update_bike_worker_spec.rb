@@ -24,6 +24,24 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     expect(bike.updated_at).to be_within(1).of Time.current
   end
 
+  context "id collision" do
+    let(:organization) { impound_record.organization }
+    let(:og_id) { impound_record.display_id }
+    let!(:impound_record2) { FactoryBot.create(:impound_record, organization: organization, display_id: og_id) }
+    let!(:impound_record3) { FactoryBot.create(:impound_record, organization: organization, display_id: og_id + 1) }
+    it "fixes the issue" do
+      expect(impound_record.display_id).to eq impound_record2.display_id
+      expect(impound_record2.id).to be > impound_record.id
+      described_class.new.perform(impound_record.id)
+      impound_record.reload
+      impound_record2.reload
+      impound_record3.reload
+      expect(impound_record.display_id).to eq og_id
+      expect(impound_record2.display_id).to eq og_id + 2
+      expect(impound_record3.display_id).to eq og_id + 1
+    end
+  end
+
   context "retrieved by owner" do
     let(:kind) { "retrieved_by_owner" }
     it "marks the impound_record resolved" do

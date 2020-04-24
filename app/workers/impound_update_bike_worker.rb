@@ -4,6 +4,15 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
   def perform(impound_record_id)
     impound_record = ImpoundRecord.find(impound_record_id)
     bike = impound_record.bike
+    matching_display_ids = ImpoundRecord.where(organization_id: impound_record.organization_id, display_id: impound_record.display_id)
+    if matching_display_ids.where.not(id: impound_record.id).any?
+      display_id = impound_record.display_id
+      matching_display_ids.reorder(:id).each_with_index do |irecord, index|
+        next if index == 0 # Skip updating the first one
+        irecord.update_attributes(display_id: nil)
+      end
+    end
+    # Run each impound_record_updates that hasn't been run
     impound_record.impound_record_updates.unresolved.each do |impound_record_update|
       if impound_record_update.kind == "transferred_to_new_owner"
         bike.update(status: "status_with_owner",

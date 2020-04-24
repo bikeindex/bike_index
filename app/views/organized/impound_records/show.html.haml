@@ -20,10 +20,12 @@
         %tr
           %td ID
           %td
-            %code= @impound_record.display_id
+            %strong= @impound_record.display_id
             - if current_user.developer?
-              %small.only-dev-visible
-                %span.less-strong global ID: #{@impound_record.id}
+              %small.only-dev-visible.ml-2
+                %em.less-strong real id:
+                %code
+                  = @impound_record.id
         %tr
           %td Created
           %td
