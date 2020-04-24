@@ -9,7 +9,8 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
         bike.update(status: "status_with_owner",
                     owner_email: impound_record_update.transfer_email,
                     is_for_sale: false,
-                    address_set_manually: false)
+                    address_set_manually: false,
+                    hidden: false)
         ownership = bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
                                             impound_record_id: impound_record.id,
                                             creator_id: impound_record_update.user_id,

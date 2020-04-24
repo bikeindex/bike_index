@@ -238,6 +238,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(bike.current_ownership.impound_record).to eq impound_record
           expect(bike.current_ownership.organization).to eq current_organization
           expect(bike.current_ownership.owner_email).to eq "a@b.c"
+          expect(bike.current_ownership.calculated_send_email).to be_truthy
         end
       end
     end
