@@ -71,7 +71,9 @@ class Ownership < ApplicationRecord
   end
 
   def send_notification_and_update_other_ownerships
-    bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
+    if bike.present?
+      bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
+    end
     EmailOwnershipInvitationWorker.perform_async(id)
   end
 end
