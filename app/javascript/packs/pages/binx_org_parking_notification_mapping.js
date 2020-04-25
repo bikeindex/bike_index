@@ -187,9 +187,9 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.notification_number > 1
         ? "- notification #" + record.notification_number
         : ""
-    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span> <span class="small extended-col-info d-block status-cell">${
+    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span> <em class="small extended-col-info d-block status-cell">${
       record.status
-    }</span>
+    } status</em>
     ${
       impoundLink.length
         ? "<strong class='small extended-col-info d-block'>Impounded: " +

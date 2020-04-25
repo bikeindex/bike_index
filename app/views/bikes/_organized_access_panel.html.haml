@@ -61,7 +61,7 @@
                       %ul
                         - stickers.each do |bike_sticker|
                           %li
-                            - if bike_sticker.organization.present?
+                            - if bike_sticker.organization.present? && bike_sticker.organization == passive_organization
                               = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param)
                             - else
                               = bike_sticker.code

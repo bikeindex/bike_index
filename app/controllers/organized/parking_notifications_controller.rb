@@ -83,10 +83,13 @@ module Organized
       unless @search_status == "all"
         notifications = parking_notifications.where(status: @search_status)
       end
+      if params[:search_bike_id].present?
+        notifications = notifications.where(bike_id: params[:search_bike_id])
+      end
       if bike_search_params_present?
-        bikes = a_impound_records.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
-        notifications = a_impound_records.where(bike_id: bikes.pluck(:id))
+        bikes = notifications.bikes.search(@interpreted_params)
+        bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
+        notifications = notifications.where(bike_id: bikes.pluck(:id))
       end
       @matching_parking_notifications = notifications.where(created_at: @time_range)
     end
@@ -164,7 +167,7 @@ module Organized
     end
 
     def bike_search_params_present?
-      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:email].present?
+      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:search_email].present?
     end
 
     def search_organization_bikes

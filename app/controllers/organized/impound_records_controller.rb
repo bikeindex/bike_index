@@ -38,7 +38,7 @@ module Organized
     end
 
     def bike_search_params_present?
-      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:email].present?
+      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:search_email].present?
     end
 
     def available_impound_records
@@ -56,7 +56,7 @@ module Organized
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
+        bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
       end
 
