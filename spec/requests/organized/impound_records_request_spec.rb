@@ -37,15 +37,15 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(assigns(:search_status)).to eq "active"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
 
-        get "#{base_url}?email=&serial=yar1s"
+        get "#{base_url}?search_email=&serial=yar1s"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
 
-        get "#{base_url}?email=someemail%40things"
+        get "#{base_url}?search_email=someemail%40things"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id])
 
-        get "#{base_url}?email=someemail%40things&search_status=all"
+        get "#{base_url}?search_email=someemail%40things&search_status=all"
         expect(response.status).to eq(200)
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record_retrieved.id])
@@ -61,6 +61,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
+    end
+    context "not found" do
+      it "raises" do
+        expect do
+          get "#{base_url}/2812912"
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 

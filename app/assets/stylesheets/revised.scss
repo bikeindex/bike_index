@@ -421,3 +421,7 @@ $dev-color: #9400d3;
   border: 1px solid $dev-color;
   background: rgba($dev-color, 0.1);
 }
+// This is frequently used in display-tables, make it work
+.table-list .only-dev-visible {
+  padding: 2px 0.25rem;
+}

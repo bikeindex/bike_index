@@ -1097,9 +1097,9 @@ en:
         which they appear
       finished_uploading: Finished uploading
     edit_primary_menu:
-      bike_type_details: "%{bike_type} Details"
+      bike_type_information: "%{bike_type} Information"
       save_changes: Save changes
-      theft_details: Theft Details
+      theft_information: Theft Information
       you_are_editing: You are editing
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
@@ -4403,7 +4403,6 @@ en:
         by: By
         created: Created
         impounded: Impounded
-        kind: Because
         notification_number: Notification#
         retrieved: Retrieved
     stickers:

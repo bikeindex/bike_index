@@ -27,7 +27,7 @@
 
         = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
         .sidebyside-queries
-          = text_field_tag :email, params[:email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
+          = text_field_tag :search_email, params[:search_email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
           = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
 
       .search-button-wrap
@@ -40,9 +40,10 @@
       = hidden_field_tag :period, params[:period]
       = hidden_field_tag :start_time, params[:start_time]
       = hidden_field_tag :end_time, params[:end_time]
+      = hidden_field_tag :search_status, @search_status
 
-  .row.mt-2
-    .col-md-12
+  .row.mt-4
+    .col-sm-6
       - if search_params_present?
         = pluralize number_with_delimiter(matching_parking_notifications.count), "parking notification"
 
@@ -54,6 +55,18 @@
           - else
             %em
               unknown bike ##{params[:search_bike_id]}
+    .col-sm-6.offset-lg-4.col-lg-2
+      %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+        = @search_status.humanize
+        = @search_status == "all" ? " statuses" : ""
+      .dropdown-menu
+        - (ParkingNotification.statuses + ["all"]).each do |kind|
+          - if kind == "all" # Add a divider before all
+            .dropdown-divider
+          - kind_active = @search_status == kind
+          - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
+          = link_to "#{kind.humanize} #{kind == 'all' ? 'statuses' : ''}", organization_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+
   .row.mt-2.mb-4
     .col-md-4.col-xs-6
       #recordsCount
@@ -91,7 +104,7 @@
                   .col-xs-6.text-center
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
 
-    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [] }
+    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status != "all" }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

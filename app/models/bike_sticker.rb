@@ -34,7 +34,9 @@ class BikeSticker < ApplicationRecord
   def self.calculated_code_prefix(str); str.present? ? str.gsub(/\d+\z/, "").upcase : nil end
 
   def self.code_integer_and_prefix_search(str)
-    where(code_integer: calculated_code_integer(str), code_prefix: calculated_code_prefix(str))
+    code_integer = calculated_code_integer(str)
+    return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+    where(code_integer: code_integer, code_prefix: calculated_code_prefix(str))
   end
 
   def self.organization_search(organization_id)

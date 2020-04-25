@@ -1817,10 +1817,10 @@ nl:
         ze verschijnen te herschikken
       finished_uploading: Uploaden voltooid
     edit_primary_menu:
-      bike_type_details: "%{bike_type} Details"
       save_changes: Wijzigingen opslaan
-      theft_details: Diefstal details
       you_are_editing: Je bent aan het bewerken
+      bike_type_information: "%{bike_type} Informatie"
+      theft_information: Diefstalinformatie
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Doe deze dingen voor de beste kans
         op herstel!
@@ -4590,7 +4590,6 @@ nl:
         by: Door
         created: Gemaakt
         impounded: In beslag genomen bij
-        kind: Soort
         address: Adres
         notification_number: Kennisgeving#
         retrieved: Opgehaald

@@ -127,7 +127,7 @@ class Organization < ApplicationRecord
 
   def self.with_enabled_feature_slugs(slugs)
     matching_slugs = PaidFeature.matching_slugs(slugs)
-    return nil unless matching_slugs.present?
+    return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
@@ -186,7 +186,7 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def nearby_and_partner_organization_ids;
+  def nearby_and_partner_organization_ids
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 

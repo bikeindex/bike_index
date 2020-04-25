@@ -29,6 +29,7 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.unclaimed.count).to eq 1
       expect(BikeSticker.spokecard.count).to eq 2
       expect(BikeSticker.sticker.count).to eq 1
+      expect(BikeSticker.lookup("92233720368547758999")).to be_blank # Outside of range
       expect(BikeSticker.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.to_param)).to eq sticker
       expect(BikeSticker.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker

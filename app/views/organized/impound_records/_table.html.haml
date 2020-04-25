@@ -66,12 +66,12 @@
         - unless skip_bike
           %td
             - if impound_record.bike.present?
-              = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike)
+              = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id)
         %td
           %em
             = impound_record.status_humanized
         %td
-          = impound_record.user&.display_name
+          = impound_record.user&.display_name&.truncate(20)
         - if render_resolved_at
           %td
             - if impound_record.resolved_at.present?

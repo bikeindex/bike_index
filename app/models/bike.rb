@@ -381,6 +381,8 @@ class Bike < ApplicationRecord
     true
   end
 
+  def sticker_organizations; organizations.with_enabled_feature_slugs("bike_stickers") end
+
   def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
     bike_stickers.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
