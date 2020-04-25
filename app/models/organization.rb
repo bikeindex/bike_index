@@ -127,7 +127,7 @@ class Organization < ApplicationRecord
 
   def self.with_enabled_feature_slugs(slugs)
     matching_slugs = PaidFeature.matching_slugs(slugs)
-    return nil unless matching_slugs.present?
+    return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 

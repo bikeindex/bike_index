@@ -1817,10 +1817,10 @@ nl:
         ze verschijnen te herschikken
       finished_uploading: Uploaden voltooid
     edit_primary_menu:
-      bike_type_details: "%{bike_type} Details"
       save_changes: Wijzigingen opslaan
-      theft_details: Diefstal details
       you_are_editing: Je bent aan het bewerken
+      bike_type_information: "%{bike_type} Informatie"
+      theft_information: Diefstalinformatie
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Doe deze dingen voor de beste kans
         op herstel!
@@ -2399,11 +2399,7 @@ nl:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
       bikes:
         update:
-          bike_impounded: "%{bike_type} in beslag genomen!"
-          unable_to_impound: 'Kan %{bike_type} niet in beslag nemen: %{errors}'
           unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
-          your_org_not_permitted_to_impound: Uw organisatie heeft geen toestemming
-            om fietsen in beslag te nemen. Neem contact op met support@bikeindex.org.
       bulk_imports:
         create:
           bulk_import_created: Bulkimport gemaakt!
@@ -4594,7 +4590,6 @@ nl:
         by: Door
         created: Gemaakt
         impounded: In beslag genomen bij
-        kind: Soort
         address: Adres
         notification_number: Kennisgeving#
         retrieved: Opgehaald

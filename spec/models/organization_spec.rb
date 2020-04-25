@@ -146,7 +146,7 @@ RSpec.describe Organization, type: :model do
       it "finds the organizations" do
         organization1.reload
         organization2.reload
-        expect(Organization.with_enabled_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
+        expect(Organization.with_enabled_feature_slugs(" ")).to be_blank # If we don't have a matching slug, return nil - otherwise it's confusing
         expect(Organization.with_enabled_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.with_enabled_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
         expect(Organization.with_enabled_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
@@ -277,7 +277,8 @@ RSpec.describe Organization, type: :model do
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
-      it "sets on the regional organization" do
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
+      it "sets on the regional organization, applies to bieks" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
         expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
@@ -287,6 +288,11 @@ RSpec.describe Organization, type: :model do
         regional_child.reload
         # It's private, so, gotta send
         expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(["bike_stickers"])
+        regional_child.update(updated_at: Time.current)
+        expect(regional_child.enabled_feature_slugs).to eq(["bike_stickers"])
+        bike.reload
+        expect(bike.organizations).to eq([regional_child])
+        expect(bike.sticker_organizations).to eq([regional_child])
       end
     end
   end
