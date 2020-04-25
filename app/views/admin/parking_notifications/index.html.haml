@@ -10,7 +10,7 @@
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
           = @search_status.humanize
         .dropdown-menu
-          - (ParkingNotification.statuses + %w[all]).each do |kind|
+          - (ParkingNotification.statuses + ["all"]).each do |kind|
             - if kind == "all" # Add a divider before all
               .dropdown-divider
             - kind_active = @search_status == kind
@@ -45,6 +45,7 @@
     %th
       = sortable "kind"
     %th Bike
+    %th #
     %th
       = sortable "status"
     %th
@@ -69,6 +70,10 @@
         %td
           - if parking_notification.bike.present?
             = link_to organized_bike_text(parking_notification.bike), admin_bike_path(parking_notification.bike)
+        %td
+          - if parking_notification.repeat_record?
+            %small.less-strong
+              = parking_notification.notification_number
         %td
           %em.small
             = parking_notification.status.humanize

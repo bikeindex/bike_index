@@ -40,7 +40,7 @@
     %em
       = humanized_time_range(@time_range)
   .col-sm-6.offset-lg-4.col-lg-2
-    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
+    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
       = @search_status.humanize
     .dropdown-menu
       - (%w[active all] + ImpoundRecord.statuses).each do |kind|

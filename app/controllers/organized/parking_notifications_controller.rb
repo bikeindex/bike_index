@@ -14,6 +14,11 @@ module Organized
 
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      if params[:search_status] == "all"
+        @search_status = "all"
+      else
+        @search_status = ParkingNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+      end
 
       respond_to do |format|
         format.html
@@ -75,8 +80,13 @@ module Organized
       if params[:search_bike_id].present?
         notifications = notifications.where(bike_id: params[:search_bike_id])
       end
+      unless @search_status == "all"
+        notifications = parking_notifications.where(status: @search_status)
+      end
       if bike_search_params_present?
-        notifications = notifications.where(bike_id: search_organization_bikes.pluck(:id))
+        bikes = a_impound_records.bikes.search(@interpreted_params)
+        bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
+        notifications = a_impound_records.where(bike_id: bikes.pluck(:id))
       end
       @matching_parking_notifications = notifications.where(created_at: @time_range)
     end

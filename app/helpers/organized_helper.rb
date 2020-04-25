@@ -51,4 +51,12 @@ module OrganizedHelper
       %w[dashboard index],
     ].include?([controller_name, action_name])
   end
+
+  def status_display(status)
+    if status == "current"
+      content_tag(:span, status.humanize, class: "text-success")
+    else
+      content_tag(:span, status.humanize, class: "less-strong")
+    end
+  end
 end
