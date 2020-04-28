@@ -1,6 +1,8 @@
 development:
   adapter: postgresql
   database: bikeindex_development
+  host: <%= ENV["PGHOST"] %>
+  username: <%= ENV["PGUSER"] %>
   pool: 20
 
 # Warning: The database defined as "test" will be erased and
