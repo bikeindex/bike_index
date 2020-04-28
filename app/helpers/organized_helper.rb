@@ -16,7 +16,9 @@ module OrganizedHelper
       end
       # If it's an unregistered bike, don't display where it was created
       # ... since it only could've been created in one place
-      if bike.unregistered_parking_notification?
+      if bike.deleted?
+        concat(content_tag(:em, " removed from Bike Index", class: "small text-danger"))
+      elsif bike.unregistered_parking_notification?
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
       elsif bike.creation_description.present?
         concat(", ")
@@ -48,5 +50,13 @@ module OrganizedHelper
       %w[users new],
       %w[dashboard index],
     ].include?([controller_name, action_name])
+  end
+
+  def status_display(status)
+    if status == "current"
+      content_tag(:span, status.humanize, class: "text-success")
+    else
+      content_tag(:span, status.humanize, class: "less-strong")
+    end
   end
 end

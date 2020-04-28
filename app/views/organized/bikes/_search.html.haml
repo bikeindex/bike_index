@@ -15,7 +15,7 @@
 
       = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
       .sidebyside-queries
-        = text_field_tag :email, params[:email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
+        = text_field_tag :search_email, params[:search_email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
         = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
 
     .search-button-wrap

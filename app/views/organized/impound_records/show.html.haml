@@ -1,54 +1,160 @@
-- # TODO: add translations
+-# Need to set ivars here because we rerender the page if update fails
+- @bike = @impound_record.bike
+- @parking_notification = @impound_record.parking_notification
+- impound_record_updates = @impound_record.impound_record_updates.reorder(created_at: :desc)
+- locations_enabled = current_organization.enabled?("impound_bikes_locations")
 
+- # TODO: add translations
 .organized-page-header
   %h1
     Impound Record
-    - if @bike.unregistered_parking_notification?
-      %span.text-warning
-        for
-        %em unregistered
-        = @bike.type
+    - if @bike.present? && @bike.created_by_parking_notification
+      %small.text-warning
+        %em for
+        unregistered #{@bike.type}
 
-- # TODO: add translations
 .row
   .col-md-6
     %table.table-list
       %tbody
         %tr
+          %td ID
+          %td
+            %strong= @impound_record.display_id
+            - if current_user.developer?
+              %small.only-dev-visible.ml-2
+                %em.less-strong real id:
+                %code
+                  = @impound_record.id
+        %tr
           %td Created
           %td
-            %span.convertTime
+            %span.convertTime.preciseTime
               = l(@impound_record.created_at, format: :convert_time)
         %tr
-          %td By
-          %td= @impound_record.user.display_name
-        %tr
-          %td Status
-          %td
-            %strong
-              = @impound_record.status
+          %td Impounded by
+          %td= @impound_record.creator&.display_name
+        - if @impound_record.resolved?
+          %tr
+            %td Resolved
+            %td
+              %span.convertTime.preciseTime
+                = l(@impound_record.resolved_at, format: :convert_time)
+          %tr
+            %td By
+            %td= @impound_record.user&.display_name
         %tr
           %td Bike
           %td
             - if @bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
-              %br
-              %small
-                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
-                  view parking notifications for
-                  %em
-                    = @bike.type
-        - if @impound_record.resolved?
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Status
+          %td
+            %strong
+              = @impound_record.status_humanized
+        - if locations_enabled
+          %tr
+            %td Location
+            %td= @impound_record.location&.name
+        - if impound_record_updates.any?
+          %tr
+            %td Updated
+            %td
+              %span.convertTime.preciseTime
+                = l(@impound_record.updated_at, format: :convert_time)
+        %tr
+          %td last update by
+          %td= @impound_record.user&.display_name
+        - if @impound_record.resolving_update.present?
           %tr
             %td Resolved
             %td
-              %span.convertTime
-                = l(@impound_record.resolved_at, format: :convert_time)
+              - if @impound_record.resolved_at.present?
+                %span.convertTime.preciseTime
+                  = l(@impound_record.resolved_at, format: :convert_time)
+
+
+- if @impound_record.active?
+  .row
+    .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
+      .card
+        - @impound_record_update ||= ImpoundRecordUpdate.new
+        = form_for @impound_record_update, url: organization_impound_record_path(@impound_record.display_id, organization_id: current_organization), action: "update", method: :patch do |f|
+          .card-block
+            .card-title
+              %h3.uncap
+                Update impound record
+            .card-body#impoundRecordUpdateForm
+              .row
+                .col-sm-6
+                  - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(locations_enabled ? nil : :move_location)
+                  = f.select :kind,
+                    options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }),
+                    {},
+                    class: "form-control"
+                - if locations_enabled
+                  .col-sm-6.collapse.collapseKind.kind_move_location
+                    - @impound_record_update.location_id ||= current_organization.default_impound_location&.id
+                    = f.select :location_id,
+                      options_for_select(current_organization.locations.impound_locations.map { |l| [l.name, l.id] }),
+                      {},
+                      class: "form-control"
+                .col-sm-6.collapse.collapseKind.kind_transferred_to_new_owner
+                  = f.email_field :transfer_email, placeholder: "New owner email", class: "form-control"
+
+              .row.mt-2
+                .col-xs-12
+                  = f.text_area :notes, placeholder: "Internal note", class: "form-control"
+                .col-xs-12.mt-2
+                  = submit_tag "Update impound record", class: "btn btn-success btn-md-lg"
+
+- if impound_record_updates.any?
+  .mt-4
+    %table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+      %thead.small-header.hidden-md-down
+        %th
+          Updated
+        %th
+          By
+        %th
+          Kind
+        %th
+          Info
+      %tbody
+        - impound_record_updates.each do |impound_record_update|
+          %tr
+            %td
+              %span.convertTime.preciseTime
+                = l(impound_record_update.created_at, format: :convert_time)
+            %td
+              = impound_record_update.user&.display_name
+            %td
+              %em
+                = impound_record_update.kind_humanized
+            %td
+              - if impound_record_update.move_location?
+                Moved to #{impound_record_update.location.name}
+              - elsif impound_record_update.transferred_to_new_owner?
+                Sent to
+                %strong
+                  = impound_record_update.transfer_email
+
+              - if !impound_record_update.note? && impound_record_update.notes.present?
+                %br
+              %small
+                = impound_record_update.notes
+
 
 - if @parking_notification.present?
-  %hr
+  %hr.mt-4
   %h2.uncap
-    Record created by
-    = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+    Impounded by
+    %em
+      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
 
-  = render partial: "/organized/parking_notifications/show_details"
+  = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }

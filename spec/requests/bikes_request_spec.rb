@@ -109,6 +109,7 @@ RSpec.describe BikesController, type: :request do
           get "#{base_url}/#{bike.id}"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
+          expect(bike.created_by_parking_notification).to be_truthy
         end
       end
     end
@@ -263,6 +264,15 @@ RSpec.describe BikesController, type: :request do
 
   describe "update" do
     before { log_in(current_user) if current_user.present? }
+    context "setting a bike_sticker" do
+      it "gracefully fails if the number is weird" do
+        expect(bike.bike_stickers.count).to eq 0
+        patch "#{base_url}/#{bike.id}", params: { bike_sticker: "02891426438 " }
+        expect(flash[:error]).to be_present
+        bike.reload
+        expect(bike.bike_stickers.count).to eq 0
+      end
+    end
     context "setting address for bike" do
       let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
       let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }

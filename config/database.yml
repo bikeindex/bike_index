@@ -3,6 +3,8 @@ development:
   host: <%= ENV['PGHOST'] || 'localhost' %>
   username: <%= ENV["PGUSER"] || 'root' %>
   database: bikeindex_development
+  host: <%= ENV["PGHOST"] %>
+  username: <%= ENV["PGUSER"] %>
   pool: 20
 
 # Warning: The database defined as "test" will be erased and

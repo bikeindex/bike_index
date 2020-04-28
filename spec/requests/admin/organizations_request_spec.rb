@@ -103,7 +103,9 @@ RSpec.describe Admin::OrganizationsController, type: :request do
             latitude: 22_222,
             longitude: 11_111,
             organization_id: 844,
-            shown: false,
+            publicly_visible: false,
+            impound_location: true,
+            default_impound_location: false,
             _destroy: 0,
           },
           Time.current.to_i.to_s => {
@@ -120,6 +122,9 @@ RSpec.describe Admin::OrganizationsController, type: :request do
             longitude: 11_111,
             organization_id: 844,
             shown: false,
+            publicly_visible: true,
+            impound_location: true,
+            default_impound_location: true,
           },
         },
       }

@@ -31,10 +31,10 @@
     %fieldset{:disabled => "disabled"}
       .form-group
         = f.label :slug, "Slug:"
-        %p
+        %p.less-strong
           = @organization.slug
   - if current_user.developer?
-    .col-6.col-lg-3
+    .col-6.col-lg-3.only-dev-visible
       .form-group
         = f.label :previous_slug do
           Previous Slug
@@ -54,15 +54,17 @@
             .form-check
               = f.radio_button "kind", kind, class: "form-check-input"
               = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
-
-  .col-md-6
-    .form-group
-      = f.label :search_radius, "Search radius (mi)"
-      = f.number_field :search_radius, {class: "form-control"}
-      %em.small
-        %pre.d-inline organizations_nearby
-        will search within this radius for other organizations in the same area
-
+  - if @organization.id.present?
+    .col-md-6
+      - emails = @organization.users.pluck(:email)
+      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+      .form-group.fancy-select.unfancy
+        = f.label :embedable_user_email
+        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+        %small.less-strong
+          - if @organization.memberships.count == 0
+            You can use #{ENV['AUTO_ORG_MEMBER']} if
+            there are no members of the organization
   .col-md-6
     .form-group
       = f.check_box :show_on_map
@@ -76,13 +78,13 @@
       = f.check_box :api_access_approved
       = f.label :api_access_approved
       %small.less-strong
-        to be able to post updates via API, check this too
+        to be able to post updates via API (rarely necessary)
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
 
   - if current_user.developer?
-    .col-md-6.mt-4
+    .col-md-6.mt-4.only-dev-visible
       %label.less-strong.d-block
         Manually set POS kind
         %span.text-danger
@@ -97,22 +99,24 @@
           = f.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label"
       .mb-4
 
-.row
+.row.mt-2
   .col-md-6
     .form-group.fancy-select.unfancy
       = f.label :parent_organization_id
       = f.collection_select(:parent_organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
-  - if @organization.id.present?
+      %em.small To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization
+  - if @organization.enabled?("regional_bike_counts")
     .col-md-6
-      - emails = @organization.users.pluck(:email)
-      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .form-group.fancy-select.unfancy
-        = f.label :embedable_user_email
-        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
-        %small.less-strong
-          - if @organization.memberships.count == 0
-            You can use #{ENV['AUTO_ORG_MEMBER']} if
-            there are no members of the organization
+      .form-group
+        = f.label :search_radius do
+          Search radius (mi)
+          %small.text-success organization has paid for Regional bike counts, this controls how large the region is
+        = f.number_field :search_radius, { class: "form-control" }
+        .only-dev-visible.p-1
+          %em.small
+            %code.d-inline nearby_organizations
+            will search within this radius for other organizations in the same area
+
 
   / .control-group.padded
   /   .control-label

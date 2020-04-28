@@ -4,10 +4,9 @@
   %h1
     Parking Notification
     - if @parking_notification.unregistered_bike
-      %span.text-warning
-        for
-        %em unregistered
-        = @bike.type
+      %small.text-warning
+        %em for
+        unregistered #{@bike.type}
 
 = render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
 

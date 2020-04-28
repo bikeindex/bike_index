@@ -91,9 +91,9 @@ RSpec.describe Organized::BikesController, type: :request do
       it "creates along with parking_notification" do
         current_organization.reload
         expect(current_organization.auto_user).to eq current_user
-
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          ActionMailer::Base.deliveries = []
           expect do
             post base_url, params: { bike: bike_params, parking_notification: parking_notification }
             expect(flash[:success]).to match(/tricycle/i)

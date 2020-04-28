@@ -45,28 +45,18 @@ $(document).ready(function() {
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
-  if (
-    [
-      "organized_parking_notifications_index",
-      "organized_parking_notifications_show",
-    ].includes(bodyId)
-  ) {
+  // If we're trying to target all pages from a controller ;)
+  const pageControllerId = bodyId.replace(/_[^_]*$/, "");
+  if ("organized_parking_notifications" == pageControllerId) {
     window.binxAppOrgParkingNotifications = new BinxAppOrgParkingNotifications();
     binxAppOrgParkingNotifications.init();
-  } else if (
-    ["organized_exports_show", "organized_exports_new"].includes(bodyId)
-  ) {
+  } else if ("organized_exports" === pageControllerId) {
     window.binxAppOrgExport = new BinxAppOrgExport();
     binxAppOrgExport.init();
   } else if (bodyId === "organized_bikes_index") {
     const binxAppOrgBikes = BinxAppOrgBikes();
     binxAppOrgBikes.init();
-  } else if (
-    [
-      "organized_impound_records_index",
-      "organized_impound_records_show",
-    ].includes(bodyId)
-  ) {
+  } else if ("organized_impound_records" === pageControllerId) {
     window.binxAppOrgImpoundRecords = new BinxAppOrgImpoundRecords();
     binxAppOrgImpoundRecords.init();
   }

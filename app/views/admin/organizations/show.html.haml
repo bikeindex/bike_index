@@ -326,7 +326,7 @@
       .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
-            - if !location.shown && @organization.allowed_show
+            - if !location.shown && @organization.allowed_show?
               %h2
                 Location is not visible! Try updating the organization
             %p

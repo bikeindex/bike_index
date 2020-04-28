@@ -42,7 +42,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             lng: parking_notification1.longitude,
             user_id: parking_notification1.user_id,
             user_display_name: parking_notification1.user.display_name,
-            impound_record_id: impound_record.id,
+            impound_record_id: impound_record&.display_id,
             resolved_at: parking_notification1.resolved_at&.to_i,
             unregistered_bike: false,
             notification_number: 1,
@@ -53,13 +53,19 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           }
         end
         it "renders json, no cors present" do
-          get base_url, params: { format: :json }
+          get base_url, params: { search_status: "all", format: :json }
           expect(response.status).to eq(200)
           parking_notifications = json_result["parking_notifications"]
           expect(parking_notifications.count).to eq 1
           expect(parking_notifications.first).to eq target.as_json
           expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
           expect(response.headers["Access-Control-Request-Method"]).not_to be_present
+
+          # Also test that current is default scope
+          get base_url, params: { format: :json }
+          expect(response.status).to eq(200)
+          parking_notifications = json_result["parking_notifications"]
+          expect(parking_notifications.count).to eq 0
         end
       end
     end
@@ -68,7 +74,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization) }
       let(:bike) { parking_notification2.bike }
       it "renders" do
+        expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
         get base_url, params: { search_bike_id: bike.id }, headers: json_headers
+        expect(response.status).to eq(200)
+        expect(json_result["parking_notifications"].count).to eq 1
+        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
+
+        get base_url, params: { search_email: bike.owner_email }, headers: json_headers
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id

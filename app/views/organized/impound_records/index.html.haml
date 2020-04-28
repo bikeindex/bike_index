@@ -18,7 +18,7 @@
 
       = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
       .sidebyside-queries
-        = text_field_tag :email, params[:email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
+        = text_field_tag :search_email, params[:search_email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
         = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
 
     .search-button-wrap
@@ -36,9 +36,11 @@
 
 .row.mt-4.mb-4
   .col-sm-6
-    = pluralize(number_with_delimiter(@impound_records.total_count), "Matching impound record")
+    = pluralize(number_with_delimiter(@impound_records.total_count), "matching impound record")
+    %em
+      = humanized_time_range(@time_range)
   .col-sm-6.offset-lg-4.col-lg-2
-    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
+    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
       = @search_status.humanize
     .dropdown-menu
       - (%w[active all] + ImpoundRecord.statuses).each do |kind|

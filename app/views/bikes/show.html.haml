@@ -9,6 +9,12 @@
         = t(".hidden_by_owner")
         %small.less-strong
           = t(".no_one_but_the_user_and_bike_index_admins")
+    - if @bike.deleted?
+      %h2.text-danger.uncap.text-center
+        This bike was deleted
+        - if @bike.deleted_at.present?
+          %span.convertTime.preciseTime
+            = l @bike.deleted_at, format: :convert_time
 
   - if @bike_sticker.present?
     .alert.alert-success
