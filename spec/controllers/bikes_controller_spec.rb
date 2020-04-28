@@ -1084,11 +1084,11 @@ RSpec.describe BikesController, type: :controller do
         end
       end
     end
-    context "user allowed to edit the bike" do
+    context "user allowed to edit the bike, general alert" do
       let(:user) { ownership.creator }
       context "revised" do
         before do
-          user.update_column :has_stolen_bikes_without_locations, true
+          user.update_column :general_alerts, ["stolen_bikes_without_locations"]
           set_current_user(user)
         end
         context "root" do
@@ -1099,7 +1099,7 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template "edit_bike_details"
-              expect(assigns(:show_missing_information_alert)).to be_truthy
+              expect(assigns(:show_general_alert)).to be_truthy
             end
           end
           context "stolen bike" do
@@ -1112,7 +1112,7 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to be_ok
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(assigns(:show_missing_information_alert)).to be_falsey
+              expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template "edit_theft_details"
             end
           end
@@ -1149,6 +1149,7 @@ RSpec.describe BikesController, type: :controller do
             bc.instance_variable_set(:@bike, Bike.new(stolen: true))
             bc.edit_templates.keys + ["alert_purchase", "alert_purchase_confirmation"]
           end
+          let(:no_global_alert_templates) { %w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation] }
           before { FactoryBot.create_list(:theft_alert_plan, 3) }
           it "renders the template" do
             # Ensure stolen bike is set up correctly
@@ -1166,6 +1167,28 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
               expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
+
+              should_show_general_alert = !no_global_alert_templates.include?(template)
+              pp template unless assigns(:show_general_alert) == should_show_general_alert
+              expect(assigns(:show_general_alert)).to eq should_show_general_alert
+            end
+          end
+          context "with a purchased alert and stolen location" do
+            it "does not render show_general_alert on photos" do
+              user.update_attributes(general_alerts: ["theft_alert_without_photo"])
+
+              templates.each do |template|
+                get :edit, params: { id: bike.id, page: template }
+
+                expect(response.status).to eq(200)
+                expect(response).to render_template("edit_#{template}")
+                expect(assigns(:edit_template)).to eq(template)
+                expect(assigns(:private_images)).to eq([]) if template == "photos"
+                expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
+                show_general_alert = ! %w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation].include?(template)
+                pp template unless assigns(:show_general_alert) == show_general_alert
+                expect(assigns(:show_general_alert)).to eq(show_general_alert)
+              end
             end
           end
         end

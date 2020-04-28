@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path, :bikehub_url, :show_missing_information_alert
+                  :default_bike_search_path, :bikehub_url, :show_general_alert
     before_action :enable_rack_profiler
 
     before_action do
@@ -82,21 +82,15 @@ module ControllerHelpers
     end
   end
 
-  def show_missing_information_alert
-    return @show_missing_information_alert if defined?(@show_missing_information_alert)
-    return @show_missing_information_alert = false unless current_user.present?
-    missing_location = current_user.has_stolen_bikes_without_locations
+  def show_general_alert
+    return @show_general_alert = false if @skip_general_alert
+    return @show_general_alert = false unless current_user.present? && current_user.general_alerts.any?
 
-    return @show_missing_information_alert = false unless missing_location
-    if @bike.present? && @edit_template.present?
-      # If we're looking at the bike edit pages, render the missing information if not on an important page
-      @show_missing_information_alert = %w[bike_details ownership drivetrain accessories publicize groups].include?(@edit_template)
-    elsif %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
-      @show_missing_information_alert = false
+    if %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
+      @show_general_alert = false
     else
-      @show_missing_information_alert = true
+      @show_general_alert = true
     end
-    @show_missing_information_alert
   end
 
   def default_bike_search_path

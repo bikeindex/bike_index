@@ -262,43 +262,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "stolen records missing locations" do
-    let(:user) { FactoryBot.create(:user) }
-    let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
-    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: ownership.bike, street: "         ") }
-    let(:ownership_with_location) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
-    let!(:stolen_record_with_location) { FactoryBot.create(:stolen_record, bike: ownership_with_location.bike, street: "some cool street") }
-    let(:ownership_unclaimed) { FactoryBot.create(:ownership, creator: user) }
-    let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record, bike: ownership_unclaimed.bike) }
-    it "lists the bikes with missing locations" do
-      # Ensure we've got the current stolen records set
-      stolen_record.bike.update_attributes(updated_at: Time.current)
-      stolen_record_with_location.bike.update_attributes(updated_at: Time.current)
-      stolen_record_unclaimed.bike.update_attributes(updated_at: Time.current)
-      expect(stolen_record.bike.current_stolen_record).to eq stolen_record
-      expect(stolen_record_with_location.bike.current_stolen_record).to eq stolen_record_with_location
-      expect(stolen_record_unclaimed.bike.current_stolen_record).to eq stolen_record_unclaimed
-      # Test that the missing location is there
-      expect(stolen_record.missing_location?).to be_truthy
-      expect(stolen_record_with_location.missing_location?).to be_falsey
-      expect(stolen_record_unclaimed.missing_location?).to be_truthy
-      expect(stolen_record.bike.user).to eq user
-      expect(stolen_record_with_location.bike.user).to eq user
-      expect(stolen_record_unclaimed.bike.user).to be_blank
-      # Unmemoize the stolen_bikes_without_locations
-      user_id = user.id
-      user = User.find(user_id)
-      user.save
-      expect(stolen_record.bike.stolen).to be_truthy
-      expect(stolen_record_with_location.bike.stolen).to be_truthy
-      expect(user.rough_approx_bikes.stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
-      expect(user.stolen_bikes_without_locations.map(&:id)).to eq([stolen_record.bike_id])
-      expect(user.has_stolen_bikes_without_locations).to be_truthy
-      user.update_attributes(superuser: true)
-      expect(user.has_stolen_bikes_without_locations).to be_falsey
-    end
-  end
-
   describe "set_calculated_attributes" do
     describe "title, urls" do
       it "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do

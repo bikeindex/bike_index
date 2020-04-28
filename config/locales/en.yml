@@ -4999,7 +4999,7 @@ en:
       to: To
       update: Update
       year: year
-    stolen_missing_information_modal:
+    user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       location_critical_html: >-
         <strong>It is critical for recovery</strong> that you include the address
