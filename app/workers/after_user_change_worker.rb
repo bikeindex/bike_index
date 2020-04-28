@@ -12,8 +12,9 @@ class AfterUserChangeWorker < ApplicationWorker
   end
 
   def user_general_alerts(user)
-    return [] if user.superuser
     alerts = []
+    return alerts if user.superuser # No alerts for superusers
+
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.theft_alert_missing_photo? }
       alerts << "theft_alert_without_photo"
     end
