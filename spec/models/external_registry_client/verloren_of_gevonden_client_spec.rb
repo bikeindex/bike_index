@@ -25,7 +25,6 @@ RSpec.describe ExternalRegistryClient::VerlorenOfGevondenClient, type: :model do
           expect(results.map(&:description)).to all(match(/fiets/))
           expect(results.first.external_id).to match(/F\d+\w*-.+/)
           expect(results.first.serial_number).to be_present
-          fail
         end
       end
     end
@@ -36,7 +35,6 @@ RSpec.describe ExternalRegistryClient::VerlorenOfGevondenClient, type: :model do
           results = described_class.new.search(13949483)
           expect(results).to be_an(Array)
           expect(results).to be_empty
-          fail
         end
       end
     end
@@ -46,7 +44,6 @@ RSpec.describe ExternalRegistryClient::VerlorenOfGevondenClient, type: :model do
         results = described_class.new.search("")
         expect(results).to be_an(Array)
         expect(results).to be_empty
-        fail
       end
     end
   end

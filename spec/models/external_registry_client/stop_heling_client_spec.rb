@@ -19,7 +19,6 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
         client = build_client
         results = client.search("nothing")
         expect(results).to be_empty
-        fail
       end
     end
 
@@ -28,7 +27,6 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
         client = build_client(results: [non_bike_result])
         results = client.search("28484")
         expect(results).to be_empty
-        fail
       end
     end
 
@@ -39,7 +37,6 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
         expect(results).to_not be_empty
         expect(results).to all(be_an_instance_of(ExternalRegistryBike::StopHelingBike))
         expect(results.none?(&:persisted?)).to eq(true)
-        fail
       end
     end
   end
