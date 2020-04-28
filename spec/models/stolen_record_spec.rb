@@ -4,9 +4,10 @@ RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
 
   describe "after_save hooks" do
+    let(:bike) { FactoryBot.create(:bike, stolen: true) }
     context "if bike no longer exists" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image)
         expect(stolen_record.alert_image).to be_present
 
         stolen_record.update_attribute(:bike, nil)
@@ -17,25 +18,26 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "if being marked as recovered" do
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
-        bike = FactoryBot.create(:bike, stolen: true)
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+        stolen_record.reload
         expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.bike.stolen).to eq(true)
+        expect(stolen_record.bike.stolen).to be_truthy
 
         stolen_record.add_recovery_information
-        stolen_record.save
         stolen_record.reload
+        bike.reload
 
-        expect(stolen_record.bike.stolen).to eq(false)
+        expect(stolen_record.recovered?).to be_truthy
+        expect(stolen_record.bike.stolen).to be_falsey
         expect(stolen_record.alert_image).to be_blank
       end
     end
 
     context "if not being marked as recovered" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "does not removes alert_image" do
-        bike = FactoryBot.create(:bike, stolen: true)
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+
         expect(stolen_record.alert_image).to be_present
 
         stolen_record.run_callbacks(:commit)

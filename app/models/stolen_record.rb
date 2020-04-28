@@ -52,7 +52,6 @@ class StolenRecord < ApplicationRecord
 
   before_save :set_calculated_attributes
   after_validation :reverse_geocode, unless: :skip_geocoding?
-  after_save :remove_outdated_alert_images
   after_commit :update_associations
 
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
@@ -259,8 +258,8 @@ class StolenRecord < ApplicationRecord
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
-      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
+      index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
+      can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery]),
     )
 
     bike.stolen = false
@@ -300,15 +299,8 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # If the bike has been recovered, remove the alert_image
-  def remove_outdated_alert_images
-    if bike.blank? || !bike.stolen?
-      alert_image&.destroy
-      reload
-    end
-  end
-
   def update_associations
+    remove_outdated_alert_images
     return true unless bike.present?
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current
@@ -317,10 +309,17 @@ class StolenRecord < ApplicationRecord
     bike.user&.update_attributes(updated_at: Time.current)
   end
 
+  # If the bike has been recovered, remove the alert_image
+  def remove_outdated_alert_images
+    return true unless bike.blank? || !bike.stolen? || recovered?
+    alert_image&.destroy
+    reload
+  end
+
   def notify_of_promoted_alert_recovery
-    return unless recovered? && theft_alerts.active.present?
+    return unless recovered? && theft_alerts.any?
 
     EmailTheftAlertNotificationWorker
-      .perform_async(theft_alerts.active.last.id, :recovered)
+      .perform_async(theft_alerts.last.id, :recovered)
   end
 end
