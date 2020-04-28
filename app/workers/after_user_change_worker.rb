@@ -14,9 +14,7 @@ class AfterUserChangeWorker < ApplicationWorker
   def user_general_alerts(user)
     return [] if user.superuser
     alerts = []
-    pp "c7c7c7c7c7c", user.rough_stolen_bikes.map { |b| b.current_stolen_record_id }, user.rough_stolen_bikes.map { |b| b.current_stolen_record&.theft_alert_missing_photo? }
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.theft_alert_missing_photo? }
-      pp "fffff8d8sd"
       alerts << "theft_alert_without_photo"
     end
 

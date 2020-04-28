@@ -148,10 +148,8 @@ RSpec.describe WelcomeController, type: :controller do
           end
         end
         context "with show_general_alert" do
-          before { user.update_column :has_stolen_bikes_without_locations, true }
+          before { user.update_column :general_alerts, ["has_stolen_bikes_without_locations"] }
           it "renders with show_general_alert" do
-            expect(user.has_stolen_bikes_without_locations).to be_truthy
-
             get :user_home
 
             expect(response).to be_ok

@@ -6,10 +6,10 @@ RSpec.describe PaymentsController, type: :controller do
   describe "new" do
     context "with user" do
       before do
+        user.update(general_alerts: ["has_stolen_bikes_without_locations"])
         set_current_user(user)
       end
       it "renders" do
-        user.update_column :has_stolen_bikes_without_locations, true
         get :new
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
@@ -23,6 +23,7 @@ RSpec.describe PaymentsController, type: :controller do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(assigns(:show_general_alert)).to be_falsey
       end
     end
   end
