@@ -551,7 +551,15 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "given an address change" do
-      it "is truthy" do
+      it "returns false unless there has been an address change" do
+        stolen_record = FactoryBot.create(
+          :stolen_record,
+          :in_los_angeles,
+          skip_geocoding: false,
+        )
+        expect(stolen_record.should_be_geocoded?).to eq(false)
+
+        stolen_record.city = "New York"
         stolen_record.valid? # triggers an update to address
         expect(stolen_record.should_be_geocoded?).to eq(true)
       end
