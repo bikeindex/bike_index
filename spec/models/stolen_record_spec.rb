@@ -453,20 +453,10 @@ RSpec.describe StolenRecord, type: :model do
   end
 
   describe "#add_recovery_information" do
-    context "given a bike save success" do
-      it "returns true" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record.bike).to receive(:save).and_return(true)
-        expect(stolen_record.add_recovery_information).to eq(true)
-      end
-    end
-
-    context "given a bike save failure" do
-      it "returns false" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record.bike).to receive(:save).and_return(false)
-        expect(stolen_record.add_recovery_information).to eq(false)
-      end
+    it "returns true" do
+      stolen_record = FactoryBot.create(:stolen_record)
+      allow(stolen_record.bike).to receive(:save).and_return(true)
+      expect(stolen_record.add_recovery_information).to eq(true)
     end
   end
 
@@ -559,39 +549,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.address_location).to eq(nil)
       end
     end
-  end
-
-  describe "#should_be_geocoded?" do
-    context "given the skip geocoding flag" do
-      it "returns false" do
-        stolen_record = FactoryBot.build(:stolen_record, skip_geocoding: true)
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-        expect(stolen_record).to_not be_geocoded
-      end
-    end
-
-    context "given a missing address" do
-      it "returns false and prevents geocoding" do
-        stolen_record = FactoryBot.build(
-          :stolen_record,
-          country: nil,
-          skip_geocoding: false,
-        )
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-        expect(stolen_record).to_not be_geocoded
-      end
-    end
 
     context "given an address change" do
-      it "returns false unless there has been an address change" do
-        stolen_record = FactoryBot.create(
-          :stolen_record,
-          :in_los_angeles,
-          skip_geocoding: false,
-        )
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-
-        stolen_record.city = "New York"
+      it "is truthy" do
         stolen_record.valid? # triggers an update to address
         expect(stolen_record.should_be_geocoded?).to eq(true)
       end
