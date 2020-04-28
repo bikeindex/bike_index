@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
+  RUN_EXTERNAL_STOP_HELING_TESTS = ENV["STOP_HELING_BASE_URL"] != "test"
+
   before do
     null_cache = ActiveSupport::Cache.lookup_store(:null_store)
     allow(Rails).to receive(:cache).and_return(null_cache)
@@ -13,28 +15,31 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
 
   describe "#search" do
     context "given no matching results" do
-      it "returns an empty array" do
+      it "returns an empty array", if: RUN_EXTERNAL_STOP_HELING_TESTS do
         client = build_client
         results = client.search("nothing")
         expect(results).to be_empty
+        fail
       end
     end
 
     context "given matching results but no bikes" do
-      it "returns an empty array" do
+      it "returns an empty array", if: RUN_EXTERNAL_STOP_HELING_TESTS do
         client = build_client(results: [non_bike_result])
         results = client.search("28484")
         expect(results).to be_empty
+        fail
       end
     end
 
     context "given matching results but no bikes" do
-      it "returns an array of unpersisted ExternalRegistryBikes" do
+      it "returns an array of unpersisted ExternalRegistryBikes", if: RUN_EXTERNAL_STOP_HELING_TESTS do
         client = build_client(results: [bike_result])
         results = client.search("28484")
         expect(results).to_not be_empty
         expect(results).to all(be_an_instance_of(ExternalRegistryBike::StopHelingBike))
         expect(results.none?(&:persisted?)).to eq(true)
+        fail
       end
     end
   end
