@@ -1,6 +1,8 @@
 module API
   module V3
     class Search < API::Base
+      include API::V2::Defaults
+
       helpers do
         params :non_serial_search_params do
           optional :query, type: String, desc: "Full text search"

@@ -14,6 +14,8 @@ RSpec.describe "Search API V3", type: :request do
         expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
         expect(result["bikes"][0]["id"]).to eq bike_2.id
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end
     end
   end
@@ -122,6 +124,8 @@ RSpec.describe "Search API V3", type: :request do
           result = JSON.parse(response.body)
           expect(result).to match({ non: 1, stolen: 2, proximity: 1 }.as_json)
           expect(response.status).to eq(200)
+          expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+          expect(response.headers["Access-Control-Request-Method"]).to eq("*")
         end
       end
     end
