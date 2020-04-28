@@ -2067,7 +2067,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2093,7 +2093,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -4999,7 +4999,7 @@ en:
       to: To
       update: Update
       year: year
-    stolen_missing_location_modal:
+    stolen_missing_information_modal:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       location_critical_html: >-
         <strong>It is critical for recovery</strong> that you include the address

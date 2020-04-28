@@ -289,6 +289,9 @@ RSpec.describe User, type: :model do
       user_id = user.id
       user = User.find(user_id)
       user.save
+      expect(stolen_record.bike.stolen).to be_truthy
+      expect(stolen_record_with_location.bike.stolen).to be_truthy
+      expect(user.rough_approx_bikes.stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
       expect(user.stolen_bikes_without_locations.map(&:id)).to eq([stolen_record.bike_id])
       expect(user.has_stolen_bikes_without_locations).to be_truthy
       user.update_attributes(superuser: true)

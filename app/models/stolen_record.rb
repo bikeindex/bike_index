@@ -48,7 +48,7 @@ class StolenRecord < ApplicationRecord
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
   scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
-  scope :missing_location, -> { where(street: ["", nil]) }
+  scope :missing_location, -> { where(street: ["", nil]) } # Overrides geocodeable missing_location, we need more specificity
 
   before_save :set_calculated_attributes
   after_validation :reverse_geocode, unless: :skip_geocoding?
@@ -90,6 +90,7 @@ class StolenRecord < ApplicationRecord
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
 
+  # Overrides geocodeable missing_location, we need more specificity
   def missing_location?; street.blank? end
 
   def address(skip_default_country: false, force_show_address: false)
@@ -272,14 +273,13 @@ class StolenRecord < ApplicationRecord
     recovery_link_token
   end
 
-  # The associated bike's first public image, if available. Else nil.
-  def bike_main_image
-    bike&.public_images&.order(:id)&.first
-  end
+  # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
+  def theft_alert_missing_photo?; current_alert_image.blank? && theft_alerts.any? end
 
-  def current_alert_image
-    alert_image || generate_alert_image
-  end
+  # The associated bike's first public image, if available. Else nil.
+  def bike_main_image; bike&.public_images&.order(:id)&.first end
+
+  def current_alert_image; alert_image || generate_alert_image end
 
   # Generate the "promoted alert image"
   # (One of the stolen bike's public images, placed on a branded template)

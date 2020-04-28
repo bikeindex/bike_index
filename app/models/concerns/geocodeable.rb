@@ -7,6 +7,8 @@ module Geocodeable
     geocoded_by :address
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
+    scope :missing_location, -> { where(latitude: nil) }
+
     # Skip geocoding if this flag is truthy
     attr_accessor :skip_geocoding
 
@@ -61,6 +63,8 @@ module Geocodeable
   end
 
   def address(**kwargs); Geocodeable.address(self, **kwargs) end
+
+  def missing_location?; latitude.blank? end
 
   # Should the receiving object be geocoded?
   #

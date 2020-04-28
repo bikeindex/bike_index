@@ -1099,20 +1099,20 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template "edit_bike_details"
-              expect(assigns(:show_missing_location_alert)).to be_truthy
+              expect(assigns(:show_missing_information_alert)).to be_truthy
             end
           end
           context "stolen bike" do
+            let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
             it "renders with stolen as first template, different description" do
-              bike.update_attribute(:stolen, true)
               expect(bike.reload.stolen).to eq(true)
-
+              expect(bike.current_stolen_record.missing_location?).to be_truthy
               get :edit, params: { id: bike.id }
 
               expect(response).to be_ok
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(assigns(:show_missing_location_alert)).to be_falsey
+              expect(assigns(:show_missing_information_alert)).to be_falsey
               expect(response).to render_template "edit_theft_details"
             end
           end
@@ -1139,19 +1139,21 @@ RSpec.describe BikesController, type: :controller do
             end
           end
         end
-        # Grab all the template keys from the controller so we can test that we
-        # render all of them Both to ensure we get all of them and because we
-        # can't use the let block
-        bc = BikesController.new
-        bc.instance_variable_set(:@bike, Bike.new)
-        templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
-        templates.each do |template|
-          context "with query param ?page=#{template}" do
-            it "renders the #{template} template" do
-              FactoryBot.create_list(:theft_alert_plan, 3)
-              bike.update(current_stolen_record: FactoryBot.create(:stolen_record, bike: bike))
-              expect(bike.current_stolen_record).to be_present
+        context "with test all the templates" do
+          let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+          it "renders the template" do
+            # Grab all the template keys from the controller so we can test that we
+            # render all of them Both to ensure we get all of them and because we
+            # can't use the let block
+            bc = BikesController.new
+            bc.instance_variable_set(:@bike, Bike.new)
+            templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
+            FactoryBot.create_list(:theft_alert_plan, 3)
+            bike.reload
+            expect(bike.current_stolen_record).to eq stolen_record
+            expect(bike.current_stolen_record.missing_location?).to be_truthy
 
+            templates.each do |template|
               get :edit, params: { id: bike.id, page: template }
 
               expect(response.status).to eq(200)
@@ -1159,8 +1161,21 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
               expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
+              show_missing_information = %w[theft_details alert alert_purchase alert_purchase_confirmation].include?(template)
+              expect(assigns(:show_missing_information_alert)).to eq(show_missing_information)
+
+              expect(assigns(:page_title)).to eq "#{template.humanize} Bike"
             end
           end
+        end
+      end
+      context "user with a theft alert and no images" do
+        xit "does not render show_missing_information_alert on photos" do
+          bc = BikesController.new
+          bc.instance_variable_set(:@bike, Bike.new)
+          templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
+
+          expect(assigns(:show_missing_information_alert)).to eq(should_show_missing_information)
         end
       end
     end
@@ -1439,15 +1454,14 @@ RSpec.describe BikesController, type: :controller do
           it "updates and returns to the right page" do
             # VCR for some reason fails to match this request with standard matching, so specify different
             VCR.use_cassette("bikes_controller-create-stolen", match_requests_on: [:path]) do
-              bike.update_attribute :stolen, true
-              bike.reload
-              expect(bike.stolen).to be_truthy
-
               expect(stolen_record.date_stolen).to be_present
               expect(stolen_record.proof_of_ownership).to be_falsey
               expect(stolen_record.receive_notifications).to be_truthy
 
-              expect(bike.fetch_current_stolen_record).to eq stolen_record
+              bike.reload
+              expect(bike.current_stolen_record).to eq stolen_record
+              expect(bike.stolen).to be_truthy
+
               put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }
               expect(flash[:error]).to_not be_present
               expect(response).to redirect_to edit_bike_url(page: "fancy_template")
@@ -1495,9 +1509,8 @@ RSpec.describe BikesController, type: :controller do
             end
             it "updates, ignores passed state" do
               VCR.use_cassette("bikes_controller-create-stolen-canada", match_requests_on: [:path]) do
-                bike.update_attribute :stolen, true
-                bike.reload
                 expect(stolen_record.date_stolen).to be_present
+                bike.reload
 
                 expect(bike.fetch_current_stolen_record).to eq stolen_record
                 put :update, params: { id: bike.id, bike: bike_attrs, edit_template: "fancy_template" }

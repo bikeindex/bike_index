@@ -67,6 +67,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(result).to be_an_instance_of(AlertImage)
         expect(stolen_record.alert_image).to eq(result)
         expect(AlertImage.count).to eq(1)
+        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
       end
     end
 
@@ -103,10 +106,11 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  it "marks current true by default, display_checklist? false" do
+  it "has some defaults" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
     expect(stolen_record.display_checklist?).to be_falsey
+    expect(stolen_record.theft_alert_missing_photo?).to be_falsey
   end
 
   describe "find_or_create_recovery_link_token" do
@@ -178,6 +182,7 @@ RSpec.describe StolenRecord, type: :model do
                                        zipcode: "60647",
                                        country_id: country.id)
       expect(stolen_record.address).to eq("60647, NEVVVV")
+      expect(stolen_record.missing_location?).to be_falsey
       stolen_record.show_address = true
       expect(stolen_record.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
@@ -508,6 +513,8 @@ RSpec.describe StolenRecord, type: :model do
       it "returns all available location components" do
         stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
         expect(stolen_record.address_location(include_all: true)).to eq("New York, NY - US")
+        stolen_record.street = ""
+        expect(stolen_record.missing_location?).to be_truthy
 
         ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
         stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
@@ -594,6 +601,8 @@ RSpec.describe StolenRecord, type: :model do
       it "sends an admin notification" do
         stolen_record = FactoryBot.create(:stolen_record)
         FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        stolen_record.reload
+        expect(stolen_record.theft_alert_missing_photo?).to be_truthy
 
         Sidekiq::Testing.inline! do
           expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)

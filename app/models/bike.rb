@@ -692,6 +692,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
+    self.stolen = true if current_stolen_record.present?
     set_location_info
     self.listing_order = calculated_listing_order
     # Quick hack to store the fact that it was creation for parking notification
