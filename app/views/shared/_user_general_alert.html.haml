@@ -18,3 +18,19 @@
 
     = render partial: "shared/modal", locals: { title: t(".stolen_missing_location_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true }
 
+- if current_user.general_alerts.include?("theft_alert_without_photo")
+  - missing_photo_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
+  - if missing_photo_bikes.present?
+
+    - modal_body = capture_haml do
+      .modal-body
+        %p
+          = t(".photo_critical_html", bike_type: missing_photo_bikes.first.type)
+        - missing_photo_bikes.each do |bike|
+          %p
+            = link_to t(".add_photo_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, page: "photos")
+        %p
+          %em.less-strong
+            = t(".without_photo_all_is_lost", bike_type: missing_photo_bikes.first.type)
+
+    = render partial: "shared/modal", locals: { title: t(".missing_stolen_photo_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true }
