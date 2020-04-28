@@ -1139,19 +1139,24 @@ RSpec.describe BikesController, type: :controller do
             end
           end
         end
-        context "with test all the templates" do
+        context "test all the templates" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-          it "renders the template" do
+          let(:templates) do
             # Grab all the template keys from the controller so we can test that we
             # render all of them Both to ensure we get all of them and because we
             # can't use the let block
             bc = BikesController.new
-            bc.instance_variable_set(:@bike, Bike.new)
-            templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
-            FactoryBot.create_list(:theft_alert_plan, 3)
+            bc.instance_variable_set(:@bike, Bike.new(stolen: true))
+            bc.edit_templates.keys + ["alert_purchase", "alert_purchase_confirmation"]
+          end
+          before { FactoryBot.create_list(:theft_alert_plan, 3) }
+          it "renders the template" do
+            # Ensure stolen bike is set up correctly
+            stolen_record.reload
             bike.reload
             expect(bike.current_stolen_record).to eq stolen_record
             expect(bike.current_stolen_record.missing_location?).to be_truthy
+            expect(stolen_record.theft_alert_missing_photo?).to be_falsey
 
             templates.each do |template|
               get :edit, params: { id: bike.id, page: template }
@@ -1161,21 +1166,8 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
               expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
-              show_missing_information = %w[theft_details alert alert_purchase alert_purchase_confirmation].include?(template)
-              expect(assigns(:show_missing_information_alert)).to eq(show_missing_information)
-
-              expect(assigns(:page_title)).to eq "#{template.humanize} Bike"
             end
           end
-        end
-      end
-      context "user with a theft alert and no images" do
-        xit "does not render show_missing_information_alert on photos" do
-          bc = BikesController.new
-          bc.instance_variable_set(:@bike, Bike.new)
-          templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
-
-          expect(assigns(:show_missing_information_alert)).to eq(should_show_missing_information)
         end
       end
     end

@@ -95,7 +95,9 @@ module HeaderTagHelper
       self.page_description = translation_description(location: "meta_descriptions.bikes_new_stolen")
     elsif action_name == "edit" || action_name == "update"
       if @edit_templates.present?
-        self.page_title = "#{@edit_templates[@edit_template]} - #{@bike.title_string}"
+        # Some of the theft alert templates don't have translations, so just jam it in there
+        template_str = @edit_templates[@edit_template] || @edit_template&.humanize
+        self.page_title = "#{template_str} - #{@bike.title_string}"
       else
         self.page_title = "Edit #{@bike.title_string}"
       end

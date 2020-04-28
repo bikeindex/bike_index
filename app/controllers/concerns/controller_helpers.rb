@@ -84,9 +84,13 @@ module ControllerHelpers
 
   def show_missing_information_alert
     return @show_missing_information_alert if defined?(@show_missing_information_alert)
-    return @show_missing_information_alert = false unless current_user&.has_stolen_bikes_without_locations
-    if @bike.present? && @edit_template.present? && !%w[bike_details photos drivetrain accessories ownership groups].include?(@edit_template)
-      @show_missing_information_alert = false
+    return @show_missing_information_alert = false unless current_user.present?
+    missing_location = current_user.has_stolen_bikes_without_locations
+
+    return @show_missing_information_alert = false unless missing_location
+    if @bike.present? && @edit_template.present?
+      # If we're looking at the bike edit pages, render the missing information if not on an important page
+      @show_missing_information_alert = %w[bike_details ownership drivetrain accessories publicize groups].include?(@edit_template)
     elsif %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
       @show_missing_information_alert = false
     else
