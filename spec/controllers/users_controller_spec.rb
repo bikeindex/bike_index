@@ -287,7 +287,6 @@ RSpec.describe UsersController, type: :controller do
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
           expect(session[:partner]).to be_nil
-          expect(AfterUserChangeWorker).to have_enqueued_sidekiq_job(user.id)
         end
       end
 

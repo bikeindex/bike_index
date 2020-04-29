@@ -698,6 +698,7 @@ class Bike < ApplicationRecord
     # Quick hack to store the fact that it was creation for parking notification
     self.created_by_parking_notification = true if unregistered_parking_notification?
     self.status = calculated_status unless skip_status_update
+    self.abandoned = true if status_abandoned? # Quick hack to manage prior to status update
     clean_frame_size
     set_mnfg_name
     set_user_hidden
@@ -771,9 +772,10 @@ class Bike < ApplicationRecord
   def calculated_status
     # NOTE: If it's impounded, status is still unregistered_parking_notification
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
+    return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     return "status_stolen" if stolen
     return "status_impounded" if current_impound_record.present?
-    return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
+
     "status_with_owner"
   end
 
