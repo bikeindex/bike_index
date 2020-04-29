@@ -61,14 +61,19 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
     end
     context "broken pos" do
       it "updates" do
-        expect do
+        Sidekiq::Worker.clear_all
+        expect(organization).to be_present
+        Sidekiq::Testing.inline! do
           put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "broken_lightspeed_pos").to_json,
               headers: json_headers
-        end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
+        end
         expect(response.code).to eq("200")
         expect(json_result["manual_pos_kind"]).to eq "broken_lightspeed_pos"
         organization.reload
         expect(organization.manual_pos_kind).to eq "broken_lightspeed_pos"
+        expect(organization.pos_kind).to eq "broken_lightspeed_pos"
+        expect(organization.broken_pos?).to be_truthy
+        expect(Organization.broken_pos.pluck(:id)).to eq([organization.id])
       end
     end
     context "no_pos" do
