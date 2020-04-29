@@ -96,25 +96,24 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
 
     context "other active notification for bike, from organization" do
       let(:initial_record_id) { nil }
-      let(:parking_notification3) { FactoryBot.create(:parking_notification, bike: bike) }
+      let(:parking_notification_other_org) { FactoryBot.create(:parking_notification, bike: bike) }
       it "does nothing to the other notification, closes all on retrieval" do
         initial.reload
         parking_notification2.reload
         expect(initial.associated_notifications).to eq([])
         expect(parking_notification2.associated_notifications).to eq([])
-        expect(parking_notification3.associated_notifications).to eq([])
+        expect(parking_notification_other_org.associated_notifications).to eq([])
         expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
         instance.perform(parking_notification2.id)
         initial.reload
         parking_notification2.reload
-        parking_notification3.reload
+        parking_notification_other_org.reload
         expect(initial.associated_notifications.pluck(:id)).to match_array([])
         expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([])
-        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
-        expect(parking_notification3.current?).to be_truthy
-        expect(parking_notification2.replaced?).to be_truthy
-        expect(parking_notification2.current?).to be_truthy
-        expect(initial.current?).to be_truthy
+        expect(parking_notification_other_org.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification_other_org.current?).to be_truthy
+        expect(parking_notification2.status).to eq "current"
+        expect(initial.status).to eq "current"
         expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
@@ -122,11 +121,11 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         end
         initial.reload
         parking_notification2.reload
-        parking_notification3.reload
+        parking_notification_other_org.reload
         expect(initial.associated_notifications.pluck(:id)).to match_array([])
         expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([])
-        expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
-        expect(parking_notification3.current?).to be_truthy
+        expect(parking_notification_other_org.associated_notifications.pluck(:id)).to match_array([])
+        expect(parking_notification_other_org.current?).to be_truthy
 
         expect(parking_notification2.associated_retrieved_notification).to eq parking_notification2
         expect(parking_notification2.retrieved?).to be_truthy

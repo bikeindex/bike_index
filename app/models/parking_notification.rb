@@ -42,7 +42,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 
-  def self.active_statuses; %w[current] end
+  def self.active_statuses; %w[current replaced] end
 
   def self.resolved_statuses; statuses - active_statuses end
 
@@ -228,7 +228,7 @@ class ParkingNotification < ActiveRecord::Base
     if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
       mark_retrieved!(retrieved_by_id: new_attrs[:user_id], retrieved_kind: "organization_recovery")
     else
-      return self unless current?
+      return self unless active?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
                                 "location_from_address", "retrieval_link_token", "delivery_status")
                         .merge(new_attrs)
