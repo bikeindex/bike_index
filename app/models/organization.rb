@@ -19,8 +19,9 @@ class Organization < ApplicationRecord
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
-    broken_pos: 4,
+    broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
+    broken_other_pos: 6,
   }.freeze
 
   acts_as_paranoid
@@ -65,6 +66,7 @@ class Organization < ApplicationRecord
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
+  scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
   # Regional orgs have to have the paid feature slug AND the search location set
@@ -94,6 +96,8 @@ class Organization < ApplicationRecord
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
+
+  def self.broken_pos_kinds; %w[broken_other_pos broken_lightspeed_pos] end
 
   def self.no_pos_kinds; %w[no_pos does_not_need_pos] end
 
@@ -144,6 +148,8 @@ class Organization < ApplicationRecord
   def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
 
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
+  def broken_pos?; self.class.broken_pos_kinds.include?(pos_kind) end
 
   def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
 
@@ -238,7 +244,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
+    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind)
   end
 
   # Bikes geolocated within `search_radius` miles.
@@ -336,7 +342,8 @@ class Organization < ApplicationRecord
     if bike_shop? && created_at < Time.current - 1.week
       return "does_not_need_pos" if recent_bikes.count > 2
     end
-    bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
+    return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
+    bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
   end
 
   def update_associations

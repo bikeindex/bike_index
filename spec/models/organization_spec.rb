@@ -526,66 +526,6 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "calculated_pos_kind" do
-    context "organization with pos bike and non pos bike" do
-      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
-      let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
-      it "returns pos type" do
-        organization.reload
-        expect(organization.pos_kind).to eq "no_pos"
-        expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.pos_kind).to eq "lightspeed_pos"
-        # And if bike is created before cut-of for pos kind, it returns broken
-        bike_pos.update_attribute :created_at, Time.current - 2.weeks
-        expect(organization.calculated_pos_kind).to eq "broken_pos"
-      end
-    end
-    context "ascend_name" do
-      let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
-      it "returns ascend_pos" do
-        expect(organization.calculated_pos_kind).to eq "ascend_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind?).to be_blank
-        expect(organization.pos_kind).to eq "ascend_pos"
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-    context "manual_pos_kind" do
-      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
-      it "overrides everything" do
-        expect(organization.manual_lightspeed_pos?).to be_truthy
-        expect(organization.pos_kind).to eq "no_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind).to eq "lightspeed_pos"
-        expect(organization.pos_kind).to eq "lightspeed_pos"
-        organization.update_attribute :manual_pos_kind, "broken_pos"
-
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind).to eq "broken_pos"
-        expect(organization.pos_kind).to eq "broken_pos"
-      end
-    end
-    context "recent bikes" do
-      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
-      it "no_pos, does_not_need_pos if older organization" do
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
-        3.times { FactoryBot.create(:bike_organized, organization: organization) }
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
-        organization.update_attribute :created_at, Time.current - 2.weeks
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "does_not_need_pos"
-      end
-    end
-  end
-
   describe "bike_shop_display_integration_alert?" do
     let(:organization) { Organization.new(kind: "law_enforcement", pos_kind: "no_pos") }
     it "is falsey for non-shops" do
@@ -610,7 +550,7 @@ RSpec.describe Organization, type: :model do
         end
       end
       context "broken_pos" do
-        let(:pos_kind) { "broken_pos" }
+        let(:pos_kind) { "broken_lightspeed_pos" }
         it "is true" do
           expect(organization.bike_shop_display_integration_alert?).to be_truthy
         end
