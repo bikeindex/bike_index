@@ -21,7 +21,7 @@ class AfterUserChangeWorker < ApplicationWorker
 
     return alerts if user.memberships.admin.any?
 
-    if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.missing_location? }
+    if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
       alerts << "stolen_bikes_without_locations"
     end
 

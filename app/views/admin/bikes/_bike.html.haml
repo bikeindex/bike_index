@@ -176,7 +176,7 @@
                 Location
               %td
                 = stolen_record.address
-                - if stolen_record.missing_location?
+                - if stolen_record.without_location?
                   %em.small.text-warning missing address (user alerted)
             %tr
               %td
