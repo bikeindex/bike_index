@@ -124,7 +124,6 @@ class UsersController < ApplicationController
       end
     end
     if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
-      AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if ParamsNormalizer.boolean(params[:user][:terms_of_service])
           @user.terms_of_service = true

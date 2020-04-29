@@ -69,50 +69,49 @@ class User < ApplicationRecord
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
+  after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_update }
+  after_commit :perform_user_update_jobs
 
-  attr_accessor :skip_create_jobs
+  attr_accessor :skip_update
 
-  class << self
-    def fuzzy_email_find(email)
-      UserEmail.confirmed.fuzzy_user_find(email)
+  def self.fuzzy_email_find(email)
+    UserEmail.confirmed.fuzzy_user_find(email)
+  end
+
+  def self.fuzzy_unconfirmed_primary_email_find(email)
+    find_by_email(EmailNormalizer.normalize(email))
+  end
+
+  def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
+  end
+
+  def self.username_friendly_find(n)
+    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+      where(id: n).first
+    else
+      find_by_username(n)
     end
+  end
 
-    def fuzzy_unconfirmed_primary_email_find(email)
-      find_by_email(EmailNormalizer.normalize(email))
-    end
+  def self.friendly_find(str)
+    self.fuzzy_email_find(str) || username_friendly_find(str)
+  end
 
-    def fuzzy_confirmed_or_unconfirmed_email_find(email)
-      fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
-    end
+  def self.friendly_id_find(str)
+    friendly_find(str)&.id
+  end
 
-    def username_friendly_find(n)
-      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-        where(id: n).first
-      else
-        find_by_username(n)
-      end
-    end
+  def self.admin_text_search(str)
+    q = "%#{str.to_s.strip}%"
+    unscoped.includes(:user_emails)
+      .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+      .distinct.references(:user_emails)
+  end
 
-    def friendly_find(str)
-      self.fuzzy_email_find(str) || username_friendly_find(str)
-    end
-
-    def friendly_id_find(str)
-      friendly_find(str)&.id
-    end
-
-    def admin_text_search(str)
-      q = "%#{str.to_s.strip}%"
-      unscoped.includes(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
-        .distinct.references(:user_emails)
-    end
-
-    def from_auth(auth)
-      return nil unless auth&.kind_of?(Array)
-      where(id: auth[0], auth_token: auth[1]).first
-    end
+  def self.from_auth(auth)
+    return nil unless auth&.kind_of?(Array)
+    where(id: auth[0], auth_token: auth[1]).first
   end
 
   def additional_emails=(value)
@@ -133,9 +132,10 @@ class User < ApplicationRecord
 
   def unconfirmed?; !confirmed? end
 
-  def perform_create_jobs
-    AfterUserCreateWorker.new.perform(id, "new", user: self)
-  end
+  # Performed inline
+  def perform_create_jobs; AfterUserCreateWorker.new.perform(id, "new", user: self) end
+
+  def perform_user_update_jobs; AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update end
 
   def superuser?; superuser end
 
@@ -272,10 +272,8 @@ class User < ApplicationRecord
     ows.reject(&:blank?)
   end
 
-  # Just check a couple, to avoid blocking save
-  def stolen_bikes_without_locations
-    @stolen_bikes_without_locations ||= rough_approx_bikes.limit(10).select { |b| b.current_stolen_record&.missing_location? }
-  end
+  # Just check a couple, so we don't move too slowly
+  def rough_stolen_bikes; rough_approx_bikes.stolen.limit(10) end
 
   def render_donation_request
     return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
@@ -293,9 +291,6 @@ class User < ApplicationRecord
       mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
-    end
-    unless skip_create_jobs || skip_geocoding # Don't run if we're resaving user
-      self.has_stolen_bikes_without_locations = calculated_has_stolen_bikes_without_locations
     end
     true
   end
@@ -332,12 +327,6 @@ class User < ApplicationRecord
   end
 
   protected
-
-  def calculated_has_stolen_bikes_without_locations
-    return false if superuser
-    return false if memberships.admin.any?
-    stolen_bikes_without_locations.any?
-  end
 
   def generate_username_confirmation_and_auth
     usrname = username || SecureRandom.urlsafe_base64

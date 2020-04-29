@@ -2468,7 +2468,8 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    has_stolen_bikes_without_locations boolean DEFAULT false
+    has_stolen_bikes_without_locations boolean DEFAULT false,
+    general_alerts jsonb DEFAULT '[]'::jsonb
 );
 
 
@@ -4684,6 +4685,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200421230336'),
 ('20200422161944'),
 ('20200422171902'),
-('20200424222002');
+('20200424222002'),
+('20200428203014');
 
 

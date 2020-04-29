@@ -147,15 +147,13 @@ RSpec.describe WelcomeController, type: :controller do
             expect(assigns[:passive_organization]).to eq organization
           end
         end
-        context "with show_missing_location_alert" do
-          before { user.update_column :has_stolen_bikes_without_locations, true }
-          it "renders with show_missing_location_alert" do
-            expect(user.has_stolen_bikes_without_locations).to be_truthy
-
+        context "with show_general_alert" do
+          before { user.update_column :general_alerts, ["has_stolen_bikes_without_locations"] }
+          it "renders with show_general_alert" do
             get :user_home
 
             expect(response).to be_ok
-            expect(assigns(:show_missing_location_alert)).to be_truthy
+            expect(assigns(:show_general_alert)).to be_truthy
             expect(response).to render_template("user_home")
           end
         end
