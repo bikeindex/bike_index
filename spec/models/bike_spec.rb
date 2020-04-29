@@ -1427,9 +1427,9 @@ RSpec.describe Bike, type: :model do
         expect(stolen_record.address).to eq(abbr_address)
 
         bike.reload
+        # Ensure we aren't geocoding ;)
         allow(bike).to receive(:bike_index_geocode) { fail "should not have called geocoding" }
         stolen_record.save
-        expect(bike.manual_csr).to be_truthy
         bike.save
         expect(StolenRecord.unscoped.where(bike_id: bike.id).count).to eq 1
 
