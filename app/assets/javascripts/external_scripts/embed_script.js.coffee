@@ -174,6 +174,18 @@ initializeUnregisteredParkingNotification = ->
   $("#selectEnteredAddress input").change (e) ->
     showOrHideEnteredAddress()
 
+initializeStateHiding = ->
+  united_states_id = $("#us_id_data").attr("data-usid")
+  $target = $("#us_id_data select")
+  $other_field = $("#state-select")
+  $target.change (e) ->
+    if $target.val() == united_states_id
+      $other_field.slideDown "fast", ->
+        $other_field.addClass("unhidden").removeClass("currently-hidden")
+    else
+      $other_field.slideUp "fast", ->
+        $other_field.removeClass("unhidden initially-unhidden").addClass("currently-hidden")
+
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
   initializeFrameMaker("#bike_manufacturer_id")
@@ -228,3 +240,7 @@ $(document).ready ->
 
   if $("#new-unregistered-parking-notification").length
     initializeUnregisteredParkingNotification()
+
+  if $("#us_id_data").length
+    initializeStateHiding()
+

@@ -1,14 +1,15 @@
 require "rails_helper"
 
 RSpec.describe ImageAssociatorWorker, type: :job do
-  let(:subject) { ImageAssociatorWorker }
-
   it "is the correct queue" do
-    expect(subject.sidekiq_options["queue"]).to eq "high_priority"
+    expect(described_class.sidekiq_options["queue"]).to eq "high_priority"
   end
 
-  it "enqueues another awesome job" do
-    ImageAssociatorWorker.perform_async
-    expect(ImageAssociatorWorker).to have_enqueued_sidekiq_job
+  context "user_hidden bike" do
+    it "attaches the image"
+  end
+
+  context "deleted bike" do
+    it "does not attach the image"
   end
 end

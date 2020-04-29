@@ -5,6 +5,7 @@ module Geocodeable
 
   included do
     geocoded_by :address
+    before_validation :clean_state_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
     scope :missing_location, -> { where(latitude: nil) }
@@ -86,11 +87,15 @@ module Geocodeable
 
   def address_present?; [street, city, zipcode].any?(&:present?) end
 
-  def bike_index_geocode
+  # Separate from geocode because a number of models handle geocoding independently
+  def clean_state_data
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
     end
+  end
+
+  def bike_index_geocode
     # Only geocode if there is specific location information
     if address_present?
       self.attributes = Geohelper.coordinates_for(address) || {}

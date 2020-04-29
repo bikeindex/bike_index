@@ -14,11 +14,11 @@ module OrganizedHelper
       unless bike.cycle_type == "bike"
         concat(content_tag(:small, " #{bike.type}"))
       end
-      # If it's an unregistered bike, don't display where it was created
-      # ... since it only could've been created in one place
       if bike.deleted?
         concat(content_tag(:em, " removed from Bike Index", class: "small text-danger"))
-      elsif bike.unregistered_parking_notification?
+      elsif bike.unregistered_parking_notification? # Only care if currently unregistered parking notification
+        # If it's an unregistered bike, don't display where it was created
+        # ... since it only could've been created in one place
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
       elsif bike.creation_description.present?
         concat(", ")

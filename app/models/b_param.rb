@@ -10,11 +10,12 @@ class BParam < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :organization
 
-  scope :with_bike, -> { where("created_bike_id IS NOT NULL") }
+  scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
+  scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
 
   before_create :generate_id_token
   before_save :clean_params
@@ -107,6 +108,9 @@ class BParam < ApplicationRecord
 
   def with_bike?; created_bike_id.present? end
 
+  # Get it unscoped, because unregistered_bike notifications
+  def created_bike; @created_bike ||= created_bike_id.present? ? Bike.unscoped.find_by_id(created_bike_id) : nil end
+
   def bike; (params && params["bike"] || {}).with_indifferent_access end
 
   def status; Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first end
@@ -179,6 +183,7 @@ class BParam < ApplicationRecord
   # write illegal things to the bikes
   def clean_params(updated_params = {}) # So we can pass in the params
     self.params ||= { bike: {} } # ensure valid json object
+    process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
     set_foreign_keys
@@ -377,5 +382,13 @@ class BParam < ApplicationRecord
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)
     formatted_address
+  end
+
+  private
+
+  def process_image_if_required
+    return true if image_processed || image.blank?
+    ImageAssociatorWorker.perform_in(5.seconds)
+    ImageAssociatorWorker.perform_in(1.minutes)
   end
 end

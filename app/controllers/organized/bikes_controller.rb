@@ -62,6 +62,9 @@ module Organized
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
+        if params[:bike][:image].present? # Have to do in the controller, before assigning
+          @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
+        end
         # we handle filtering & coercion in BParam, just create it with whatever here
         @b_param.update_attributes(permitted_create_params)
         @bike = BikeCreator.new(@b_param).create_bike
