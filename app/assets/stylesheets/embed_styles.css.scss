@@ -440,6 +440,14 @@ a {
   #selectEnteredAddress {
     margin-top: 0.5rem;
   }
+  .waitingOnLocationText {
+    padding: 1rem;
+    color: $infoText;
+    font-style: italic;
+  }
+}
+// Address fields - both for embed and parking notifications
+#address-fields {
   .street-control {
     clear: both;
     float: none;
@@ -449,18 +457,19 @@ a {
       max-width: 100%;
     }
   }
-  #address-fields {
-    .control-group {
-      margin-right: 16px;
-    }
-    .state-select {
-      clear: left;
-    }
+  .control-group {
+    margin-right: 16px;
   }
-  .waitingOnLocationText {
-    padding: 1rem;
-    color: $infoText;
-    font-style: italic;
+  .full-width-wrap {
+    width: 100%;
+    clear: left;
+  }
+  .hidden-other.unhidden {
+    padding: 0;
+    width: auto;
+    &.initially-unhidden {
+      display: block;
+    }
   }
 }
 

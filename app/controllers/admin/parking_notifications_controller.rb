@@ -16,19 +16,18 @@ class Admin::ParkingNotificationsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at organization_id kind updated_at status user_id resolved_at]
+    %w[created_at organization_id kind updated_at user_id resolved_at]
   end
 
   def matching_parking_notifications
     return @matching_parking_notifications if defined?(@matching_parking_notifications)
     parking_notifications = ParkingNotification
     parking_notifications.resolved if sort_column == "resolved_at"
-    if params[:search_status] == "all"
-      @search_status = "all"
-      parking_notifications = parking_notifications
-    else
-      @search_status = ParkingNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+    if ParkingNotification.statuses.include?(params[:search_status])
+      @search_status = params[:search_status]
       parking_notifications = parking_notifications.where(status: @search_status)
+    else
+      @search_status = "all"
     end
     parking_notifications = parking_notifications.where(organization_id: current_organization.id) if current_organization.present?
     @matching_parking_notifications = parking_notifications.where(created_at: @time_range)

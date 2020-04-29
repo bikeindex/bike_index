@@ -187,7 +187,7 @@ CREATE TABLE public.b_params (
     bike_errors text,
     image character varying(255),
     image_tmp character varying(255),
-    image_processed boolean DEFAULT true,
+    image_processed boolean DEFAULT false,
     id_token text,
     params json DEFAULT '{"bike":{}}'::json,
     origin character varying,
@@ -4686,6 +4686,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200422171902'),
 ('20200424222002'),
 ('20200428203014'),
-('20200429004612');
+('20200429004612'),
+('20200429174144');
 
 

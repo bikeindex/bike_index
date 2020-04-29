@@ -4,7 +4,7 @@
   - if current_user&.superuser
     %p.mb-4.text-center
       = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
-    - if !@bike.unregistered_parking_notification? && @bike.user_hidden
+    - if !@bike.created_by_parking_notification && @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
         %small.less-strong

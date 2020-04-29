@@ -10,8 +10,9 @@
     Impound Record
     - if @bike.present? && @bike.created_by_parking_notification
       %small.text-warning
-        %em for
-        unregistered #{@bike.type}
+        for
+        %em
+          unregistered #{@bike.type}
 
 .row
   .col-md-6
@@ -56,7 +57,7 @@
           %td Status
           %td
             %strong
-              = @impound_record.status_humanized
+              = status_display(@impound_record.status_humanized)
         - if locations_enabled
           %tr
             %td Location

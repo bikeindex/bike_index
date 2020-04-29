@@ -331,7 +331,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
     end
-    context "superseded" do
+    context "replaced" do
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification,
                           :in_chicago,
@@ -370,8 +370,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         parking_notification2.reload
         parking_notification_initial.reload
         expect(parking_notification2.current?).to be_truthy
-        expect(parking_notification_initial.superseded?).to be_truthy
-        expect(parking_notification_initial.active?).to be_truthy
+        expect(parking_notification_initial.replaced?).to be_truthy
         expect(parking_notification_initial.to_coordinates).to_not eq(parking_notification2.to_coordinates)
         expect(parking_notification_initial.current_associated_notification).to eq parking_notification2
         expect(parking_notification2.current_associated_notification).to eq parking_notification2

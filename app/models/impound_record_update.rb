@@ -34,6 +34,18 @@ class ImpoundRecordUpdate < ApplicationRecord
       retrieved_by_owner: "Owner retrieved bike",
       removed_from_bike_index: "Removed from Bike Index",
       transferred_to_new_owner: "Transferred to new owner",
+      current: "Current",
+    }
+  end
+
+  def self.kinds_humanized_short
+    {
+      current: "Current",
+      note: "Note",
+      move_location: "Moved",
+      retrieved_by_owner: "Retrieved",
+      removed_from_bike_index: "Trashed",
+      transferred_to_new_owner: "Transferred",
     }
   end
 

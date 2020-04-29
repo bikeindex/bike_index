@@ -5,17 +5,18 @@
   .col-md-7
     %ul
       %li.nav-item
-        = link_to "graph", admin_impound_records_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-      %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
-          = @search_status.humanize
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "all" ? "" : "active") }
+          = ImpoundRecord.statuses_humanized_short[@search_status.to_sym] || "All records"
         .dropdown-menu
-          - (%w[active all] + ImpoundRecord.statuses).each do |kind|
+          - (["all"] + ImpoundRecord.statuses).each do |kind|
             - kind_active = @search_status == kind
             - kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind))
-            = link_to kind.humanize, admin_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - display_status = ImpoundRecord.statuses_humanized_short[kind.to_sym] || "All records"
+            = link_to display_status, admin_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
             - if kind == "all" # Add a divider after all
               .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_impound_records_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
 .row.mt-4.mb-4
   .col-sm-6
@@ -23,6 +24,10 @@
     matching Impound Records
     %em
       = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_impound_records), stacked: true, thousands: ",", defer: true
@@ -39,8 +44,9 @@
       = sortable "created_at"
     %th
       = sortable "updated_at"
-    %th
-      = sortable "organization_id"
+    - unless current_organization.present?
+      %th
+        = sortable "organization_id"
     %th
       = sortable "location_id"
     %th Bike
@@ -48,8 +54,9 @@
       = sortable "status"
     %th
       = sortable "user_id", "last updator"
-    %th
-      = sortable "resolved_at"
+    - unless @search_status == "current"
+      %th
+        = sortable "resolved_at"
   %tbody
     - @impound_records.each do |impound_record|
       %tr
@@ -59,8 +66,9 @@
         %td
           %span.convertTime.preciseTime
             = l(impound_record.updated_at, format: :convert_time)
-        %td
-          = link_to impound_record.organization&.short_name, admin_impound_records_path(organization_id: impound_record.organization_id)
+        - unless current_organization.present?
+          %td
+            = link_to impound_record.organization&.short_name, admin_impound_records_path(organization_id: impound_record.organization_id)
         %td
           %small
             = impound_record.location&.name
@@ -69,10 +77,11 @@
             = link_to organized_bike_text(impound_record.bike), admin_bike_path(impound_record.bike)
         %td
           %em
-            = impound_record.status_humanized
+            = status_display(impound_record.status_humanized_short)
         %td
           = impound_record.user&.display_name&.truncate(20)
-        %td
-          - if impound_record.resolved_at.present?
-            %span.convertTime.preciseTime
-              = l(impound_record.resolved_at, format: :convert_time)
+        - unless @search_status == "current"
+          %td
+            - if impound_record.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_record.resolved_at, format: :convert_time)

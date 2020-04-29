@@ -644,10 +644,11 @@ RSpec.describe BikesController, type: :controller do
         it "registers a bike and uploads an image" do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
-            expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             post :create, params: { persist_email: "", bike: bike_params.merge(image: test_photo) }
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
+            # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
+            ImageAssociatorWorker.new.perform
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.creation_state.origin).to eq "embed_extended"
@@ -655,6 +656,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
             expect(bike.manufacturer).to eq manufacturer
+            expect(bike.public_images.count).to eq 1
           end
         end
       end
@@ -779,6 +781,7 @@ RSpec.describe BikesController, type: :controller do
             end.to change(StolenRecord, :count).by(1)
             expect(b_param.reload.created_bike_id).not_to be_nil
             expect(b_param.reload.bike_errors).to be_nil
+            expect(b_param.image_processed).to be_falsey
             expect(user.reload.phone).to eq("3123799513")
           end
         end
