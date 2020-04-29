@@ -2,6 +2,7 @@ module Api
   module V1
     class OrganizationsController < ApiV1Controller
       before_action :verify_organizations_token, only: [:show]
+      skip_before_action :verify_authenticity_token
 
       def show
         info = { name: @organization.name, can_add_bikes: false, id: @organization.id }

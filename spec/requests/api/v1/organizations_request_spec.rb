@@ -60,6 +60,7 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
     end
     context "broken pos" do
+      include_context :test_csrf_token
       it "updates" do
         Sidekiq::Worker.clear_all
         expect(organization).to be_present
