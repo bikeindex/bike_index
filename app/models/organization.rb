@@ -342,7 +342,8 @@ class Organization < ApplicationRecord
     if bike_shop? && created_at < Time.current - 1.week
       return "does_not_need_pos" if recent_bikes.count > 2
     end
-    bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
+    return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
+    bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
   end
 
   def update_associations

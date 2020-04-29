@@ -11,11 +11,11 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
 
   describe "perform" do
     let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
-    let!(:ascend_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization) }
+    let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization) }
     it "schedules all the workers" do
       organization.reload
-      ascend_bike.reload
-      expect(organization.bikes).to eq([ascend_bike])
+      pos_bike.reload
+      expect(organization.bikes).to eq([pos_bike])
       expect(organization.pos_kind).to eq "no_pos"
       expect do
         described_class.new.perform
@@ -23,6 +23,32 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       described_class.drain
       organization.reload
       expect(organization.pos_kind).to eq "ascend_pos"
+    end
+    context "broken ascend" do
+      let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization, created_at: Time.current - 1.month) }
+      it "updates to broken" do
+        organization.reload
+        pos_bike.reload
+        expect(organization.bikes).to eq([pos_bike])
+        expect(organization.pos_kind).to eq "no_pos"
+        described_class.new.perform(organization.id)
+
+        organization.reload
+        expect(organization.pos_kind).to eq "broken_other_pos"
+      end
+    end
+    context "broken lightspeed" do
+      let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, organization: organization, created_at: Time.current - 1.month) }
+      it "updates to broken" do
+        organization.reload
+        pos_bike.reload
+        expect(organization.bikes).to eq([pos_bike])
+        expect(organization.pos_kind).to eq "no_pos"
+        described_class.new.perform(organization.id)
+
+        organization.reload
+        expect(organization.pos_kind).to eq "broken_lightspeed_pos"
+      end
     end
   end
 end
