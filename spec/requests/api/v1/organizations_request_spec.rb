@@ -62,13 +62,27 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
     context "broken pos" do
       it "updates" do
         expect do
-          put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "broken_pos").to_json,
+          put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "broken_lightspeed_pos").to_json,
               headers: json_headers
         end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
         expect(response.code).to eq("200")
-        expect(json_result["manual_pos_kind"]).to eq "broken_pos"
+        expect(json_result["manual_pos_kind"]).to eq "broken_lightspeed_pos"
         organization.reload
-        expect(organization.manual_pos_kind).to eq "broken_pos"
+        expect(organization.manual_pos_kind).to eq "broken_lightspeed_pos"
+      end
+    end
+    context "no_pos" do
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "removes" do
+        expect(organization.manual_pos_kind).to eq "lightspeed_pos"
+        expect do
+          put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "no_pos").to_json,
+              headers: json_headers
+        end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
+        expect(response.code).to eq("200")
+        expect(json_result["manual_pos_kind"]).to be_blank
+        organization.reload
+        expect(organization.manual_pos_kind).to be_blank
       end
     end
     context "not valid pos_kind" do

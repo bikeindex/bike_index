@@ -21,6 +21,7 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     broken_pos: 4,
     does_not_need_pos: 5,
+    broken_lightspeed_pos: 6,
   }.freeze
 
   acts_as_paranoid
@@ -238,7 +239,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
+    bike_shop? && %w[no_pos broken_pos broken_lightspeed_pos].include?(pos_kind)
   end
 
   # Bikes geolocated within `search_radius` miles.
