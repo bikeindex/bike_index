@@ -1109,7 +1109,7 @@ RSpec.describe BikesController, type: :controller do
             let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
             it "renders with stolen as first template, different description" do
               expect(bike.reload.stolen).to eq(true)
-              expect(bike.current_stolen_record.missing_location?).to be_truthy
+              expect(bike.current_stolen_record.without_location?).to be_truthy
               get :edit, params: { id: bike.id }
 
               expect(response).to be_ok
@@ -1159,7 +1159,7 @@ RSpec.describe BikesController, type: :controller do
             stolen_record.reload
             bike.reload
             expect(bike.current_stolen_record).to eq stolen_record
-            expect(bike.current_stolen_record.missing_location?).to be_truthy
+            expect(bike.current_stolen_record.without_location?).to be_truthy
             expect(stolen_record.theft_alert_missing_photo?).to be_falsey
 
             templates.each do |template|

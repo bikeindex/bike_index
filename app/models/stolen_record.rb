@@ -48,7 +48,7 @@ class StolenRecord < ApplicationRecord
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
   scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
-  scope :missing_location, -> { where(street: ["", nil]) } # Overrides geocodeable missing_location, we need more specificity
+  scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity
 
   before_save :set_calculated_attributes
   after_validation :reverse_geocode, unless: :skip_geocoding?
@@ -89,8 +89,8 @@ class StolenRecord < ApplicationRecord
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
 
-  # Overrides geocodeable missing_location, we need more specificity
-  def missing_location?; street.blank? end
+  # Overrides geocodeable without_location, we need more specificity
+  def without_location?; street.blank? end
 
   def address(skip_default_country: false, force_show_address: false)
     Geocodeable.address(

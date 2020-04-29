@@ -26,9 +26,9 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(stolen_record_with_location.bike.current_stolen_record).to eq stolen_record_with_location
       expect(stolen_record_unclaimed.bike.current_stolen_record).to eq stolen_record_unclaimed
       # Test that the missing location is there
-      expect(stolen_record.missing_location?).to be_truthy
-      expect(stolen_record_with_location.missing_location?).to be_falsey
-      expect(stolen_record_unclaimed.missing_location?).to be_truthy
+      expect(stolen_record.without_location?).to be_truthy
+      expect(stolen_record_with_location.without_location?).to be_falsey
+      expect(stolen_record_unclaimed.without_location?).to be_truthy
       expect(stolen_record.bike.user).to eq user
       expect(stolen_record_with_location.bike.user).to eq user
       expect(stolen_record_unclaimed.bike.user).to be_blank
@@ -39,7 +39,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(stolen_record.bike.stolen).to be_truthy
       expect(stolen_record_with_location.bike.stolen).to be_truthy
       expect(user.rough_approx_bikes.stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
-      expect(user.rough_stolen_bikes.select { |b| b.current_stolen_record.missing_location? }.map(&:id)).to eq([stolen_record.bike_id])
+      expect(user.rough_stolen_bikes.select { |b| b.current_stolen_record.without_location? }.map(&:id)).to eq([stolen_record.bike_id])
       instance.perform(user.id)
 
       user.reload
