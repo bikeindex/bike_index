@@ -32,6 +32,31 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 
+  describe "status_display" do
+    it "renders text-success" do
+      expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
+      expect(status_display("Current")).to eq "<span class=\"text-success\">Current</span>"
+    end
+    context "retrieved" do
+      it "is blue" do
+        expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
+        expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
+      end
+    end
+    context "removed_from_bike_index, trashed or Removed from Bike Index" do
+      it "is red" do
+        expect(status_display("removed_from_bike_index")).to eq "<span class=\"text-danger\">removed from bike index</span>"
+        expect(status_display("Removed from Bike Index")).to eq "<span class=\"text-danger\">Removed from Bike Index</span>"
+        expect(status_display("Trashed")).to eq "<span class=\"text-danger\">Trashed</span>"
+      end
+    end
+    context "impounded" do
+      it "is orange" do
+        expect(status_display("impounded")).to eq "<span class=\"text-danger\">impounded</span>"
+      end
+    end
+  end
+
   describe "organized_container" do
     before do
       allow(view).to receive(:controller_name) { controller_name }

@@ -5,17 +5,18 @@
   .col-md-7
     %ul
       %li.nav-item
-        = link_to "graph", admin_parking_notifications_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-      %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "active" ? "" : "active") }
-          = @search_status.humanize
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "all" ? "" : "active") }
+          #{@search_status.humanize} notifications
         .dropdown-menu
-          - (ParkingNotification.statuses + ["all"]).each do |kind|
-            - if kind == "all" # Add a divider before all
-              .dropdown-divider
+          - (["all"] + ParkingNotification.statuses).each do |kind|
             - kind_active = @search_status == kind
             - kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind))
-            = link_to kind.humanize, admin_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - kind_display = "#{kind.humanize} notifications"
+            = link_to kind_display, admin_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "all" # Add a divider after all
+              .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_parking_notifications_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
 
 .row.mt-4.mb-4
@@ -24,6 +25,10 @@
     matching parking notifications
     %em
       = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_parking_notifications), stacked: true, thousands: ",", defer: true
@@ -40,8 +45,9 @@
       = sortable "created_at"
     %th
       %small= sortable "updated_at"
-    %th
-      = sortable "organization_id"
+    - unless current_organization.present?
+      %th
+        = sortable "organization_id"
     %th
       = sortable "kind"
     %th Bike
@@ -62,8 +68,9 @@
         %td
           %span.convertTime.preciseTime
             = l(parking_notification.updated_at, format: :convert_time)
-        %td
-          = link_to parking_notification.organization&.short_name, admin_parking_notifications_path(organization_id: parking_notification.organization_id)
+        - unless current_organization.present?
+          %td
+            = link_to parking_notification.organization&.short_name, admin_parking_notifications_path(organization_id: parking_notification.organization_id)
         %td
           %small
             = parking_notification.kind_humanized
@@ -75,8 +82,11 @@
             %small.less-strong
               = parking_notification.notification_number
         %td
-          %em.small
-            = parking_notification.status.humanize
+          - if parking_notification.status == "impounded"
+            = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+          - else
+            %em.small
+              = status_display(parking_notification.status)
         %td
           %small
             = parking_notification.user&.display_name&.truncate(20)

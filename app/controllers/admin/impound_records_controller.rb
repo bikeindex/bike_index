@@ -23,15 +23,11 @@ class Admin::ImpoundRecordsController < Admin::BaseController
     return @matching_impound_records if defined?(@matching_impound_records)
     impound_records = ImpoundRecord
     impound_records.resolved if sort_column == "resolved_at"
-    if params[:search_status].blank? || params[:search_status] == "active"
-      @search_status = "active"
-      a_impound_records = impound_records.active
-    elsif params[:search_status] == "all"
-      @search_status = "all"
-      a_impound_records = impound_records
+    if ImpoundRecord.statuses.include?(params[:search_status])
+      @search_status = params[:search_status]
+      impound_records = impound_records.where(status: @search_status)
     else
-      @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "all"
-      a_impound_records = impound_records.where(status: @search_status)
+      @search_status = "all"
     end
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
     @matching_impound_records = impound_records.where(created_at: @time_range)
