@@ -15,7 +15,7 @@ module Api
           redirect_to api_v1_not_found_url and return
         elsif params[:access_token] == @organization.access_token
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
-            if params[:manual_pos_kind] == "no_pos" # Blank out POS on this
+            if params[:manual_pos_kind] == "no_pos"
               @organization.update_attributes(manual_pos_kind: nil)
             else
               @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
