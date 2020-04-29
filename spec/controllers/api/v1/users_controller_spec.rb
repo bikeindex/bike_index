@@ -215,6 +215,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           expect(bike.current_stolen_record).to eq stolen_record
 
           Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post :send_request, params: recovery_request.as_json
           end
