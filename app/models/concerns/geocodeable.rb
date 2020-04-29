@@ -87,7 +87,7 @@ module Geocodeable
 
   def address_present?; [street, city, zipcode].any?(&:present?) end
 
-  # Separate from geocode because a number of models handle geocoding independently
+  # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_data
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
