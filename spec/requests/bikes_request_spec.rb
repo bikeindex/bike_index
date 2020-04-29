@@ -377,7 +377,6 @@ RSpec.describe BikesController, type: :request do
         stolen_record.reload
         expect(bike.current_stolen_record).to eq stolen_record
         expect(stolen_record.without_location?).to be_truthy
-        pp stolen_record.city, stolen_record.country_id
         og_alert_image_id = stolen_record.alert_image.id
         expect(og_alert_image_id).to be_present
         Sidekiq::Worker.clear_all
@@ -396,7 +395,6 @@ RSpec.describe BikesController, type: :request do
         expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
         expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
 
-        pp stolen_record.city, stolen_record.country_id
         expect(stolen_record.phone).to eq "1111111111"
         expect(stolen_record.secondary_phone).to eq "1231231234"
         expect(stolen_record.country_id).to eq Country.united_states.id
