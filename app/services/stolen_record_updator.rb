@@ -45,7 +45,6 @@ class StolenRecordUpdator
     nested_params = @b_param.dig("bike", "stolen_records_attributes")
     sr = nested_params.values.reject(&:blank?).last if nested_params&.values&.first&.is_a?(Hash)
     return stolen_record unless sr.present?
-
     stolen_record.attributes = permitted_attributes(sr)
 
     stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.current unless @date_stolen.present?

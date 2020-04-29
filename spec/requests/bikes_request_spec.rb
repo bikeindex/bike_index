@@ -342,5 +342,76 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+    context "adding location to a stolen bike" do
+      let(:bike) { FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg") }
+      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+      let(:stolen_params) do
+        {
+          timezone: "America/Los_Angeles",
+          date_stolen:  "2020-04-28T11:00",
+          phone: "111 111 1111",
+          secondary_phone: "123 123 1234",
+          country_id: Country.united_states.id,
+          street: "278 Broadway",
+          city: "New York",
+          zipcode: "10007",
+          state_id: state.id,
+          show_address: "1",
+          estimated_value: "2101",
+          locking_description: "party",
+          lock_defeat_description: "cool things",
+          theft_description: "Something",
+          police_report_number: "23891921",
+          police_report_department: "Manahattan",
+          proof_of_ownership: "0",
+          receive_notifications: "1",
+          id: stolen_record.id
+        }
+      end
+
+      it "clears the existing alert image" do
+        bike.reload
+        stolen_record.current_alert_image
+        stolen_record.reload
+        expect(bike.current_stolen_record).to eq stolen_record
+        expect(stolen_record.without_location?).to be_truthy
+        og_alert_image_id = stolen_record.alert_image.id
+        expect(og_alert_image_id).to be_present
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          patch "#{base_url}/#{bike.id}", params: {
+            bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } }
+          }
+          expect(flash[:success]).to be_present
+        end
+        bike.reload
+        stolen_record.reload
+        stolen_record.current_alert_image
+        stolen_record.reload
+
+        expect(bike.current_stolen_record.id).to eq stolen_record.id
+        expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
+        expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
+
+        expect(stolen_record.phone).to eq "1111111111"
+        expect(stolen_record.secondary_phone).to eq "1231231234"
+        expect(stolen_record.country_id).to eq Country.united_states.id
+        expect(stolen_record.state_id).to eq state.id
+        expect(stolen_record.show_address).to be_truthy
+        expect(stolen_record.estimated_value).to eq 2101
+        expect(stolen_record.locking_description).to eq "party"
+        expect(stolen_record.lock_defeat_description).to eq "cool things"
+        expect(stolen_record.theft_description).to eq "Something"
+        expect(stolen_record.police_report_number).to eq "23891921"
+        expect(stolen_record.police_report_department).to eq "Manahattan"
+        expect(stolen_record.proof_of_ownership).to be_falsey
+        expect(stolen_record.receive_notifications).to be_truthy
+
+        expect(stolen_record.alert_image).to be_present
+        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+      end
+    end
   end
 end

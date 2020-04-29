@@ -20,7 +20,7 @@ class StolenRecord < ApplicationRecord
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved recovered_at recovered_description index_helped_recovery can_share_recovery
-       recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
+       recovery_posted show_address tsved_at estimated_value).map(&:to_sym).freeze
   end
 
   belongs_to :bike
@@ -170,6 +170,7 @@ class StolenRecord < ApplicationRecord
     self.street = nil unless street.present? # Make it easier to find blank addresses
     titleize_city
     update_tsved_at
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.recovery_display_status = calculated_recovery_display_status
   end
 
@@ -286,10 +287,16 @@ class StolenRecord < ApplicationRecord
   # The URL is available immediately - processing is performed in the background.
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
-    return if bike_image&.image.blank?
+    return if (bike_image&.image).blank? && (bike&.stock_photo_url).blank?
 
     alert_image&.destroy
-    new_image = AlertImage.create(image: bike_image.image, stolen_record: self)
+    new_image = AlertImage.new(stolen_record: self)
+    if bike_image&.image.blank?
+      new_image.remote_image_url = bike.stock_photo_url
+    else
+      new_image.image = bike_image.image
+    end
+    new_image.save
 
     if new_image.valid?
       new_image
@@ -311,7 +318,8 @@ class StolenRecord < ApplicationRecord
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_images
-    return true unless bike.blank? || !bike.stolen? || recovered?
+    no_longer_around = bike.blank? || !bike.stolen? || recovered?
+    return true unless no_longer_around || @alert_location_changed
     alert_image&.destroy
     reload
   end
