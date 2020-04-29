@@ -3,7 +3,7 @@
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
-  STATUS_ENUM = { current: 0, superseded: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4 }.freeze
+  STATUS_ENUM = { current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4 }.freeze
   RETRIEVED_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
 
   belongs_to :bike
@@ -42,7 +42,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 
-  def self.active_statuses; %w[current superseded] end
+  def self.active_statuses; %w[current] end
 
   def self.resolved_statuses; statuses - active_statuses end
 
@@ -228,7 +228,7 @@ class ParkingNotification < ActiveRecord::Base
     if new_attrs.with_indifferent_access[:kind] == "mark_retrieved"
       mark_retrieved!(retrieved_by_id: new_attrs[:user_id], retrieved_kind: "organization_recovery")
     else
-      return self unless active?
+      return self unless current?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
                                 "location_from_address", "retrieval_link_token", "delivery_status")
                         .merge(new_attrs)
@@ -248,6 +248,6 @@ class ParkingNotification < ActiveRecord::Base
     if resolved_at.present?
       return associated_retrieved_notification.present? ? "retrieved" : "resolved_otherwise"
     end
-    associated_notifications.where("id > ?", id).any? ? "superseded" : "current"
+    associated_notifications.where("id > ?", id).any? ? "replaced" : "current"
   end
 end

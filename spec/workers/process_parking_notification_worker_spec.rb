@@ -22,7 +22,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         parking_notification2.reload
         bike.reload
         expect(bike.status).to eq "status_abandoned"
-        expect(initial.status).to eq "superseded"
+        expect(initial.status).to eq "replaced"
         expect(parking_notification2.status).to eq "current"
         expect(parking_notification2.delivery_status).to eq "email_success"
         expect(parking_notification2.organization_id).to be_present
@@ -72,7 +72,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         parking_notification2.reload
         bike.reload
         expect(bike.status).to eq "status_abandoned"
-        expect(initial.status).to eq "superseded"
+        expect(initial.status).to eq "replaced"
         expect(parking_notification2.status).to eq "current"
         expect(initial.associated_retrieved_notification).to be_nil
         Sidekiq::Worker.clear_all
@@ -112,7 +112,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification2.associated_notifications.pluck(:id)).to match_array([])
         expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([])
         expect(parking_notification3.current?).to be_truthy
-        expect(parking_notification2.superseded?).to be_falsey
+        expect(parking_notification2.replaced?).to be_truthy
         expect(parking_notification2.current?).to be_truthy
         expect(initial.current?).to be_truthy
         expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
