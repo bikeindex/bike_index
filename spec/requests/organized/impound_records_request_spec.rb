@@ -34,7 +34,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
-        expect(assigns(:search_status)).to eq "active"
+        expect(assigns(:search_status)).to eq "current"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
 
         get "#{base_url}?search_email=&serial=yar1s"

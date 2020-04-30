@@ -34,7 +34,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[display_id created_at updated_at status user_id resolved_at]
+      %w[display_id created_at updated_at user_id resolved_at]
     end
 
     def bike_search_params_present?
@@ -43,14 +43,11 @@ module Organized
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
-      if params[:search_status].blank? || params[:search_status] == "active"
-        @search_status = "active"
-        a_impound_records = impound_records.active
-      elsif params[:search_status] == "all"
+      if params[:search_status] == "all"
         @search_status = "all"
         a_impound_records = impound_records
       else
-        @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "all"
+        @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
         a_impound_records = impound_records.where(status: @search_status)
       end
 
