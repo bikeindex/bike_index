@@ -80,6 +80,9 @@
             = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
           %li
             = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
+          - if current_organization.enabled?("customize_emails")
+            %li
+              = active_link t(".customize_emails"), organization_emails_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
 
 .organized-wrap
   %div{ class: organized_container }

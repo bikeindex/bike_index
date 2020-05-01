@@ -322,7 +322,7 @@ Rails.application.routes.draw do
     end
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
-    resources :messages, only: %i[index show create]
+    resources :emails, only: %i[index show edit update]
     resources :parking_notifications do
       member { get :email }
     end

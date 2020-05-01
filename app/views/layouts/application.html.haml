@@ -96,6 +96,9 @@
                     = active_link t(".org_profile", org_name: passive_organization.short_name), organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
                   %li
                     = active_link t(".org_locations", org_name: passive_organization.short_name), locations_organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  - if passive_organization.enabled?("customize_emails")
+                    %li
+                      = active_link t(".customize_emails"), organization_emails_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
               - if current_user&.superuser?
                 %li.divider-nav-item
                 %li

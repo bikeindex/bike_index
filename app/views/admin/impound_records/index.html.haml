@@ -68,7 +68,7 @@
             = l(impound_record.updated_at, format: :convert_time)
         - unless current_organization.present?
           %td
-            = link_to impound_record.organization&.short_name, admin_impound_records_path(organization_id: impound_record.organization_id)
+            = link_to impound_record.organization&.short_name, admin_impound_records_path(sortable_search_params.merge(organization_id: impound_record.organization_id))
         %td
           %small
             = impound_record.location&.name

@@ -37,7 +37,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
         end
       end
       describe "mail_snippets" do
-        MailSnippet.organization_snippet_types.each do |snippet_name|
+        MailSnippet.organization_snippet_kinds.each do |snippet_name|
           context snippet_name do
             it "renders" do
               expect(organization.mail_snippets.count).to eq 0
@@ -69,7 +69,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
         end
       end
       context "mail_snippet" do
-        let(:snippet_type) { MailSnippet.organization_snippet_types.last }
+        let(:snippet_type) { MailSnippet.organization_snippet_kinds.last }
         let(:mail_snippet) do
           FactoryBot.create(:organization_mail_snippet,
                             organization: organization,
