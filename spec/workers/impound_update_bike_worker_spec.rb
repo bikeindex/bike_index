@@ -14,7 +14,9 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     expect(bike.updated_at).to be < Time.current - 1.minute
 
     impound_record_update.save
+    Sidekiq::Worker.clear_all
     described_class.new.perform(impound_record.id)
+    expect(described_class.jobs.count).to eq 0
 
     impound_record_update.reload
     expect(impound_record_update.resolved).to be_truthy
@@ -32,7 +34,9 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     it "fixes the issue" do
       expect(impound_record.display_id).to eq impound_record2.display_id
       expect(impound_record2.id).to be > impound_record.id
+      Sidekiq::Worker.clear_all
       described_class.new.perform(impound_record.id)
+      expect(described_class.jobs.count).to eq 0
       impound_record.reload
       impound_record2.reload
       impound_record3.reload
@@ -49,7 +53,9 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(bike.status_impounded?).to be_truthy
 
       impound_record_update.save
+      Sidekiq::Worker.clear_all
       described_class.new.perform(impound_record.id)
+      expect(described_class.jobs.count).to eq 0
 
       impound_record_update.reload
       expect(impound_record_update.resolved).to be_truthy
@@ -68,7 +74,9 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     let(:kind) { "removed_from_bike_index" }
     it "deletes the bike" do
       impound_record_update.save
+      Sidekiq::Worker.clear_all
       described_class.new.perform(impound_record.id)
+      expect(described_class.jobs.count).to eq 0
 
       impound_record_update.reload
       expect(impound_record_update.resolved).to be_truthy

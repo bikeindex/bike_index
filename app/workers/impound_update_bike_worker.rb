@@ -30,7 +30,8 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
       end
       impound_record_update.update(resolved: true)
     end
+    impound_record.update_attributes(skip_update: true)
     impound_record.bike&.update(updated_at: Time.current)
-    impound_record.bike.reload
+    impound_record.bike&.reload
   end
 end
