@@ -9,7 +9,7 @@ RSpec.describe MailSnippet, type: :model do
       expect(mail_snippet.is_enabled).to be_truthy
       mail_snippet.save
       expect(mail_snippet.is_enabled).to be_falsey
-      expect(mail_snippet.kind).to eq "welcome"
+      expect(mail_snippet.kind).to eq "custom"
     end
   end
 
