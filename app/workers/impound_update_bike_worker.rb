@@ -8,8 +8,8 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
     if matching_display_ids.where.not(id: impound_record.id).any?
       display_id = impound_record.display_id
       matching_display_ids.reorder(:id).each_with_index do |irecord, index|
-        next if index == 0 # Skip updating the first one
-        irecord.update_attributes(display_id: nil)
+        next if index == 0 # don't change the ID of the first one
+        irecord.update_attributes(display_id: nil, skip_update: true)
       end
     end
     # Run each impound_record_updates that hasn't been run
@@ -28,9 +28,10 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
       end
-      impound_record_update.update(resolved: true)
+      impound_record_update.update(resolved: true, skip_update: true)
     end
+    impound_record.update_attributes(skip_update: true)
     impound_record.bike&.update(updated_at: Time.current)
-    impound_record.bike.reload
+    impound_record.bike&.reload
   end
 end
