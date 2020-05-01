@@ -1,6 +1,13 @@
 %h1
   = @parking_notification.title
 
+- organization_message_snippet = @organization.mail_snippets.enabled.where(kind: @parking_notification.kind).first
+- if @email_preview
+  - organization_message_snippet ||= @organization.mail_snippets.where(kind: @parking_notification.kind).first
+
+- if organization_message_snippet.present?
+  %div{ style: "margin-top: 20px;" }
+  = organization_message_snippet.body.html_safe
 
 - if @parking_notification.repeat_record?
   %h2.uncap{ style: "margin-top: 1rem;" }

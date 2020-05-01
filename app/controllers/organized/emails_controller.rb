@@ -21,6 +21,13 @@ module Organized
     end
 
     def update
+      if @mail_snippet.update(permitted_parameters)
+        flash[:success] = "Email updated"
+        redirect_to edit_organization_email_path(@kind, organization_id: current_organization.to_param)
+      else
+        flash[:error] = "Unable to update your custom email - #{@mail_snippet.errors.full_messages}"
+        render :edit
+      end
     end
 
     private
@@ -38,11 +45,10 @@ module Organized
       @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
-      if @kind = "graduated_bike_email"
+      if @kind == "graduated_bike_email"
         @retrieval_link_url = "#"
         @bike ||= current_organization.bikes.last
       else
-        pp "9d9d9d9d"
         @parking_notification = parking_notifications.where(kind: @kind).last
         @parking_notification ||= build_parking_notification
         @bike = @parking_notification.bike
@@ -55,14 +61,14 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:mail_snippet).permit(:body)
+      params.require(:mail_snippet).permit(:body, :is_enabled)
     end
 
     def build_parking_notification
-      parking_notifications.build(bike: current_organization.bikes.last,
-                                  kind: @kind,
-                                  user: current_user,
-                                  created_at: Time.current - 1.hour)
+      parking_notification = parking_notifications.build(bike: current_organization.bikes.last,
+                                                         kind: @kind,
+                                                         user: current_user,
+                                                         created_at: Time.current - 1.hour)
       parking_notification.set_location_from_organization
       parking_notification
     end

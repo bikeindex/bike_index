@@ -4128,6 +4128,7 @@ nl:
       parking_notifications: Verlaten records
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       impounded_bikes: In beslag genomen fietsen
+      customize_emails: Pas e-mails aan
     application_bikehub:
       contact: contact
       home: Thuis
@@ -5035,6 +5036,7 @@ nl:
       overview_dashboard: Dashboard
       parking_notifications: Verlaten records
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
+      customize_emails: Pas e-mails aan
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat

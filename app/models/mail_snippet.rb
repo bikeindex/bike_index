@@ -59,14 +59,16 @@ class MailSnippet < ApplicationRecord
 
   def organization_message?; self.class.organization_message_kinds.include?(kind) end
 
-  def kind_humanized; kind.humanized end
-
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
     if is_location_triggered # No longer used, but keeping in case we decide to use. Check PR#415
       self.kind = "location_triggered"
     else
-      self.kind = self.class.kinds.include?(name) ? name : "custom"
+      if kind.present?
+        self.name ||= kind
+      else
+        self.kind = self.class.kinds.include?(name) ? name : "custom"
+      end
     end
   end
 

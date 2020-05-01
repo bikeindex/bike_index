@@ -1,6 +1,13 @@
 %h1
   Is your bike still on campus?
 
+- organization_message_snippet = @organization.mail_snippets.enabled.graduated_bike_email.first
+- if @email_preview
+  - organization_message_snippet ||= @organization.mail_snippets.graduated_bike_email.first
+
+- if organization_message_snippet.present?
+  = organization_message_snippet.body.html_safe
+
 = render partial: "shared/email_bike_box"
 
 - if @retrieval_link_url.present?
