@@ -19,6 +19,8 @@ class ImpoundRecordUpdate < ApplicationRecord
   scope :with_location, -> { where.not(location_id: nil) }
   scope :unresolved, -> { where(resolved: false) } # Means the update worker hasn't taken care of them
 
+  attr_accessor :skip_update
+
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.active_kinds; %w[note move_location] end
@@ -56,6 +58,7 @@ class ImpoundRecordUpdate < ApplicationRecord
   def kind_humanized; self.class.kinds_humanized[kind.to_sym] end
 
   def update_associations
+    return true if skip_update
     impound_record&.update(updated_at: Time.current)
   end
 end
