@@ -1,33 +1,75 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Impound Records
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "new snippet", new_admin_mail_snippet_path, class: "nav-link"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
+          #{@search_kind.humanize} kind
+        .dropdown-menu
+          - (["all"] + MailSnippet.kinds).each do |kind|
+            - kind_active = @search_kind == kind
+            - kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind))
+            - display_kind = "#{kind.humanize} kind"
+            = link_to display_kind, admin_mail_snippets_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "all" # Add a divider after all
+              .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_mail_snippets_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-%h1
-  Manage (non-organization) mail snippets
-= link_to 'New snippet', new_admin_mail_snippet_url, class: "btn btn-success float-right"
-%h4.mt-4
-  = @mail_snippets.count
-  Mail snippets are in the system so far!
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@mail_snippets.total_count)
+    matching Mail Snippets
+    %em
+      = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_mail_snippets), stacked: true, thousands: ",", defer: true
+
+.mt-2.mb-4
+  = render partial: "/shared/period_select"
+
+= paginate @mail_snippets, views_prefix: "admin"
 
 
-.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead.thead-light
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+  %thead.small-header.hidden-md-down
+    %th= sortable "created_at"
+    %th
+      %small= sortable "updated_at"
+    - unless current_organization.present?
       %th
-        Created
-      %th
-        Name
-      %th
-        Location
-      %th
-        Live?
+        = sortable "organization_id"
+    %th= sortable "kind"
+    %th Body
+    %th
+      %small Enabled
 
     %tbody
       - @mail_snippets.each do |mail_snippet|
         %tr
           %td
-            %a.convertTime{ href: admin_mail_snippet_url(mail_snippet) }
+            %a.convertTime{ href: edit_mail_snippet_path_for(mail_snippet) }
               = l mail_snippet.created_at, format: :convert_time
           %td
-            = mail_snippet.name
+            %small.convertTime
+              = l mail_snippet.updated_at, format: :convert_time
+          - unless current_organization.present?
+            %td
+              - if mail_snippet.organization.present?
+                = link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sortable_search_params.merge(organization_id: mail_snippet.organization_id))
           %td
-            = mail_snippet.address
+            = mail_snippet.kind
+          %td
+            %small
+              = truncate(mail_snippet.body, length: 100)
           %td.table-cell-check
             = check_mark if mail_snippet.is_enabled

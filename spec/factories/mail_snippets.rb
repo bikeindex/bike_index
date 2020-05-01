@@ -9,7 +9,7 @@ FactoryBot.define do
       address { "New York, NY" }
     end
     factory :organization_mail_snippet do
-      sequence(:name) { |n| MailSnippet.organization_snippet_types[MailSnippet.organization_snippet_types.count % n] }
+      sequence(:name) { |n| MailSnippet.organization_snippet_kinds[MailSnippet.organization_snippet_kinds.count % n] }
       organization { FactoryBot.create(:organization) }
     end
   end

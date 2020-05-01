@@ -196,9 +196,9 @@ class Organization < ApplicationRecord
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
-  def mail_snippet_body(type)
-    return nil unless MailSnippet.organization_snippet_types.include?(type)
-    snippet = mail_snippets.enabled.where(name: type).first
+  def mail_snippet_body(kind)
+    return nil unless MailSnippet.organization_snippet_kinds.include?(kind)
+    snippet = mail_snippets.enabled.where(name: kind).first
     snippet&.body
   end
 

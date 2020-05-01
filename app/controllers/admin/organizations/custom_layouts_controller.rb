@@ -28,7 +28,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   end
 
   def edit_layout_pages
-    @edit_layout_pages ||= MailSnippet.organization_snippet_types + %w(landing_page)
+    @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w(landing_page)
   end
 
   def find_and_authorize_organization

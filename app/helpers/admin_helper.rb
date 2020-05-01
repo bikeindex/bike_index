@@ -1,4 +1,11 @@
 module AdminHelper
+  def dev_nav_select_links
+    return [] unless current_user&.developer?
+    [
+      { title: "Mail Snippets", path: admin_mail_snippets_path, match_controller: true },
+    ]
+  end
+
   def admin_nav_select_links
     [
       { title: "Users", path: admin_users_path, match_controller: true },
@@ -40,7 +47,7 @@ module AdminHelper
       { title: "Feature Flags", path: admin_feature_flags_path, match_controller: false },
       { title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false },
       { title: "Exit Admin", path: root_path, match_controller: false },
-    ]
+    ] + dev_nav_select_links
   end
 
   def admin_nav_select_link_active
@@ -68,5 +75,13 @@ module AdminHelper
     # If there are any parameters that aren't
     ignored_keys = %w[render_chart sort period direction]
     (sortable_search_params.reject { |_k, v| v.blank? }.keys - ignored_keys).any?
+  end
+
+  def edit_mail_snippet_path_for(mail_snippet)
+    if mail_snippet.organization_message?
+      edit_organization_email_path(mail_snippet.kind, organization_id: mail_snippet.organization_id)
+    else
+      edit_admin_mail_snippet_path(mail_snippet.id)
+    end
   end
 end

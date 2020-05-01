@@ -1,0 +1,14 @@
+%h1
+  Is your bike still on campus?
+
+= render partial: "shared/email_bike_box"
+
+- if @retrieval_link_url.present?
+  .mark-retrieved-box
+    = link_to "I am still on campus", @retrieval_link_url, class: "binx-button"
+    %p
+      %em
+        Let
+        %strong
+          = @organization&.name
+        know that your #{@bike.type} is still on campus! Click the button above.
