@@ -58,10 +58,12 @@
 #emailPreviewUpdated.collapse
   %h3.uncap.mt-4 Save the email to see the preview
 
+-# Tiny little thing to make the preview show and collapse
 :coffee
   $(document).ready ->
     window.previewCollapsed = false
-    $("#mail_snippet_body").change ->
-      unless previewCollapsed
-        $("#emailPreview").collapse("hide")
-        $("#emailPreviewUpdated").collapse("show")
+
+    $("#mail_snippet_body").keyup ->
+      return true if previewCollapsed
+      $("#emailPreview").collapse("hide")
+      $("#emailPreviewUpdated").collapse("show")

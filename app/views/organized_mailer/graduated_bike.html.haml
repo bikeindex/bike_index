@@ -1,5 +1,12 @@
+- user = @bike.user
+- bikes = @user&.rough_approx_bikes || []
 %h1
-  Is your bike still on campus?
+  Will your
+  - if bikes.count > 1
+    bikes
+  - else
+    #{@bike.type}
+  be at #{@organization.short_name} next semester?
 
 - organization_message_snippet = @organization.mail_snippets.enabled.graduated_bike_email.first
 - if @email_preview
@@ -12,10 +19,15 @@
 
 - if @retrieval_link_url.present?
   .mark-retrieved-box
-    = link_to "I am still on campus", @retrieval_link_url, class: "binx-button"
+    = link_to @retrieval_link_url, class: "binx-button" do
+      - if bikes.count > 1
+        My bikes
+      - else
+        This #{@bike.type}
+      will still be on campus
     %p
       %em
         Let
         %strong
           = @organization&.name
-        know that your #{@bike.type} is still on campus! Click the button above.
+        know that your #{@bike.type} will remain on campus! Click the button above.
