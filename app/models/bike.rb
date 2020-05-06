@@ -691,7 +691,7 @@ class Bike < ApplicationRecord
   end
 
   def set_calculated_attributes
-    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of thingsc
+    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     self.stolen = true if current_stolen_record.present? && !current_stolen_record.recovered? # Only assign if present
     set_location_info
     self.listing_order = calculated_listing_order
