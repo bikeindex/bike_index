@@ -263,9 +263,9 @@ class StolenRecord < ApplicationRecord
       can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery]),
     )
 
-    if bike.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
-      notify_of_promoted_alert_recovery
-    end
+    bike.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
+    notify_of_promoted_alert_recovery
+    true
   end
 
   def find_or_create_recovery_link_token

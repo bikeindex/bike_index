@@ -203,7 +203,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         expect(feedback.feedback_hash).to eq recovery_request
                                                .slice(:index_helped_recovery, :can_share_recovery)
                                                .merge(bike_id: bike.id.to_s).as_json
-        expect(bike.status).to eq "with_owner"
+        expect(bike.status).to eq "status_with_owner"
         expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
         expect(stolen_record.recovered?).to be_truthy
