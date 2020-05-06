@@ -443,7 +443,9 @@ class Bike < ApplicationRecord
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
-    self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
+    csr = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
+    self.current_stolen_record_id = csr&.id
+    csr
   end
 
   def title_string
@@ -691,7 +693,7 @@ class Bike < ApplicationRecord
   end
 
   def set_calculated_attributes
-    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
+    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of thingsc
     self.stolen = true if current_stolen_record.present? && !current_stolen_record.recovered? # Only assign if present
     set_location_info
     self.listing_order = calculated_listing_order
@@ -774,7 +776,7 @@ class Bike < ApplicationRecord
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_impounded" if current_impound_record.present?
     return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
-    return "status_stolen" if stolen
+    return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
   end
