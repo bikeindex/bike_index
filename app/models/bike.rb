@@ -443,9 +443,7 @@ class Bike < ApplicationRecord
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
-    csr = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
-    self.current_stolen_record_id = csr&.id # Assign manually to ensure we get the
-    csr
+    self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
   def title_string
