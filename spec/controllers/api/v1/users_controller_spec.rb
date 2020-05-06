@@ -187,6 +187,9 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       end
 
       it "recovers the bike" do
+        bike.reload
+        expect(bike.current_stolen_record_id).to eq stolen_record.id
+        og_updated_at = bike.updated_at
         post :send_request, params: recovery_request.as_json
         expect(response.code).to eq("200")
         bike.reload
@@ -194,10 +197,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         feedback = Feedback.last
 
         expect(bike.stolen).to be_falsey
+        expect(bike.current_stolen_record_id).to be_blank
+        expect(bike.updated_at).to be > og_updated_at
         expect(feedback.body).to eq recovery_request[:request_reason]
         expect(feedback.feedback_hash).to eq recovery_request
                                                .slice(:index_helped_recovery, :can_share_recovery)
                                                .merge(bike_id: bike.id.to_s).as_json
+        expect(bike.status).to eq "status_with_owner"
         expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
         expect(stolen_record.recovered?).to be_truthy
