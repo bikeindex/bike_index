@@ -136,7 +136,7 @@ GEM
     docile (1.3.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    doorkeeper (5.2.3)
+    doorkeeper (5.2.6)
       railties (>= 5)
     dotenv (2.7.5)
     dotenv-rails (2.7.5)
@@ -323,7 +323,7 @@ GEM
       railties (>= 4)
       request_store (~> 1.0)
     logstash-event (1.2.02)
-    loofah (2.4.0)
+    loofah (2.5.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.13)
@@ -360,7 +360,7 @@ GEM
     naught (1.1.0)
     nenv (0.3.0)
     nio4r (2.5.2)
-    nokogiri (1.10.7)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -435,7 +435,7 @@ GEM
       rack
     rack-proxy (0.6.5)
       rack
-    rack-test (0.8.3)
+    rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rack-throttle (0.7.0)
       bundler (>= 1.0.0)
@@ -629,7 +629,7 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
-    tzinfo (1.2.6)
+    tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
@@ -685,7 +685,7 @@ DEPENDENCIES
   coffee-rails
   dalli
   database_cleaner
-  doorkeeper (= 5.2.3)
+  doorkeeper (~> 5.2.5)
   dotenv-rails
   draper
   eventmachine

@@ -81,7 +81,7 @@ gem "twitter" # Twitter. For rendering tweets
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
-gem "doorkeeper", "5.2.3"
+gem "doorkeeper", "~> 5.2.5"
 gem "grape", "~> 0.19.1"
 gem "grape-active_model_serializers", "~> 1.4.0"
 gem "grape-swagger", "0.11"
