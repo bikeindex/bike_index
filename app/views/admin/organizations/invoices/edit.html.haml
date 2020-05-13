@@ -50,8 +50,10 @@
           %strong
             - if @invoice.active?
               "Yes"
-            - elsif @invoice.was_active?
-              Expired
+            - elsif @invoice.expired?
+              %em.small.text-danger Expired
+            - elsif @invoice.future?
+              %em.small.text-danger Starts in the future
             - else
               no
       %tr
