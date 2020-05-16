@@ -15,9 +15,9 @@ gem "bootsnap" # Faster bootup
 gem "pg", "~> 1.0" # Postgres
 
 # Speed
-gem "fast_blank", "~> 1.0"
-gem "dalli" # memcached client
 gem "active_model_serializers", "~> 0.9.3" # Use active model serializers to serialize JSON.
+gem "dalli" # memcached client
+gem "fast_blank", "~> 1.0"
 
 # Feature flagging
 gem "flipper"
@@ -40,6 +40,7 @@ gem "soulheart", "~> 0.3.0"
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "draper", require: false # NB: Draper is deprecated in this project
+gem "eu_central_bank"
 gem "eventmachine"
 gem "faraday_middleware"
 gem "fog-aws"
