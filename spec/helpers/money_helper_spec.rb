@@ -36,6 +36,10 @@ RSpec.describe MoneyHelper, type: :helper do
 
   describe "#money_usd" do
     context "given a valid target currency" do
+      before do
+        Money.default_bank.add_rate(:USD, :EUR, 0.88)
+      end
+
       it "returns a Money object converting to the target currency" do
         conversion_rate = Money.default_bank.get_rate(:USD, :EUR)
         currency = money_usd(1.00, exchange_to: :EUR)

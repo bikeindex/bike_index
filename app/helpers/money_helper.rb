@@ -2,8 +2,16 @@
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
-  # TODO: Add a bank implementation that fetches conversion rate values
-  Money.default_bank.add_rate(:USD, :EUR, 0.88)
+  Money.default_bank = EuCentralBank.new.tap do |bank|
+    if !bank.rates_updated_at || bank.rates_updated_at < Time.current - 1.day
+      data_dir = Rails.root.join("data/")
+      Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
+      cache = Rails.root.join("data/exchange_rates.xml")
+      bank.save_rates(cache)
+      bank.update_rates(cache)
+    end
+  end
+
   Money.rounding_mode = BigDecimal::ROUND_HALF_UP
   Money.locale_backend = :i18n
 

@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Locale detection", type: :request do
+  before do
+    Money.default_bank.add_rate(:USD, :EUR, 0.88)
+  end
+
   describe "requesting the root path" do
     context "given a user preference" do
       include_context :request_spec_logged_in_as_user
