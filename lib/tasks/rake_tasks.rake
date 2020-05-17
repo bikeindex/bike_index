@@ -58,3 +58,9 @@ task database_size: :environment do
   # Print DB size
   puts "\n#{'Total size'.ljust(name_col_length) } | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
 end
+
+task exchange_rates_update: :environment do
+  print "\nUpdating exchange rates..."
+  is_success = ExchangeRateUpdator.update
+  print is_success ? "done.\n" : "failed.\n"
+end
