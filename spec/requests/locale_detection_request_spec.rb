@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Locale detection", type: :request do
+  before do
+    FactoryBot.create(:exchange_rate_to_eur)
+  end
+
   describe "requesting the root path" do
     context "given a user preference" do
       include_context :request_spec_logged_in_as_user
