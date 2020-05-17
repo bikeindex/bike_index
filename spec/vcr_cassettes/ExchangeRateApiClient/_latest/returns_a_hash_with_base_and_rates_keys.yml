@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.exchangeratesapi.io/latest?base=CAD
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.17.1
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 17 May 2020 11:10:13 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET
+      Cache-Control:
+      - max-age=1800
+      Cf-Cache-Status:
+      - HIT
+      Age:
+      - '2095'
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 594ce406cf3be112-IAD
+      Cf-Request-Id:
+      - 02c3ecd8380000e11207803200000001
+    body:
+      encoding: ASCII-8BIT
+      string: '{"rates":{"CAD":1.0,"HKD":5.4949116933,"ISK":103.4075241284,"PHP":35.964808614,"DKK":4.8963298536,"HUF":232.8803098943,"CZK":18.1137154488,"GBP":0.5826144048,"RON":3.1777296304,"SEK":7.0051211345,"IDR":10588.8122907229,"INR":53.830017727,"BRL":4.1475937233,"RUB":52.2754907754,"HRK":4.9696671263,"JPY":75.8518810321,"THB":22.7535946425,"CHF":0.6902370166,"EUR":0.6565557088,"MYR":3.0846300309,"BGN":1.2840916552,"TRY":4.9037489331,"CNY":5.0396559648,"NOK":7.2594051605,"NZD":1.1913203335,"ZAR":13.1810780645,"USD":0.7089488543,"MXN":17.0025605673,"SGD":1.0108988248,"AUD":1.1033418686,"ILS":2.5065983849,"KRW":874.9261374828,"PLN":2.9971768105},"base":"CAD","date":"2020-05-15"}'
+    http_version: 
+  recorded_at: Sun, 17 May 2020 11:10:13 GMT
+recorded_with: VCR 5.0.0
