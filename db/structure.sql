@@ -789,6 +789,39 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 
 
 --
+-- Name: exchange_rates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.exchange_rates (
+    id bigint NOT NULL,
+    "from" character varying NOT NULL,
+    "to" character varying NOT NULL,
+    rate double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: exchange_rates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.exchange_rates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: exchange_rates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.exchange_rates_id_seq OWNED BY public.exchange_rates.id;
+
+
+--
 -- Name: exports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1900,6 +1933,7 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2659,6 +2693,13 @@ ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: exchange_rates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.exchange_rates ALTER COLUMN id SET DEFAULT nextval('public.exchange_rates_id_seq'::regclass);
+
+
+--
 -- Name: exports id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3117,6 +3158,14 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rates exchange_rates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.exchange_rates
+    ADD CONSTRAINT exchange_rates_pkey PRIMARY KEY (id);
 
 
 --
@@ -3664,6 +3713,13 @@ CREATE INDEX index_creation_states_on_creator_id ON public.creation_states USING
 --
 
 CREATE INDEX index_creation_states_on_organization_id ON public.creation_states USING btree (organization_id);
+
+
+--
+-- Name: index_exchange_rates_on_from_and_to; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_exchange_rates_on_from_and_to ON public.exchange_rates USING btree ("from", "to");
 
 
 --
@@ -4687,6 +4743,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200424222002'),
 ('20200428203014'),
 ('20200429004612'),
-('20200429174144');
+('20200429174144'),
+('20200517001632');
 
 

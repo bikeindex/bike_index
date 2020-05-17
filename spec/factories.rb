@@ -68,6 +68,12 @@ FactoryBot.define do
     ctype { FactoryBot.create(:ctype) }
   end
 
+  factory :exchange_rate do
+    from { "USD" }
+    to { 3.times.map { ("A".."Z").entries.sample }.join }
+    rate { rand.truncate(2) }
+  end
+
   factory :state do
     sequence(:name) { |n| "State #{n}" }
     sequence(:abbreviation) { |n| "state-#{n}" }
