@@ -37,14 +37,14 @@ class Bike < ApplicationRecord
   has_many :organizations, through: :bike_organizations
   has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
   has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
-  has_many :creation_states, dependent: :destroy
+  has_many :creation_states
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications
   has_many :stolen_records
   has_many :other_listings, dependent: :destroy
   has_many :normalized_serial_segments, dependent: :destroy
-  has_many :ownerships, dependent: :destroy
+  has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
   has_many :bike_stickers
