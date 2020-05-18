@@ -8,7 +8,9 @@ RSpec.describe BikeDeleterWorker, type: :job do
   it "deletes a bike and associations, doesn't error if bike is deleted already" do
     expect do
       described_class.new.perform(bike.id)
-    end.to change(Ownership, :count).by(-1)
+    end.to change(Bike, :count).by(-1)
     described_class.new.perform(bike.id)
+    bike.reload
+    expect(bike.deleted?).to be_truthy
   end
 end

@@ -133,8 +133,8 @@ RSpec.describe BikeCreator do
       let(:existing_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: email) }
       let(:new_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: new_email) }
       let!(:ownerships) do
-        FactoryBot.create(:ownership, bike: existing_bike, owner_email: email)
-        FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)
+        [FactoryBot.create(:ownership, bike: existing_bike, owner_email: email),
+         FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)]
       end
       let(:params) do
         {
@@ -154,6 +154,7 @@ RSpec.describe BikeCreator do
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
+            pp Ownership.count
           end.to change(Ownership, :count).by(-1)
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
