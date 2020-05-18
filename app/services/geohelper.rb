@@ -7,13 +7,23 @@ class Geohelper
     def reverse_geocode(latitude, longitude)
       result = Geocoder.search([latitude, longitude])
       return nil unless result&.first
-      result.first.formatted_address || result.first.address
+       if Geocoder.config.lookup == :mapbox
+        # the Mapbox result for address doesn't include the street number, so try to grab it from the data
+        result.first.data["place_name"] || result.first.address
+      else
+        result.first.formatted_address || result.first.address
+      end
     end
 
     # accept 'result' parameter to skip lookup for formatted_address_hash
     def coordinates_for(addy, result: nil)
       result ||= Geocoder.search(formatted_address(addy))
       return nil unless result&.any?
+      if Geocoder.config.lookup == :mapbox
+        # Mapbox specific work
+        coords = result.first.coordinates
+        return { latitude: coords[0], longitude: coords[1] }
+      end
       geometry = result.first&.data && result.first.data["geometry"]
       if geometry && geometry["location"].present?
         location = geometry["location"]
