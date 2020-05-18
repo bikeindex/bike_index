@@ -2011,6 +2011,13 @@ nl:
       added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
         bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
       unregistered_parking_notification: gemaakt voor parkeermelding
+      additional_registrations_information: Registratie door gebruiker
+      additional_registrations_information_visible_because: zichtbaar met %{org_name}
+        toegang voor rechtshandhaving
+      additional_registrations_potential_duplicates: 'Potentiële dubbele fietsen die
+        overeenkomen met seriële segmenten:'
+      additional_registrations_registered_at: Geregistreerd bij
+      additional_registrations_this_bike: Deze %{bike_type}
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
