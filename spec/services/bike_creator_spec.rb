@@ -154,7 +154,6 @@ RSpec.describe BikeCreator do
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
-            pp Ownership.count
           end.to change(Ownership, :count).by(-1)
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
