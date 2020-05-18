@@ -1,14 +1,19 @@
 require "rails_helper"
 
 RSpec.describe DuplicateBikeFinderWorker, type: :job do
-  it "takes a bike id and search for groups" do
-    bike1 = FactoryBot.create(:bike, serial_number: "applejacks cereal")
+  it "takes a bike id and search for groups, ignoring any less than 5 chars" do
+    bike1 = FactoryBot.create(:bike, serial_number: "applejacks cereal cross")
     bike1.create_normalized_serial_segments
-    bike2 = FactoryBot.create(:bike, serial_number: "applejacks Funtimes")
+    bike2 = FactoryBot.create(:bike, serial_number: "applejacks Funtimes cross")
     bike2.create_normalized_serial_segments
-    described_class.new.perform(bike1.id)
-    duplicate_group = bike1.normalized_serial_segments.first.duplicate_bike_group
-    expect(bike2.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
+    expect do
+      described_class.new.perform(bike1.id)
+    end.to change(DuplicateBikeGroup, :count).by 1
+
+    expect do
+      duplicate_group = bike1.normalized_serial_segments.first.duplicate_bike_group
+      expect(bike2.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
+    end.to_not change(DuplicateBikeGroup, :count)
   end
   context "only one match" do
     it "doesn't create a duplicate" do

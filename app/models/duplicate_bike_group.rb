@@ -6,6 +6,11 @@ class DuplicateBikeGroup < ApplicationRecord
 
   before_save :update_added_bike_at
 
+  def self.matching_segment(segment)
+    includes(:normalized_serial_segments).
+        where(normalized_serial_segments: { segment: segment }).first
+  end
+
   def update_added_bike_at
     self.added_bike_at ||= Time.current
   end

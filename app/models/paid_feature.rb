@@ -17,6 +17,7 @@ class PaidFeature < ApplicationRecord
     parking_notifications
     impound_bikes
     unstolen_notifications
+    additional_registrations_information
   ].freeze
   EXPECTED_SLUGS = (%w[
     avery_export
