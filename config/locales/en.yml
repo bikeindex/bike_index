@@ -1097,9 +1097,9 @@ en:
         which they appear
       finished_uploading: Finished uploading
     edit_primary_menu:
-      bike_type_details: "%{bike_type} Details"
+      bike_type_information: "%{bike_type} Information"
       save_changes: Save changes
-      theft_details: Theft Details
+      theft_information: Theft Information
       you_are_editing: You are editing
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
@@ -1603,12 +1603,7 @@ en:
           must_be_an_admin: You have to be an admin to do that!
       bikes:
         update:
-          bike_impounded: "%{bike_type} impounded!"
-          unable_to_impound: 'Unable to impound %{bike_type}: %{errors}'
           unknown_update_action: Unknown update action. Please contact support@bikeindex.org
-          your_org_not_permitted_to_impound: >-
-            Your organization doesn't have permission to impound bikes, please contact
-            support@bikeindex.org.
       bulk_imports:
         create:
           bulk_import_created: Bulk Import created!
@@ -3662,6 +3657,7 @@ en:
       about: About
       add_a_bike: Add a bike
       blog: Blog
+      customize_emails: Customize emails
       discuss: Discuss
       donate: Donate
       exports: Exports
@@ -4408,7 +4404,6 @@ en:
         by: By
         created: Created
         impounded: Impounded
-        kind: Because
         notification_number: Notification#
         retrieved: Retrieved
     stickers:
@@ -4961,6 +4956,7 @@ en:
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports
+      customize_emails: Customize emails
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
@@ -5005,15 +5001,21 @@ en:
       to: To
       update: Update
       year: year
-    stolen_missing_location_modal:
+    user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
+      add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
       location_critical_html: >-
         <strong>It is critical for recovery</strong> that you include the address
         or cross-street where your %{bike_type} was stolen.
+      missing_stolen_photo_title: Please add a photo
+      photo_critical_html: Successful promoted alerts <strong>need to have an image</strong>
       stolen_missing_location_title: Please add theft location
       without_location_all_is_lost: >-
         Without a location we can't spread the word about the theft and people won't
         know where to look for your %{bike_type}.
+      without_photo_all_is_lost: >-
+        If you don't have any photos of your bike, find a stock image on the internet
+        and upload it. Without some image, the promoted alert won't be effective.
   stolen:
     index:
       ambassador: ambassador

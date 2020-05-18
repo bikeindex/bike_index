@@ -40,7 +40,7 @@ class ProcessMembershipWorker < ApplicationWorker
     return false unless membership.organization.enabled?("passwordless_users") &&
                         membership.user.blank?
     password = SecurityTokenizer.new_password_token
-    user = User.new(skip_create_jobs: true,
+    user = User.new(skip_update: true,
                     email: membership.invited_email,
                     password: password,
                     password_confirmation: password)

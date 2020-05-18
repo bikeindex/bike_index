@@ -180,7 +180,7 @@ Rails.application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
-              :ctypes
+              :ctypes, :parking_notifications, :impound_records
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
@@ -322,13 +322,12 @@ Rails.application.routes.draw do
     end
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
-    resources :messages, only: %i[index show create]
+    resources :emails, only: %i[index show edit update]
     resources :parking_notifications do
       member { get :email }
     end
-    resources :impound_records
+    resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
-    resources :appointments
     resource :ambassador_dashboard, only: %i[show] do
       collection do
         get :resources

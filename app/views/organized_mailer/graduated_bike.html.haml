@@ -1,0 +1,37 @@
+- user = @bike.user
+- bikes = @user&.rough_approx_bikes || []
+%h1
+  Renew Your Bike Permit
+  -# Temporarily commented out, for PSU initial email
+  -# Will your
+  -# - if bikes.count > 1
+  -#   bikes
+  -# - else
+  -#   #{@bike.type}
+  -# be at #{@organization.short_name} next semester?
+
+- organization_message_snippet = @organization.mail_snippets.enabled.graduated_bike_email.first
+- if @email_preview
+  - organization_message_snippet ||= @organization.mail_snippets.graduated_bike_email.first
+
+- if organization_message_snippet.present?
+  = organization_message_snippet.body.html_safe
+
+= render partial: "shared/email_bike_box"
+
+- if @retrieval_link_url.present?
+  .mark-retrieved-box
+    = link_to @retrieval_link_url, class: "binx-button" do
+      Click to renew
+      -# Temporarily commented out for PSU initial email
+      -# - if bikes.count > 1
+      -#   My bikes
+      -# - else
+      -#   This #{@bike.type}
+      -# will still be on campus
+    %p
+      %em
+        Your #{@bike.type} registration is set to expire soon.
+        %br
+        If you're remaining in the Centre Region Area or returning in the fall, please click the link above to keep your registration up to date.
+

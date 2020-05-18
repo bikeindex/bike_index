@@ -2,8 +2,7 @@ class ImageAssociatorWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   def perform
-    BParam.where(image_processed: false).where("image IS NOT NULL").each do |b_param|
-      next unless b_param.created_bike.present?
+    BParam.unprocessed_image.with_bike.each do |b_param|
       BikeCreatorAssociator.new(b_param).attach_photo(b_param.created_bike)
     end
   end

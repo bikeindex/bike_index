@@ -3,7 +3,7 @@ class InfoController < ApplicationController
   end
 
   def where
-    @organizations = Organization.shown_on_map
+    @organizations = Organization.show_on_map.includes(:locations)
   end
 
   def serials

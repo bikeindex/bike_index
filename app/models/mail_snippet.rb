@@ -1,7 +1,21 @@
 class MailSnippet < ApplicationRecord
   include Geocodeable
 
-  KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned_bike: 5, location_triggered: 6 }.freeze
+  KIND_ENUM = {
+    custom: 0,
+    header: 1,
+    welcome: 2,
+    footer: 3,
+    security: 4,
+    location_triggered: 5,
+    # partial: 6, # To be enabled!
+    appears_abandoned_notification: 7,
+    parked_incorrectly_notification: 8,
+    impound_notification: 9,
+    graduated_bike_email: 10,
+  }.freeze
+
+  # TODO: Stop requiring name when it's the same as other things
   validates_presence_of :name
 
   belongs_to :state
@@ -18,9 +32,11 @@ class MailSnippet < ApplicationRecord
 
   enum kind: KIND_ENUM
 
-  after_commit :update_organization
+  after_commit :update_associations
 
   before_validation :set_calculated_attributes
+
+  attr_accessor :skip_update
 
   def self.organization_snippets
     {
@@ -33,25 +49,34 @@ class MailSnippet < ApplicationRecord
     }.as_json
   end
 
-  def self.organization_snippet_types
-    organization_snippets.keys
-  end
-
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  def self.organization_snippet_kinds; organization_snippets.keys end
+
+  def self.organization_message_kinds; ParkingNotification.kinds + ["graduated_bike_email"] end
+
+  def organization_snippet?; self.class.organization_snippet_kinds.include?(kind) end
+
+  def organization_message?; self.class.organization_message_kinds.include?(kind) end
 
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
     if is_location_triggered # No longer used, but keeping in case we decide to use. Check PR#415
       self.kind = "location_triggered"
     else
-      self.kind = self.class.kinds.include?(name) ? name : "custom"
+      if kind.present?
+        self.name ||= kind
+      else
+        self.kind = self.class.kinds.include?(name) ? name : "custom"
+      end
     end
   end
 
-  def update_organization
+  def update_associations
+    return true if skip_update
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update(updated_at: Time.current)
+    organization&.update(updated_at: Time.current)
   end
 
   private

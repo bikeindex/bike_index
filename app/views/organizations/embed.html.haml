@@ -140,17 +140,22 @@
   - if @organization&.include_field_reg_address?
     - label_address = @organization.registration_field_label("reg_address") || t(".owners_street_address")
     / Set all the bike address attrs
-    - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state") }
-    .input-group
-      = f.label :street, label_address
-      .controls
-        = f.text_field :street, required: true, placeholder: t(".address")
-      .controls.extra-field
-        = f.text_field :city, required: true, placeholder: t(".city")
-      .controls.extra-field
-        = f.text_field :zipcode, required: true, placeholder: t(".zipcode")
-      #state-select.controls.extra-field.special-select-single
-        = f.collection_select(:state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state"))
+    - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
+    - @bike.country_id ||= @organization.country_id || Country.united_states.id
+    .input-group.with-optional-blocks
+      #address-fields
+        = f.label :street, label_address
+        .street-control
+          = f.text_field :street, required: true, placeholder: t(".address")
+        .control-group
+          = f.text_field :city, required: true, placeholder: t(".city")
+        .control-group
+          = f.text_field :zipcode, required: true, placeholder: t(".zipcode")
+        .full-width-wrap
+          #state-select.control-group.fancy-select.unfancy.hidden-other{ class: (@bike.country_id == Country.united_states.id ? "unhidden initially-unhidden" : "") }
+            = f.collection_select(:state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
+          .control-group.special-select-single#us_id_data{ data: { usid: Country.united_states.id } }
+            = f.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
   - if @organization&.include_field_reg_phone?
     - label_phone = @organization.registration_field_label("reg_phone") || t(".your_phone_number")
     .input-group

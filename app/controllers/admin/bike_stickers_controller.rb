@@ -25,7 +25,7 @@ class Admin::BikeStickersController < Admin::BaseController
   def matching_bike_stickers
     return @matching_bike_stickers if defined?(@matching_bike_stickers)
     bike_stickers = BikeSticker.all
-    if params[:organization_id].present?
+    if current_organization.present?
       bike_stickers = bike_stickers.where(organization_id: current_organization.id)
     end
     if params[:search_bike_sticker_batch_id].present?

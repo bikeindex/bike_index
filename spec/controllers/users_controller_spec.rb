@@ -282,6 +282,7 @@ RSpec.describe UsersController, type: :controller do
         include_context :logged_in_as_user
         it "redirects" do
           expect(user.confirmed?).to be_truthy
+          Sidekiq::Worker.clear_all
           get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"

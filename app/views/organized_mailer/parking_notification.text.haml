@@ -7,9 +7,17 @@
 
 This is for your #{@bike.title_string}.
 
+- if @parking_notification.impound_notification? && @parking_notification.impound_record.present?
+  - impound_record = @parking_notification.impound_record
+  - if impound_record.location.present?
+    It is being held at #{impound_record.location.name}
 
-It is located at: #{@parking_notification.address}
+    = impound_record.location.address
 
+- if @parking_notification.impound_notification?
+  It was located at: #{@parking_notification.address}
+- else
+  It is located at: #{@parking_notification.address}
 
 \---
 

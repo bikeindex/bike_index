@@ -5,6 +5,11 @@
     %title= content_for?(:title) ? yield(:title) : t(".bike_index")
     = stylesheet_link_tag 'email'
 
+    -# Remove the top and bottom margin on email preview, because they look funky
+    - if @email_preview
+      :css
+        .binx-wrapper { margin: 0; }
+
   %body
     .binx-wrapper
       .binx-header

@@ -21,6 +21,8 @@
     From #{link_to @user.display_name, admin_user_path(@user)}
 
   = "message".pluralize(@feedbacks.count)
+  %em
+    = humanized_time_range(@time_range)
 
 .row
   .col-12

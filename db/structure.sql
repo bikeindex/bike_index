@@ -187,7 +187,7 @@ CREATE TABLE public.b_params (
     bike_errors text,
     image character varying(255),
     image_tmp character varying(255),
-    image_processed boolean DEFAULT true,
+    image_processed boolean DEFAULT false,
     id_token text,
     params json DEFAULT '{"bike":{}}'::json,
     origin character varying,
@@ -300,7 +300,7 @@ CREATE TABLE public.bike_stickers (
     claimed_at timestamp without time zone,
     previous_bike_id integer,
     bike_sticker_batch_id integer,
-    code_integer integer,
+    code_integer bigint,
     code_prefix character varying
 );
 
@@ -394,7 +394,8 @@ CREATE TABLE public.bikes (
     status integer DEFAULT 0,
     street character varying,
     state_id bigint,
-    address_set_manually boolean DEFAULT false
+    address_set_manually boolean DEFAULT false,
+    created_by_parking_notification boolean DEFAULT false
 );
 
 
@@ -1044,6 +1045,43 @@ ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.i
 
 
 --
+-- Name: impound_record_updates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.impound_record_updates (
+    id bigint NOT NULL,
+    impound_record_id bigint,
+    user_id bigint,
+    location_id bigint,
+    kind integer,
+    notes text,
+    transfer_email character varying,
+    resolved boolean DEFAULT false,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: impound_record_updates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.impound_record_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: impound_record_updates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.impound_record_updates_id_seq OWNED BY public.impound_record_updates.id;
+
+
+--
 -- Name: impound_records; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1056,7 +1094,8 @@ CREATE TABLE public.impound_records (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     display_id bigint,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    location_id bigint
 );
 
 
@@ -1247,7 +1286,10 @@ CREATE TABLE public.locations (
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
     country_id integer,
-    state_id integer
+    state_id integer,
+    not_publicly_visible boolean DEFAULT false,
+    impound_location boolean DEFAULT false,
+    default_impound_location boolean DEFAULT false
 );
 
 
@@ -1719,7 +1761,8 @@ CREATE TABLE public.ownerships (
     claimed boolean,
     example boolean DEFAULT false NOT NULL,
     send_email boolean DEFAULT true,
-    user_hidden boolean DEFAULT false NOT NULL
+    user_hidden boolean DEFAULT false NOT NULL,
+    impound_record_id bigint
 );
 
 
@@ -2425,7 +2468,7 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    has_stolen_bikes_without_locations boolean DEFAULT false
+    general_alerts jsonb DEFAULT '[]'::jsonb
 );
 
 
@@ -2662,6 +2705,13 @@ ALTER TABLE ONLY public.flipper_gates ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('public.front_gear_types_id_seq'::regclass);
+
+
+--
+-- Name: impound_record_updates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_record_updates ALTER COLUMN id SET DEFAULT nextval('public.impound_record_updates_id_seq'::regclass);
 
 
 --
@@ -3123,6 +3173,14 @@ ALTER TABLE ONLY public.flipper_gates
 
 ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: impound_record_updates impound_record_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_record_updates
+    ADD CONSTRAINT impound_record_updates_pkey PRIMARY KEY (id);
 
 
 --
@@ -3679,10 +3737,38 @@ CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON publ
 
 
 --
+-- Name: index_impound_record_updates_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_record_updates_on_impound_record_id ON public.impound_record_updates USING btree (impound_record_id);
+
+
+--
+-- Name: index_impound_record_updates_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_record_updates_on_location_id ON public.impound_record_updates USING btree (location_id);
+
+
+--
+-- Name: index_impound_record_updates_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_record_updates_on_user_id ON public.impound_record_updates USING btree (user_id);
+
+
+--
 -- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING btree (bike_id);
+
+
+--
+-- Name: index_impound_records_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_location_id ON public.impound_records USING btree (location_id);
 
 
 --
@@ -3872,6 +3958,13 @@ CREATE INDEX index_ownerships_on_bike_id ON public.ownerships USING btree (bike_
 --
 
 CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (creator_id);
+
+
+--
+-- Name: index_ownerships_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_impound_record_id ON public.ownerships USING btree (impound_record_id);
 
 
 --
@@ -4588,6 +4681,12 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200416202219'),
 ('20200420181614'),
 ('20200421191302'),
-('20200421230336');
+('20200421230336'),
+('20200422161944'),
+('20200422171902'),
+('20200424222002'),
+('20200428203014'),
+('20200429004612'),
+('20200429174144');
 
 

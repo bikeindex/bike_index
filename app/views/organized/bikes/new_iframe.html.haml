@@ -68,7 +68,7 @@
 
       .input-group
         %label Kind of notification
-        - current_organization.parking_notification_kinds.each do |kind|
+        - ParkingNotification.kinds.each do |kind|
           %label.radio-inline
             = n.radio_button :kind, kind, checked: kind == "appears_abandoned_notification"
             = ParkingNotification.kinds_humanized[kind.to_sym]
@@ -91,23 +91,34 @@
         .waitingOnLocationText.hideOnLocationFind{ class: @parking_notification.use_entered_address ? "currently-hidden" : "" }
           Waiting on device location
 
-        #address-fields.hidden-other.currently-hidden
+        #address-fields
           .street-control.ifManualRequired
             = n.text_field :street, placeholder: "Address or intersection", class: "form-control"
 
           .control-group.ifManualRequired
             = n.text_field :city, placeholder: "City", class: "form-control"
 
-          .control-group.ifManualRequired
+          .control-group.ifManualRequired.clear-right
             = n.text_field :zipcode, placeholder: "Postal code", class: "form-control"
 
-          .control-group.fancy-select.unfancy.state-select
-            = n.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: "state" }, { class: "form-control" })
-          .control-group.fancy-select.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
-            = n.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
+          .full-width-wrap
+            #state-select.control-group.fancy-select.unfancy.hidden-other{ class: (@parking_notification.country_id == Country.united_states.id ? "unhidden initially-unhidden" : "") }
+              = n.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: "state" }, { class: "form-control" })
+            .control-group.fancy-select.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
+              = n.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
 
-    .input-group.form-foot
+    .input-group
       .submit-registration
         = submit_tag "Record parking notification for", class: "button-submit"
         = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 
+    .input-group.form-foot
+      .control-group.form-photo-group
+        - if @b_param.image.present? or @b_param.image_tmp.present?
+          %strong
+            Image has been uploaded
+        - else
+          .filefield-button
+            Choose photo
+            = f.file_field :image
+          #filepath

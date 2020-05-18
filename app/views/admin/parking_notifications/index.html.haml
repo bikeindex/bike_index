@@ -1,0 +1,95 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      parking notifications
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "all" ? "" : "active") }
+          #{@search_status.humanize} notifications
+        .dropdown-menu
+          - (["all"] + ParkingNotification.statuses).each do |kind|
+            - kind_active = @search_status == kind
+            - kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind))
+            - kind_display = "#{kind.humanize} notifications"
+            = link_to kind_display, admin_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "all" # Add a divider after all
+              .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_parking_notifications_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@parking_notifications.total_count)
+    matching parking notifications
+    %em
+      = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_parking_notifications), stacked: true, thousands: ",", defer: true
+
+.mt-2.mb-4
+  = render partial: "/shared/period_select"
+
+= paginate @parking_notifications, views_prefix: "admin"
+
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "created_at"
+    %th
+      %small= sortable "updated_at"
+    - unless current_organization.present?
+      %th
+        = sortable "organization_id"
+    %th
+      = sortable "kind"
+    %th Bike
+    %th #
+    %th Status
+    %th
+      %small
+        = sortable "user_id", "last updator"
+    %th
+      %small= sortable "resolved_at"
+  %tbody
+    - @parking_notifications.each do |parking_notification|
+      %tr
+        %td
+          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id) }
+            = l(parking_notification.created_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(parking_notification.updated_at, format: :convert_time)
+        - unless current_organization.present?
+          %td
+            = link_to parking_notification.organization&.short_name, admin_parking_notifications_path(organization_id: parking_notification.organization_id)
+        %td
+          %small
+            = parking_notification.kind_humanized
+        %td
+          - if parking_notification.bike.present?
+            = link_to organized_bike_text(parking_notification.bike), admin_bike_path(parking_notification.bike)
+        %td
+          - if parking_notification.repeat_record?
+            %small.less-strong
+              = parking_notification.notification_number
+        %td
+          - if parking_notification.status == "impounded"
+            = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+          - else
+            %em.small
+              = status_display(parking_notification.status)
+        %td
+          %small
+            = parking_notification.user&.display_name&.truncate(20)
+        %td
+          - if parking_notification.resolved_at.present?
+            %small.convertTime.preciseTime
+              = l(parking_notification.resolved_at, format: :convert_time)

@@ -31,14 +31,15 @@ module GraphingHelper
     end
   end
 
-  def group_by_format(time_range)
-    if group_by_method(time_range) == :group_by_minute
+  def group_by_format(time_range, group_period = nil)
+    group_period ||= group_by_method(time_range)
+    if group_period == :group_by_minute
       "%l:%M %p"
-    elsif group_by_method(time_range) == :group_by_hour
+    elsif group_period == :group_by_hour
       "%a%l %p"
-    elsif time_range.last - time_range.first < 2.weeks.to_i
+    elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
       "%a %-m-%-d"
-    elsif group_by_method(time_range) == :group_by_month
+    elsif group_period == :group_by_month
       "%Y-%-m"
     else
       nil # Let it fallback to the default handling
@@ -48,10 +49,10 @@ module GraphingHelper
   def humanized_time_range(time_range)
     return nil if @period == "all"
     return "in the past #{@period}" unless @period == "custom"
-    group_by = group_by_method(time_range)
-    if group_by == :group_by_minute
+    group_period = group_by_method(time_range)
+    if group_period == :group_by_minute
       precision_class = "preciseTimeSeconds"
-    elsif group_by == :group_by_hour
+    elsif group_period == :group_by_hour
       precision_class = "preciseTime"
     else
       precision_class = ""

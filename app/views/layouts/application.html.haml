@@ -50,7 +50,7 @@
                   = link_to t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}"
                 - if passive_organization.enabled?("impound_bikes")
                   %li
-                    = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: passive_organization.to_param), class: "nav-link secondary-item"
+                    = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link secondary-item"
                 - if passive_organization.enabled?("show_partial_registrations")
                   %li
                     = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
@@ -96,6 +96,9 @@
                     = active_link t(".org_profile", org_name: passive_organization.short_name), organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
                   %li
                     = active_link t(".org_locations", org_name: passive_organization.short_name), locations_organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  - if passive_organization.enabled?("customize_emails")
+                    %li
+                      = active_link t(".customize_emails"), organization_emails_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
               - if current_user&.superuser?
                 %li.divider-nav-item
                 %li
@@ -163,8 +166,8 @@
     - donation_request = session.delete(:render_donation_request)
     - if donation_request.present?
       = render "/shared/law_enforcement_donation_modal", locals: { kind: donation_request }
-    - elsif show_missing_location_alert
-      = render "/shared/stolen_missing_location_modal"
+    - elsif show_general_alert
+      = render "/shared/user_general_alert"
 
     = render 'shared/footer_revised'
 

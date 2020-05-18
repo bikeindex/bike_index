@@ -7,10 +7,6 @@ RSpec.describe Ownership, type: :model do
       ownership.set_calculated_attributes
       expect(ownership.owner_email).to eq("some@dd.com")
     end
-
-    it "haves before save callback" do
-      expect(Ownership._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_calculated_attributes)).to eq(true)
-    end
   end
 
   describe "validate owner_email format" do

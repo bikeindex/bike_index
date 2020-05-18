@@ -187,7 +187,9 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.notification_number > 1
         ? "- notification #" + record.notification_number
         : ""
-    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span>
+    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span> <em class="small extended-col-info d-block status-cell">${
+      record.status
+    } status</em>
     ${
       impoundLink.length
         ? "<strong class='small extended-col-info d-block'>Impounded: " +
@@ -206,6 +208,8 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.user_display_name
     }</td><td class="hidden-sm-cells">${
       record.notification_number > 1 ? record.notification_number : ""
+    }</td><td class="hidden-sm-cells status-cell">${
+      record.status
     }</td><td class="hidden-sm-cells">${impoundLink}</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
       record.id
@@ -237,7 +241,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records
-      body_html = "<tr><td colspan=7>No matching notifications</td></tr>";
+      body_html = "<tr><td colspan=8>No matching notifications</td></tr>";
     }
 
     // Render the body - whether it says no records or records

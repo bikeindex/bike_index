@@ -34,7 +34,7 @@
                 = t(".dont_have_an_account")
               = link_to t(".sign_up"), new_user_path(partner: sign_in_partner, email: params[:email])
 
-          = form_for :session, url: session_url do |f|
+          = form_for :session, url: session_url(params.permit(:return_to)) do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 

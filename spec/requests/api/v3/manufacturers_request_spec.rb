@@ -25,7 +25,6 @@ RSpec.describe "Manufacturers API V3", type: :request do
       expect(response.code).to eq("200")
       expect(JSON.parse(result)["manufacturer"]["id"]).to eq(@manufacturer.id)
     end
-
     it "responds with missing and cors headers" do
       get "/api/v3/manufacturers/10000"
       expect(response.code).to eq("404")

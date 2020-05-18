@@ -56,34 +56,15 @@ module Organized
 
     def multi_serial_search; end
 
-    def update
-      if params.dig(:bike, :impound)
-        if current_organization.enabled?("impound_bikes")
-          bike = Bike.find(params[:id])
-          impound_record = bike.impound(current_user, organization: current_organization)
-          if impound_record.valid?
-            flash[:success] = translation(:bike_impounded, bike_type: bike.type)
-          else
-            flash[:error] = translation(:unable_to_impound,
-                                        bike_type: bike.type,
-                                        errors: impound_record.errors.full_messages.to_sentence)
-          end
-        else
-          flash[:error] = translation(:your_org_not_permitted_to_impound)
-        end
-      else
-        flash[:error] = translation(:unknown_update_action)
-      end
-
-      redirect_back(fallback_location: redirect_back_fallback_path)
-    end
-
     def create
       @b_param = find_or_new_b_param
       iframe_redirect_params = { organization_id: current_organization.to_param }
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
+        if params[:bike][:image].present? # Have to do in the controller, before assigning
+          @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
+        end
         # we handle filtering & coercion in BParam, just create it with whatever here
         @b_param.update_attributes(permitted_create_params)
         @bike = BikeCreator.new(@b_param).create_bike
@@ -145,7 +126,7 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
+        bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
       else
         bikes = Bike.search(@interpreted_params)
       end

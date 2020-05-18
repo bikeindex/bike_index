@@ -20,7 +20,7 @@ class StolenRecord < ApplicationRecord
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved recovered_at recovered_description index_helped_recovery can_share_recovery
-       recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
+       recovery_posted show_address tsved_at estimated_value).map(&:to_sym).freeze
   end
 
   belongs_to :bike
@@ -48,11 +48,10 @@ class StolenRecord < ApplicationRecord
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
   scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
-  scope :missing_location, -> { where(street: ["", nil]) }
+  scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity
 
   before_save :set_calculated_attributes
   after_validation :reverse_geocode, unless: :skip_geocoding?
-  after_save :remove_outdated_alert_images
   after_commit :update_associations
 
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
@@ -90,7 +89,8 @@ class StolenRecord < ApplicationRecord
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
 
-  def missing_location?; street.blank? end
+  # Overrides geocodeable without_location, we need more specificity
+  def without_location?; street.blank? end
 
   def address(skip_default_country: false, force_show_address: false)
     Geocodeable.address(
@@ -170,6 +170,7 @@ class StolenRecord < ApplicationRecord
     self.street = nil unless street.present? # Make it easier to find blank addresses
     titleize_city
     update_tsved_at
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.recovery_display_status = calculated_recovery_display_status
   end
 
@@ -258,12 +259,13 @@ class StolenRecord < ApplicationRecord
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
-      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
+      index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
+      can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery]),
     )
 
-    bike.stolen = false
-    bike.save.tap { |was_saved| notify_of_promoted_alert_recovery if was_saved }
+    bike.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
+    notify_of_promoted_alert_recovery
+    true
   end
 
   def find_or_create_recovery_link_token
@@ -272,14 +274,13 @@ class StolenRecord < ApplicationRecord
     recovery_link_token
   end
 
-  # The associated bike's first public image, if available. Else nil.
-  def bike_main_image
-    bike&.public_images&.order(:id)&.first
-  end
+  # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
+  def theft_alert_missing_photo?; current_alert_image.blank? && theft_alerts.any? end
 
-  def current_alert_image
-    alert_image || generate_alert_image
-  end
+  # The associated bike's first public image, if available. Else nil.
+  def bike_main_image; bike&.public_images&.order(:id)&.first end
+
+  def current_alert_image; alert_image || generate_alert_image end
 
   # Generate the "promoted alert image"
   # (One of the stolen bike's public images, placed on a branded template)
@@ -287,10 +288,16 @@ class StolenRecord < ApplicationRecord
   # The URL is available immediately - processing is performed in the background.
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
-    return if bike_image&.image.blank?
+    return if (bike_image&.image).blank? && (bike&.stock_photo_url).blank?
 
     alert_image&.destroy
-    new_image = AlertImage.create(image: bike_image.image, stolen_record: self)
+    new_image = AlertImage.new(stolen_record: self)
+    if bike_image&.image.blank?
+      new_image.remote_image_url = bike.stock_photo_url
+    else
+      new_image.image = bike_image.image
+    end
+    new_image.save
 
     if new_image.valid?
       new_image
@@ -300,15 +307,8 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # If the bike has been recovered, remove the alert_image
-  def remove_outdated_alert_images
-    if bike.blank? || !bike.stolen?
-      alert_image&.destroy
-      reload
-    end
-  end
-
   def update_associations
+    remove_outdated_alert_images
     return true unless bike.present?
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current
@@ -317,10 +317,18 @@ class StolenRecord < ApplicationRecord
     bike.user&.update_attributes(updated_at: Time.current)
   end
 
+  # If the bike has been recovered, remove the alert_image
+  def remove_outdated_alert_images
+    no_longer_around = bike.blank? || !bike.stolen? || recovered?
+    return true unless no_longer_around || @alert_location_changed
+    alert_image&.destroy
+    reload
+  end
+
   def notify_of_promoted_alert_recovery
-    return unless recovered? && theft_alerts.active.present?
+    return unless recovered? && theft_alerts.any?
 
     EmailTheftAlertNotificationWorker
-      .perform_async(theft_alerts.active.last.id, :recovered)
+      .perform_async(theft_alerts.last.id, :recovered)
   end
 end

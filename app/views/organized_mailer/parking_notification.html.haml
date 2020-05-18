@@ -1,13 +1,35 @@
 %h1
   = @parking_notification.title
 
+- organization_message_snippet = @organization.mail_snippets.enabled.where(kind: @parking_notification.kind).first
+- if @email_preview
+  - organization_message_snippet ||= @organization.mail_snippets.where(kind: @parking_notification.kind).first
+
+- if organization_message_snippet.present?
+  %div{ style: "margin-top: 20px;" }
+  = organization_message_snippet.body.html_safe
 
 - if @parking_notification.repeat_record?
   %h2.uncap{ style: "margin-top: 1rem;" }
     This is your #{@parking_notification.notification_number.ordinalize} notification!
 
+
+- if @parking_notification.impound_notification? && @parking_notification.impound_record.present?
+  - impound_record = @parking_notification.impound_record
+  - if impound_record.location.present?
+    %div{ style: "padding: 1rem; border: 1px solid #ccc; margin: 1rem 0;" }
+      %strong
+        It is being held at #{impound_record.location.name}
+      %br
+      %em
+      = impound_record.location.address
+
 %p
-  Your #{@bike.title_string} is located at:
+  Your #{@bike.title_string}
+  - if @parking_notification.impound_notification?
+    was located at:
+  - else
+    is located at:
   %br
   %em
     = @parking_notification.address

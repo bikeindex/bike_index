@@ -46,16 +46,15 @@ RSpec.describe InfoController, type: :controller do
   describe "user with stolen info" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     before do
-      user.update_column :has_stolen_bikes_without_locations, true
+      user.update_column :general_alerts, ["theft_alert_without_photo"]
       set_current_user(user)
     end
     it "renders with show alert" do
-      expect(user.has_stolen_bikes_without_locations).to be_truthy
       get :lightspeed
       expect(response.code).to eq("200")
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
-      expect(assigns(:show_missing_location_alert)).to be_truthy
+      expect(assigns(:show_general_alert)).to be_truthy
     end
     context "support_bike_index" do
       it "renders without show alert" do
@@ -63,7 +62,7 @@ RSpec.describe InfoController, type: :controller do
         expect(response.code).to eq("200")
         expect(response).to render_template("support_bike_index")
         expect(flash).to_not be_present
-        expect(assigns(:show_missing_location_alert)).to be_falsey
+        expect(assigns(:show_general_alert)).to be_falsey
       end
     end
   end

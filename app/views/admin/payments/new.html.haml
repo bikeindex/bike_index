@@ -9,7 +9,7 @@
     .col-md-6
       .form-group.fancy-select.unfancy
         = f.label :payment_method
-        = f.select :payment_method, Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] }
+        = f.select :payment_method, Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] }, {}, class: "form-control"
     .col-md-6
       .form-group
         - f.object.created_at = TimeParser.round(f.object.created_at || Time.current)

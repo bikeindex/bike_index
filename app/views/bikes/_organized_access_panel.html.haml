@@ -61,7 +61,7 @@
                       %ul
                         - stickers.each do |bike_sticker|
                           %li
-                            - if bike_sticker.organization.present?
+                            - if bike_sticker.organization.present? && bike_sticker.organization == passive_organization
                               = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param)
                             - else
                               = bike_sticker.code
@@ -210,88 +210,97 @@
         %em
           = link_to "view all on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
 
-    - parking_notification_open = params[:parking_notification].present?
-
-    .text-center#openNewParkingNotification.collapse{ class: (parking_notification_open ? "" : "in") }
-      %a.btn.btn-primary.btn-lg{ href: "#newParkingNotificationFields" }
-        New parking notification
-
-    #newParkingNotificationFields.collapse{ class: (parking_notification_open ? "in" : "")  }
+    - if @bike.status_impounded?
       %hr
-      - parking_notification_present = @parking_notification.present?
-      - @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: passive_organization, use_entered_address: false)
-      - unless parking_notification_present
-        / We only want to assign is_repeat if creating a new parking notification
-        - @parking_notification.is_repeat = @parking_notification.likely_repeat?
-        - @parking_notification.set_location_from_organization
-      - @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first
+      %h3.uncap.mt-4.text-center
+        %span.text-warning
+          #{@bike.type} is impounded!
+        - if @bike.current_impound_record.present? && @bike.current_impound_record.organization_id == passive_organization.id
+          = link_to "Impound record ##{@bike.current_impound_record.display_id}", organization_impound_record_path(@bike.current_impound_record.display_id, organization_id: passive_organization.to_param)
 
-      = form_for @parking_notification, url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
-        = f.hidden_field :bike_id
-        = f.hidden_field :latitude, class: "parkingLocation-latitude"
-        = f.hidden_field :longitude, class: "parkingLocation-longitude"
-        = f.hidden_field :accuracy, class: "parkingLocation-accuracy"
-        .mt-4.text-center
-          - if @parking_notification.can_be_repeat?
-            .btn-group{ role: "group", "aria-label" => "Repeat notice", data: { toggle: "buttons" } }
-              %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "" : "active") }
-                = f.radio_button :is_repeat, false
-                First notice
-              %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
-                = f.radio_button :is_repeat, true
-                -# We have to add 1 on the repeat because this hasn't been created yet
-                Repeat ##{@parking_notification.earlier_bike_notifications.count} of earlier notification
+    - else
+      - parking_notification_open = params[:parking_notification].present?
 
-        .row.mt-4
-          .col-md-6
-            .form-group
-              = f.label :message, "Optional message to send to user"
-              = f.text_area :message, placeholder: "Optional", class: 'form-control'
-          .col-md-6
-            .form-group
-              %p{ style: "margin-bottom: 0;" } Notification because
-              - passive_organization.parking_notification_kinds.each do |kind|
-                %label.radio-inline.mr-2
-                  = f.radio_button :kind, kind
-                  = ParkingNotification.kinds_humanized[kind.to_sym]
+      .text-center#openNewParkingNotification.collapse{ class: (parking_notification_open ? "" : "in") }
+        %a.btn.btn-primary.btn-lg{ href: "#newParkingNotificationFields" }
+          New parking notification
 
-        .form-group.text-center.mt-4
-          = submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true
+      #newParkingNotificationFields.collapse{ class: (parking_notification_open ? "in" : "")  }
+        %hr
+        - parking_notification_present = @parking_notification.present?
+        - @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: passive_organization, use_entered_address: false)
+        - unless parking_notification_present
+          / We only want to assign is_repeat if creating a new parking notification
+          - @parking_notification.is_repeat = @parking_notification.likely_repeat?
+          - @parking_notification.set_location_from_organization
+        - @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first
 
-        .row.mt-4
-          .col-md-6#choseLocationMethod
-            %span.less-strong.waitingOnLocationText.hideOnLocationFind.collapse.in
-              = t(".waiting_on_device_location")
-            .use-entered-address-radios.showOnLocationFind.collapse.mb-2
-              .radio
-                %label
-                  = f.radio_button :use_entered_address, false
-                  Use current location
-              .radio
-                %label
-                  = f.radio_button :use_entered_address, true
-                  Enter address manually
+        = form_for @parking_notification, url: organization_parking_notifications_path(organization_id: passive_organization) do |f|
+          = f.hidden_field :bike_id
+          = f.hidden_field :latitude, class: "parkingLocation-latitude"
+          = f.hidden_field :longitude, class: "parkingLocation-longitude"
+          = f.hidden_field :accuracy, class: "parkingLocation-accuracy"
+          .mt-4.text-center
+            - if @parking_notification.can_be_repeat?
+              .btn-group{ role: "group", "aria-label" => "Repeat notice", data: { toggle: "buttons" } }
+                %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "" : "active") }
+                  = f.radio_button :is_repeat, false
+                  First notice
+                %label.btn.btn-secondary{ class: (@parking_notification.is_repeat ? "active" : ""), disabled: !@parking_notification.can_be_repeat? }
+                  = f.radio_button :is_repeat, true
+                  -# We have to add 1 on the repeat because this hasn't been created yet
+                  Repeat ##{@parking_notification.earlier_bike_notifications.count} of earlier notification
 
-            .form-group.address-group.related-fields.collapse
-              .ifManualRequired
-                = f.text_field :street, placeholder: t(".address_or_intersection"), class: "form-control"
+          .row.mt-4
+            .col-md-6
+              .form-group
+                = f.label :message, "Optional message to send to user"
+                = f.text_area :message, placeholder: "Optional", class: 'form-control'
+            .col-md-6
+              .form-group
+                %p{ style: "margin-bottom: 0;" } Notification because
+                - ParkingNotification.kinds.each do |kind|
+                  %label.radio-inline.mr-2
+                    = f.radio_button :kind, kind
+                    = ParkingNotification.kinds_humanized[kind.to_sym]
 
-              .ifManualRequired
-                = f.text_field :city, placeholder: t(".city"), class: "form-control"
+          .form-group.text-center.mt-4
+            = submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true
 
-              .row.countrystatezip
-                .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.hidden-other{ class: (@parking_notification.country_id == Country.united_states.id ? "unhidden" : "") }
-                  = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
-                .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.ifManualRequired#us_id_data{ data: { usid: Country.united_states.id } }
-                  = f.select(:country_id, Country.select_options,
-                    { prompt: t(".choose_country") },
-                    { class: 'country-select-input form-control' } )
-                .col-sm-4
-                  = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
-          .col-md-6
-            .form-group.less-strong
-              = f.label :internal_notes, t(".parking_notification_notes_html", org_name: passive_organization.short_name)
-              = f.text_area :internal_notes, class: "form-control"
+          .row.mt-4
+            .col-md-6#choseLocationMethod
+              %span.less-strong.waitingOnLocationText.hideOnLocationFind.collapse.in
+                = t(".waiting_on_device_location")
+              .use-entered-address-radios.showOnLocationFind.collapse.mb-2
+                .radio
+                  %label
+                    = f.radio_button :use_entered_address, false
+                    Use current location
+                .radio
+                  %label
+                    = f.radio_button :use_entered_address, true
+                    Enter address manually
+
+              .form-group.address-group.related-fields.collapse
+                .ifManualRequired
+                  = f.text_field :street, placeholder: t(".address_or_intersection"), class: "form-control"
+
+                .ifManualRequired
+                  = f.text_field :city, placeholder: t(".city"), class: "form-control"
+
+                .row.countrystatezip
+                  .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.hidden-other{ class: (@parking_notification.country_id == Country.united_states.id ? "unhidden" : "") }
+                    = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+                  .col-sm-4
+                    = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
+                  .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.ifManualRequired#us_id_data{ data: { usid: Country.united_states.id } }
+                    = f.select(:country_id, Country.select_options,
+                      { prompt: t(".choose_country") },
+                      { class: 'country-select-input form-control' } )
+            .col-md-6
+              .form-group.less-strong
+                = f.label :internal_notes, t(".parking_notification_notes_html", org_name: passive_organization.short_name)
+                = f.text_area :internal_notes, class: "form-control"
 
 
 - if show_sticker_modal

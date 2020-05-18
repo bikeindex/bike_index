@@ -4,9 +4,10 @@ RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
 
   describe "after_save hooks" do
+    let(:bike) { FactoryBot.create(:bike, stolen: true) }
     context "if bike no longer exists" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image)
         expect(stolen_record.alert_image).to be_present
 
         stolen_record.update_attribute(:bike, nil)
@@ -17,25 +18,30 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "if being marked as recovered" do
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
-        bike = FactoryBot.create(:bike, stolen: true)
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+        stolen_record.reload
         expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.bike.stolen).to eq(true)
+        expect(stolen_record.bike.stolen).to be_truthy
+        expect(bike.current_stolen_record_id).to eq stolen_record.id
 
         stolen_record.add_recovery_information
-        stolen_record.save
         stolen_record.reload
+        bike.reload
 
-        expect(stolen_record.bike.stolen).to eq(false)
+        expect(bike.stolen).to be_falsey
+        expect(bike.current_stolen_record_id).to be_blank
+
+        expect(stolen_record.recovered?).to be_truthy
+        expect(stolen_record.bike.stolen).to be_falsey
         expect(stolen_record.alert_image).to be_blank
       end
     end
 
     context "if not being marked as recovered" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "does not removes alert_image" do
-        bike = FactoryBot.create(:bike, stolen: true)
-        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+
         expect(stolen_record.alert_image).to be_present
 
         stolen_record.run_callbacks(:commit)
@@ -67,6 +73,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(result).to be_an_instance_of(AlertImage)
         expect(stolen_record.alert_image).to eq(result)
         expect(AlertImage.count).to eq(1)
+        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
       end
     end
 
@@ -103,10 +112,11 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  it "marks current true by default, display_checklist? false" do
+  it "has some defaults" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
     expect(stolen_record.display_checklist?).to be_falsey
+    expect(stolen_record.theft_alert_missing_photo?).to be_falsey
   end
 
   describe "find_or_create_recovery_link_token" do
@@ -178,6 +188,7 @@ RSpec.describe StolenRecord, type: :model do
                                        zipcode: "60647",
                                        country_id: country.id)
       expect(stolen_record.address).to eq("60647, NEVVVV")
+      expect(stolen_record.without_location?).to be_falsey
       stolen_record.show_address = true
       expect(stolen_record.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
@@ -446,20 +457,10 @@ RSpec.describe StolenRecord, type: :model do
   end
 
   describe "#add_recovery_information" do
-    context "given a bike save success" do
-      it "returns true" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record.bike).to receive(:save).and_return(true)
-        expect(stolen_record.add_recovery_information).to eq(true)
-      end
-    end
-
-    context "given a bike save failure" do
-      it "returns false" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record.bike).to receive(:save).and_return(false)
-        expect(stolen_record.add_recovery_information).to eq(false)
-      end
+    it "returns true" do
+      stolen_record = FactoryBot.create(:stolen_record)
+      allow(stolen_record.bike).to receive(:save).and_return(true)
+      expect(stolen_record.add_recovery_information).to eq(true)
     end
   end
 
@@ -508,6 +509,8 @@ RSpec.describe StolenRecord, type: :model do
       it "returns all available location components" do
         stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
         expect(stolen_record.address_location(include_all: true)).to eq("New York, NY - US")
+        stolen_record.street = ""
+        expect(stolen_record.without_location?).to be_truthy
 
         ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
         stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
@@ -550,28 +553,6 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.address_location).to eq(nil)
       end
     end
-  end
-
-  describe "#should_be_geocoded?" do
-    context "given the skip geocoding flag" do
-      it "returns false" do
-        stolen_record = FactoryBot.build(:stolen_record, skip_geocoding: true)
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-        expect(stolen_record).to_not be_geocoded
-      end
-    end
-
-    context "given a missing address" do
-      it "returns false and prevents geocoding" do
-        stolen_record = FactoryBot.build(
-          :stolen_record,
-          country: nil,
-          skip_geocoding: false,
-        )
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-        expect(stolen_record).to_not be_geocoded
-      end
-    end
 
     context "given an address change" do
       it "returns false unless there has been an address change" do
@@ -594,6 +575,8 @@ RSpec.describe StolenRecord, type: :model do
       it "sends an admin notification" do
         stolen_record = FactoryBot.create(:stolen_record)
         FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        stolen_record.reload
+        expect(stolen_record.theft_alert_missing_photo?).to be_truthy
 
         Sidekiq::Testing.inline! do
           expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)

@@ -2,6 +2,7 @@ module Api
   module V1
     class OrganizationsController < ApiV1Controller
       before_action :verify_organizations_token, only: [:show]
+      skip_before_action :verify_authenticity_token
 
       def show
         info = { name: @organization.name, can_add_bikes: false, id: @organization.id }
@@ -15,7 +16,11 @@ module Api
           redirect_to api_v1_not_found_url and return
         elsif params[:access_token] == @organization.access_token
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
-            @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
+            if params[:manual_pos_kind] == "no_pos"
+              @organization.update_attributes(manual_pos_kind: nil)
+            else
+              @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
+            end
             UpdateOrganizationPosKindWorker.perform_async(@organization.id)
             render json: { manual_pos_kind: @organization.manual_pos_kind }
           else

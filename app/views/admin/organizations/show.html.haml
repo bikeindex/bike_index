@@ -9,7 +9,7 @@
       %li.nav-item
         = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
       - if current_user.developer?
-        %li.nav-item
+        %li.nav-item.only-dev-visible
           = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
 
 - if @organization.is_suspended
@@ -27,7 +27,7 @@
           %td
             ID
           %td
-            %spand.less-strong
+            %spand.less-strong.only-dev-visible
               = @organization.id
       %tr
         %td
@@ -96,6 +96,18 @@
           Auto user email
         %td
           = @organization.auto_user.email if @organization.auto_user.present?
+      - if current_user.developer?
+        %tr
+          %td
+            API V1 token
+          %td
+            %pre.only-dev-visible#stupidLegacyToken{ style: "overflow-x: scroll;" }
+              %code.small
+                = @organization.access_token
+            :scss
+              @media (max-width: 1000px) {
+                #stupidLegacyToken { max-width: 250px; }
+              }
       %tr
         %td
           Users
@@ -195,7 +207,7 @@
 
             - if current_user.developer? && @organization.manual_pos_kind.present?
               %br
-              %small
+              %small.only-dev-visible
                 %em.less-strong manual POS kind set:
                 = @organization.manual_pos_kind
 .row.mt-4
@@ -326,7 +338,7 @@
       .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
-            - if !location.shown && @organization.allowed_show
+            - if !location.shown && @organization.allowed_show?
               %h2
                 Location is not visible! Try updating the organization
             %p

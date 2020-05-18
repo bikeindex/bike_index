@@ -3,8 +3,13 @@
 - skip_repeat ||= false
 - render_address ||= false
 - skip_multiselect ||= false
+- hide_status ||= false
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+- # TODO: add translations
+:css
+  #recordsTable.hide-status .status-cell { display: none; }
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable{ class: hide_status ? "hide-status" : "" }
   %thead.small-header.hidden-md-down
     - unless skip_map_cell
       %th.map-cell
@@ -15,11 +20,12 @@
       %th=t(".bike")
     - if render_address
       %th=t(".address")
-    %th=t(".kind")
+    %th Kind
     %th=t(".by")
     - unless skip_repeat
       %th
         %small=t(".notification_number")
+    %th.status-cell Status
     %th
       %small=t(".impounded")
     %th
@@ -44,8 +50,9 @@
                 Notification ##{parking_notification.repeat_number}
           - unless skip_bike
             %span.extended-col-info.d-block
-              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike)
-
+              = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike, organization_id: current_organization.id)
+          %em.small.extended-col-info.d-block.status-cell
+            #{status_display(parking_notification.status)} status
           - if parking_notification.resolved_at.present?
             %strong.small.extended-col-info.d-block
               Impounded:
@@ -68,11 +75,13 @@
           %em
             = parking_notification.kind_humanized
         %td.hidden-sm-cells
-          = parking_notification.user&.display_name
+          = parking_notification.user&.display_name&.truncate(20)
         - unless skip_repeat
           %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?
               = parking_notification.notification_number
+        %td.hidden-sm-cells.status-cell
+          = status_display(parking_notification.status)
         %td.hidden-sm-cells
           - if parking_notification.resolved_at.present?
             %span.convertTime.preciseTime

@@ -107,12 +107,6 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "scopes" do
-    it "Shown on map is shown on map *and* validated" do
-      expect(Organization.shown_on_map.to_sql).to eq(Organization.where(show_on_map: true).where(approved: true).order(:name).to_sql)
-    end
-  end
-
   describe "admin text search" do
     context "by name" do
       let!(:organization) { FactoryBot.create(:organization, name: "University of Maryland") }
@@ -152,7 +146,7 @@ RSpec.describe Organization, type: :model do
       it "finds the organizations" do
         organization1.reload
         organization2.reload
-        expect(Organization.with_enabled_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
+        expect(Organization.with_enabled_feature_slugs(" ")).to be_blank # If we don't have a matching slug, return nil - otherwise it's confusing
         expect(Organization.with_enabled_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.with_enabled_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
         expect(Organization.with_enabled_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
@@ -212,9 +206,20 @@ RSpec.describe Organization, type: :model do
       expect(Organization.new.map_focus_coordinates).to eq(latitude: 37.7870322, longitude: -122.4061122)
     end
     context "organization with a location" do
-      let(:location) { FactoryBot.create(:location) }
-      let!(:organization) { location.organization }
-      it "is the locations coordinates" do
+      let(:organization) { FactoryBot.create(:organization, approved: true, show_on_map: true) }
+      let!(:location) { FactoryBot.create(:location, organization: organization) }
+      let!(:location2) { FactoryBot.create(:location, organization: organization, latitude: 12, longitude: -111, skip_geocoding: true) }
+      it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
+        expect(organization.default_location).to eq location
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        location.update_attributes(publicly_visible: false, skip_update: false)
+        organization.reload
+        expect(organization.default_location.id).to eq location2.id
+        expect(organization.map_focus_coordinates).to eq(latitude: 12, longitude: -111)
+        location2.update_attributes(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
+        organization.reload
+        # Now get the first location
+        expect(organization.default_location).to eq location
         expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
       end
     end
@@ -272,7 +277,8 @@ RSpec.describe Organization, type: :model do
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
-      it "sets on the regional organization" do
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
+      it "sets on the regional organization, applies to bieks" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
         expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
@@ -282,6 +288,11 @@ RSpec.describe Organization, type: :model do
         regional_child.reload
         # It's private, so, gotta send
         expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(["bike_stickers"])
+        regional_child.update(updated_at: Time.current)
+        expect(regional_child.enabled_feature_slugs).to eq(["bike_stickers"])
+        bike.reload
+        expect(bike.organizations).to eq([regional_child])
+        expect(bike.sticker_organizations).to eq([regional_child])
       end
     end
   end
@@ -385,7 +396,7 @@ RSpec.describe Organization, type: :model do
       let(:location) { Location.create(country_id: country.id, city: "Chicago", name: "stuff", organization_id: organization.id, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
-          expect(organization.allowed_show).to be_truthy
+          expect(organization.allowed_show?).to be_truthy
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_truthy
         end
@@ -394,7 +405,7 @@ RSpec.describe Organization, type: :model do
         it "sets not shown" do
           organization.update_attribute :approved, false
           organization.reload
-          expect(organization.allowed_show).to be_falsey
+          expect(organization.allowed_show?).to be_falsey
           organization.set_calculated_attributes
           expect(location.reload.shown).to be_falsey
         end
@@ -472,19 +483,19 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "display_avatar" do
+  describe "display_avatar?" do
     context "unpaid" do
       it "does not display" do
         organization = Organization.new(is_paid: false)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_falsey
+        expect(organization.display_avatar?).to be_falsey
       end
     end
     context "paid" do
       it "displays" do
         organization = Organization.new(is_paid: true)
         allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar).to be_truthy
+        expect(organization.display_avatar?).to be_truthy
       end
     end
   end
@@ -515,66 +526,6 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "calculated_pos_kind" do
-    context "organization with pos bike and non pos bike" do
-      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
-      let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
-      it "returns pos type" do
-        organization.reload
-        expect(organization.pos_kind).to eq "no_pos"
-        expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.pos_kind).to eq "lightspeed_pos"
-        # And if bike is created before cut-of for pos kind, it returns broken
-        bike_pos.update_attribute :created_at, Time.current - 2.weeks
-        expect(organization.calculated_pos_kind).to eq "broken_pos"
-      end
-    end
-    context "ascend_name" do
-      let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
-      it "returns ascend_pos" do
-        expect(organization.calculated_pos_kind).to eq "ascend_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind?).to be_blank
-        expect(organization.pos_kind).to eq "ascend_pos"
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-    context "manual_pos_kind" do
-      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
-      it "overrides everything" do
-        expect(organization.manual_lightspeed_pos?).to be_truthy
-        expect(organization.pos_kind).to eq "no_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind).to eq "lightspeed_pos"
-        expect(organization.pos_kind).to eq "lightspeed_pos"
-        organization.update_attribute :manual_pos_kind, "broken_pos"
-
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        organization.reload
-        expect(organization.manual_pos_kind).to eq "broken_pos"
-        expect(organization.pos_kind).to eq "broken_pos"
-      end
-    end
-    context "recent bikes" do
-      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
-      it "no_pos, does_not_need_pos if older organization" do
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
-        3.times { FactoryBot.create(:bike_organized, organization: organization) }
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
-        organization.update_attribute :created_at, Time.current - 2.weeks
-        organization.reload
-        expect(organization.calculated_pos_kind).to eq "does_not_need_pos"
-      end
-    end
-  end
-
   describe "bike_shop_display_integration_alert?" do
     let(:organization) { Organization.new(kind: "law_enforcement", pos_kind: "no_pos") }
     it "is falsey for non-shops" do
@@ -599,7 +550,7 @@ RSpec.describe Organization, type: :model do
         end
       end
       context "broken_pos" do
-        let(:pos_kind) { "broken_pos" }
+        let(:pos_kind) { "broken_lightspeed_pos" }
         it "is true" do
           expect(organization.bike_shop_display_integration_alert?).to be_truthy
         end

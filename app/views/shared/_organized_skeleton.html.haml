@@ -3,7 +3,7 @@
 %nav.organized-left-menu
   .organized-menu-wrapper
     %header{ class: show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" }
-      - if current_organization.display_avatar
+      - if current_organization.display_avatar?
         = image_tag current_organization.avatar.url(:medium)
       %h3
         = t(".admin_panel")
@@ -31,7 +31,7 @@
           = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{on_bikes_path ? 'active' : ''}"
         - if current_organization.enabled?("impound_bikes")
           %li
-            = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: current_organization.to_param), class: "menu-item secondary-item"
+            = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item secondary-item"
         %li
           - if current_organization.enabled?("show_partial_registrations")
             = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(current_organization.to_param), class: "menu-item secondary-item"
@@ -80,6 +80,9 @@
             = active_link t(".organization_profile", org_name: current_organization.short_name), organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
           %li
             = active_link t(".organization_locations", org_name: current_organization.short_name), locations_organization_manage_path(organization_id: current_organization.to_param), class: "menu-item"
+          - if current_organization.enabled?("customize_emails")
+            %li
+              = active_link t(".customize_emails"), organization_emails_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
 
 .organized-wrap
   %div{ class: organized_container }

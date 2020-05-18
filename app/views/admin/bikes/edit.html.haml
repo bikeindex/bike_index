@@ -16,10 +16,10 @@
   .col-12
     %h1
       Edit Bike
-      - if @bike.deleted?.present?
+      - if @bike.deleted?
         %span.text-danger
           Deleted at:
-          %span.convertTime
+          %span.convertTime.preciseTime
             = l @bike.deleted_at, format: :convert_time
 
 

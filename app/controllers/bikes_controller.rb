@@ -117,11 +117,8 @@ class BikesController < ApplicationController
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
-      if params[:bike][:image].present?
-        @b_param.image = params[:bike][:image]
-        @b_param.image_processed = false # Don't need to save because update below
-        ImageAssociatorWorker.perform_in(1.minutes)
-        params[:bike].delete(:image)
+      if params[:bike][:image].present? # Have to do in the controller, before assigning
+        @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
       end
       @b_param.update_attributes(params: permitted_bparams,
                                  origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
@@ -169,6 +166,7 @@ class BikesController < ApplicationController
       redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
 
+    @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)
     case @edit_template
     when "photos"
       @private_images =
@@ -181,7 +179,7 @@ class BikesController < ApplicationController
       unless @bike&.current_stolen_record.present?
         redirect_to edit_bike_url(@bike, page: @edit_template) and return
       end
-
+      @skip_general_alert = true
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
       @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 

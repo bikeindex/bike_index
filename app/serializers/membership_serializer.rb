@@ -24,7 +24,7 @@ class MembershipSerializer < ApplicationSerializer
   end
 
   def is_admin
-    true if object.role == "admin"
+    object.role == "admin"
   end
 
   def base_url
@@ -32,14 +32,12 @@ class MembershipSerializer < ApplicationSerializer
   end
 
   def locations
-    l = []
     if object.organization.locations && object.organization.locations.length > 1
-      object.organization.locations.each do |location|
-        l.push({ name: location.name, id: location.id })
+      object.organization.locations.map do |location|
+        { name: location.name, id: location.id }
       end
     else
-      l.push({ name: organization_name, id: nil })
+      [{ name: organization_name, id: nil }]
     end
-    return l
   end
 end

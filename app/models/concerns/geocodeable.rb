@@ -5,7 +5,11 @@ module Geocodeable
 
   included do
     geocoded_by :address
+    before_validation :clean_state_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
+
+    scope :without_location, -> { where(latitude: nil) }
+    scope :with_location, -> { where.not(latitude: nil) }
 
     # Skip geocoding if this flag is truthy
     attr_accessor :skip_geocoding
@@ -62,6 +66,10 @@ module Geocodeable
 
   def address(**kwargs); Geocodeable.address(self, **kwargs) end
 
+  def without_location?; latitude.blank? end
+
+  def with_location?; !without_location? end
+
   # Should the receiving object be geocoded?
   #
   # By default:
@@ -82,11 +90,15 @@ module Geocodeable
 
   def address_present?; [street, city, zipcode].any?(&:present?) end
 
-  def bike_index_geocode
+  # Separate from bike_index_geocode because some models handle geocoding independently
+  def clean_state_data
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
     end
+  end
+
+  def bike_index_geocode
     # Only geocode if there is specific location information
     if address_present?
       self.attributes = Geohelper.coordinates_for(address) || {}

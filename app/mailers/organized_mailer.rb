@@ -27,7 +27,7 @@ class OrganizedMailer < ApplicationMailer
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
       registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id),
     }
-    @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
+    @organization = @ownership.organization
     @vars[:donation_message] = @bike.stolen? && !(@organization && !@organization.is_paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
 

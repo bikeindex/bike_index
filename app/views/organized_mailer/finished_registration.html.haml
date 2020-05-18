@@ -49,7 +49,7 @@
     - else
       = t(".html.hopefully_you_find_the_bike_html", biketype: @bike.type )
       %strong
-        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token))
+        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token))
         = t(".html.mark_recovered_link_html", mark_recovered_link: mark_recovered_link)
 
 - if @vars[:donation_message]

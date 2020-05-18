@@ -5,6 +5,7 @@ class AfterUserCreateWorker < ApplicationWorker
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
   def perform(user_id, job_stage, user: nil, email: nil)
     user ||= User.find(user_id)
+    user.skip_update = true
     email ||= user.email
     if job_stage == "new"
       perform_create_jobs(user, email)

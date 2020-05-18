@@ -5,7 +5,7 @@
   .col-md-7
     %ul
       %li.nav-item
-        - if @verified_only
+        - if @unapproved_only
           = link_to "All stolen (not just unverified)", admin_stolen_bikes_url(unapproved: true), class: "nav-link"
         - else
           = link_to "Only unverified bikes", admin_stolen_bikes_url, class: "nav-link"
@@ -27,7 +27,7 @@
     = column_chart time_range_counts(collection: available_stolen_records, column: chart_column), stacked: true, thousands: ",", defer: true
 
 -# Show traditional counts unless viewing the default (only unapproved) scoped view
-- if !@verified_only || @render_chart
+- if !@unapproved_only || @render_chart
   = render partial: "/shared/period_select"
   %p.mt-4
     %strong
@@ -41,11 +41,28 @@
     Stolen Bikes indexed,
     %em
       (#{number_with_delimiter(Bike.where(stolen: true).where("created_at >= ?", Time.current.beginning_of_day).count)} today)
+  .row.mb-4.mt-4
+    - if @only_with_location
+      .col-5
+        %strong
+          = number_with_delimiter(available_stolen_records.count) # use the available_stolen_records count because of special scoping
+          are unapproved
+      .col-7.text-right
+        %small.less-strong
+          .d-none.d-lg-inline-block
+            there are
+          = number_with_delimiter(@unapproved_without_location_count) # use the available_stolen_records count because of special scoping
+          .d-none.d-lg-inline-block
+            unapproved records
+          = link_to "without location", admin_stolen_bikes_path(without_location: true)
+    - else
+      .col
+        %strong
+          = number_with_delimiter(available_stolen_records.count) # use the available_stolen_records count because of special scoping
+          are unapproved
+        %em.less-strong
+          including records without location
 
-  %p.mb-4
-    %strong
-      = number_with_delimiter(available_stolen_records.count) # use the available_stolen_records count because of special scoping
-      are unapproved
 
 = paginate @stolen_records, views_prefix: "admin"
 .full-screen-table

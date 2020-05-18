@@ -1,0 +1,33 @@
+-# TODO: add translations
+
+.organized-page-header
+  %h1
+    Customize Emails
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+  %thead.small-header.hidden-md-down
+    %th Kind
+    %th Enabled?
+    %th Created
+    %th Last updated
+    %th Body
+  %tbody
+    - MailSnippet.organization_message_kinds.each do |kind|
+      - mail_snippet = current_organization.mail_snippets.where(kind: kind).first
+      %tr
+        %td
+          = link_to kind.humanize, edit_organization_email_path(kind, organization_id: current_organization.to_param)
+        %td
+          = check_mark if mail_snippet.present? && mail_snippet.is_enabled
+        %td
+          - if mail_snippet.present?
+            %span.convertTime
+              = l(mail_snippet.created_at, format: :convert_time)
+        %td
+          - if mail_snippet.present?
+            %span.convertTime
+              = l(mail_snippet.updated_at, format: :convert_time)
+        %td
+          - if mail_snippet.present?
+            %small
+              = truncate(mail_snippet.body, length: 100)
