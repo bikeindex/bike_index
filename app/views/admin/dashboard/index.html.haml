@@ -21,8 +21,7 @@
       = number_with_delimiter(Bike.count)
       bikes total
       %em
-
-        (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
+        (#{number_with_delimiter(yesterday)} yesterday, #{number_with_delimiter(today)} today)
 
 = column_chart bikes, stacked: true, thousands: ",", defer: true
 
@@ -40,7 +39,7 @@
       - today = User.where("created_at >= ?", Time.current.beginning_of_day).count
       - yesterday = (User.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
       %em
-        (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
+        (#{number_with_delimiter(yesterday)} yesterday, #{number_with_delimiter(today)} today)
 
 %hr
 
@@ -56,4 +55,4 @@
       - today = Organization.where("created_at >= ?", Time.current.beginning_of_day).count
       - yesterday = (Organization.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
       %em
-        (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
+        (#{number_with_delimiter(yesterday)} yesterday, #{number_with_delimiter(today)} today)
