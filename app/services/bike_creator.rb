@@ -87,6 +87,8 @@ class BikeCreator
     bike.errors.messages.each do |message|
       @bike.errors.add(message[0], message[1][0])
     end
+    bike.ownerships.destroy_all
+    bike.creation_states.destroy_all
     bike.destroy
     @bike
   end

@@ -1240,6 +1240,13 @@ en:
       added_to_track_parking_notification: >-
         This %{bike_type} is not registered to a user. It was added to track parking
         notifications.
+      additional_registrations_information: Registrations by user
+      additional_registrations_information_visible_because: visible with %{org_name}
+        law enforcement access
+      additional_registrations_potential_duplicates: 'Potential duplicate bikes matching
+        serial segments:'
+      additional_registrations_registered_at: Registered at
+      additional_registrations_this_bike: This %{bike_type}
       address: Registration Address
       address_or_intersection: Address or intersection
       as_a_bikeindex_ambassador_html: >-

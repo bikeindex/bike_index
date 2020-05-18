@@ -133,8 +133,8 @@ RSpec.describe BikeCreator do
       let(:existing_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: email) }
       let(:new_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: new_email) }
       let!(:ownerships) do
-        FactoryBot.create(:ownership, bike: existing_bike, owner_email: email)
-        FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)
+        [FactoryBot.create(:ownership, bike: existing_bike, owner_email: email),
+         FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)]
       end
       let(:params) do
         {

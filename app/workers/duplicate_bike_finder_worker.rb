@@ -6,9 +6,8 @@ class DuplicateBikeFinderWorker < ApplicationWorker
     return true unless bike.present?
     serial_segments = bike.normalized_serial_segments
 
-    serial_segments.each do |serial_segment|
-      existing_duplicate = DuplicateBikeGroup.includes(:normalized_serial_segments).
-        where(normalized_serial_segments: { segment: serial_segment.segment }).first
+    serial_segments.considered_for_duplicate.each do |serial_segment|
+      existing_duplicate = DuplicateBikeGroup.matching_segment(serial_segment.segment)
       if existing_duplicate.present?
         serial_segment.update_attribute :duplicate_bike_group_id, existing_duplicate.id
         existing_duplicate.update_attribute :added_bike_at, Time.current

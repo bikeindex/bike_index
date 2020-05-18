@@ -194,6 +194,54 @@
                 = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
                 = t(".email_to_deal_with_this_html", support_link: support_link)
 
+      / Additional law enforcement information
+      - if passive_organization.enabled?("additional_registrations_information")
+        .row.law-enforcement-wrapper.mt-4
+          .col-xs-12.mt-2
+            %p.mt-2.mb-2
+              = t(".additional_registrations_information")
+              %em.less-strong.hidden-md-down
+                = t(".additional_registrations_information_visible_because", org_name: passive_organization.short_name)
+
+            %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+              %tbody
+                %thead
+                  %th
+                    = t(".additional_registrations_registered_at")
+                  %th
+
+                -# If user isn't present, use email to search
+                - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
+                - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
+                  %tr
+                    %td
+                      %span.convertTime
+                        = l other_bike.created_at, format: :convert_time
+                    %td
+                      - if other_bike.id == @bike.id
+                        %em.less-strong= t(".additional_registrations_this_bike", bike_type: @bike.type)
+                      - else
+                        = link_to organized_bike_text(other_bike), bike_path(other_bike)
+
+        - duplicate_bikes = @bike.duplicate_bikes.where.not(id: @bike.id)
+        - if duplicate_bikes.any?
+          %p.mt-2.mb-2
+            = t(".additional_registrations_potential_duplicates")
+            - @bike.normalized_serial_segments.considered_for_duplicate.each do |normalized_segment|
+              %code= normalized_segment.segment
+          %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+            %tbody
+              - duplicate_bikes.reorder(created_at: :desc).limit(25).each do |duplicate_bike|
+                %tr
+                  %td
+                    %span.convertTime
+                      = l duplicate_bike.created_at, format: :convert_time
+                  %td
+                    = link_to  organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
+                    %small.less-strong
+                      = duplicate_bike.normalized_serial_segments.considered_for_duplicate.pluck(:segment).join(", ")
+
+
 - # TODO: add translations
 - if passive_organization.enabled?("parking_notifications")
   - parking_notifications = passive_organization.parking_notifications.where(bike_id: @bike.id).order(id: :desc)
@@ -301,7 +349,6 @@
               .form-group.less-strong
                 = f.label :internal_notes, t(".parking_notification_notes_html", org_name: passive_organization.short_name)
                 = f.text_area :internal_notes, class: "form-control"
-
 
 - if show_sticker_modal
   - sticker_modal_body = capture_haml do
