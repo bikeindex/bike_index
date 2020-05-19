@@ -22,6 +22,16 @@ RSpec.describe ExchangeRate, type: :model do
       expect(rate).to be_valid
     end
 
+    it "ensures currencies are ISO-formatted, case-insensitively" do
+      rate = FactoryBot.build(:exchange_rate, from: "us", to: "eu")
+      expect(rate).to be_invalid
+
+      rate.from = "usd"
+      rate.to = "eur"
+
+      expect(rate).to be_valid
+    end
+
     it "ensures currencies are pairwise unique" do
       rate0 = FactoryBot.create(:exchange_rate)
       rate1 = FactoryBot.build(:exchange_rate, from: rate0.from, to: rate0.to)
@@ -29,6 +39,18 @@ RSpec.describe ExchangeRate, type: :model do
 
       rate1.to = rate1.to.reverse
       expect(rate1).to be_valid
+    end
+
+    it "prevents deleting a rate required for i18n" do
+      allow(ExchangeRate).to receive(:required_targets).and_return(["USD", "EUR"])
+
+      rate1 = FactoryBot.create(:exchange_rate_to_eur)
+      expect(rate1.to).to be_in(ExchangeRate.required_targets)
+      expect { rate1.destroy }.to_not(change { ExchangeRate.count })
+
+      rate2 = FactoryBot.create(:exchange_rate, to: "CAD")
+      expect(rate2.to).to_not be_in(ExchangeRate.required_targets)
+      expect { rate2.destroy }.to(change { ExchangeRate.count }.by(-1))
     end
   end
 

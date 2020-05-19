@@ -1,0 +1,14 @@
+.container
+  %h1 Edit Exchange Rate
+  .text-right
+    = link_to "Delete exchange rate",
+    admin_exchange_rate_path(@exchange_rate),
+    method: :delete,
+    data: { confirm: "Are you sure you want to delete this? This can't be undone" },
+    class: "text-warning"
+
+  = render "form",
+    exchange_rate: @exchange_rate,
+    action: admin_ambassador_task_path(@exchange_rate),
+    method: :put,
+    submit_label: "Save"

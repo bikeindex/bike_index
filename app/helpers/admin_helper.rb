@@ -46,6 +46,7 @@ module AdminHelper
       { title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false },
       { title: "Feature Flags", path: admin_feature_flags_path, match_controller: false },
       { title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false },
+      { title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: false },
       { title: "Exit Admin", path: root_path, match_controller: false },
     ] + dev_nav_select_links
   end

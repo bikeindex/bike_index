@@ -13,7 +13,7 @@ module MoneyHelper
 
   # Return a list of currency abbreviations (USD, EUR) for all available locales.
   def available_currencies
-    I18n.available_locales.map { |locale| t(locale, scope: [:money, :currencies]) }
+    ExchangeRate.required_targets
   end
 
   # Return a list of currency symbols and abbreviations for all available locales:
