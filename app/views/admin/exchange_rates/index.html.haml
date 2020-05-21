@@ -1,0 +1,41 @@
+.admin-subnav
+  .col-md-4
+    %h1 Exchange Rates
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "New Exchange Rate", new_admin_exchange_rate_path
+
+.row
+  .col-md-6
+    - if filter_params.any?
+      %p
+        = pluralize number_with_delimiter(@exchange_rates.count),
+        "matching exchange rate"
+        %em= link_to "view all", admin_exchange_rates_path
+  .col-md-6
+    = form_tag admin_exchange_rates_path, method: :get,
+      class: "form-inline admin-filter-menu" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      .form-group.ml-2
+        = select_tag :search_to,
+          options_for_select(ExchangeRate.pluck(:to).uniq),
+          prompt: "Filter by target currency",
+          class: "form-control"
+      = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th= sortable "from", "Source currency"
+      %th= sortable "to", "Target currency"
+      %th= sortable "rate"
+      %th= sortable "updated_at"
+    %tbody
+      - @exchange_rates.each do |xrate|
+        %tr
+          %td= xrate.from
+          %td= xrate.to
+          %td= link_to xrate.rate.truncate(2), edit_admin_exchange_rate_path(xrate)
+          %td.convertTime= l(xrate.updated_at, format: :convert_time)

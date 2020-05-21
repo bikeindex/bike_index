@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   around_action :set_locale
+  rescue_from Money::Bank::UnknownRate, with: :localization_failure
 
   ensure_security_headers(csp: false,
                           hsts: "max-age=#{20.years.to_i}",
@@ -98,5 +99,14 @@ class ApplicationController < ActionController::Base
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
     Time.zone = TimeParser::DEFAULT_TIMEZONE
+  end
+
+  # Handle localization / currency conversion exceptions by redirecting to the
+  # root url with the default locale and a flash message.
+  def localization_failure
+    locale = t(requested_locale, scope: [:locales])
+    flash[:error] = "#{locale} localization is unavailable. Please try again later."
+    params.delete(:locale)
+    redirect_to root_url
   end
 end

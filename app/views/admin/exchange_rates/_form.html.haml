@@ -1,0 +1,22 @@
+= form_for exchange_rate,
+  url: action,
+  method: method,
+  html: { class: "form" } do |f|
+
+  = f.label :from, "From (iso)", class: "form-label"
+  = f.text_field :from,
+    class: "form-control",
+    style: "text-transform: uppercase;",
+    required: true
+
+  = f.label :to, "To (iso)", class: "form-label"
+  = f.text_field :to,
+    class: "form-control",
+    style: "text-transform: uppercase;",
+    required: true
+
+  = f.label :rate, "Rate", class: "form-label"
+  = f.text_field :rate, class: "form-control"
+
+  %br
+  = submit_tag submit_label, class: "btn btn-success btn-lg"

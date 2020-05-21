@@ -262,8 +262,7 @@ class StolenRecord < ApplicationRecord
       index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
       can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery]),
     )
-
-    bike.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
+    Bike.unscoped.find_by_id(bike_id)&.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
     notify_of_promoted_alert_recovery
     true
   end

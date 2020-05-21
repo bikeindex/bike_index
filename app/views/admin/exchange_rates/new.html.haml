@@ -1,0 +1,8 @@
+.container
+  %h1 New Exchange Rate
+
+  = render "form",
+    exchange_rate: @exchange_rate,
+    action: admin_exchange_rates_path,
+    method: :post,
+    submit_label: "Create"

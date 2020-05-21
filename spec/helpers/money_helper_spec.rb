@@ -35,6 +35,10 @@ RSpec.describe MoneyHelper, type: :helper do
   end
 
   describe "#money_usd" do
+    before do
+      FactoryBot.create(:exchange_rate_to_eur)
+    end
+
     context "given a valid target currency" do
       it "returns a Money object converting to the target currency" do
         conversion_rate = Money.default_bank.get_rate(:USD, :EUR)
@@ -47,7 +51,15 @@ RSpec.describe MoneyHelper, type: :helper do
 
     context "given an invalid target currency" do
       it "raises UnknownCurrency" do
-        expect { money_usd(1.00, exchange_to: :ERR) }.to raise_error(Money::Currency::UnknownCurrency)
+        expect { money_usd(1.00, exchange_to: :ERR) }
+          .to(raise_error(Money::Currency::UnknownCurrency))
+      end
+    end
+
+    context "given an unknown exchange rate" do
+      it "raises UnknownRate" do
+        expect { money_usd(1.00, exchange_to: :CAD) }
+          .to(raise_error(Money::Bank::UnknownRate))
       end
     end
 
@@ -62,6 +74,10 @@ RSpec.describe MoneyHelper, type: :helper do
   end
 
   describe "#as_currency" do
+    before do
+      FactoryBot.create(:exchange_rate_to_eur)
+    end
+
     context "given a valid target currency" do
       it "returns a Money object converting to the default currency" do
         expect(as_currency(100, exchange_to: :EUR)).to eq("€88")
@@ -70,7 +86,15 @@ RSpec.describe MoneyHelper, type: :helper do
 
     context "given an invalid target currency" do
       it "raises UnknownCurrency" do
-        expect { as_currency(100, exchange_to: :ERR) }.to raise_error(Money::Currency::UnknownCurrency)
+        expect { as_currency(100, exchange_to: :ERR) }
+          .to(raise_error(Money::Currency::UnknownCurrency))
+      end
+    end
+
+    context "given an unknown exchange rate" do
+      it "raises UnknownRate" do
+        expect { as_currency(1.00, exchange_to: :CAD) }
+          .to(raise_error(Money::Bank::UnknownRate))
       end
     end
 
