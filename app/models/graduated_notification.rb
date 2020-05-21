@@ -1,18 +1,3 @@
-# t.references :primary_graduated_notification, index: true
-
-# t.text :marked_remaining_link_token
-# t.datetime :marked_remaining_at
-
-# t.integer :status, default: 0
-
-# t.references :organization, index: true
-# t.references :bike, index: true
-# t.references :user, index: true
-# t.references :primary_notification, index: true
-# t.string :email
-
-# t.string :delivery_status
-
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = { pending: 0, delivered: 1, marked_remaining: 2 }.freeze
   belongs_to :bike
