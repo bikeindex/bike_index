@@ -57,8 +57,7 @@ FactoryBot.define do
       end
     end
 
-    # before(:create) { |organization| organization.short_name ||= organization.name }
-    factory :organization_with_auto_user do
+    trait :with_auto_user do
       # passing in user DOESN'T ACTUALLY WORK!! TODO: make it work
       transient { user { FactoryBot.create(:user) } }
 
@@ -67,6 +66,9 @@ FactoryBot.define do
         organization.update_attributes(auto_user: evaluator.user)
       end
     end
+
+    factory :organization_with_auto_user, traits: [:with_auto_user]
+
     factory :organization_child do
       parent_organization { FactoryBot.create(:organization) }
     end

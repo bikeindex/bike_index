@@ -127,9 +127,8 @@ RSpec.describe BikesController, type: :controller do
   end
 
   describe "show" do
-    let(:ownership) { FactoryBot.create(:ownership) }
-    let(:user) { ownership.creator }
-    let(:bike) { ownership.bike }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+    let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
     it "shows the bike" do
       get :show, params: { id: bike.id }
@@ -202,31 +201,50 @@ RSpec.describe BikesController, type: :controller do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       before { set_current_user(user) }
       it "renders" do
+        expect(bike.editable_organizations.pluck(:id)).to eq([])
         get :show, params: { id: bike.id }
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
         expect(session[:passive_organization_id]).to eq organization.id
+        expect(assigns(:bike_authorized_by_passive_organization)).to be_falsey
       end
+      # This is mostly legacy - really we don't care about creation organization
+      # Leaving this in just for better test coverage
       context "bike created by organization" do
-        let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+        let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
         it "renders" do
-          get :show, params: { id: ownership.bike_id }
+          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+          get :show, params: { id: bike.id }
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
+          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
         end
       end
       context "bike owned by organization" do
-        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
-        let(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization) }
         it "renders" do
-          get :show, params: { id: ownership.bike_id }
+          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+          get :show, params: { id: bike.id }
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
+          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
+        end
+      end
+      context "bike owned by organization, without can_edit_claimed" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization) }
+        it "renders" do
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          get :show, params: { id: bike.id }
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(flash).to_not be_present
+          expect(session[:passive_organization_id]).to eq organization.id
+          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
         end
       end
     end
@@ -1205,7 +1223,7 @@ RSpec.describe BikesController, type: :controller do
         ownership = FactoryBot.create(:ownership)
         user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
-        put :update, params: { id: ownership.bike.id, bike: { serial_number: "69" } }
+        put :update, params: { id: ownership.bike_id, bike: { serial_number: "69" } }
         expect(response).to redirect_to bike_url(ownership.bike)
         expect(flash[:error]).to be_present
       end
@@ -1651,9 +1669,8 @@ RSpec.describe BikesController, type: :controller do
       let(:organization) { FactoryBot.create(:organization) }
       let(:can_edit_claimed) { false }
       let(:claimed) { false }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:bike) { ownership.bike }
       before { set_current_user(user) }
       it "updates the bike" do
         bike.reload
@@ -1672,7 +1689,6 @@ RSpec.describe BikesController, type: :controller do
       context "bike is claimed" do
         let(:claimed) { true }
         it "fails to update" do
-          ownership.reload
           bike.reload
           expect(bike.owner).to_not eq(user)
           expect(bike.editable_organizations.pluck(:id)).to eq([])

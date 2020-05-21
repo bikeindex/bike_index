@@ -31,7 +31,8 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
-
+    # This is here primarily to make testing possible
+    @bike_authorized_by_passive_organization = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
     @bike = @bike.decorate
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
