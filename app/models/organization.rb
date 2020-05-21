@@ -48,6 +48,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :bike_stickers
+  has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
   accepts_nested_attributes_for :mail_snippets
@@ -148,6 +149,8 @@ class Organization < ApplicationRecord
   def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
 
   def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
+  def deliver_graduated_notifications?; enabled?("graduated_notifications") && graduated_notification_interval.present? end
 
   def broken_pos?; self.class.broken_pos_kinds.include?(pos_kind) end
 
@@ -270,6 +273,16 @@ class Organization < ApplicationRecord
       enabled_feature_slugs.include?(feature) ||
       (ambassador? && feature == "unstolen_notifications")
     end
+  end
+
+  def graduated_notification_interval_days
+    return nil unless graduated_notification_interval.present?
+    graduated_notification_interval / ActiveSupport::Duration::SECONDS_PER_DAY
+  end
+
+  def graduated_notification_interval_days=(val)
+    val_i = val.to_i
+    self.graduated_notification_interval = (val_i > 0) ? val_i.days.to_i : nil
   end
 
   def set_calculated_attributes

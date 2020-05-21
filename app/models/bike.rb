@@ -343,6 +343,15 @@ class Bike < ApplicationRecord
     end
   end
 
+  def graduated_notifications(org = nil)
+    return GraduatedNotification.none unless org.present?
+    org.graduated_notifications.where(bike_id: id)
+  end
+
+  def graduated?(org = nil)
+    graduated_notifications(org).active.any?
+  end
+
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
