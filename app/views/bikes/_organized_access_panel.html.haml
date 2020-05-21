@@ -13,7 +13,7 @@
           - if @bike.unregistered_parking_notification?
             %p.strong.text-warning.text-right
               = t(".unregistered_parking_notification")
-          - elsif @bike.organized?(passive_organization)
+          - elsif @passive_organization_registered
             %p.text-success.text-right
               %span.hidden-md-down
                 = t(".bike_is_registered", bike_type: @bike.type, org_name: passive_organization.short_name)
@@ -41,7 +41,7 @@
               %tr
                 %td= t(".permission")
                 %td
-                  - if @bike.authorized_by_organization?(org: passive_organization)
+                  - if @passive_organization_authorized
                     = t(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
                     - if @bike.can_edit_claimed_organizations.pluck(:id).include?(passive_organization.id)
                       %em.small
@@ -77,7 +77,7 @@
                 %tr
                   %td{ colspan: 2, style: "text-align: center; font-size: 1rem;" }
                     = t(".added_to_track_parking_notification", bike_type: @bike.type)
-              - elsif @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
+              - elsif @passive_organization_registered # Only display information about the bike if bike is registered through org
                 - if passive_organization.parent?
                   %tr
                     %td
@@ -154,7 +154,7 @@
                           - unless @bike.valid_registration_address_present?
                             = t(".missing_address")
 
-          - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations
+          - if !@passive_organization_registered # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
                 = t(".unable_to_display_additional_information", bike_type: @bike.type, org_name: passive_organization.name)

@@ -207,7 +207,8 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
         expect(session[:passive_organization_id]).to eq organization.id
-        expect(assigns(:bike_authorized_by_passive_organization)).to be_falsey
+        expect(assigns(:passive_organization_authorized)).to be_falsey
+        expect(assigns(:passive_organization_registered)).to be_falsey
       end
       # This is mostly legacy - really we don't care about creation organization
       # Leaving this in just for better test coverage
@@ -220,7 +221,8 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
+          expect(assigns(:passive_organization_authorized)).to be_truthy
+          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
       context "bike owned by organization" do
@@ -232,11 +234,12 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
+          expect(assigns(:passive_organization_authorized)).to be_truthy
+          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
       context "bike owned by organization, without can_edit_claimed" do
-        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, organization: organization) }
         it "renders" do
           expect(bike.editable_organizations.pluck(:id)).to eq([])
           get :show, params: { id: bike.id }
@@ -244,7 +247,8 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:bike_authorized_by_passive_organization)).to be_truthy
+          expect(assigns(:passive_organization_authorized)).to be_falsey
+          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
     end
