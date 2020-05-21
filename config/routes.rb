@@ -153,6 +153,7 @@ Rails.application.routes.draw do
     root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show
     resources :ambassador_task_assignments, only: [:index]
+    resources :exchange_rates, only: %i[index new create edit update destroy]
 
     resources :external_registry_bikes, only: %i[index show]
     resources :external_registry_credentials, only: %i[index new create edit update] do

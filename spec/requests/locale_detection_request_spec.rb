@@ -1,6 +1,25 @@
 require "rails_helper"
 
 RSpec.describe "Locale detection", type: :request do
+  before do
+    FactoryBot.create(:exchange_rate_to_eur)
+  end
+
+  describe "given a currency conversion with a missing required exchange rate" do
+    it "redirects to the root url in the default locale" do
+      ExchangeRate.delete_all
+      expect(ExchangeRate.count).to be_zero
+
+      get "/", params: { locale: :nl }
+      expect(response).to redirect_to(root_url)
+      expect(flash[:error]).to match(/Nederlands .+ localization is unavailable.+/)
+
+      get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+      expect(response).to redirect_to(root_url)
+      expect(flash[:error]).to match(/Nederlands .+ localization is unavailable.+/)
+    end
+  end
+
   describe "requesting the root path" do
     context "given a user preference" do
       include_context :request_spec_logged_in_as_user

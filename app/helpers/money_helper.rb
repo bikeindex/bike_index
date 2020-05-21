@@ -2,8 +2,7 @@
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
-  # TODO: Add a bank implementation that fetches conversion rate values
-  Money.default_bank.add_rate(:USD, :EUR, 0.88)
+  Money.default_bank = Money::Bank::VariableExchange.new(ExchangeRate)
   Money.rounding_mode = BigDecimal::ROUND_HALF_UP
   Money.locale_backend = :i18n
 
@@ -14,7 +13,7 @@ module MoneyHelper
 
   # Return a list of currency abbreviations (USD, EUR) for all available locales.
   def available_currencies
-    I18n.available_locales.map { |locale| t(locale, scope: [:money, :currencies]) }
+    ExchangeRate.required_targets
   end
 
   # Return a list of currency symbols and abbreviations for all available locales:
