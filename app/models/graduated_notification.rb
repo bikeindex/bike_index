@@ -47,6 +47,11 @@ class GraduatedNotification < ApplicationRecord
       .or(where(id: primary_notification_id))
   end
 
+  def self.bikes
+    Bike.unscoped.includes(:graduated_notifications)
+        .where(graduated_notifications: { id: pluck(:id) })
+  end
+
   def active?; self.class.active_statuses.include?(status) end
 
   def primary_notification?; primary_notification_id.blank? end

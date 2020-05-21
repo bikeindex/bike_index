@@ -54,6 +54,7 @@ class Bike < ApplicationRecord
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :parking_notifications
+  has_many :graduated_notifications
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true

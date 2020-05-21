@@ -29,6 +29,7 @@ RSpec.describe GraduatedNotification, type: :model do
                           enabled_feature_slugs: ["graduated_notifications"],
                           graduated_notification_interval: nil)
       end
+      let(:graduated_notification2) { FactoryBot.create(:graduated_notification) }
       it "is valid" do
         expect(organization.deliver_graduated_notifications?).to be_falsey
         expect(graduated_notification).to be_valid
@@ -47,6 +48,12 @@ RSpec.describe GraduatedNotification, type: :model do
         organization.reload
         expect(organization.graduated_notification_interval_days).to be_blank
         expect(organization.deliver_graduated_notifications?).to be_falsey
+
+        # Test scoping of graduated_notification bikes
+        expect(graduated_notification2.bike_id).to_not eq bike.id
+        expect(graduated_notification2.organization_id).to_not eq organization.id
+        expect(GraduatedNotification.bikes.pluck(:id)).to match_array([bike.id, graduated_notification2.bike_id])
+        expect(organization.graduated_notifications.bikes.pluck(:id)).to eq([bike.id])
       end
     end
     context "marked_remaining" do
