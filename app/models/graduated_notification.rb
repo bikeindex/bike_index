@@ -3,6 +3,7 @@ class GraduatedNotification < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
+  belongs_to :primary_bike, class_name: "Bike"
   belongs_to :primary_notification, class_name: "GraduatedNotification"
 
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
@@ -49,9 +50,21 @@ class GraduatedNotification < ApplicationRecord
 
   def main_notification; primary_notification? ? self : primary_notification end
 
+  def calculated_primary_bike
+    if user.present?
+      user.bikes.organization(organization).reorder(:created_at).first
+    else
+      organization
+    end
+  end
+
+  def calculated_primary_notification
+    primary_bike
+  end
+
   def send_email?
     return false unless primary_notification?
-    organization.deliver_graduated_notifications?
+    organization.deliver_graduated_notifications? && primary_bike?
   end
 
   def mark_remaining!(resolved_at: nil)
@@ -64,14 +77,20 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.status = calculated_status
+    self.primary_bike_id ||= calculated_primary_bike&.id
+    self.primary_notification_id ||= calculated_primary_notification&id
     self.marked_remaining_link_token ||= SecurityTokenizer.new_token if pending?
+    self.status = calculated_status
     self.user ||= bike.user
     self.email ||= calculated_email
   end
 
-  def process_notification
-    # ProcessGraduatedNotificationWorker.perform_async(id)
+  # This is here because we're calling it from the creation job, and I like it here more than in the job
+  def process_notification!
+    return true if delivery_status == "email_success"
+    delete bike organization
+    OrganizedMailer.graduated_notification(self).deliver_now
+    update_attribute :delivery_status, "email_success" # I'm not sure how to make this more representative
   end
 
   private

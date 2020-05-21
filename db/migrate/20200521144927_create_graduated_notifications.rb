@@ -4,6 +4,7 @@ class CreateGraduatedNotifications < ActiveRecord::Migration[5.2]
       t.references :organization, index: true
       t.references :bike, index: true
       t.references :user, index: true
+      t.references :primary_bike, index: true
       t.references :primary_notification, index: true
 
       t.text :marked_remaining_link_token

@@ -1086,6 +1086,7 @@ CREATE TABLE public.graduated_notifications (
     organization_id bigint,
     bike_id bigint,
     user_id bigint,
+    primary_bike_id bigint,
     primary_notification_id bigint,
     marked_remaining_link_token text,
     marked_remaining_at timestamp without time zone,
@@ -3858,6 +3859,13 @@ CREATE INDEX index_graduated_notifications_on_bike_id ON public.graduated_notifi
 --
 
 CREATE INDEX index_graduated_notifications_on_organization_id ON public.graduated_notifications USING btree (organization_id);
+
+
+--
+-- Name: index_graduated_notifications_on_primary_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_primary_bike_id ON public.graduated_notifications USING btree (primary_bike_id);
 
 
 --
