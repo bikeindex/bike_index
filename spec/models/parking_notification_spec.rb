@@ -19,7 +19,9 @@ RSpec.describe ParkingNotification, type: :model do
     context "organized record" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 2.weeks) }
-      let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike) }
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: parking_notification.user) }
+      let!(:parking_notification3) { FactoryBot.create(:parking_notification_organized) }
       it "is valid" do
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.owner_known?).to be_truthy
@@ -28,8 +30,9 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.retrieval_link_token).to be_present
         expect(parking_notification.organization).to eq organization
         expect(parking_notification.user.organizations).to eq([organization])
-        # Test that we are just getting the orgs abandoned bikes
-        FactoryBot.create(:parking_notification, user: parking_notification.user)
+        expect(parking_notification2.organization_id).to be_blank
+        expect(parking_notification3.organization_id).to_not eq organization.id
+        expect(ParkingNotification.bikes.pluck(:id)).to match_array([bike.id, parking_notification2.bike_id, parking_notification3.bike_id])
         organization.reload
         expect(organization.parking_notifications.bikes.pluck(:id)).to eq([bike.id])
         expect(organization.auto_user).to be_blank
