@@ -15,7 +15,7 @@
         = render partial: "/shared/errors", locals: { name: "Ownership", obj: @ownership }
       .form-group
         = f.label :creator_id
-        = f.email_field :creator_email, value: @ownership.creator.email, required: true, prompt: "Creator's email", class: "form-control"
+        = f.email_field :creator_email, value: @ownership.creator&.email, required: true, prompt: "Creator's email", class: "form-control"
 
       .form-group
         = f.label :user_id
