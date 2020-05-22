@@ -78,22 +78,27 @@
         = f.text_field :frame_model, class: "form-control"
     .col-md-4.col-lg-3
       .form-group
-        = f.label :owner_email
-        = f.text_field :owner_email, required: true, class: "form-control"
+        = f.label :description
+        = f.text_area :description, class: "form-control"
     .col-md-4.col-lg-3
-      %label.d-none.d-md-block
-        &nbsp;
-      = f.label :hidden do
-        = f.check_box :hidden
-        - if @bike.user_hidden
-          User hidden
-        - else
-          Hidden (oldskool fake delete)
+      %span.less-strong.d-inline-block
+        = f.label :hidden do
+          = f.check_box :hidden
+          - if @bike.user_hidden
+            User hidden
+          - else
+            Hidden (oldskool fake delete)
   .row.mt-2
     .col-md-4.col-lg-6
       .form-group
-        = f.label :description
-        = f.text_area :description, class: "form-control"
+        %label
+          Owner email
+          = f.label :skip_email do
+            %span.text-info.ml-2
+              = f.check_box :skip_email
+              Don't Send email
+            %em.small only applies if email changes
+        = f.email_field :owner_email, required: true, class: "form-control"
     - if @organizations.present?
       .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
