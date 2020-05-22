@@ -29,10 +29,12 @@ class BikeUpdator
     # Since we've deleted the owner_email from the update hash, we have to assign it here
     # This is required because ownership_creator uses it :/ - not a big fan of this side effect though
     @bike.owner_email = new_owner_email
+    # This is what we should've been doing a long time ago - we should migrate send_email to skip_email everywhere :/
+    skip_email = ParamsNormalizer.boolean(@bike_params.dig("bike", "skip_email"))
     OwnershipCreator.new(owner_email: new_owner_email,
                          bike: @bike,
                          creator: @user,
-                         send_email: true).create_ownership
+                         send_email: !skip_email).create_ownership
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
     @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
   end

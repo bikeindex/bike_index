@@ -49,18 +49,6 @@ RSpec.describe Admin::BikesController, type: :controller do
     end
   end
 
-  describe "destroy" do
-    it "destroys the bike" do
-      bike = FactoryBot.create(:bike)
-      expect do
-        delete :destroy, params: { id: bike.id }
-      end.to change(Bike, :count).by(-1)
-      expect(response).to redirect_to(:admin_bikes)
-      expect(flash[:success]).to match(/deleted/i)
-      expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
-    end
-  end
-
   describe "update" do
     context "success" do
       let(:organization) { FactoryBot.create(:organization) }

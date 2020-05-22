@@ -62,14 +62,14 @@ class Bike < ApplicationRecord
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
   validates_presence_of :cycle_type
-  validates_presence_of :creator
+  validates_presence_of :creator, on: :create
   validates_presence_of :manufacturer_id
 
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
-                :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
+                :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
                 :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
@@ -128,7 +128,7 @@ class Bike < ApplicationRecord
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
-          stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+          stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
           marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
       ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                          components_attributes: Component.old_attr_accessible]).freeze
@@ -278,7 +278,7 @@ class Bike < ApplicationRecord
 
   def pos?; pos_kind != "no_pos" end
 
-  def current_ownership; ownerships.reorder(:created_at).last end
+  def current_ownership; ownerships.reorder(:id).last end
 
   # Use present? to ensure true/false rather than nil
   def claimed?; current_ownership.present? && current_ownership.claimed.present? end

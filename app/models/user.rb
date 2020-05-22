@@ -21,7 +21,7 @@ class User < ApplicationRecord
   has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
-  has_many :ownerships, dependent: :destroy
+  has_many :ownerships
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike

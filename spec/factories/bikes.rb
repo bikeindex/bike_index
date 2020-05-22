@@ -44,6 +44,7 @@ FactoryBot.define do
       transient do
         user { FactoryBot.create(:user) }
       end
+      creator { user }
       owner_email { user.email }
       after(:create) do |bike, evaluator|
         create(:ownership_claimed, bike: bike, creator: bike.creator, owner_email: bike.owner_email, user_id: evaluator.user)
