@@ -73,6 +73,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
+    pp permitted_parameters
     updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }.as_json)
     updator.update_ownership
     updator.update_stolen_record

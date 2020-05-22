@@ -191,7 +191,7 @@
       %th.d-none.d-md-table-cell
         User hidden
     %tbody
-      - @bike.ownerships.each do |ownership|
+      - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
         %tr
           %td.d-none.d-lg-table-cell
             = ownership.id
