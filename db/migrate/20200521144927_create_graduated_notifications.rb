@@ -3,6 +3,7 @@ class CreateGraduatedNotifications < ActiveRecord::Migration[5.2]
     create_table :graduated_notifications do |t|
       t.references :organization, index: true
       t.references :bike, index: true
+      t.references :bike_organization, index: true
       t.references :user, index: true
       t.references :primary_bike, index: true
       t.references :primary_notification, index: true

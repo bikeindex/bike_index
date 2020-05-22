@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -1085,6 +1085,7 @@ CREATE TABLE public.graduated_notifications (
     id bigint NOT NULL,
     organization_id bigint,
     bike_id bigint,
+    bike_organization_id bigint,
     user_id bigint,
     primary_bike_id bigint,
     primary_notification_id bigint,
@@ -3852,6 +3853,13 @@ CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON publ
 --
 
 CREATE INDEX index_graduated_notifications_on_bike_id ON public.graduated_notifications USING btree (bike_id);
+
+
+--
+-- Name: index_graduated_notifications_on_bike_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_bike_organization_id ON public.graduated_notifications USING btree (bike_organization_id);
 
 
 --

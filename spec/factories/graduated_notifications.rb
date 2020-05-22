@@ -12,6 +12,7 @@ FactoryBot.define do
     end
     bike do
       FactoryBot.create(:bike_organized,
+                        :with_ownership, # Or else we can't send email
                         organization: organization,
                         created_at: bike_created_at)
     end
@@ -24,16 +25,6 @@ FactoryBot.define do
                           organization: organization,
                           created_at: bike_created_at,
                           user: user)
-      end
-    end
-
-    factory :graduated_notification_with_secondary, traits: [:with_user] do
-      after(:create) do |graduated_notification, evaluator|
-        FactoryBot.create(:graduated_notification,
-                          primary_notification: graduated_notification,
-                          organization: evaluator.organization,
-                          bike: evaluator.bike,
-                          user: evaluator.user)
       end
     end
   end
