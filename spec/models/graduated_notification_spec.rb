@@ -194,7 +194,7 @@ RSpec.describe GraduatedNotification, type: :model do
     let(:graduated_notification1) do
       expect(bike_organization1.deleted?).to be_falsey
       bike_organization1_id = bike_organization1.id
-      graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
+      graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike)
       graduated_notification1.update(created_at: Time.current - graduated_notification_interval - 1.day)
       graduated_notification1.reload
       graduated_notification1
@@ -225,4 +225,3 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 end
-
