@@ -273,7 +273,7 @@ class Organization < ApplicationRecord
     end
   end
 
-  # Done multiple places, might be worth optimizing
+  # Done multiple places, so consolidating. Might be worth optimizing
   def any_enabled?(features); features.detect { |f| enabled?(f) }.present? end
 
   def set_calculated_attributes
