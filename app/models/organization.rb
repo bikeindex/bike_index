@@ -236,7 +236,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    PaidFeature::BIKE_ACTIONS.detect { |f| enabled?(f) }.present?
+    any_enabled?(PaidFeature::BIKE_ACTIONS)
   end
 
   def law_enforcement_missing_verified_features?
@@ -260,6 +260,7 @@ class Organization < ApplicationRecord
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
 
+  # Accepts string or array, tests that ALL are enabled
   def enabled?(feature_name)
     features =
       Array(feature_name)
@@ -271,6 +272,9 @@ class Organization < ApplicationRecord
       (ambassador? && feature == "unstolen_notifications")
     end
   end
+
+  # Done multiple places, might be worth optimizing
+  def any_enabled?(features); features.detect { |f| enabled?(f) }.present? end
 
   def set_calculated_attributes
     return true unless name.present?
