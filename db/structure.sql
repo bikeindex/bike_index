@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -1518,7 +1518,8 @@ CREATE TABLE public.memberships (
     deleted_at timestamp without time zone,
     sender_id integer,
     claimed_at timestamp without time zone,
-    email_invitation_sent_at timestamp without time zone
+    email_invitation_sent_at timestamp without time zone,
+    created_by_magic_link boolean DEFAULT false
 );
 
 

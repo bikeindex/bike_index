@@ -15,16 +15,28 @@
       %td
         = t(".invited")
       %td
-        %span.converTime.preciseTime
-          = l(@membership.created_at, format: :short_with_year)
+        %span.convertTime.preciseTime
+          = l(@membership.created_at, format: :convert_time)
     %tr
       %td
         = t(".signed_up")
       %td
         - if @membership.claimed?
-          %span.converTime.preciseTime= l(@membership.claimed_at, format: :short_with_year)
+          %span.convertTime.preciseTime= l(@membership.claimed_at, format: :convert_time)
         - else
           = t(".has_not_signed_up_html", name: @membership.invited_display_name)
+    %tr
+      %td
+        = t(".last_login")
+      %td
+        - if @membership&.user&.last_login_at&.present?
+          %span.convertTime.preciseTime= l(@membership.user.last_login_at, format: :convert_time)
+    %tr
+      %td
+        = t(".last_login_ip")
+      %td
+        - if @membership&.user&.last_login_ip&.present?
+          %code= @membership.user.last_login_ip
 
 = form_for @membership, { as: :membership, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   .form-group.row

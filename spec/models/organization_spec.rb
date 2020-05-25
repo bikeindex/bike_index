@@ -311,6 +311,18 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "restrict_invitations?" do
+    it "is truthy" do
+      expect(Organization.new.restrict_invitations?).to be_truthy
+    end
+    context "passwordless_users with passwordless_user_domain" do
+      let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
+      it "is falsey" do
+        expect(organization.restrict_invitations?).to be_falsey
+      end
+    end
+  end
+
   describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }

@@ -140,6 +140,8 @@ class Organization < ApplicationRecord
 
   def to_param; slug end
 
+  def restrict_invitations?; !enabled?("passwordless_users") && !passwordless_user_domain.present? end
+
   def sent_invitation_count; memberships.count end
 
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end

@@ -97,7 +97,7 @@
       - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
       .form-group.fancy-select.unfancy
         = f.label :embedable_user_email
-        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+        = f.select :embedable_user_email, emails, { prompt: "Select email", selected: @embedable_email }, class: "form-control"
         %small.less-strong
           - if @organization.memberships.count == 0
             You can use #{ENV['AUTO_ORG_MEMBER']} if
@@ -130,7 +130,10 @@
                 Whitelisted domain for passwordless sign in
                 %small
                   <span class="text-success">passwordless user feature</span>
-              = f.number_field :passwordless_user_domain, { class: "form-control", disabled: !current_user.developer? }
+              .input-group
+                .input-group-prepend
+                  .input-group-text @
+                = f.text_field :passwordless_user_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
               - unless current_user.developer?
                 %span.small.less-strong Ask Seth for help changing this, it's delicate
 

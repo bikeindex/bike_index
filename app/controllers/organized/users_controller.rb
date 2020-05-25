@@ -37,13 +37,13 @@ module Organized
     end
 
     def create
-      unless current_organization.remaining_invitation_count > 0
+      if current_organization.restrict_invitations? && current_organization.remaining_invitation_count < 1
         flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
         redirect_to current_root_path and return
       end
       @membership = Membership.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
-        if multiple_emails_invited.count > current_organization.remaining_invitation_count
+        if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
           flash[:error] = translation(:insufficient_invitations,
                                       invite_count: multiple_emails_invited.count,
                                       org_name: current_organization.name,

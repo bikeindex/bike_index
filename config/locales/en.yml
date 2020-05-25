@@ -4448,6 +4448,8 @@ en:
         email: Email
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited
+        last_login: Last login
+        last_login_ip: Last login ip
         member_of_organization: Member of organization
         membership_type: Membership type
         remove_from_organization: remove from organization

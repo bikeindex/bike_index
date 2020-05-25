@@ -1,12 +1,13 @@
 .mb-4
   %h1
     = t(".invite_user")
-  %p
-    - count = number_with_delimiter(current_organization.sent_invitation_count)
-    = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
-  %p
-    - count = number_with_delimiter(current_organization.remaining_invitation_count)
-    = t(".remaining_invites_html", invitations_count: count)
+  - if current_organization.restrict_invitations?
+    %p
+      - count = number_with_delimiter(current_organization.sent_invitation_count)
+      = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
+    %p
+      - count = number_with_delimiter(current_organization.remaining_invitation_count)
+      = t(".remaining_invites_html", invitations_count: count)
   - if current_organization.enabled?("passwordless_users")
     %p= t(".automatic_passwordless")
 

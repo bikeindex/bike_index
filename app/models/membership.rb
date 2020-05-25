@@ -23,7 +23,10 @@ class Membership < ApplicationRecord
 
   def invited_display_name; user.present? ? user.display_name : invited_email end
 
-  def send_invitation_email?; email_invitation_sent_at.blank? && invited_email.present? end
+  def send_invitation_email?
+    return false if created_by_magic_link
+    email_invitation_sent_at.blank? && invited_email.present?
+  end
 
   def admin?; role == "admin" end
 
