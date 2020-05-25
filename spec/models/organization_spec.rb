@@ -321,14 +321,14 @@ RSpec.describe Organization, type: :model do
         expect(organization.restrict_invitations?).to be_falsey
         expect(Organization.whitelisted_passwordless_signin.pluck(:id)).to eq([organization.id])
         expect(Organization.passwordless_email_matching("fakeexample.gov")).to be_blank
-        expect(Organization.passwordless_email_matching("seth@EXample.gov")).to eq organization
+        expect(Organization.passwordless_email_matching("f@example.gov@party.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@éxample.gov")).to be_blank # accent
+        expect(Organization.passwordless_email_matching("party@@example.gov")).to be_blank
+        expect(Organization.passwordless_email_matching("seth@EXample.gov")).to eq organization
         expect(Organization.passwordless_email_matching("seth@EXample.gov ")).to eq organization
       end
     end
   end
-
-
 
   describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }

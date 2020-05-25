@@ -20,6 +20,17 @@ class SessionsController < ApplicationController
 
   def create_magic_link
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
+    if user.blank?
+      matching_organization = Organization.passwordless_email_matching(params[:email])
+      if matching_organization.present?
+        membership = matching_organization.memberships.create(role: "member",
+                                                              invited_email: params[:email],
+                                                              created_by_magic_link: true)
+        ProcessMembershipWorker.new.perform(membership.id)
+        membership.reload
+        user = membership.user
+      end
+    end
     if user.present?
       user.send_magic_link_email
       flash[:success] = translation(:link_sent)

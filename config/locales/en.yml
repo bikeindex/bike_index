@@ -4458,6 +4458,7 @@ en:
       index:
         claimed: Claimed
         created: Created
+        current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         invite_more_users: Invite more users
         is_admin: Admin?

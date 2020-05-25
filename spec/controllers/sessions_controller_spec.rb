@@ -110,35 +110,6 @@ RSpec.describe SessionsController, type: :controller do
     end
   end
 
-  describe "create_magic_link" do
-    it "sends the magic link" do
-      user = FactoryBot.create(:user_confirmed)
-      expect(user.magic_link_token).to be_nil
-      ActionMailer::Base.deliveries = []
-      Sidekiq::Worker.clear_all
-      Sidekiq::Testing.inline! do
-        post :create_magic_link, params: { email: user.email }
-        expect(ActionMailer::Base.deliveries.count).to eq 1
-        mail = ActionMailer::Base.deliveries.last
-        expect(mail.subject).to eq("Sign in to Bike Index")
-        expect(mail.to).to eq([user.email])
-        expect(user.reload.magic_link_token).not_to be_nil
-      end
-    end
-    context "unknown email" do
-      it "redirects to login" do
-        ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          post :create_magic_link, params: { email: "something@stuff.bike" }
-          expect(flash[:error]).to be_present
-          expect(response).to redirect_to new_user_path
-          expect(ActionMailer::Base.deliveries.count).to eq 0
-        end
-      end
-    end
-  end
-
   describe "destroy" do
     include_context :logged_in_as_user
     it "logs out the current user" do

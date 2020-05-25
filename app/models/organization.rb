@@ -135,6 +135,17 @@ class Organization < ApplicationRecord
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
+  def self.whitelisted_passwordless_signin
+    where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
+  end
+
+  def self.passwordless_email_matching(str)
+    str = EmailNormalizer.normalize(str)
+    return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+    domain = str.split("@").last
+    whitelisted_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+  end
+
   # never geocode, use default_location lat/long
   def should_be_geocoded?; false end
 
@@ -286,6 +297,7 @@ class Organization < ApplicationRecord
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
+    self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")

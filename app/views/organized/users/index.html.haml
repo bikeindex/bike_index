@@ -14,7 +14,7 @@
     %p
       %strong
         #{user_count}
-      Current users
+      = t(".current_users")
     %p
       = t(".whitelisted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
       %em.less-strong
