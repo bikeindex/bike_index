@@ -1518,7 +1518,8 @@ CREATE TABLE public.memberships (
     deleted_at timestamp without time zone,
     sender_id integer,
     claimed_at timestamp without time zone,
-    email_invitation_sent_at timestamp without time zone
+    email_invitation_sent_at timestamp without time zone,
+    created_by_magic_link boolean DEFAULT false
 );
 
 
@@ -1722,7 +1723,8 @@ CREATE TABLE public.organizations (
     location_latitude double precision,
     location_longitude double precision,
     regional_ids jsonb,
-    manual_pos_kind integer
+    manual_pos_kind integer,
+    passwordless_user_domain character varying
 );
 
 
@@ -1933,7 +1935,6 @@ CREATE TABLE public.parking_notifications (
 --
 
 CREATE SEQUENCE public.parking_notifications_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4744,6 +4745,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200428203014'),
 ('20200429004612'),
 ('20200429174144'),
-('20200517001632');
+('20200517001632'),
+('20200524214006');
 
 

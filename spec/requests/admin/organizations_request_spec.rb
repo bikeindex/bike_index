@@ -165,6 +165,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(organization.manual_pos_kind).to be_blank
       end
     end
+    context "update passwordless_user_domain" do
+      it "updates (only blocking non-developers in frontend because whateves)" do
+        put "#{base_url}/#{organization.to_param}", params: { organization: { passwordless_user_domain: "@bikeindex.org" } }
+        organization.reload
+        expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
+      end
+    end
     context "not updating manual_pos_kind" do
       it "updates and doesn't enqueue worker" do
         expect do

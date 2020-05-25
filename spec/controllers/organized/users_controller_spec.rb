@@ -200,8 +200,8 @@ RSpec.describe Organized::UsersController, type: :controller do
         end
       end
       context "no available invitations" do
+        let(:organization) { FactoryBot.create(:organization, available_invitation_count: 1) }
         it "does not create a new membership" do
-          organization.update_attributes(available_invitation_count: 1)
           expect do
             put :create, params: { organization_id: organization.to_param, membership: membership_params }
           end.to change(Membership, :count).by(0)
@@ -209,19 +209,17 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect(flash[:error]).to be_present
         end
       end
-      context "multiple invitations, more than available" do
-        let(:multiple_emails_invited) { %w[stuff@stuff.com stuff@stuff2.com stuff@stuff.com stuff3@stuff.com stuff4@stuff.com stuff5@stuff.com stuff6@stuff.com] }
-        it "renders error, doesn't create any" do
+      context "restrict_invitations? is false" do
+        let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+        it "just creates the user" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
-            expect(organization.remaining_invitation_count).to eq 4
+            expect(organization.remaining_invitation_count).to eq 0
+            expect(organization.restrict_invitations?).to be_falsey
             expect do
-              put :create, params: {
-                             organization_id: organization.to_param,
-                             membership: membership_params,
-                             multiple_emails_invited: multiple_emails_invited.join("\n"),
-                           }
-            end.to_not change(Membership, :count)
+              put :create, params: { organization_id: organization.to_param, membership: membership_params }
+            end.to change(Membership, :count).by 1
+            expect(ActionMailer::Base.deliveries.count).to eq 0 # Because passwordless users
           end
         end
       end
@@ -244,6 +242,41 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
             expect(organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          end
+        end
+        context "more than available" do
+          let(:organization) { FactoryBot.create(:organization, available_invitation_count: 3) }
+          it "renders error, doesn't create any" do
+            Sidekiq::Testing.inline! do
+              ActionMailer::Base.deliveries = []
+              expect do
+                put :create, params: {
+                               organization_id: organization.to_param,
+                               membership: membership_params,
+                               multiple_emails_invited: multiple_emails_invited.join("\n"),
+                             }
+              end.to_not change(Membership, :count)
+              expect(ActionMailer::Base.deliveries.count).to eq 0
+            end
+          end
+          context "restrict_invitations? is false" do
+            let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+            it "creates memberships" do
+              Sidekiq::Testing.inline! do
+                ActionMailer::Base.deliveries = []
+                expect(organization.remaining_invitation_count).to eq 0
+                expect do
+                  put :create, params: {
+                                 organization_id: organization.to_param,
+                                 membership: membership_params,
+                                 multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
+                               }
+                end.to change(Membership, :count).by 4
+                expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+                expect(organization.users.count).to eq 5
+                expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+              end
+            end
           end
         end
         context "auto_passwordless_users" do

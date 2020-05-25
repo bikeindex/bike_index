@@ -4553,6 +4553,8 @@ nl:
         remove_from_organization: verwijderen uit organisatie
         signed_up: Ingeschreven
         update: Bijwerken
+        last_login: Laatste login
+        last_login_ip: Laatste login ip
       index:
         claimed: beweerde
         created: Gemaakt
@@ -4568,6 +4570,12 @@ nl:
         update_email: Update e-mail
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
+        current_users: Huidige gebruikers
+        manually_invite_email: e-mails handmatig uitnodigen
+        whitelisted_domain_info_html: Je hebt een domein op de witte lijst. Iedereen
+          die zich aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
+          , wordt lid van %{org_name}.
+        you_can_also: Je kan ook
       new:
         1_email_per_line: 1 e-mail per regel
         admin_of_organization: Beheerder van organisatie
@@ -4586,6 +4594,10 @@ nl:
         send_invitation: Verstuur uitnodiging
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
+        signing_in_with_whitelisted_html: Als u zich aanmeldt met een "Aanmeldlink
+          per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
+          u automatisch lid van %{org_name}.
+        you_have_a_whitelisted_domain: Je hebt een domein op de witte lijst
     parking_notifications:
       index:
         parking_notifications: Verlaten records
