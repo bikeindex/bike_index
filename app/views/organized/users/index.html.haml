@@ -1,15 +1,25 @@
 .mb-4
   %h1= t(".manage_users")
-  %p
-    - count = number_with_delimiter(current_organization.sent_invitation_count)
-    = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
-  %p
-    - count = number_with_delimiter(current_organization.remaining_invitation_count)
-    = t(".remaining_invites_html", invitations_count: count)
+  - user_count = number_with_delimiter(current_organization.sent_invitation_count)
+  - if current_organization.restrict_invitations?
+    %p
+      = t(".you_have_invited_html", users_count: pluralize(user_count, t(".user")))
+    %p
+      - remaining_count = number_with_delimiter(current_organization.remaining_invitation_count)
+      = t(".remaining_invites_html", invitations_count: remaining_count)
 
-    - if current_organization.remaining_invitation_count > 0
-      = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
-
+      - if current_organization.remaining_invitation_count > 0
+        = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
+  - else
+    %p
+      %strong
+        #{user_count}
+      Current users
+    %p
+      = t(".whitelisted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+      %em.less-strong
+        = t(".you_can_also")
+        #{link_to t(".manually_invite_email"), new_organization_user_path(organization_id: current_organization.to_param)}.
   %p
     - if current_organization.auto_user.present?
       = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)

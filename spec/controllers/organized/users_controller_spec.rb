@@ -264,7 +264,7 @@ RSpec.describe Organized::UsersController, type: :controller do
             it "creates memberships" do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []
-                expect(organization.remaining_invitation_count).to eq 4
+                expect(organization.remaining_invitation_count).to eq 0
                 expect do
                   put :create, params: {
                                  organization_id: organization.to_param,
@@ -272,10 +272,8 @@ RSpec.describe Organized::UsersController, type: :controller do
                                  multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
                                }
                 end.to change(Membership, :count).by 4
-                expect(organization.remaining_invitation_count).to eq 0
-                expect(organization.sent_invitation_count).to eq 5
                 expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-                expect(organization.users.count).to eq 1
+                expect(organization.users.count).to eq 5
                 expect(ActionMailer::Base.deliveries.empty?).to be_truthy
               end
             end

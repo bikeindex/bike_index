@@ -11,6 +11,13 @@
   - if current_organization.enabled?("passwordless_users")
     %p= t(".automatic_passwordless")
 
+    - if current_organization.passwordless_user_domain.present?
+      .alert.alert-info.mt-4.col-md-8.offset-md-1
+        %strong
+          = t(".you_have_a_whitelisted_domain")
+        %br
+        = t(".signing_in_with_whitelisted_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+
 = form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
   - if @membership.errors.any?

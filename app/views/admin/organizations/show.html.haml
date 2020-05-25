@@ -122,7 +122,11 @@
         %td
           Remaining invites
         %td
-          = number_with_delimiter @organization.remaining_invitation_count
+          - if @organization.restrict_invitations?
+            = number_with_delimiter @organization.remaining_invitation_count
+          - else
+            %em
+              Whitelisted domain, no invite restrictions
       %tr
         %td
           Website
