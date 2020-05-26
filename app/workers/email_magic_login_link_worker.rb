@@ -4,8 +4,7 @@ class EmailMagicLoginLinkWorker < ApplicationWorker
   def perform(user_id)
     user = User.find(user_id)
     unless user.magic_link_token.present?
-      user.update_auth_token("magic_link_token")
-      user.reload
+      raise StandardError, "User #{user_id} does not have a magic_link_token"
     end
     CustomerMailer.magic_login_link_email(user).deliver_now
   end

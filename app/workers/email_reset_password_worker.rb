@@ -4,8 +4,7 @@ class EmailResetPasswordWorker < ApplicationWorker
   def perform(user_id)
     user = User.find(user_id)
     unless user.password_reset_token.present?
-      user.update_auth_token("password_reset_token")
-      user.reload
+      raise StandardError, "User #{user_id} does not have a password_reset_token"
     end
     CustomerMailer.password_reset_email(user).deliver_now
   end
