@@ -12,6 +12,8 @@ class Membership < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker
 
+  attr_accessor :skip_processing
+
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :admin, -> { where(role: "admin") }
@@ -22,11 +24,21 @@ class Membership < ApplicationRecord
     MEMBERSHIP_TYPES
   end
 
+  def self.create_passwordless(**create_attrs)
+    new_passwordless_attrs = { skip_processing: true, role: "member" }
+    membership = create!(new_passwordless_attrs.merge(create_attrs))
+    # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
+    ProcessMembershipWorker.new.perform(membership.id)
+    membership.reload
+    membership
+  end
+
   def invited_display_name; user.present? ? user.display_name : invited_email end
 
   def send_invitation_email?
-    return false if created_by_magic_link
-    email_invitation_sent_at.blank? && invited_email.present?
+    return false if created_by_magic_link # Don't send an email if this is already happening
+    return false if email_invitation_sent_at.present?
+    invited_email.present?
   end
 
   def admin?; role == "admin" end
@@ -36,6 +48,7 @@ class Membership < ApplicationRecord
   def ambassador?; organization.ambassador? end
 
   def enqueue_processing_worker
+    return true if skip_processing
     ProcessMembershipWorker.perform_async(id)
   end
 

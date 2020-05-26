@@ -8,7 +8,7 @@ RSpec.describe SessionsController, type: :request do
       ActionMailer::Base.deliveries = []
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
-        post "/session/create_magic_link", params: { email: current_user.email }
+        post "/session/create_magic_link", params: { email: " #{current_user.email} " }
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Sign in to Bike Index")

@@ -194,4 +194,63 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       end
     end
   end
+
+  context "organization with auto passwordless users" do
+    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "city.gov", available_invitation_count: 1) }
+    let(:user) { FactoryBot.create(:user, email: email) }
+    let(:email) { "example@somethingcity.gov" }
+    it "does not become member for non-matching domain" do
+      user.reload
+      expect(user.confirmed?).to be_falsey
+      # This is called inline on the user, but doing it here, to more accurately model what happens
+      Sidekiq::Worker.clear_all
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+      user.reload
+      expect(user.confirmed?).to be_truthy
+      expect(user.memberships.count).to eq 0
+    end
+    context "matching domain" do
+      let(:email) { "example@city.gov" }
+      it "creates the membership on confirm" do
+        user.reload
+        expect(user.confirmed?).to be_falsey
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
+        user.reload
+        expect(user.confirmed?).to be_truthy
+        expect(user.memberships.count).to eq 1
+        membership = user.memberships.first
+        expect(membership.claimed?).to be_truthy
+        expect(membership.organization_id).to eq organization.id
+        expect(membership.role).to eq "member"
+
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to match(/join.*#{organization.name}/i)
+      end
+      context "membership exists" do
+        it "does not create an additional membership" do
+          expect(user.confirmed?).to be_falsey
+          membership = FactoryBot.create(:membership, user: user, sender: nil, organization: organization, role: "admin")
+          expect(membership.claimed?).to be_truthy
+          user.reload
+          Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
+          expect do
+            Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
+          end.to_not change(Membership, :count)
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+          user.reload
+          expect(user.confirmed?).to be_truthy
+          expect(user.memberships.count).to eq 1
+          membership.reload
+          expect(membership.organization_id).to eq organization.id
+          expect(membership.role).to eq "admin"
+        end
+      end
+    end
+  end
 end

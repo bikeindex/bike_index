@@ -213,6 +213,7 @@ class User < ApplicationRecord
       self.confirmation_token = nil
       self.confirmed = true
       self.save
+      reload
       AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
       true
     end
