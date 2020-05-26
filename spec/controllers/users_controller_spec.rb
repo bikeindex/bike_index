@@ -208,6 +208,7 @@ RSpec.describe UsersController, type: :controller do
       end
       context "with auto passwordless users" do
         let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let(:email) { "example@ladot.online" }
         it "Does not create a membership or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
           ActionMailer::Base.deliveries = []
@@ -215,7 +216,7 @@ RSpec.describe UsersController, type: :controller do
           Sidekiq::Testing.inline! do
             request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
             expect do
-              post "/users", params: { user: user_attributes.merge(email: "example@ladot.online") }
+              post :create, params: { user: user_attributes.merge(email: email) }
             end.to change(User, :count).by 1
 
             user = User.where(email: email).first
@@ -223,20 +224,18 @@ RSpec.describe UsersController, type: :controller do
             expect(response).to redirect_to(please_confirm_email_users_path)
 
             expect(user.terms_of_service).to be_truthy
-            expect(user.email).to eq email
-            expect(cookies.signed[:auth]).to be_blank
+            expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.confirmed?).to be_falsey
             expect(user.last_login_at).to be_within(3.seconds).of Time.current
             expect(user.last_login_ip).to eq "169.99.69.2"
             expect(user.preferred_language).to be_blank # Because language wasn't passed
             expect(user.user_emails.count).to eq 0
-            expect(user.user_emails.first.email).to eq email
           end
 
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Please confirm your Bike Index email!")
-          expect(mail.to).to eq([user.email])
+          expect(mail.to).to eq([email])
           expect(mail.from).to eq(["contact@bikeindex.org"])
         end
       end

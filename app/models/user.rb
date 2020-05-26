@@ -191,7 +191,7 @@ class User < ApplicationRecord
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("password_reset_token") > Time.current - 2.minutes
     update_auth_token("password_reset_token")
-    reload
+    reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     EmailResetPasswordWorker.perform_async(id)
   end
 
@@ -199,7 +199,7 @@ class User < ApplicationRecord
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
     update_auth_token("magic_link_token")
-    reload
+    reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     EmailMagicLoginLinkWorker.perform_async(id)
   end
 

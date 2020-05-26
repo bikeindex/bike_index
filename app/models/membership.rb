@@ -28,6 +28,7 @@ class Membership < ApplicationRecord
     new_passwordless_attrs = { skip_processing: true, role: "member" }
     membership = create!(new_passwordless_attrs.merge(create_attrs))
     # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
+    # because of that, we want to process this inline
     ProcessMembershipWorker.new.perform(membership.id)
     membership.reload
     membership
@@ -36,7 +37,7 @@ class Membership < ApplicationRecord
   def invited_display_name; user.present? ? user.display_name : invited_email end
 
   def send_invitation_email?
-    return false if created_by_magic_link # Don't send an email if this is already happening
+    return false if created_by_magic_link # Don't send an email if they're already being emailed
     return false if email_invitation_sent_at.present?
     invited_email.present?
   end
