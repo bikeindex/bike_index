@@ -10,7 +10,7 @@ class Membership < ApplicationRecord
   validates_presence_of :role, :organization_id, :invited_email
 
   before_validation :set_calculated_attributes
-  after_commit :enqueue_processing_worker
+  after_commit :enqueue_processing_worker, if: :persisted?
 
   attr_accessor :skip_processing
 
@@ -26,6 +26,11 @@ class Membership < ApplicationRecord
 
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = { skip_processing: true, role: "member" }
+    if create_attrs[:invited_email].present? # This should always be present...
+      # We need to check for existing memberships because the AfterUserCreateWorker calls this
+      existing_membership = Membership.find_by_invited_email(create_attrs[:invited_email])
+      return existing_membership if existing_membership.present?
+    end
     membership = create!(new_passwordless_attrs.merge(create_attrs))
     # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
     # because of that, we want to process this inline

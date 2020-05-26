@@ -36,9 +36,11 @@ RSpec.describe SessionsController, type: :request do
         Sidekiq::Testing.inline! do
           # Just throw this in here because we don't have anywhere else that tests signup with passwordless_user_domain present...
           expect { post "/session/create_magic_link", params: { email: "somethingcool@ party.edu" } }.to_not change(User, :count)
+          expect(current_organization.memberships.count).to eq 0
           expect do
             post "/session/create_magic_link", params: { email: "somethingcool@party.edu" }
           end.to change(User, :count).by 1
+          expect(current_organization.memberships.count).to eq 1
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Sign in to Bike Index")
