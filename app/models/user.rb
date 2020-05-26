@@ -188,17 +188,19 @@ class User < ApplicationRecord
   end
 
   def send_password_reset_email
-    unless auth_token_time("password_reset_token") > Time.current - 2.minutes
-      update_auth_token("password_reset_token")
-      EmailResetPasswordWorker.perform_async(id)
-    end
+    # If the auth token was just created, don't create a new one, it's too error prone
+    return true if auth_token_time("password_reset_token") > Time.current - 2.minutes
+    update_auth_token("password_reset_token")
+    reload
+    EmailResetPasswordWorker.perform_async(id)
   end
 
   def send_magic_link_email
-    unless auth_token_time("magic_link_token") > Time.current - 1.minutes
-      update_auth_token("magic_link_token")
-      EmailMagicLoginLinkWorker.perform_async(id)
-    end
+    # If the auth token was just created, don't create a new one, it's too error prone
+    return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+    update_auth_token("magic_link_token")
+    reload
+    EmailMagicLoginLinkWorker.perform_async(id)
   end
 
   def update_last_login(ip_address)
