@@ -70,9 +70,26 @@ RSpec.describe SessionsController, type: :controller do
         expect(response).to render_template("layouts/application")
       end
     end
+    context "user signed in" do
+      include_context :logged_in_as_user
+      it "flash errors, redirects to home" do
+        post :magic_link, params: { token: SecurityTokenizer.new_token }
+        expect(cookies.signed[:auth]).to_not be_nil
+        expect(response).to redirect_to(user_home_url)
+        expect(flash[:success]).to be_present
+      end
+    end
   end
 
   context "sign_in_with_magic_link" do
+    context "unmatched magic_link" do
+      let(:unknown_token) { SecurityTokenizer.new_token }
+      it "redirects" do
+        post :sign_in_with_magic_link, params: { token: unknown_token }
+        expect(cookies.signed[:auth]).to be_nil
+        expect(response).to redirect_to(magic_link_session_path(incorrect_token: unknown_token))
+      end
+    end
     context "matching magic_link" do
       let(:user) { FactoryBot.create(:user_confirmed) }
       it "signs in and redirects" do
@@ -113,14 +130,6 @@ RSpec.describe SessionsController, type: :controller do
           expect(user.last_login_at).to be_blank
           expect(user.magic_link_token).to eq og_token
           expect(user.last_login_ip).to be_blank
-        end
-      end
-      context "unmatched magic_link" do
-        it "redirects" do
-          unknown_token = SecurityTokenizer.new_token
-          post :sign_in_with_magic_link, params: { token: unknown_token }
-          expect(cookies.signed[:auth]).to be_nil
-          expect(response).to redirect_to(magic_link_session_path(incorrect_token: unknown_token))
         end
       end
     end
