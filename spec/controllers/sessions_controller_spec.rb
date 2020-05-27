@@ -58,6 +58,7 @@ RSpec.describe SessionsController, type: :controller do
       expect(cookies.signed[:auth]).to be_nil
       expect(response.code).to eq "200"
       expect(response).to render_template("magic_link")
+      expect(response).to render_template("layouts/application")
     end
     context "incorrect_token" do
       it "renders" do
@@ -66,6 +67,7 @@ RSpec.describe SessionsController, type: :controller do
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
         expect(response).to render_template("magic_link")
+        expect(response).to render_template("layouts/application")
       end
     end
   end
