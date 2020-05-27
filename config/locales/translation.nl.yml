@@ -4818,6 +4818,9 @@ nl:
       sign_in_with_magic_link: Inloggen zonder wachtwoord
       unable_to_auth: Kan dat token niet verifiëren
       your_email_address: Uw e-mailadres
+      if_not_click_button: Zo niet, klik dan op de onderstaande knop
+      sign_in: Log in
+      you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
     new:
       dont_have_an_account: Heb je nog geen account?
       email: E-mail

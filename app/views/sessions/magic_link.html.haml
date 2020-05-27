@@ -2,12 +2,11 @@
   - if @token.present?
     .text-center
       %h3
-        You should be automatically signed in.
-      %p
-        If you are not, please click the below button
+        = t(".you_should_be_signed_in_automatically")
+      %p= t(".if_not_click_button")
       = form_tag sign_in_with_magic_link_session_path, id: "sign_in_with_magic_link", method: "post" do
         = hidden_field_tag :token, params[:token]
-        %input{ type: "submit", value: "sign in", class: 'btn btn-success btn-lg' }
+        %input{ type: "submit", value: t(".sign_in"), class: 'btn btn-success btn-lg' }
       :javascript
         document.forms["sign_in_with_magic_link"].submit()
   - else

@@ -4730,9 +4730,12 @@ en:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
       get_sign_in_link: Get sign in link
+      if_not_click_button: If you are not, please click the button below
       reenter_email: Please re-enter your email address to receive a new token
+      sign_in: Sign in
       sign_in_with_magic_link: Passwordless sign in
       unable_to_auth: Unable to authenticate that token
+      you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
     new:
       dont_have_an_account: don't have an account?
