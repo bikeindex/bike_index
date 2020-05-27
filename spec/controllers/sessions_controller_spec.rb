@@ -59,21 +59,24 @@ RSpec.describe SessionsController, type: :controller do
       expect(response.code).to eq "200"
       expect(response).to render_template("magic_link")
     end
-    context "unmatched magic_link" do
+    context "incorrect_token" do
       it "renders" do
-        get :magic_link, params: { token: SecurityTokenizer.new_token }
+        get :magic_link, params: { incorrect_token: SecurityTokenizer.new_token }
         expect(assigns(:incorrect_token)).to be_truthy
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
         expect(response).to render_template("magic_link")
       end
     end
+  end
+
+  context "sign_in_with_magic_link" do
     context "matching magic_link" do
       let(:user) { FactoryBot.create(:user_confirmed) }
       it "signs in and redirects" do
         user.update_auth_token("magic_link_token")
         request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-        get :magic_link, params: { token: user.magic_link_token }
+        post :sign_in_with_magic_link, params: { token: user.magic_link_token }
         expect(cookies.signed[:auth][1]).to eq(user.auth_token)
         expect(response).to redirect_to user_home_url
         user.reload
@@ -87,7 +90,7 @@ RSpec.describe SessionsController, type: :controller do
           user.update_auth_token("magic_link_token")
           user.reload
           expect(user.confirmed?).to be_falsey
-          get :magic_link, params: { token: user.magic_link_token }
+          post :sign_in_with_magic_link, params: { token: user.magic_link_token }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(response).to redirect_to user_home_url
           user.reload
@@ -99,12 +102,23 @@ RSpec.describe SessionsController, type: :controller do
       context "magic_link expired" do
         it "renders" do
           user.update_auth_token("magic_link_token", Time.current - 61.minutes)
+          og_token = user.magic_link_token
           request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-          get :magic_link, params: { token: user.magic_link_token }
-          expect(assigns(:incorrect_token)).to be_truthy
+          post :sign_in_with_magic_link, params: { token: og_token }
           expect(cookies.signed[:auth]).to be_nil
-          expect(response.code).to eq "200"
-          expect(response).to render_template("magic_link")
+          expect(response).to redirect_to(magic_link_session_path(incorrect_token: og_token))
+          user.reload
+          expect(user.last_login_at).to be_blank
+          expect(user.magic_link_token).to eq og_token
+          expect(user.last_login_ip).to be_blank
+        end
+      end
+      context "unmatched magic_link" do
+        it "redirects" do
+          unknown_token = SecurityTokenizer.new_token
+          post :sign_in_with_magic_link, params: { token: unknown_token }
+          expect(cookies.signed[:auth]).to be_nil
+          expect(response).to redirect_to(magic_link_session_path(incorrect_token: unknown_token))
         end
       end
     end

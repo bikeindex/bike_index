@@ -1,13 +1,25 @@
 .container
-  %h3= t(".sign_in_with_magic_link")
-  - if @incorrect_token
-    .alert.alert-warning.mt-2.mb-4
-      %h3.header-font-alt.mb-2=t(".unable_to_auth")
-      %p=t(".reenter_email")
+  - if @token.present?
+    .text-center
+      %h3
+        You should be automatically signed in.
+      %p
+        If you are not, please click the below button
+      = form_tag sign_in_with_magic_link_session_path, id: "sign_in_with_magic_link", method: "post" do
+        = hidden_field_tag :token, params[:token]
+        %input{ type: "submit", value: "sign in", class: 'btn btn-success btn-lg' }
+      :javascript
+        document.forms["sign_in_with_magic_link"].submit()
+  - else
+    %h3= t(".sign_in_with_magic_link")
+    - if @incorrect_token
+      .alert.alert-warning.mt-2.mb-4
+        %h3.header-font-alt.mb-2=t(".unable_to_auth")
+        %p=t(".reenter_email")
 
-  %p= t(".enter_email_address")
+    %p= t(".enter_email_address")
 
-  = form_tag create_magic_link_session_path, method: 'post' do
-    .form-group
-      %input{ name: 'email', id: 'email', type: 'text', placeholder: t(".your_email_address"), class: 'form-control' }
-    %input{ type: 'submit', value: t(".get_sign_in_link"), class: 'btn btn-primary btn-lg' }
+    = form_tag create_magic_link_session_path, method: 'post' do
+      .form-group
+        %input{ name: 'email', id: 'email', type: 'text', placeholder: t(".your_email_address"), class: 'form-control' }
+      %input{ type: 'submit', value: t(".get_sign_in_link"), class: 'btn btn-primary btn-lg' }

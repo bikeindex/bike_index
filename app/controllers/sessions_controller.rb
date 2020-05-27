@@ -7,6 +7,11 @@ class SessionsController < ApplicationController
   end
 
   def magic_link
+    @token = params[:token]
+    @incorrect_token = params[:incorrect_token].presence
+  end
+
+  def sign_in_with_magic_link
     user = User.find_by_magic_link_token(params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
       user.confirm(user.confirmation_token) unless user.confirmed?
@@ -14,7 +19,7 @@ class SessionsController < ApplicationController
       user.update_attributes(magic_link_token: nil)
       sign_in_and_redirect(@user)
     else
-      @incorrect_token = params[:token].present?
+      redirect_to magic_link_session_path(incorrect_token: params[:token])
     end
   end
 
