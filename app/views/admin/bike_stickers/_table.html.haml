@@ -10,6 +10,12 @@
         - else
           Created
       %th
+        %small
+          - if render_sortable
+            = sortable "updated_at"
+          - else
+            Updated
+      %th
         - if render_sortable
           = sortable "organization_id"
         - else
@@ -41,6 +47,9 @@
               - bike_sticker_url = "/bikes/scanned/#{bike_sticker.code}"
             %a.convertTime{ href: bike_sticker_url }
               = l bike_sticker.created_at, format: :convert_time
+          %td
+            %small.convertTime
+              = l bike_sticker.updated_at, format: :convert_time
           %td
             - if bike_sticker.organization.present?
               = link_to bike_sticker.organization.name, admin_bike_stickers_path(sortable_search_params.merge(organization_id: bike_sticker.organization_id))
