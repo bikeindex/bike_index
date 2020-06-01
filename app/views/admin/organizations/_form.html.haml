@@ -8,10 +8,16 @@
     = f.text_field :name, required: true, class: "form-control"
 
   .form-group.col-md-6
-    = f.label :available_invitation_count, "Available invitations"
-    = f.number_field :available_invitation_count, class: "form-control"
-    %p.text-success
-      = "Invitations sent: #{@organization.sent_invitation_count}"
+    - if @organization.restrict_invitations?
+      = f.label :available_invitation_count, "Available invitations"
+      = f.number_field :available_invitation_count, class: "form-control"
+      %p.text-success
+        = "Invitations sent: #{@organization.sent_invitation_count}"
+    - else
+      .d-md-block.d-none
+        %label &nbsp;
+        .text-form-control
+          Whitelisted domain with passwordless sign in, no invite restrictions
 .row
   .col-md-6
     .form-group
@@ -54,18 +60,8 @@
             .form-check
               = f.radio_button "kind", kind, class: "form-check-input"
               = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
-  - if @organization.id.present?
-    .col-md-6
-      - emails = @organization.users.pluck(:email)
-      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .form-group.fancy-select.unfancy
-        = f.label :embedable_user_email
-        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
-        %small.less-strong
-          - if @organization.memberships.count == 0
-            You can use #{ENV['AUTO_ORG_MEMBER']} if
-            there are no members of the organization
-  .col-md-6
+
+    %hr
     .form-group
       = f.check_box :show_on_map
       = f.label :show_on_map
@@ -82,40 +78,70 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
-
-  - if current_user.developer?
-    .col-md-6.mt-4.only-dev-visible
-      %label.less-strong.d-block
-        Manually set POS kind
-        %span.text-danger
-          Warning - you can break things here!
-      .form-check.form-check-inline
-        = f.radio_button "manual_pos_kind", "not_set", class: "form-check-input"
-        %strong
-          = f.label "manual_pos_kind_not_set", "not set", class: "form-check-label"
-      - Organization.pos_kinds.each do |pos_kind|
-        .form-check.form-check-inline.small
-          = f.radio_button "manual_pos_kind", pos_kind, class: "form-check-input"
-          = f.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label"
-      .mb-4
-
-.row.mt-2
-  .col-md-6
     .form-group.fancy-select.unfancy
       = f.label :parent_organization_id
       = f.collection_select(:parent_organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
       %em.small To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization
-  - if @organization.enabled?("regional_bike_counts")
-    .col-md-6
-      .form-group
-        = f.label :search_radius do
-          Search radius (mi)
-          %small.text-success organization has paid for Regional bike counts, this controls how large the region is
-        = f.number_field :search_radius, { class: "form-control" }
-        .only-dev-visible.p-1
-          %em.small
-            %code.d-inline nearby_organizations
-            will search within this radius for other organizations in the same area
+  .col-md-6
+    - if current_user.developer?
+      .mt-4.only-dev-visible.mb-4
+        %label.less-strong.d-block
+          Manually set POS kind
+          %span.text-danger
+            Warning - you can break things here!
+        .form-check.form-check-inline
+          = f.radio_button "manual_pos_kind", "not_set", class: "form-check-input"
+          %strong
+            = f.label "manual_pos_kind_not_set", "not set", class: "form-check-label"
+        - Organization.pos_kinds.each do |pos_kind|
+          .form-check.form-check-inline.small
+            = f.radio_button "manual_pos_kind", pos_kind, class: "form-check-input"
+            = f.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label"
+        .mb-4
+    - if @organization.id.present?
+      - emails = @organization.users.pluck(:email)
+      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+      .form-group.fancy-select.unfancy
+        = f.label :embedable_user_email
+        = f.select :embedable_user_email, emails, { prompt: "Select email", selected: @embedable_email }, class: "form-control"
+        %small.less-strong
+          - if @organization.memberships.count == 0
+            You can use #{ENV['AUTO_ORG_MEMBER']} if
+            there are no members of the organization
+
+    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users]
+
+    - if @organization.any_enabled?(enabled_features_with_admin_forms)
+      .card
+        .card-body
+          %h4
+            Settings for paid features
+          - if @organization.enabled?("regional_bike_counts")
+            .form-group
+              = f.label :search_radius do
+                %span
+                Search radius (mi)
+                %small
+                  <span class="text-success">regional bike counts setting</span>, this controls how large the region is
+              = f.number_field :search_radius, { class: "form-control" }
+              .only-dev-visible.p-1
+                %em.small
+                  %code.d-inline nearby_organizations
+                  will search within this radius for other organizations in the same area
+
+          - if @organization.enabled?("passwordless_users")
+            .form-group
+              = f.label :passwordless_user_domain do
+                %span
+                Whitelisted domain for passwordless sign in
+                %small
+                  <span class="text-success">passwordless user feature</span>
+              .input-group
+                .input-group-prepend
+                  .input-group-text @
+                = f.text_field :passwordless_user_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
+              - unless current_user.developer?
+                %span.small.less-strong Ask Seth for help changing this, it's delicate
 
 
   / .control-group.padded

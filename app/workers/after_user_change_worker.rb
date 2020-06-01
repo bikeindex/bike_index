@@ -7,7 +7,7 @@ class AfterUserChangeWorker < ApplicationWorker
 
     current_alerts = user_general_alerts(user)
     unless user.general_alerts == current_alerts
-      user.update_attributes(general_alerts: current_alerts)
+      user.update_attributes(general_alerts: current_alerts, skip_update: true)
     end
   end
 

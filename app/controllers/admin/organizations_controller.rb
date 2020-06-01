@@ -92,6 +92,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :embedable_user_email,
         :is_suspended,
         :lightspeed_cloud_api_key,
+        :passwordless_user_domain,
         :lock_show_on_map,
         :name,
         :parent_organization_id,

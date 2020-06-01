@@ -29,12 +29,13 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_merged_jobs(user, email)
     # This is already performing in a background job, so we don't need to run async
     # Also, we we need to process with the previous email, not the user's current email
-    associate_membership_invites(user, email, without_confirm: true)
+    associate_membership_invites(user, email, skip_confirm: true)
     associate_ownerships(user, email)
   end
 
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
+    create_passwordless_domain_memberships(user)
     AfterUserCreateWorker.perform_async(user.id, "async")
   end
 
@@ -59,7 +60,7 @@ class AfterUserCreateWorker < ApplicationWorker
     end
   end
 
-  def associate_membership_invites(user, email, without_confirm: false)
+  def associate_membership_invites(user, email, skip_confirm: false)
     memberships = Membership.unclaimed.where(invited_email: email)
     return false unless memberships.any?
 
@@ -72,7 +73,7 @@ class AfterUserCreateWorker < ApplicationWorker
       ProcessMembershipWorker.perform_async(membership_id, user.id)
     end
 
-    user.confirm(user.confirmation_token) unless without_confirm
+    user.confirm(user.confirmation_token) unless skip_confirm
   end
 
   def import_user_attributes(user)
@@ -93,5 +94,14 @@ class AfterUserCreateWorker < ApplicationWorker
     # Deal with example bikes
     Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).pluck(:bike_id)
       .map { |id| Bike.unscoped.where(id: id).first }.compact
+  end
+
+  def create_passwordless_domain_memberships(user)
+    matching_organization = Organization.passwordless_email_matching(user.email)
+    return false unless matching_organization.present?
+    return false if user.memberships.pluck(:organization_id).include?(matching_organization.id)
+    Membership.create_passwordless(organization_id: matching_organization.id,
+                                   invited_email: user.email)
+    user.reload
   end
 end

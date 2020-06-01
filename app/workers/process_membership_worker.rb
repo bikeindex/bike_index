@@ -9,7 +9,7 @@ class ProcessMembershipWorker < ApplicationWorker
     auto_generate_user_for_organization(membership)
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
-      membership.update_attribute :email_invitation_sent_at, Time.current
+      membership.update_attributes(email_invitation_sent_at: Time.current, skip_processing: true)
     end
 
     # Bust cache keys on user and organization

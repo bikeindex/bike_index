@@ -4448,6 +4448,8 @@ en:
         email: Email
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited
+        last_login: Last login
+        last_login_ip: Last login ip
         member_of_organization: Member of organization
         membership_type: Membership type
         remove_from_organization: remove from organization
@@ -4456,23 +4458,30 @@ en:
       index:
         claimed: Claimed
         created: Created
+        current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         invite_more_users: Invite more users
         is_admin: Admin?
         manage_users: Manage Users
+        manually_invite_email: manually invite emails
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         sender: Sender
         to: To
         update_email: Update email
         user: user
+        whitelisted_domain_info_html: >-
+          You have a whitelisted domain, anyone signing up with an email address ending
+          in <code>%{email_suffix}</code> will be a member of %{org_name}.
+        you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       new:
         1_email_per_line: 1 email per line
         admin_of_organization: Admin of organization
         automatic_passwordless: >-
-          Your organization is set up with automatic passwordless log in. The Emails
-          you add will receive a message with a link to sign in.
+          Your organization is set up with automatic passwordless log in. Emails you
+          invite will be able to sign in by using the "Emailed sign in link" button
+          on the sign in page.
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
@@ -4483,7 +4492,11 @@ en:
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         send_invitation: Send invitation
+        signing_in_with_whitelisted_html: >-
+          Signing in with an "Emailed sign in link" using an address that ends with
+          <code>%{email_suffix}</code> will automatically make you a member of %{org_name}.
         user: user
+        you_have_a_whitelisted_domain: You have a whitelisted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
   organized_mailer:
     custom_message:
@@ -4717,9 +4730,12 @@ en:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
       get_sign_in_link: Get sign in link
+      if_not_click_button: If you are not, please click the button below
       reenter_email: Please re-enter your email address to receive a new token
+      sign_in: Sign in
       sign_in_with_magic_link: Passwordless sign in
       unable_to_auth: Unable to authenticate that token
+      you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
     new:
       dont_have_an_account: don't have an account?

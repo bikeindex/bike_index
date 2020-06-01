@@ -19,7 +19,7 @@ class Admin::BikeStickersController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at claimed_at code_integer organization_id bike_sticker_batch_id]
+    %w[created_at updated_at claimed_at code_integer organization_id bike_sticker_batch_id]
   end
 
   def matching_bike_stickers
