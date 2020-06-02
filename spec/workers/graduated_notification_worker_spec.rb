@@ -36,4 +36,34 @@ RSpec.describe GraduatedNotificationWorker, type: :lib do
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     end
   end
+
+  # describe "bikes_to_notify" do
+  #   let(:user) { FactoryBot.create(:user) }
+  #   let!(:bike1) do
+  #     FactoryBot.create(:bike_organized,
+  #                       :with_ownership_claimed,
+  #                       user: user,
+  #                       organization: organization,
+  #                       created_at: Time.current - 13.days)
+  #   end
+  #   let!(:bike1) do
+  #     FactoryBot.create(:bike_organized,
+  #                       :with_ownership_claimed,
+  #                       user: user,
+  #                       organization: organization,
+  #                       created_at: Time.current - 16.days)
+  #   end
+  #   it "creates for both bikes" do
+  #     expect(GraduatedNotification.bikes_to_notify(organization).pluck(:id)).to eq([bike1.id])
+  #     graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
+  #     expect(graduated_notification1.main_notification?).to be_truthy
+  #     expect(graduated_notification1.send_email?).to be_truthy
+  #     organization.update(graduated_notification_interval_days: 7)
+  #     expect(GraduatedNotification.bikes_to_notify(organization).pluck(:id)).to eq([bike2.id])
+  #     graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
+  #     expect(graduated_notification2.main_notification?).to be_falsey
+  #     expect(graduated_notification2.primary_notification).to eq(graduated_notification1)
+  #     expect(graduated_notification2.send_email?).to be_falsey
+  #   end
+  # end
 end

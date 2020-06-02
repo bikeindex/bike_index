@@ -80,6 +80,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def resolved?; !active? end
 
+  def email_success?; delivery_status == "email_success" end
+
   def initial_record?; initial_record_id.blank? end
 
   def repeat_record?; initial_record_id.present? end

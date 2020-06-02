@@ -26,14 +26,12 @@ class GraduatedNotification < ApplicationRecord
   def self.active_statuses; ["delivered"] end
 
   def self.associated_notifications_including_self(id, primary_notification_id)
-    potential_id_matches = [id, primary_notification_id].compact
-    where(primary_notification_id: potential_id_matches).or(where(id: potential_id_matches))
+    return none unless primary_notification_id.present?
+    where(primary_notification_id: primary_notification_id)
   end
 
   def self.associated_notifications(id, primary_notification_id)
-    potential_id_matches = [id, primary_notification_id].compact
-    where(primary_notification_id: potential_id_matches).where.not(id: id)
-      .or(where(id: primary_notification_id))
+    associated_notifications_including_self(id, primary_notification_id).where.not(id: id)
   end
 
   def self.bikes
@@ -67,14 +65,16 @@ class GraduatedNotification < ApplicationRecord
 
   def primary_bike?; bike_id == primary_bike_id end
 
+  def email_success?; delivery_status == "email_success" end
+
   # Get it unscoped, because we delete it
-  def bike_organization; @bike_organization ||= bike_organization_id.present? ? BikeOrganization.unscoped.find_by_id(bike_organization_id) : nil end
+  def bike_organization; bike_organization_id.present? ? BikeOrganization.unscoped.find_by_id(bike_organization_id) : nil end
 
   def active?; self.class.active_statuses.include?(status) end
 
-  def main_notification?; self.id.present? && self.id == calculated_main_notification&.id end
+  def primary_notification?; id.present? && id == primary_notification_id end
 
-  def secondary_notification?; !main_notification? end
+  def secondary_notification?; !primary_notification? end
 
   def associated_notifications; self.class.associated_notifications(id, primary_notification_id) end
 
@@ -82,20 +82,14 @@ class GraduatedNotification < ApplicationRecord
 
   def associated_bikes
     return Bike.none unless user.present? || bike.present?
-    if user_id.present?
-      bikes = Bike.unscoped.current.includes(:ownerships).where(ownerships: { current: true, user_id: user_id })
-                  .organization(organization_id)
-    else
-      bikes = organization.bikes.includes(:ownerships).where(owner_email: bike.owner_email)
-    end
+    # If the notifications have been processed, the bikes are removed from the organization - using associated_notifications will get them
+    bike_ids = user_or_email_bike_ids + associated_notifications.pluck(:bike_id) + [bike_id]
     # We want to order the bikes by when the ownership was created, so perform that on either result
-    bikes.where("ownerships.created_at < ?", created_at || Time.current)
-         .reorder("ownerships.created_at DESC")
+    Bike.unscoped.where(id: bike_ids).includes(:ownerships).reorder("ownerships.created_at DESC")
   end
 
   def send_email?
-    return false unless organization.deliver_graduated_notifications?
-     main_notification?
+    organization.deliver_graduated_notifications? && primary_notification?
   end
 
   def mark_remaining!(resolved_at: nil)
@@ -104,7 +98,15 @@ class GraduatedNotification < ApplicationRecord
     return true unless marked_remaining_at_changed?
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
-    associated_notifications.each { |n| n.update(updated_at: Time.current) }
+    associated_notifications.each { |n| n.update(updated_at: Time.current, skip_update: true) }
+    # Long shot - but update any graduated notifications that might have been missed, just in case
+    organization.graduated_notifications.where(bike_id: bike_id).active.each do |pre_notification|
+      if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
+        # remove the newer bike_organization, keep the older one
+        bike_organization.destroy if bike_organization.created_at > pre_notification.bike_organization.created_at
+      end
+      pre_notification.mark_remaining!
+    end
     true
   end
 
@@ -112,17 +114,15 @@ class GraduatedNotification < ApplicationRecord
     self.bike_organization_id ||= calculated_bike_organization&.id
     self.user ||= bike.user
     self.email ||= calculated_email
-    self.primary_bike_id ||= calculated_primary_bike&.id
-    if primary_notification_id.blank? && calculated_main_notification.present? && !main_notification?
-      self.primary_notification_id = calculated_main_notification.id
-    end
+    self.primary_bike_id ||= associated_bikes.last&.id
+    self.primary_notification ||= calculated_primary_notification
     self.marked_remaining_link_token ||= SecurityTokenizer.new_token if pending?
     self.status = calculated_status
   end
 
   def update_associated_notifications
     return true if skip_update
-    return true unless main_notification? && persisted?
+    return true unless primary_notification? && persisted?
 
     organization.graduated_notifications.where(primary_notification_id: nil, primary_bike_id: bike_id)
                 .where.not(id: id)
@@ -131,8 +131,9 @@ class GraduatedNotification < ApplicationRecord
 
   # This is here because we're calling it from the creation job, and I like it here more than in the job
   def process_notification!
-    return true if delivery_status == "email_success"
+    return true if email_success?
     bike_organization&.destroy
+
     OrganizedMailer.graduated_notification(self).deliver_now if send_email?
     # I'm not sure how to make this more representative, similar issue in parking_notification
     update(delivery_status: "email_success")
@@ -142,7 +143,7 @@ class GraduatedNotification < ApplicationRecord
 
   def calculated_status
     return "marked_remaining" if marked_remaining_at.present? # Because prior to saving
-    return "pending" unless calculated_main_notification.present? && calculated_main_notification.delivery_status == "email_success"
+    return "pending" unless primary_notification.present? && primary_notification.email_success?
     associated_notifications_including_self.marked_remaining.any? ? "marked_remaining" : "delivered"
   end
 
@@ -150,31 +151,48 @@ class GraduatedNotification < ApplicationRecord
     user&.email || bike.owner_email
   end
 
-  def calculated_primary_bike; associated_bikes&.last end
-
   def calculated_bike_organization
     BikeOrganization.where(bike_id: bike_id, organization_id: organization_id)
                     .where("created_at < ?", created_at || Time.current)
                     .reorder(:id).last
   end
 
-  # THIS CAN BE NIL! - it's distinct from primary_notification because main_notification might not exist yet
-  def calculated_main_notification
-    return primary_notification if primary_notification_id.present?
-    return self if primary_bike? && primary_notification_id.blank?
+  # THIS CAN BE NIL! - the primary_notification might not exist yet
+  def calculated_primary_notification
+    return primary_notification if primary_notification_id.present? # Use already calculated value
+    # If an associated notification was already emailed out, use that notification
+    return existing_sent_notification if existing_sent_notification.present?
+    return self if primary_bike? && primary_notification_id.blank? # This is the primary notification
     notifications = organization.graduated_notifications.where(bike_id: primary_bike_id)
     # If there aren't any notifications, return nil
     # Also - if the organization doesn't have an interval set, we can't do anything, so skip it
-    return notifications&.first if notifications.count < 1 || organization.deliver_graduated_notifications?
+    return notifications&.first if organization.graduated_notification_interval.blank?
     # Otherwise, only match on notifications from the same period
+    notifications.where(created_at: potential_matching_period)
+                 .or(notifications.where(marked_remaining_at: potential_matching_period)).first
+  end
+
+  def potential_matching_period
     c_at = created_at || Time.current
-    matching_period = (c_at - organization.graduated_notification_interval)..(c_at + organization.graduated_notification_interval)
-    notifications.where(created_at: matching_period)
-                 .or(where(marked_remaining_at: matching_period))
-                 .first
-    # return notifications&.first if notifications.count < 2
-    # fail # Because we haven't written the logic for this
-    # .last
-    #                                   .where(created_at: (c_at - organization))
+    (c_at - organization.graduated_notification_interval)..(c_at + organization.graduated_notification_interval)
+  end
+
+  def existing_sent_notification
+    if user_id.present?
+      existing_notification = GraduatedNotification.where(user_id: user_id, created_at: potential_matching_period)
+                                                        .email_success.first
+    end
+    existing_notification ||= associated_notifications_including_self.email_success.first
+    existing_notification
+  end
+
+  def user_or_email_bike_ids
+    if user_id.present?
+      bikes = Bike.unscoped.current.includes(:ownerships).where(ownerships: { current: true, user_id: user_id })
+                  .organization(organization_id)
+    else
+      bikes = organization.bikes.includes(:ownerships).where(owner_email: bike.owner_email)
+    end
+    bikes.where("ownerships.created_at < ?", created_at || Time.current).pluck("bikes.id")
   end
 end

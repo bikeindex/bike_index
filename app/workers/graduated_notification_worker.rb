@@ -20,8 +20,8 @@ class GraduatedNotificationWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    self.class.organizations.pluck(:id).each do |id|
-      UpdateOrganizationPosKindWorker.perform_async(id)
+    self.class.organizations.each do |organization|
+      self.class.perform_async(id)
     end
   end
 end

@@ -39,7 +39,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         end.to change(ProcessParkingNotificationWorker.jobs, :size).by(-1)
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
         parking_notification3.reload
-        expect(parking_notification3.delivery_status).to eq "email_success"
+        expect(parking_notification3.email_success?).to be_truthy
         expect(parking_notification3.kind).to eq "impound_notification"
         expect(parking_notification3.impound_record).to be_present
         expect(parking_notification3.status).to eq "impounded"

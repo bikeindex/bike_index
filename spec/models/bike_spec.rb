@@ -980,9 +980,10 @@ RSpec.describe Bike, type: :model do
           # Just check that we stored it, since lazily not testing this anywhere else
           expect(b_param.params["formatted_address"]).to eq target.as_json
           expect(bike.registration_address).to eq target.as_json
-          # For some reason, something is funky with latitude precision here vs on CI. It isn't relevant, so bypassing
-          expect(bike.address_hash.except(:latitude)).to eq target.merge(country: "US").except(:latitude).as_json
+          # For some reason, something is funky with coordinates precision here vs on CI. It isn't relevant, so bypassing
+          expect(bike.address_hash.except(:latitude, :longitude)).to eq target.merge(country: "US").except(:latitude, :longitude).as_json
           expect(bike.latitude).to be_within(0.1).of target[:latitude]
+          expect(bike.longitude).to be_within(0.1).of target[:longitude]
         end
       end
       context "legacy address (street -> address)" do
