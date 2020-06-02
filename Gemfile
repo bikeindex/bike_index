@@ -61,7 +61,7 @@ gem "omniauth-strava"
 gem "omniauth-twitter"
 gem "paranoia"
 gem "pg_search"
-gem "puma", "~> 3.11"
+gem "puma", "~> 3.12"
 gem "rack-contrib"
 gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
