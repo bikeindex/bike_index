@@ -887,7 +887,7 @@ RSpec.describe Bike, type: :model do
       it "sets owner email to primary email (on save)" do
         user_email = FactoryBot.create(:user_email, confirmation_token: "123456789")
         user = user_email.user
-        expect(user_email.unconfirmed).to be_truthy
+        expect(user_email.unconfirmed?).to be_truthy
         expect(user.email).to_not eq user_email.email
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(bike.owner_email).to eq user_email.email

@@ -81,7 +81,8 @@
             %p.form-well-input-static
               = user_email.email
             .right-input-help.right-text-help.full-width
-              = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post
+              = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"
+              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: { confirm: "Are you sure you want to remove #{user_email.email}?" }, class: 'delete-email'
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields.no-divider-row
         - labeled = false
@@ -94,8 +95,8 @@
             %p.form-well-input-static
               = user_email.email
             .right-input-help.right-text-help.full-width
-              = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post
-              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, class: 'delete-email'
+              = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post, class: "d-block"
+              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: { confirm: "Are you sure you want to remove #{user_email.email}?" }, class: 'delete-email'
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil

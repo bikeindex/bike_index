@@ -40,7 +40,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(ownership).to be_present
         expect(membership).to be_present
         expect(second_membership).to be_present
-        expect(user_email.confirmed).to be_truthy
+        expect(user_email.confirmed?).to be_truthy
         old_user_ownership.mark_claimed
         expect(old_user.ownerships.pluck(:id)).to eq([ownership.id, old_user_ownership.id])
         expect(membership.user).to eq old_user
@@ -113,7 +113,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       before do
         expect(ownership).to be_present
         expect(membership).to be_present
-        expect(user_email.confirmed).to be_truthy
+        expect(user_email.confirmed?).to be_truthy
       end
 
       it "runs the same things as user_create" do
@@ -136,11 +136,11 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     it "doesn't merge" do
       ownership = FactoryBot.create(:ownership)
       user_email = FactoryBot.create(:user_email, email: ownership.owner_email, confirmation_token: "token-stuff")
-      expect(user_email.confirmed).to be_falsey
+      expect(user_email.confirmed?).to be_falsey
       MergeAdditionalEmailWorker.new.perform(user_email.id)
       user_email.reload
       ownership.reload
-      expect(user_email.confirmed).to be_falsey
+      expect(user_email.confirmed?).to be_falsey
       expect(ownership.owner).to_not eq user_email.user
     end
   end

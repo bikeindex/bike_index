@@ -314,7 +314,7 @@ RSpec.describe SessionsController, type: :controller do
       context "with confirmed user_email" do
         let!(:user_email) { FactoryBot.create(:user_email, user: user) }
         it "logs in, sends to please_confirm_email" do
-          expect(user_email.confirmed).to be_truthy
+          expect(user_email.confirmed?).to be_truthy
           post :create, params: { session: { email: user.email, password: "testthisthing7$" } }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to(please_confirm_email_users_path)

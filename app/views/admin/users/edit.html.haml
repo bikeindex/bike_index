@@ -197,9 +197,9 @@
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
-            = check_mark if user_email.confirmed
+            = check_mark if user_email.confirmed?
           %td
-            = check_mark if user_email.primary
+            = check_mark if user_email.primary?
           %td
             = user_email.old_user_id
 

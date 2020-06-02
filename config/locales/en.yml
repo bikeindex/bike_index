@@ -1753,13 +1753,13 @@ en:
         incorrect_token: Incorrect token for %{user_email}. Try resending the confirmation
           email
       destroy:
-        email_confirmed: >-
-          %{user_email} is confirmed and can't be removed. Email contact@bikeindex.org
-          for help.
+        email_primary: >-
+          %{user_email} is your primary email and can't be removed. You need to make
+          a different email your primary email before removing this email
         email_removed: "%{user_email} removed."
-        only_confirmed_email: >-
-          %{user_email} is your only confirmed email and can't be removed. Email contact@bikeindex.org
-          for help.
+        only_email: >-
+          %{user_email} is your only email on file and can't be removed. Please add
+          another email if you want to remove this email
       ensure_user_email_ownership:
         you_must_be_signed_in: >-
           You must be signed in with primary email! Email contact@bikeindex.org if

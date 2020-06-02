@@ -17,7 +17,7 @@ RSpec.describe UserEmail, type: :model do
         user.confirmed = true
         user.id = 4444
         user_email = UserEmail.create_confirmed_primary_email(user)
-        expect(user_email.confirmed).to be_truthy
+        expect(user_email.confirmed?).to be_truthy
         expect(user_email.email).to eq "cool@stuff.com"
         expect(user_email.valid?).to be_truthy
       end
@@ -81,7 +81,7 @@ RSpec.describe UserEmail, type: :model do
       let(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "2@dddd") }
       it "returns the user" do
         expect(secondary_email.user).to eq user
-        expect(secondary_email.confirmed).to be_truthy
+        expect(secondary_email.confirmed?).to be_truthy
         expect(UserEmail.fuzzy_user_find("2@dddd")).to eq user
       end
     end
