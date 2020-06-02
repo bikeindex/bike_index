@@ -208,7 +208,7 @@ RSpec.describe User, type: :model do
         let(:email) { "another@foo.com" }
         let(:secondary_email) { FactoryBot.create(:user_email, user: user, email: email) }
         it "finds users by secondary email" do
-          expect(secondary_email.confirmed).to be_truthy
+          expect(secondary_email.confirmed?).to be_truthy
           expect(secondary_email.user).to eq user
           expect(user.secondary_emails.include?(email)).to be_truthy
           expect(User.fuzzy_email_find(email)).to eq user
@@ -581,10 +581,6 @@ RSpec.describe User, type: :model do
       user = User.new(show_bikes: false, username: "coolstuff", twitter: "bikeindex")
       expect(user.userlink).to eq("https://twitter.com/bikeindex")
     end
-  end
-
-  describe "primary_user_email" do
-    it "can not set a unconfirmed email to the primary email"
   end
 
   describe "additional_emails=" do

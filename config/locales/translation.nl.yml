@@ -2314,11 +2314,12 @@ nl:
         incorrect_token: Onjuist token voor %{user_email}. Probeer de bevestigingsmail
           opnieuw te verzenden
       destroy:
-        email_confirmed: "%{user_email} is bevestigd en kan niet worden verwijderd.
-          E-mail contact@bikeindex.org voor hulp."
         email_removed: "%{user_email} verwijderd."
-        only_confirmed_email: "%{user_email} is uw enige bevestigde e-mail en kan
-          niet worden verwijderd. E-mail contact@bikeindex.org voor hulp."
+        email_primary: "%{user_email} is je primaire e-mailadres en kan niet worden
+          verwijderd. U moet een ander e-mailadres als primair e-mailadres instellen
+          voordat u dit e-mailadres verwijdert"
+        only_email: "%{user_email} is je enige geregistreerde e-mailadres en kan niet
+          worden verwijderd. Voeg een andere e-mail toe als u deze e-mail wilt verwijderen"
       ensure_user_email_ownership:
         you_must_be_signed_in: U moet zijn aangemeld met primaire e-mail! E-mail contact@bikeindex.org
           als dit niet logisch is.

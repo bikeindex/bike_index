@@ -887,7 +887,7 @@ RSpec.describe Bike, type: :model do
       it "sets owner email to primary email (on save)" do
         user_email = FactoryBot.create(:user_email, confirmation_token: "123456789")
         user = user_email.user
-        expect(user_email.unconfirmed).to be_truthy
+        expect(user_email.unconfirmed?).to be_truthy
         expect(user.email).to_not eq user_email.email
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(bike.owner_email).to eq user_email.email
@@ -980,7 +980,7 @@ RSpec.describe Bike, type: :model do
           # Just check that we stored it, since lazily not testing this anywhere else
           expect(b_param.params["formatted_address"]).to eq target.as_json
           expect(bike.registration_address).to eq target.as_json
-          # For some reason, something is funky with coordinates precision here vs on CI. It isn't relevant, so bypassing
+          # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
           expect(bike.address_hash.except(:latitude, :longitude)).to eq target.merge(country: "US").except(:latitude, :longitude).as_json
           expect(bike.latitude).to be_within(0.1).of target[:latitude]
           expect(bike.longitude).to be_within(0.1).of target[:longitude]
