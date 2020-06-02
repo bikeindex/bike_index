@@ -10,7 +10,7 @@ class GraduatedNotification < ApplicationRecord
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
   before_validation :set_calculated_attributes
-  after_commit :update_associated_notifications
+  after_commit :update_associated_notifications, if: :persisted?
 
   enum status: STATUS_ENUM
 
@@ -56,8 +56,8 @@ class GraduatedNotification < ApplicationRecord
 
   def self.bike_ids_to_notify(organization)
     return Bike.nil unless organization.graduated_notification_interval.present?
-    bikes_to_notify_without_notifications(organization).pluck(:id) + []
-      # bikes_to_notify_expired_notifications(organization).pluck(:id)
+    bikes_to_notify_without_notifications(organization).pluck(:id) +
+      bikes_to_notify_expired_notifications(organization).pluck(:id)
   end
 
   # Get it unscoped, because we really want it
@@ -139,12 +139,18 @@ class GraduatedNotification < ApplicationRecord
     update(delivery_status: "email_success")
   end
 
+  # Right now, just static - but we're going to make it configurable
+  def email_title
+    "Renew your bike permit"
+  end
+
   private
 
   def calculated_status
-    return "marked_remaining" if marked_remaining_at.present? # Because prior to saving
-    return "pending" unless primary_notification.present? && primary_notification.email_success?
-    associated_notifications_including_self.marked_remaining.any? ? "marked_remaining" : "delivered"
+    # Because prior to commit, the value for the current notification isn't set
+    return "marked_remaining" if marked_remaining_at.present? || associated_notifications_including_self.marked_remaining.any?
+    # Similar - if this is the primary_notification, we want to make sure it's marked delivered during save
+    delivery_status == "email_success" || primary_notification.present? && primary_notification.email_success? ? "delivered" : "pending"
   end
 
   def calculated_email

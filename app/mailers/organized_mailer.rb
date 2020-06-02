@@ -80,7 +80,7 @@ class OrganizedMailer < ApplicationMailer
     end
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(reply_to: reply_to, to: @graduated_notification.email, subject: "Renew your bike permit")
+      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.email_title)
     end
   end
 

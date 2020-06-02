@@ -14,18 +14,22 @@ RSpec.describe GraduatedNotification, type: :model do
     it "is valid" do
       expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
       expect(organization.deliver_graduated_notifications?).to be_truthy
+      graduated_notification.reload
       expect(graduated_notification).to be_valid
+      expect(bike.created_at).to be < (Time.current - graduated_notification_interval)
       expect(graduated_notification.send("calculated_primary_notification").id).to eq graduated_notification.id
+      expect(graduated_notification.send_email?).to be_truthy
+      expect(graduated_notification.email_success?).to be_falsey
       expect do
         graduated_notification.process_notification!
       end.to change(BikeOrganization, :count).by(-1)
       expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
       graduated_notification.reload
       expect(graduated_notification.bike_organization.deleted?).to be_truthy
+      expect(graduated_notification.email_success?).to be_truthy
       expect(graduated_notification.status).to eq "delivered"
       expect(graduated_notification.active?).to be_truthy
       expect(graduated_notification.user).to be_blank
-      expect(graduated_notification.send_email?).to be_truthy
       expect(graduated_notification.email).to eq bike.owner_email
       expect(bike.graduated?(organization)).to be_truthy
     end
@@ -58,13 +62,12 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(organization.graduated_notifications.bikes.pluck(:id)).to eq([bike.id])
       end
     end
-    context "marked_remaining" do
+    context "manually marked_remaining" do
       it "is not active" do
         graduated_notification.process_notification!
         graduated_notification.reload
         expect(graduated_notification.bike_organization.deleted?).to be_truthy
         bike_organization_id = graduated_notification.bike_organization.id
-        # graduated_notification = GraduatedNotification.find(graduated_notification.id) # get rid of memoizing, maybe
         expect(organization.bikes.pluck(:id)).to eq([])
         graduated_notification.mark_remaining!
         graduated_notification.reload
@@ -78,6 +81,49 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(organization.bikes.pluck(:id)).to eq([bike.id])
         expect(graduated_notification.bike_organization.id).to eq bike_organization_id
       end
+    end
+    context "marked_remaining" do
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: Time.current - 1.year) }
+      it "is not active" do
+        expect(graduated_notification.active?).to be_falsey
+        expect(graduated_notification.email_success?).to be_truthy
+        expect(graduated_notification.marked_remaining_at).to be < Time.current
+
+        expect(BikeOrganization.unscoped.where(bike_id: bike.id).count).to eq 1
+        bike_organization = BikeOrganization.unscoped.where(bike_id: bike.id).first
+        expect(bike_organization.deleted?).to be_falsey
+
+        bike.reload
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        expect(bike.graduated?(organization)).to be_falsey
+        expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification.id])
+      end
+    end
+  end
+
+  describe "bikes_to_notify" do
+    let(:graduated_notification_interval) { 2.years }
+    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - 5.years) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, :stolen, :with_ownership, organization: organization, created_at: Time.current - 3.years) }
+    let!(:bike_organization1) { bike1.bike_organizations.where(organization_id: organization.id).first }
+    let!(:bike_organization2) { bike2.bike_organizations.where(organization_id: organization.id).first }
+    let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
+    it "finds bikes to notify" do
+      bike1.reload
+      expect(bike1.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
+      bike_organization1.reload
+      bike_organization2.reload
+      expect(bike_organization1.deleted?).to be_falsey
+      expect(bike_organization2.deleted?).to be_falsey
+      interval_start = Time.current - graduated_notification_interval
+      expect(bike1.created_at).to be < interval_start - graduated_notification_interval # Double interval early
+      expect(graduated_notification1.created_at).to be < interval_start
+      expect(graduated_notification1.marked_remaining_at).to be < interval_start
+      expect(GraduatedNotification.count).to eq 1
+      expect(GraduatedNotification.active.count).to eq 0
+      expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike2.id])
+      expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to match_array([bike1.id])
+      expect(GraduatedNotification.bike_ids_to_notify(organization)).to match_array([bike1.id, bike2.id])
     end
   end
 
@@ -93,7 +139,7 @@ RSpec.describe GraduatedNotification, type: :model do
       it "finds the first bike" do
         _bike3 = FactoryBot.create(:bike_organized, :with_ownership, organization: organization) # Test to ensure that we aren't grabbing bikes that aren't due notification
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike1.id, bike2.id])
-        # expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to match_array([])
+        expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to match_array([])
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id, bike2.id])
         expect(GraduatedNotification.count).to eq 0
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)

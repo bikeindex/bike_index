@@ -105,6 +105,7 @@ FactoryBot.define do
       after(:create) do |bike, evaluator|
         create(:bike_organization, organization: bike.creation_organization,
                                    bike: bike,
+                                   created_at: bike.created_at,
                                    can_edit_claimed: evaluator.can_edit_claimed)
         bike.reload
       end

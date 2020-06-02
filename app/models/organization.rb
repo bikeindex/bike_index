@@ -283,7 +283,7 @@ class Organization < ApplicationRecord
 
   def graduated_notification_interval_days=(val)
     val_i = val.to_i
-    self.graduated_notification_interval = (val_i > 0) ? val_i.days.to_i : nil
+    self.graduated_notification_interval = val_i.days.to_i if val_i.present?
   end
 
   # Accepts string or array, tests that ALL are enabled
@@ -311,6 +311,7 @@ class Organization < ApplicationRecord
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
+    self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
