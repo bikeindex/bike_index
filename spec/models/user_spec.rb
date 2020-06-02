@@ -583,10 +583,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "primary_user_email" do
-    it "can not set a unconfirmed email to the primary email"
-  end
-
   describe "additional_emails=" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     before do

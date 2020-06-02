@@ -43,24 +43,24 @@ class UserEmail < ActiveRecord::Base
     ue && ue.user
   end
 
-  def confirmed
+  def confirmed?
     confirmation_token.blank?
   end
 
-  def unconfirmed
-    !confirmed
+  def unconfirmed?
+    !confirmed?
   end
 
-  def primary
-    confirmed && user.email == email
+  def primary?
+    confirmed? && user.email == email
   end
 
-  def expired
+  def expired?
     created_at > Time.current - 2.hours
   end
 
   def make_primary
-    return false unless confirmed && !primary
+    return false unless confirmed? && !primary?
     if user.user_emails.where(email: user.email).present?
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
@@ -77,7 +77,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def send_confirmation_email
-    AdditionalEmailConfirmationWorker.perform_async(id) unless confirmed
+    AdditionalEmailConfirmationWorker.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation
