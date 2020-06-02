@@ -169,11 +169,14 @@ class GraduatedNotification < ApplicationRecord
     return false unless processable?
 
     bike_organization&.destroy!
+    # If it isn't the primary_notification, only necessary to update it
+    return update(processed_at: Time.current) unless primary_notification?
 
-    OrganizedMailer.graduated_notification(self).deliver_now if send_email?
-    self.processed_at ||= Time.current
-    # I'm not sure how to make this more representative, similar issue in parking_notification
-    update(delivery_status: "email_success")
+    # deliver email before everything, so if fails, we send when we try again
+    OrganizedMailer.graduated_notification(self).deliver_now
+    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+    # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
+    associated_notifications.each { |notification| notification.process_notification! }
   end
 
   # Right now, just static - but we're going to make it configurable

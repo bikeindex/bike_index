@@ -214,16 +214,9 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.in_pending_period?).to be_falsey
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification1.processable?).to be_truthy
+        # Processing right now
         graduated_notification1.process_notification!
         expect(ActionMailer::Base.deliveries.count).to eq 1
-        graduated_notification2.reload
-        expect(graduated_notification2.send_email?).to be_falsey
-        expect(graduated_notification2.primary_notification?).to be_falsey
-        expect(graduated_notification2.primary_bike?).to be_falsey
-        expect(graduated_notification2.primary_bike_id).to eq bike1.id
-        expect(graduated_notification2.send_email?).to be_falsey
-        expect(graduated_notification2.processed?).to be_truthy
-        expect(BikeOrganization.unscoped.find(graduated_notification2.bike_organization_id).deleted?).to be_truthy
         graduated_notification1.reload
         expect(graduated_notification1.primary_bike?).to be_truthy
         expect(BikeOrganization.unscoped.find(graduated_notification1.bike_organization_id).deleted?).to be_truthy
@@ -233,48 +226,61 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.send("calculated_primary_notification")&.id).to eq graduated_notification1.id
         expect(graduated_notification1.associated_notifications.pluck(:id)).to eq([graduated_notification2.id])
 
+        graduated_notification2.reload
+        expect(graduated_notification2.send_email?).to be_falsey
+        expect(graduated_notification2.primary_notification?).to be_falsey
+        expect(graduated_notification2.primary_bike?).to be_falsey
+        expect(graduated_notification2.primary_bike_id).to eq bike1.id
+        expect(graduated_notification2.send_email?).to be_falsey
+        expect(graduated_notification2.processed_at).to be_present
+        expect(graduated_notification2.processed?).to be_truthy
+        expect(BikeOrganization.unscoped.find(graduated_notification2.bike_organization_id).deleted?).to be_truthy
+
         # And since we've sent these notifications, the bikes aren't around anymore
         expect(organization.bikes.pluck(:id)).to match_array([])
       end
     end
   end
 
-  # # This overlaps with some of the above tests, but it's separate to ensure coverage
-  # describe "bike assigned after creation" do
-  #   let(:period_start) { Time.current - 8.days }
-  #   let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start, user: user, organization: organization) }
-  #   let(:user) { FactoryBot.create(:user) }
-  #   let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start + 4.days, user: user, organization: organization) }
-  #   it "it is still primary notification" do
-  #     expect(bike1.user&.id).to eq user.id
-  #     graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-  #     graduated_notification1.update(created_at: Time.current - 2.days)
-  #     expect(graduated_notification1.primary_notification?).to be_truthy
-  #     graduated_notification1.process_notification!
-  #     expect(graduated_notification1.primary_notification?).to be_truthy
-  #     expect(graduated_notification1.email_success?).to be_truthy
-  #     expect(graduated_notification1.user_id).to eq user.id
-  #     bike1.reload
-  #     bike2.reload # This creates the bike
-  #     expect(bike1.current_ownership.created_at).to be_within(100).of period_start
-  #     expect(bike2.current_ownership.created_at).to be > bike1.current_ownership.created_at
+  # This overlaps with some of the above tests, but it's separate to ensure coverage
+  describe "bike assigned after creation" do
+    let(:period_start) { Time.current - 8.days }
+    let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start, user: user, organization: organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start + 4.days, user: user, organization: organization) }
+    it "it is still primary notification" do
+      expect(bike1.user&.id).to eq user.id
+      graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
+      graduated_notification1.update(created_at: Time.current - 1.day)
+      expect(graduated_notification1.primary_notification?).to be_truthy
+      expect(graduated_notification1.processable?).to be_truthy
+      graduated_notification1.process_notification!
+      expect(graduated_notification1.primary_notification?).to be_truthy
+      expect(graduated_notification1.email_success?).to be_truthy
+      expect(graduated_notification1.processed?).to be_truthy
+      expect(graduated_notification1.user_id).to eq user.id
+      bike1.reload
+      bike2.reload # This creates the bike
+      expect(bike1.current_ownership.created_at).to be_within(100).of period_start
+      expect(bike2.current_ownership.created_at).to be > bike1.current_ownership.created_at
 
-  #     expect(bike2.user&.id).to eq user.id
-  #     graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-  #     expect(graduated_notification2.send("existing_sent_notification")&.id).to eq graduated_notification1.id
-  #     expect(graduated_notification2.send("calculated_primary_notification").id).to eq graduated_notification1.id
-  #     expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
-  #     expect(graduated_notification2.primary_notification?).to be_falsey
-  #     expect(graduated_notification2.primary_bike).to eq bike2
-  #     expect(graduated_notification2.send_email?).to be_falsey
+      expect(bike2.user&.id).to eq user.id
+      graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
+      expect(graduated_notification2.send("potential_matching_period").include?(graduated_notification1.created_at)).to be_truthy
+      expect(graduated_notification2.send("calculated_primary_notification").id).to eq graduated_notification1.id
+      expect(graduated_notification2.send("existing_sent_notification")&.id).to eq graduated_notification1.id
+      expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
+      expect(graduated_notification2.primary_notification?).to be_falsey
+      expect(graduated_notification2.primary_bike).to eq bike2
+      expect(graduated_notification2.send_email?).to be_falsey
 
-  #     # Ensure it's still the primary notification, even though it isn't the primary bike
-  #     graduated_notification1.reload
-  #     expect(graduated_notification1.send("calculated_primary_notification").id).to eq graduated_notification1.id
-  #     expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
-  #     expect(graduated_notification1.primary_notification?).to be_truthy
-  #   end
-  # end
+      # Ensure it's still the primary notification, even though it isn't the primary bike
+      graduated_notification1.reload
+      expect(graduated_notification1.send("calculated_primary_notification").id).to eq graduated_notification1.id
+      expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(graduated_notification1.primary_notification?).to be_truthy
+    end
+  end
 
   describe "bike_organization recreated after graduated_notification sent" do
     let(:bike) { FactoryBot.create(:bike_organized, created_at: Time.current - 3*graduated_notification_interval, organization: organization) }
@@ -403,16 +409,6 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification2.reload
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(graduated_notification2.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
-      end
-    end
-    context "no user" do
-      let(:graduated_notification1) { FactoryBot.build(:graduated_notification, :with_user, organization: organization) }
-      let(:email) { graduated_notification1.email }
-      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, owner_email: email, organization: organization, created_at: Time.current - 1.hour) }
-      let!(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, owner_email: email, organization: organization) }
-      xit "enqueues additional graduated_notification creation if they aren't there" do
-        expect(bike1.user&.id).to eq user.id
-        expect(bike2.user&.id).to eq user.id
       end
     end
   end
