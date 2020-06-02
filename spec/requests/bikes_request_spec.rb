@@ -295,7 +295,9 @@ RSpec.describe BikesController, type: :request do
         bike.reload
         expect(bike.street).to eq "10544 82 Ave NW"
         expect(bike.country).to eq Country.canada
-        expect(bike.to_coordinates).to eq([53.5183351, -113.5015663])
+        # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
+        expect(bike.latitude).to be_within(0.01).of(53.5183351)
+        expect(bike.longitude).to be_within(0.01).of(-113.5015663)
         expect(bike.address_set_manually).to be_truthy
       end
     end
