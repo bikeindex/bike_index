@@ -8,6 +8,8 @@ class CreateGraduatedNotifications < ActiveRecord::Migration[5.2]
       t.references :primary_bike, index: true
       t.references :primary_notification, index: true
 
+      t.datetime :processed_at
+
       t.text :marked_remaining_link_token
       t.datetime :marked_remaining_at
 

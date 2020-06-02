@@ -64,7 +64,7 @@ RSpec.describe GraduatedNotificationWorker, type: :lib do
       end
       graduated_notification = GraduatedNotification.last
       expect(graduated_notification.delivery_status).to eq "email_success"
-      expect(graduated_notification.status).to eq "delivered"
+      expect(graduated_notification.status).to eq "active"
       expect(graduated_notification.active?).to be_truthy
       expect(graduated_notification.primary_notification?).to be_truthy
       bike.reload
@@ -97,7 +97,7 @@ RSpec.describe GraduatedNotificationWorker, type: :lib do
 
         graduated_notification = GraduatedNotification.last
         expect(graduated_notification.delivery_status).to eq "email_success"
-        expect(graduated_notification.status).to eq "delivered"
+        expect(graduated_notification.status).to eq "active"
         expect(graduated_notification.active?).to be_truthy
         expect(graduated_notification.primary_notification?).to be_truthy
         bike.reload

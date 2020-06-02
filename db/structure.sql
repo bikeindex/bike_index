@@ -1089,6 +1089,7 @@ CREATE TABLE public.graduated_notifications (
     user_id bigint,
     primary_bike_id bigint,
     primary_notification_id bigint,
+    processed_at timestamp without time zone,
     marked_remaining_link_token text,
     marked_remaining_at timestamp without time zone,
     status integer DEFAULT 0,
@@ -1765,8 +1766,8 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
-    passwordless_user_domain character varying,
-    graduated_notification_interval bigint
+    graduated_notification_interval bigint,
+    passwordless_user_domain character varying
 );
 
 

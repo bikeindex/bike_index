@@ -242,8 +242,7 @@
       %table.table-list
         %tbody
           %tr
-            %td
-              Bike Search
+            %td Bike Search
             %td
               - if @organization.enabled?("bike_search")
                 Yes
@@ -251,8 +250,7 @@
                 %small.less-strong
                   No
           %tr
-            %td
-              Templates
+            %td Templates
             %td
               - if @organization.mail_snippets.any?
                 = @organization.mail_snippets.pluck(:name).to_sentence
@@ -260,8 +258,7 @@
                 %small.less-strong
                   None
           %tr
-            %td
-              Landing Page
+            %td Landing Page
             %td
               - if @organization.landing_html.present?
                 - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
@@ -272,8 +269,7 @@
                 %small.less-strong
                   no landing page
           %tr
-            %td
-              Additional Fields
+            %td Additional Fields
             %td
               - additional_fields = @organization.additional_registration_fields.map(&:titleize)
               - if additional_fields.any?
@@ -290,17 +286,28 @@
                 %small.less-strong
                   None
           %tr
-            %td
-              Stickers
+            %td Stickers
             %td
               - if @organization.enabled?("bike_stickers")
                 = link_to "Has stickers", admin_bike_stickers_path(organization_id: @organization.to_param)
               - else
                 %small.less-strong
                   no
+          - if @organization.enabled?("graduated_notifications")
+            %tr
+              %td Graduated bikes
+              %td
+                - if @organization.deliver_graduated_notifications?
+                  Delivering notifications
+                  %small
+                    #{@organization.graduated_notification_interval_days} day interval
+                - else
+                  %em.text-warning
+                    Not delivering
+                  %small
+                    notification interval is not set
           %tr
-            %td
-              Enabled features
+            %td Enabled features
             %td.small
               = safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
 .row.mt-4

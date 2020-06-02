@@ -89,6 +89,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         ascend_name: "party on",
         previous_slug: "partied-on",
         manual_pos_kind: "lightspeed_pos",
+        graduated_notification_interval_days: " ",
         locations_attributes: {
           "0" => {
             id: location1.id,
@@ -144,6 +145,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(organization.previous_slug).to eq "partied-on"
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
       expect(organization.pos_kind).to eq "lightspeed_pos"
+      expect(organization.graduated_notification_interval).to be_blank
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
@@ -170,6 +172,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         put "#{base_url}/#{organization.to_param}", params: { organization: { passwordless_user_domain: "@bikeindex.org" } }
         organization.reload
         expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
+      end
+    end
+    context "updating graduated notifications" do
+      it "updates graduated_notification_interval_days" do
+        put "#{base_url}/#{organization.to_param}", params: { organization: { graduated_notification_interval_days: "365" } }
+        organization.reload
+        expect(organization.graduated_notification_interval).to eq 365.days.to_i
       end
     end
     context "not updating manual_pos_kind" do

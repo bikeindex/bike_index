@@ -32,7 +32,7 @@ FactoryBot.define do
     end
 
     trait :marked_remaining do
-      marked_remaining_at { created_at + 1.hour }
+      marked_remaining_at { created_at + GraduatedNotification::PENDING_PERIOD + 1.hour }
       after(:create) do |graduated_notification, evaluator|
         graduated_notification.marked_remaining_at = nil # need to blank this so mark_remaining functions
         graduated_notification.process_notification!
