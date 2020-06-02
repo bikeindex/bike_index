@@ -29,10 +29,10 @@ class UserEmailsController < ApplicationController
   end
 
   def destroy
-    if @user_email.confirmed?
-      flash[:info] = translation(:email_confirmed, user_email: @user_email.email)
+    if @user_email.primary?
+      flash[:info] = translation(:email_primary, user_email: @user_email.email)
     elsif @user_email.user.user_emails.count < 2
-      flash[:info] = translation(:only_confirmed_email, user_email: @user_email.email)
+      flash[:info] = translation(:only_email, user_email: @user_email.email)
     else
       flash[:success] = translation(:email_removed, user_email: @user_email.email)
       @user_email.destroy

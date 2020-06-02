@@ -101,13 +101,14 @@ RSpec.describe UserEmailsController, type: :controller do
         it "deletes the email" do
           expect(user_email1.confirmed?).to be_falsey
           expect(user.user_emails.count).to eq 2
-          delete :destroy, params: { id: user_email.id }
-          expect(UserEmail.where(id: user_email.id)).to_not be_present
+          delete :destroy, params: { id: user_email1.id }
+          expect(UserEmail.where(id: user_email1.id)).to_not be_present
           expect(flash[:success]).to be_present
         end
       end
-      context "only email" do
+      context "only email, not confirmed" do
         it "sets flash info and does not delete the email" do
+          expect(user_email1.confirmed?).to be_falsey
           user_email_primary.destroy
           user.reload
           expect(user.user_emails.count).to eq 1
@@ -121,32 +122,37 @@ RSpec.describe UserEmailsController, type: :controller do
           expect(flash[:info]).to be_present
         end
       end
-      context "primary" do
-        it "sets flash info and does not delete the email" do
+      context "multiple confirmed" do
+        let!(:user_email1) { FactoryBot.create(:user_email, user: user, confirmation_token: nil) }
+        it "permits deleting" do
+          user.reload
+          user_email1.reload
+          expect(user.user_emails.count).to eq 2
+          expect(user.user_emails.confirmed.count).to eq 2
+          expect(user_email1.primary?).to be_falsey
+          expect(user_email_primary.primary?).to be_truthy
+          expect do
+            delete :destroy, params: { id: user_email1.id }
+          end.to change(UserEmail, :count).by(-1)
+          expect(flash[:success]).to be_present
+          expect(UserEmail.where(id: user_email1.id)).to_not be_present
+          user.reload
+          user_email_primary.reload
           expect(user.user_emails.confirmed.count).to eq 1
-          delete :destroy, params: { id: user_email_primary.id }
-          user_email.reload
-          expect(user_email).to be_present
-          expect(flash[:info]).to be_present
+          expect(user_email_primary.primary?).to be_truthy
         end
-        context "multiple emails" do
-          let!(:user_email1) { FactoryBot.create(:user_email, confirmation_token: nil, user: user) }
-          it "permits deleting" do
-            user.reload
-            user_email1.reload
-            # expect(user.user_emails.count).to eq 2
+        context "delete primary" do
+          it "sets flash info and does not delete the email" do
+            expect(user_email1.confirmed?).to be_truthy
             expect(user.user_emails.confirmed.count).to eq 2
-            expect(user_email1.primary?).to be_falsey
-            expect(user_email_primary.primary?).to be_truthy
             expect do
-              delete :destroy, params: { id: user_email1.id }
-            end.to change(UserEmail, :count).by(-1)
-            expect(flash[:success]).to be_present
-            expect(UserEmail.where(id: user_email1.id)).to_not be_present
+              delete :destroy, params: { id: user_email_primary.id }
+            end.to_not change(UserEmail, :count)
+            expect(flash[:info]).to be_present
             user.reload
-            user_email2.reload
-            expect(user.user_emails.confirmed.count).to eq 1
-            expect(user_email_primary.primary?).to be_truthy
+            user_email_primary.reload
+            expect(user_email_primary).to be_present
+            expect(user.user_emails.confirmed.count).to eq 2
           end
         end
       end
