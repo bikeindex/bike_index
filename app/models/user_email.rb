@@ -43,21 +43,13 @@ class UserEmail < ActiveRecord::Base
     ue && ue.user
   end
 
-  def confirmed?
-    confirmation_token.blank?
-  end
+  def confirmed?; confirmation_token.blank? end
 
-  def unconfirmed?
-    !confirmed?
-  end
+  def unconfirmed?; !confirmed? end
 
-  def primary?
-    confirmed? && user.email == email
-  end
+  def primary?; confirmed? && user.email == email end
 
-  def expired?
-    created_at > Time.current - 2.hours
-  end
+  def expired?; created_at > Time.current - 2.hours end
 
   def make_primary
     return false unless confirmed? && !primary?
