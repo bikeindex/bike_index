@@ -47,10 +47,10 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       ownership.reload
       expect(ownership.current?).to be_falsey
       expect(ownership2.send_email).to be_truthy
-      expect(ownership2.calculated_send_email).to be_falsey
+      expect(ownership2.calculated_send_email).to be_truthy
       ActionMailer::Base.deliveries = []
       EmailOwnershipInvitationWorker.new.perform(ownership2.id)
-      expect(ActionMailer::Base.deliveries).to_not be_empty
+      expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end
 end
