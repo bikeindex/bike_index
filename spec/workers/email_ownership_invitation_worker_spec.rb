@@ -42,10 +42,10 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       expect(ownership.current?).to be_truthy
       # Second email
       ownership2 = FactoryBot.create(:ownership, bike: bike)
-      ownership2.update(updated_at: Time.current)
       ownership.reload
       expect(ownership.current?).to be_falsey
       expect(ownership2.send_email).to be_truthy
+      expect(ownership2.organization).to be_blank
       expect(ownership2.calculated_send_email).to be_truthy
       ActionMailer::Base.deliveries = []
       EmailOwnershipInvitationWorker.new.perform(ownership2.id)
