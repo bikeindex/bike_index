@@ -45,7 +45,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
       FetchProject529BikesWorker,
-      GraduatedNotificationWorker,
+      ProcessGraduatedNotificationWorker,
       UpdateExchangeRatesWorker,
       self,
     ]

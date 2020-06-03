@@ -189,7 +189,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(graduated_notification.marked_remaining_link_token).to be_present
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.body.encoded).to match target_remaining_link_url
-      expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+      expect(mail.reply_to).to eq([graduated_notification.email])
       expect(mail.subject).to eq "Renew your bike permit"
     end
     context "multiple bikes" do

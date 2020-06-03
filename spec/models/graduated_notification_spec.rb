@@ -350,7 +350,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(GraduatedNotification.count).to eq 1
       expect do
         expect(graduated_notification1.process_notification!).to be_falsey
-      end.to change(GraduatedNotificationWorker.jobs, :count).by 0
+      end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
       graduated_notification1.reload
       expect(graduated_notification1.status).to eq "pending"
       expect(graduated_notification1.processed?).to be_falsey
@@ -374,15 +374,15 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect do
           expect(graduated_notification1.process_notification!).to be_falsey
-        end.to change(GraduatedNotificationWorker.jobs, :count).by 1
+        end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 1
         expect(ActionMailer::Base.deliveries.count).to eq 0
-        expect(GraduatedNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike2.id])
+        expect(CreateGraduatedNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike2.id])
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(graduated_notification1.send("associated_bike_ids_missing_notifications")).to eq([bike2.id])
 
         expect(GraduatedNotification.count).to eq 1
         expect do
-          GraduatedNotificationWorker.drain
+          CreateGraduatedNotificationWorker.drain
         end.to change(GraduatedNotification, :count).by 1
         expect(ActionMailer::Base.deliveries.count).to eq 0
         graduated_notification2 = GraduatedNotification.reorder(:created_at).last

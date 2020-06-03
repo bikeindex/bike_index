@@ -21,8 +21,9 @@ class GraduatedNotification < ApplicationRecord
 
   scope :processed, -> { where(status: processed_statuses) } # could be where.not(processed_at: nil)
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
-  scope :primary_notification, -> { where(primary_notification_id: nil) }
-  scope :secondary_notifications, -> { where.not(primary_notification_id: nil) }
+  scope :not_marked_remaining, -> { where.not(status: "marked_remaining") }
+  scope :primary_notification, -> { where("primary_notification_id = id") }
+  scope :secondary_notifications, -> { where.not("primary_notification_id  = id") }
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
@@ -36,9 +37,6 @@ class GraduatedNotification < ApplicationRecord
           primary_bike_id: graduated_notification.primary_bike_id,
           primary_notification_id: nil)
       .or(where(primary_notification_id: graduated_notification.primary_notification_id))
-      # organization.graduated_notifications.where(primary_notification_id: nil, primary_bike_id: bike_id)
-    #             .where.not(id: id)
-    #             .or(self.class.associated_notifications(id, primary_notification_id))
   end
 
   def self.associated_notifications(graduated_notification)
@@ -155,7 +153,7 @@ class GraduatedNotification < ApplicationRecord
     if primary_notification? && associated_bike_ids_missing_notifications.any?
       # We haven't created all the relevant graduated notifications, create them before processing
       associated_bike_ids_missing_notifications.each do |b_id|
-        GraduatedNotificationWorker.perform_async(organization_id, b_id)
+        CreateGraduatedNotificationWorker.perform_async(organization_id, b_id)
       end
       return false
     end
@@ -169,12 +167,12 @@ class GraduatedNotification < ApplicationRecord
     return false unless processable?
 
     bike_organization&.destroy!
-    # If it isn't the primary_notification, only necessary to update it
-    return update(processed_at: Time.current) unless primary_notification?
 
     # deliver email before everything, so if fails, we send when we try again
-    OrganizedMailer.graduated_notification(self).deliver_now
+    OrganizedMailer.graduated_notification(self).deliver_now if send_email?
     update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+
+    return true unless primary_notification?
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
     associated_notifications.each { |notification| notification.process_notification! }
   end
