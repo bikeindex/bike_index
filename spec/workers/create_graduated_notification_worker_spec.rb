@@ -2,13 +2,13 @@ require "rails_helper"
 
 RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
   let(:instance) { described_class.new }
-  # include_context :scheduled_worker
-  # include_examples :scheduled_worker_tests
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
 
-  # it "is the correct queue and frequency" do
-  #   expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
-  #   expect(described_class.frequency).to be > 23.hours
-  # end
+  it "is the correct queue and frequency" do
+    expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
+    expect(described_class.frequency).to be > 23.hours
+  end
 
   describe "perform" do
     let(:graduated_notification_interval) { 1.year.to_i }
