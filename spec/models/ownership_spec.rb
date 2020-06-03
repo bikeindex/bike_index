@@ -113,6 +113,7 @@ RSpec.describe Ownership, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership2) { FactoryBot.build(:ownership_organization_bike, organization: organization, bike: bike) }
       it "returns false" do
+        ownership.update(updated_at: Time.current)
         expect(organization.enabled?("skip_ownership_email")).to be_truthy
         expect(ownership.first?).to be_truthy
         pp ownership.organization.present?, ownership.organization.enabled?("skip_ownership_email"), ownership.calculated_send_email
