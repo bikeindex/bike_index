@@ -243,11 +243,18 @@
 
 
 - # TODO: add translations
+- if passive_organization.enabled?("graduated_notifications")
+  - graduated_notifications = @bike.graduated_notifications(passive_organization).order(id: :desc)
+  - if graduated_notifications.any?
+    .parking-notifications-wrap
+      %h3.mt-2.mb-2 Graduated notifications
+      = render partial: "/organized/graduated_notifications/table", locals: { graduated_notifications: graduated_notifications, skip_bike: true, skip_email: true }
+
+
 - if passive_organization.enabled?("parking_notifications")
   - parking_notifications = passive_organization.parking_notifications.where(bike_id: @bike.id).order(id: :desc)
   .parking-notifications-wrap
-    %h3.mt-2.mb-2
-      Parking notifications
+    %h3.mt-2.mb-2 Parking notifications
 
     - if parking_notifications.any?
       = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.limit(4), skip_bike: true, skip_map_cell: true, render_address: true }

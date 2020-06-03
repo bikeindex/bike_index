@@ -29,7 +29,7 @@ class GraduatedNotification < ApplicationRecord
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 
-  def self.current_statuses; statuses - ["mark_remaining"] end
+  def self.current_statuses; statuses - ["marked_remaining"] end
 
   def self.processed_statuses; %w[active marked_remaining] end
 

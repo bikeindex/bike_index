@@ -16,9 +16,9 @@
         Created
     %th
       - if render_sortable
-        = sortable "processed_at", "Emailed"
+        = sortable "processed_at"
       - else
-        Emailed
+        Processed
     - unless skip_bike
       %th Bike
     - unless skip_status

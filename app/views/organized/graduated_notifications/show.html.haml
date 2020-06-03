@@ -19,13 +19,13 @@
 
         - if @graduated_notification.processed?
           %tr
-            %td Emailed
+            %td Processed
             %td
               %span.convertTime.preciseTime
                 = l(@graduated_notification.processed_at, format: :convert_time)
         - else
           %tr
-            %td Will email
+            %td Will process
             %td
               %span.convertTime.preciseTime
                 = l(@graduated_notification.pending_period_ends_at, format: :convert_time)
