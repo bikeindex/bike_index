@@ -40,6 +40,8 @@ class BikesController < ApplicationController
     end
     if params[:parking_notification_retrieved].present?
       resolve_parking_notification(params[:parking_notification_retrieved])
+    elsif params[:graduated_notification_remaining].present?
+      resolve_graduated_notification(params[:graduated_notification_remaining])
     else
       respond_to do |format|
         format.html { render :show }
@@ -375,6 +377,17 @@ class BikesController < ApplicationController
       end
     else
       flash[:error] = "Unable to find that Parking Notification!"
+    end
+    redirect_to bike_path(@bike.id) and return
+  end
+
+  def resolve_graduated_notification(marked_remaining_link_token)
+    matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: marked_remaining_link_token).first
+    if matching_notification.present? && matching_notification.processed?
+      flash[:success] = "#{@bike.type.titleize} marked remaining!"
+      matching_notification.mark_remaining! unless matching_notification.marked_remaining?
+    else
+      flash[:error] = "Unable to find that Graduated Notification!"
     end
     redirect_to bike_path(@bike.id) and return
   end

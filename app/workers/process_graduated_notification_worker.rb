@@ -1,8 +1,5 @@
-# TODO: make scheduled rather than manual call
-#  - inherit from ScheduledWorker
-#  - update specs to include examples
-class ProcessGraduatedNotificationWorker < ApplicationWorker
-  # prepend ScheduledWorkerRecorder
+class ProcessGraduatedNotificationWorker < ScheduledWorker
+  prepend ScheduledWorkerRecorder
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency

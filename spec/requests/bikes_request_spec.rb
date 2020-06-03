@@ -114,6 +114,62 @@ RSpec.describe BikesController, type: :request do
       end
     end
 
+    describe "graduated_notification_remaining param" do
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      let!(:bike) { graduated_notification.bike }
+      let(:ownership) { bike.current_ownership }
+      let(:organization) { graduated_notification.organization }
+      let(:current_user) { nil }
+      it "marks the bike remaining" do
+        graduated_notification.reload
+        bike.reload
+        expect(graduated_notification.processed?).to be_truthy
+        expect(graduated_notification.marked_remaining_link_token).to be_present
+        expect(bike.graduated?(organization)).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
+        expect(assigns(:bike)).to eq bike
+        expect(flash[:success]).to be_present
+        bike.reload
+        graduated_notification.reload
+        expect(bike.graduated?(organization)).to be_falsey
+        expect(graduated_notification.marked_remaining?).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+      end
+      context "already marked recovered" do
+        let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
+        it "doesn't update, but flash success" do
+          og_marked_remaining_at = graduated_notification.marked_remaining_at
+          expect(og_marked_remaining_at).to be_present
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(flash[:success]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(graduated_notification.marked_remaining?).to be_truthy
+          expect(graduated_notification.marked_remaining_at).to eq og_marked_remaining_at
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        end
+      end
+      context "unknown token" do
+        it "flash errors" do
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=333#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(flash[:error]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(graduated_notification.status).to eq("active")
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        end
+      end
+    end
+
     describe "parking_notification_retrieved param" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
       let(:creator) { parking_notification.user }
@@ -352,7 +408,7 @@ RSpec.describe BikesController, type: :request do
       let(:stolen_params) do
         {
           timezone: "America/Los_Angeles",
-          date_stolen:  "2020-04-28T11:00",
+          date_stolen: "2020-04-28T11:00",
           phone: "111 111 1111",
           secondary_phone: "123 123 1234",
           country_id: Country.united_states.id,
@@ -369,7 +425,7 @@ RSpec.describe BikesController, type: :request do
           police_report_department: "Manahattan",
           proof_of_ownership: "0",
           receive_notifications: "1",
-          id: stolen_record.id
+          id: stolen_record.id,
         }
       end
 
@@ -384,8 +440,8 @@ RSpec.describe BikesController, type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
-            bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } }
-          }
+                                      bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } },
+                                    }
           expect(flash[:success]).to be_present
         end
         bike.reload

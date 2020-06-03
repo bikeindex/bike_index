@@ -44,4 +44,14 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(assigns(:graduated_notification)).to eq graduated_notification1
     end
   end
+
+  describe "email" do
+    let!(:graduated_notification1) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
+    it "renders" do
+      get "#{base_url}/#{graduated_notification1.id}/email"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:email)
+      expect(assigns(:graduated_notification)).to eq graduated_notification1
+    end
+  end
 end
