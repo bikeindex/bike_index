@@ -1,0 +1,85 @@
+-# TODO: add translations
+- # TODO: add translations
+.organized-page-header
+  %h1
+    Graduated notification
+
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime.preciseTime
+              = l(@graduated_notification.created_at, format: :convert_time)
+        %tr
+          %td Status
+          %td= status_display(@graduated_notification.status.humanize)
+
+        - if @graduated_notification.processed?
+          %tr
+            %td Emailed
+            %td
+              %span.convertTime.preciseTime
+                = l(@graduated_notification.processed_at, format: :convert_time)
+        - else
+          %tr
+            %td Will email
+            %td
+              %span.convertTime.preciseTime
+                = l(@graduated_notification.pending_period_ends_at, format: :convert_time)
+        - if @graduated_notification.marked_remaining?
+          %tr
+            %td Marked remaining
+            %td
+              %span.convertTime.preciseTime
+                = l(@graduated_notification.marked_remaining_at, format: :convert_time)
+        %tr
+          %td Email
+          %td
+            = @graduated_notification.email
+            - if @graduated_notification.user.present?
+              %em
+                (#{@graduated_notification.user&.display_name})
+  .col-md-6
+    %h3.uncap Bikes
+    %table.table-list
+      %tbody
+        - @graduated_notification.associated_bikes.each do |bike|
+          %tr
+            %td
+              %span.convertTime
+                = l(bike.created_at, format: :convert_time)
+            %td
+              = link_to organized_bike_text(bike), bike_path(bike, organization_id: current_organization.id)
+              - if @graduated_notification.primary_bike_id == bike.id
+                %strong.less-strong Primary bike
+              - if !@graduated_notification.primary_notification? && bike.id == @graduated_notification.bike_id
+                %small.text-warning viewing this notification
+
+
+- if @graduated_notification.send_email?
+  %h2.uncap.mt-4
+    Preview of email
+    - if @graduated_notification.email_success?
+      sent:
+    - else
+      to send:
+  .email-preview.parking-notification-email-preview
+    <iframe src="#{email_organization_graduated_notification_path(@graduated_notification, organization_id: current_organization.to_param)}"></iframe>
+- else
+  %p.text-warning.mt-4
+    %em
+      - if @graduated_notification.primary_notification?
+        No email will be sent for unknown reason! Please contact support
+      - else
+        No email sent because this isn't the
+        - if @graduated_notification.primary_notification_id.present?
+          = link_to "primary notification", organization_graduated_notification_path(@graduated_notification.primary_notification, organization_id: current_organization.to_param)
+        - else
+          primary notification
+        - if @graduated_notification.primary_bike.present?
+          %br
+          The primary notification is for
+          = link_to organized_bike_text(@graduated_notification.primary_bike), bike_path(@graduated_notification.primary_bike, organization_id: current_organization.id)

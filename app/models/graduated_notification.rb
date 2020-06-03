@@ -19,7 +19,8 @@ class GraduatedNotification < ApplicationRecord
 
   attr_accessor :skip_update
 
-  scope :processed, -> { where(status: processed_statuses) } # could be where.not(processed_at: nil)
+  scope :current, -> { where(status: current_statuses) }
+  scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :not_marked_remaining, -> { where.not(status: "marked_remaining") }
   scope :primary_notifications, -> { where("primary_notification_id = id") }
@@ -27,6 +28,8 @@ class GraduatedNotification < ApplicationRecord
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+
+  def self.current_statuses; statuses - ["mark_remaining"] end
 
   def self.processed_statuses; %w[active marked_remaining] end
 
@@ -80,6 +83,8 @@ class GraduatedNotification < ApplicationRecord
   # Get it unscoped, because we delete it
   def bike_organization; bike_organization_id.present? ? BikeOrganization.unscoped.find_by_id(bike_organization_id) : nil end
 
+  def current?; self.class.current_statuses.include?(status) end
+
   def processed?; self.class.processed_statuses.include?(status) end
 
   def unprocessed?; !processed? end
@@ -102,14 +107,14 @@ class GraduatedNotification < ApplicationRecord
     organization.deliver_graduated_notifications? && primary_notification?
   end
 
-  def pending_period_ends
+  def pending_period_ends_at
     # provide a consistent answer for all associated notifications
-    return primary_notification.pending_period_ends if primary_notification.present? && !primary_notification?
+    return primary_notification.pending_period_ends_at if primary_notification.present? && !primary_notification?
     (created_at || Time.current) + PENDING_PERIOD
   end
 
   # At least for now, don't email immediately - but maybe drop this in the future
-  def in_pending_period?; pending_period_ends > Time.current end
+  def in_pending_period?; pending_period_ends_at > Time.current end
 
   def mark_remaining!(resolved_at: nil)
     self.marked_remaining_at ||= resolved_at || Time.current

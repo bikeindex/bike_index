@@ -73,6 +73,9 @@
         - if current_organization.enabled?("csv_exports")
           %li
             = active_link t(".exports"), organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+        - if current_organization.deliver_graduated_notifications?
+          %li
+            = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
         - if current_user.admin_of?(current_organization) || current_user.superuser?
           %li.divider-above
             = active_link t(".users"), organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
