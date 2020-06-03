@@ -2486,6 +2486,10 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
+      graduated_notifications:
+        ensure_access_to_graduated_notifications!:
+          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
+            neem contact op met Bike Index support.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4137,6 +4141,7 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       impounded_bikes: In beslag genomen fietsen
       customize_emails: Pas e-mails aan
+      graduated_notifications: Gegradueerde meldingen
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4661,6 +4666,11 @@ nl:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
+    graduated_notifications:
+      index:
+        search_bike_descriptions: Zoek fietsbeschrijvingen
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5060,6 +5070,7 @@ nl:
       parking_notifications: Verlaten records
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       customize_emails: Pas e-mails aan
+      graduated_notifications: Gegradueerde meldingen
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
