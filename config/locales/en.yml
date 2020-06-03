@@ -1645,6 +1645,11 @@ en:
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
+      graduated_notifications:
+        ensure_access_to_graduated_notifications!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
       manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
@@ -3669,6 +3674,7 @@ en:
       donate: Donate
       exports: Exports
       getting_started: Getting started
+      graduated_notifications: Graduated notifications
       help: Help
       impounded_bikes: Impounded Bikes
       incomplete_registrations: Incomplete registrations
@@ -4350,6 +4356,11 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
+    graduated_notifications:
+      index:
+        search_bike_descriptions: Search bike descriptions
+        search_for_serial_number: Search for serial number
+        search_owner_email: Search owner email
     impound_records:
       index:
         search_bike_descriptions: Search bike descriptions
@@ -4983,6 +4994,7 @@ en:
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
+      graduated_notifications: Graduated notifications
       how_integration_works: how the integration works
       impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations

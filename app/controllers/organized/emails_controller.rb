@@ -10,8 +10,8 @@ module Organized
     def show
       @organization = current_organization
       @email_preview = true
-      if @kind == "graduated_bike_email"
-        render template: "/organized_mailer/graduated_bike", layout: "email"
+      if @kind == "graduated_notification_email"
+        render template: "/organized_mailer/graduated_notification", layout: "email"
       else
         render template: "/organized_mailer/parking_notification", layout: "email"
       end
@@ -45,7 +45,7 @@ module Organized
       @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
-      if @kind == "graduated_bike_email"
+      if @kind == "graduated_notification_email"
         @retrieval_link_url = "#"
         @bike ||= current_organization.bikes.last
       else

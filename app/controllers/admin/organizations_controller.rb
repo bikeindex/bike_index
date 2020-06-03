@@ -93,6 +93,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :is_suspended,
         :lightspeed_cloud_api_key,
         :passwordless_user_domain,
+        :graduated_notification_interval_days,
         :lock_show_on_map,
         :name,
         :parent_organization_id,

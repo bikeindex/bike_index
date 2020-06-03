@@ -54,6 +54,7 @@ class Bike < ApplicationRecord
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :parking_notifications
+  has_many :graduated_notifications
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -341,6 +342,15 @@ class Bike < ApplicationRecord
     else
       bike_organizations.any?
     end
+  end
+
+  def graduated_notifications(org = nil)
+    return GraduatedNotification.none unless org.present?
+    org.graduated_notifications.where(bike_id: id)
+  end
+
+  def graduated?(org = nil)
+    graduated_notifications(org).active.any?
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably

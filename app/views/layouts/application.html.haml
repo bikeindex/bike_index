@@ -88,6 +88,9 @@
                 - if passive_organization.enabled?("csv_exports")
                   %li
                     = active_link t(".exports"), organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.deliver_graduated_notifications?
+                  %li
+                    = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                 - if current_user.admin_of?(passive_organization) || current_user.superuser?
                   %li.divider-nav-item
                   %li

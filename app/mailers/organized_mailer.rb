@@ -69,6 +69,22 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  def graduated_notification(graduated_notification)
+    @graduated_notification = graduated_notification
+    @organization = @graduated_notification.organization
+    @bike = @graduated_notification.bike
+    @bikes = @graduated_notification.associated_bikes
+    if @graduated_notification.marked_remaining_link_token.present?
+      @retrieval_link_url = bike_url(@bike.to_param, graduated_notification_remaining: @graduated_notification.marked_remaining_link_token)
+    else
+      @retrieval_link_url = nil
+    end
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.email_subject)
+    end
+  end
+
   private
 
   def finished_registration_type

@@ -1078,6 +1078,48 @@ ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.i
 
 
 --
+-- Name: graduated_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.graduated_notifications (
+    id bigint NOT NULL,
+    organization_id bigint,
+    bike_id bigint,
+    bike_organization_id bigint,
+    user_id bigint,
+    primary_bike_id bigint,
+    primary_notification_id bigint,
+    processed_at timestamp without time zone,
+    marked_remaining_link_token text,
+    marked_remaining_at timestamp without time zone,
+    status integer DEFAULT 0,
+    email character varying,
+    delivery_status character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: graduated_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.graduated_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: graduated_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.graduated_notifications_id_seq OWNED BY public.graduated_notifications.id;
+
+
+--
 -- Name: impound_record_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1724,6 +1766,7 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
+    graduated_notification_interval bigint,
     passwordless_user_domain character varying
 );
 
@@ -2750,6 +2793,13 @@ ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: graduated_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.graduated_notifications ALTER COLUMN id SET DEFAULT nextval('public.graduated_notifications_id_seq'::regclass);
+
+
+--
 -- Name: impound_record_updates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3223,6 +3273,14 @@ ALTER TABLE ONLY public.flipper_gates
 
 ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: graduated_notifications graduated_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.graduated_notifications
+    ADD CONSTRAINT graduated_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -3791,6 +3849,48 @@ CREATE UNIQUE INDEX index_flipper_features_on_key ON public.flipper_features USI
 --
 
 CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON public.flipper_gates USING btree (feature_key, key, value);
+
+
+--
+-- Name: index_graduated_notifications_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_bike_id ON public.graduated_notifications USING btree (bike_id);
+
+
+--
+-- Name: index_graduated_notifications_on_bike_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_bike_organization_id ON public.graduated_notifications USING btree (bike_organization_id);
+
+
+--
+-- Name: index_graduated_notifications_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_organization_id ON public.graduated_notifications USING btree (organization_id);
+
+
+--
+-- Name: index_graduated_notifications_on_primary_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_primary_bike_id ON public.graduated_notifications USING btree (primary_bike_id);
+
+
+--
+-- Name: index_graduated_notifications_on_primary_notification_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_primary_notification_id ON public.graduated_notifications USING btree (primary_notification_id);
+
+
+--
+-- Name: index_graduated_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_user_id ON public.graduated_notifications USING btree (user_id);
 
 
 --
@@ -4746,6 +4846,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200429004612'),
 ('20200429174144'),
 ('20200517001632'),
+('20200521143231'),
+('20200521144927'),
 ('20200524214006');
 
 

@@ -108,17 +108,19 @@ RSpec.describe Ownership, type: :model do
       end
     end
     context "organization with paid feature of skip_ownership_email" do
-      let(:organization) { FactoryBot.create(:organization) }
+      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["skip_ownership_email"]) }
       let!(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
       let(:bike) { ownership.bike }
-      let(:ownership2) { FactoryBot.build(:ownership_organization_bike, organization: organization, bike: bike) }
       it "returns false" do
-        organization.update_attribute :enabled_feature_slugs, ["skip_ownership_email"]
-        ownership.reload
+        # There was some trouble with CI on this, so now we're just updating a bunch
+        ownership.update(updated_at: Time.current)
+        expect(organization.enabled?("skip_ownership_email")).to be_truthy
         expect(ownership.first?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey
-        ownership2.save
+        ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
+        ownership2.update(updated_at: Time.current)
         ownership2.reload
+        expect(ownership2.organization).to be_blank
         expect(ownership2.calculated_send_email).to be_truthy
       end
     end

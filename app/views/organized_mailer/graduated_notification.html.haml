@@ -1,4 +1,3 @@
-- user = @bike.user
 - bikes = @user&.rough_approx_bikes || []
 %h1
   Renew Your Bike Permit
@@ -10,14 +9,17 @@
   -#   #{@bike.type}
   -# be at #{@organization.short_name} next semester?
 
-- organization_message_snippet = @organization.mail_snippets.enabled.graduated_bike_email.first
+- organization_message_snippet = @organization.mail_snippets.enabled.graduated_notification_email.first
 - if @email_preview
-  - organization_message_snippet ||= @organization.mail_snippets.graduated_bike_email.first
+  - organization_message_snippet ||= @organization.mail_snippets.graduated_notification_email.first
 
 - if organization_message_snippet.present?
   = organization_message_snippet.body.html_safe
 
-= render partial: "shared/email_bike_box"
+- if bikes.count == 1
+  = render partial: "shared/email_bike_box"
+- else
+  - # TODO! update
 
 - if @retrieval_link_url.present?
   .mark-retrieved-box

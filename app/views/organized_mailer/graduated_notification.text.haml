@@ -1,0 +1,18 @@
+Renew Your Bike Registration
+
+- organization_message_snippet = @organization.mail_snippets.enabled.graduated_notification_email.first
+- if @email_preview
+  - organization_message_snippet ||= @organization.mail_snippets.graduated_notification_email.first
+
+- if organization_message_snippet.present?
+  = organization_message_snippet.body.strip_tags
+
+- if @retrieval_link_url.present?
+  Go to
+
+  = @retrieval_link_url
+
+  to renew
+
+Your #{@bike.type} registration is set to expire soon.
+

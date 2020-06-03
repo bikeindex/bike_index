@@ -109,17 +109,24 @@
             You can use #{ENV['AUTO_ORG_MEMBER']} if
             there are no members of the organization
 
-    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users]
-
+    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications]
     - if @organization.any_enabled?(enabled_features_with_admin_forms)
       .card
         .card-body
-          %h4
-            Settings for paid features
+          %h4.mb-4 Settings for paid features
+          - if @organization.enabled?("graduated_notifications")
+            .form-group
+              = f.label :graduated_notification_interval_days do
+                Interval for send graduated notifications, in days
+                %small
+                  <span class="text-success">graduated_notifications setting</span>
+              = f.number_field :graduated_notification_interval_days, { class: "form-control" }
+              .only-dev-visible.p-1
+                %em.small
+                  Unless this is set, the organization will not send graduated notifications - even if they have the feature enabled
           - if @organization.enabled?("regional_bike_counts")
             .form-group
               = f.label :search_radius do
-                %span
                 Search radius (mi)
                 %small
                   <span class="text-success">regional bike counts setting</span>, this controls how large the region is

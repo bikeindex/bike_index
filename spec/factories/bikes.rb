@@ -47,7 +47,7 @@ FactoryBot.define do
       creator { user }
       owner_email { user.email }
       after(:create) do |bike, evaluator|
-        create(:ownership_claimed, bike: bike, creator: bike.creator, owner_email: bike.owner_email, user_id: evaluator.user)
+        create(:ownership_claimed, bike: bike, creator: bike.creator, owner_email: bike.owner_email, user: evaluator.user)
         bike.reload
       end
     end
@@ -105,6 +105,7 @@ FactoryBot.define do
       after(:create) do |bike, evaluator|
         create(:bike_organization, organization: bike.creation_organization,
                                    bike: bike,
+                                   created_at: bike.created_at,
                                    can_edit_claimed: evaluator.can_edit_claimed)
         bike.reload
       end

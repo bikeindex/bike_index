@@ -48,6 +48,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :bike_stickers
+  has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
   accepts_nested_attributes_for :mail_snippets
@@ -273,6 +274,18 @@ class Organization < ApplicationRecord
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
 
+  def deliver_graduated_notifications?; enabled?("graduated_notifications") && graduated_notification_interval.present? end
+
+  def graduated_notification_interval_days
+    return nil unless graduated_notification_interval.present?
+    graduated_notification_interval / ActiveSupport::Duration::SECONDS_PER_DAY
+  end
+
+  def graduated_notification_interval_days=(val)
+    val_i = val.to_i
+    self.graduated_notification_interval = val_i.days.to_i if val_i.present?
+  end
+
   # Accepts string or array, tests that ALL are enabled
   def enabled?(feature_name)
     features =
@@ -298,6 +311,7 @@ class Organization < ApplicationRecord
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
+    self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")

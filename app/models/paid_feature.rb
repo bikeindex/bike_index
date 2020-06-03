@@ -24,6 +24,7 @@ class PaidFeature < ApplicationRecord
     bike_search
     bike_stickers
     csv_exports
+    graduated_notifications
     passwordless_users
     regional_bike_counts
     regional_stickers

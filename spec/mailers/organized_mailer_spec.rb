@@ -157,9 +157,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
   describe "organization_invitation" do
     let(:membership) { FactoryBot.create(:membership, organization: organization) }
     let(:mail) { OrganizedMailer.organization_invitation(membership) }
-    before do
-      expect(header_mail_snippet).to be_present
-    end
+    before { expect(header_mail_snippet).to be_present }
     it "renders email" do
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
@@ -168,18 +166,32 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "parking_notification" do
-    context "geolocation" do
-      let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization) }
-      let(:mail) { OrganizedMailer.parking_notification(parking_notification) }
-      let(:target_retrieval_link_url) { "parking_notification_retrieved=#{parking_notification.retrieval_link_token}" }
-      before { expect(header_mail_snippet).to be_present }
-      it "renders email" do
-        expect(parking_notification.retrieval_link_token).to be_present
-        expect(mail.body.encoded).to match header_mail_snippet.body
-        expect(mail.body.encoded).to match "map" # includes location
-        expect(mail.body.encoded).to match target_retrieval_link_url
-        expect(mail.reply_to).to eq([parking_notification.reply_to_email])
-      end
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization) }
+    let(:mail) { OrganizedMailer.parking_notification(parking_notification) }
+    let(:target_retrieval_link_url) { "parking_notification_retrieved=#{parking_notification.retrieval_link_token}" }
+    before { expect(header_mail_snippet).to be_present }
+    it "renders email" do
+      expect(parking_notification.retrieval_link_token).to be_present
+      expect(mail.body.encoded).to match header_mail_snippet.body
+      expect(mail.body.encoded).to match "map" # includes location
+      expect(mail.body.encoded).to match target_retrieval_link_url
+      expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+    end
+  end
+
+  describe "graduated_notification" do
+    let(:user) { FactoryBot.create(:user) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, organization: organization, user: user) }
+    let(:mail) { OrganizedMailer.graduated_notification(graduated_notification) }
+    let(:target_remaining_link_url) { "graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}" }
+    before { expect(header_mail_snippet).to be_present }
+    it "renders email" do
+      expect(graduated_notification.marked_remaining_link_token).to be_present
+      expect(mail.body.encoded).to match header_mail_snippet.body
+      expect(mail.body.encoded).to match target_remaining_link_url
+      expect(mail.to).to eq([graduated_notification.email])
+      expect(mail.reply_to).to eq([organization.auto_user.email])
+      expect(mail.subject).to eq "Renew your bike permit"
     end
   end
 end

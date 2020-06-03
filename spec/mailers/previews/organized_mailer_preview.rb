@@ -1,5 +1,10 @@
 # Preview emails at /rails/mailers/organized_mailer
 class OrganizedMailerPreview < ActionMailer::Preview
+  def graduated_notification
+    graduated_notification = GraduatedNotification.last
+    OrganizedMailer.graduated_notification(graduated_notification)
+  end
+
   def partial_registration
     b_param = BParam.order(:created_at).last
     OrganizedMailer.partial_registration(b_param)
