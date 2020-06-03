@@ -32,7 +32,6 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
     let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["skip_ownership_email"]) }
     let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
     let(:bike) { ownership.bike }
-    let(:ownership2) { FactoryBot.build(:ownership, bike: bike) }
     it "doesn't send email, updates to be send_email false, sends email to the second ownership" do
       ActionMailer::Base.deliveries = []
       expect(ownership.send_email).to be_truthy
@@ -42,8 +41,8 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       expect(ownership.send_email).to be_falsey
       expect(ownership.current?).to be_truthy
       # Second email
-      ownership2.save
-      ownership2.reload
+      ownership2 = FactoryBot.create(:ownership, bike: bike)
+      ownership2.update(updated_at: Time.current)
       ownership.reload
       expect(ownership.current?).to be_falsey
       expect(ownership2.send_email).to be_truthy
