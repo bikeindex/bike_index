@@ -52,7 +52,7 @@
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
 
         %p
-          - printed_materials_link = link_to t(".printed_materials"), "https://bikeindex.myshopify.com/"
+          - printed_materials_link = link_to t(".printed_materials"), store_path
           = t(".dont_use_ascend_or_lightspeed_html", printed_materials: printed_materials_link)
 
         %h4= t(".related_articles")
