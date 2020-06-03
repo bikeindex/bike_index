@@ -117,7 +117,7 @@ RSpec.describe Ownership, type: :model do
         expect(organization.enabled?("skip_ownership_email")).to be_truthy
         expect(ownership.first?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey
-        ownership2 = FactoryBot.create(:ownership, bike: bike)
+        ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
         ownership2.update(updated_at: Time.current)
         ownership2.reload
         expect(ownership2.organization).to be_blank
