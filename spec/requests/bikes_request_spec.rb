@@ -408,7 +408,7 @@ RSpec.describe BikesController, type: :request do
       let(:stolen_params) do
         {
           timezone: "America/Los_Angeles",
-          date_stolen:  "2020-04-28T11:00",
+          date_stolen: "2020-04-28T11:00",
           phone: "111 111 1111",
           secondary_phone: "123 123 1234",
           country_id: Country.united_states.id,
@@ -425,7 +425,7 @@ RSpec.describe BikesController, type: :request do
           police_report_department: "Manahattan",
           proof_of_ownership: "0",
           receive_notifications: "1",
-          id: stolen_record.id
+          id: stolen_record.id,
         }
       end
 
@@ -440,8 +440,8 @@ RSpec.describe BikesController, type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
-            bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } }
-          }
+                                      bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } },
+                                    }
           expect(flash[:success]).to be_present
         end
         bike.reload
