@@ -67,7 +67,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
                           :marked_remaining,
                           organization: organization,
                           bike: bike,
-                          marked_remaining_at: Time.current - (2* graduated_notification_interval))
+                          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
       end
       let!(:graduated_notification_remaining) do
         FactoryBot.create(:graduated_notification,

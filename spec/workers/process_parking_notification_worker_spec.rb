@@ -146,7 +146,6 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
     end
   end
 
-
   describe "sending email" do
     let(:bike) { FactoryBot.create(:ownership).bike }
     let(:parking_notification) { FactoryBot.create(:parking_notification_organized, delivery_status: delivery_status, bike: bike) }
@@ -161,7 +160,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
     end
 
     context "delivery failed" do
-      let(:delivery_status)  { "email_failure" }
+      let(:delivery_status) { "email_failure" }
       it "does not send" do
         expect(parking_notification.send_email?).to be_truthy
         instance.perform(parking_notification.id)
@@ -170,7 +169,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
     end
 
     context "delivery succeeded" do
-      let(:delivery_status)  { "email_success" }
+      let(:delivery_status) { "email_success" }
       it "does not send" do
         instance.perform(parking_notification.id)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy

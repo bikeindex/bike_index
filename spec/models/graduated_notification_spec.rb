@@ -1,6 +1,5 @@
 require "rails_helper"
 
-
 RSpec.describe GraduatedNotification, type: :model do
   let(:graduated_notification_interval) { 2.days.to_i }
   let(:organization) do
@@ -285,7 +284,7 @@ RSpec.describe GraduatedNotification, type: :model do
   end
 
   describe "bike_organization recreated after graduated_notification sent" do
-    let(:bike) { FactoryBot.create(:bike_organized, created_at: Time.current - 3*graduated_notification_interval, organization: organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, created_at: Time.current - 3 * graduated_notification_interval, organization: organization) }
     let!(:bike_organization1) { bike.bike_organizations.where(organization_id: organization.id).first }
     let(:graduated_notification1) do
       expect(bike_organization1.deleted?).to be_falsey

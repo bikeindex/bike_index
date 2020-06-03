@@ -13,7 +13,7 @@ RSpec.describe ProcessGraduatedNotificationWorker, type: :lib do
   describe "perform" do
     let(:graduated_notification_interval) { 2.years.to_i }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
-    let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - (2*graduated_notification_interval)) }
+    let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - (2 * graduated_notification_interval)) }
     let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - 1.week) }
     let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: organization) }
     let!(:graduated_notification_processable) { FactoryBot.create(:graduated_notification, organization: organization, created_at: Time.current - GraduatedNotification::PENDING_PERIOD - 55.minutes) }

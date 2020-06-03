@@ -1210,7 +1210,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(assigns(:edit_template)).to eq(template)
                 expect(assigns(:private_images)).to eq([]) if template == "photos"
                 expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
-                show_general_alert = ! %w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation].include?(template)
+                show_general_alert = !%w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation].include?(template)
                 pp template unless assigns(:show_general_alert) == show_general_alert
                 expect(assigns(:show_general_alert)).to eq(show_general_alert)
               end
@@ -1298,7 +1298,6 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.country&.name).to eq(Country.netherlands.name)
           expect(bike.zipcode).to eq "3035"
           expect(bike.city).to eq "Rotterdam"
-
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey
@@ -1404,6 +1403,7 @@ RSpec.describe BikesController, type: :controller do
             expect(mail.from).to eq(["contact@bikeindex.org"])
             expect(mail.to).to eq([new_email])
           end
+
           it "creates a new ownership and emails the new owner" do
             expect(bike.claimed?).to be_falsey
             expect(bike.user).to be_nil
