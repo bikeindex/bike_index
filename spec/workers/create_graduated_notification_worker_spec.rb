@@ -40,91 +40,69 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
     describe "create notification" do
       it "creates notification only once" do
         ActionMailer::Base.deliveries = []
-        expect do
-          instance.perform(organization.id, bike.id)
-        end.to change(GraduatedNotification, :count).by 1
-        expect(ActionMailer::Base.deliveries.count).to eq 0
+        Sidekiq::Testing.inline! do
+          expect do
+            instance.perform
+            instance.perform
+            instance.perform
+            instance.perform
+          end.to change(GraduatedNotification, :count).by 1
+        end
 
-        expect do
-          instance.perform(organization.id, bike.id)
-        end.to_not change(GraduatedNotification, :count)
         expect(ActionMailer::Base.deliveries.count).to eq 0
+        graduated_notification = GraduatedNotification.last
+        expect(graduated_notification.status).to eq "pending"
+        expect(graduated_notification.in_pending_period?).to be_truthy
+        expect(graduated_notification.processed?).to be_falsey
+        expect(graduated_notification.bike_id).to eq bike.id
+        expect(graduated_notification.organization_id).to eq organization.id
       end
     end
 
-    it "schedules, creates and sends graduated_notification" do
-      expect(bike.organizations.pluck(:id)).to eq([organization.id])
-      expect(bike.graduated?(organization)).to be_falsey
-      Sidekiq::Worker.clear_all
-      ActionMailer::Base.deliveries = []
-      Sidekiq::Testing.inline! do
-        expect do
-          instance.perform
-          instance.perform
-        end.to change(GraduatedNotification, :count).by 1
-      end
-      graduated_notification = GraduatedNotification.last
-      expect(graduated_notification.status).to eq "pending"
-      expect(graduated_notification.in_pending_period?).to be_truthy
-      graduated_notification.update(created_at: Time.current - 1.day)
-      expect(graduated_notification.processable?).to be_truthy
-      expect(ActionMailer::Base.deliveries.count).to eq 0
+    context "with existing graduated_notification" do
+      let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: organization) }
 
-      Sidekiq::Testing.inline! do
-        expect do
-          instance.perform
-          instance.perform
-        end.to_not change(GraduatedNotification, :count)
+      let!(:graduated_notification_remaining_expired) do
+        FactoryBot.create(:graduated_notification,
+                          :marked_remaining,
+                          organization: organization,
+                          bike: bike,
+                          marked_remaining_at: Time.current - (2* graduated_notification_interval))
       end
-      graduated_notification.reload
-      expect(graduated_notification.delivery_status).to eq "email_success"
-      expect(graduated_notification.status).to eq "active"
-      expect(graduated_notification.active?).to be_truthy
-      expect(graduated_notification.primary_notification?).to be_truthy
-      bike.reload
-      expect(bike.organizations.pluck(:id)).to eq([])
-      expect(bike.graduated?(organization)).to be_truthy
+      let!(:graduated_notification_remaining) do
+        FactoryBot.create(:graduated_notification,
+                          :marked_remaining,
+                          organization: organization,
+                          marked_remaining_at: Time.current - graduated_notification_interval + 2.days)
+      end
 
-      expect(ActionMailer::Base.deliveries.count).to eq 1
-      mail = ActionMailer::Base.deliveries.last
-      expect(mail.subject).to eq("Renew your bike permit")
-      expect(mail.to).to eq([bike.owner_email])
+      it "enqueues and creates" do
+        # Couple of tests to ensure we're making the factories right
+        expect(graduated_notification_remaining_expired.created_at).to be < graduated_notification_remaining_expired.marked_remaining_at
+        expect(graduated_notification_active.processed_at).to be < Time.current
+        expect(graduated_notification_active.status).to eq("active")
+        # Really, testing bike_ids_to_notify ensures we're enqueueing the right things, but - just to be sure
+        expect(GraduatedNotification.bike_ids_to_notify(organization)).to match_array([bike.id])
+        expect(bike.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.graduated?(organization)).to be_falsey
+        expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification_remaining_expired.id])
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          expect do
+            instance.perform
+            instance.perform
+            instance.perform
+          end.to change(GraduatedNotification, :count).by 1
+        end
+        graduated_notification = GraduatedNotification.last
+        expect(graduated_notification.status).to eq "pending"
+        expect(graduated_notification.in_pending_period?).to be_truthy
+        expect(graduated_notification.processed?).to be_falsey
+        expect(graduated_notification.processed?).to be_falsey
+        expect(graduated_notification.bike_id).to eq bike.id
+        expect(graduated_notification.organization_id).to eq organization.id
+      end
     end
-
-    # context "expired notification" do
-    #   let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike: bike) }
-    #   it "schedules, creates and sends" do
-    #     bike.reload
-    #     expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
-    #     interval_start = Time.current - graduated_notification_interval
-    #     expect(bike.created_at).to be < interval_start - graduated_notification_interval # Double interval early
-    #     expect(graduated_notification1.created_at).to be < interval_start
-    #     expect(graduated_notification1.marked_remaining_at).to be < interval_start
-    #     expect(GraduatedNotification.count).to eq 1
-    #     Sidekiq::Worker.clear_all
-    #     ActionMailer::Base.deliveries = []
-    #     Sidekiq::Testing.inline! do
-    #       expect do
-    #         instance.perform
-    #       end.to change(GraduatedNotification, :count).by 1
-    #     end
-
-    #     graduated_notification = GraduatedNotification.last
-    #     expect(graduated_notification.delivery_status).to eq "email_success"
-    #     expect(graduated_notification.status).to eq "active"
-    #     expect(graduated_notification.active?).to be_truthy
-    #     expect(graduated_notification.primary_notification?).to be_truthy
-    #     bike.reload
-    #     expect(bike.organizations.pluck(:id)).to eq([])
-    #     expect(bike.graduated?(organization)).to be_truthy
-
-    #     expect(ActionMailer::Base.deliveries.count).to eq 1
-    #     mail = ActionMailer::Base.deliveries.last
-    #     expect(mail.subject).to eq("Renew your bike permit")
-    #     expect(mail.to).to eq([bike.owner_email])
-    #   end
-    # end
   end
-
-  describe ""
 end

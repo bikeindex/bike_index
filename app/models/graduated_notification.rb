@@ -22,7 +22,7 @@ class GraduatedNotification < ApplicationRecord
   scope :processed, -> { where(status: processed_statuses) } # could be where.not(processed_at: nil)
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :not_marked_remaining, -> { where.not(status: "marked_remaining") }
-  scope :primary_notification, -> { where("primary_notification_id = id") }
+  scope :primary_notifications, -> { where("primary_notification_id = id") }
   scope :secondary_notifications, -> { where.not("primary_notification_id  = id") }
   scope :email_success, -> { where(delivery_status: "email_success") }
 
@@ -65,7 +65,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def self.bike_ids_to_notify(organization)
-    return Bike.nil unless organization.graduated_notification_interval.present?
+    return Bike.nil unless organization&.graduated_notification_interval&.present?
     bikes_to_notify_without_notifications(organization).pluck(:id) +
       bikes_to_notify_expired_notifications(organization).pluck(:id)
   end
@@ -162,7 +162,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   # This is here because we're calling it from the creation job, and I like it here more than in the job
-  def process_notification!
+  def process_notification
     return true if email_success?
     return false unless processable?
 
@@ -174,7 +174,8 @@ class GraduatedNotification < ApplicationRecord
 
     return true unless primary_notification?
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
-    associated_notifications.each { |notification| notification.process_notification! }
+    associated_notifications.each { |notification| notification.process_notification }
+    true
   end
 
   # Right now, just static - but we're going to make it configurable
@@ -222,7 +223,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def existing_sent_notification
-    if user_id.present?
+    if user_id.present? && organization.graduated_notification_interval.present?
       existing_notification = GraduatedNotification.where(user_id: user_id, created_at: potential_matching_period)
                                                         .email_success.first
     end

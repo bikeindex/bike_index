@@ -16,8 +16,7 @@ class CreateGraduatedNotificationWorker < ApplicationWorker
     return graduated_notification if graduated_notification.present?
 
     graduated_notification = GraduatedNotification.create(organization_id: org_id, bike_id: bike_id)
-    graduated_notification.process_notification!
-    graduated_notification
+    graduated_notification.process_notification
   end
 
   def organizations

@@ -157,9 +157,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
   describe "organization_invitation" do
     let(:membership) { FactoryBot.create(:membership, organization: organization) }
     let(:mail) { OrganizedMailer.organization_invitation(membership) }
-    before do
-      expect(header_mail_snippet).to be_present
-    end
+    before { expect(header_mail_snippet).to be_present }
     it "renders email" do
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
@@ -182,20 +180,18 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "graduated_notification" do
-    let!(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
-    let(:mail) { OrganizedMailer.parking_notification(parking_notification) }
+    let(:user) { FactoryBot.create(:user) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, organization: organization, user: user) }
+    let(:mail) { OrganizedMailer.graduated_notification(graduated_notification) }
     let(:target_remaining_link_url) { "graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}" }
+    before { expect(header_mail_snippet).to be_present }
     it "renders email" do
       expect(graduated_notification.marked_remaining_link_token).to be_present
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.body.encoded).to match target_remaining_link_url
-      expect(mail.reply_to).to eq([graduated_notification.email])
+      expect(mail.to).to eq([graduated_notification.email])
+      expect(mail.reply_to).to eq([organization.auto_user.email])
       expect(mail.subject).to eq "Renew your bike permit"
-    end
-    context "multiple bikes" do
-      it "renders email with multiple bikes" do
-
-      end
     end
   end
 end

@@ -73,6 +73,7 @@ class OrganizedMailer < ApplicationMailer
     @graduated_notification = graduated_notification
     @organization = @graduated_notification.organization
     @bike = @graduated_notification.bike
+    @bikes = @graduated_notification.associated_bikes
     if @graduated_notification.marked_remaining_link_token.present?
       @retrieval_link_url = bike_url(@bike.to_param, graduated_notification_remaining: @graduated_notification.marked_remaining_link_token)
     else

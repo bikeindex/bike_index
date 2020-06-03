@@ -31,11 +31,20 @@ FactoryBot.define do
       end
     end
 
+    factory :graduated_notification_active do
+      transient do
+        bike_created_at { Time.current - 1.day - graduated_notification_interval }
+      end
+      after(:create) do |graduated_notification, _evaluator|
+        graduated_notification.process_notification
+      end
+    end
+
     trait :marked_remaining do
       marked_remaining_at { created_at + GraduatedNotification::PENDING_PERIOD + 1.hour }
       after(:create) do |graduated_notification, evaluator|
         graduated_notification.marked_remaining_at = nil # need to blank this so mark_remaining functions
-        graduated_notification.process_notification!
+        graduated_notification.process_notification
         graduated_notification.mark_remaining!(resolved_at: evaluator.marked_remaining_at)
         graduated_notification.reload
       end

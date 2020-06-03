@@ -21,7 +21,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.send_email?).to be_truthy
       expect(graduated_notification.email_success?).to be_falsey
       expect do
-        graduated_notification.process_notification!
+        graduated_notification.process_notification
       end.to change(BikeOrganization, :count).by(-1)
       expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
       graduated_notification.reload
@@ -37,7 +37,7 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:graduated_notification_interval) { nil }
       let(:graduated_notification2) { FactoryBot.create(:graduated_notification) }
       it "is valid" do
-        graduated_notification.process_notification!
+        graduated_notification.process_notification
         graduated_notification.reload
         expect(organization.deliver_graduated_notifications?).to be_falsey
         expect(graduated_notification).to be_valid
@@ -68,7 +68,7 @@ RSpec.describe GraduatedNotification, type: :model do
     context "manually marked_remaining" do
       it "is not active" do
         expect(graduated_notification.processed?).to be_falsey
-        graduated_notification.process_notification!
+        graduated_notification.process_notification
         graduated_notification.reload
         expect(graduated_notification.bike_organization.deleted?).to be_truthy
         bike_organization_id = graduated_notification.bike_organization.id
@@ -178,6 +178,8 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
         expect(graduated_notification2.processable?).to be_falsey
 
+        expect(GraduatedNotification.primary_notifications.pluck(:id)).to eq([graduated_notification1.id])
+        expect(GraduatedNotification.secondary_notifications.pluck(:id)).to eq([graduated_notification2.id])
 
         expect(graduated_notification1.associated_notifications.pluck(:id)).to eq([graduated_notification2.id])
         # And test that we update to set the primary notification on the other one after creation
@@ -199,7 +201,7 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification1.update(created_at: Time.current - 25.hours)
         expect(graduated_notification1.in_pending_period?).to be_falsey
         expect(graduated_notification1.processable?).to be_falsey
-        expect(graduated_notification1.process_notification!).to be_falsey
+        expect(graduated_notification1.process_notification).to be_falsey
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(organization.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(graduated_notification1.associated_notifications.pluck(:id)).to eq([])
@@ -215,7 +217,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification1.processable?).to be_truthy
         # Processing right now
-        graduated_notification1.process_notification!
+        graduated_notification1.process_notification
         expect(ActionMailer::Base.deliveries.count).to eq 1
         graduated_notification1.reload
         expect(graduated_notification1.primary_bike?).to be_truthy
@@ -254,7 +256,7 @@ RSpec.describe GraduatedNotification, type: :model do
       graduated_notification1.update(created_at: Time.current - 1.day)
       expect(graduated_notification1.primary_notification?).to be_truthy
       expect(graduated_notification1.processable?).to be_truthy
-      graduated_notification1.process_notification!
+      graduated_notification1.process_notification
       expect(graduated_notification1.primary_notification?).to be_truthy
       expect(graduated_notification1.email_success?).to be_truthy
       expect(graduated_notification1.processed?).to be_truthy
@@ -289,7 +291,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(bike_organization1.deleted?).to be_falsey
       @bike_organization1_id = bike_organization1.id
       graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike, created_at: Time.current - graduated_notification_interval - 4.days)
-      graduated_notification1.process_notification!
+      graduated_notification1.process_notification
       graduated_notification1.reload
       expect(graduated_notification1.processed?).to be_truthy
       graduated_notification1
@@ -315,7 +317,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike, created_at: Time.current - 2.days)
         expect(graduated_notification2.errors.full_messages).to eq([])
-        graduated_notification2.process_notification!
+        graduated_notification2.process_notification
         expect(graduated_notification2.bike_organization.id).to eq bike_organization_again.id
         expect(graduated_notification2.bike_organization.organization_id).to eq organization.id
         expect(graduated_notification2.bike_id).to eq graduated_notification1.bike_id
@@ -334,7 +336,7 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
-  describe "process_notification!" do
+  describe "process_notification" do
     let(:graduated_notification_interval) { 2.years.to_i }
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:graduated_notification1) { FactoryBot.build(:graduated_notification, :with_user, organization: organization, user: user) }
@@ -349,7 +351,7 @@ RSpec.describe GraduatedNotification, type: :model do
       ActionMailer::Base.deliveries = []
       expect(GraduatedNotification.count).to eq 1
       expect do
-        expect(graduated_notification1.process_notification!).to be_falsey
+        expect(graduated_notification1.process_notification).to be_falsey
       end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
       graduated_notification1.reload
       expect(graduated_notification1.status).to eq "pending"
@@ -373,7 +375,7 @@ RSpec.describe GraduatedNotification, type: :model do
         ActionMailer::Base.deliveries = []
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect do
-          expect(graduated_notification1.process_notification!).to be_falsey
+          expect(graduated_notification1.process_notification).to be_falsey
         end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 1
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(CreateGraduatedNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike2.id])
@@ -394,7 +396,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.status).to eq "pending"
         expect(graduated_notification2.processed?).to be_falsey
 
-        graduated_notification1.process_notification!
+        graduated_notification1.process_notification
         expect(ActionMailer::Base.deliveries.count).to eq 1
         graduated_notification1.reload
         expect(graduated_notification1.processed?).to be_truthy

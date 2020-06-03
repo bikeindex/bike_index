@@ -1,5 +1,8 @@
+# TODO: make scheduled rather than manual call
+#  - inherit from ScheduledWorker
+#  - update specs to include examples
 class ProcessGraduatedNotificationWorker < ApplicationWorker
-  prepend ScheduledWorkerRecorder
+  # prepend ScheduledWorkerRecorder
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -9,19 +12,15 @@ class ProcessGraduatedNotificationWorker < ApplicationWorker
   def perform(graduated_notification_id = nil)
     return enqueue_workers unless graduated_notification_id.present?
 
-    graduated_notification = GraduatedNotification.not_marked_remaining.where(organization_id: org_id, bike_id: bike_id).first
-    return graduated_notification if graduated_notification.present?
+    graduated_notification = GraduatedNotification.find(graduated_notification_id)
+    return graduated_notification if graduated_notification.processed?
 
-    graduated_notification = GraduatedNotification.create(organization_id: org_id, bike_id: bike_id)
-    graduated_notification.process_notification!
-    graduated_notification
+    graduated_notification.process_notification
   end
 
   def enqueue_workers
-    organizations.each do |organization|
-      GraduatedNotification.bike_ids_to_notify(organization).each do |bike_id|
-        self.class.perform_async(organization.id, bike_id)
-      end
+    GraduatedNotification.pending.primary_notifications.pluck(:id).each do |id|
+      self.class.perform_async(id)
     end
   end
 end
