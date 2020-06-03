@@ -114,6 +114,62 @@ RSpec.describe BikesController, type: :request do
       end
     end
 
+    describe "graduated_notification_remaining param" do
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      let!(:bike) { graduated_notification.bike }
+      let(:ownership) { bike.current_ownership }
+      let(:organization) { graduated_notification.organization }
+      let(:current_user) { nil }
+      it "marks the bike remaining" do
+        graduated_notification.reload
+        bike.reload
+        expect(graduated_notification.processed?).to be_truthy
+        expect(graduated_notification.marked_remaining_link_token).to be_present
+        expect(bike.graduated?(organization)).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
+        expect(assigns(:bike)).to eq bike
+        expect(flash[:success]).to be_present
+        bike.reload
+        graduated_notification.reload
+        expect(bike.graduated?(organization)).to be_falsey
+        expect(graduated_notification.marked_remaining?).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+      end
+      context "already marked recovered" do
+        let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
+        it "doesn't update, but flash success" do
+          og_marked_remaining_at = graduated_notification.marked_remaining_at
+          expect(og_marked_remaining_at).to be_present
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(flash[:success]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(graduated_notification.marked_remaining?).to be_truthy
+          expect(graduated_notification.marked_remaining_at).to eq og_marked_remaining_at
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        end
+      end
+      context "unknown token" do
+        it "flash errors" do
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=333#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(flash[:error]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(graduated_notification.status).to eq("active")
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        end
+      end
+    end
+
     describe "parking_notification_retrieved param" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
       let(:creator) { parking_notification.user }
