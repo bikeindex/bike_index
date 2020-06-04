@@ -1,6 +1,6 @@
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = { pending: 0, active: 1, marked_remaining: 2 }.freeze
-  PENDING_PERIOD = 24.hours # Trying out a pending period, temporarily
+  PENDING_PERIOD = 24.hours
   belongs_to :bike
   belongs_to :bike_organization
   belongs_to :user
