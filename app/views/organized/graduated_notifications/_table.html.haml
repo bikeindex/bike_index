@@ -49,8 +49,10 @@
             %span.convertTime
               = l(graduated_notification.processed_at, format: :convert_time)
           - else
-            %small.less-strong.convertTime
-              = l(graduated_notification.pending_period_ends_at, format: :convert_time)
+            %small.less-strong
+              @
+              %span.convertTime
+                = l(graduated_notification.pending_period_ends_at, format: :convert_time)
         - unless skip_bike
           %td
             - if graduated_notification.bike.present?
