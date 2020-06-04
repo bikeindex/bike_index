@@ -17,7 +17,7 @@ RSpec.describe ProcessGraduatedNotificationWorker, type: :lib do
     let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - 1.week) }
     let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: organization) }
     let!(:graduated_notification_processable) { FactoryBot.create(:graduated_notification, organization: organization, created_at: Time.current - GraduatedNotification::PENDING_PERIOD - 55.minutes) }
-    let!(:graduated_notification_primary) { FactoryBot.create(:graduated_notification, organization: organization, bike: bike1, created_at: Time.current - 2.hours) }
+    let!(:graduated_notification_primary) { FactoryBot.create(:graduated_notification, organization: organization, bike: bike1, created_at: Time.current - 30.minutes) }
 
     it "enqueues the expected notifications and only sends one email" do
       graduated_notification_primary.reload
