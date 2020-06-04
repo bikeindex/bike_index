@@ -36,22 +36,30 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   end
 
   describe "show" do
-    let!(:graduated_notification1) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
     it "renders" do
-      get "#{base_url}/#{graduated_notification1.id}"
+      get "#{base_url}/#{graduated_notification.id}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
-      expect(assigns(:graduated_notification)).to eq graduated_notification1
+      expect(assigns(:graduated_notification)).to eq graduated_notification
+    end
+    context "different organization's" do
+      let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      it "raises not found" do
+        expect do
+          get "#{base_url}/#{graduated_notification.id}"
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 
   describe "email" do
-    let!(:graduated_notification1) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
     it "renders" do
-      get "#{base_url}/#{graduated_notification1.id}/email"
+      get "#{base_url}/#{graduated_notification.id}/email"
       expect(response.status).to eq(200)
       expect(response).to render_template(:email)
-      expect(assigns(:graduated_notification)).to eq graduated_notification1
+      expect(assigns(:graduated_notification)).to eq graduated_notification
     end
   end
 end

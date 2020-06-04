@@ -51,6 +51,9 @@ module Organized
         a_graduated_notifications = graduated_notifications.send(@search_status)
       end
 
+      # Doesn't make sense to include unprocessed if sorting by processed_at
+      a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
+
       if bike_search_params_present?
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
