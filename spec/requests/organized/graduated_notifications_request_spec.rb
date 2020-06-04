@@ -43,12 +43,12 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:graduated_notification)).to eq graduated_notification
     end
-    context "not orgs" do
-      let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active, bike: bike1) }
-      it "redirects" do
-        get "#{base_url}/#{graduated_notification.id}"
-        expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-        expect(flash[:error]).to be_present
+    context "different organization's" do
+      let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      it "raises not found" do
+        expect do
+          get "#{base_url}/#{graduated_notification.id}"
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
