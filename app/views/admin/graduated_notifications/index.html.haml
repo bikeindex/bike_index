@@ -1,0 +1,91 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      graduated notifications
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == "all" ? "" : "active") }
+          #{@search_status.humanize} notifications
+        .dropdown-menu
+          - (["all"] + GraduatedNotification.statuses).each do |kind|
+            - kind_active = @search_status == kind
+            - kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind))
+            - kind_display = "#{kind.humanize} notifications"
+            = link_to kind_display, admin_graduated_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "all" # Add a divider after all
+              .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_graduated_notifications_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@graduated_notifications.total_count)
+    matching graduated notifications
+    %em
+      = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
+
+- if @render_chart
+  - graph_column = @search_status == "marked_remaining" ? "marked_remaining_at" : "created_at"
+  = column_chart time_range_counts(collection: matching_graduated_notifications, column: graph_column), stacked: true, thousands: ",", defer: true
+
+.mt-2.mb-4
+  = render partial: "/shared/period_select"
+
+= paginate @graduated_notifications, views_prefix: "admin"
+
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "created_at"
+    %th
+      = sortable "processed_at"
+    %th
+      %small primary?
+    - unless current_organization.present?
+      %th
+        Organization
+    %th Bike
+    %th Status
+    %th
+      = sortable "email"
+    %th
+      = sortable "marked_remaining_at"
+  %tbody
+    - @graduated_notifications.each do |graduated_notification|
+      %tr
+        %td
+          %a.convertTime.preciseTime{ href: organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id) }
+            = l(graduated_notification.created_at, format: :convert_time)
+        %td
+          - if graduated_notification.processed_at
+            %span.convertTime.preciseTime
+              = l(graduated_notification.processed_at, format: :convert_time)
+          - else
+            %small.less-strong
+              @
+              %span.convertTime
+                = l(graduated_notification.pending_period_ends_at, format: :convert_time)
+        %td
+          = check_mark if graduated_notification.primary_notification?
+        - unless current_organization.present?
+          %td
+            = link_to graduated_notification.organization&.short_name, admin_graduated_notifications_path(organization_id: graduated_notification.organization_id)
+        %td
+          - if graduated_notification.bike.present?
+            = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
+        %td
+          %em
+            = status_display(graduated_notification.status.humanize)
+        %td
+          = graduated_notification.email
+        %td
+          - if graduated_notification.marked_remaining_at.present?
+            %span.convertTime
+              = l(graduated_notification.marked_remaining_at, format: :convert_time)
