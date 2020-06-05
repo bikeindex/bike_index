@@ -68,14 +68,40 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
         end
       end
+      context "passed id" do
+        let!(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
+        it "renders passed id" do
+          get "#{base_url}/appears_abandoned_notification", params: { parking_notification_id: parking_notification.id }
+          expect(response.status).to eq(200)
+          expect(response).to render_template("organized_mailer/parking_notification")
+          expect(assigns(:parking_notification)).to eq parking_notification
+          expect(assigns(:retrieval_link_url)).to eq "#"
+        end
+        context "different org" do
+          let!(:parking_notification) { FactoryBot.create(:parking_notification) }
+          it "404s" do
+            expect do
+              get "#{base_url}/appears_abandoned_notification", params: { parking_notification_id: parking_notification.id }
+            end.to raise_error(ActiveRecord::RecordNotFound)
+          end
+        end
+      end
       context "graduated_notification passed id" do
         let!(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: current_organization) }
         it "renders" do
-          get "#{base_url}/graduated_notification", params: { graduated_notification_id: graduated_notification.id }
+          get "#{base_url}/graduated_notification_email", params: { graduated_notification_id: graduated_notification.id }
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/graduated_notification")
           expect(assigns(:graduated_notification).id).to eq graduated_notification.id
           expect(assigns(:retrieval_link_url)).to eq "#"
+        end
+        context "different org" do
+          let!(:graduated_notification) { FactoryBot.create(:graduated_notification) }
+          it "404s" do
+            expect do
+              get "#{base_url}/graduated_notification_email", params: { graduated_notification_id: graduated_notification.id }
+            end.to raise_error(ActiveRecord::RecordNotFound)
+          end
         end
       end
     end

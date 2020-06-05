@@ -42,8 +42,7 @@ module Organized
     end
 
     def find_mail_snippet
-      # TODO: render specific mail snippet, if given ID
-      @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds
+      @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds.first
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
     end
@@ -62,7 +61,7 @@ module Organized
         @bike ||= current_organization.bikes.last
       else
         parking_notifications = current_organization.parking_notifications
-        @graduated_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
+        @parking_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
         @parking_notification ||= parking_notifications.where(kind: @kind).last
         @parking_notification ||= build_parking_notification
         @bike = @parking_notification.bike
