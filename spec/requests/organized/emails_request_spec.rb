@@ -78,6 +78,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
     describe "update" do
       it "creates" do
+        fail # This needs to update whether the snippet is enabled! So it isn't secretly hidden sometimes
         expect(current_organization.mail_snippets.count).to eq 0
         put "#{base_url}/impound_notification", params: {
           organization_id: current_organization.to_param,
