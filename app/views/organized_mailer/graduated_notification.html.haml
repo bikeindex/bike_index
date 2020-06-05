@@ -9,6 +9,7 @@
   -#   #{@bike.type}
   -# be at #{@organization.short_name} next semester?
 
+-# TODO: these should be enabled!!!
 - organization_message_snippet = @organization.mail_snippets.enabled.graduated_notification_email.first
 - if @email_preview
   - organization_message_snippet ||= @organization.mail_snippets.graduated_notification_email.first

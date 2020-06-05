@@ -56,7 +56,7 @@
         - unless skip_bike
           %td
             - if graduated_notification.bike.present?
-              = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: current_organization.id)
+              = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
         - unless skip_status
           %td
             %em
@@ -67,5 +67,5 @@
         - if render_remaining_at
           %td
             - if graduated_notification.marked_remaining_at.present?
-              %span.convertTime.preciseTime
+              %span.convertTime
                 = l(graduated_notification.marked_remaining_at, format: :convert_time)
