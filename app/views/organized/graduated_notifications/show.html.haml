@@ -1,5 +1,4 @@
 -# TODO: add translations
-- # TODO: add translations
 .organized-page-header
   %h1
     Graduated notification
@@ -33,8 +32,9 @@
           %tr
             %td Marked remaining
             %td
-              %span.convertTime.preciseTime
-                = l(@graduated_notification.marked_remaining_at, format: :convert_time)
+              - if @graduated_notification.marked_remaining_at.present?
+                %span.convertTime.preciseTime
+                  = l(@graduated_notification.marked_remaining_at, format: :convert_time)
         %tr
           %td Email
           %td
@@ -67,7 +67,7 @@
     - else
       to send:
   .email-preview.parking-notification-email-preview
-    <iframe src="#{email_organization_graduated_notification_path(@graduated_notification, organization_id: current_organization.to_param)}"></iframe>
+    <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
 - else
   %p.text-warning.mt-4
     %em

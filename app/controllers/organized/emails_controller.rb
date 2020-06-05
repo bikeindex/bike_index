@@ -10,6 +10,7 @@ module Organized
     def show
       @organization = current_organization
       @email_preview = true
+      find_or_build_email
       if @kind == "graduated_notification_email"
         render template: "/organized_mailer/graduated_notification", layout: "email"
       else
@@ -45,14 +46,27 @@ module Organized
       @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
+    end
+
+    def find_or_build_email
+      @organization = current_organization
+      @email_preview = true
       if @kind == "graduated_notification_email"
+        graduated_notifications = current_organization.graduated_notifications
+        @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
+        @graduated_notification ||= graduated_notifications.last
+        @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: current_organization.bikes.last)
+        @bike = @graduated_notification.bike
+        @bikes = @graduated_notification.associated_bikes
         @retrieval_link_url = "#"
         @bike ||= current_organization.bikes.last
       else
-        @parking_notification = parking_notifications.where(kind: @kind).last
+        parking_notifications = current_organization.parking_notifications
+        @graduated_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
+        @parking_notification ||= parking_notifications.where(kind: @kind).last
         @parking_notification ||= build_parking_notification
         @bike = @parking_notification.bike
-        @retrieval_link_url = @parking_notification.retrieval_link_token.present? ? "#" : nil
+        @retrieval_link_url = "#"
       end
     end
 

@@ -18,15 +18,6 @@ module Organized
 
     def show; end
 
-    def email
-      @organization = current_organization
-      @email_preview = true
-      @bike = @graduated_notification.bike
-      @bikes = @graduated_notification.associated_bikes
-      @retrieval_link_url = @graduated_notification.marked_remaining_link_token.present? ? "#" : nil
-      render template: "/organized_mailer/graduated_notification", layout: "email"
-    end
-
     private
 
     def graduated_notifications
