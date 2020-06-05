@@ -38,15 +38,18 @@ class BikesController < ApplicationController
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
-    if params[:parking_notification_retrieved].present?
-      resolve_parking_notification(params[:parking_notification_retrieved])
-    elsif params[:graduated_notification_remaining].present?
-      resolve_graduated_notification(params[:graduated_notification_remaining])
-    else
-      respond_to do |format|
-        format.html { render :show }
-        format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
-      end
+    @token = params[:parking_notification_retrieved] || params[:graduated_notification_remaining]
+    if @token.present?
+      @token_type = %i[parking_notification_retrieved graduated_notification_remaining].select { |k| params[k].present? }.first
+    end
+    # if params[:parking_notification_retrieved].present?
+    #   resolve_parking_notification(params[:parking_notification_retrieved])
+    # elsif params[:graduated_notification_remaining].present?
+    #   resolve_graduated_notification(params[:graduated_notification_remaining])
+    # else
+    respond_to do |format|
+      format.html { render :show }
+      format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
     end
   end
 

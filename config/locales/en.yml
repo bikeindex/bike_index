@@ -1360,6 +1360,8 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
+      you_should_be_redirected_automatically: You should be redirected automatically
+      if_not_click_button: If you are not, please click the button below
       abandoned: Abandoned
       at: at
       bike_in_admin: "%{bike_type} in Super Admin"
@@ -2079,7 +2081,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2105,7 +2107,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

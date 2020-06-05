@@ -1,5 +1,16 @@
 = render partial: "bike_show_overlays"
 
+- if @token.present?
+  .text-center
+    %h3=t(".you_should_be_redirected_automatically")
+    %p= t(".if_not_click_button")
+    = form_tag token_bike_path(@bike), id: "update_bike_with_token", method: "patch" do
+      = hidden_field_tag :token, @token
+      = hidden_field_tag :token_type, @token_type
+      %input{ type: "submit", value: @token_type&.humanize, class: 'btn btn-success btn-lg' }
+    / :javascript
+    /   document.forms["update_bike_with_token"].submit()
+
 .container
   - if current_user&.superuser
     %p.mb-4.text-center

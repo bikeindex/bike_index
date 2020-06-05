@@ -134,6 +134,7 @@ RSpec.describe BikesController, type: :request do
         graduated_notification.reload
         expect(bike.graduated?(organization)).to be_falsey
         expect(graduated_notification.marked_remaining?).to be_truthy
+        expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
       end
       context "already marked recovered" do
@@ -145,7 +146,9 @@ RSpec.describe BikesController, type: :request do
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
           expect(assigns(:bike)).to eq bike
-          expect(flash[:success]).to be_present
+          expect(assigns(:token)).to eq graduated_notification.marked_remaining_link_token
+          expect(assigns(:token_type)).to eq "graduated_notification_remaining"
+          expect(flash).to be_blank
           bike.reload
           graduated_notification.reload
           expect(bike.graduated?(organization)).to be_falsey

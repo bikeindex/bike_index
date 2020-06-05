@@ -117,9 +117,9 @@ class GraduatedNotification < ApplicationRecord
   def in_pending_period?; pending_period_ends_at > Time.current end
 
   def mark_remaining!(resolved_at: nil)
+    return true unless marked_remaining_at.blank?
     self.marked_remaining_at ||= resolved_at || Time.current
     # We don't want to re-mark remaining
-    return true unless marked_remaining_at_changed?
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
     associated_notifications.each { |n| n.update(updated_at: Time.current, skip_update: true) }
