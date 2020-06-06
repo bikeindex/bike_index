@@ -248,7 +248,7 @@
   - if graduated_notifications.any?
     .parking-notifications-wrap
       %h3.mt-2.mb-2 Graduated notifications
-      = render partial: "/organized/graduated_notifications/table", locals: { graduated_notifications: graduated_notifications, skip_email: true }
+      = render partial: "/organized/graduated_notifications/table", locals: { graduated_notifications: graduated_notifications, skip_email: true, render_remaining_at: true }
 
 
 - if passive_organization.enabled?("parking_notifications")

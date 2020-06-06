@@ -13,18 +13,18 @@
           - if @matching_notification&.resolved?
             %strong.text-info{ style: "font-size: 125%;" }
               - if @token_type == "graduated_notification"
-                You have already marked this #{@bike.type} remaining
+                = t(".you_have_already_marked_remaining", bike_type: @bike.type)
               - else
-                You have marked this notification resolved
+                = t(".you_have_already_marked_resolved")
             .mt-1
-              %em.small.less-strong no further action necessary!
+              %em.small.less-strong=t(".no_futher_action_necessary")
           - else
 
             = form_tag resolve_token_bike_path(@bike), method: "PUT" do
               = hidden_field_tag :token, @token
               = hidden_field_tag :token_type, @token_type
-              - button_action = @token_type == "graduated_notification" ? "remaining" : "retrieved"
-              %input{ type: "submit", value: "Mark #{@bike.type} #{button_action}", class: 'btn btn-success btn-lg' }
+              - button_value = @token_type == "graduated_notification" ? t(".mark_graduated_resolved", bike_type: @bike.type) : t(".mark_parking_resolved", bike_type: @bike.type)
+              %input{ type: "submit", value: button_value, class: 'btn btn-success btn-lg' }
 
 - if @bike.stolen && session[:recovery_link_token].present?
   -# Delete token so modal doesn't keep rendering

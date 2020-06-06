@@ -232,23 +232,23 @@ class BikesController < ApplicationController
     if params[:token_type] == "graduated_notification"
       matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: params[:token]).first
       if matching_notification.present? && matching_notification.processed?
-        flash[:success] = "#{@bike.type.titleize} marked remaining!"
+        flash[:success] = translation(:marked_remaining, bike_type: @bike.type)
         matching_notification.mark_remaining! unless matching_notification.marked_remaining?
       else
-        flash[:error] = "Unable to find that Graduated Notification!"
+        flash[:error] = translation(:unable_to_find_graduated_notification)
       end
     else
-      matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first
+      matching_notification = @bike.parking_notifications.where(retrieval_link_token: params[:token]).first
       if matching_notification.present?
         if matching_notification.active?
-          flash[:success] = "#{@bike.type.titleize} marked retrieved!"
+          flash[:success] = translation(:marked_retrieved, bike_type: @bike.type)
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
         elsif matching_notification.impounded?
-          flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
+          flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
         elsif matching_notification.retrieved?
-          flash[:info] = "That #{@bike.type} has already been marked retrieved!"
+          flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
         flash[:error] = "Unable to find that Parking Notification!"

@@ -973,8 +973,11 @@ en:
       how_did_you_get_it_back: How did you get it back?
       its_also_how_we_get_better_at_recovering: It's also how we get better at recovering
         bikes.
+      mark_graduated_resolved: Mark %{bike_type} remaining
+      mark_parking_resolved: Mark %{bike_type} retrieved
       mark_recovered: Mark recovered
       nevermind: Nevermind
+      no_futher_action_necessary: no further action necessary!
       no_one_can_see_it_but_you: No one can see it but you
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
@@ -986,6 +989,9 @@ en:
         was stolen.
       when_did_you_recover_it: When did you recover it?
       whoa_this_awesome_bike_type_is_yours: Whoa, this awesome %{bike_type} is yours!
+      you_have_already_marked_remaining: You have already marked this %{bike_type}
+        remaining
+      you_have_already_marked_resolved: You have marked this notification resolved
       you_sent_this_bike_html: >-
         You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed
         yet. You can update it.
@@ -1383,7 +1389,6 @@ en:
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
-      if_not_click_button: If you are not, please click the button below
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
@@ -1426,7 +1431,6 @@ en:
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
-      you_should_be_redirected_automatically: You should be redirected automatically
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
       add: Add
@@ -1526,6 +1530,15 @@ en:
           incorrect_token: Incorrect Token, check your email again
         update:
           bike_recovered: Bike marked recovered! Thank you!
+      resolve_token:
+        marked_remaining: "%{bike_type} marked remaining!"
+        marked_retrieved: "%{@bike_type} marked retrieved!"
+        notification_already_retrieved: That %{bike_type} has already been marked
+          retrieved!
+        notification_impounded: That %{bike_type} has been impounded! Contact %{org_name}
+          to retrieve it.
+        unable_to_find_graduated_notification: Unable to find that Graduated Notification!
+        unable_to_find_parking_notification: Unable to find that Parking Notification!
       scanned:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:

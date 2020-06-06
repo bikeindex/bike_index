@@ -11,7 +11,7 @@ module Organized
       @organization = current_organization
       @email_preview = true
       find_or_build_email
-      if @kind == "graduated_notification_email"
+      if @kind == "graduated_notification"
         render template: "/organized_mailer/graduated_notification", layout: "email"
       else
         render template: "/organized_mailer/parking_notification", layout: "email"
@@ -50,7 +50,7 @@ module Organized
     def find_or_build_email
       @organization = current_organization
       @email_preview = true
-      if @kind == "graduated_notification_email"
+      if @kind == "graduated_notification"
         graduated_notifications = current_organization.graduated_notifications
         @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
         @graduated_notification ||= graduated_notifications.last
