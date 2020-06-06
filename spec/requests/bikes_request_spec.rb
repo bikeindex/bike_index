@@ -140,8 +140,6 @@ RSpec.describe BikesController, type: :request do
       context "already marked recovered" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
         it "renders" do
-          og_marked_remaining_at = graduated_notification.marked_remaining_at
-          expect(og_marked_remaining_at).to be_present
           expect(bike.graduated?(organization)).to be_falsey
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
@@ -340,9 +338,9 @@ RSpec.describe BikesController, type: :request do
           expect(bike.graduated?(organization)).to be_falsey
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           put "#{base_url}/#{bike.id}/resolve_token", params: {
-            token: graduated_notification.marked_remaining_link_token,
-            token_type: "graduated_notification"
-          }
+                                                    token: graduated_notification.marked_remaining_link_token,
+                                                    token_type: "graduated_notification",
+                                                  }
           expect(response).to redirect_to(bike_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload

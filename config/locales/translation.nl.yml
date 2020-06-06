@@ -1715,6 +1715,12 @@ nl:
       you_sent_this_bike_html: U heeft deze %{bike_type} verzonden naar <em>%{owner_email}</em>
         en het is nog niet geclaimd. Je kunt het updaten.
       your_bike: Uw %{bike_type}
+      mark_graduated_resolved: Markeer %{bike_type} resterend
+      mark_parking_resolved: Markeer %{bike_type} opgehaald
+      no_futher_action_necessary: geen verdere actie nodig!
+      you_have_already_marked_remaining: U heeft deze %{bike_type} al gemarkeerd als
+        resterend
+      you_have_already_marked_resolved: Je hebt deze melding als opgelost gemarkeerd
     edit_accessories:
       add_a_component: Voeg een component toe
       other_handlebar_type: Ander type stuur
@@ -2222,6 +2228,15 @@ nl:
       assign_bike_stickers:
         sticker_assigned: Succes! Sticker '%{bike_sticker}' is toegewezen aan uw %{bike_type}
         unable_to_find_sticker: Kan geen overeenkomende sticker vinden %{bike_sticker}
+      resolve_token:
+        marked_remaining: "%{bike_type} gemarkeerd als resterend!"
+        marked_retrieved: "% {@ bike_type} gemarkeerd als opgehaald!"
+        notification_already_retrieved: Dat %{bike_type} al is gemarkeerd als opgehaald!
+        notification_impounded: Dat %{bike_type} in beslag is genomen! Neem contact
+          op met %{org_name} om het op te halen.
+        unable_to_find_graduated_notification: Kan die afgestudeerde melding niet
+          vinden!
+        unable_to_find_parking_notification: Kan die parkeermelding niet vinden!
     application:
       handle_unverified_request:
         csrf_invalid: CSRF ongeldig. Neem contact met ons op als u niet weet waarom

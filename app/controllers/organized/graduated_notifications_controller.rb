@@ -46,13 +46,12 @@ module Organized
       a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
 
       if bike_search_params_present?
-        @separate_non_primary_notifications = true
+        @separate_non_primary_notifications = true # Because we need to match per bike things, show all potential notifications
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
       else
         @separate_non_primary_notifications = false
-        # Only show the primary notification
         a_graduated_notifications = a_graduated_notifications.primary_notifications
       end
 

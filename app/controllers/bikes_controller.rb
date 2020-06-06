@@ -251,7 +251,7 @@ class BikesController < ApplicationController
           flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
-        flash[:error] = "Unable to find that Parking Notification!"
+        flash[:error] = translation(:unable_to_find_parking_notification)
       end
     end
 
