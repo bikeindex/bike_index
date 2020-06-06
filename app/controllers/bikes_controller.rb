@@ -238,21 +238,21 @@ class BikesController < ApplicationController
         flash[:error] = "Unable to find that Graduated Notification!"
       end
     else
-      # matching_notification = @bike.parking_notifications.where(retrieval_link_token: retrieval_link_token).first
-      # if matching_notification.present?
-      #   if matching_notification.active?
-      #     flash[:success] = "#{@bike.type.titleize} marked retrieved!"
-      #     # Quick hack to skip making another endpoint
-      #     retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
-      #     matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
-      #   elsif matching_notification.impounded?
-      #     flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
-      #   elsif matching_notification.retrieved?
-      #     flash[:info] = "That #{@bike.type} has already been marked retrieved!"
-      #   end
-      # else
-      #   flash[:error] = "Unable to find that Parking Notification!"
-      # end
+      matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first
+      if matching_notification.present?
+        if matching_notification.active?
+          flash[:success] = "#{@bike.type.titleize} marked retrieved!"
+          # Quick hack to skip making another endpoint
+          retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
+          matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
+        elsif matching_notification.impounded?
+          flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
+        elsif matching_notification.retrieved?
+          flash[:info] = "That #{@bike.type} has already been marked retrieved!"
+        end
+      else
+        flash[:error] = "Unable to find that Parking Notification!"
+      end
     end
 
     redirect_to bike_path(@bike.id)
@@ -388,7 +388,7 @@ class BikesController < ApplicationController
   end
 
   def find_token
-    @token = params[:parking_notification_retrieved] || params[:graduated_notification_remaining]
+    @token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence
     return false if @token.blank?
     if params[:parking_notification_retrieved].present?
       @matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first

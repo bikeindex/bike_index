@@ -120,7 +120,7 @@ RSpec.describe BikesController, type: :request do
       let(:ownership) { bike.current_ownership }
       let(:organization) { graduated_notification.organization }
       let(:current_user) { nil }
-      it "marks the bike remaining" do
+      it "renders" do
         graduated_notification.reload
         bike.reload
         expect(graduated_notification.processed?).to be_truthy
@@ -139,7 +139,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "already marked recovered" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
-        it "doesn't update, but flash success" do
+        it "renders" do
           og_marked_remaining_at = graduated_notification.marked_remaining_at
           expect(og_marked_remaining_at).to be_present
           expect(bike.graduated?(organization)).to be_falsey
@@ -156,7 +156,7 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "unknown token" do
-        it "flash errors" do
+        it "renders" do
           expect(bike.graduated?(organization)).to be_truthy
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
           get "#{base_url}/#{bike.id}?graduated_notification_remaining=333#{graduated_notification.marked_remaining_link_token}"
@@ -172,12 +172,25 @@ RSpec.describe BikesController, type: :request do
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
         end
       end
+      context "no token" do
+        it "renders" do
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining="
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to be_blank
+          expect(assigns(:token_type)).to be_blank
+          expect(assigns(:matching_notification)).to be_blank
+          expect(flash).to be_blank
+          bike.reload
+        end
+      end
     end
 
     describe "parking_notification_retrieved param" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
       let(:creator) { parking_notification.user }
-      it "retrieves the bike" do
+      it "renders" do
         parking_notification.reload
         expect(parking_notification.current?).to be_truthy
         expect(parking_notification.retrieval_link_token).to be_present
@@ -196,7 +209,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "user not present" do
         let(:current_user) { nil }
-        it "retrieves the bike" do
+        it "renders" do
           parking_notification.reload
           expect(parking_notification.current?).to be_truthy
           expect(parking_notification.retrieval_link_token).to be_present
@@ -213,7 +226,7 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "with direct_link" do
-        it "marks it retrieved directly" do
+        it "renders" do
           parking_notification.reload
           expect(parking_notification.current?).to be_truthy
           expect(parking_notification.retrieval_link_token).to be_present
@@ -229,7 +242,7 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "not notification token" do
-        it "flash errors" do
+        it "renders" do
           parking_notification.reload
           expect(parking_notification.current?).to be_truthy
           expect(parking_notification.retrieval_link_token).to be_present
@@ -246,7 +259,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "already retrieved" do
         let(:retrieval_time) { Time.current - 2.minutes }
-        it "has a flash saying so" do
+        it "renders" do
           parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
@@ -263,7 +276,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "abandoned as well" do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
-        it "recovers both" do
+        it "renders" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
@@ -279,17 +292,17 @@ RSpec.describe BikesController, type: :request do
       end
       context "impound notification" do
         let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
-        it "refuses" do
+        it "renders" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.resolved?).to be_truthy
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification_impounded.retrieval_link_token}"
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
-          expect(assigns(:token)).to eq parking_notification_impounded.retrieval_link_token
-          expect(assigns(:token_type)).to eq "impound_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification_impounded
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification
         end
       end
     end
