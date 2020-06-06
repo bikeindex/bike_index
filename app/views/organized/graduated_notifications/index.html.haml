@@ -54,7 +54,7 @@
 
 
 - skip_remaining = (GraduatedNotification.current_statuses + ["current"]).include?(@search_status)
-= render partial: "/organized/graduated_notifications/table", locals: { graduated_notifications: @graduated_notifications, render_sortable: true, render_remaining_at: !skip_remaining }
+= render partial: "/organized/graduated_notifications/table", locals: { graduated_notifications: @graduated_notifications, render_sortable: true, render_remaining_at: !skip_remaining, show_non_primary_notifications: @show_non_primary_notifications }
 
 .paginate-container.paginate-container-bottom
   = paginate @graduated_notifications

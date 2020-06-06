@@ -13,7 +13,7 @@ module Organized
 
       @graduated_notifications = available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
                           .page(@page).per(@per_page)
-                          .includes(:user, :bike)
+                          .includes(:user, :bike, :secondary_notifications)
     end
 
     def show; end
@@ -46,9 +46,14 @@ module Organized
       a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
 
       if bike_search_params_present?
+        @separate_non_primary_notifications = true
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
+      else
+        @separate_non_primary_notifications = false
+        # Only show the primary notification
+        a_graduated_notifications = a_graduated_notifications.primary_notifications
       end
 
       @available_graduated_notifications = a_graduated_notifications.where(created_at: @time_range)

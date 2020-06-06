@@ -1360,8 +1360,6 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      you_should_be_redirected_automatically: You should be redirected automatically
-      if_not_click_button: If you are not, please click the button below
       abandoned: Abandoned
       at: at
       bike_in_admin: "%{bike_type} in Super Admin"
@@ -1385,6 +1383,7 @@ en:
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
+      if_not_click_button: If you are not, please click the button below
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
@@ -1427,6 +1426,7 @@ en:
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
+      you_should_be_redirected_automatically: You should be redirected automatically
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
       add: Add
@@ -2081,7 +2081,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2107,7 +2107,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
