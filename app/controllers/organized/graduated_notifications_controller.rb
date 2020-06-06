@@ -12,8 +12,8 @@ module Organized
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
       @graduated_notifications = available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
-                          .page(@page).per(@per_page)
-                          .includes(:user, :bike, :secondary_notifications)
+        .page(@page).per(@per_page)
+        .includes(:user, :bike, :secondary_notifications)
     end
 
     def show; end

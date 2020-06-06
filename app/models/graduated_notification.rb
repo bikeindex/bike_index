@@ -89,6 +89,9 @@ class GraduatedNotification < ApplicationRecord
 
   def unprocessed?; !processed? end
 
+  # Necessary to match parking_notification method
+  def resolved?; marked_remaining? end
+
   def primary_notification?; id.present? && id == primary_notification_id end
 
   def secondary_notification?; !primary_notification? end
@@ -122,7 +125,7 @@ class GraduatedNotification < ApplicationRecord
     # We don't want to re-mark remaining
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
-    associated_notifications.each { |n| n.update(updated_at: Time.current, skip_update: true) }
+    associated_notifications.each { |n| n.update(updated_at: Time.current, skip_update: true, marked_remaining_at: marked_remaining_at) }
     # Long shot - but update any graduated notifications that might have been missed, just in case
     organization.graduated_notifications.where(bike_id: bike_id).active.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
@@ -184,7 +187,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   # Right now, just static - but we're going to make it configurable
-  def email_subject
+  def title
     "Renew your bike permit"
   end
 

@@ -5,7 +5,7 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_action :find_bike, only: [:show, :edit, :update, :pdf]
+  before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_action :render_ad, only: [:index, :show]
   before_action :store_return_to, only: [:edit]
@@ -38,15 +38,7 @@ class BikesController < ApplicationController
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
-    @token = params[:parking_notification_retrieved] || params[:graduated_notification_remaining]
-    if @token.present?
-      @token_type = %i[parking_notification_retrieved graduated_notification_remaining].select { |k| params[k].present? }.first
-    end
-    # if params[:parking_notification_retrieved].present?
-    #   resolve_parking_notification(params[:parking_notification_retrieved])
-    # elsif params[:graduated_notification_remaining].present?
-    #   resolve_graduated_notification(params[:graduated_notification_remaining])
-    # else
+    find_token
     respond_to do |format|
       format.html { render :show }
       format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
@@ -236,6 +228,36 @@ class BikesController < ApplicationController
     @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
+  def resolve_token
+    if params[:token_type] == "graduated_notification"
+      matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: params[:token]).first
+      if matching_notification.present? && matching_notification.processed?
+        flash[:success] = "#{@bike.type.titleize} marked remaining!"
+        matching_notification.mark_remaining! unless matching_notification.marked_remaining?
+      else
+        flash[:error] = "Unable to find that Graduated Notification!"
+      end
+    else
+      # matching_notification = @bike.parking_notifications.where(retrieval_link_token: retrieval_link_token).first
+      # if matching_notification.present?
+      #   if matching_notification.active?
+      #     flash[:success] = "#{@bike.type.titleize} marked retrieved!"
+      #     # Quick hack to skip making another endpoint
+      #     retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
+      #     matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
+      #   elsif matching_notification.impounded?
+      #     flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
+      #   elsif matching_notification.retrieved?
+      #     flash[:info] = "That #{@bike.type} has already been marked retrieved!"
+      #   end
+      # else
+      #   flash[:error] = "Unable to find that Parking Notification!"
+      # end
+    end
+
+    redirect_to bike_path(@bike.id)
+  end
+
   protected
 
   # Determine the appropriate edit template to use in the edit view.
@@ -365,34 +387,17 @@ class BikesController < ApplicationController
     end
   end
 
-  def resolve_parking_notification(retrieval_link_token)
-    matching_notification = @bike.parking_notifications.where(retrieval_link_token: retrieval_link_token).first
-    if matching_notification.present?
-      if matching_notification.active?
-        flash[:success] = "#{@bike.type.titleize} marked retrieved!"
-        # Quick hack to skip making another endpoint
-        retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
-        matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
-      elsif matching_notification.impounded?
-        flash[:error] = "That #{@bike.type} has been impounded! Contact #{matching_notification.organization.short_name} to retrieve it."
-      elsif matching_notification.retrieved?
-        flash[:info] = "That #{@bike.type} has already been marked retrieved!"
-      end
-    else
-      flash[:error] = "Unable to find that Parking Notification!"
+  def find_token
+    @token = params[:parking_notification_retrieved] || params[:graduated_notification_remaining]
+    return false if @token.blank?
+    if params[:parking_notification_retrieved].present?
+      @matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first
+      @token_type = @matching_notification&.kind
+    elsif params[:graduated_notification_remaining].present?
+      @matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: @token).first
+      @token_type = "graduated_notification"
     end
-    redirect_to bike_path(@bike.id) and return
-  end
-
-  def resolve_graduated_notification(marked_remaining_link_token)
-    matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: marked_remaining_link_token).first
-    if matching_notification.present? && matching_notification.processed?
-      flash[:success] = "#{@bike.type.titleize} marked remaining!"
-      matching_notification.mark_remaining! unless matching_notification.marked_remaining?
-    else
-      flash[:error] = "Unable to find that Graduated Notification!"
-    end
-    redirect_to bike_path(@bike.id) and return
+    @token_type ||= "parked_incorrectly_notification" # Fallback
   end
 
   def render_ad

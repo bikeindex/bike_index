@@ -67,7 +67,7 @@
     - else
       to send:
   .email-preview.parking-notification-email-preview
-    <iframe src="#{organization_email_path("graduated_notification_email", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
+    <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
 - else
   %p.text-warning.mt-4
     %em

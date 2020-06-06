@@ -118,13 +118,13 @@ RSpec.describe Organized::EmailsController, type: :request do
       it "creates" do
         expect(current_organization.mail_snippets.count).to eq 0
         put "#{base_url}/impound_notification", params: {
-          organization_id: current_organization.to_param,
-          id: "impound_notification",
-          mail_snippet: {
-            body: "cool new things",
-            is_enabled: "true",
-          }
-        }
+                                              organization_id: current_organization.to_param,
+                                              id: "impound_notification",
+                                              mail_snippet: {
+                                                body: "cool new things",
+                                                is_enabled: "true",
+                                              },
+                                            }
         expect(current_organization.mail_snippets.count).to eq 1
         mail_snippet = current_organization.mail_snippets.last
         expect(mail_snippet.kind).to eq "impound_notification"

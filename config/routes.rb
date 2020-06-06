@@ -141,7 +141,7 @@ Rails.application.routes.draw do
       get :spokecard
       get :scanned
       get :pdf
-      patch :token
+      put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
   end

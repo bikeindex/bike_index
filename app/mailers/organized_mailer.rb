@@ -81,7 +81,7 @@ class OrganizedMailer < ApplicationMailer
     end
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.email_subject)
+      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.title)
     end
   end
 
