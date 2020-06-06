@@ -2,8 +2,6 @@
   = @parking_notification.title
 
 - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: @parking_notification.kind).first
-- if @email_preview
-  - organization_message_snippet ||= @organization.mail_snippets.where(kind: @parking_notification.kind).first
 
 - if organization_message_snippet.present?
   %div{ style: "margin-top: 20px;" }

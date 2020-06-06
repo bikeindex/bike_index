@@ -1,9 +1,9 @@
 - graduated_notifications ||= @graduated_notifications
-- skip_bike ||= false
 - render_sortable ||= false
 - render_remaining_at ||= false
 - skip_status ||= false
 - skip_email ||= false
+- separate_non_primary_notifications ||= false
 
 - # TODO: add translations
 
@@ -14,13 +14,12 @@
         = sortable "created_at"
       - else
         Created
-    %th
+    %th.small
       - if render_sortable
         = sortable "processed_at"
       - else
         Processed
-    - unless skip_bike
-      %th Bike
+    %th Bike(s)
     - unless skip_status
       %th
         Status
@@ -44,7 +43,7 @@
           - notification_link = graduated_notification.primary_notification_id.present? ? graduated_notification.primary_notification_id : graduated_notification.id
           %a.convertTime.preciseTime{ href: organization_graduated_notification_path(notification_link.to_param, organization_id: graduated_notification.organization_id) }
             = l(graduated_notification.created_at, format: :convert_time)
-        %td
+        %td.small
           - if graduated_notification.processed_at.present?
             %span.convertTime
               = l(graduated_notification.processed_at, format: :convert_time)
@@ -53,10 +52,13 @@
               @
               %span.convertTime
                 = l(graduated_notification.pending_period_ends_at, format: :convert_time)
-        - unless skip_bike
-          %td
-            - if graduated_notification.bike.present?
-              = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
+        %td
+          - if graduated_notification.bike.present?
+            = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
+          - if !separate_non_primary_notifications
+            - graduated_notification.associated_notifications.each do |associated_notification|
+              %small.d-block{ style: "padding-left: 0.5rem; line-height: 1.5" }
+                = link_to organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: associated_notification.organization_id)
         - unless skip_status
           %td
             %em

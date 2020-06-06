@@ -141,6 +141,7 @@ Rails.application.routes.draw do
       get :spokecard
       get :scanned
       get :pdf
+      put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
   end
@@ -325,12 +326,8 @@ Rails.application.routes.draw do
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
     resources :emails, only: %i[index show edit update]
-    resources :parking_notifications do
-      member { get :email }
-    end
-    resources :graduated_notifications, only: %w[index show] do
-      member { get :email }
-    end
+    resources :parking_notifications
+    resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
     resource :ambassador_dashboard, only: %i[show] do

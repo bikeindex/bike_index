@@ -5,9 +5,9 @@ RSpec.describe BikesController, type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
+  before { log_in(current_user) if current_user.present? }
 
   describe "show" do
-    before { log_in(current_user) if current_user.present? }
     context "example bike" do
       it "shows the bike" do
         ownership.bike.update_attributes(example: true)
@@ -120,7 +120,7 @@ RSpec.describe BikesController, type: :request do
       let(:ownership) { bike.current_ownership }
       let(:organization) { graduated_notification.organization }
       let(:current_user) { nil }
-      it "marks the bike remaining" do
+      it "renders" do
         graduated_notification.reload
         bike.reload
         expect(graduated_notification.processed?).to be_truthy
@@ -129,11 +129,205 @@ RSpec.describe BikesController, type: :request do
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
         get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
         expect(assigns(:bike)).to eq bike
+        expect(assigns(:token)).to eq graduated_notification.marked_remaining_link_token
+        expect(assigns(:token_type)).to eq "graduated_notification"
+        expect(assigns(:matching_notification)).to eq graduated_notification
+        expect(flash).to be_blank
+        bike.reload
+        graduated_notification.reload
+        expect(graduated_notification.marked_remaining?).to be_falsey
+      end
+      context "already marked recovered" do
+        let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
+        it "renders" do
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq graduated_notification.marked_remaining_link_token
+          expect(assigns(:token_type)).to eq "graduated_notification"
+          expect(assigns(:matching_notification)).to eq graduated_notification
+          expect(flash).to be_blank
+          bike.reload
+          graduated_notification.reload
+          expect(graduated_notification.marked_remaining?).to be_truthy
+        end
+      end
+      context "unknown token" do
+        it "renders" do
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining=333#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq "333#{graduated_notification.marked_remaining_link_token}"
+          expect(assigns(:token_type)).to eq "graduated_notification"
+          expect(assigns(:matching_notification)).to be_blank
+          expect(flash).to be_blank
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(graduated_notification.status).to eq("active")
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        end
+      end
+      context "no token" do
+        it "renders" do
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          get "#{base_url}/#{bike.id}?graduated_notification_remaining="
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to be_blank
+          expect(assigns(:token_type)).to be_blank
+          expect(assigns(:matching_notification)).to be_blank
+          expect(flash).to be_blank
+          bike.reload
+        end
+      end
+    end
+
+    describe "parking_notification_retrieved param" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
+      let(:creator) { parking_notification.user }
+      it "renders" do
+        parking_notification.reload
+        expect(parking_notification.current?).to be_truthy
+        expect(parking_notification.retrieval_link_token).to be_present
+        expect(bike.current_parking_notification).to eq parking_notification
+        get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+        expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+        expect(assigns(:matching_notification)).to eq parking_notification
+        expect(flash).to be_blank
+        bike.reload
+        parking_notification.reload
+        expect(bike.current_parking_notification).to eq parking_notification
+        expect(parking_notification.current?).to be_truthy
+      end
+      context "user not present" do
+        let(:current_user) { nil }
+        it "renders" do
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+          expect(parking_notification.retrieval_link_token).to be_present
+          expect(parking_notification.retrieved?).to be_falsey
+          expect(bike.current_parking_notification).to eq parking_notification
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+        end
+      end
+      context "with direct_link" do
+        it "renders" do
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+          expect(parking_notification.retrieval_link_token).to be_present
+          expect(bike.current_parking_notification).to eq parking_notification
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}&user_recovery=true"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+        end
+      end
+      context "not notification token" do
+        it "renders" do
+          parking_notification.reload
+          expect(parking_notification.current?).to be_truthy
+          expect(parking_notification.retrieval_link_token).to be_present
+          expect(parking_notification.retrieved?).to be_falsey
+          expect(bike.current_parking_notification).to eq parking_notification
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}xxx"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq "#{parking_notification.retrieval_link_token}xxx"
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to be_blank
+          expect(parking_notification.retrieved?).to be_falsey
+        end
+      end
+      context "already retrieved" do
+        let(:retrieval_time) { Time.current - 2.minutes }
+        it "renders" do
+          parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
+          parking_notification.reload
+          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.retrieval_link_token).to be_present
+          expect(parking_notification.retrieved?).to be_truthy
+          expect(bike.current_parking_notification).to be_blank
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification
+        end
+      end
+      context "abandoned as well" do
+        let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
+        it "renders" do
+          ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          parking_notification.reload
+          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.active?).to be_truthy
+          expect(parking_notification.resolved?).to be_falsey
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification_abandoned.retrieval_link_token}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq parking_notification_abandoned.retrieval_link_token
+          expect(assigns(:token_type)).to eq "appears_abandoned_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification_abandoned
+        end
+      end
+      context "impound notification" do
+        let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
+        it "renders" do
+          ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
+          parking_notification.reload
+          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.resolved?).to be_truthy
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
+          expect(assigns(:matching_notification)).to eq parking_notification
+        end
+      end
+    end
+  end
+
+  describe "update token" do
+    context "graduated_notification" do
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      let!(:bike) { graduated_notification.bike }
+      let(:ownership) { bike.current_ownership }
+      let(:organization) { graduated_notification.organization }
+      let(:current_user) { nil }
+      it "marks the bike remaining" do
+        graduated_notification.reload
+        bike.reload
+        expect(graduated_notification.processed?).to be_truthy
+        expect(graduated_notification.marked_remaining_link_token).to be_present
+        expect(bike.graduated?(organization)).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+        put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
+        expect(response).to redirect_to(bike_path(bike.id))
         expect(flash[:success]).to be_present
         bike.reload
         graduated_notification.reload
         expect(bike.graduated?(organization)).to be_falsey
         expect(graduated_notification.marked_remaining?).to be_truthy
+        expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
       end
       context "already marked recovered" do
@@ -143,8 +337,11 @@ RSpec.describe BikesController, type: :request do
           expect(og_marked_remaining_at).to be_present
           expect(bike.graduated?(organization)).to be_falsey
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
-          get "#{base_url}/#{bike.id}?graduated_notification_remaining=#{graduated_notification.marked_remaining_link_token}"
-          expect(assigns(:bike)).to eq bike
+          put "#{base_url}/#{bike.id}/resolve_token", params: {
+                                                    token: graduated_notification.marked_remaining_link_token,
+                                                    token_type: "graduated_notification",
+                                                  }
+          expect(response).to redirect_to(bike_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload
           graduated_notification.reload
@@ -158,8 +355,8 @@ RSpec.describe BikesController, type: :request do
         it "flash errors" do
           expect(bike.graduated?(organization)).to be_truthy
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
-          get "#{base_url}/#{bike.id}?graduated_notification_remaining=333#{graduated_notification.marked_remaining_link_token}"
-          expect(assigns(:bike)).to eq bike
+          put "#{base_url}/#{bike.id}/resolve_token?token=333#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
+          expect(response).to redirect_to(bike_path(bike.id))
           expect(flash[:error]).to be_present
           bike.reload
           graduated_notification.reload
@@ -169,8 +366,7 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
-
-    describe "parking_notification_retrieved param" do
+    context "parking_notification" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
       let(:creator) { parking_notification.user }
       it "retrieves the bike" do
@@ -178,9 +374,8 @@ RSpec.describe BikesController, type: :request do
         expect(parking_notification.current?).to be_truthy
         expect(parking_notification.retrieval_link_token).to be_present
         expect(bike.current_parking_notification).to eq parking_notification
-        get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+        put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
         expect(response).to redirect_to(bike_path(bike.id))
-        expect(assigns(:bike)).to eq bike
         expect(flash[:success]).to be_present
         bike.reload
         parking_notification.reload
@@ -198,7 +393,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieval_link_token).to be_present
           expect(parking_notification.retrieved?).to be_falsey
           expect(bike.current_parking_notification).to eq parking_notification
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:success]).to be_present
@@ -218,7 +413,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.current?).to be_truthy
           expect(parking_notification.retrieval_link_token).to be_present
           expect(bike.current_parking_notification).to eq parking_notification
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}&user_recovery=true"
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&user_recovery=true&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:success]).to be_present
@@ -238,7 +433,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieval_link_token).to be_present
           expect(parking_notification.retrieved?).to be_falsey
           expect(bike.current_parking_notification).to eq parking_notification
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}xxx"
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}xxx&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:error]).to be_present
@@ -255,7 +450,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieval_link_token).to be_present
           expect(parking_notification.retrieved?).to be_truthy
           expect(bike.current_parking_notification).to be_blank
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:info]).to match(/retrieved/)
@@ -274,7 +469,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.resolved?).to be_falsey
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+            put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
             expect(response).to redirect_to(bike_path(bike.id))
             expect(assigns(:bike)).to eq bike
             expect(flash[:success]).to be_present
@@ -303,7 +498,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.resolved?).to be_truthy
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
+            put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
             expect(response).to redirect_to(bike_path(bike.id))
             expect(assigns(:bike)).to eq bike
             expect(flash[:error]).to match(/impound/i)
@@ -319,7 +514,6 @@ RSpec.describe BikesController, type: :request do
   end
 
   describe "update" do
-    before { log_in(current_user) if current_user.present? }
     context "setting a bike_sticker" do
       it "gracefully fails if the number is weird" do
         expect(bike.bike_stickers.count).to eq 0
@@ -440,8 +634,8 @@ RSpec.describe BikesController, type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
-                                      bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } },
-                                    }
+                                            bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } },
+                                          }
           expect(flash[:success]).to be_present
         end
         bike.reload

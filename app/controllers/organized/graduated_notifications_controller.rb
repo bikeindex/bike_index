@@ -12,20 +12,11 @@ module Organized
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
       @graduated_notifications = available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
-                          .page(@page).per(@per_page)
-                          .includes(:user, :bike)
+        .page(@page).per(@per_page)
+        .includes(:user, :bike, :secondary_notifications)
     end
 
     def show; end
-
-    def email
-      @organization = current_organization
-      @email_preview = true
-      @bike = @graduated_notification.bike
-      @bikes = @graduated_notification.associated_bikes
-      @retrieval_link_url = @graduated_notification.marked_remaining_link_token.present? ? "#" : nil
-      render template: "/organized_mailer/graduated_notification", layout: "email"
-    end
 
     private
 
@@ -55,9 +46,13 @@ module Organized
       a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
 
       if bike_search_params_present?
+        @separate_non_primary_notifications = true # Because we need to match per bike things, show all potential notifications
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
+      else
+        @separate_non_primary_notifications = false
+        a_graduated_notifications = a_graduated_notifications.primary_notifications
       end
 
       @available_graduated_notifications = a_graduated_notifications.where(created_at: @time_range)

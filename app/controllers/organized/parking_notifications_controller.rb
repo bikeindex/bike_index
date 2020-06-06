@@ -2,7 +2,6 @@ module Organized
   class ParkingNotificationsController < Organized::BaseController
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
-    skip_before_action :set_x_frame_options_header, only: [:email]
     before_action :set_failed_and_repeated_ivars
 
     def index
@@ -37,15 +36,6 @@ module Organized
     def show
       @parking_notification = parking_notifications.find(params[:id])
       @bike = @parking_notification.bike
-    end
-
-    def email
-      @organization = current_organization
-      @email_preview = true
-      @parking_notification = parking_notifications.find(params[:id])
-      @bike = @parking_notification.bike
-      @retrieval_link_url = @parking_notification.retrieval_link_token.present? ? "#" : nil
-      render template: "/organized_mailer/parking_notification", layout: "email"
     end
 
     def create

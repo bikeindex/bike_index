@@ -97,17 +97,6 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
   end
 
-  describe "email" do
-    let(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
-    it "renders" do
-      get "#{base_url}/#{parking_notification.to_param}/email"
-      expect(response.status).to eq(200)
-      expect(response).to render_template("organized_mailer/parking_notification")
-      expect(parking_notification.retrieval_link_token).to be_present
-      expect(assigns(:retrieval_link_url)).to eq "#"
-    end
-  end
-
   describe "create" do
     let(:parking_notification_params) do
       {
@@ -129,9 +118,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
           expect do
             post base_url, params: {
-              organization_id: current_organization.to_param,
-              parking_notification: parking_notification_params,
-            }
+                             organization_id: current_organization.to_param,
+                             parking_notification: parking_notification_params,
+                           }
             expect(response).to redirect_to user_root_url
             expect(flash[:error]).to be_present
           end.to_not change(ParkingNotification, :count)
@@ -142,9 +131,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         it "fails and renders error" do
           expect do
             post base_url, params: {
-              organization_id: current_organization.to_param,
-              parking_notification: parking_notification_params.except(:latitude),
-            }
+                             organization_id: current_organization.to_param,
+                             parking_notification: parking_notification_params.except(:latitude),
+                           }
             expect(flash[:error]).to match(/address/i)
           end.to_not change(ParkingNotification, :count)
         end
@@ -161,8 +150,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(current_organization.enabled?("parking_notifications")).to be_falsey
           expect do
             post base_url, params: {
-              organization_id: current_organization.to_param, parking_notification: parking_notification_params
-            }
+                             organization_id: current_organization.to_param, parking_notification: parking_notification_params,
+                           }
             expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
           end.to_not change(ParkingNotification, :count)
@@ -176,9 +165,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
         expect do
           post base_url, params: {
-            organization_id: current_organization.to_param,
-            parking_notification: parking_notification_params,
-          }
+                           organization_id: current_organization.to_param,
+                           parking_notification: parking_notification_params,
+                         }
           expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
         end.to change(ParkingNotification, :count).by(1)
@@ -225,9 +214,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           Sidekiq::Testing.inline! do
             expect do
               post base_url, params: {
-                organization_id: current_organization.to_param,
-                parking_notification: parking_notification_params,
-              }
+                               organization_id: current_organization.to_param,
+                               parking_notification: parking_notification_params,
+                             }
               expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
               expect(flash[:success]).to be_present
             end.to change(ParkingNotification, :count).by(1)
@@ -281,10 +270,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         post base_url, params: {
-          organization_id: current_organization.to_param,
-          kind: "parked_incorrectly_notification",
-          ids: parking_notification_initial.id,
-        }
+                         organization_id: current_organization.to_param,
+                         kind: "parked_incorrectly_notification",
+                         ids: parking_notification_initial.id,
+                       }
         expect(ParkingNotification.count).to eq 2
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
@@ -320,10 +309,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         Sidekiq::Testing.inline! do
           expect do
             post base_url, params: {
-              organization_id: current_organization.to_param,
-              kind: "parked_incorrectly_notification",
-              ids: parking_notification_initial.id,
-            }
+                             organization_id: current_organization.to_param,
+                             kind: "parked_incorrectly_notification",
+                             ids: parking_notification_initial.id,
+                           }
           end.to_not change(ParkingNotification, :count)
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([parking_notification_initial.id])
@@ -381,10 +370,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
-            organization_id: current_organization.to_param,
-            kind: "appears_abandoned_notification",
-            ids: parking_notification_initial.id,
-          }
+                           organization_id: current_organization.to_param,
+                           kind: "appears_abandoned_notification",
+                           ids: parking_notification_initial.id,
+                         }
         end
         expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
         expect(response).to redirect_to organization_parking_notification_path(ParkingNotification.last.id, organization_id: current_organization.to_param)
@@ -400,10 +389,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
-              organization_id: current_organization.to_param,
-              kind: "appears_abandoned_notification",
-              ids: ids_params,
-            }
+                             organization_id: current_organization.to_param,
+                             kind: "appears_abandoned_notification",
+                             ids: ids_params,
+                           }
           end
           expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
           expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
@@ -426,10 +415,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         ActionMailer::Base.deliveries = []
         expect do
           post base_url, params: {
-            organization_id: current_organization.to_param,
-            kind: "impound_notification",
-            ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
-          }
+                           organization_id: current_organization.to_param,
+                           kind: "impound_notification",
+                           ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
+                         }
         end.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
         ProcessParkingNotificationWorker.drain
         expect(ParkingNotification.count).to eq 4

@@ -12,7 +12,7 @@ class MailSnippet < ApplicationRecord
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
     impound_notification: 9,
-    graduated_notification_email: 10,
+    graduated_notification: 10,
   }.freeze
 
   # TODO: Stop requiring name when it's the same as other things
@@ -53,7 +53,7 @@ class MailSnippet < ApplicationRecord
 
   def self.organization_snippet_kinds; organization_snippets.keys end
 
-  def self.organization_message_kinds; ParkingNotification.kinds + ["graduated_notification_email"] end
+  def self.organization_message_kinds; ParkingNotification.kinds + ["graduated_notification"] end
 
   def organization_snippet?; self.class.organization_snippet_kinds.include?(kind) end
 

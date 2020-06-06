@@ -1,3 +1,31 @@
+- if @token.present?
+  .container
+    .card
+      .card-body{ style: "padding: 2rem; background: #eceeef" }
+        - if @matching_notification.present?
+          %h3.uncap
+            = @matching_notification.title
+          - organization_message_snippet = @matching_notification.organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first
+          - if organization_message_snippet.present?
+            = organization_message_snippet.body.html_safe
+
+        .text-center.mt-4
+          - if @matching_notification&.resolved?
+            %strong.text-info{ style: "font-size: 125%;" }
+              - if @token_type == "graduated_notification"
+                = t(".you_have_already_marked_remaining", bike_type: @bike.type)
+              - else
+                = t(".you_have_already_marked_resolved")
+            .mt-1
+              %em.small.less-strong=t(".no_futher_action_necessary")
+          - else
+
+            = form_tag resolve_token_bike_path(@bike), method: "PUT" do
+              = hidden_field_tag :token, @token
+              = hidden_field_tag :token_type, @token_type
+              - button_value = @token_type == "graduated_notification" ? t(".mark_graduated_resolved", bike_type: @bike.type) : t(".mark_parking_resolved", bike_type: @bike.type)
+              %input{ type: "submit", value: button_value, class: 'btn btn-success btn-lg' }
+
 - if @bike.stolen && session[:recovery_link_token].present?
   -# Delete token so modal doesn't keep rendering
   - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token))
