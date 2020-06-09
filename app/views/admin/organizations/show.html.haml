@@ -76,19 +76,6 @@
         %td
           %span.convertTime.preciseTime
             = l @organization.updated_at, format: :convert_time
-      %tr
-        %td
-          Search Location
-        %td
-          %span
-            = @organization.default_location&.address
-      %tr
-        %td
-          Search Radius (mi)
-        %td
-          %span
-            = @organization.search_radius
-
   .col-md-6
     %table.table-list
       %tr
@@ -135,97 +122,44 @@
           - if @organization.website.present?
             = link_to @organization.website, class: "strong" do
               &#128279;
+
       %tr
         %td
-          Paid
+          POS integration:
         %td
-          -if @organization.is_paid
-            %strong
-              True
-          -else
-            - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
-              %p.text-danger
-                IS NOT MARKED PAID BUT HAS A LANDING PAGE
-            -else
-              False
-          %em.less-strong
-            Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
-      %tr
-        %td
-          Associated organizations
-        %td
-          - if @organization.parent_organization.present?
-            .d-block
-              %strong
-                Child of
-            = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
-            %small.less-strong
-              Parent organization should be part of the same organization. Use "regional" feature otherwise
-          - if @organization.parent?
-            .d-block
-              %strong Child organizations
-              %small.less-strong
-                Child organizations should be part of the same organization. Use "regional" feature otherwise
-            %ul{ style: "font-size: 80%;" }
-              - @organization.child_organizations.each do |org|
-                %li
-                  = link_to org.name, admin_organization_url(org)
-          - if @organization.regional?
-            .d-block
-              %strong Regional Sub-Organizations
-              %small.less-strong
-                set the "Search radius" to control which organizations are associated
-            %ul{ style: "font-size: 80%;" }
-              - @organization.nearby_organizations.each do |suborg|
-                %li
-                  = link_to suborg.name, admin_organization_path(suborg)
-          - if @organization.regional_parents.any?
-            .d-block
-              %strong Regional master organizations
-              %small.less-strong with search radius including this organization
-            %ul{ style: "font-size: 80%;" }
-              - @organization.regional_parents.each do |regiona_parent|
-                %li
-                  = link_to regiona_parent.name, admin_organization_path(regiona_parent)
+          - if @organization.no_pos?
+            %em.small.less-strong no integration
+          - elsif @organization.ascend_pos?
+            = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
+            %small
+              Ascend name:
+              %em
+                = @organization.ascend_name
+          - elsif @organization.broken_pos?
+            %span.text-danger
+              POS Integration broken!
+            = @organization.pos_kind.humanize
 
-  - if @organization.bike_shop? || @organization.any_pos?
-    .col-md-6
-      %table.table-list
-        %tr
-          %td
-            POS integration:
-          %td
-            - if @organization.ascend_pos?
-              = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
-              %small
-                Ascend name:
-                %em
-                  = @organization.ascend_name
-            - elsif @organization.broken_pos?
-              %span.text-danger
-                POS Integration broken!
-              = @organization.pos_kind.humanize
+          -# Show link if it's lightspeed - or if it used to be lightspeed
+          - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
+            = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
 
-            -# Show link if it's lightspeed - or if it used to be lightspeed
-            - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
-              = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
-
-            - if current_user.developer? && @organization.manual_pos_kind.present?
-              %br
-              %small.only-dev-visible
-                %em.less-strong manual POS kind set:
-                = @organization.manual_pos_kind
+          - if current_user.developer? && @organization.manual_pos_kind.present?
+            %br
+            %small.only-dev-visible
+              %em.less-strong manual POS kind set:
+              = @organization.manual_pos_kind
 .row.mt-4
   .col-md-6
     %p
       %strong
         = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
-        %em.less-strong
-          #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
-        - if @organization.invoices.count > 0
-          and
-          %strong
-            #{@organization.invoices.active.count} active
+      %em.less-strong
+        #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
+      - if @organization.invoices.count > 0
+        and
+        %strong
+          #{@organization.invoices.active.count} active
     - if @organization.parent_organization.present?
       %p
         Parent
@@ -237,11 +171,81 @@
         %small.less-strong
           which may add features to this organization
     = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
+  .col-md-6
+    %table.table-list
+      / %tr
+      /   %td.full-width-data{ colspan: 2 }
+      /     Associated orgs
+      - if @organization.parent_organization.present?
+        - associated_orgs = true
+        %tr
+          %td Child of
+          %td
+            = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
+            %small.less-strong
+              Parent organization should be part of the same organization. Use "regional" feature otherwise
+      - if @organization.parent?
+        - associated_orgs = true
+        %tr
+          %td Child organizations
+          %td
+            %ul{ style: "font-size: 80%;" }
+              - @organization.child_organizations.each do |org|
+                %li
+                  = link_to org.name, admin_organization_url(org)
+      - if @organization.regional?
+        - associated_orgs = true
+        %tr
+          %td Regional Sub-Organizations
+          %td
+            %ul{ style: "font-size: 80%;" }
+              - @organization.nearby_organizations.each do |suborg|
+                %li
+                  = link_to suborg.name, admin_organization_path(suborg)
+        %tr
+          %td Regional address
+          %td
+            = @organization.default_location&.address
+        %tr
+          %td Search radius (mi)
+          %td
+            = @organization.search_radius
+            %small.less-strong
+              This controls which organizations are regional sub organizations
+      - if @organization.regional_parents.any?
+        - associated_orgs = true
+        %tr
+          %td Regional master organizations
+          %td
+            %ul{ style: "font-size: 80%;" }
+              - @organization.regional_parents.each do |regiona_parent|
+                %li
+                  = link_to regiona_parent.name, admin_organization_path(regiona_parent)
+            %small.less-strong with search radius including this organization
+      - unless associated_orgs
+        %tr
+          %td.full-width-data{ colspan: 2 }
+            Has no associated organizations
 
   .col-md-6
-    - if @organization.is_paid
-      %table.table-list
-        %tbody
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Paid
+          %td
+            -if @organization.is_paid
+              %strong
+                True
+            -else
+              - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
+                %p.text-danger
+                  IS NOT MARKED PAID BUT HAS A LANDING PAGE
+              -else
+                False
+            %em.less-strong
+              Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
+        - if @organization.is_paid
           %tr
             %td Bike Search
             %td
@@ -311,6 +315,8 @@
             %td Enabled features
             %td.small
               = safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
+
+
 .row.mt-4
   .col-sm-6
     %h2

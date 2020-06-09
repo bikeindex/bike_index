@@ -273,13 +273,6 @@ RSpec.describe Organization, type: :model do
       expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
-
-      paid_feature.update(feature_slugs: ["csv_exports"])
-      UpdateAssociatedOrganizationsWorker.new.perform(organization.id)
-      organization.reload
-      organization_child.reload
-      expect(organization.parent?).to be_falsey
-      expect(organization_child.is_paid).to be_truthy # Because we aren't updating this automatically
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }

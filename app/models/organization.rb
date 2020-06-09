@@ -325,7 +325,8 @@ class Organization < ApplicationRecord
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
-    self.child_ids = enabled?("child_organizations") && calculated_children.pluck(:id).presence || []
+    # NOTE: only organizations with child_organization feature are permitted to be selected in admin view, but feature doesn't block them
+    self.child_ids = calculated_children.pluck(:id).presence || []
     self.regional_ids = nearby_organizations.pluck(:id) || []
     set_auto_user
     self.location_latitude = default_location&.latitude
