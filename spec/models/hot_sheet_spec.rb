@@ -15,7 +15,7 @@ RSpec.describe HotSheet, type: :model do
     end
   end
 
-  describe "fetch_bike_ids" do
+  describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
     let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
@@ -33,7 +33,7 @@ RSpec.describe HotSheet, type: :model do
     context "with stolen_record_ids set" do
       let(:hot_sheet) { FactoryBot.create(:hot_sheet, stolen_record_ids: [stolen_record.id]) }
       it "returns the stolen records from stolen_record_ids" do
-        expect(hot_sheet.organization.search_coordinates).to be_blank
+        expect(hot_sheet.organization.search_coordinates.reject(&:blank?)).to be_blank
         expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id])
       end
     end
