@@ -79,8 +79,11 @@
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
     .form-group.fancy-select.unfancy
-      = f.label :parent_organization_id
-      = f.collection_select(:parent_organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
+      = f.label :parent_organization_id do
+        Parent organization
+        %small.less-strong
+          must have "Child Organizations" enabled
+      = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
       %em.small To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization
   .col-md-6
     - if current_user.developer?
@@ -129,7 +132,7 @@
               = f.label :search_radius do
                 Search radius (mi)
                 %small
-                  <span class="text-success">regional bike counts setting</span>, this controls how large the region is
+                  <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
               = f.number_field :search_radius, { class: "form-control" }
               .only-dev-visible.p-1
                 %em.small

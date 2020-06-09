@@ -18,7 +18,7 @@
         = f.email_field :creator_email, value: @ownership.creator&.email, required: true, prompt: "Creator's email", class: "form-control"
 
       .form-group
-        = f.label :user_id
+        = f.label :user_email
         - user_email = @ownership.user.present? ? @ownership.user.email : ''
         = f.email_field :user_email, value: user_email, required: true, prompt: "Owner's email", class: "form-control"
       .form-group

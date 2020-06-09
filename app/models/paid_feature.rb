@@ -23,6 +23,7 @@ class PaidFeature < ApplicationRecord
     avery_export
     bike_search
     bike_stickers
+    child_organizations
     csv_exports
     graduated_notifications
     passwordless_users
