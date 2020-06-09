@@ -42,7 +42,7 @@
                 %li
                   = active_link t(".discuss"), "https://discuss.bikeindex.org", class: "nav-link"
               - else
-                - if passive_organization.parent?
+                - if passive_organization.overview_dashboard?
                   %li
                     = active_link "#{passive_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
                 - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
