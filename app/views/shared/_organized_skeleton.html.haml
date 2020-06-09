@@ -1,4 +1,4 @@
-- show_overview_dashboard = (current_user.admin_of?(current_organization) || current_user.superuser?) && current_organization.overview_dashboard?
+- show_overview_dashboard = current_organization.overview_dashboard?
 - show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
 %nav.organized-left-menu
   .organized-menu-wrapper
