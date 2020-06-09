@@ -38,7 +38,8 @@ class StolenRecord < ApplicationRecord
 
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
 
-  default_scope { where(current: true) }
+  default_scope { current }
+  scope :current, -> { where(current: true) }
   scope :approveds, -> { where(approved: true) }
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }

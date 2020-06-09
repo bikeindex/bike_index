@@ -9,7 +9,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   scope :enabled, -> { where(enabled: true) }
 
-  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius) end
+  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles) end
 
   def set_default_attributes
     self.search_radius_miles ||= organization&.search_radius
