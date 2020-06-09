@@ -181,8 +181,6 @@
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th.d-none.d-lg-table-cell
-        ID
       %th
         Created&nbsp;<small class="convertTimezone"></small>
       %th
@@ -198,11 +196,11 @@
     %tbody
       - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
         %tr
-          %td.d-none.d-lg-table-cell
-            = ownership.id
           %td
             %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
               = l ownership.created_at, format: :convert_time
+            %small.less-strong.only-dev-visible
+              = ownership.id
           %td
             - creator = ownership.creator
             - if creator.blank?
