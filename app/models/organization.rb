@@ -51,6 +51,8 @@ class Organization < ApplicationRecord
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
+  has_one :hot_sheet_configuration
+  has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :locations, allow_destroy: true
 
@@ -325,7 +327,7 @@ class Organization < ApplicationRecord
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
-    # NOTE: only organizations with child_organization feature are permitted to be selected in admin view, but feature doesn't block them
+    # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
     self.regional_ids = nearby_organizations.pluck(:id) || []
     set_auto_user
