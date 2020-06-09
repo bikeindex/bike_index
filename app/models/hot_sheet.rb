@@ -9,11 +9,6 @@ class HotSheet < ApplicationRecord
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 
-  # t.references :organization
-  # t.jsonb :stolen_record_ids
-  # t.jsonb :recipients
-  # t.string :delivery_status
-
   def self.for(organization, date_or_time)
     date = date_or_time.to_date
     where(organization_id: organization.id).where(created_at: date.beginning_of_day..date.end_of_day).first
@@ -45,6 +40,6 @@ class HotSheet < ApplicationRecord
   private
 
   def calculated_stolen_records
-    StolenRecord.current.within_bounding_box(bounding_box).reorder(date_stolen: :desc)
+    StolenRecord.approveds.within_bounding_box(bounding_box).reorder(date_stolen: :desc)
   end
 end
