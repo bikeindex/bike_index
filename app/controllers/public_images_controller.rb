@@ -81,7 +81,7 @@ class PublicImagesController < ApplicationController
   def ensure_authorized_to_create!
     if params[:bike_id].present? # Ensure the
       @bike = Bike.unscoped.find(params[:bike_id])
-      return true if @bike.owner == current_user
+      return true if @bike.authorized?(current_user)
     end
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
