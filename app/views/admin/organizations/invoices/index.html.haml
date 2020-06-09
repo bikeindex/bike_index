@@ -11,7 +11,7 @@
   %p.subtitle
     View #{link_to @organization.name, admin_organization_path(@organization.to_param)} admin page
 
-= render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices }
+= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices }
 
 %h2.mt-4
   #{@organization.name} has #{pluralize(@organization.payments.count, "payment")}
