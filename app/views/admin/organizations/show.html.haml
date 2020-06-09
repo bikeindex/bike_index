@@ -173,62 +173,6 @@
     = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
   .col-md-6
     %table.table-list
-      / %tr
-      /   %td.full-width-data{ colspan: 2 }
-      /     Associated orgs
-      - if @organization.parent_organization.present?
-        - associated_orgs = true
-        %tr
-          %td Child of
-          %td
-            = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
-            %small.less-strong
-              Parent organization should be part of the same organization. Use "regional" feature otherwise
-      - if @organization.parent?
-        - associated_orgs = true
-        %tr
-          %td Child organizations
-          %td
-            %ul{ style: "font-size: 80%;" }
-              - @organization.child_organizations.each do |org|
-                %li
-                  = link_to org.name, admin_organization_url(org)
-      - if @organization.regional?
-        - associated_orgs = true
-        %tr
-          %td Regional Sub-Organizations
-          %td
-            %ul{ style: "font-size: 80%;" }
-              - @organization.nearby_organizations.each do |suborg|
-                %li
-                  = link_to suborg.name, admin_organization_path(suborg)
-        %tr
-          %td Regional address
-          %td
-            = @organization.default_location&.address
-        %tr
-          %td Search radius (mi)
-          %td
-            = @organization.search_radius
-            %small.less-strong
-              This controls which organizations are regional sub organizations
-      - if @organization.regional_parents.any?
-        - associated_orgs = true
-        %tr
-          %td Regional master organizations
-          %td
-            %ul{ style: "font-size: 80%;" }
-              - @organization.regional_parents.each do |regiona_parent|
-                %li
-                  = link_to regiona_parent.name, admin_organization_path(regiona_parent)
-            %small.less-strong with search radius including this organization
-      - unless associated_orgs
-        %tr
-          %td.full-width-data{ colspan: 2 }
-            Has no associated organizations
-
-  .col-md-6
-    %table.table-list
       %tbody
         %tr
           %td
@@ -245,6 +189,7 @@
                 False
             %em.less-strong
               Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
+
         - if @organization.is_paid
           %tr
             %td Bike Search
@@ -315,6 +260,63 @@
             %td Enabled features
             %td.small
               = safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
+
+        -# Associated organizations info
+        - if @organization.parent_organization.present?
+          - associated_orgs = true
+          %tr
+            %td Child of
+            %td
+              = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
+              %small.less-strong.d-block
+                Parent organization should be part of the same organization. Use "regional" feature otherwise
+        - if @organization.parent?
+          - associated_orgs = true
+          %tr
+            %td Child organizations
+            %td
+              %ul{ style: "font-size: 80%;" }
+                - @organization.child_organizations.each do |org|
+                  %li
+                    = link_to org.name, admin_organization_url(org)
+              %small.less-strong.d-block
+                Parent organization should be part of the same organization. Use "regional" feature otherwise
+        - if @organization.regional?
+          - associated_orgs = true
+          %tr
+            %td Regional Sub-Organizations
+            %td
+              %ul{ style: "font-size: 80%;" }
+                - @organization.nearby_organizations.each do |suborg|
+                  %li
+                    = link_to suborg.name, admin_organization_path(suborg)
+          %tr
+            %td Regional address
+            %td
+              = @organization.default_location&.address
+          %tr
+            %td Search radius (mi)
+            %td
+              = @organization.search_radius
+              %small.less-strong
+                This controls which organizations are regional sub organizations
+        - if @organization.regional_parents.any?
+          - associated_orgs = true
+          %tr
+            %td Regional master organizations
+            %td
+              %ul{ style: "font-size: 80%;" }
+                - @organization.regional_parents.each do |regiona_parent|
+                  %li
+                    = link_to regiona_parent.name, admin_organization_path(regiona_parent)
+              %small.less-strong with search radius including this organization
+        - unless associated_orgs
+          %tr
+            %td
+              Associated orgs
+            %td
+              %em.small.less-strong
+                No associated organizations
 
 
 .row.mt-4
