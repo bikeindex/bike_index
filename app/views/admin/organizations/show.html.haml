@@ -152,36 +152,37 @@
             Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
       %tr
         %td
-          Parent
+          Associated organizations
         %td
           - if @organization.parent_organization.present?
+            .d-block
+              %strong
+                Child of
             = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
             %small.less-strong
-              If parent's paid, so's this
-          - else
-            &nbsp;
-      - if @organization.child_organizations.present?
-        %tr
-          %td
-            Children
-          %td
+              Parent organization should be part of the same organization. Use "regional" feature otherwise
+          - if @organization.parent?
+            .d-block
+              %strong Child organizations
+              %small.less-strong
+                Child organizations should be part of the same organization. Use "regional" feature otherwise
             %ul{ style: "font-size: 80%;" }
               - @organization.child_organizations.each do |org|
                 %li
                   = link_to org.name, admin_organization_url(org)
-      %tr
-        - if @organization.regional?
-          %td
-            Regional Sub-Organizations
-          %td
+          - if @organization.regional?
+            .d-block
+              %strong Regional Sub-Organizations
+              %small.less-strong
+                set the "Search radius" to control which organizations are associated
             %ul{ style: "font-size: 80%;" }
               - @organization.nearby_organizations.each do |suborg|
                 %li
                   = link_to suborg.name, admin_organization_path(suborg)
-        - elsif @organization.regional_parents.any?
-          %td
-            Regional Parent
-          %td
+          - if @organization.regional_parents.any?
+            .d-block
+              %strong Regional master organizations
+              %small.less-strong with search radius including this organization
             %ul{ style: "font-size: 80%;" }
               - @organization.regional_parents.each do |regiona_parent|
                 %li

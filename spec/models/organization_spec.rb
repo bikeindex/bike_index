@@ -246,7 +246,7 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "is_paid and enabled? calculations" do
-    let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
+    let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
@@ -254,12 +254,12 @@ RSpec.describe Organization, type: :model do
       expect(organization.enabled?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       invoice.update_attributes(child_enabled_feature_slugs_string: "csv_exports")
-      expect(invoice.feature_slugs).to eq(["csv_exports"])
+      expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
       expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
 
       expect(organization.is_paid).to be_truthy
-      expect(organization.enabled_feature_slugs).to eq(["csv_exports"])
+      expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])
       expect(organization.enabled?("csv_exports")).to be_truthy
       expect(organization_child.is_paid).to be_falsey
 
@@ -273,12 +273,19 @@ RSpec.describe Organization, type: :model do
       expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
+
+      paid_feature.update(feature_slugs: ["csv_exports"])
+      UpdateAssociatedOrganizationsWorker.new.perform(organization.id)
+      organization.reload
+      organization_child.reload
+      expect(organization.parent?).to be_falsey
+      expect(organization_child.is_paid).to be_truthy # Because we aren't updating this automatically
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
       let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
-      it "sets on the regional organization, applies to bieks" do
+      it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
         expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])

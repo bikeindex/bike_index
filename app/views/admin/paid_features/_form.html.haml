@@ -13,19 +13,16 @@
         = f.label :name
         = f.text_field :name, class: "form-control"
   - if current_user.developer?
-    .row
+    .row.only-dev-visible
       .col-md-6
         .form-group
           = f.label :feature_slugs_string do
             Paid Feature Slugs <small>comma delineated</small>
           = f.text_area :feature_slugs_string, class: "form-control"
-      .col-md-6
-        %label.d-none.d-md-block &nbsp;
-        %small.less-strong
+      .col-md-6{ style: "background: #fff;" }
+        %small.less-strong.p-1
           Permitted slugs:
-          - PaidFeature::EXPECTED_SLUGS.sort.each do |slug|
-            %code
-              = slug
+          = safe_join(PaidFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2
     .col-md-6.col-xs-12
       .form-group
@@ -34,15 +31,14 @@
           .input-group-prepend
             = f.select :currency, options_for_select(currency_symbols.zip(available_currencies)), {}, class: "form-control small"
           = f.number_field :amount, step: 1, min: 0, class: "form-control"
-
-    .col-md-6.col-xs-12
-      .form-group
-        = f.label :description
-        = f.text_area :description, style: "width: 100%;", class: "form-control"
-  .row
     .col-xs-12.col-md-6
       .form-group
         = f.label :details_link
         = f.text_field :details_link, class: "form-control"
+  .row
+    .col-12
+      .form-group
+        = f.label :description
+        = f.text_area :description, style: "width: 100%;", class: "form-control"
 
   = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'
