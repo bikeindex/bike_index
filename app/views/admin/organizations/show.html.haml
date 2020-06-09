@@ -275,7 +275,7 @@
           %tr
             %td Child organizations
             %td
-              %ul{ style: "font-size: 80%;" }
+              %ul{ style: "font-size: 80%; margin-bottom: 0.5rem;" }
                 - @organization.child_organizations.each do |org|
                   %li
                     = link_to org.name, admin_organization_url(org)
@@ -286,7 +286,7 @@
           %tr
             %td Regional Sub-Organizations
             %td
-              %ul{ style: "font-size: 80%;" }
+              %ul{ style: "font-size: 80%; margin-bottom: 0.5rem;" }
                 - @organization.nearby_organizations.each do |suborg|
                   %li
                     = link_to suborg.name, admin_organization_path(suborg)
@@ -303,13 +303,17 @@
         - if @organization.regional_parents.any?
           - associated_orgs = true
           %tr
-            %td Regional master organizations
+            %td Regional overview organization
             %td
-              %ul{ style: "font-size: 80%;" }
-                - @organization.regional_parents.each do |regiona_parent|
-                  %li
-                    = link_to regiona_parent.name, admin_organization_path(regiona_parent)
-              %small.less-strong with search radius including this organization
+              - if @organization.regional_parents.count == 1
+                - regional_parent = @organization.regional_parents.first
+                = link_to regional_parent.name, admin_organization_path(regional_parent)
+              - else
+                %ul{ style: "font-size: 80%; margin-bottom: 0.5rem;" }
+                  - @organization.regional_parents.each do |regional_parent|
+                    %li
+                      = link_to regional_parent.name, admin_organization_path(regional_parent)
+              %small.less-strong.d-block Search radius includes this organization
         - unless associated_orgs
           %tr
             %td
