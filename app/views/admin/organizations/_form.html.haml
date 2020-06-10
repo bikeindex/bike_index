@@ -124,7 +124,7 @@
                 %small
                   <span class="text-success">graduated_notifications setting</span>
               = f.number_field :graduated_notification_interval_days, { class: "form-control" }
-              .only-dev-visible.p-1
+              .text-warning.p-1
                 %em.small
                   Unless this is set, the organization will not send graduated notifications - even if they have the feature enabled
           - if @organization.enabled?("regional_bike_counts")
@@ -134,7 +134,7 @@
                 %small
                   <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
               = f.number_field :search_radius, { class: "form-control" }
-              .only-dev-visible.p-1
+              .text-warning.p-1
                 %em.small
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area

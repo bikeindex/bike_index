@@ -1,5 +1,5 @@
 %h1
-  = @parking_notification.title
+  = @parking_notification.subject
 
 - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: @parking_notification.kind).first
 
