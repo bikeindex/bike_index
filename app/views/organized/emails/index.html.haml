@@ -12,7 +12,7 @@
     %th Last updated
     %th Body
   %tbody
-    - MailSnippet.organization_message_kinds.each do |kind|
+    - viewable_email_kinds.each do |kind|
       - mail_snippet = current_organization.mail_snippets.where(kind: kind).first
       %tr
         %td

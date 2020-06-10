@@ -48,7 +48,7 @@ module Organized
     end
 
     def find_mail_snippets
-      @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds.first
+      @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
     end
