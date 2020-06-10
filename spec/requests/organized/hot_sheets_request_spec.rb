@@ -46,6 +46,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
+    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
 
     describe "show" do
       it "renders" do
@@ -74,6 +75,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
     describe "update" do
       it "enables the features we expect" do
         expect(current_organization.hot_sheet_configuration).to be_blank
+        Sidekiq::Worker.clear_all
         expect do
           put base_url, params: {
                           hot_sheet_configuration: {
@@ -81,13 +83,18 @@ RSpec.describe Organized::HotSheetsController, type: :request do
                           },
                         }
         end.to change(HotSheetConfiguration, :count).by 1
+        expect(flash[:success]).to be_present
         current_organization.reload
         expect(current_organization.hot_sheet_configuration).to be_present
         expect(current_organization.hot_sheet_configuration.enabled?).to be_truthy
+
+        expect(ProcessHotSheetWorker.jobs.count).to eq 1
+        expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
       end
       context "already enabled" do
         let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_enabled: true) }
         it "updates" do
+          Sidekiq::Worker.clear_all
           expect do
             put base_url, params: {
                             hot_sheet_configuration: {
@@ -95,9 +102,13 @@ RSpec.describe Organized::HotSheetsController, type: :request do
                             },
                           }
           end.to_not change(HotSheetConfiguration, :count)
+          expect(flash[:success]).to be_present
           current_organization.reload
           expect(current_organization.hot_sheet_configuration).to be_present
           expect(current_organization.hot_sheet_configuration.enabled?).to be_falsey
+
+          expect(ProcessHotSheetWorker.jobs.count).to eq 1
+          expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
         end
       end
     end

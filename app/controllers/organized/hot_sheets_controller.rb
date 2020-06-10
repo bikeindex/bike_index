@@ -2,6 +2,7 @@ module Organized
   class HotSheetsController < Organized::BaseController
     before_action :ensure_admin!, except: [:show]
     before_action :ensure_access_to_hot_sheet!
+    before_action :set_current_hot_sheet_configuration, except: [:show]
 
     def show
       @day = (params[:day].present? ? params[:day] : Time.current).to_date
@@ -10,14 +11,17 @@ module Organized
     end
 
     def edit
-      @hot_sheet_configuration = current_organization.hot_sheet_configuration
-      unless @hot_sheet_configuration.present?
-        @hot_sheet_configuration = HotSheetConfiguration.new(organization_id: current_organization.id)
-        @hot_sheet_configuration.set_default_attributes
-      end
     end
 
     def update
+      if @hot_sheet_configuration.update(permitted_parameters)
+        flash[:success] = "Hot Sheet configuration updated"
+        ProcessHotSheetWorker.perform_async(current_organization.id)
+        redirect_back(fallback_location: organization_root_url)
+      else
+        flash[:error] = @hot_sheet_configuration.errors.full_messages.to_sentence
+        render :edit
+      end
     end
 
     private
@@ -32,8 +36,17 @@ module Organized
       redirect_to organization_root_path and return
     end
 
+    def set_current_hot_sheet_configuration
+      @hot_sheet_configuration = current_organization.hot_sheet_configuration
+      unless @hot_sheet_configuration.present?
+        @hot_sheet_configuration = HotSheetConfiguration.new(organization_id: current_organization.id)
+        @hot_sheet_configuration.set_default_attributes
+      end
+      @hot_sheet_configuration
+    end
+
     def permitted_parameters
-      params.require(:hot_sheet_configuration).permit([:enabled])
+      params.require(:hot_sheet_configuration).permit([:is_enabled])
     end
   end
 end

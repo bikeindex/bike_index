@@ -1,0 +1,21 @@
+require "rails_helper"
+
+RSpec.describe ProcessHotSheetWorker, type: :lib do
+  let(:instance) { described_class.new }
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
+
+  it "is the correct queue and frequency" do
+    expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
+    expect(described_class.frequency).to be < 55.minutes
+  end
+
+  describe "perform" do
+    let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+    let!(:organization1) { hot_sheet_configuration.organization }
+    let!(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["hot_sheet"]) }
+    it "enqueues just enabled" do
+      expect(instance.organizations.pluck(:id)).to eq([organization1.id])
+    end
+  end
+end

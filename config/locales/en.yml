@@ -1626,11 +1626,6 @@ en:
       bikes:
         update:
           unknown_update_action: Unknown update action. Please contact support@bikeindex.org
-      hot_sheets:
-        ensure_access_to_hot_sheet!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       bulk_imports:
         create:
           bulk_import_created: Bulk Import created!
@@ -1668,6 +1663,11 @@ en:
       graduated_notifications:
         ensure_access_to_graduated_notifications!:
           your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+      hot_sheets:
+        ensure_access_to_hot_sheet!:
+          org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
       manages:
@@ -2099,7 +2099,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2125,7 +2125,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -3690,14 +3690,14 @@ en:
       add_a_bike: Add a bike
       blog: Blog
       customize_emails: Customize emails
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet configuration
       discuss: Discuss
       donate: Donate
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
       help: Help
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet configuration
       impounded_bikes: Impounded Bikes
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
@@ -5012,13 +5012,13 @@ en:
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet config
       customize_emails: Customize emails
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet config
       how_integration_works: how the integration works
       impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations

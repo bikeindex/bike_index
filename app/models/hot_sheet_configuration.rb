@@ -22,6 +22,11 @@ class HotSheetConfiguration < ApplicationRecord
     Time.current.beginning_of_day + send_seconds_past_midnight
   end
 
+  def create_today_now?
+    return false if !disabled? || hot_sheets.where("created_at > ?", Time.current.beginning_of_day)
+    Time.current > send_at_today
+  end
+
   def set_default_attributes
     unless search_radius_miles.present? && search_radius_miles > 0
       self.search_radius_miles = (organization&.search_radius || 50)

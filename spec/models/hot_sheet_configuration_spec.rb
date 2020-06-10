@@ -19,4 +19,10 @@ RSpec.describe HotSheetConfiguration, type: :model do
       expect(hot_sheet_configuration.errors.full_messages.to_s).to match(/location/)
     end
   end
+
+  describe "create_today_now?" do
+    it "is falsey if not enabled" do
+      expect(HotSheetConfiguration.new.create_today_now?).to be_falsey
+    end
+  end
 end
