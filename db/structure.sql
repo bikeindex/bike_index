@@ -1465,7 +1465,6 @@ ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 
 CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
-    name character varying(255),
     is_enabled boolean DEFAULT false NOT NULL,
     is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
@@ -1481,7 +1480,8 @@ CREATE TABLE public.mail_snippets (
     city character varying,
     zipcode character varying,
     state_id bigint,
-    country_id bigint
+    country_id bigint,
+    subject text
 );
 
 
@@ -1766,8 +1766,8 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
-    graduated_notification_interval bigint,
-    passwordless_user_domain character varying
+    passwordless_user_domain character varying,
+    graduated_notification_interval bigint
 );
 
 
@@ -4848,6 +4848,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200517001632'),
 ('20200521143231'),
 ('20200521144927'),
-('20200524214006');
+('20200524214006'),
+('20200610194531');
 
 
