@@ -46,7 +46,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:hot_sheet_configuration).permit([:is_enabled])
+      params.require(:hot_sheet_configuration).permit([:is_enabled, :timezone_str, :send_hour])
     end
   end
 end

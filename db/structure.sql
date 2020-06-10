@@ -1162,7 +1162,7 @@ CREATE TABLE public.hot_sheets (
     id bigint NOT NULL,
     organization_id bigint,
     stolen_record_ids jsonb,
-    recipients jsonb,
+    recipient_ids jsonb,
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
