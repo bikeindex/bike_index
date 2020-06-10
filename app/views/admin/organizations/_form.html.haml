@@ -78,7 +78,7 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
-    .form-group.fancy-select.unfancy
+    .form-group.fancy-select.unfancy.no-restore-on-backspace
       = f.label :parent_organization_id do
         Parent organization
         %small.less-strong
