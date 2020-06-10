@@ -6,7 +6,7 @@ RSpec.describe CreationState, type: :model do
       it "ignores an unknown origin" do
         creation_state = CreationState.new(origin: "SOMEwhere", bike_id: 2)
         creation_state.set_calculated_attributes
-        expect(creation_state.origin).to be_nil
+        expect(creation_state.origin).to eq "web"
       end
     end
     context "known origin" do

@@ -154,13 +154,19 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.where(manufacturer_id: @manufacturer&.id)
     end
     bikes = bikes.non_example if params[:search_non_example].present?
-    bikes = bikes.organization(current_organization) if current_organization.present?
+    if current_organization.present?
+      if params[:search_only_creation_organization].present?
+        bikes = bikes.includes(:creation_states).where(creation_states: { organization_id: current_organization.id })
+      else
+        bikes = bikes.organization(current_organization)
+      end
+    end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     bikes = bikes.stolen if params[:search_stolen].present?
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
-    bikes = bikes.ascend_pos if params[:search_ascend].present?
-    bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
+    @origin_search_type = CreationState.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
+    bikes = bikes.includes(:creation_states).where(creation_states: { origin: @origin_search_type }) if @origin_search_type.present?
     bikes
   end
 
