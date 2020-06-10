@@ -32,11 +32,11 @@
           = check_mark if @organization.landing_html.present?
         %td.table-cell-check
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
-      - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|
-        - snippet = @organization.mail_snippets.where(name: snippet_name).first
+      - MailSnippet.organization_snippets.each do |snippet_kind, snippet_description|
+        - snippet = @organization.mail_snippets.where(kind: snippet_kind).first
         %tr
           %td
-            = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_name)
+            = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_kind)
           %td.table-cell-check
             = check_mark if snippet&.body.present?
           %td.table-cell-check

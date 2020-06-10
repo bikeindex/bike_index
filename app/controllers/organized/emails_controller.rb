@@ -10,10 +10,11 @@ module Organized
     def show
       @organization = current_organization
       @email_preview = true
-      find_or_build_email
       if @kind == "graduated_notification"
+        find_or_build_graduated_notification
         render template: "/organized_mailer/graduated_notification", layout: "email"
       else
+        find_or_build_parking_notification
         render template: "/organized_mailer/parking_notification", layout: "email"
       end
     end
@@ -53,44 +54,39 @@ module Organized
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
     end
 
-    def find_or_build_email
-      @organization = current_organization
-      @email_preview = true
-      if @kind == ""
-      elsif @kind == "graduated_notification"
-        graduated_notifications = current_organization.graduated_notifications
-        @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
-        @graduated_notification ||= graduated_notifications.last
-        @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: current_organization.bikes.last)
-        @bike = @graduated_notification.bike
-        @bikes = @graduated_notification.associated_bikes
-        @retrieval_link_url = "#"
-        @bike ||= current_organization.bikes.last
-      else
-        parking_notifications = current_organization.parking_notifications
-        @parking_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
-        @parking_notification ||= parking_notifications.where(kind: @kind).last
-        @parking_notification ||= build_parking_notification
-        @bike = @parking_notification.bike
-        @retrieval_link_url = "#"
-      end
-    end
-
     def permitted_mail_snippet_kinds
       MailSnippet.organization_message_kinds
     end
 
     def permitted_parameters
-      params.require(:mail_snippet).permit(:body, :is_enabled)
+      params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
     end
 
-    def build_parking_notification
-      parking_notification = parking_notifications.build(bike: current_organization.bikes.last,
-                                                         kind: @kind,
-                                                         user: current_user,
-                                                         created_at: Time.current - 1.hour)
-      parking_notification.set_location_from_organization
-      parking_notification
+    def find_or_build_graduated_notification
+      graduated_notifications = @organization.graduated_notifications
+      @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
+      @graduated_notification ||= graduated_notifications.last
+      @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: current_organization.bikes.last)
+      @bike = @graduated_notification.bike
+      @retrieval_link_url = "#"
+      @bike ||= current_organization.bikes.last
+      @graduated_notification
+    end
+
+    def find_or_build_parking_notification
+      parking_notifications = current_organization.parking_notifications
+      @parking_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
+      @parking_notification ||= parking_notifications.where(kind: @kind).last
+      unless @parking_notification.present?
+        @parking_notification = parking_notifications.build(bike: current_organization.bikes.last,
+                                                            kind: @kind,
+                                                            user: current_user,
+                                                            created_at: Time.current - 1.hour)
+        @parking_notification.set_location_from_organization
+      end
+      @bike = @parking_notification.bike
+      @retrieval_link_url = "#"
+      @parking_notification
     end
   end
 end

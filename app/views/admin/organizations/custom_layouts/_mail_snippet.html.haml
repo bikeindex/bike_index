@@ -3,8 +3,8 @@
     = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization  }
   = form_for @organization, { as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
     = f.fields_for :mail_snippets do |snippet|
-      - snippet_name = snippet.object.name
-      - next unless snippet_name == @edit_template
+      - snippet_kind = snippet.object.kind
+      - next unless snippet_kind == @edit_template
       - snippet_description = MailSnippet.organization_snippets[snippet.object.name.to_sym]
       .form-group
         = snippet.label :body, "#{snippet.object.name.titleize} snippet"

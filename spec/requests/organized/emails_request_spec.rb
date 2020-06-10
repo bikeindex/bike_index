@@ -121,6 +121,7 @@ RSpec.describe Organized::EmailsController, type: :request do
                                                   organization_id: current_organization.to_param,
                                                   id: "impound_notification",
                                                   mail_snippet: {
+                                                    subject: "a fancy custom subject",
                                                     body: "cool new things",
                                                     is_enabled: "true",
                                                   },
@@ -129,6 +130,7 @@ RSpec.describe Organized::EmailsController, type: :request do
         mail_snippet = current_organization.mail_snippets.last
         expect(mail_snippet.kind).to eq "impound_notification"
         expect(mail_snippet.body).to eq "cool new things"
+        expect(mail_snippet.subject).to eq "a fancy custom subject"
         expect(mail_snippet.is_enabled).to be_truthy
       end
     end
