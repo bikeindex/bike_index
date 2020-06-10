@@ -18,6 +18,7 @@ class OrganizedMailer < ApplicationMailer
   end
 
   def finished_registration(ownership)
+    # Things set here are also set in emails_controller - if updating, make sure to update there too
     @ownership = ownership
     @user = ownership.owner
     @bike = Bike.unscoped.find(@ownership.bike_id)

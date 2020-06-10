@@ -5,9 +5,9 @@
     = f.fields_for :mail_snippets do |snippet|
       - snippet_kind = snippet.object.kind
       - next unless snippet_kind == @edit_template
-      - snippet_description = MailSnippet.organization_snippets[snippet.object.name.to_sym]
+      - snippet_description = MailSnippet.organization_snippets[snippet.object.kind.to_sym]
       .form-group
-        = snippet.label :body, "#{snippet.object.name.titleize} snippet"
+        = snippet.label :body, "#{snippet.object.kind.titleize} snippet"
         = snippet.text_area :body, placeholder: snippet_description, rows: 10, class: "form-control"
       .row
         .col-md-6

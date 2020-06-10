@@ -52,6 +52,8 @@ class MailSnippet < ApplicationRecord
 
   def self.organization_message_kinds; ParkingNotification.kinds + ["graduated_notification"] end
 
+  def self.finished_registration_kinds; %w[welcome footer security] end
+
   def organization_snippet?; self.class.organization_snippet_kinds.include?(kind) end
 
   def organization_message?; self.class.organization_message_kinds.include?(kind) end

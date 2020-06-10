@@ -4,7 +4,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
   let(:organization) { FactoryBot.create(:organization_with_auto_user) }
   let(:header_mail_snippet) do
     FactoryBot.create(:organization_mail_snippet,
-                      name: "header",
+                      kind: "header",
                       organization: organization,
                       body: "<p>HEADERXSNIPPET</p>")
   end
@@ -36,7 +36,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
             FactoryBot.create(:organization_mail_snippet,
-                              name: "partial",
+                              kind: "partial",
                               organization: organization,
                               body: "<p>PARTIALYXSNIPPET</p>")
           end
@@ -99,13 +99,13 @@ RSpec.describe OrganizedMailer, type: :mailer do
     context "organized snippets" do
       let(:welcome_mail_snippet) do
         FactoryBot.create(:organization_mail_snippet,
-                          name: "welcome",
+                          kind: "welcome",
                           organization: organization,
                           body: "<p>WELCOMEXSNIPPET</p>")
       end
       let(:security_mail_snippet) do
         FactoryBot.create(:organization_mail_snippet,
-                          name: "security",
+                          kind: "security",
                           organization: organization,
                           body: "<p>SECURITYXSNIPPET</p>")
       end

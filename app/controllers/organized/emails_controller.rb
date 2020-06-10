@@ -10,7 +10,13 @@ module Organized
     def show
       @organization = current_organization
       @email_preview = true
-      if @kind == "graduated_notification"
+      if @kind == "finished_registration"
+        build_finished_email
+        render template: "/organized_mailer/finished_registration" , layout: "email"
+      elsif @kind == "partial_registration"
+        build_partial_email
+        render template: "/organized_mailer/partial_registration" , layout: "email"
+      elsif @kind == "graduated_notification"
         find_or_build_graduated_notification
         render template: "/organized_mailer/graduated_notification", layout: "email"
       else
@@ -45,13 +51,20 @@ module Organized
     end
 
     def viewable_email_kinds
-      ParkingNotification.kinds + ["graduated_notification"]
+      return @viewable_email_kinds if defined?(@viewable_email_kinds)
+      viewable_email_kinds = ["finished_registration"]
+      viewable_email_kinds += ["partial_registration"] if current_organization.enabled?("show_partial_registrations")
+      viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
+      viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
+      @viewable_email_kinds = viewable_email_kinds
     end
 
     def find_mail_snippets
       @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
-      @mail_snippet = mail_snippets.where(kind: @kind).first
-      @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
+      if ParkingNotification.kinds.include?(@kind)
+        @mail_snippet = mail_snippets.where(kind: @kind).first
+        @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
+      end
     end
 
     def permitted_mail_snippet_kinds
@@ -60,6 +73,23 @@ module Organized
 
     def permitted_parameters
       params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
+    end
+
+    def build_partial_email
+      @b_param = @organization.b_params.order(:created_at).last
+      @b_param ||= BParam.new(organization_id: @organization.id)
+    end
+
+    def build_finished_email
+      @bike = @organization.bikes.last
+      @ownership = @bike.current_ownership
+      @user = @ownership.owner
+      @vars = {
+        new_bike: (@bike.ownerships.count == 1),
+        email: @ownership.owner_email,
+        new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
+        registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id),
+      }
     end
 
     def find_or_build_graduated_notification
