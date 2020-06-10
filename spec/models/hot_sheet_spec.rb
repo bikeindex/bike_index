@@ -5,13 +5,13 @@ RSpec.describe HotSheet, type: :model do
     let(:hot_sheet) { FactoryBot.build(:hot_sheet) }
     let(:organization) { hot_sheet.organization }
     it "is valid" do
-      expect do
-        hot_sheet.save
-      end.to change(EmailHotSheetWorker.jobs, :count).by 1
+      pp Time.current.to_i
+      hot_sheet.save
       expect(hot_sheet.valid?).to be_truthy
       expect(hot_sheet.id).to be_present
       expect(hot_sheet.email_success?).to be_falsey
       expect(HotSheet.for(organization, Time.current)).to eq hot_sheet
+      expect(hot_sheet.subject).to eq "Hot Sheet: Wednesday, Jun 7"
     end
   end
 

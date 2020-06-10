@@ -85,6 +85,17 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  def hot_sheet(hot_sheet)
+    @hot_sheet(hot_sheet)
+    @hot_sheet = hot_sheet
+    @organization = @hot_sheet.organization
+
+    mail(reply_to: reply_to,
+         to: reply_to,
+         bcc: @hot_sheet.recipients,
+         subject: @hot_sheet.subject)
+  end
+
   private
 
   def finished_registration_type

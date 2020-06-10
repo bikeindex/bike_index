@@ -15,10 +15,19 @@ class HotSheet < ApplicationRecord
 
   def bounding_box; hot_sheet_configuration.bounding_box end
 
+  def timezone; hot_sheet_configuration.timezone end
+
   def email_success?; delivery_status == "email_success" end
+
+  def subject; "Hot Sheet #{sheet_date.strftime("%A, %b %-d")}" end
 
   # This may become a configurable option
   def max_bikes; 10 end
+
+  # This will use the timezone sometime
+  def sheet_date
+    created_at.in_time_zone(timezone).to_date
+  end
 
   def fetch_stolen_records
     if stolen_record_ids.is_a?(Array)

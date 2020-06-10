@@ -18,8 +18,10 @@ class HotSheetConfiguration < ApplicationRecord
 
   def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles) end
 
+  def timezone; TimeParser.parse_timezone(timezone_str) end
+
   def send_at_today
-    Time.current.beginning_of_day + send_seconds_past_midnight
+    Time.current.in_time_zone(timezone).beginning_of_day + send_seconds_past_midnight
   end
 
   def create_today_now?
