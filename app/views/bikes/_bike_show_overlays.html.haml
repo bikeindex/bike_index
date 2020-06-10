@@ -4,7 +4,7 @@
       .card-body{ style: "padding: 2rem; background: #eceeef" }
         - if @matching_notification.present?
           %h3.uncap
-            = @matching_notification.title
+            = @matching_notification.subject
           - organization_message_snippet = @matching_notification.organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first
           - if organization_message_snippet.present?
             = organization_message_snippet.body.html_safe

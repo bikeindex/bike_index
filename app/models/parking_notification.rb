@@ -208,7 +208,7 @@ class ParkingNotification < ActiveRecord::Base
     self.errors.add(:address, :address_required)
   end
 
-  def title
+  def subject
     if appears_abandoned_notification?
       "Your #{bike&.type || "Bike"} appears to be abandoned"
     elsif parked_incorrectly_notification?

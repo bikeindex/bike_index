@@ -62,7 +62,7 @@ class OrganizedMailer < ApplicationMailer
     I18n.with_locale(@sender&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
            to: @parking_notification.email,
-           subject: @parking_notification.title) do |format|
+           subject: @parking_notification.subject) do |format|
         format.html { render "parking_notification" }
         format.text { render "parking_notification" }
       end
@@ -81,7 +81,7 @@ class OrganizedMailer < ApplicationMailer
     end
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.title)
+      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.subject)
     end
   end
 

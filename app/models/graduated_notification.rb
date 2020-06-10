@@ -187,7 +187,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   # Right now, just static - but we're going to make it configurable
-  def title
+  def subject
     "Renew your bike permit"
   end
 
