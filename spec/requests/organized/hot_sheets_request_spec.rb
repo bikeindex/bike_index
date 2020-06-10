@@ -80,6 +80,8 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           put base_url, params: {
                           hot_sheet_configuration: {
                             is_enabled: true,
+                            send_hour: "11"
+                            timezone_str: "(GMT-06:00) Central America"
                           },
                         }
         end.to change(HotSheetConfiguration, :count).by 1

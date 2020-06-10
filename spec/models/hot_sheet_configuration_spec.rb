@@ -24,5 +24,8 @@ RSpec.describe HotSheetConfiguration, type: :model do
     it "is falsey if not enabled" do
       expect(HotSheetConfiguration.new.create_today_now?).to be_falsey
     end
+    context "with send_at_today after current time" do
+
+    end
   end
 end
