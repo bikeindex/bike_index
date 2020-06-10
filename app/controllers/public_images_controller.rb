@@ -70,7 +70,7 @@ class PublicImagesController < ApplicationController
     if params[:list_of_photos]
       params[:list_of_photos].each_with_index do |id, index|
         image = PublicImage.unscoped.find(id)
-        image.update_attribute :listing_order, index + 1 if current_user_image_owner(image)
+        image.update_attribute :listing_order, index + 1 if current_user_image_authorized(image)
       end
     end
     head :ok
@@ -81,7 +81,7 @@ class PublicImagesController < ApplicationController
   def ensure_authorized_to_create!
     if params[:bike_id].present? # Ensure the
       @bike = Bike.unscoped.find(params[:bike_id])
-      return true if @bike.owner == current_user
+      return true if @bike.authorized?(current_user)
     end
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
@@ -89,9 +89,9 @@ class PublicImagesController < ApplicationController
     render json: { error: "Access denied" }, status: 401 and return
   end
 
-  def current_user_image_owner(public_image)
+  def current_user_image_authorized(public_image)
     if public_image.imageable_type == "Bike"
-      Bike.unscoped.find(public_image.imageable_id).owner == current_user
+      Bike.unscoped.find(public_image.imageable_id).authorized?(current_user)
     elsif public_image.imageable_type == "Blog" || public_image.imageable_type == "MailSnippet"
       current_user && current_user.superuser?
     end
@@ -107,7 +107,7 @@ class PublicImagesController < ApplicationController
 
   def find_image_if_owned
     @public_image = PublicImage.unscoped.find(params[:id])
-    unless current_user_image_owner(@public_image)
+    unless current_user_image_authorized(@public_image)
       flash[:error] = translation(:no_permission_to_edit)
       redirect_to @public_image.imageable and return
     end

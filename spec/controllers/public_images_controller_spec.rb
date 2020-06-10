@@ -15,6 +15,24 @@ RSpec.describe PublicImagesController, type: :controller do
           expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
+      context "org authorized" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization) }
+        it "creates an image" do
+          bike.reload
+          current_user.reload
+          set_current_user(current_user)
+          expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([organization.id])
+          expect(bike.authorized?(current_user)).to be_truthy
+          expect do
+            post :create, params: { bike_id: bike.id, public_image: { name: "cool name" }, format: :js }
+          end.to change(PublicImage, :count).by 1
+          bike.reload
+          expect(bike.public_images.first.name).to eq "cool name"
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        end
+      end
       context "no user" do
         it "does not create an image" do
           expect do
