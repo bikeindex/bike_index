@@ -191,7 +191,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match target_remaining_link_url
       expect(mail.to).to eq([graduated_notification.email])
       expect(mail.reply_to).to eq([organization.auto_user.email])
-      expect(mail.subject).to eq "Renew your bike permit"
+      expect(mail.subject).to eq graduated_notification.subject
     end
   end
 end
