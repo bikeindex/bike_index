@@ -81,10 +81,13 @@
                   %li
                     = link_to t(".parking_notification_unregistered"), new_organization_bike_path(passive_organization.to_param, parking_notification: true), class: "nav-link #{new_bike_with_parking_notification ? 'active' : ''} secondary-item"
 
+                %li.divider-nav-item
                 - if passive_organization.enabled?("bike_stickers")
-                  %li.divider-nav-item
                   %li
                     = active_link t(".registration_stickers"), organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.enabled?("hot_sheet")
+                  %li
+                    = active_link t(".hot_sheet"), organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
                 - if passive_organization.enabled?("csv_exports")
                   %li
                     = active_link t(".exports"), organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
@@ -102,6 +105,9 @@
                   - if passive_organization.enabled?("customize_emails")
                     %li
                       = active_link t(".customize_emails"), organization_emails_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                  - if passive_organization.enabled?("hot_sheet")
+                    %li
+                      = active_link t(".hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
               - if current_user&.superuser?
                 %li.divider-nav-item
                 %li

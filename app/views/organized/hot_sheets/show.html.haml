@@ -1,0 +1,32 @@
+-# TODO: translations
+
+.organized-page-header
+  %h1
+    Hot Sheet
+    %small.less-strong
+      for
+      - if @today
+        today
+      - else
+        #{@day}
+
+- if @hot_sheet.blank?
+  - if current_organization.hot_sheet_configuration.present? && current_organization.hot_sheet_configuration.enabled?
+    - if @today
+      %h3.uncap
+        Hot sheet not created yet!
+      %p Please wait a few minutes
+    - else
+      %h3.uncap
+        No hotsheet for #{@day}
+  - else
+    .alert.alert-info
+      %h3.uncap
+        Hot Sheets are not enabled!
+      - if current_user.admin_of?(current_organization)
+        %p
+          Enable them on the
+          %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
+
+- else
+  HOT SHEEEET

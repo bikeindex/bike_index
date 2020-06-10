@@ -1129,7 +1129,7 @@ CREATE TABLE public.hot_sheet_configurations (
     send_seconds_past_midnight integer,
     timezone_str character varying,
     search_radius_miles integer,
-    enabled boolean DEFAULT false,
+    is_enabled boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

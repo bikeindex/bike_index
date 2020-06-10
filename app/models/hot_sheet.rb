@@ -40,6 +40,6 @@ class HotSheet < ApplicationRecord
   private
 
   def calculated_stolen_records
-    StolenRecord.approveds.within_bounding_box(bounding_box).reorder(date_stolen: :desc)
+    StolenRecord.current.within_bounding_box(bounding_box).reorder(date_stolen: :desc)
   end
 end

@@ -97,7 +97,7 @@ class StolenRecord < ApplicationRecord
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: [(:skip_default if skip_default_country)]
+      country: [(:skip_default if skip_default_country)],
     ).presence
   end
 
