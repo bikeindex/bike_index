@@ -362,8 +362,14 @@
       .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
-            - if !location.shown && @organization.allowed_show?
-              %h2
+            - if location.impound_location
+              %strong
+                - if location.default_impound_location
+                  %span.text-info Default
+                Impound location
+
+            - elsif !location.shown && @organization.allowed_show?
+              %strong.text-warning
                 Location is not visible! Try updating the organization
             %p
               Name:

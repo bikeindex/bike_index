@@ -15,7 +15,7 @@ class CreationState < ApplicationRecord
 
   # Probably should be switched to enum at some point
   def self.origins
-    %w[embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form].freeze
+    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form].freeze
   end
 
   def creation_description
@@ -29,7 +29,7 @@ class CreationState < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.origin = nil unless self.class.origins.include?(origin)
+    self.origin = "web" unless self.class.origins.include?(origin)
     self.pos_kind = calculated_pos_kind
   end
 

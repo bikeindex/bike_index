@@ -748,6 +748,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.claimed?).to be_truthy
           expect(bike.no_serial?).to be_truthy
           expect(bike.made_without_serial?).to be_falsey
+          expect(bike.creation_state.origin).to eq "web"
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.serial_number).to eq "unknown"
           expect(bike.normalized_serial_segments).to eq([])
