@@ -2,7 +2,7 @@ module Organized
   class EmailsController < Organized::AdminController
     skip_before_action :ensure_admin!, only: [:show]
     before_action :ensure_member!, only: [:show]
-    before_action :find_mail_snippet, only: [:show, :edit, :update]
+    before_action :find_mail_snippets, only: [:show, :edit, :update]
 
     def index
     end
@@ -31,6 +31,8 @@ module Organized
       end
     end
 
+    helper_method :viewable_email_kinds
+
     private
 
     def parking_notifications
@@ -41,7 +43,11 @@ module Organized
       current_organization.mail_snippets.where(kind: MailSnippet.organization_message_kinds)
     end
 
-    def find_mail_snippet
+    def viewable_email_kinds
+      ParkingNotification.kinds + ["graduated_notification"]
+    end
+
+    def find_mail_snippets
       @kind = MailSnippet.organization_message_kinds.include?(params[:id]) ? params[:id] : MailSnippet.organization_message_kinds.first
       @mail_snippet = mail_snippets.where(kind: @kind).first
       @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
@@ -50,7 +56,8 @@ module Organized
     def find_or_build_email
       @organization = current_organization
       @email_preview = true
-      if @kind == "graduated_notification"
+      if @kind == ""
+      elsif @kind == "graduated_notification"
         graduated_notifications = current_organization.graduated_notifications
         @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
         @graduated_notification ||= graduated_notifications.last
