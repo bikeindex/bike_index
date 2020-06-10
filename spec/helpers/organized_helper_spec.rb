@@ -4,7 +4,7 @@ RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:creation_organization_bike) }
     let(:target_text) do
-      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
+      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">web</small></span>"
     end
     it "renders" do
       expect(organized_bike_text).to be_nil
