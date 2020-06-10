@@ -104,6 +104,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def current_associated_notification; current? ? self : associated_notifications_including_self.order(:id).last end
 
+  def mail_snippet; organization.blank? ? nil : MailSnippet.where(kind: kind, organization_id: organization_id).first end
+
   # Only initial_record and repeated records - does not include any resolved parking notifications
   def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
 
@@ -209,6 +211,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def subject
+    return mail_snippet.subject if (mail_snippet&.subject).present?
     if appears_abandoned_notification?
       "Your #{bike&.type || "Bike"} appears to be abandoned"
     elsif parked_incorrectly_notification?
