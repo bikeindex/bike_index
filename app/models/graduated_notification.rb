@@ -100,6 +100,8 @@ class GraduatedNotification < ApplicationRecord
 
   def associated_notifications_including_self; self.class.associated_notifications_including_self(self) end
 
+  def mail_snippet; MailSnippet.where(kind: "graduated_notification", organization_id: organization_id).first end
+
   def associated_bikes
     return Bike.none unless user.present? || bike.present?
     # We want to order the bikes by when the ownership was created, so perform that on either result
@@ -186,9 +188,9 @@ class GraduatedNotification < ApplicationRecord
     true
   end
 
-  # Right now, just static - but we're going to make it configurable
   def subject
-    "Renew your bike permit"
+    return mail_snippet.subject if (mail_snippet&.subject).present?
+    "Renew your #{bike&.type || "Bike"} registration with #{organization&.short_name}"
   end
 
   private

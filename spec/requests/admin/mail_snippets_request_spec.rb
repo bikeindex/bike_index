@@ -12,6 +12,14 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders" do
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:new)
+    end
+  end
+
   describe "edit" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
     it "renders" do

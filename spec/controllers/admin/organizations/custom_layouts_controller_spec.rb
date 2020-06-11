@@ -37,16 +37,16 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
         end
       end
       describe "mail_snippets" do
-        MailSnippet.organization_snippet_kinds.each do |snippet_name|
-          context snippet_name do
+        MailSnippet.organization_snippet_kinds.each do |snippet_kind|
+          context snippet_kind do
             it "renders" do
               expect(organization.mail_snippets.count).to eq 0
-              get :edit, params: { organization_id: organization.to_param, id: snippet_name }
+              get :edit, params: { organization_id: organization.to_param, id: snippet_kind }
               expect(response.status).to eq(200)
               expect(response).to render_template(:edit)
               organization.reload
               expect(organization.mail_snippets.count).to eq 1
-              expect(organization.mail_snippets.where(name: snippet_name).count).to eq 1
+              expect(organization.mail_snippets.where(kind: snippet_kind).count).to eq 1
             end
           end
         end
@@ -69,11 +69,11 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
         end
       end
       context "mail_snippet" do
-        let(:snippet_type) { MailSnippet.organization_snippet_kinds.last }
+        let(:snippet_kind) { MailSnippet.organization_snippet_kinds.last }
         let(:mail_snippet) do
           FactoryBot.create(:organization_mail_snippet,
                             organization: organization,
-                            name: snippet_type,
+                            kind: snippet_kind,
                             is_enabled: false)
         end
         let(:update_attributes) do
@@ -81,7 +81,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
             mail_snippets_attributes: {
               "0" => {
                 id: mail_snippet.id,
-                name: "CRAZZY new name", # ignore
                 body: "<p>html for snippet 1</p>",
                 organization_id: 844, # Ignore
                 is_enabled: true,
@@ -95,13 +94,12 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller 
             put :update, params: {
                            organization_id: organization.to_param,
                            organization: update_attributes,
-                           id: snippet_type
+                           id: snippet_kind
                          }
           end.to change(MailSnippet, :count).by 0
-          target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: mail_snippet.name)
+          target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: snippet_kind)
           expect(response).to redirect_to target
           mail_snippet.reload
-          expect(mail_snippet.name).to eq snippet_type
           expect(mail_snippet.body).to eq "<p>html for snippet 1</p>"
           expect(mail_snippet.organization).to eq organization
           expect(mail_snippet.is_enabled).to be_truthy

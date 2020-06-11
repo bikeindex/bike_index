@@ -17,6 +17,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   end
 
   def edit
+    @organizations = Organization.all
   end
 
   def update
@@ -30,6 +31,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def new
     @mail_snippet = MailSnippet.new
+    @organizations = Organization.all
   end
 
   def create
@@ -71,6 +73,6 @@ class Admin::MailSnippetsController < Admin::BaseController
   end
 
   def find_snippet
-    @mail_snippet = MailSnippet.without_organizations.find(params[:id])
+    @mail_snippet = MailSnippet.find(params[:id])
   end
 end

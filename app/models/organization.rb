@@ -212,7 +212,7 @@ class Organization < ApplicationRecord
 
   def mail_snippet_body(kind)
     return nil unless MailSnippet.organization_snippet_kinds.include?(kind)
-    snippet = mail_snippets.enabled.where(name: kind).first
+    snippet = mail_snippets.enabled.where(kind: kind).first
     snippet&.body
   end
 

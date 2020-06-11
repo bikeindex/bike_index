@@ -203,7 +203,7 @@
             %td Templates
             %td
               - if @organization.mail_snippets.any?
-                = @organization.mail_snippets.pluck(:name).to_sentence
+                = @organization.mail_snippets.pluck(:kind).to_sentence
               - else
                 %small.less-strong
                   None

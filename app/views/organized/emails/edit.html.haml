@@ -4,55 +4,65 @@
   %h1
     Edit
     %em
-      = @mail_snippet.kind.humanize
+      = @kind.humanize
 
-.row
-  .col-md-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Created
-          %td
-            - if @mail_snippet.id.present?
-              %span.convertTime.preciseTime
-                = l(@mail_snippet.created_at, format: :convert_time)
-            - else
-              not created
-        %tr
-          %td Last updated
-          %td
-            - if @mail_snippet.id.present?
-              %span.convertTime.preciseTime
-                = l(@mail_snippet.updated_at, format: :convert_time)
+- if @can_edit
+  .row
+    .col-md-6
+      %table.table-list
+        %tbody
+          %tr
+            %td Created
+            %td
+              - if @mail_snippet.id.present?
+                %span.convertTime.preciseTime
+                  = l(@mail_snippet.created_at, format: :convert_time)
+              - else
+                not created
+          %tr
+            %td Last updated
+            %td
+              - if @mail_snippet.id.present?
+                %span.convertTime.preciseTime
+                  = l(@mail_snippet.updated_at, format: :convert_time)
 
-        %tr
-          %td Enabled?
-          %td
-            - if @mail_snippet.is_enabled
-              = check_mark
-            - else
-              %small.less-strong false
+          %tr
+            %td Enabled?
+            %td
+              - if @mail_snippet.is_enabled
+                = check_mark
+              - else
+                %small.less-strong false
 
-%h3.uncap.mt-4
-  Edit the email text
+  %h3.uncap.mt-4
+    Edit the email
 
-= form_for @mail_snippet, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
-  .form-group
-    = f.label :body, class: "control-label" do
-      Custom message to add to the email
-      %small HTML is permitted
-    = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
+  = form_for @mail_snippet, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
+    .form-group
+      = f.label :subject, "Custom email subject", class: "control-label"
+      = f.text_field :subject, class: "form-control"
+    .form-group
+      = f.label :body, class: "control-label" do
+        Custom message to add to the email
+        %em.less-strong HTML is permitted
+      = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
 
-  .form-group
-    = f.check_box :is_enabled
-    = f.label :is_enabled, "Enabled", class: "org-form-label"
+    .form-group
+      = f.check_box :is_enabled
+      = f.label :is_enabled, class: "org-form-label" do
+        Enabled
+        %em.less-strong customizations won't show up unless checked
 
-  .mt-2
-    = submit_tag "Save", class: "btn btn-success btn-md-lg"
-
+    .mt-2
+      = submit_tag "Save", class: "btn btn-success btn-md-lg"
+- else
+  .alert.alert-info.mt-4.mb-4
+    %h3.uncap.less-strong Not customizable directly
+    %p Ask Bike Index support for help
 
 #emailPreview.collapse.show.in
   %h3.uncap.mt-4 Preview of email sent:
+
   .email-preview.parking-notification-email-preview
     <iframe src="#{organization_email_url(@kind, organization_id: current_organization.to_param)}"></iframe>
 #emailPreviewUpdated.collapse
