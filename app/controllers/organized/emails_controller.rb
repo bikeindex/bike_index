@@ -61,7 +61,7 @@ module Organized
 
     def find_mail_snippets
       @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
-      if ParkingNotification.kinds.include?(@kind)
+      if ParkingNotification.kinds.include?(@kind) || @kind == "graduated_notification"
         @mail_snippet = mail_snippets.where(kind: @kind).first
         @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
       end

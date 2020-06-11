@@ -4,10 +4,12 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/emails" }
   # we need a default organized bike to render emails, so build one
   let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: current_organization) }
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails] }
   let!(:bike) { ownership.bike }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
+    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "redirects to the organization root path" do
         get base_url
@@ -29,7 +31,6 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification)).to eq parking_notification
-          expect(parking_notification.retrieval_link_token).to be_present
           expect(assigns(:retrieval_link_url)).to eq "#"
         end
       end
@@ -46,15 +47,16 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
+    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "renders" do
         get base_url
         expect(response).to render_template(:index)
+        expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification impound_notification graduated_notification])
       end
     end
 
     describe "show" do
-      let(:current_organization) { FactoryBot.create(:organization, :in_nyc) }
       context "appears_abandoned_notification" do
         it "renders" do
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -102,6 +104,24 @@ RSpec.describe Organized::EmailsController, type: :request do
               get "#{base_url}/graduated_notification", params: { graduated_notification_id: graduated_notification.id }
             end.to raise_error(ActiveRecord::RecordNotFound)
           end
+        end
+      end
+      context "finished_registration" do
+        let(:enabled_feature_slugs) { %w[customize_emails] }
+        it "renders" do
+          get "#{base_url}/finished_registration"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("organized_mailer/finished_registration")
+          expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
+        end
+      end
+      context "partial_registration" do
+        let(:enabled_feature_slugs) { %w[customize_emails show_partial_registrations] }
+        it "renders" do
+          get "#{base_url}/partial_registration"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("organized_mailer/partial_registration")
+          expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration])
         end
       end
     end
