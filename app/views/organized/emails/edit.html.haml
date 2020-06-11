@@ -25,7 +25,9 @@
               - if @mail_snippet.id.present?
                 %span.convertTime.preciseTime
                   = l(@mail_snippet.updated_at, format: :convert_time)
-
+    .col-md-6
+      %table.table-list
+        %tbody
           %tr
             %td Enabled?
             %td
