@@ -180,7 +180,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(current_organization.mail_snippets.count).to eq 1
           put "#{base_url}/appears_abandoned_notification", params: {
                                                     organization_id: current_organization.to_param,
-                                                    id: "impound_notification",
+                                                    id: "appears_abandoned_notification",
                                                     mail_snippet: {
                                                       subject: "a fancy custom subject",
                                                       body: "cool new things",
@@ -189,7 +189,7 @@ RSpec.describe Organized::EmailsController, type: :request do
                                                   }
           expect(current_organization.mail_snippets.count).to eq 1
           mail_snippet.reload
-          expect(mail_snippet.kind).to eq "impound_notification"
+          expect(mail_snippet.kind).to eq "appears_abandoned_notification"
           expect(mail_snippet.body).to eq "cool new things"
           expect(mail_snippet.subject).to eq "a fancy custom subject"
           expect(mail_snippet.is_enabled).to be_falsey
