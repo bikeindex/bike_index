@@ -325,6 +325,7 @@ Rails.application.routes.draw do
     end
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
+    resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
@@ -345,7 +346,6 @@ Rails.application.routes.draw do
         get :hot_sheet_configuration
       end
     end
-    resources :emails, only: %i[index show edit update]
     resources :users, except: [:show]
   end
 

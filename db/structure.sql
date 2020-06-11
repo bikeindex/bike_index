@@ -1534,7 +1534,6 @@ ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 
 CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
-    name character varying(255),
     is_enabled boolean DEFAULT false NOT NULL,
     is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
@@ -1550,7 +1549,8 @@ CREATE TABLE public.mail_snippets (
     city character varying,
     zipcode character varying,
     state_id bigint,
-    country_id bigint
+    country_id bigint,
+    subject text
 );
 
 
@@ -1630,7 +1630,8 @@ CREATE TABLE public.memberships (
     sender_id integer,
     claimed_at timestamp without time zone,
     email_invitation_sent_at timestamp without time zone,
-    created_by_magic_link boolean DEFAULT false
+    created_by_magic_link boolean DEFAULT false,
+    receive_hot_sheet boolean DEFAULT false
 );
 
 
@@ -4963,6 +4964,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200521144927'),
 ('20200524214006'),
 ('20200609201821'),
-('20200609203625');
+('20200609203625'),
+('20200610194531'),
+('20200611040757');
 
 
