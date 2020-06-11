@@ -191,7 +191,6 @@ class GraduatedNotification < ApplicationRecord
   def subject
     return mail_snippet.subject if (mail_snippet&.subject).present?
     "Renew your #{bike&.type || "Bike"} registration with #{organization&.short_name}"
-    # "Renew your bike permit"
   end
 
   private
