@@ -194,7 +194,7 @@ RSpec.describe "Bikes API V2", type: :request do
         theft_description: "This bike was stolen and that's no fair.",
         country: "US",
         city: "New York",
-        street: "278 Broadway",
+        address: "278 Broadway",
         zipcode: "10007",
         state: "NY",
         police_report_number: "99999999",
