@@ -1,9 +1,9 @@
 = t(".text.youre_almost_done")
 
+= t(".text.youre_just_a_few_steps_away_from_register")
+
 - if @organization && @organization.mail_snippet_body("partial").present?
   = @organization.mail_snippet_body("partial").html_safe
-
-= t(".text.youre_just_a_few_steps_away_from_register")
 
 = t(".text.go_to_the_following_url_to_finish")
 

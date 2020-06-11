@@ -1,14 +1,14 @@
 %h1= t(".html.youre_almost_done")
 
-- if @organization && @organization.mail_snippet_body("partial").present?
-  = @organization.mail_snippet_body("partial").html_safe
-
 - color_and_brand = []
 - color_and_brand << Color.find(@b_param.primary_frame_color_id).name if @b_param.primary_frame_color_id.present?
 - color_and_brand << @b_param.mnfg_name
 - color_and_brand = color_and_brand.compact.join(" ")
 
 %p= t(".html.just_a_few_steps_away_html", color_and_brand: color_and_brand)
+
+- if @organization && @organization.mail_snippet_body("partial").present?
+  = @organization.mail_snippet_body("partial").html_safe
 
 %p= t(".html.click_below_to_complete_your_registration")
 
