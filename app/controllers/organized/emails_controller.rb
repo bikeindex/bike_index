@@ -10,22 +10,23 @@ module Organized
     def show
       @organization = current_organization
       @email_preview = true
-      if @kind == "finished_registration"
-        build_finished_email
-        render template: "/organized_mailer/finished_registration" , layout: "email"
-      elsif @kind == "partial_registration"
-        build_partial_email
-        render template: "/organized_mailer/partial_registration" , layout: "email"
+      if ParkingNotification.kinds.include?(@kind)
+        find_or_build_parking_notification
+        render template: "/organized_mailer/parking_notification", layout: "email"
       elsif @kind == "graduated_notification"
         find_or_build_graduated_notification
         render template: "/organized_mailer/graduated_notification", layout: "email"
-      else
-        find_or_build_parking_notification
-        render template: "/organized_mailer/parking_notification", layout: "email"
+      elsif @kind == "partial_registration"
+        build_partial_email
+        render template: "/organized_mailer/partial_registration" , layout: "email"
+      else # Default to finished email
+        build_finished_email
+        render template: "/organized_mailer/finished_registration" , layout: "email"
       end
     end
 
     def edit
+      @can_edit = !%w[finished_registration partial_registration].include?(@kind)
     end
 
     def update

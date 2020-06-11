@@ -41,7 +41,7 @@ class MailSnippet < ApplicationRecord
       header: "Top of email block",
       welcome: "Below header",
       footer: "Above <3 <3 <3 <3 Bike Index Team",
-      partial: "Below \"Finish it\" button, in email \"Partial registration\"",
+      partial: "Above \"Finish it\" button, in email \"Partial registration\"",
       security: "How to keep your bike safe, in email \"Finished registration\"",
     }.as_json
   end
