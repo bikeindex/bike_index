@@ -40,7 +40,6 @@ class Phonifyer
   def self.components(string)
     return nil unless string.present?
     number = string.to_s.strip
-
     number, country_code = split_with_country_code(number)
     number, extension = split_with_extension(number)
 

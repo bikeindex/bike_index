@@ -273,13 +273,13 @@ RSpec.describe StolenRecord, type: :model do
   describe "titleize_city" do
     it "it should titleize_city" do
       stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
-      stolen_record.send("titleize_city")
+      stolen_record.set_calculated_attributes
       expect(stolen_record.city).to eq("Indianapolis")
     end
 
     it "it shouldn't remove other things" do
       stolen_record = StolenRecord.new(city: "Georgian la")
-      stolen_record.send("titleize_city")
+      stolen_record.set_calculated_attributes
       expect(stolen_record.city).to eq("Georgian La")
     end
   end

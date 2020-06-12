@@ -168,7 +168,9 @@ class StolenRecord < ApplicationRecord
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
     fix_date
     self.street = nil unless street.present? # Make it easier to find blank addresses
-    titleize_city
+    if city.present?
+      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
+    end
     update_tsved_at
     @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.recovery_display_status = calculated_recovery_display_status
@@ -319,13 +321,5 @@ class StolenRecord < ApplicationRecord
       corrected = date_stolen.change(year: Time.current.year - 1)
       self.date_stolen = corrected
     end
-  end
-
-  def titleize_city
-    if city.present?
-      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "")
-      self.city = city.strip.titleize
-    end
-    true
   end
 end
