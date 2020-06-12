@@ -32,7 +32,7 @@ class Location < ApplicationRecord
   def publicly_visible=(val); self.not_publicly_visible = !ParamsNormalizer.boolean(val) end
 
   def set_calculated_attributes
-    self.phone = Phonifyer.phonify(self.phone) if self.phone
+    self.phone = Phonifyer.phonify(self.phone)
     self.shown = calculated_shown
   end
 

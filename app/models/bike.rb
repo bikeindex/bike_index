@@ -1,6 +1,5 @@
 class Bike < ApplicationRecord
   acts_as_paranoid without_default_scope: true
-  include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
   include Geocodeable

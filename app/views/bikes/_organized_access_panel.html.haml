@@ -186,7 +186,7 @@
               - if @bike.phoneable_by?(current_user)
                 %p.phoneable-by.mt-4
                   = t(".or_call_owner_html")
-                  = link_to @bike.phone_display, "tel:#{@bike.phone}"
+                  = phone_link(@bike.phone)
             - else
               %p
                 = t(".user_revoked_permission_html")

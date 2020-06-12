@@ -45,7 +45,7 @@
                   = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.street, location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
               - if location.phone.present?
-                %p= link_to display_phone(location.phone), "tel:#{ location.phone }"
+                %p= phone_link(location.phone)
               - if location&.organization&.website.present?
                 %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
               .map-window
@@ -84,7 +84,7 @@
                 %p= [location.street, location.city, location.zipcode, location.country.name].join(", ")
 
               - if location.phone.present?
-                %p= link_to display_phone(location.phone), "tel:#{ location.phone }"
+                %p= phone_link(location.phone)
 
               - if location&.organization&.website.present?
                 %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
