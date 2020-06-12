@@ -161,14 +161,17 @@ module ApplicationHelper
     )
   end
 
-  def display_phone(str = nil)
-    if str.blank?
-      nil
-    elsif str[/\+/]
-      number_to_phone(str.gsub(/\+\d*/, ""), country_code: str[/\A.\d*/].gsub("+", ""), delimiter: " ")
-    else
-      number_to_phone(str, delimiter: " ")
-    end
+  def phone_display(str)
+    return "" if str.blank?
+    phone_components = Phonifyer.components(str)
+    number_to_phone(phone_components[:number], phone_components.except(:number))
+  end
+
+  def phone_link(phone, html_options = {})
+    return "" if phone.blank?
+    phone_d = phone_display(phone)
+    # Switch extension to be pause in link
+    link_to(phone_d, "tel:#{phone_d.gsub("x", ";")}", html_options)
   end
 
   def twitterable(user)

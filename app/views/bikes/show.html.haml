@@ -240,6 +240,5 @@
                 = t(".or_call")
               %strong
                 = t(".owners_phone_number")
-              %a{ href: "tel:#{@stolen_record.phone}" }
-                = @stolen_record.phone_display
+              = phone_link(@stolen_record.phone)
       .ad-block#right300x600

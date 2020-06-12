@@ -182,12 +182,12 @@
               %td
                 Phone
               %td
-                = stolen_record.phone_display
+                = phone_display(stolen_record.phone)
                 - if stolen_record.secondary_phone.present?
                   %br
                   %small
                     %span.less-strong secondary:
-                    = stolen_record.secondary_phone
+                    = phone_display(stolen_record.secondary_phone)
             %tr
               %td
                 Police Department

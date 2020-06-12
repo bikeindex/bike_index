@@ -125,12 +125,12 @@ RSpec.describe Organized::EmailsController, type: :request do
         end
       end
       context "partial_registration" do
-        let(:enabled_feature_slugs) { %w[customize_emails show_partial_registrations] }
+        let(:enabled_feature_slugs) { %w[customize_emails show_partial_registrations graduated_notifications] }
         it "renders" do
           get "#{base_url}/partial_registration"
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/partial_registration")
-          expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration])
+          expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
     end

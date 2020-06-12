@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-  include Phonifyerable
   include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
   include Geocodeable
@@ -284,7 +283,7 @@ class User < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.phone = Phonifyer.phonify(phone) if phone
+    self.phone = Phonifyer.phonify(phone)
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?

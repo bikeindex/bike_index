@@ -22,7 +22,7 @@
   .form-group.row
     = f.label :phone, class: "form-well-label"
     .form-well-input
-      = f.text_field :phone, value: Phonifyer.display(@user.phone), class: "form-control"
+      = f.text_field :phone, value: phone_display(@user.phone), class: "form-control"
 
   .related-fields
     .form-group.row.fancy-select.unfancy
