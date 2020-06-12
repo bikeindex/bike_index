@@ -169,9 +169,9 @@ module ApplicationHelper
 
   def phone_link(phone, html_options = {})
     return "" if phone.blank?
-    # Switch extension to be pause, remove whitespace
-    phone_url = Phonifyer.phonify(phone).gsub("x", ";").gsub(/\s+/, "")
-    link_to(phone_display(phone), "tel:#{phone_url}", html_options)
+    phone_d = phone_display(phone)
+    # Switch extension to be pause in link
+    link_to(phone_d, "tel:#{phone_d.gsub("x", ";")}", html_options)
   end
 
   def twitterable(user)
