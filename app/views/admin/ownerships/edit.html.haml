@@ -55,6 +55,11 @@
           = @bike.owner.email
       %tr
         %td
+          Send Email
+        %td
+          = @ownership.send_email
+      %tr
+        %td
           Cached Data
         %td
           = @bike.cached_data
