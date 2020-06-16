@@ -1,6 +1,5 @@
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
-  include Phonifyerable
   include Geocodeable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
@@ -166,39 +165,16 @@ class StolenRecord < ApplicationRecord
   end
 
   def set_calculated_attributes
-    set_phone
+    self.phone = Phonifyer.phonify(phone)
+    self.secondary_phone = Phonifyer.phonify(secondary_phone)
     fix_date
     self.street = nil unless street.present? # Make it easier to find blank addresses
-    titleize_city
+    if city.present?
+      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
+    end
     update_tsved_at
     @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.recovery_display_status = calculated_recovery_display_status
-  end
-
-  def set_phone
-    self.phone = Phonifyer.phonify(phone) if phone
-    self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
-  end
-
-  def fix_date
-    year = date_stolen.year
-    if date_stolen.year < (Time.current - 100.years).year
-      decade = year.to_s.chars.last(2).join("")
-      corrected = date_stolen.change(year: "20#{decade}".to_i)
-      self.date_stolen = corrected
-    end
-    if date_stolen > Time.current + 2.days
-      corrected = date_stolen.change(year: Time.current.year - 1)
-      self.date_stolen = corrected
-    end
-  end
-
-  def titleize_city
-    if city.present?
-      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "")
-      self.city = city.strip.titleize
-    end
-    true
   end
 
   def update_tsved_at
@@ -330,5 +306,21 @@ class StolenRecord < ApplicationRecord
 
     EmailTheftAlertNotificationWorker
       .perform_async(theft_alerts.last.id, :recovered)
+  end
+
+  private
+
+  def fix_date
+    self.date_stolen ||= Time.current
+    year = date_stolen.year
+    if date_stolen.year < (Time.current - 100.years).year
+      decade = year.to_s.chars.last(2).join("")
+      corrected = date_stolen.change(year: "20#{decade}".to_i)
+      self.date_stolen = corrected
+    end
+    if date_stolen > Time.current + 2.days
+      corrected = date_stolen.change(year: Time.current.year - 1)
+      self.date_stolen = corrected
+    end
   end
 end

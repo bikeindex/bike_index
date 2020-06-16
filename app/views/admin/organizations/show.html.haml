@@ -203,7 +203,7 @@
             %td Templates
             %td
               - if @organization.mail_snippets.any?
-                = @organization.mail_snippets.pluck(:name).to_sentence
+                = @organization.mail_snippets.pluck(:kind).to_sentence
               - else
                 %small.less-strong
                   None
@@ -362,15 +362,21 @@
       .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
-            - if !location.shown && @organization.allowed_show?
-              %h2
+            - if location.impound_location
+              %strong
+                - if location.default_impound_location
+                  %span.text-info Default
+                Impound location
+
+            - elsif !location.shown && @organization.allowed_show?
+              %strong.text-warning
                 Location is not visible! Try updating the organization
             %p
               Name:
               = location.name
             %p
               Phone:
-              = display_phone(location.phone)
+              = phone_display(location.phone)
             %p
               Address:
               = location.address

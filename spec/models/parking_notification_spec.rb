@@ -143,6 +143,29 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "subject" do
+    let(:bike) { FactoryBot.create(:bike, cycle_type: 'pedi-cab') }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike) }
+    let(:organization) { parking_notification.organization }
+    it "is default with snippet" do
+      expect(parking_notification.mail_snippet).to be_blank
+      expect(parking_notification.subject).to eq "Your pedi cab (rickshaw) is parked incorrectly"
+    end
+    context "with mail_snippet" do
+      let!(:mail_snippet) do
+        FactoryBot.create(:mail_snippet,
+                          kind: "parked_incorrectly_notification",
+                          subject: "Some crazy subject",
+                          organization: organization,
+                          is_enabled: true)
+      end
+      it "returns the mail_snippet" do
+        expect(parking_notification.mail_snippet).to eq mail_snippet
+        expect(parking_notification.subject).to eq "Some crazy subject"
+      end
+    end
+  end
+
   describe "address" do
     # Copies StolenRecord, needs to be moved to a concern
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }

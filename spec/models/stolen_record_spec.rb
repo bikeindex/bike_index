@@ -262,35 +262,24 @@ RSpec.describe StolenRecord, type: :model do
   end
 
   describe "set_phone" do
+    let(:stolen_record) { StolenRecord.new(phone: "000/000/0000", secondary_phone: "+220000000000 extension: 000") }
     it "it should set_phone" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.phone = "000/000/0000"
-      stolen_record.secondary_phone = "000/000/0000"
-      stolen_record.set_phone
+      stolen_record.set_calculated_attributes
       expect(stolen_record.phone).to eq("0000000000")
-      expect(stolen_record.secondary_phone).to eq("0000000000")
-    end
-  end
-
-  describe "phone_display" do # from phoneifyerable
-    it "has phone_display" do
-      stolen_record = StolenRecord.new(phone: "272 222-22222")
-      expect(stolen_record.phone_display).to eq "272.222.22222"
+      expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
     end
   end
 
   describe "titleize_city" do
     it "it should titleize_city" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.city = "INDIANAPOLIS, IN USA"
-      stolen_record.titleize_city
+      stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
+      stolen_record.set_calculated_attributes
       expect(stolen_record.city).to eq("Indianapolis")
     end
 
     it "it shouldn't remove other things" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.city = "Georgian la"
-      stolen_record.titleize_city
+      stolen_record = StolenRecord.new(city: "Georgian la")
+      stolen_record.set_calculated_attributes
       expect(stolen_record.city).to eq("Georgian La")
     end
   end
@@ -307,21 +296,21 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record = StolenRecord.new
       stupid_year = Date.strptime("07-22-0014", "%m-%d-%Y")
       stolen_record.date_stolen = stupid_year
-      stolen_record.fix_date
+      stolen_record.send("fix_date")
       expect(stolen_record.date_stolen.year).to eq(2014)
     end
     it "it should set the year to not last century" do
       stolen_record = StolenRecord.new
       wrong_century = Date.strptime("07-22-1913", "%m-%d-%Y")
       stolen_record.date_stolen = wrong_century
-      stolen_record.fix_date
+      stolen_record.send("fix_date")
       expect(stolen_record.date_stolen.year).to eq(2013)
     end
     it "it should set the year to the past year if the date hasn't happened yet" do
       stolen_record = FactoryBot.create(:stolen_record)
       next_year = (Time.current + 2.months)
       stolen_record.date_stolen = next_year
-      stolen_record.fix_date
+      stolen_record.send("fix_date")
       expect(stolen_record.date_stolen.year).to eq(Time.current.year - 1)
     end
   end

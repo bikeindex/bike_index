@@ -295,11 +295,8 @@ RSpec.describe User, type: :model do
     let(:user) { FactoryBot.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
     before(:each) { user.set_calculated_attributes }
 
-    it "strips the non-digit numbers from the phone input" do
-      expect(user.phone).to eq("7738383887")
-    end
-
-    it "normalizes the email" do
+    it "strips the non-digit numbers from the phone input and normalizes the email" do
+      expect(user.phone).to eq("77383ddp+83887")
       expect(user.email).to eq("something@example.com")
     end
   end

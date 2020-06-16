@@ -62,8 +62,7 @@
                 %td.td-title
                   = t(".owner_phone")
                 %td
-                  %a.phone-number-link{ href: "tel:#{@stolen_record.phone}" }
-                    = display_phone(@stolen_record.phone)
+                  = phone_link(@stolen_record.phone, class: "phone-number-link")
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title

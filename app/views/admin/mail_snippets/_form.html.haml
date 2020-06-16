@@ -1,17 +1,20 @@
 - if @mail_snippet.errors.any?
-  = render partial: "/shared/errors", locals: { name: "Payment", obj: @mail_snippet }
-
+  = render partial: "/shared/errors", locals: { name: "Mail Snippet", obj: @mail_snippet }
 
 .form-group
-  = f.label :name
-  = f.text_field :name, :required =>true, class: "form-control w-25"
+  = f.label :kind
+  = f.select :kind, MailSnippet.kinds.map { |k| [k.humanize, k] }, { required: true }, class: "form-control"
 .form-group
   = f.label :address
-  = f.text_field :address, :required =>true, class: "form-control w-25"
+  = f.text_field :address, required: true, class: "form-control"
 .form-group
   = f.label :proximity_radius
-  = f.number_field :proximity_radius, :required =>true, class: "form-control w-25"
+  = f.number_field :proximity_radius, required: true, class: "form-control"
+
+.form-group.fancy-select.unfancy
+  = f.label :organization_id
+  = f.collection_select(:organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
 
 .form-group
   = f.label :body
-  = f.text_area :body, placeholder: "Body", class: "form-control w-25"
+  = f.text_area :body, placeholder: "Body", class: "form-control"

@@ -6,7 +6,7 @@ RSpec.describe Location, type: :model do
   describe "set_calculated_attributes" do
     it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")
-      expect(location.phone).to eq("7738383887")
+      expect(location.phone).to eq("77383ddp+83887")
     end
   end
 

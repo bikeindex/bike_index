@@ -12,22 +12,27 @@
     %th Last updated
     %th Body
   %tbody
-    - MailSnippet.organization_message_kinds.each do |kind|
-      - mail_snippet = current_organization.mail_snippets.where(kind: kind).first
+    - viewable_email_kinds.each do |kind|
+      - if kind == "finished_registration"
+        - mail_snippets = current_organization.mail_snippets.where(kind: MailSnippet.finished_registration_kinds)
+      - elsif kind == "partial_registration"
+        - mail_snippets = current_organization.mail_snippets.where(kind: "partial")
+      - else
+        - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr
         %td
           = link_to kind.humanize, edit_organization_email_path(kind, organization_id: current_organization.to_param)
         %td
-          = check_mark if mail_snippet.present? && mail_snippet.is_enabled
+          = check_mark if mail_snippets.any? && mail_snippets.enabled.any?
         %td
-          - if mail_snippet.present?
+          - if mail_snippets.any?
             %span.convertTime
-              = l(mail_snippet.created_at, format: :convert_time)
+              = l(mail_snippets.first.created_at, format: :convert_time)
         %td
-          - if mail_snippet.present?
+          - if mail_snippets.any?
             %span.convertTime
-              = l(mail_snippet.updated_at, format: :convert_time)
+              = l(mail_snippets.last.updated_at, format: :convert_time)
         %td
-          - if mail_snippet.present?
+          - if mail_snippets.any?
             %small
-              = truncate(mail_snippet.body, length: 100)
+              = truncate(mail_snippets.first.body, length: 100)

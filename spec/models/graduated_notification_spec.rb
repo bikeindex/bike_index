@@ -106,6 +106,28 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
+  describe "subject" do
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
+    let(:organization) { graduated_notification.organization }
+    it "is default with snippet" do
+      expect(graduated_notification.mail_snippet).to be_blank
+      expect(graduated_notification.subject).to eq "Renew your bike registration with #{organization&.short_name}"
+    end
+    context "with mail_snippet" do
+      let!(:mail_snippet) do
+        FactoryBot.create(:mail_snippet,
+                          kind: "graduated_notification",
+                          subject: "Another crazy subject",
+                          organization: organization,
+                          is_enabled: true)
+      end
+      it "returns the mail_snippet" do
+        expect(graduated_notification.mail_snippet).to eq mail_snippet
+        expect(graduated_notification.subject).to eq "Another crazy subject"
+      end
+    end
+  end
+
   describe "bikes_to_notify" do
     let(:graduated_notification_interval) { 2.years }
     let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - 5.years) }
