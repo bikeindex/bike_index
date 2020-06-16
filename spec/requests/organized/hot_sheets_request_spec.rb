@@ -22,15 +22,19 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
+        expect(assigns(:hot_sheet).current?).to be_truthy
+        expect(assigns(:current)).to be_truthy
+        expect(assigns(:day)).to be_blank
       end
       context "current hot_sheet" do
         let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization) }
         it "renders" do
-          get base_url
+          get "#{base_url}?day=#{Time.current.to_date}"
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
           expect(assigns(:hot_sheet)).to eq(hot_sheet)
-          expect(assigns(:today)).to be_truthy
+          expect(assigns(:current)).to be_falsey
+          expect(assigns(:day)).to eq Time.current.to_date
         end
       end
     end
@@ -80,15 +84,16 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           put base_url, params: {
                           hot_sheet_configuration: {
                             is_enabled: true,
-                            send_hour: "11"
-                            timezone_str: "(GMT-06:00) Central America"
+                            send_hour: "25",
+                            timezone_str: "(GMT-06:00) Central America",
                           },
                         }
         end.to change(HotSheetConfiguration, :count).by 1
         expect(flash[:success]).to be_present
         current_organization.reload
+        expect(current_organization.hot_sheet_enabled?).to be_truthy
         expect(current_organization.hot_sheet_configuration).to be_present
-        expect(current_organization.hot_sheet_configuration.enabled?).to be_truthy
+        expect(current_organization.hot_sheet_configuration.send_hour).to eq 0
 
         expect(ProcessHotSheetWorker.jobs.count).to eq 1
         expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
@@ -107,7 +112,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           expect(current_organization.hot_sheet_configuration).to be_present
-          expect(current_organization.hot_sheet_configuration.enabled?).to be_falsey
+          expect(current_organization.hot_sheet_enabled?).to be_falsey
 
           expect(ProcessHotSheetWorker.jobs.count).to eq 1
           expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])

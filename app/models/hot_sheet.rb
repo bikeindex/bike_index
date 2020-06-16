@@ -29,11 +29,6 @@ class HotSheet < ApplicationRecord
   # This may become a configurable option
   def max_bikes; 10 end
 
-  # # This will use the timezone sometime
-  # def sheet_date
-  #   created_at.in_time_zone(timezone).to_date
-  # end
-
   def next_sheet
     return nil if current?
     HotSheet.where(organization_id: organization_id, sheet_date: sheet_date + 1.day).first

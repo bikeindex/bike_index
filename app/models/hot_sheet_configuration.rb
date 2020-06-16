@@ -36,18 +36,15 @@ class HotSheetConfiguration < ApplicationRecord
 
   def send_hour=(val)
     hour = val.to_i
-    if hour > 0 && hour < 24
-      self.send_seconds_past_midnight = hour * 3600
-    else
-      errors(:base, "Invalid time - must be between 0 and 24")
-    end
+    hour = 0 unless hour >= 0 && hour < 24
+    self.send_seconds_past_midnight = hour * 3600
   end
 
   def set_default_attributes
     unless search_radius_miles.present? && search_radius_miles > 0
       self.search_radius_miles = (organization&.search_radius || 50)
     end
-    self.send_seconds_past_midnight ||= 21600 # 6am
+    self.send_seconds_past_midnight ||= 0 # midnight
   end
 
   def ensure_location_if_enabled
