@@ -20,14 +20,16 @@ class HotSheetConfiguration < ApplicationRecord
 
   def timezone; TimeParser.parse_timezone(timezone_str) end
 
-  def send_at_today
-    Time.current.in_time_zone(timezone).beginning_of_day + send_seconds_past_midnight
+  def time_in_zone; Time.current.in_time_zone(timezone) end
+
+  def send_today_at
+    time_in_zone.beginning_of_day + send_seconds_past_midnight
   end
 
-  def create_today_now?
+  def send_today_now?
     return false if disabled?
-    return false if hot_sheets.where("created_at > ?", Time.current.beginning_of_day).email_success.any?
-    Time.current > send_at_today
+    return false if hot_sheets.where(sheet_date: time_in_zone.to_date).email_success.any?
+    time_in_zone > send_today_at
   end
 
   def send_hour; send_seconds_past_midnight/3600 end

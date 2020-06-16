@@ -20,7 +20,8 @@
               Generates at
             %td
               %span.convertTime.preciseTime
-                = l(@hot_sheet_configuration.send_at_today, format: :convert_time)
+                = l(@hot_sheet_configuration.send_today_at, format: :convert_time)
+              %span.convertTimezone
 
 - unless current_organization.search_coordinates.reject(&:blank?).count == 2
   .alert.alert-warning

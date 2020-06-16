@@ -23,7 +23,7 @@ class ProcessHotSheetWorker < ScheduledWorker
 
   def enqueue_workers
     organizations.each do |organization|
-      next unless organization.hot_sheet_configuration&.create_today_now?
+      next unless organization.hot_sheet_configuration&.send_today_now?
       self.class.perform_async(organization.id)
     end
   end

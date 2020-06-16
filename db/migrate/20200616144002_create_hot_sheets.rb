@@ -5,6 +5,7 @@ class CreateHotSheets < ActiveRecord::Migration[5.2]
       t.jsonb :stolen_record_ids
       t.jsonb :recipient_ids
       t.string :delivery_status
+      t.date :sheet_date
 
       t.timestamps
     end

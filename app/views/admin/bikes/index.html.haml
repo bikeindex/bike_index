@@ -79,7 +79,7 @@
     are claimed
 
 .row.mt-4
-  .col-md-5
+  .col-md-7
     %p
       %strong
         = number_with_delimiter(available_bikes.count)
@@ -94,7 +94,7 @@
             = link_to current_organization.name, admin_organization_path(current_organization.to_param)
             %small.less-strong
               - if params[:search_only_creation_organization].present?
-                viewing only bikes created by organization
+                viewing only bikes created by
                 = link_to "view all associated bikes", admin_bikes_path(sortable_search_params.merge(search_only_creation_organization: nil))
               - else
                 viewing all associated bikes -
@@ -118,7 +118,7 @@
               No manufacturer found for
               %code
                 = params[:search_manufacturer_id]
-  .col-md-7
+  .col-md-5
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, params[:sort]
       = hidden_field_tag :direction, params[:direction]

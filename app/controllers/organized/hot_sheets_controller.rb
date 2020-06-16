@@ -5,8 +5,8 @@ module Organized
     before_action :set_current_hot_sheet_configuration, except: [:show]
 
     def show
-      @day = (params[:day].present? ? params[:day] : Time.current).to_date
-      @today = @day == Time.current.to_date
+      @current = params[:day].blank?
+      @day = @current ? nil : (params[:day]).to_date
       @hot_sheet = HotSheet.for(current_organization, @day)
     end
 

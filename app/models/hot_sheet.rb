@@ -5,11 +5,16 @@ class HotSheet < ApplicationRecord
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 
-  def self.for(organization_or_id, date_or_time)
+  def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
-    date = date_or_time.to_date
-    where(organization_id: org_id).where(created_at: date.beginning_of_day..date.end_of_day).first
+    if date.present?
+      where(organization_id: org_id, sheet_date: date).first
+    else
+      new(organization_id: org_id)
+    end
   end
+
+  def current?; sheet_date.blank? end
 
   def hot_sheet_configuration; organization.hot_sheet_configuration end
 
@@ -19,14 +24,24 @@ class HotSheet < ApplicationRecord
 
   def email_success?; delivery_status == "email_success" end
 
-  def subject; "Hot Sheet #{sheet_date.strftime("%A, %b %-d")}" end
+  def subject; "Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
 
   # This may become a configurable option
   def max_bikes; 10 end
 
-  # This will use the timezone sometime
-  def sheet_date
-    created_at.in_time_zone(timezone).to_date
+  # # This will use the timezone sometime
+  # def sheet_date
+  #   created_at.in_time_zone(timezone).to_date
+  # end
+
+  def next_sheet
+    return nil if current?
+    HotSheet.where(organization_id: organization_id, sheet_date: sheet_date + 1.day).first
+  end
+
+  def previous_sheet
+    prev_date = current? ? Time.current.to_date : (sheet_date - 1.day)
+    HotSheet.where(organization_id: organization_id, sheet_date: prev_date).first
   end
 
   def fetch_stolen_records

@@ -1,11 +1,14 @@
 class Membership < ApplicationRecord
   MEMBERSHIP_TYPES = %w(admin member).freeze
+  HOT_SHEET_NOTIFICATION_ENUM = { no_notification: 0, daily_notification: 1 }.freeze
 
   acts_as_paranoid
 
   belongs_to :user
   belongs_to :organization
   belongs_to :sender, class_name: "User"
+
+  enum hot_sheet_notification: HOT_SHEET_NOTIFICATION_ENUM
 
   validates_presence_of :role, :organization_id, :invited_email
 

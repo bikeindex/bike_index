@@ -86,7 +86,6 @@ class OrganizedMailer < ApplicationMailer
   end
 
   def hot_sheet(hot_sheet)
-    @hot_sheet(hot_sheet)
     @hot_sheet = hot_sheet
     @organization = @hot_sheet.organization
 
