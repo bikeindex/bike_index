@@ -4,6 +4,8 @@
   %strong
     = @organization.short_name
   = @hot_sheet.subject
+  %em.small{ style: "font-size: 16px;" }
+    = link_to "on Index", organization_hot_sheet_url(organization_id: @organization.to_param, day: @hot_sheet.sheet_date)
 
 - @stolen_records.each do |stolen_record|
   - bike = stolen_record.bike

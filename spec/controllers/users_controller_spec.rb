@@ -755,6 +755,44 @@ RSpec.describe UsersController, type: :controller do
       expect(user.notification_unstolen).to be_falsey
     end
 
+    context "organization with hotsheet" do
+      let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:membership) { user.memberships.first }
+      it "updates hotsheet" do
+        set_current_user(user)
+        expect(membership.notification_never?).to be_truthy
+        request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
+        patch :update, params: { id: user.username, hot_sheet_notifications: { organization.id.to_s => true } }
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
+        membership.reload
+        expect(membership.notification_daily?).to be_truthy
+      end
+      context "with other parameters too" do
+        it "updates all the parameters" do
+          membership.update(hot_sheet_notification: "notification_daily")
+          set_current_user(user)
+          put :update, params: {
+                  id: user.username,
+                  hot_sheet_notifications: { organization.id.to_s => "0" },
+                  user: {
+                    notification_newsletters: "true",
+                    notification_unstolen: "false"
+                  }
+          }
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to my_account_url
+          membership.reload
+          expect(membership.notification_never?).to be_truthy
+          user.reload
+          expect(user.notification_newsletters).to be_truthy
+          expect(user.notification_unstolen).to be_falsey
+        end
+      end
+    end
+
     it "updates the vendor terms of service and emailable" do
       user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
       expect(user.notification_newsletters).to be_falsey

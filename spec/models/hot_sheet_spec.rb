@@ -40,8 +40,8 @@ RSpec.describe HotSheet, type: :model do
 
   describe "fetch_recipients" do
     let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-    let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "daily_notification") }
-    let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "no_notification") }
+    let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "notification_daily") }
+    let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "notification_never") }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     it "finds the recipients" do
       expect(organization.memberships.pluck(:id)).to match_array([membership.id, membership2.id])

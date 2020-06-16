@@ -194,4 +194,10 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.subject).to eq graduated_notification.subject
     end
   end
+
+  describe "hot_sheet_notification" do
+    it "renders email" do
+      fail
+    end
+  end
 end

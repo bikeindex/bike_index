@@ -1,0 +1,54 @@
+// Ambassador dash styles
+.hot-sheet-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  li {
+    width: 100%;
+    margin: 1rem 0 0;
+    border: 1px solid #ccc;
+  }
+  .bike-display {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+  .bike-image {
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%;
+    img {
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+      height: auto;
+    }
+    &.placeholder {
+      background: #ddd;
+
+      a {
+        padding: $vertical-height 0;
+      }
+
+      img {
+        width: 70%;
+      }
+    }
+  }
+  .bike-info {
+    flex: 0 0 66.6666666666%;
+    max-width: 66.6666666666%;
+    padding: 6px 12px;
+  }
+  .bike-main-info {
+    font-size: 125%;
+  }
+}
+
+// Basically like alert, but the text isn't colored by default
+.hot-sheet-notification-panel {
+  border: 1px solid #3498db;
+  margin-top: 30px;
+  h3 {
+    color: #3498db;
+  }
+}

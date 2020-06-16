@@ -1,6 +1,6 @@
 class Membership < ApplicationRecord
   MEMBERSHIP_TYPES = %w(admin member).freeze
-  HOT_SHEET_NOTIFICATION_ENUM = { no_notification: 0, daily_notification: 1 }.freeze
+  HOT_SHEET_NOTIFICATION_ENUM = { notification_never: 0, notification_daily: 1 }.freeze
 
   acts_as_paranoid
 
