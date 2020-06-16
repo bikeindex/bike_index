@@ -13,23 +13,23 @@
   .hot-sheet-header
     %h1
       #{current_organization.short_name} Hot Sheet
-    .row
-      .col-xs-1.col-md-2
-        - unless @current
-          = link_to "<", "#"
-      .col-xs-10.col-md-8
-        %h3
-          - if @current
-            Current
-          - elsif @hot_sheet.present?
-            @day
-          - else
-            %h3.uncap
-              No hotsheet for #{@day}
-      .col-xs-1.col-md-2
+    %h3.uncap.mb-0.d-inline-block
+      %span.switch-day-link
         - unless @next.blank?
-          = link_to ">", "#"
-  HOT SHEEEET
+          = link_to "&lt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @next.sheet_date)
+      %span.sheet-day-text
+        - if @current
+          Current
+        - else
+          - unless @hot_sheet.present?
+            No hotsheet for
+          = @day.strftime("%A, %b %-d")
+      %span.switch-day-link
+        - unless @previous.blank?
+          = link_to "&gt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @previous.sheet_date)
 
+
+  -# if current_user.member_of?(current_organization, no_superuser_override: true)
   %alert.alert-info
-    %h4
+    %h4 #{current_organization.short_name} Hot Sheet Notification preferences
+

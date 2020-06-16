@@ -8,9 +8,9 @@ class ProcessHotSheetWorker < ScheduledWorker
 
   def perform(org_id = nil)
     return enqueue_workers unless org_id.present?
-    hot_sheet = HotSheet.for(org_id, Time.current)
+    hot_sheet = HotSheet.for(org_id, Time.current.to_date)
     return hot_sheet if hot_sheet&.email_success?
-    hot_sheet ||= HotSheet.create(organization_id: org_id)
+    hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
     hot_sheet.fetch_stolen_records
     hot_sheet.fetch_recipients
     hot_sheet.deliver_email

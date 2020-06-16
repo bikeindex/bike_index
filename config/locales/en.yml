@@ -4820,10 +4820,10 @@ en:
     email_bike_box:
       color: color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
-      date: 'Date:'
       found: 'Found:'
       make: 'Make:'
       serial: 'Serial:'
+      stolen_at: 'Stolen at:'
       stolen_from: 'Stolen from:'
     errors:
       error: error
@@ -5155,7 +5155,7 @@ en:
       convert_time: "%FT%T%z"
       dotted: "%Y.%-m.%-d"
       no_day_with_year: "%B %d %Y"
-      short_with_hour: "%m.%d.%y - %l%P"
+      short_with_hour: "%l%P - %m.%d.%y"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%A, %B %d"
   user_embeds:

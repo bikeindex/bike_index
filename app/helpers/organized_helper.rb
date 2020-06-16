@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OrganizedHelper
-  def organized_bike_text(bike = nil)
+  def organized_bike_text(bike = nil, skip_creation: false)
     return nil unless bike.present?
     content_tag(:span) do
       concat(bike.frame_colors.to_sentence)
@@ -20,7 +20,7 @@ module OrganizedHelper
         # If it's an unregistered bike, don't display where it was created
         # ... since it only could've been created in one place
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
-      elsif bike.creation_description.present?
+      elsif !skip_creation && bike.creation_description.present?
         concat(", ")
         concat(content_tag(:small, bike.creation_description, class: "less-strong"))
       end

@@ -1,7 +1,7 @@
 class HotSheet < ApplicationRecord
   belongs_to :organization
 
-  validates_presence_of :organization_id
+  validates_presence_of :organization_id, :sheet_date
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 
@@ -41,15 +41,20 @@ class HotSheet < ApplicationRecord
 
   def fetch_stolen_records
     if stolen_record_ids.is_a?(Array)
-      return StolenRecord.unscoped.where(id: stolen_record_ids).includes(:bike)
+      stolen_records = StolenRecord.unscoped.where(id: stolen_record_ids)
+                                   .reorder(date_stolen: :desc)
+    else
+      stolen_records = calculated_stolen_records
+      update(stolen_record_ids: stolen_records.pluck(:id))
     end
-    stolen_records = calculated_stolen_records
-    update(stolen_record_ids: stolen_records.pluck(:id))
-    stolen_records
+    stolen_records.includes(:bike)
   end
 
   def fetch_recipients
-    fail # not yet implemented
+    unless recipient_ids.is_a?(Array)
+      update(recipient_ids: organization.memberships.daily_notification.pluck(:user_id))
+    end
+    organization.users.where(id: recipient_ids)
   end
 
   def deliver_email
@@ -61,6 +66,8 @@ class HotSheet < ApplicationRecord
   private
 
   def calculated_stolen_records
-    StolenRecord.current.within_bounding_box(bounding_box).reorder(date_stolen: :desc)
+    StolenRecord.current.within_bounding_box(bounding_box)
+                .reorder(date_stolen: :desc)
+                .limit(max_bikes)
   end
 end

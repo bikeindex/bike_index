@@ -9,6 +9,7 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "renders" do
       expect(organized_bike_text).to be_nil
       expect(organized_bike_text(bike)).to eq target_text
+      expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end
     context "unregistered" do
       let(:target_text) do

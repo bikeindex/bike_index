@@ -223,14 +223,16 @@ class User < ApplicationRecord
     m && m.role
   end
 
-  def member_of?(organization)
+  def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    Membership.claimed.where(user_id: id, organization_id: organization.id).present? || superuser?
+    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).present?
+    superuser? && !no_superuser_override
   end
 
-  def admin_of?(organization)
+  def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    Membership.claimed.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
+    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).present?
+    superuser? && !no_superuser_override
   end
 
   def has_membership?

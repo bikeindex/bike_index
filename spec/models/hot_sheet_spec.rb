@@ -38,6 +38,27 @@ RSpec.describe HotSheet, type: :model do
     end
   end
 
+  describe "fetch_recipients" do
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+    let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "daily_notification") }
+    let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization, hot_sheet_notification: "no_notification") }
+    let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
+    it "finds the recipients" do
+      expect(organization.memberships.pluck(:id)).to match_array([membership.id, membership2.id])
+      expect(hot_sheet.recipient_ids).to be_nil
+      expect(hot_sheet.fetch_recipients.pluck(:id)).to eq([membership.user_id])
+      hot_sheet.reload
+      expect(hot_sheet.recipient_ids).to eq([membership.user_id])
+    end
+    context "with recipient_ids set" do
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [membership.user_id, membership2.user_id]) }
+      it "returns the set recipients" do
+        hot_sheet.reload
+        expect(hot_sheet.fetch_recipients.pluck(:id)).to match_array([membership.user_id, membership2.user_id])
+      end
+    end
+  end
+
   describe "for" do
     let!(:hot_sheet1) { FactoryBot.create(:hot_sheet, sheet_date: Time.current - 2.days) }
     let(:organization) { hot_sheet1.organization }
