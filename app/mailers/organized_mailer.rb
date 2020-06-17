@@ -91,7 +91,7 @@ class OrganizedMailer < ApplicationMailer
     @hot_sheet = hot_sheet
     @organization = @hot_sheet.organization
     @stolen_records = @hot_sheet.fetch_stolen_records
-    # enable passing in email to make testing easier, make it an array
+    # Enable passing in email to make testing easier, ensure the emails are an array
     recipient_emails = Array(override_emails || @hot_sheet.recipient_emails)
     # Ensure we only email people once
     if recipient_emails.include?(reply_to)
@@ -100,6 +100,7 @@ class OrganizedMailer < ApplicationMailer
     else
       direct_to = recipient_emails.shift
     end
+
     mail(reply_to: reply_to,
          to: direct_to,
          bcc: recipient_emails,
