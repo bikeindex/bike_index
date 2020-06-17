@@ -42,7 +42,8 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
       expect(ActionMailer::Base.deliveries.count).to eq 1
       email = ActionMailer::Base.deliveries.last
       expect(email.subject).to eq hot_sheet.subject
-      expect(email.bcc).to eq([membership.user.email])
+      expect(email.to).to eq([membership.user.email])
+      expect(email.bcc).to eq([])
     end
   end
 end
