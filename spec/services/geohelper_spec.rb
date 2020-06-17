@@ -62,6 +62,11 @@ RSpec.describe Geohelper do
           expect(Geohelper.formatted_address_hash(address_str)).to eq target.as_json
         end
       end
+      context "blank" do
+        it "returns empty" do
+          expect(Geohelper.formatted_address_hash(nil)).to eq({})
+        end
+      end
     end
 
     # This is an internal method, and probably shouldn't be called from elsewhere in the code

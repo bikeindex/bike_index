@@ -313,12 +313,25 @@ a {
     float: left;
     font-size: 1.3em;
     margin: -0.6em 0 0.5em;
+
+    // Hovering color overrides disabled, re-overide here :(
+    &[disabled]:hover {
+      background: #cacaca !important;
+    }
   }
 
   .what-you-register {
     color: $grayLight;
     display: inline-block;
     margin: 0 0.5em;
+  }
+
+  .please-wait-text {
+    clear: both;
+    display: block;
+    display: none;
+    padding-bottom: 0.5rem;
+    font-style: italic;
   }
 }
 

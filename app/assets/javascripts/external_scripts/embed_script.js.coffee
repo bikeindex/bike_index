@@ -131,7 +131,7 @@ window.fillInParkingLocation = (position) ->
   $(".parkingLocation-latitude").val(position.coords.latitude)
   $(".parkingLocation-longitude").val(position.coords.longitude)
   $(".parkingLocation-accuracy").val(position.coords.accuracy)
-  $(".submit-registration input").attr("disabled", false)
+  updateSubmitButtonDisabled(false)
   $(".hideOnLocationFind").slideUp()
   $(".showOnLocationFind").slideDown()
 
@@ -155,9 +155,9 @@ showOrHideEnteredAddress = ->
     $(".fancy-select.unfancy select").selectize
       create: false
     $(".fancy-select.unfancy").removeClass("unfancy")
-    $(".submit-registration input").attr("disabled", false)
+    updateSubmitButtonDisabled(false)
   else
-    $(".submit-registration input").attr("disabled", true)
+    updateSubmitButtonDisabled(true)
     $addressFields.slideUp().removeClass('unhidden')
     $(".waitingOnLocationText").slideDown()
     $(".ifManualRequired input").attr("required", false)
@@ -185,6 +185,14 @@ initializeStateHiding = ->
     else
       $other_field.slideUp "fast", ->
         $other_field.removeClass("unhidden initially-unhidden").addClass("currently-hidden")
+
+updateSubmitButtonDisabled = (is_disabled) ->
+  $(".submit-registration input").attr("disabled", is_disabled)
+  if is_disabled
+    $(".submit-registration .please-wait-text").slideDown("fast")
+  else
+    $(".submit-registration .please-wait-text").slideUp("fast")
+
 
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
@@ -234,6 +242,7 @@ $(document).ready ->
 
     # mark the form as processed, so we will not process it again
     $this.data().isSubmitted = true
+    updateSubmitButtonDisabled(true)
     true
 
   new window.CheckEmail('#bike_owner_email')
