@@ -94,7 +94,7 @@ class OrganizedMailer < ApplicationMailer
 
     mail(reply_to: reply_to,
          to: reply_to,
-         bcc: @hot_sheet.fetch_recipients.pluck(:email),
+         bcc: @hot_sheet.recipient_emails,
          subject: @hot_sheet.subject)
   end
 

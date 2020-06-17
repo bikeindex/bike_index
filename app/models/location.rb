@@ -41,11 +41,12 @@ class Location < ApplicationRecord
     # If this wasn't set by the organization callback (which uses skip_update: true)
     # And this location was updated with default_impound_location, ensure there aren't any others
     if default_impound_location
+      # Updating columns, no need to skip_update
       other_organization_locations.update_all(default_impound_location: false)
     end
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
-    organization&.reload&.update(updated_at: Time.current, skip_update: true)
+    organization&.reload&.update(updated_at: Time.current)
   end
 
   def display_name

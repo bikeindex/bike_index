@@ -16,15 +16,17 @@ class HotSheetConfiguration < ApplicationRecord
 
   def disabled?; !enabled? end
 
+  def current_recipients; organization.users.where(id: current_recipient_ids) end
+
+  def current_recipient_ids; organization.memberships.claimed.notification_daily.pluck(:user_id) end
+
   def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles) end
 
   def timezone; TimeParser.parse_timezone(timezone_str) end
 
   def time_in_zone; Time.current.in_time_zone(timezone) end
 
-  def send_today_at
-    time_in_zone.beginning_of_day + send_seconds_past_midnight
-  end
+  def send_today_at; time_in_zone.beginning_of_day + send_seconds_past_midnight end
 
   def send_today_now?
     return false if disabled?

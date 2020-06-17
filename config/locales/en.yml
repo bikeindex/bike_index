@@ -5197,11 +5197,13 @@ en:
       choose_language: Choose language
       city: City
       confirmed_emails: Confirmed emails
+      daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: >-
         Give us permission to contact you if we believe your bike has been stolen,
         <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
+      hot_sheets: Hot Sheets
       make_primary_email: Make primary email
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}

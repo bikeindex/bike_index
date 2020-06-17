@@ -2505,6 +2505,10 @@ nl:
         ensure_access_to_graduated_notifications!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
             neem contact op met Bike Index support.
+      hot_sheets:
+        ensure_access_to_hot_sheet!:
+          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+            contact op met Bike Index support.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4157,6 +4161,8 @@ nl:
       impounded_bikes: In beslag genomen fietsen
       customize_emails: Pas e-mails aan
       graduated_notifications: Gegradueerde meldingen
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet configuratie
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4866,11 +4872,11 @@ nl:
     email_bike_box:
       color: Kleur
       color_may_be_incorrect: Kleur is mogelijk onjuist. Werk deze indien nodig bij!
-      date: 'Datum:'
       found: 'gevonden:'
       make: 'Maken:'
       serial: 'Serial:'
       stolen_from: 'Gestolen van:'
+      stolen_at: 'Gestolen bij:'
     faq:
       absolutely: Absoluut!
       add_a_stolen_bike_link: voeg uw gestolen fiets toe aan Bike Index!
@@ -5086,6 +5092,8 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       customize_emails: Pas e-mails aan
       graduated_notifications: Gegradueerde meldingen
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet-configuratie
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
@@ -5193,6 +5201,8 @@ nl:
       unconfirmed_emails: Niet-bevestigde e-mails
       zipcode: Postcode
       why_you_should_text: Lees waarom u zou moeten
+      daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
+      hot_sheets: Hot Sheets
     edit_sharing:
       additional_link: Aanvullende link
       choose_file: Kies bestand...

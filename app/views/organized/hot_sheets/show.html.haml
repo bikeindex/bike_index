@@ -40,44 +40,46 @@
           %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
           = form_for current_user, multipart: true do |f|
             %label
-              = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notify_daily?
+              = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notification_daily?
               Email daily #{current_organization.short_name} Hot Sheets to
               %em= current_user.email
             = submit_tag "update preferences", class: "btn btn-sm btn-success ml-2"
-  .row
-    .col-lg-8
-      %ul.hot-sheet-list
-        - @hot_sheet.fetch_stolen_records.each do |stolen_record|
-          %li
-            - bike = stolen_record.bike
-            - thumb_url = bike.thumb_path || bike.stock_photo_url
-            - bike_link = bike_url(bike, organization_id: @organization.to_param)
 
-            - unless thumb_url.present?
-              - thumbclass = 'placeholder'
-              - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+  - if @hot_sheet.present?
+    .row
+      .col-lg-8
+        %ul.hot-sheet-list
+          - @hot_sheet.fetch_stolen_records.each do |stolen_record|
+            %li
+              - bike = stolen_record.bike
+              - thumb_url = bike.thumb_path || bike.stock_photo_url
+              - bike_link = bike_url(bike, organization_id: @organization.to_param)
 
-            .bike-display
-              .bike-image{ class: thumbclass }
-                %a{ href:  bike_link }
-                  %img{ src: thumb_url }
-              .bike-info
-                %span.bike-main-info
-                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
-                %table.table-list.mb-0
-                  %tr
-                    %td Serial
-                    %td= bike.serial_display
+              - unless thumb_url.present?
+                - thumbclass = 'placeholder'
+                - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
 
-                  %tr
-                    %td
-                      %span.stolen-color Stolen at
-                    %td
-                      %span.convertTime.preciseTime
-                        = l stolen_record.date_stolen, format: :convert_time
+              .bike-display
+                .bike-image{ class: thumbclass }
+                  %a{ href:  bike_link }
+                    %img{ src: thumb_url }
+                .bike-info
+                  %span.bike-main-info
+                    = link_to organized_bike_text(bike, skip_creation: true), bike_link
+                  %table.table-list.mb-0
+                    %tr
+                      %td Serial
+                      %td= bike.serial_display
 
-                  %tr
-                    %td
-                      %span.stolen-color From
-                    %td
-                      = Geocodeable.address(stolen_record, country: false)
+                    %tr
+                      %td
+                        %span.stolen-color Stolen at
+                      %td
+                        %span.convertTime.preciseTime
+                          = l stolen_record.date_stolen, format: :convert_time
+
+                    %tr
+                      %td
+                        %span.stolen-color From
+                      %td
+                        = Geocodeable.address(stolen_record, country: false)

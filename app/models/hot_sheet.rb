@@ -26,6 +26,8 @@ class HotSheet < ApplicationRecord
 
   def subject; "Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
 
+  def recipient_emails; fetch_recipients.pluck(:email) end
+
   # This may become a configurable option
   def max_bikes; 10 end
 
@@ -52,7 +54,7 @@ class HotSheet < ApplicationRecord
 
   def fetch_recipients
     unless recipient_ids.is_a?(Array)
-      update(recipient_ids: organization.memberships.claimed.notification_daily.pluck(:user_id))
+      update(recipient_ids: hot_sheet_configuration.current_recipient_ids)
     end
     organization.users.where(id: recipient_ids)
   end

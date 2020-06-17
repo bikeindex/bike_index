@@ -1,4 +1,13 @@
-// Ambassador dash styles
+.hot-sheet-recipient-emails {
+  // border: 1px solid #ddd;
+  padding: 0 !important;
+  ul {
+    max-height: 250px;
+    overflow-x: scroll;
+    margin-bottom: 0;
+  }
+}
+
 .hot-sheet-list {
   list-style-type: none;
   margin: 0;

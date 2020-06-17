@@ -1,4 +1,16 @@
 #users_edit {
+  .user-notification-checks {
+    // @media (max-width: $grid-breakpoint-sm) {
+    //   padding-bottom:
+    // }
+    // .form-group {
+    //   margin-bottom: 0;
+    // }
+    .form-well-input {
+      line-height: 1.5em;
+    }
+  }
+
   .delete-email {
     color: $gray-light;
     display: block;

@@ -22,6 +22,15 @@
               %span.convertTime.preciseTime
                 = l(@hot_sheet_configuration.send_today_at, format: :convert_time)
               %span.convertTimezone
+          %tr
+            %td
+              Recipients
+            %td.hot-sheet-recipient-emails
+              %ul.small
+                -# @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
+                - User.limit(100).pluck(:email).each do |email|
+                  %li= email
+
 
 - unless current_organization.search_coordinates.reject(&:blank?).count == 2
   .alert.alert-warning
