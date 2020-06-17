@@ -53,7 +53,7 @@
           - @hot_sheet.fetch_stolen_records.each do |stolen_record|
             - bike = stolen_record.bike
             - thumb_url = bike.thumb_path || bike.stock_photo_url
-            - bike_link = bike_url(bike, organization_id: @organization.to_param)
+            - bike_link = bike_url(bike, organization_id: current_organization.to_param)
             %li
               - unless thumb_url.present?
                 - thumbclass = 'placeholder'
