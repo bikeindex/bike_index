@@ -58,6 +58,18 @@
   }
 }
 
+.recovered-alert {
+  background: $btn-success-bg;
+  padding: 0.5rem;
+  margin: 0 0 0.5rem;
+  h3 {
+    color: #fff;
+    margin: 0;
+    line-height: 1;
+    font-weight: bold;
+  }
+}
+
 // Basically like alert, but the text isn't colored by default
 .hot-sheet-notification-panel {
   border: 1px solid #3498db;

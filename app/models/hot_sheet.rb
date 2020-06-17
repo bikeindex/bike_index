@@ -47,7 +47,7 @@ class HotSheet < ApplicationRecord
       stolen_records = calculated_stolen_records
       update(stolen_record_ids: stolen_records.pluck(:id))
     end
-    stolen_records.includes(:bike)
+    stolen_records.joins(:bike).where(bikes: { deleted_at: nil })
   end
 
   def fetch_recipients
@@ -68,6 +68,7 @@ class HotSheet < ApplicationRecord
   def calculated_stolen_records
     StolenRecord.current.within_bounding_box(bounding_box)
                 .reorder(date_stolen: :desc)
+                .joins(:bike).where(bikes: { deleted_at: nil })
                 .limit(max_bikes)
   end
 end

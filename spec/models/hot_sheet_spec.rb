@@ -18,22 +18,38 @@ RSpec.describe HotSheet, type: :model do
 
   describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
-    let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
-    it "finds the stolen records, assigns" do
-      expect(hot_sheet_configuration).to be_present
-      hot_sheet.reload
-      expect(hot_sheet.stolen_record_ids).to be_blank
-      expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id, stolen_record2.id])
-      expect(hot_sheet.stolen_record_ids).to eq([stolen_record.id, stolen_record2.id])
+    context "with two records" do
+      let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }
+      before { expect(hot_sheet_configuration).to be_present }
+      it "finds the stolen records, assigns" do
+        hot_sheet.reload
+        expect(hot_sheet.stolen_record_ids).to be_blank
+        expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id, stolen_record2.id])
+        expect(hot_sheet.stolen_record_ids).to eq([stolen_record.id, stolen_record2.id])
+      end
+      context "with stolen record recovered" do
+        let!(:stolen_record2) { FactoryBot.create(:stolen_record_recovered, date_stolen: Time.current - 2.days) }
+        it "only returns if already stored" do
+          expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id])
+          hot_sheet.stolen_record_ids = [stolen_record.id, stolen_record2.id]
+          expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id, stolen_record2.id])
+        end
+      end
     end
     context "with stolen_record_ids set" do
       let(:hot_sheet) { FactoryBot.create(:hot_sheet, stolen_record_ids: [stolen_record.id]) }
       it "returns the stolen records from stolen_record_ids" do
         expect(hot_sheet.organization.search_coordinates.reject(&:blank?)).to be_blank
         expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id])
+      end
+      context "with bike deleted" do
+        it "does not return stolen record" do
+          stolen_record.bike.destroy
+          expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([])
+        end
       end
     end
   end
