@@ -32,7 +32,7 @@ class HotSheetConfiguration < ApplicationRecord
     time_in_zone > send_today_at
   end
 
-  def send_hour; send_seconds_past_midnight/3600 end
+  def send_hour; send_seconds_past_midnight / 3600 end
 
   def send_hour=(val)
     hour = val.to_i
@@ -44,12 +44,13 @@ class HotSheetConfiguration < ApplicationRecord
     unless search_radius_miles.present? && search_radius_miles > 0
       self.search_radius_miles = (organization&.search_radius || 50)
     end
-    self.send_seconds_past_midnight ||= 0 # midnight
+    self.send_seconds_past_midnight ||= 21_600 # 6am
   end
 
   def ensure_location_if_enabled
     return true unless enabled?
     return true if search_coordinates.reject(&:blank?).count == 2
+    self.is_enabled = false
     errors.add(:base, "Organization must have a location set to enable Hot Sheets")
   end
 end

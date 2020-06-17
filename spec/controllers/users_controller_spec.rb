@@ -86,7 +86,7 @@ RSpec.describe UsersController, type: :controller do
         email: "poo@pile.com",
         password: "testthisthing7$",
         password_confirmation: "testthisthing7$",
-        terms_of_service: true
+        terms_of_service: true,
       }
     end
     describe "success" do
@@ -322,6 +322,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
+
         def expect_confirmed_and_set_ip(user)
           user.reload
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
@@ -775,13 +776,13 @@ RSpec.describe UsersController, type: :controller do
           membership.update(hot_sheet_notification: "notification_daily")
           set_current_user(user)
           put :update, params: {
-                  id: user.username,
-                  hot_sheet_notifications: { organization.id.to_s => "0" },
-                  user: {
-                    notification_newsletters: "true",
-                    notification_unstolen: "false"
-                  }
-          }
+                     id: user.username,
+                     hot_sheet_notifications: { organization.id.to_s => "0" },
+                     user: {
+                       notification_newsletters: "true",
+                       notification_unstolen: "false",
+                     },
+                   }
           expect(flash[:success]).to be_present
           expect(response).to redirect_to my_account_url
           membership.reload

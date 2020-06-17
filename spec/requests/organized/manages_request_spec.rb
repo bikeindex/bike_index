@@ -173,8 +173,8 @@ RSpec.describe Organized::ManagesController, type: :request do
                 street: "some street 2",
                 phone: "7272772727272",
                 email: "stuff@goooo.com",
-                latitude: 22_222,
-                longitude: 11_111,
+                latitude: 33_222,
+                longitude: 44_111,
                 organization_id: 844,
                 publicly_visible: "0",
                 impound_location: "true",
@@ -243,6 +243,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         context "removing a location" do
           it "removes the location" do
             update_attributes[:locations_attributes]["0"][:_destroy] = 1
+            expect(location1).to be_present
+            expect(current_organization.locations.count).to eq 1
 
             expect do
               put base_url,
@@ -251,11 +253,63 @@ RSpec.describe Organized::ManagesController, type: :request do
                     id: current_organization.to_param,
                     organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
                   }
+            # Because we added 1 location and deleted 1 location
             end.to change(Location, :count).by 0
 
             current_organization.reload
             expect(Location.where(id: location1.id).count).to eq 0
             expect(current_organization.short_name).to eq "cool other name"
+
+            expect(current_organization.locations.count).to eq 1
+            location = current_organization.locations.first
+            expect(location.name).to eq "Second shop"
+            expect(location.latitude).to be_within(0.1).of(40.7)
+            expect(location.longitude).to be_within(0.1).of(-74.0)
+            expect(current_organization.to_coordinates).to eq location.to_coordinates
+          end
+        end
+
+        context "only updating location" do
+          let(:update_attributes) do # really location_attributes
+           {
+              created_at: Time.current.to_f.to_s,
+              name: "new shop",
+              zipcode: "60608",
+              city: "Chicago",
+              state_id: state.id,
+              country_id: country.id,
+              street: "1300 W 14th Pl",
+              phone: "7272772727272",
+              email: "stuff@goooo.com",
+              publicly_visible: false
+            }
+          end
+          let(:state) { FactoryBot.create(:state_illinois) }
+          include_context :geocoder_real
+          it "still updates the organization" do
+            expect(current_organization.locations.count).to eq 0
+            expect(current_organization.search_coordinates_set?).to be_falsey
+            VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
+              expect do
+                patch base_url,
+                    params: {
+                      organization_id: current_organization.to_param,
+                      id: current_organization.to_param,
+                      organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } }
+                    }
+              end.to change(Location, :count).by 1
+            end
+
+            current_organization.reload
+            expect(current_organization.locations.count).to eq 1
+            location = current_organization.locations.first
+
+            expect_attrs_to_match_hash(location, update_attributes.except(:created_at, :organization_id))
+            expect(location.latitude).to be_within(0.1).of(41.8)
+            expect(location.longitude).to be_within(0.1).of(-87.6)
+
+            expect(current_organization.to_coordinates).to eq location.to_coordinates
+            expect(current_organization.search_coordinates_set?).to be_truthy
           end
         end
       end

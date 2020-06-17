@@ -33,17 +33,17 @@
     -#   - unless @previous.blank?
     -#     = link_to "&gt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @previous.sheet_date)
 
-  -# if current_user.member_of?(current_organization, no_superuser_override: true)
-  .row
-    .col-lg-8
-      .alert.hot-sheet-notification-panel
-        %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
-        = form_for current_user, multipart: true do |f|
-          %label
-            = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notify_daily?
-            Email Daily #{current_organization.short_name} Hot Sheets to
-            %em= current_user.email
-          = submit_tag "update preferences", class: "btn btn-sm btn-success ml-2"
+  - if current_user.member_of?(current_organization, no_superuser_override: true)
+    .row
+      .col-lg-8
+        .alert.hot-sheet-notification-panel
+          %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
+          = form_for current_user, multipart: true do |f|
+            %label
+              = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notify_daily?
+              Email daily #{current_organization.short_name} Hot Sheets to
+              %em= current_user.email
+            = submit_tag "update preferences", class: "btn btn-sm btn-success ml-2"
   .row
     .col-lg-8
       %ul.hot-sheet-list

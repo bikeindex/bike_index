@@ -235,6 +235,19 @@
               - else
                 %small.less-strong
                   None
+          - if @organization.enabled?("hot_sheet")
+            %tr
+              %td Hot Sheet
+              %td
+                - if @organization.hot_sheet_enabled?
+                  Enabled
+                  %em.less-strong
+                    = organization.memberships.notification_daily.count
+                    recipients
+                - else
+                  %span.less-strong not enabled
+                %small
+                  = link_to "configuration", edit_organization_hot_sheet_path(organization_id: @organization.to_param)
           %tr
             %td Stickers
             %td

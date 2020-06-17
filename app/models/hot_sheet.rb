@@ -52,7 +52,7 @@ class HotSheet < ApplicationRecord
 
   def fetch_recipients
     unless recipient_ids.is_a?(Array)
-      update(recipient_ids: organization.memberships.notification_daily.pluck(:user_id))
+      update(recipient_ids: organization.memberships.claimed.notification_daily.pluck(:user_id))
     end
     organization.users.where(id: recipient_ids)
   end

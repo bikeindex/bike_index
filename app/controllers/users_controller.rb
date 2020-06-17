@@ -156,7 +156,6 @@ class UsersController < ApplicationController
           @user.reload
           default_session_set(@user)
         end
-
       end
       if successfully_updated
         flash[:success] ||= translation(:successfully_updated)

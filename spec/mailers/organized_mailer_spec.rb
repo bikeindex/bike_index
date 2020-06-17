@@ -196,8 +196,20 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "hot_sheet_notification" do
+    let(:recipient) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [recipient.id], stolen_record_ids: [stolen_record.id]) }
+    before { expect(header_mail_snippet).to be_present }
+    let(:mail) { OrganizedMailer.hot_sheet(hot_sheet) }
     it "renders email" do
-      fail
+      expect(hot_sheet.fetch_recipients.pluck(:id)).to eq([recipient.id])
+      expect(mail.body.encoded).to match header_mail_snippet.body
+      expect(mail.body.encoded).to match hot_sheet.subject
+      expect(mail.body.encoded).to match bike_path(stolen_record.bike.to_param) # using path because we don't care about specifics
+      expect(mail.to).to eq([organization.auto_user.email])
+      expect(mail.reply_to).to eq([organization.auto_user.email])
+      expect(mail.bcc).to eq([recipient.email])
+      expect(mail.subject).to eq hot_sheet.subject
     end
   end
 end
