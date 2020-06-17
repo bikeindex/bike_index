@@ -1,0 +1,49 @@
+-# TODO: translations
+
+%h1
+  %strong
+    = @organization.short_name
+  = @hot_sheet.subject
+  %em.small{ style: "font-size: 16px;" }
+    = link_to "on Index", organization_hot_sheet_url(organization_id: @organization.to_param, day: @hot_sheet.sheet_date)
+
+- @stolen_records.each do |stolen_record|
+  - bike = stolen_record.bike
+  - thumb_url = bike.thumb_path || bike.stock_photo_url
+  - bike_link = bike_url(bike, organization_id: @organization.to_param)
+
+  - unless thumb_url.present?
+    - thumbclass = 'placeholder'
+    - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+
+  .bike-display
+    .image-holder{ class: thumbclass }
+      %a{ href:  bike_link }
+        %img{ src: thumb_url }
+
+    %ul.info-holder
+      %li
+        = link_to organized_bike_text(bike, skip_creation: true), bike_link
+
+      %li
+        %strong Serial
+        = bike.serial_display
+
+      %li
+        %strong.stolen-color
+          Stolen at
+        -# Render the hour
+        = stolen_record.date_stolen.strftime("%l%P")
+        - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
+          %strong Today
+        - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
+          %strong Yesterday
+        - else
+          = l stolen_record.date_stolen, format: :standard_display
+
+      %li
+        %strong.stolen-color
+          From
+        = Geocodeable.address(stolen_record, country: false)
+
+    .clearstuffdiv

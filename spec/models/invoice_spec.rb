@@ -126,7 +126,7 @@ RSpec.describe Invoice, type: :model do
       invoice.paid_feature_ids = [paid_feature_one_time.id, paid_feature2.id, "xxxxx"]
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature2.id, paid_feature_one_time.id])
 
-      expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
+      expect { organization.save }.to change { UpdateOrganizationAssociationsWorker.jobs.count }.by(1)
       expect(organization.enabled_feature_slugs).to eq([])
     end
   end

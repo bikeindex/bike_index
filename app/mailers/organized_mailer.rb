@@ -4,6 +4,8 @@ class OrganizedMailer < ApplicationMailer
   default content_type: "multipart/alternative",
           parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
+  helper :organized
+
   def partial_registration(b_param)
     @b_param = b_param
     @organization = @b_param.creation_organization
@@ -83,6 +85,17 @@ class OrganizedMailer < ApplicationMailer
     I18n.with_locale(@user&.preferred_language) do
       mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.subject)
     end
+  end
+
+  def hot_sheet(hot_sheet)
+    @hot_sheet = hot_sheet
+    @organization = @hot_sheet.organization
+    @stolen_records = @hot_sheet.fetch_stolen_records
+
+    mail(reply_to: reply_to,
+         to: reply_to,
+         bcc: @hot_sheet.recipient_emails,
+         subject: @hot_sheet.subject)
   end
 
   private

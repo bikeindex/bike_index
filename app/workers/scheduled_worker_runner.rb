@@ -37,6 +37,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       UpdateInvoiceWorker,
       UpdateCountsWorker,
       UpdateOrganizationPosKindWorker,
+      ProcessHotSheetWorker,
       ProcessGraduatedNotificationWorker,
       CreateGraduatedNotificationWorker,
       FileCacheMaintenanceWorker,

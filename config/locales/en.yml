@@ -1665,6 +1665,11 @@ en:
           your_org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
+      hot_sheets:
+        ensure_access_to_hot_sheet!:
+          org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
       manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
@@ -3691,6 +3696,8 @@ en:
       getting_started: Getting started
       graduated_notifications: Graduated notifications
       help: Help
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet configuration
       impounded_bikes: Impounded Bikes
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
@@ -4813,10 +4820,10 @@ en:
     email_bike_box:
       color: color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
-      date: 'Date:'
       found: 'Found:'
       make: 'Make:'
       serial: 'Serial:'
+      stolen_at: 'Stolen at:'
       stolen_from: 'Stolen from:'
     errors:
       error: error
@@ -5010,6 +5017,8 @@ en:
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
+      hot_sheet: Hot Sheet
+      hot_sheet_configuration: Hot Sheet config
       how_integration_works: how the integration works
       impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations
@@ -5146,7 +5155,7 @@ en:
       convert_time: "%FT%T%z"
       dotted: "%Y.%-m.%-d"
       no_day_with_year: "%B %d %Y"
-      short_with_hour: "%m.%d.%y - %l%P"
+      short_with_hour: "%l%P - %m.%d.%y"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%A, %B %d"
   user_embeds:
@@ -5188,11 +5197,13 @@ en:
       choose_language: Choose language
       city: City
       confirmed_emails: Confirmed emails
+      daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: >-
         Give us permission to contact you if we believe your bike has been stolen,
         <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
+      hot_sheets: Hot Sheets
       make_primary_email: Make primary email
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}

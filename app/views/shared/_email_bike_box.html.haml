@@ -33,7 +33,7 @@
         = stolen_record.address(skip_default_country: true)
       %li
         %strong
-          = t(".date")
+          = t(".stolen_at")
         = l stolen_record.date_stolen, format: :dotted
 
     - if (@bike.ownerships.count == 1 && @bike.registered_new)

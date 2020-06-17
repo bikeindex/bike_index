@@ -4,22 +4,37 @@
       = t(".personal_information_for_user", user_name: @user.display_name)
   .col-xs-12
     %p= t(".any_use_of_your_personal_information_html", privacy_policy: link_to("Privacy policy", privacy_url))
-  .form-group.row
+  .form-group.row.unnested-field
     = f.label :name, class: "form-well-label"
     .form-well-input
       = f.text_field :name, class: "form-control"
-  .form-group.row{ style: "margin-bottom: 0;" }
-    %label.form-well-label
-    %label.form-well-input
-      = f.check_box :notification_newsletters
-      = t(".receive_the_bike_index_newsletter")
-  .form-group.row.unnested-field
-    %label.form-well-label
-    %label.form-well-input{ style: "line-height: 1.5em;" }
-      = f.check_box :notification_unstolen
-      - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
-      = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
-  .form-group.row
+
+  .related-fields.user-notification-checks
+    .form-group.row
+      %label.form-well-label
+      %label.form-well-input
+        = f.check_box :notification_newsletters
+        = t(".receive_the_bike_index_newsletter")
+
+    .form-group.row
+      %label.form-well-label
+      %label.form-well-input
+        = f.check_box :notification_unstolen
+        - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
+        = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
+
+    - hot_sheet_organizations = current_user.organizations.select { |o| o.hot_sheet_enabled? }
+    - if hot_sheet_organizations.any?
+      = hidden_field_tag :hot_sheet_organization_ids, hot_sheet_organizations.pluck(:id).join(",")
+    - hot_sheet_organizations.each do |organization|
+      .form-group.row
+        %label.form-well-label
+        %label.form-well-input{ style: "line-height: 1.5em;" }
+          = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.memberships.where(organization_id: organization.id).first&.notification_daily?
+          - hot_sheets_link = link_to(t(".hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
+          = t(".daily_hot_sheet_notifications_html", org_name: organization.short_name, hot_sheets_link: hot_sheets_link)
+
+  .form-group.row.mt-2
     = f.label :phone, class: "form-well-label"
     .form-well-input
       = f.text_field :phone, value: phone_display(@user.phone), class: "form-control"

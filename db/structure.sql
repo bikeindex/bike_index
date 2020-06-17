@@ -1120,6 +1120,76 @@ ALTER SEQUENCE public.graduated_notifications_id_seq OWNED BY public.graduated_n
 
 
 --
+-- Name: hot_sheet_configurations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.hot_sheet_configurations (
+    id bigint NOT NULL,
+    organization_id bigint,
+    send_seconds_past_midnight integer,
+    timezone_str character varying,
+    search_radius_miles integer,
+    is_enabled boolean DEFAULT false,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: hot_sheet_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.hot_sheet_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: hot_sheet_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.hot_sheet_configurations_id_seq OWNED BY public.hot_sheet_configurations.id;
+
+
+--
+-- Name: hot_sheets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.hot_sheets (
+    id bigint NOT NULL,
+    organization_id bigint,
+    stolen_record_ids jsonb,
+    recipient_ids jsonb,
+    delivery_status character varying,
+    sheet_date date,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: hot_sheets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.hot_sheets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: hot_sheets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.hot_sheets_id_seq OWNED BY public.hot_sheets.id;
+
+
+--
 -- Name: impound_record_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1561,7 +1631,9 @@ CREATE TABLE public.memberships (
     sender_id integer,
     claimed_at timestamp without time zone,
     email_invitation_sent_at timestamp without time zone,
-    created_by_magic_link boolean DEFAULT false
+    created_by_magic_link boolean DEFAULT false,
+    receive_hot_sheet boolean DEFAULT false,
+    hot_sheet_notification integer DEFAULT 0
 );
 
 
@@ -2800,6 +2872,20 @@ ALTER TABLE ONLY public.graduated_notifications ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: hot_sheet_configurations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hot_sheet_configurations ALTER COLUMN id SET DEFAULT nextval('public.hot_sheet_configurations_id_seq'::regclass);
+
+
+--
+-- Name: hot_sheets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hot_sheets ALTER COLUMN id SET DEFAULT nextval('public.hot_sheets_id_seq'::regclass);
+
+
+--
 -- Name: impound_record_updates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3281,6 +3367,22 @@ ALTER TABLE ONLY public.front_gear_types
 
 ALTER TABLE ONLY public.graduated_notifications
     ADD CONSTRAINT graduated_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hot_sheet_configurations hot_sheet_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hot_sheet_configurations
+    ADD CONSTRAINT hot_sheet_configurations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hot_sheets hot_sheets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hot_sheets
+    ADD CONSTRAINT hot_sheets_pkey PRIMARY KEY (id);
 
 
 --
@@ -3891,6 +3993,20 @@ CREATE INDEX index_graduated_notifications_on_primary_notification_id ON public.
 --
 
 CREATE INDEX index_graduated_notifications_on_user_id ON public.graduated_notifications USING btree (user_id);
+
+
+--
+-- Name: index_hot_sheet_configurations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_hot_sheet_configurations_on_organization_id ON public.hot_sheet_configurations USING btree (organization_id);
+
+
+--
+-- Name: index_hot_sheets_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_hot_sheets_on_organization_id ON public.hot_sheets USING btree (organization_id);
 
 
 --
@@ -4849,6 +4965,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200521143231'),
 ('20200521144927'),
 ('20200524214006'),
-('20200610194531');
+('20200610194531'),
+('20200611040757'),
+('20200616144000'),
+('20200616144002'),
+('20200616144623');
 
 

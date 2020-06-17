@@ -634,6 +634,9 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it "returns true" do
         expect(user.member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization, no_superuser_override: true)).to be_truthy
+        expect(user.admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization, no_superuser_override: true)).to be_truthy
       end
     end
     context "member of organization" do
@@ -658,6 +661,9 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.create(:admin) }
       it "returns true" do
         expect(user.member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization, no_superuser_override: true)).to be_falsey
+        expect(user.admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization, no_superuser_override: true)).to be_falsey
       end
     end
     context "incorrect searching" do

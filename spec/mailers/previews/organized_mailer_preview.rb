@@ -34,6 +34,10 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.parking_notification(ParkingNotification.send_email.last)
   end
 
+  def hot_sheet
+    OrganizedMailer.hot_sheet(HotSheet.last)
+  end
+
   private
 
   def render_finished_registration(bikes)

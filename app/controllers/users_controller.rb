@@ -108,8 +108,8 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
-    if params[:user][:password_reset_token].present?
-      if @user.password_reset_token != params[:user][:password_reset_token]
+    if params.dig(:user, :password_reset_token).present?
+      if @user.password_reset_token != params.dig(:user, :password_reset_token)
         remove_session
         flash[:error] = translation(:does_not_match_token)
         redirect_to user_home_url and return
@@ -118,43 +118,49 @@ class UsersController < ApplicationController
         flash[:error] = translation(:token_expired)
         redirect_to user_home_url and return
       end
-    elsif params[:user][:password].present?
-      unless @user.authenticate(params[:user][:current_password])
+    elsif params.dig(:user, :password).present?
+      unless @user.authenticate(params.dig(:user, :current_password))
         @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
     end
-    if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
-      if params[:user][:terms_of_service].present?
-        if ParamsNormalizer.boolean(params[:user][:terms_of_service])
-          @user.terms_of_service = true
-          @user.save
-          flash[:success] = translation(:you_can_use_bike_index)
-          redirect_to user_home_url and return
-        else
-          flash[:notice] = translation(:accept_tos)
-          redirect_to accept_terms_url and return
-        end
-      elsif params[:user][:vendor_terms_of_service].present?
-        if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
-          @user.update_attributes(accepted_vendor_terms_of_service: true)
-          if @user.memberships.any?
-            flash[:success] = translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+    if !@user.errors.any?
+      successfully_updated = update_hot_sheet_notifications
+      if params[:user].present? && @user.update_attributes(permitted_update_parameters)
+        successfully_updated = true
+        if params.dig(:user, :terms_of_service).present?
+          if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
+            @user.terms_of_service = true
+            @user.save
+            flash[:success] = translation(:you_can_use_bike_index)
+            redirect_to user_home_url and return
           else
-            flash[:success] = translation(:thanks_for_accepting_tos)
+            flash[:notice] = translation(:accept_tos)
+            redirect_to accept_terms_url and return
           end
-          redirect_to user_root_url and return
-        else
-          redirect_to accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org) and return
+        elsif params.dig(:user, :vendor_terms_of_service).present?
+          if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
+            @user.update_attributes(accepted_vendor_terms_of_service: true)
+            if @user.memberships.any?
+              flash[:success] = translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+            else
+              flash[:success] = translation(:thanks_for_accepting_tos)
+            end
+            redirect_to user_root_url and return
+          else
+            redirect_to accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org) and return
+          end
+        end
+        if params.dig(:user, :password).present?
+          @user.generate_auth_token("auth_token")
+          @user.update_auth_token("password_reset_token")
+          @user.reload
+          default_session_set(@user)
         end
       end
-      if params[:user][:password].present?
-        @user.generate_auth_token("auth_token")
-        @user.update_auth_token("password_reset_token")
-        @user.reload
-        default_session_set(@user)
+      if successfully_updated
+        flash[:success] ||= translation(:successfully_updated)
+        redirect_back(fallback_location: my_account_url(page: params[:page])) and return
       end
-      flash[:success] = translation(:successfully_updated)
-      redirect_to my_account_url(page: params[:page]) and return
     end
     @page_errors = @user.errors.full_messages
     render action: :edit
@@ -213,5 +219,17 @@ class UsersController < ApplicationController
 
   def assign_edit_template
     @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+  end
+
+  def update_hot_sheet_notifications
+    return false unless params[:hot_sheet_organization_ids].present?
+    params[:hot_sheet_organization_ids].split(",").each do |org_id|
+      notify = params.dig(:hot_sheet_notifications, org_id).present?
+      membership = @user.memberships.where(organization_id: org_id).first
+      next unless membership.present?
+      membership.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
+      flash[:success] ||= "Notification setting updated"
+    end
+    true
   end
 end

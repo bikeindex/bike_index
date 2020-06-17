@@ -8,16 +8,16 @@ class PaidFeature < ApplicationRecord
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[
-    organization_affiliation
     extra_registration_number
+    organization_affiliation
     reg_phone
     reg_address
   ].freeze
   BIKE_ACTIONS = %w[
-    parking_notifications
-    impound_bikes
-    unstolen_notifications
     additional_registrations_information
+    impound_bikes
+    parking_notifications
+    unstolen_notifications
   ].freeze
   EXPECTED_SLUGS = (%w[
     avery_export
@@ -25,17 +25,18 @@ class PaidFeature < ApplicationRecord
     bike_stickers
     child_organizations
     csv_exports
+    customize_emails
     graduated_notifications
+    hot_sheet
+    impound_bikes_locations
     passwordless_users
     regional_bike_counts
     regional_stickers
-    impound_bikes_locations
     show_bulk_import
     show_multi_serial
     show_partial_registrations
     show_recoveries
     skip_ownership_email
-    customize_emails
   ] + BIKE_ACTIONS + REG_FIELDS).freeze
 
   has_many :invoice_paid_features

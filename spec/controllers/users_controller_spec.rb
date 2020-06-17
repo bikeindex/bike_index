@@ -86,7 +86,7 @@ RSpec.describe UsersController, type: :controller do
         email: "poo@pile.com",
         password: "testthisthing7$",
         password_confirmation: "testthisthing7$",
-        terms_of_service: true
+        terms_of_service: true,
       }
     end
     describe "success" do
@@ -322,6 +322,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
+
         def expect_confirmed_and_set_ip(user)
           user.reload
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
@@ -753,6 +754,57 @@ RSpec.describe UsersController, type: :controller do
       user.reload
       expect(user.notification_newsletters).to be_truthy
       expect(user.notification_unstolen).to be_falsey
+    end
+
+    context "organization with hotsheet" do
+      let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:membership) { user.memberships.first }
+      it "updates hotsheet" do
+        set_current_user(user)
+        expect(membership.notification_never?).to be_truthy
+        request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
+        # Doesn't include the parameter because when false, it doesn't include
+        patch :update, params: {
+          id: user.username,
+          hot_sheet_organization_ids: organization.id.to_s,
+          hot_sheet_notifications: { organization.id.to_s => "1" }
+        }
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
+        membership.reload
+        expect(membership.notification_daily?).to be_truthy
+      end
+      context "with other parameters too" do
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+        let(:organization2) { hot_sheet_configuration2.organization }
+        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: user, hot_sheet_notification: "notification_daily") }
+        it "updates all the parameters" do
+          set_current_user(user)
+          expect(membership.notification_never?).to be_truthy
+          expect(membership2.notification_daily?).to be_truthy
+          put :update, params: {
+                     id: user.username,
+                     hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
+                     hot_sheet_notifications: { organization.id.to_s => "1" },
+                     user: {
+                       notification_newsletters: "true",
+                       notification_unstolen: "false",
+                     },
+                   }
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to my_account_url
+          membership.reload
+          membership2.reload
+          expect(membership.notification_daily?).to be_truthy
+          expect(membership2.notification_daily?).to be_falsey
+
+          user.reload
+          expect(user.notification_newsletters).to be_truthy
+          expect(user.notification_unstolen).to be_falsey
+        end
+      end
     end
 
     it "updates the vendor terms of service and emailable" do

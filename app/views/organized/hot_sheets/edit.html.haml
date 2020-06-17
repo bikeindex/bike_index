@@ -1,0 +1,62 @@
+-# TODO: translations
+.organized-page-header
+  %h1
+    Hot Sheet Configuration
+
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Enabled?
+          %td
+            - if @hot_sheet_configuration.enabled?
+              = check_mark
+            - else
+              %small.less-strong false
+        - if @hot_sheet_configuration.enabled?
+          %tr
+            %td
+              Generates at
+            %td
+              %span.convertTime.preciseTime
+                = l(@hot_sheet_configuration.send_today_at, format: :convert_time)
+              %span.convertTimezone
+          %tr
+            %td
+              Recipients
+            %td.hot-sheet-recipient-emails
+              %ul.small
+                - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
+                  %li= email
+
+
+- unless current_organization.search_coordinates.reject(&:blank?).count == 2
+  .alert.alert-warning
+    %h3.uncap
+      Organization does not have a base location
+    %p
+      = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "text-underline"
+      to be able to enable Hot Sheet
+.row
+  .col-md-6
+    = form_for @hot_sheet_configuration, url: organization_hot_sheet_path(organization_id: current_organization), action: "update", method: :patch do |f|
+      .form-group
+        = f.label :send_hour do
+          Hour to create Hot Sheet every day
+          %small
+            24 hour clock
+        = f.number_field :send_hour, class: "form-control"
+      .form-group
+        = f.label :timezone_st, "Timezone"
+        -# We need to do a special timezone select so we can select it with moment
+        - timezones_select = ActiveSupport::TimeZone.all.sort.map { |z| [z.to_s, z.tzinfo.name] }
+        -# If we add hiddenFieldTimezone it will automatically assign to the timezone, so don't add that classname and clober the existing zone if configuration already exists
+        - auto_class_name = @hot_sheet_configuration.id.present? ? "" : "hiddenFieldTimezone"
+        = f.select :timezone_str, timezones_select, { prompt: "Choose timezone" }, class: "form-control #{auto_class_name}"
+
+      .form-group
+        = f.check_box :is_enabled
+        = f.label :is_enabled, "Enabled", class: "org-form-label"
+      .mt-2
+        = submit_tag "Save", class: "btn btn-success btn-md-lg"

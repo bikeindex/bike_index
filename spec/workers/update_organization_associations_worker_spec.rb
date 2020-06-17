@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UpdateAssociatedOrganizationsWorker, type: :job do
+RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
   let(:instance) { described_class.new }
 
   context "multiple organizations" do
@@ -12,7 +12,7 @@ RSpec.describe UpdateAssociatedOrganizationsWorker, type: :job do
       Sidekiq::Worker.clear_all
       instance.perform([organization1.id, organization2.id])
       # Make sure we don't reenqueue
-      expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 0
+      expect(described_class.jobs.count).to eq 0
       expect(organization1.reload.updated_at).to be_within(1).of Time.current
       expect(organization2.reload.updated_at).to be_within(1).of Time.current
     end
@@ -34,9 +34,28 @@ RSpec.describe UpdateAssociatedOrganizationsWorker, type: :job do
 
       # And actually run the job
       instance.perform([regional_child.id])
-      expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 0
+      expect(described_class.jobs.count).to eq 0
       expect(regional_child.reload.updated_at).to be_within(1).of Time.current
       expect(regional_parent.reload.updated_at).to be_within(1).of Time.current
+    end
+  end
+
+  context "organization without location set" do
+    let!(:organization) { FactoryBot.create(:organization, :in_nyc) }
+    it "updates the regional parent too" do
+      expect(organization.locations.count).to eq 1
+      organization.update_columns(updated_at: Time.current - 1.hour, location_longitude: nil, location_latitude: nil)
+      expect(organization.reload.updated_at).to be < Time.current - 30.minutes
+      expect(organization.search_coordinates_set?).to be_falsey
+      Sidekiq::Worker.clear_all
+
+      # And actually run the job
+      instance.perform([organization.id])
+      expect(described_class.jobs.count).to eq 0
+      organization.reload
+
+      expect(organization.reload.updated_at).to be_within(1).of Time.current
+      expect(organization.search_coordinates_set?).to be_truthy
     end
   end
 end

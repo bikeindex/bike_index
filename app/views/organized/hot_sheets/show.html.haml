@@ -1,0 +1,86 @@
+-# TODO: translations
+
+- if !current_organization.hot_sheet_enabled?
+  .alert.alert-info
+    %h3.uncap
+      Hot Sheets are not enabled!
+    - if current_user.admin_of?(current_organization)
+      %p
+        Enable them on the
+        %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
+
+- else
+  %h1.uncap
+    #{current_organization.short_name} Hot Sheet
+  %h3.uncap.mb-0.d-inline-block
+    -# Skipping implementing these buttons for now, because whatever
+    -# %span.switch-day-link
+    -#   - unless @next.blank?
+    -#     = link_to "&lt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @next.sheet_date)
+    %span.sheet-day-text
+      - if @current
+        Current hotsheet
+      - else
+        - unless @hot_sheet.present?
+          No hotsheet
+        for
+        %strong
+          = @day.strftime("%A, %b %-d")
+          - if @day.year != Time.current.year
+            = @day.year
+    -# Skipping implementing these buttons for now, because whatever
+    -# %span.switch-day-link
+    -#   - unless @previous.blank?
+    -#     = link_to "&gt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @previous.sheet_date)
+
+  - if current_user.member_of?(current_organization, no_superuser_override: true)
+    .row
+      .col-lg-8
+        .alert.hot-sheet-notification-panel
+          %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
+          = form_for current_user, multipart: true do |f|
+            = hidden_field_tag :hot_sheet_organization_ids, current_organization.id
+            %label
+              = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notification_daily?
+              Email daily #{current_organization.short_name} Hot Sheets to
+              %em= current_user.email
+            = submit_tag "update preferences", class: "btn btn-sm btn-success ml-2"
+
+  - if @hot_sheet.present?
+    .row
+      .col-lg-8
+        %ul.hot-sheet-list
+          - @hot_sheet.fetch_stolen_records.each do |stolen_record|
+            %li
+              - bike = stolen_record.bike
+              - thumb_url = bike.thumb_path || bike.stock_photo_url
+              - bike_link = bike_url(bike, organization_id: @organization.to_param)
+
+              - unless thumb_url.present?
+                - thumbclass = 'placeholder'
+                - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+
+              .bike-display
+                .bike-image{ class: thumbclass }
+                  %a{ href:  bike_link }
+                    %img{ src: thumb_url }
+                .bike-info
+                  %span.bike-main-info
+                    = link_to organized_bike_text(bike, skip_creation: true), bike_link
+                  %table.table-list.mb-0
+                    %tr
+                      %td Serial
+                      %td= bike.serial_display
+
+                    %tr
+                      %td
+                        %span.stolen-color Stolen at
+                      %td
+                        %span.convertTime.preciseTime
+                          = l stolen_record.date_stolen, format: :convert_time
+
+                    %tr
+                      %td
+                        %span.stolen-color From
+                      %td
+                        = Geocodeable.address(stolen_record, country: false)
