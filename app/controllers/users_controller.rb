@@ -222,12 +222,12 @@ class UsersController < ApplicationController
   end
 
   def update_hot_sheet_notifications
-    return false unless params[:hot_sheet_notifications].present?
-    params[:hot_sheet_notifications].each do |org_id, notify|
+    return false unless params[:hot_sheet_organization_ids].present?
+    params[:hot_sheet_organization_ids].split(",").each do |org_id|
+      notify = params.dig(:hot_sheet_notifications, org_id).present?
       membership = @user.memberships.where(organization_id: org_id).first
       next unless membership.present?
-      notification = ParamsNormalizer.boolean(notify) ? "notification_daily" : "notification_never"
-      membership.update(hot_sheet_notification: notification)
+      membership.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
     true

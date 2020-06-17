@@ -27,8 +27,7 @@
               Recipients
             %td.hot-sheet-recipient-emails
               %ul.small
-                -# @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
-                - User.limit(100).pluck(:email).each do |email|
+                - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
                   %li= email
 
 

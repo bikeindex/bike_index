@@ -242,8 +242,7 @@
                 - if @organization.hot_sheet_enabled?
                   Enabled
                   %em.less-strong
-                    = @organization.memberships.notification_daily.count
-                    recipients
+                    = "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count)
                 - else
                   %span.less-strong not enabled
                 %small

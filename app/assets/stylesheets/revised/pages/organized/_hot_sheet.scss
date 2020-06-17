@@ -1,10 +1,15 @@
 .hot-sheet-recipient-emails {
-  // border: 1px solid #ddd;
   padding: 0 !important;
   ul {
     max-height: 250px;
     overflow-x: scroll;
     margin-bottom: 0;
+    li:first-of-type {
+      margin-top: 0.5rem;
+    }
+    li:last-of-type {
+      margin-bottom: 0.5rem;
+    }
   }
 }
 

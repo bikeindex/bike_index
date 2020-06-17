@@ -10,7 +10,7 @@
         %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
 
 - else
-  %h1
+  %h1.uncap
     #{current_organization.short_name} Hot Sheet
   %h3.uncap.mb-0.d-inline-block
     -# Skipping implementing these buttons for now, because whatever
@@ -39,6 +39,7 @@
         .alert.hot-sheet-notification-panel
           %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
           = form_for current_user, multipart: true do |f|
+            = hidden_field_tag :hot_sheet_organization_ids, current_organization.id
             %label
               = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notification_daily?
               Email daily #{current_organization.short_name} Hot Sheets to

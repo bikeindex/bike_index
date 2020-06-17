@@ -765,19 +765,29 @@ RSpec.describe UsersController, type: :controller do
         set_current_user(user)
         expect(membership.notification_never?).to be_truthy
         request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
-        patch :update, params: { id: user.username, hot_sheet_notifications: { organization.id.to_s => true } }
+        # Doesn't include the parameter because when false, it doesn't include
+        patch :update, params: {
+          id: user.username,
+          hot_sheet_organization_ids: organization.id.to_s,
+          hot_sheet_notifications: { organization.id.to_s => "1" }
+        }
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
         membership.reload
         expect(membership.notification_daily?).to be_truthy
       end
       context "with other parameters too" do
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+        let(:organization2) { hot_sheet_configuration2.organization }
+        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
-          membership.update(hot_sheet_notification: "notification_daily")
           set_current_user(user)
+          expect(membership.notification_never?).to be_truthy
+          expect(membership2.notification_daily?).to be_truthy
           put :update, params: {
                      id: user.username,
-                     hot_sheet_notifications: { organization.id.to_s => "0" },
+                     hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
+                     hot_sheet_notifications: { organization.id.to_s => "1" },
                      user: {
                        notification_newsletters: "true",
                        notification_unstolen: "false",
@@ -786,7 +796,10 @@ RSpec.describe UsersController, type: :controller do
           expect(flash[:success]).to be_present
           expect(response).to redirect_to my_account_url
           membership.reload
-          expect(membership.notification_never?).to be_truthy
+          membership2.reload
+          expect(membership.notification_daily?).to be_truthy
+          expect(membership2.notification_daily?).to be_falsey
+
           user.reload
           expect(user.notification_newsletters).to be_truthy
           expect(user.notification_unstolen).to be_falsey
