@@ -270,7 +270,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         end
 
         context "only updating location" do
-          let(:update_attributes) do # really location_attributes
+          let(:update_attributes) do
            {
               created_at: Time.current.to_f.to_s,
               name: "new shop",

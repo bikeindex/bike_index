@@ -35,10 +35,10 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
       hot_sheet = HotSheet.last
       expect(hot_sheet.sheet_date).to eq Time.current.to_date
       expect(hot_sheet.organization_id).to eq organization1.id
+
       # And it's delivered the email
       expect(hot_sheet.email_success?).to be_truthy
       expect(hot_sheet.recipient_ids).to eq([membership.user_id])
-
       expect(ActionMailer::Base.deliveries.count).to eq 1
       email = ActionMailer::Base.deliveries.last
       expect(email.subject).to eq hot_sheet.subject

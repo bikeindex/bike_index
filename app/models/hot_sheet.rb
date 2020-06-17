@@ -1,6 +1,8 @@
 class HotSheet < ApplicationRecord
   belongs_to :organization
 
+  has_one :hot_sheet_configuration, through: :organization
+
   validates_presence_of :organization_id, :sheet_date
 
   scope :email_success, -> { where(delivery_status: "email_success") }
@@ -14,13 +16,9 @@ class HotSheet < ApplicationRecord
     end
   end
 
+  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+
   def current?; sheet_date.blank? end
-
-  def hot_sheet_configuration; organization.hot_sheet_configuration end
-
-  def bounding_box; hot_sheet_configuration.bounding_box end
-
-  def timezone; hot_sheet_configuration.timezone end
 
   def email_success?; delivery_status == "email_success" end
 
@@ -60,7 +58,7 @@ class HotSheet < ApplicationRecord
   end
 
   def deliver_email
-    # This is called from process_hot_sheet_worker, so it can be delivered now
+    # This is called from process_hot_sheet_worker, so it can be delivered inline
     OrganizedMailer.hot_sheet(self).deliver_now
     update(delivery_status: "email_success")
   end

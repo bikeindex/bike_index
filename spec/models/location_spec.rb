@@ -60,8 +60,6 @@ RSpec.describe Location, type: :model do
       Sidekiq::Worker.clear_all
       expect do
         location.update(impound_location: true)
-        # # Because the skip_update, we have to separately update organization
-        # organization.update(updated_at: Time.current, skip_update: false)
       end.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
       UpdateOrganizationAssociationsWorker.drain
       location.reload
