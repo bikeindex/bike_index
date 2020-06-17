@@ -111,6 +111,8 @@
       .submit-registration
         = submit_tag "Record parking notification for", class: "button-submit"
         = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+        .please-wait-text.less-strong
+          Please wait, processing
 
     .input-group.form-foot
       .control-group.form-photo-group

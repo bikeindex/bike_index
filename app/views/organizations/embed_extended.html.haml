@@ -120,6 +120,8 @@
     .submit-registration
       = submit_tag t(".register_this"), class: "button-submit"
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+      .please-wait-text.less-strong
+        Please wait, processing
   %h3
     = t(".optional_additions")
   / if the organization doesn't require a phone, show the phone as optional
