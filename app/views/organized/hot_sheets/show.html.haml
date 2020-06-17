@@ -44,7 +44,7 @@
               = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notification_daily?
               Email daily #{current_organization.short_name} Hot Sheets to
               %em= current_user.email
-            = submit_tag "update preferences", class: "btn btn-sm btn-success ml-2"
+            = submit_tag "update preferences", class: "btn btn-sm btn-primary ml-2"
 
   - if @hot_sheet.present?
     .row
