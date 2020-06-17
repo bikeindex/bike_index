@@ -87,15 +87,23 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  def hot_sheet(hot_sheet, emails = nil)
+  def hot_sheet(hot_sheet, override_emails = nil)
     @hot_sheet = hot_sheet
     @organization = @hot_sheet.organization
     @stolen_records = @hot_sheet.fetch_stolen_records
-    emails ||= @hot_sheet.recipient_emails # enable passing in email to make testing easier
+    # Enable passing in email to make testing easier, ensure the emails are an array
+    recipient_emails = Array(override_emails || @hot_sheet.recipient_emails)
+    # Ensure we only email people once
+    if recipient_emails.include?(reply_to)
+      recipient_emails = recipient_emails - [reply_to] # remove original to address from
+      direct_to = reply_to
+    else
+      direct_to = recipient_emails.shift
+    end
 
     mail(reply_to: reply_to,
-         to: reply_to,
-         bcc: emails,
+         to: direct_to,
+         bcc: recipient_emails,
          subject: @hot_sheet.subject)
   end
 
