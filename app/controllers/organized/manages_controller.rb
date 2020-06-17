@@ -9,6 +9,7 @@ module Organized
     def locations; end
 
     def update
+      locations_ids = @organization.locations.pluck(:id).sort
       if @organization.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_back(fallback_location: current_root_path)

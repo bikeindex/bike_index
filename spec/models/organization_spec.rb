@@ -256,7 +256,7 @@ RSpec.describe Organization, type: :model do
       invoice.update_attributes(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
-      expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
+      expect { organization.save }.to change { UpdateOrganizationAssociationsWorker.jobs.count }.by(1)
 
       expect(organization.is_paid).to be_truthy
       expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])

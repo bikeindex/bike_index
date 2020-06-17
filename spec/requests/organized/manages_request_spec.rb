@@ -290,14 +290,18 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
-              expect do
-                patch base_url,
-                    params: {
-                      organization_id: current_organization.to_param,
-                      id: current_organization.to_param,
-                      organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } }
-                    }
-              end.to change(Location, :count).by 1
+              Sidekiq::Worker.clear_all
+              # Need to inline to process UpdateOrganizationAssociationsWorker
+              Sidekiq::Testing.inline! do
+                expect do
+                  patch base_url,
+                      params: {
+                        organization_id: current_organization.to_param,
+                        id: current_organization.to_param,
+                        organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } }
+                      }
+                end.to change(Location, :count).by 1
+              end
             end
 
             current_organization.reload

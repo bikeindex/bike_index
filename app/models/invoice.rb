@@ -177,6 +177,6 @@ class Invoice < ApplicationRecord
   end
 
   def update_organization
-    UpdateAssociatedOrganizationsWorker.perform_async(organization_id)
+    UpdateOrganizationAssociationsWorker.perform_async(organization_id)
   end
 end

@@ -1,0 +1,128 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=1300%20W%2014th%20Pl,%20Chicago,%20IL%2060608,%20United%20States&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 17 Jun 2020 16:44:25 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Chicago, IL
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=35
+      Alt-Svc:
+      - h3-28=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-25=":443"; ma=2592000,h3-T050=":443";
+        ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q049=":443"; ma=2592000,h3-Q048=":443";
+        ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443";
+        ma=2592000; v="46,43"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "1300",
+                       "short_name" : "1300",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West 14th Place",
+                       "short_name" : "W 14th Pl",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Little Italy",
+                       "short_name" : "Little Italy",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60608",
+                       "short_name" : "60608",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "1300 W 14th Pl, Chicago, IL 60608, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.8627292,
+                       "lng" : -87.65921139999999
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.86407818029149,
+                          "lng" : -87.65786241970849
+                       },
+                       "southwest" : {
+                          "lat" : 41.86138021970849,
+                          "lng" : -87.6605603802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJz3ybaQItDogRNfoaM3L_C90",
+                 "plus_code" : {
+                    "compound_code" : "V87R+38 Chicago, IL, USA",
+                    "global_code" : "86HJV87R+38"
+                 },
+                 "types" : [ "street_address" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version:
+  recorded_at: Wed, 17 Jun 2020 16:44:25 GMT
+recorded_with: VCR 5.0.0
