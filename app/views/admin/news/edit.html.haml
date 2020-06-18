@@ -63,7 +63,7 @@
             = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email, class: "form-control"
             - user = User.fuzzy_email_find(@blog.user.email)
             - unless user.present? && user.userlink.present?
-              Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}, or link your twitter!
+              Please #{link_to "turn on your personal page", edit_my_account_url, target: '_blank'}, or link your twitter!
       .row
         .col-md-6
           .form-group

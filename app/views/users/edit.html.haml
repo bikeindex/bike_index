@@ -6,7 +6,7 @@
           - @edit_templates.each do |template, description|
             %li
               - classname = @edit_template == template ? 'active' : ''
-              %a{ href: my_account_path(page: template), class: classname }
+              %a{ href: edit_my_account_path(page: template), class: classname }
                 %h4
                   = description
 
@@ -16,7 +16,7 @@
           // ignore this select in dirty forms
           %select.dirtyignore
             - @edit_templates.each do |template, description|
-              %option{ selected: (@edit_template == template), value: my_account_path(page: template) }
+              %option{ selected: (@edit_template == template), value: edit_my_account_path(page: template) }
                 = description
         .edit-form-well-submit-wrapper
           = hidden_field_tag :page, @edit_template

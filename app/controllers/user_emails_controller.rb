@@ -4,7 +4,7 @@ class UserEmailsController < ApplicationController
   def resend_confirmation
     flash[:success] = translation(:resend_confirmation)
     @user_email.send_confirmation_email
-    redirect_to my_account_path
+    redirect_to edit_my_account_path
   end
 
   def confirm
@@ -15,7 +15,7 @@ class UserEmailsController < ApplicationController
     else
       flash[:error] = translation(:incorrect_token, user_email: @user_email.email)
     end
-    redirect_to my_account_path
+    redirect_to edit_my_account_path
   end
 
   def make_primary
@@ -25,7 +25,7 @@ class UserEmailsController < ApplicationController
     else
       flash[:info] = translation(:confirm_email_first, user_email: @user_email.email)
     end
-    redirect_to my_account_path
+    redirect_to edit_my_account_path
   end
 
   def destroy
@@ -37,7 +37,7 @@ class UserEmailsController < ApplicationController
       flash[:success] = translation(:email_removed, user_email: @user_email.email)
       @user_email.destroy
     end
-    redirect_to my_account_path
+    redirect_to edit_my_account_path
   end
 
   private

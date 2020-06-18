@@ -78,10 +78,15 @@ module HeaderTagHelper
     ]
   end
 
-  def welcome_header_tags
-    if action_name == "user_home"
+  def my_accounts_header_tags
+    if action_name == "show"
       self.page_title = (current_user && current_user.name) ? "#{current_user.name} on Bike Index" : "Your bikes"
-    elsif action_name == "choose_registration"
+    end
+    default_header_tag_array
+  end
+
+  def welcome_header_tags
+    if action_name == "choose_registration"
       self.page_title = translation_title(location: "meta_titles.bikes_new")
       self.page_description = translation_description(location: "meta_descriptions.bikes_new")
     end
@@ -163,7 +168,7 @@ module HeaderTagHelper
 
   private
 
-  SPECIAL_CONTROLLERS = %w(bikes welcome news users landing_pages).freeze
+  SPECIAL_CONTROLLERS = %w(bikes welcome my_accounts news users landing_pages).freeze
   DEFAULT_IMAGE = "/bike_index.png".freeze
 
   def default_header_tag_array(meta_overrides = {})
