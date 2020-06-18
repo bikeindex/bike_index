@@ -7,7 +7,7 @@ RSpec.describe UsersController, type: :controller do
       include_context :logged_in_as_user
       it "redirects and sets the flash" do
         get :new
-        expect(response).to redirect_to(:user_home)
+        expect(response).to redirect_to(:my_account)
         expect(flash).to be_present
       end
       context "return_to" do
@@ -65,7 +65,7 @@ RSpec.describe UsersController, type: :controller do
       include_context :logged_in_as_user
       it "redirects to user_home" do
         get :please_confirm_email
-        expect(response).to redirect_to user_home_path
+        expect(response).to redirect_to my_account_path
       end
       context "unconfirmed user" do
         let(:user) { FactoryBot.create(:user) }
@@ -278,7 +278,7 @@ RSpec.describe UsersController, type: :controller do
         it "logins and redirect when confirmation succeeds" do
           get :confirm, params: { id: user.id, code: user.confirmation_token }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
         end
 
@@ -336,7 +336,7 @@ RSpec.describe UsersController, type: :controller do
           user.reload
           expect(user.confirmed?).to be_falsey
           get :confirm, params: { id: user.id, code: user.confirmation_token }
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect_confirmed_and_set_ip(user)
           expect(user.memberships.count).to eq 0
@@ -486,7 +486,7 @@ RSpec.describe UsersController, type: :controller do
       user.show_bikes = false
       user.save
       get :show, params: { id: user.username }
-      expect(response).to redirect_to user_home_url
+      expect(response).to redirect_to my_account_url
     end
 
     it "shows the page if the user exists and wants to show their page" do
@@ -713,7 +713,7 @@ RSpec.describe UsersController, type: :controller do
     it "updates the terms of service" do
       set_current_user(user)
       post :update, params: { id: user.username, user: { terms_of_service: "1" } }
-      expect(response).to redirect_to(user_home_url)
+      expect(response).to redirect_to(my_account_url)
       expect(user.reload.terms_of_service).to be_truthy
     end
 

@@ -78,11 +78,11 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
 
   context "given an authenticated non-superadmin" do
     include_context :logged_in_as_user
-    it { expect(get(:index)).to redirect_to(user_home_url) }
-    it { expect(get(:new)).to redirect_to(user_home_url) }
-    it { expect(get(:edit, params: { id: 1 })).to redirect_to(user_home_url) }
-    it { expect(post(:create)).to redirect_to(user_home_url) }
-    it { expect(put(:update, params: { id: 1 })).to redirect_to(user_home_url) }
-    it { expect(delete(:destroy, params: { id: 1 })).to redirect_to(user_home_url) }
+    it { expect(get(:index)).to redirect_to(my_account_url) }
+    it { expect(get(:new)).to redirect_to(my_account_url) }
+    it { expect(get(:edit, params: { id: 1 })).to redirect_to(my_account_url) }
+    it { expect(post(:create)).to redirect_to(my_account_url) }
+    it { expect(put(:update, params: { id: 1 })).to redirect_to(my_account_url) }
+    it { expect(delete(:destroy, params: { id: 1 })).to redirect_to(my_account_url) }
   end
 end

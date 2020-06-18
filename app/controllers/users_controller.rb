@@ -93,7 +93,7 @@ class UsersController < ApplicationController
     @owner = user
     @user = user
     unless user == current_user || @user.show_bikes
-      redirect_to user_home_url, notice: translation(:user_not_sharing) and return
+      redirect_to my_account_url, notice: translation(:user_not_sharing) and return
     end
     @page = params[:page] || 1
     @per_page = params[:per_page] || 9
@@ -112,11 +112,11 @@ class UsersController < ApplicationController
       if @user.password_reset_token != params.dig(:user, :password_reset_token)
         remove_session
         flash[:error] = translation(:does_not_match_token)
-        redirect_to user_home_url and return
+        redirect_to my_account_url and return
       elsif @user.auth_token_expired?("password_reset_token")
         remove_session
         flash[:error] = translation(:token_expired)
-        redirect_to user_home_url and return
+        redirect_to my_account_url and return
       end
     elsif params.dig(:user, :password).present?
       unless @user.authenticate(params.dig(:user, :current_password))
@@ -132,7 +132,7 @@ class UsersController < ApplicationController
             @user.terms_of_service = true
             @user.save
             flash[:success] = translation(:you_can_use_bike_index)
-            redirect_to user_home_url and return
+            redirect_to my_account_url and return
           else
             flash[:notice] = translation(:accept_tos)
             redirect_to accept_terms_url and return

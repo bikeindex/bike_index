@@ -55,12 +55,11 @@ Rails.application.routes.draw do
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
-  %w(update_browser user_home choose_registration goodbye bike_creation_graph).freeze.each do |page|
+  %w(update_browser choose_registration goodbye bike_creation_graph).freeze.each do |page|
     get page, controller: "welcome", action: page
   end
 
   get "update_browser", to: "welcome#update_browser"
-  get "user_home", to: "welcome#user_home"
   get "choose_registration", to: "welcome#choose_registration"
   get "goodbye", to: "welcome#goodbye"
   get "bike_creation_graph", to: "welcome#bike_creation_graph"
@@ -110,6 +109,8 @@ Rails.application.routes.draw do
     member { get "unsubscribe" }
   end
   get :edit_my_account, to: "users#edit", as: :edit_my_account
+  # TODO: Move edit_my_account into my_account controller
+  resource :my_account, only: %i[show]
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
   resources :user_embeds, only: [:show]

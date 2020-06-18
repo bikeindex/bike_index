@@ -82,101 +82,37 @@ RSpec.describe WelcomeController, type: :controller do
     end
   end
 
-  describe "user_home" do
-    context "user not logged in" do
-      it "redirects" do
-        get :user_home
-        expect(response).to redirect_to(new_user_url)
-      end
+  describe "recovery_stories" do
+    it "renders recovery stories" do
+      FactoryBot.create_list(:recovery_display, 3)
+      get :recovery_stories, params: { per_page: 2 }
+      expect(assigns(:recovery_displays).count).to eq 2
+      expect(response.status).to eq(200)
+      expect(response).to render_template("recovery_stories")
+      expect(flash).to_not be_present
     end
 
-    context "user logged in" do
-      before { set_current_user(user) }
-
-      context "unconfirmed" do
-        let(:user) { FactoryBot.create(:user) }
-        it "redirects" do
-          get :user_home
-          expect(flash).to_not be_present
-          expect(response).to redirect_to(please_confirm_email_users_path)
-        end
-      end
-
-      context "confirmed" do
-        let(:user) { FactoryBot.create(:user_confirmed) }
-        context "without anything" do
-          it "renders" do
-            get :user_home
-            expect(response.status).to eq(200)
-            expect(response).to render_template("user_home")
-            expect(session[:passive_organization_id]).to eq "0"
-            expect(assigns[:passive_organization]).to be_nil
-          end
-        end
-        context "with organization" do
-          let(:organization) { FactoryBot.create(:organization) }
-          let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-          it "sets passive_organization_id" do
-            get :user_home
-            expect(response.status).to eq(200)
-            expect(response).to render_template("user_home")
-            expect(session[:passive_organization_id]).to eq organization.id
-            expect(assigns[:passive_organization]).to eq organization
-          end
-        end
-        context "with stuff" do
-          let(:ownership) { FactoryBot.create(:ownership, user_id: user.id, current: true) }
-          let(:bike) { ownership.bike }
-          let(:bike_2) { FactoryBot.create(:bike) }
-          let(:lock) { FactoryBot.create(:lock, user: user) }
-          let(:organization) { FactoryBot.create(:organization) }
-          before do
-            allow_any_instance_of(User).to receive(:bikes) { [bike, bike_2] }
-            allow_any_instance_of(User).to receive(:locks) { [lock] }
-          end
-          it "renders and user things are assigned" do
-            session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization, permit it
-            get :user_home, params: { per_page: 1 }
-            expect(response.status).to eq(200)
-            expect(response).to render_template("user_home")
-            expect(assigns(:bikes).count).to eq 1
-            expect(assigns(:per_page).to_s).to eq "1"
-            expect(assigns(:bikes).first).to eq(bike)
-            expect(assigns(:locks).first).to eq(lock)
-            expect(session[:passive_organization_id]).to eq organization.id
-            expect(assigns[:passive_organization]).to eq organization
-          end
-        end
-        context "with show_general_alert" do
-          before { user.update_column :general_alerts, ["has_stolen_bikes_without_locations"] }
-          it "renders with show_general_alert" do
-            get :user_home
-
-            expect(response).to be_ok
-            expect(assigns(:show_general_alert)).to be_truthy
-            expect(response).to render_template("user_home")
-          end
-        end
-      end
+    it "renders no recovery stories if requested page exceeds valid range" do
+      FactoryBot.create_list(:recovery_display, 2)
+      get :recovery_stories, params: { per_page: 2, page: 2 }
+      expect(assigns(:recovery_displays)).to be_empty
+      expect(response.status).to eq(200)
+      expect(response).to render_template("recovery_stories")
+      expect(flash).to be_present
     end
-
-    describe "recovery_stories" do
-      it "renders recovery stories" do
-        FactoryBot.create_list(:recovery_display, 3)
-        get :recovery_stories, params: { per_page: 2 }
+    context "with user" do
+      include_context :logged_in_as_user
+      let(:organization) { FactoryBot.create(:organization) }
+      it "renders" do
+        session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization, permit it
+        FactoryBot.create_list(:recovery_display, 2)
+        get :recovery_stories
         expect(assigns(:recovery_displays).count).to eq 2
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")
-        expect(flash).to_not be_present
-      end
-
-      it "renders no recovery stories if requested page exceeds valid range" do
-        FactoryBot.create_list(:recovery_display, 2)
-        get :recovery_stories, params: { per_page: 2, page: 2 }
-        expect(assigns(:recovery_displays)).to be_empty
-        expect(response.status).to eq(200)
-        expect(response).to render_template("recovery_stories")
-        expect(flash).to be_present
+        # These tests use to be in user_home, but that switched to be a request spec, so these moved here
+        expect(session[:passive_organization_id]).to eq organization.id
+        expect(assigns[:passive_organization]).to eq organization
       end
     end
   end

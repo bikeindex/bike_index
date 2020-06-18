@@ -12,7 +12,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
   let(:controller_namespace) { nil }
 
   describe "header_tags" do
-    %w(bikes welcome news users landing_pages).each do |controller_name|
+    %w(bikes welcome news my_accounts users landing_pages).each do |controller_name|
       context controller_name do
         let(:controller_name) { controller_name }
         it "calls special_controller name" do
@@ -225,13 +225,13 @@ RSpec.describe HeaderTagHelper, type: :helper do
     end
   end
 
-  describe "welcome_header_tags" do
-    context "user_home" do
-      let(:action_name) { "user_home" }
+  describe "my_accounts_header_tags" do
+    context "show" do
+      let(:action_name) { "show" }
       context "nil current_user name" do
         it "sets the page title" do
           allow(view).to receive(:current_user) { nil }
-          helper.welcome_header_tags
+          helper.my_accounts_header_tags
           expect(helper.page_title).to eq "Your bikes"
         end
       end
@@ -239,11 +239,14 @@ RSpec.describe HeaderTagHelper, type: :helper do
         let(:user) { FactoryBot.build(:user, name: "John") }
         it "sets the page title" do
           allow(view).to receive(:current_user) { user }
-          helper.welcome_header_tags
+          helper.my_accounts_header_tags
           expect(helper.page_title).to eq "John on Bike Index"
         end
       end
     end
+  end
+
+  describe "welcome_header_tags" do
     context "choose_registration" do
       let(:action_name) { "choose_registration" }
       it "sets the page title" do

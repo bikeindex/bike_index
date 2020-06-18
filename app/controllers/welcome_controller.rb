@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
   before_action :force_html_response
-  before_action :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
+  before_action :authenticate_user_for_welcome_controller, only: [:choose_registration]
   # Allow iframes on the index URL because safari is an asshole, and doesn't honor our iframe options
   skip_before_action :set_x_frame_options_header, only: [:bike_creation_graph, :index]
 
@@ -19,21 +19,6 @@ class WelcomeController < ApplicationController
 
   def goodbye
     redirect_to logout_url and return if current_user_or_unconfirmed_user.present?
-  end
-
-  def user_home
-    page = params[:page] || 1
-    @locks_active_tab = params[:active_tab] == "locks"
-    @per_page = params[:per_page] || 20
-    # If there are over 100 bikes created by the user, we'll have problems loading and sorting them
-    if current_user.creation_states.limit(101).count > 100
-      bikes = current_user.rough_approx_bikes.page(page).per(@per_page)
-      @bikes = bikes.decorate
-    else
-      bikes = Kaminari.paginate_array(current_user.bikes).page(page).per(@per_page)
-      @bikes = BikeDecorator.decorate_collection(bikes)
-    end
-    @locks = LockDecorator.decorate_collection(current_user.locks)
   end
 
   def choose_registration

@@ -29,7 +29,7 @@ RSpec.describe Organized::BikesController, type: :controller do
     it "redirects the user, reassigns passive_organization_id" do
       session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization
       get :index, params: { organization_id: organization.to_param }
-      expect(response.location).to eq user_home_url
+      expect(response.location).to eq my_account_url
       expect(flash[:error]).to be_present
       expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
