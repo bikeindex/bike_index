@@ -22,7 +22,7 @@ class LocksController < ApplicationController
     @lock = current_user.locks.build(permitted_parameters)
     if @lock.save
       flash[:success] = translation(:lock_created)
-      redirect_to user_home_path(active_tab: "locks")
+      redirect_to my_account_path(active_tab: "locks")
     else
       @page_errors = @lock.errors
       render action: :new
@@ -31,7 +31,7 @@ class LocksController < ApplicationController
 
   def destroy
     @lock.destroy
-    redirect_to user_home_path(active_tab: "locks")
+    redirect_to my_account_path(active_tab: "locks")
   end
 
   private
@@ -40,7 +40,7 @@ class LocksController < ApplicationController
     @lock = current_user.locks.where(id: params[:id]).first
     unless @lock.present?
       flash[:error] = translation(:not_your_lock)
-      redirect_to user_home_path and return
+      redirect_to my_account_path and return
     end
   end
 

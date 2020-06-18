@@ -203,14 +203,12 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 // separated because it's a lot
 @import "revised/pages/bikes/multi_serial_search";
 
-// User pages
-@import "revised/pages/user/home";
-@import "revised/pages/user/edit";
+// My Account pages
+@import "revised/pages/my_accounts/show";
+@import "revised/pages/my_accounts/edit";
 
-// my_account page
+// public user show page
 @import "revised/pages/user/show";
-
-// public show page
 
 // Error pages
 @import "revised/pages/errors";

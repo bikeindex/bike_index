@@ -75,7 +75,7 @@ RSpec.describe SessionsController, type: :controller do
       it "flash errors, redirects to home" do
         post :magic_link, params: { token: SecurityTokenizer.new_token }
         expect(cookies.signed[:auth]).to_not be_nil
-        expect(response).to redirect_to(user_home_url)
+        expect(response).to redirect_to(my_account_url)
         expect(flash[:success]).to be_present
       end
     end
@@ -97,7 +97,7 @@ RSpec.describe SessionsController, type: :controller do
         request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
         post :sign_in_with_magic_link, params: { token: user.magic_link_token }
         expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-        expect(response).to redirect_to user_home_url
+        expect(response).to redirect_to my_account_url
         user.reload
         expect(user.last_login_at).to be_within(1.second).of Time.current
         expect(user.last_login_ip).to eq "66.66.66.66"
@@ -111,7 +111,7 @@ RSpec.describe SessionsController, type: :controller do
           expect(user.confirmed?).to be_falsey
           post :sign_in_with_magic_link, params: { token: user.magic_link_token }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
           user.reload
           expect(user.last_login_at).to be_within(1.second).of Time.current
           expect(user.magic_link_token).to be_blank
@@ -185,11 +185,11 @@ RSpec.describe SessionsController, type: :controller do
       describe "when authentication works" do
         it "signs in" do
           expect(user).to receive(:authenticate).and_return(true)
-          request.env["HTTP_REFERER"] = user_home_url
+          request.env["HTTP_REFERER"] = my_account_url
           request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
           post :create, params: { session: { password: "would be correct" } }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           user.reload
           expect(user.last_login_at).to be_within(1.second).of Time.current
@@ -201,7 +201,7 @@ RSpec.describe SessionsController, type: :controller do
             expect(user.last_login_ip).to be_blank
             session[:partner] = "bikehub"
             expect(user).to receive(:authenticate).and_return(true)
-            request.env["HTTP_REFERER"] = user_home_url
+            request.env["HTTP_REFERER"] = my_account_url
             request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
             post :create, params: { session: { password: "would be correct" } }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
@@ -217,7 +217,7 @@ RSpec.describe SessionsController, type: :controller do
           let(:user) { FactoryBot.create(:admin) }
           it "authenticates and redirects to admin" do
             expect(user).to receive(:authenticate).and_return(true)
-            request.env["HTTP_REFERER"] = user_home_url
+            request.env["HTTP_REFERER"] = my_account_url
             post :create, params: { session: { password: "would be correct" } }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(response).to redirect_to admin_root_url
@@ -256,7 +256,7 @@ RSpec.describe SessionsController, type: :controller do
           post :create, params: { session: { thing: "asdfasdf" } }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
         end
 
         it "doesn't redirect and clears the session if not a valid oauth url" do
@@ -265,7 +265,7 @@ RSpec.describe SessionsController, type: :controller do
           post :create, params: { session: { thing: "asdfasdf" } }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to my_account_url
         end
       end
 
@@ -283,7 +283,7 @@ RSpec.describe SessionsController, type: :controller do
         let(:organization_kind) { "bike_shop" }
         it "signs in" do
           expect(user).to receive(:authenticate).and_return(true)
-          request.env["HTTP_REFERER"] = user_home_url
+          request.env["HTTP_REFERER"] = my_account_url
           post :create, params: { session: { password: "would be correct" } }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(session[:render_donation_request]).to be_falsey
@@ -293,7 +293,7 @@ RSpec.describe SessionsController, type: :controller do
           let(:organization_kind) { "law_enforcement" }
           it "sets flash of render_donation_request" do
             expect(user).to receive(:authenticate).and_return(true)
-            request.env["HTTP_REFERER"] = user_home_url
+            request.env["HTTP_REFERER"] = my_account_url
             post :create, params: { session: { password: "would be correct" } }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"

@@ -4222,7 +4222,7 @@ nl:
       grootste open fietsregistratieservice ter wereld te worden
     users_new: Meld u aan voor Bike Index
     welcome_index: 'Het beste fietsregister: eenvoudig, veilig en gratis.'
-    welcome_user_home: Uw fietsen op Bike Index
+    my_accounts_show: Uw fietsen op Bike Index
   meta_titles:
     about: FAQ
     bikes_index: Zoekresultaten
@@ -5326,42 +5326,6 @@ nl:
       go_here_to_learn_more: Ga hierheen voor meer informatie
       oh_no: Oh nee!
       unsupported_browser: Helaas ondersteunt Bike Index uw browser niet.
-    user_home:
-      add_a_bike: Voeg een fiets toe
-      add_a_lock: Voeg een slot toe
-      add_a_photo: Voeg een foto toe
-      bikes: fietsen
-      combination: Combinatie
-      date_stolen: Datum gestolen
-      edit: Bewerken
-      edit_bike: Fiets bewerken
-      key_serial: Sleutel serienummer
-      location: Plaats
-      lock_type: Slottype
-      locks: sloten
-      manufacturer: Fabrikant
-      mark_bike_stolen: Markeer fiets als gestolen
-      primary_colors: Primaire kleuren
-      printable_pdf: Afdrukbaar (pdf)
-      register_new_items: Registreer nieuwe items
-      serial: Serie
-      sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
-        maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
-      stolen: GESTOLEN
-      tell_us_more_about_yourself: Vertel ons meer over uzelf.
-      thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
-        heeft toegevoegd aan de index.
-      to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
-      update_your_profile: update uw profiel
-      user_bikes: "%{current_user_name} Fietsen"
-      welcome: Welkom
-      you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
-      you_have_no_registered_locks: U heeft geen geregistreerde sloten
-      abandoned: VERLATEN
-      date_abandoned: Datum van vermissing
-      next: Volgende stappen
-      list_a_bike_on_bikefair: Zet een fiets op BikeFair
-      want_to_sell_your_bikes: Wilt u een van uw geregistreerde fietsen verkopen?
   locales:
     en: English (Engels)
     nl: Nederlands
@@ -5751,3 +5715,40 @@ nl:
     payments:
       enter_the_minimum_amount: Voer een bedrag groter dan 1 in
       select_or_enter_amount: Selecteer of voer een bedrag in
+  my_accounts:
+    show:
+      abandoned: VERLATEN
+      add_a_bike: Voeg een fiets toe
+      add_a_lock: Voeg een slot toe
+      add_a_photo: Voeg een foto toe
+      bikes: fietsen
+      combination: Combinatie
+      date_abandoned: Datum van vermissing
+      date_stolen: Datum gestolen
+      edit: Bewerken
+      edit_bike: Fiets bewerken
+      key_serial: Sleutel serienummer
+      list_a_bike_on_bikefair: Zet een fiets op BikeFair
+      location: Plaats
+      lock_type: Slottype
+      locks: sloten
+      manufacturer: Fabrikant
+      mark_bike_stolen: Markeer fiets als gestolen
+      next: Volgende stappen
+      primary_colors: Primaire kleuren
+      printable_pdf: Afdrukbaar (pdf)
+      register_new_items: Registreer nieuwe items
+      serial: Serie
+      sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
+        maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
+      stolen: GESTOLEN
+      tell_us_more_about_yourself: Vertel ons meer over uzelf.
+      thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
+        heeft toegevoegd aan de index.
+      to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
+      update_your_profile: update uw profiel
+      user_bikes: "%{current_user_name} Fietsen"
+      want_to_sell_your_bikes: Wilt u een van uw geregistreerde fietsen verkopen?
+      welcome: Welkom
+      you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
+      you_have_no_registered_locks: U heeft geen geregistreerde sloten

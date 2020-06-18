@@ -63,7 +63,7 @@ RSpec.describe IntegrationsController, type: :controller do
           expect do
             get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             expect(flash[:success]).to be_present
-            expect(response).to redirect_to(user_home_url)
+            expect(response).to redirect_to(my_account_url)
           end.to change(Integration, :count).by 1
         end
 
@@ -73,7 +73,7 @@ RSpec.describe IntegrationsController, type: :controller do
             expect do
               get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             end.to change(Integration, :count).by 0
-            expect(response).to redirect_to(user_home_url)
+            expect(response).to redirect_to(my_account_url)
           end
         end
       end
@@ -134,7 +134,7 @@ RSpec.describe IntegrationsController, type: :controller do
           expect do
             get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             expect(flash[:success]).to be_present
-            expect(response).to redirect_to(user_home_url)
+            expect(response).to redirect_to(my_account_url)
           end.to change(Integration, :count).by 1
         end
 
@@ -144,7 +144,7 @@ RSpec.describe IntegrationsController, type: :controller do
             expect do
               get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             end.to change(Integration, :count).by 0
-            expect(response).to redirect_to(user_home_url)
+            expect(response).to redirect_to(my_account_url)
           end
         end
       end

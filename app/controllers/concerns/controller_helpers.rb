@@ -74,7 +74,7 @@ module ControllerHelpers
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser
-    return user_home_url(subdomain: false) unless current_user.default_organization.present?
+    return my_account_url(subdomain: false) unless current_user.default_organization.present?
     if user_root_bike_search?
       default_bike_search_path
     else
@@ -261,13 +261,13 @@ module ControllerHelpers
   def require_member!
     return true if current_user.member_of?(current_organization)
     flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to user_home_url(subdomain: false) and return
+    redirect_to my_account_url(subdomain: false) and return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
     flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to user_home_url and return
+    redirect_to my_account_url and return
   end
 
   def require_index_admin!

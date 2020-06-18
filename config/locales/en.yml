@@ -3854,6 +3854,7 @@ en:
     manufacturers_index: >-
       Bicycle related manufacturers listed on Bike Index - all the brands you know
       and then some.
+    my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
@@ -3863,7 +3864,6 @@ en:
       open bike registration service in the world
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
-    welcome_user_home: Your bikes on Bike Index
   meta_titles:
     about: FAQ
     bikes_index: Search results
@@ -3916,6 +3916,44 @@ en:
       en-GB: GBP
       es: EUR
       nl: EUR
+  my_accounts:
+    show:
+      abandoned: ABANDONED
+      add_a_bike: Add a bike
+      add_a_lock: Add a lock
+      add_a_photo: Add a photo
+      bikes: bikes
+      combination: Combination
+      date_abandoned: Date abandoned
+      date_stolen: Date stolen
+      edit: Edit
+      edit_bike: Edit Bike
+      key_serial: Key Serial
+      list_a_bike_on_bikefair: List a bike on BikeFair
+      location: Location
+      lock_type: Lock Type
+      locks: locks
+      manufacturer: Manufacturer
+      mark_bike_stolen: Mark bike stolen
+      next: Next steps
+      primary_colors: Primary colors
+      printable_pdf: Printable (pdf)
+      register_new_items: Register new items
+      serial: Serial
+      sorry_your_bike_was_stolen: >-
+        We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
+        able to search for it, you'll get it back!
+      stolen: STOLEN
+      tell_us_more_about_yourself: Tell us more about yourself.
+      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
+        to the Index.
+      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      update_your_profile: Update your profile
+      user_bikes: "%{current_user_name} bikes"
+      want_to_sell_your_bikes: Want to sell one of your registered bikes?
+      welcome: Welcome
+      you_have_no_registered_bikes: You have no registered bikes
+      you_have_no_registered_locks: You have no registered locks
   news:
     index:
       bike_index_blog: Bike Index Blog
@@ -5350,40 +5388,3 @@ en:
       go_here_to_learn_more: Go here to learn more
       oh_no: Oh No!
       unsupported_browser: We're sorry, Bike Index does not support your browser.
-    user_home:
-      abandoned: ABANDONED
-      add_a_bike: Add a bike
-      add_a_lock: Add a lock
-      add_a_photo: Add a photo
-      bikes: bikes
-      combination: Combination
-      date_abandoned: Date abandoned
-      date_stolen: Date stolen
-      edit: Edit
-      edit_bike: Edit Bike
-      key_serial: Key Serial
-      list_a_bike_on_bikefair: List a bike on BikeFair
-      location: Location
-      lock_type: Lock Type
-      locks: locks
-      manufacturer: Manufacturer
-      mark_bike_stolen: Mark bike stolen
-      next: Next steps
-      primary_colors: Primary colors
-      printable_pdf: Printable (pdf)
-      register_new_items: Register new items
-      serial: Serial
-      sorry_your_bike_was_stolen: >-
-        We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
-        able to search for it, you'll get it back!
-      stolen: STOLEN
-      tell_us_more_about_yourself: Tell us more about yourself.
-      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
-        to the Index.
-      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
-      update_your_profile: Update your profile
-      user_bikes: "%{current_user_name} bikes"
-      want_to_sell_your_bikes: Want to sell one of your registered bikes?
-      welcome: Welcome
-      you_have_no_registered_bikes: You have no registered bikes
-      you_have_no_registered_locks: You have no registered locks
