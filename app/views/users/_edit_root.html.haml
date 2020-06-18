@@ -23,7 +23,7 @@
         - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
         = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
 
-    - hot_sheet_organizations = current_user.organizations.select { |o| o.hot_sheet_enabled? }
+    - hot_sheet_organizations = current_user.organizations.select { |o| o.hot_sheet_on? }
     - if hot_sheet_organizations.any?
       = hidden_field_tag :hot_sheet_organization_ids, hot_sheet_organizations.pluck(:id).join(",")
     - hot_sheet_organizations.each do |organization|

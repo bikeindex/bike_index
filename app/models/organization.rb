@@ -175,7 +175,7 @@ class Organization < ApplicationRecord
 
   def suspended?; is_suspended? end
 
-  def hot_sheet_enabled?; hot_sheet_configuration.present? && hot_sheet_configuration.enabled? end
+  def hot_sheet_on?; hot_sheet_configuration.present? && hot_sheet_configuration.enabled? end
 
   def current_invoices; invoices.active end
 

@@ -239,7 +239,7 @@
             %tr
               %td Hot Sheet
               %td
-                - if @organization.hot_sheet_enabled?
+                - if @organization.hot_sheet_on?
                   Enabled
                   %em.less-strong
                     = "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count)

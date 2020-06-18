@@ -91,7 +91,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         end.to change(HotSheetConfiguration, :count).by 1
         expect(flash[:success]).to be_present
         current_organization.reload
-        expect(current_organization.hot_sheet_enabled?).to be_truthy
+        expect(current_organization.hot_sheet_on?).to be_truthy
         expect(current_organization.hot_sheet_configuration).to be_present
         expect(current_organization.hot_sheet_configuration.send_hour).to eq 0
 
