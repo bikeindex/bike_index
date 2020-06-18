@@ -175,6 +175,8 @@ class Organization < ApplicationRecord
 
   def suspended?; is_suspended? end
 
+  def appointment_functionality_enabled?; any_enabled?(PaidFeature::APPOINTMENT_FEATURES) end
+
   def hot_sheet_enabled?; hot_sheet_configuration.present? && hot_sheet_configuration.enabled? end
 
   def current_invoices; invoices.active end
