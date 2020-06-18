@@ -37,6 +37,8 @@ class Location < ApplicationRecord
 
   def virtual_line_on?; appointment_configuration.present? && appointment_configuration.virtual_line_on? end
 
+  def destroy_forbidden?; virtual_line_on? end # may also block if it's had appointments
+
   def publicly_visible=(val)
     self.not_publicly_visible = !ParamsNormalizer.boolean(val)
   end
@@ -64,8 +66,9 @@ class Location < ApplicationRecord
     name == organization.name ? name : "#{organization.name} - #{name}"
   end
 
+  # Quick and dirty hack to ensure it's block - frontend should prevent doing this normally
   def ensure_destroy_permitted!
-    return true unless virtual_line_on?
+    return true unless destroy_forbidden?
     raise StandardError, "Can't destroy a location with appointments enabled"
   end
 

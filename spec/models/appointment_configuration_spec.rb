@@ -13,9 +13,12 @@ RSpec.describe AppointmentConfiguration, type: :model do
       expect(appointment_configuration.reasons).to match_array(default_reasons)
       expect(appointment_configuration.location_id).to eq location.id
       expect(location.virtual_line_on?).to be_truthy
+      expect(organization.appointment_functionality_enabled?).to be_truthy
       appointment_configuration.update(virtual_line_on: false)
-      expect(organization.appointments_enabled?).to be_truthy
+      location.reload
       expect(location.virtual_line_on?).to be_falsey
+      # Because this is about access, not whether it's on
+      expect(organization.appointment_functionality_enabled?).to be_truthy
     end
   end
 end

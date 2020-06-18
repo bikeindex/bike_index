@@ -31,8 +31,12 @@
               = f.select(:country_id, Country.select_options, class: "form-control mt-1" )
           .col-lg-6
             .form-group.text-center
-              = f.check_box :_destroy, class: "d-none"
-              = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
+              - if f.object.destroy_forbidden?
+                %small.less-strong
+                  can't remove, has appointments
+              - else
+                = f.check_box :_destroy, class: "d-none"
+                = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
         .row
           .form-check
             = f.check_box :publicly_visible

@@ -241,8 +241,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         end
 
         context "removing a location" do
+          before { update_attributes[:locations_attributes]["0"][:_destroy] = 1 }
           it "removes the location" do
-            update_attributes[:locations_attributes]["0"][:_destroy] = 1
             expect(location1).to be_present
             expect(current_organization.locations.count).to eq 1
 
@@ -268,11 +268,12 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.to_coordinates).to eq location.to_coordinates
           end
           context "location has appointment_configuration" do
-            let!(:appointment_configuration) { FactoryBot.create(:appointment_configuration, location: location1, organization: current_organization) }
+            let!(:appointment_configuration) { FactoryBot.create(:appointment_configuration, location: location1, organization: current_organization, virtual_line_on: true) }
             it "does not remove" do
-              update_attributes[:locations_attributes]["0"][:_destroy] = 1
+              location1.reload
               expect(location1).to be_present
-              expect(location1.virtual_line_enabled?).to be_truthy
+              expect(location1.virtual_line_on?).to be_truthy
+              expect(location1.destroy_forbidden?).to be_truthy
               expect(current_organization.locations.count).to eq 1
 
               expect do

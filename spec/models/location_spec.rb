@@ -37,6 +37,7 @@ RSpec.describe Location, type: :model do
       expect(organization.allowed_show?).to be_falsey
       expect(location.shown).to be_falsey
       expect(location.not_publicly_visible).to be_falsey
+      expect(location.destroy_forbidden?).to be_falsey
       organization.reload
       Sidekiq::Worker.clear_all
       expect do
