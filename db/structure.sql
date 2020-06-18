@@ -169,7 +169,7 @@ CREATE TABLE public.appointment_configurations (
     organization_id bigint,
     location_id bigint,
     reasons jsonb,
-    virtual_line_enabled boolean DEFAULT false,
+    virtual_line_on boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

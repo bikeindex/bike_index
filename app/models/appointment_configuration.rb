@@ -8,5 +8,11 @@ class AppointmentConfiguration < ApplicationRecord
     ["Bike purchase", "Other purchase", "Service"]
   end
 
-  def virtual_line_enabled?; virtual_line_enabled end
+  def virtual_line_on?; virtual_line_on end
+
+  def reasons_text; reasons.join(", ") end
+
+  def reasons_text=(val)
+    self.reasons = val.to_s.split(/,|\n/).map(&:strip).reject(&:blank?)
+  end
 end

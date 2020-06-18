@@ -1,0 +1,29 @@
+-# TODO: translations
+.organized-page-header
+  %h1
+    Appointments Configuration
+
+- if current_organization.locations.count == 0
+  .alert.alert-warning
+    %h3.uncap
+      = current_organization.name
+      does not have a location
+    %p
+      = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "text-underline"
+      to be able to enable Virtual Line
+- else
+  %table.table.table-striped
+    %tbody
+      - current_organization.locations.each do |location|
+        %tr
+          %td
+            = link_to location.name, edit_organization_appointment_configuration_path(location.to_param, organization_id: current_organization)
+          %td
+            - if location.virtual_line_on?
+              %strong
+                Virtual line
+                %span.text-success on
+            - else
+              %small.less-strong
+                Virtual line
+                %span.text-warning off

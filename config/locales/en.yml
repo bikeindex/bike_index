@@ -2099,7 +2099,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2125,7 +2125,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3688,6 +3688,7 @@ en:
     application:
       about: About
       add_a_bike: Add a bike
+      appointment_configuration: Appointments configuration
       blog: Blog
       customize_emails: Customize emails
       discuss: Discuss
@@ -5009,6 +5010,7 @@ en:
         Bike Index provides additional features for verified Law Enforcement organizations.
         Please contact %{email_link} to get them enabled.
       admin_panel: Admin Panel
+      appointment_configuration: Appointments config
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports

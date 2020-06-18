@@ -330,6 +330,7 @@ Rails.application.routes.draw do
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
+    resources :appointments, only: %i[index update]
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do
@@ -343,9 +344,9 @@ Rails.application.routes.draw do
     resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
-        get :hot_sheet_configuration
       end
     end
+    resources :appointment_configurations, only: %i[index edit update]
     resources :users, except: [:show]
   end
 

@@ -83,20 +83,26 @@
                     = link_to t(".parking_notification_unregistered"), new_organization_bike_path(passive_organization.to_param, parking_notification: true), class: "nav-link #{new_bike_with_parking_notification ? 'active' : ''} secondary-item"
 
                 %li.divider-nav-item
+                - additional_divider = false
                 - if passive_organization.enabled?("bike_stickers")
+                  - additional_divider = true
                   %li
                     = active_link t(".registration_stickers"), organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                 - if passive_organization.enabled?("hot_sheet")
+                  - additional_divider = true
                   %li
                     = active_link t(".hot_sheet"), organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
                 - if passive_organization.enabled?("csv_exports")
+                  - additional_divider = true
                   %li
                     = active_link t(".exports"), organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                 - if passive_organization.deliver_graduated_notifications?
+                  - additional_divider = true
                   %li
                     = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                 - if current_user.admin_of?(passive_organization) || current_user.superuser?
-                  %li.divider-nav-item
+                  - if additional_divider
+                    %li.divider-nav-item
                   %li
                     = active_link t(".users"), organization_users_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                   %li
@@ -109,6 +115,9 @@
                   - if passive_organization.enabled?("hot_sheet")
                     %li
                       = active_link t(".hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  - if passive_organization.appointment_functionality_enabled?
+                    %li
+                      = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
               - if current_user&.superuser?
                 %li.divider-nav-item
                 %li

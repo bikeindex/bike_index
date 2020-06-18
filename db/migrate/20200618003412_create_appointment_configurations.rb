@@ -4,7 +4,7 @@ class CreateAppointmentConfigurations < ActiveRecord::Migration[5.2]
       t.references :organization
       t.references :location
       t.jsonb :reasons
-      t.boolean :virtual_line_enabled, default: false
+      t.boolean :virtual_line_on, default: false
 
       t.timestamps
     end

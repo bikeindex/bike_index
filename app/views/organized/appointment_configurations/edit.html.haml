@@ -1,0 +1,30 @@
+-# TODO: translations
+.organized-page-header
+  %h1
+    Appointments Configuration
+
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Virtual Line on?
+          %td
+            - if @appointment_configuration.virtual_line_on?
+              = check_mark
+            - else
+              %small.less-strong false
+
+.row.mt-4
+  .col-md-6
+    = form_for @appointment_configuration, url: organization_appointment_configuration_path(@location.to_param, organization_id: current_organization), action: "update", method: :patch do |f|
+      .form-group
+        = f.check_box :virtual_line_on
+        = f.label :virtual_line_on, class: "org-form-label"
+      .form-group
+        = f.label :reasons_text do
+          Customer visit reasons
+          %small.less-strong comma separated
+        = f.text_area :reasons_text, class: "form-control"
+      .mt-2
+        = submit_tag "Save", class: "btn btn-success btn-md-lg"

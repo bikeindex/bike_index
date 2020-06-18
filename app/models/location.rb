@@ -20,8 +20,12 @@ class Location < ApplicationRecord
 
   before_save :set_calculated_attributes
   after_commit :update_associations
+  before_destroy :ensure_destroy_permitted!
 
   attr_accessor :skip_update
+
+  # For now, doesn't do anything - but eventually we may switch to slugged locations, so prep for it
+  def self.friendly_find(str); find_by_id(str) end
 
   def other_organization_locations; Location.where(organization_id: organization_id).where.not(id: id) end
 
@@ -31,7 +35,7 @@ class Location < ApplicationRecord
 
   def publicly_visible; !not_publicly_visible end
 
-  def appointments_enabled?; appointment_configuration.present? && appointment_configuration.enabled? end
+  def virtual_line_on?; appointment_configuration.present? && appointment_configuration.virtual_line_on? end
 
   def publicly_visible=(val)
     self.not_publicly_visible = !ParamsNormalizer.boolean(val)
@@ -58,6 +62,11 @@ class Location < ApplicationRecord
   def display_name
     return "" if organization.blank?
     name == organization.name ? name : "#{organization.name} - #{name}"
+  end
+
+  def ensure_destroy_permitted!
+    return true unless virtual_line_on?
+    raise StandardError, "Can't destroy a location with appointments enabled"
   end
 
   private

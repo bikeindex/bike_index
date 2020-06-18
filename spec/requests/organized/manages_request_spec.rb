@@ -267,6 +267,27 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location.longitude).to be_within(0.1).of(-74.0)
             expect(current_organization.to_coordinates).to eq location.to_coordinates
           end
+          context "location has appointment_configuration" do
+            let!(:appointment_configuration) { FactoryBot.create(:appointment_configuration, location: location1, organization: current_organization) }
+            it "does not remove" do
+              update_attributes[:locations_attributes]["0"][:_destroy] = 1
+              expect(location1).to be_present
+              expect(location1.virtual_line_enabled?).to be_truthy
+              expect(current_organization.locations.count).to eq 1
+
+              expect do
+                put base_url,
+                    params: {
+                      organization_id: current_organization.to_param,
+                      id: current_organization.to_param,
+                      organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                    }
+              end.to raise_error(/appointment/)
+
+              current_organization.reload
+              expect(Location.where(id: location1.id).count).to eq 1
+            end
+          end
         end
 
         context "only updating location" do
