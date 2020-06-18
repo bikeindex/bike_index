@@ -112,7 +112,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           expect(current_organization.hot_sheet_configuration).to be_present
-          expect(current_organization.hot_sheet_enabled?).to be_falsey
+          expect(current_organization.hot_sheet_on?).to be_falsey
 
           expect(ProcessHotSheetWorker.jobs.count).to eq 1
           expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
