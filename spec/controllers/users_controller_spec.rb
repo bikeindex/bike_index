@@ -604,7 +604,7 @@ RSpec.describe UsersController, type: :controller do
       expect(user.password_reset_token).not_to eq("stuff")
       expect(user.auth_token).not_to eq(auth)
       expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-      expect(response).to redirect_to(my_account_url)
+      expect(response).to redirect_to(edit_my_account_url)
     end
 
     it "Doesn't updates user if reset_pass token doesn't match" do
@@ -622,7 +622,7 @@ RSpec.describe UsersController, type: :controller do
                         password_confirmation: "new_pass",
                       },
                     }
-      expect(response).to_not redirect_to(my_account_url)
+      expect(response).to_not redirect_to(edit_my_account_url)
       expect(flash[:error]).to be_present
       expect(user.reload.authenticate("new_pass")).to be_falsey
       expect(user.password_reset_token).to eq(reset)
@@ -643,7 +643,7 @@ RSpec.describe UsersController, type: :controller do
                       },
                     }
 
-      expect(response).to_not redirect_to(my_account_url)
+      expect(response).to_not redirect_to(edit_my_account_url)
       expect(flash[:error]).to be_present
       expect(user.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
@@ -666,7 +666,7 @@ RSpec.describe UsersController, type: :controller do
                         password_confirmation: "new_pass",
                       },
                     }
-      expect(response).to redirect_to(my_account_url)
+      expect(response).to redirect_to(edit_my_account_url)
       expect(flash[:error]).to_not be_present
       expect(user.reload.authenticate("new_pass")).to be_truthy
       expect(user.auth_token).not_to eq(auth)
@@ -695,7 +695,7 @@ RSpec.describe UsersController, type: :controller do
                           phone: "3223232",
                         },
                       }
-        expect(response).to redirect_to(my_account_url)
+        expect(response).to redirect_to(edit_my_account_url)
         expect(flash[:error]).to_not be_present
         user.reload
         expect(user.name).to eq("Mr. Slick")
@@ -723,7 +723,7 @@ RSpec.describe UsersController, type: :controller do
         set_current_user(user)
         patch :update, params: { id: user.username, locale: "nl", user: { preferred_language: "en" } }
         expect(flash[:success]).to match(/succesvol/i)
-        expect(response).to redirect_to(my_account_url)
+        expect(response).to redirect_to(edit_my_account_url)
         expect(user.reload.preferred_language).to eq("en")
       end
 
@@ -732,7 +732,7 @@ RSpec.describe UsersController, type: :controller do
         set_current_user(user)
         patch :update, params: { id: user.username, locale: "en", user: { preferred_language: "nl" } }
         expect(flash[:success]).to match(/successfully updated/i)
-        expect(response).to redirect_to(my_account_url)
+        expect(response).to redirect_to(edit_my_account_url)
         expect(user.reload.preferred_language).to eq("nl")
       end
 
@@ -750,7 +750,7 @@ RSpec.describe UsersController, type: :controller do
       set_current_user(user)
       expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
       post :update, params: { id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" } }
-      expect(response).to redirect_to my_account_url
+      expect(response).to redirect_to edit_my_account_url
       user.reload
       expect(user.notification_newsletters).to be_truthy
       expect(user.notification_unstolen).to be_falsey
@@ -794,7 +794,7 @@ RSpec.describe UsersController, type: :controller do
                      },
                    }
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to my_account_url
+          expect(response).to redirect_to edit_my_account_url
           membership.reload
           membership2.reload
           expect(membership.notification_daily?).to be_truthy

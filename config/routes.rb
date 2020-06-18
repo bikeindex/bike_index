@@ -109,7 +109,7 @@ Rails.application.routes.draw do
     end
     member { get "unsubscribe" }
   end
-  get :my_account, to: "users#edit", as: :my_account
+  get :edit_my_account, to: "users#edit", as: :edit_my_account
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
   resources :user_embeds, only: [:show]

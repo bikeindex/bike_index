@@ -159,7 +159,7 @@ class UsersController < ApplicationController
       end
       if successfully_updated
         flash[:success] ||= translation(:successfully_updated)
-        redirect_back(fallback_location: my_account_url(page: params[:page])) and return
+        redirect_back(fallback_location: edit_my_account_url(page: params[:page])) and return
       end
     end
     @page_errors = @user.errors.full_messages
