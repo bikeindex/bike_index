@@ -21,7 +21,7 @@ class BikeIndex.BikesEditRemove extends BikeIndex
   requestDeleteRequestCallback: (data, success) ->
     if success
       msg = "Your bike's been deleted!"
-      window.BikeIndexAlerts.add('info', msg, () -> window.location.href = "/user_home")
+      window.BikeIndexAlerts.add('info', msg, () -> window.location.href = "/my_account")
     else
       msg = "Oh no! Something went wrong and we couldn't send the delete request."
       window.BikeIndexAlerts.add('error', msg)

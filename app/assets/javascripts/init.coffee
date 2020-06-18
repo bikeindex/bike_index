@@ -53,7 +53,7 @@ class BikeIndex.Init extends BikeIndex
       users_edit: BikeIndex.UsersEdit
       users_new: BikeIndex.UsersNew
       users_create: BikeIndex.UsersNew
-      welcome_user_home: BikeIndex.UserHome
+      my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
       organized_manages_locations: BikeIndex.OrganizedManageLocations

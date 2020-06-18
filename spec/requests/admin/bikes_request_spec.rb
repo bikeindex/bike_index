@@ -1,7 +1,7 @@
 require "rails_helper"
 
-base_url = "/admin/bikes"
 RSpec.describe Admin::BikesController, type: :request do
+  base_url = "/admin/bikes"
   let(:bike) { FactoryBot.create(:bike, :with_ownership) }
 
   context "given a logged-in superuser" do

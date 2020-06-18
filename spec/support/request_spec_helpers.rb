@@ -3,7 +3,7 @@
 module RequestSpecHelpers
   # Lame copy of user_root_url - required because of subdomain: false
   def user_root_url
-    return user_home_url(subdomain: false) if current_user&.confirmed?
+    return my_account_url(subdomain: false) if current_user&.confirmed?
     root_url
   end
 
