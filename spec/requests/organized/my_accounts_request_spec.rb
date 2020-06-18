@@ -11,6 +11,13 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
+    describe "user_home" do
+      it "redirects" do
+        get "/user_home"
+        expect(response).to redirect_to(my_account_path)
+      end
+    end
+
     context "user logged in" do
       include_context :request_spec_logged_in_as_user
 
