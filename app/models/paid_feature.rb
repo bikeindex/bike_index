@@ -7,6 +7,9 @@ class PaidFeature < ApplicationRecord
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
+  APPOINTMENT_FEATURES = %w[
+    virtual_line
+  ].freeze
   REG_FIELDS = %w[
     extra_registration_number
     organization_affiliation
@@ -37,7 +40,7 @@ class PaidFeature < ApplicationRecord
     show_partial_registrations
     show_recoveries
     skip_ownership_email
-  ] + BIKE_ACTIONS + REG_FIELDS).freeze
+  ] + APPOINTMENT_FEATURES + BIKE_ACTIONS + REG_FIELDS).freeze
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features

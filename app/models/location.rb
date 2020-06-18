@@ -5,7 +5,9 @@ class Location < ApplicationRecord
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
   belongs_to :state
+
   has_many :bikes
+  has_one :appointment_configuration
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -29,7 +31,11 @@ class Location < ApplicationRecord
 
   def publicly_visible; !not_publicly_visible end
 
-  def publicly_visible=(val); self.not_publicly_visible = !ParamsNormalizer.boolean(val) end
+  def appointments_enabled?; appointment_configuration.present? && appointment_configuration.enabled? end
+
+  def publicly_visible=(val)
+    self.not_publicly_visible = !ParamsNormalizer.boolean(val)
+  end
 
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(self.phone)

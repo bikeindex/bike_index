@@ -161,6 +161,40 @@ ALTER SEQUENCE public.ambassador_tasks_id_seq OWNED BY public.ambassador_tasks.i
 
 
 --
+-- Name: appointment_configurations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.appointment_configurations (
+    id bigint NOT NULL,
+    organization_id bigint,
+    location_id bigint,
+    reasons jsonb,
+    virtual_line_enabled boolean DEFAULT false,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: appointment_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.appointment_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: appointment_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.appointment_configurations_id_seq OWNED BY public.appointment_configurations.id;
+
+
+--
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2704,6 +2738,13 @@ ALTER TABLE ONLY public.ambassador_tasks ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: appointment_configurations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointment_configurations ALTER COLUMN id SET DEFAULT nextval('public.appointment_configurations_id_seq'::regclass);
+
+
+--
 -- Name: b_params id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3167,6 +3208,14 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 ALTER TABLE ONLY public.ambassador_tasks
     ADD CONSTRAINT ambassador_tasks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: appointment_configurations appointment_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointment_configurations
+    ADD CONSTRAINT appointment_configurations_pkey PRIMARY KEY (id);
 
 
 --
@@ -3699,6 +3748,20 @@ CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_t
 --
 
 CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks USING btree (title);
+
+
+--
+-- Name: index_appointment_configurations_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointment_configurations_on_location_id ON public.appointment_configurations USING btree (location_id);
+
+
+--
+-- Name: index_appointment_configurations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointment_configurations_on_organization_id ON public.appointment_configurations USING btree (organization_id);
 
 
 --
@@ -4969,6 +5032,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200611040757'),
 ('20200616144000'),
 ('20200616144002'),
-('20200616144623');
+('20200616144623'),
+('20200618003412');
 
 
