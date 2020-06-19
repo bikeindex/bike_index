@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    -
+    - Januari
     - januari
     - februari
     - maart
@@ -43,9 +43,8 @@ nl:
     - september
     - oktober
     - november
-    - december
     abbr_month_names:
-    -
+    - Jan
     - jan
     - feb
     - mrt
@@ -57,7 +56,6 @@ nl:
     - sep
     - okt
     - nov
-    - dec
   time:
     am: "'s ochtends"
     pm: "'s middags"
