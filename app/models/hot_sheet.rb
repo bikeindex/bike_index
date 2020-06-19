@@ -22,7 +22,7 @@ class HotSheet < ApplicationRecord
 
   def email_success?; delivery_status == "email_success" end
 
-  def subject; "Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
+  def subject; "Stolen Bike Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
 
   def recipient_emails; fetch_recipients.pluck(:email) end
 

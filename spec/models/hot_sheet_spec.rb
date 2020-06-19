@@ -10,7 +10,7 @@ RSpec.describe HotSheet, type: :model do
       expect(hot_sheet.id).to be_present
       expect(hot_sheet.email_success?).to be_falsey
       expect(HotSheet.for(organization, Date.parse("2020-06-07"))).to eq hot_sheet
-      expect(hot_sheet.subject).to eq "Hot Sheet: Sunday, Jun 7"
+      expect(hot_sheet.subject).to eq "Stolen Bike Hot Sheet: Sunday, Jun 7"
       expect(hot_sheet.previous_sheet).to be_blank
       expect(hot_sheet.next_sheet).to be_blank
     end
