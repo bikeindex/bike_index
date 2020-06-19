@@ -1,6 +1,6 @@
 .email-hot-sheet-link-footer {
   margin-top: 34px;
-  border-top: 1px solid #dddddd;
+  border-top: 1px solid $email-light-bg;
   p {
     text-align: center;
   }
@@ -11,13 +11,13 @@
 }
 
 .clear-org-buttons {
-  padding: 1rem 0;
+  padding: 16px 0;
   display: block;
   position: relative;
   text-align: center;
   .org-button {
     display: inline-block;
-    padding: 0.75rem 1rem;
+    padding: 12px 16px;
     border: 1px solid darken(#aaaaaa, 5%);
     background: #aaaaaa;
     font-weight: bold;
@@ -26,5 +26,15 @@
     color: #ffffff;
     text-decoration: none;
     line-height: 1;
+  }
+}
+
+.hot-sheet-bike-display {
+  padding-top: 2px;
+  .bike-display {
+    td {
+      border: none;
+      padding: 0;
+    }
   }
 }

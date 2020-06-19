@@ -6,39 +6,40 @@
   - thumbclass = 'placeholder'
   - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
 
-.bike-display
-  .image-holder{ class: thumbclass }
-    %a{ href:  bike_url }
-      %img{ src: thumb_url }
+%table.bike-display
+  %tbody
+    %tr
+      %td.image-holder{ class: thumbclass }
+        %a{ href:  bike_url }
+          %img{ src: thumb_url }
+      %td.info-holder
+        %ul
+          %li
+            %strong= t(".make")
+            = @bike.mnfg_name
 
-  %ul.info-holder
-    %li
-      %strong= t(".make")
-      = @bike.mnfg_name
+          %li
+            %strong= t(".serial")
+            = @bike.serial_display
 
-    %li
-      %strong= t(".serial")
-      = @bike.serial_display
+          %li
+            %strong
+              = pluralize(@bike.frame_colors.count, t(".color"))
+            = @bike.frame_colors.to_sentence
 
-    %li
-      %strong
-        = pluralize(@bike.frame_colors.count, t(".color"))
-      = @bike.frame_colors.to_sentence
+          - if @bike.stolen && @bike.current_stolen_record.present?
+            - stolen_record = @bike.current_stolen_record
+            %li
+              %strong
+                = @bike.abandoned ? t(".found") : t(".stolen_from")
+              = stolen_record.address(skip_default_country: true)
+            %li
+              %strong
+                = t(".stolen_at")
+              = l stolen_record.date_stolen, format: :dotted
 
-    - if @bike.stolen && @bike.current_stolen_record.present?
-      - stolen_record = @bike.current_stolen_record
-      %li
-        %strong
-          = @bike.abandoned ? t(".found") : t(".stolen_from")
-        = stolen_record.address(skip_default_country: true)
-      %li
-        %strong
-          = t(".stolen_at")
-        = l stolen_record.date_stolen, format: :dotted
+          - if (@bike.ownerships.count == 1 && @bike.registered_new)
+            %li
+              %em.less-strong
+                = t(".color_may_be_incorrect")
 
-    - if (@bike.ownerships.count == 1 && @bike.registered_new)
-      %li
-        %em.less-strong
-          = t(".color_may_be_incorrect")
-
-  .clearstuffdiv
