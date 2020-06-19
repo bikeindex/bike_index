@@ -34,6 +34,9 @@ RSpec.describe "I18n" do
       Please run `bin/rake prepare_translations` to fix.
     STR
 
+    # CI was getting a different result, added this for diagnostics
+    pp non_normalized unless non_normalized.empty?
+
     expect(non_normalized).to be_empty, error_message
   end
 end
