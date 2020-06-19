@@ -16,7 +16,9 @@ module Organized
     def update
       if @hot_sheet_configuration.update(permitted_parameters)
         flash[:success] = "Hot Sheet configuration updated"
-        ProcessHotSheetWorker.perform_async(current_organization.id)
+        if @hot_sheet_configuration.send_today_now?
+          ProcessHotSheetWorker.perform_async(current_organization.id)
+        end
         redirect_back(fallback_location: organization_root_url)
       else
         flash[:error] = @hot_sheet_configuration.errors.full_messages.to_sentence
@@ -40,13 +42,14 @@ module Organized
       @hot_sheet_configuration = current_organization.hot_sheet_configuration
       unless @hot_sheet_configuration.present?
         @hot_sheet_configuration = HotSheetConfiguration.new(organization_id: current_organization.id)
-        @hot_sheet_configuration.set_default_attributes
+        @hot_sheet_configuration.set_calculated_attributes
       end
       @hot_sheet_configuration
     end
 
     def permitted_parameters
-      params.require(:hot_sheet_configuration).permit([:is_enabled, :timezone_str, :send_hour])
+      params.require(:hot_sheet_configuration)
+            .permit([:is_on, :timezone_str, :send_hour, :search_radius_miles, :search_radius_kilometers])
     end
   end
 end

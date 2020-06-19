@@ -66,5 +66,18 @@ RSpec.describe TimeParser do
         expect(subject.parse_timezone(timezone_str).utc_offset).to eq TimeParser::DEFAULT_TIMEZONE.utc_offset - 2.hours
       end
     end
+    context "eating itself" do
+      let(:timezone_str) { "America/Guatemala" }
+      let(:target_timezone) { ActiveSupport::TimeZone["America/Guatemala"] }
+      it "returns correct timezone" do
+        expect(target_timezone.utc_offset).to eq(-21600)
+        expect(subject.parse_timezone(timezone_str)).to eq target_timezone
+        expect(subject.parse_timezone(timezone_str).utc_offset).to eq(-21600)
+        # And it works when you do it again on itself
+        parsed_result = subject.parse_timezone(timezone_str)
+        expect(subject.parse_timezone(parsed_result)).to eq target_timezone
+        expect(subject.parse_timezone(parsed_result).utc_offset).to eq(-21600)
+      end
+    end
   end
 end

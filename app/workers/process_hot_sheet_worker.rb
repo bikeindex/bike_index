@@ -18,7 +18,7 @@ class ProcessHotSheetWorker < ScheduledWorker
 
   def organizations
     Organization.with_enabled_feature_slugs("hot_sheet").left_joins(:hot_sheet_configuration)
-      .where(hot_sheet_configurations: { is_enabled: true })
+      .where(hot_sheet_configurations: { is_on: true })
   end
 
   def enqueue_workers

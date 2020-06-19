@@ -19,7 +19,7 @@ RSpec.describe HotSheet, type: :model do
   describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
     let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-    let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
+    let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     context "with two records" do
       let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }

@@ -10,11 +10,11 @@
         %tr
           %td Enabled?
           %td
-            - if @hot_sheet_configuration.enabled?
+            - if @hot_sheet_configuration.on?
               = check_mark
             - else
               %small.less-strong false
-        - if @hot_sheet_configuration.enabled?
+        - if @hot_sheet_configuration.on?
           %tr
             %td
               Generates at
@@ -46,7 +46,20 @@
           Hour to create Hot Sheet every day
           %small
             24 hour clock
-        = f.number_field :send_hour, class: "form-control"
+        = f.number_field :send_hour, min: 0, max: 24, step: 0.1, class: "form-control"
+      .form-group
+        - if @hot_sheet_configuration.search_radius_metric_units?
+          = f.label :search_radius_kilometers do
+            Search Radius
+            %small
+              in km
+          = f.number_field :search_radius_kilometers, min: 5, step: 1, class: "form-control"
+        - else
+          = f.label :search_radius_miles do
+            Search Radius
+            %small
+              in miles
+          = f.number_field :search_radius_miles, min: 5, step: 1, class: "form-control"
       .form-group
         = f.label :timezone_st, "Timezone"
         -# We need to do a special timezone select so we can select it with moment
@@ -56,7 +69,7 @@
         = f.select :timezone_str, timezones_select, { prompt: "Choose timezone" }, class: "form-control #{auto_class_name}"
 
       .form-group
-        = f.check_box :is_enabled
-        = f.label :is_enabled, "Enabled", class: "org-form-label"
+        = f.check_box :is_on
+        = f.label :is_on, "Enabled", class: "org-form-label"
       .mt-2
         = submit_tag "Save", class: "btn btn-success btn-md-lg"
