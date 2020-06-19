@@ -5202,7 +5202,7 @@ nl:
       zipcode: Postcode
       why_you_should_text: Lees waarom u zou moeten
       daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
-      hot_sheets: Hot Sheets
+      stolen_hot_sheets: Gestolen Bike Hot Sheets
     edit_sharing:
       additional_link: Aanvullende link
       choose_file: Kies bestand...
