@@ -16,8 +16,6 @@
       %table.binx-header
         %tbody
           %td{ class: (@partner.present? ? "partner-header" : "") }
-            %img.bike-index-logo{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
-
             - if @partner
               %span.partner-logo-wrapper
                 = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo.png",
@@ -27,6 +25,8 @@
 
                 %span.logo-plus
                   +
+
+            %img.bike-index-logo{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
 
       .binx-body
         -# We only render snippets for organized messages - or if we're doing a preview

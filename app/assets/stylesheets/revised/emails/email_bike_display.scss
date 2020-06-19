@@ -5,6 +5,7 @@
   padding: $vertical-height;
   border: 1px solid $gray-light;
   clear: both;
+  display: block;
 
   .image-holder {
     margin: 0;
@@ -20,6 +21,7 @@
 
     img {
       width: 100%;
+      max-width: 300px;
       display: block;
       margin: 0 auto;
       height: auto;
