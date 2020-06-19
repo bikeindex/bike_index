@@ -15,8 +15,8 @@
     .binx-wrapper
       %table.binx-header
         %tbody
-          %td
-            %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
+          %td{ class: (@partner.present? ? "partner-header" : "") }
+            %img.bike-index-logo{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
 
             - if @partner
               %span.partner-logo-wrapper

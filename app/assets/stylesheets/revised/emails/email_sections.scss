@@ -37,6 +37,12 @@
     width: auto;
   }
 
+  // Manually set the bike index logo header height if a partner is present, because futziness
+  .partner-header .bike-index-logo {
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
   .partner-logo-wrapper {
     display: block;
     float: left;
