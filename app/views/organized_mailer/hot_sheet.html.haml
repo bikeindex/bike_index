@@ -11,38 +11,38 @@
   - unless thumb_url.present?
     - thumbclass = 'placeholder'
     - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+  .hot-sheet-bike-display
+    %table.bike-display
+      %tbody
+        %tr
+          %td.image-holder{ class: thumbclass }
+            %a{ href:  bike_link }
+              %img{ src: thumb_url }
+          %td.info-holder
+            %ul
+              %li
+                = link_to organized_bike_text(bike, skip_creation: true), bike_link
 
-  .bike-display
-    .image-holder{ class: thumbclass }
-      %a{ href:  bike_link }
-        %img{ src: thumb_url }
+              %li
+                %strong Serial
+                = bike.serial_display
 
-    %ul.info-holder
-      %li
-        = link_to organized_bike_text(bike, skip_creation: true), bike_link
+              %li
+                %strong.stolen-color
+                  Stolen at
+                -# Render the hour
+                = stolen_record.date_stolen.strftime("%l%P")
+                - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
+                  %strong Today
+                - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
+                  %strong Yesterday
+                - else
+                  = l stolen_record.date_stolen, format: :standard_display
 
-      %li
-        %strong Serial
-        = bike.serial_display
-
-      %li
-        %strong.stolen-color
-          Stolen at
-        -# Render the hour
-        = stolen_record.date_stolen.strftime("%l%P")
-        - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
-          %strong Today
-        - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
-          %strong Yesterday
-        - else
-          = l stolen_record.date_stolen, format: :standard_display
-
-      %li
-        %strong.stolen-color
-          From
-        = Geocodeable.address(stolen_record, country: false)
-
-    .clearstuffdiv
+              %li
+                %strong.stolen-color
+                  From
+                = Geocodeable.address(stolen_record, country: false)
 
 - if @organization.overview_dashboard?
   .clear-org-buttons

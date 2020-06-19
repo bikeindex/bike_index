@@ -11,8 +11,11 @@
 }
 
 .binx-header {
+  background-color: $gray-darker;
+}
+.binx-header {
   width: 100%;
-  background: $gray-darker;
+  background-color: $gray-darker;
   border: 0;
   border-spacing: 0;
   border-collapse: collapse;
@@ -23,6 +26,7 @@
   }
   td {
     height: $header-height;
+    background-color: $gray-darker;
   }
 
   img {
@@ -38,18 +42,22 @@
   }
 
   // Manually set the bike index logo header height if a partner is present, because futziness
-  .partner-header .bike-index-logo {
-    margin-top: 6px;
-    margin-bottom: 0;
+  .partner-header {
+    height: 84px;
+    .bike-index-logo {
+      margin-top: 6px;
+      margin-bottom: 0;
+    }
   }
 
   .partner-logo-wrapper {
     display: block;
     float: left;
-    background: #fff;
+    background-color: #ffffff;
     height: 84px;
 
     .logo-plus {
+      background: #ffffff;
       color: $gray-darker;
       font-size: 40px;
       float: left;
@@ -106,7 +114,7 @@
 $foot-padding: 0.5 * ($header-height - $font-size);
 
 .binx-footer {
-  background: $gray-darker;
+  background-color: $gray-darker;
   padding: $foot-padding;
 
   h5 {

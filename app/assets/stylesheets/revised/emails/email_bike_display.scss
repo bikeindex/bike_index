@@ -4,14 +4,15 @@
   margin: $vertical-height auto (2 * $vertical-height);
   padding: $vertical-height;
   border: 1px solid $gray-light;
-  clear: both;
-
+  border-spacing: unset;
+  border-collapse: collapse;
+  td {
+    border: none;
+    padding: 4px;
+  }
   .image-holder {
     margin: 0;
-    float: left;
-    width: 35%;
-    position: relative;
-    padding: 0;
+    width: 33%;
 
     a {
       display: block;
@@ -19,14 +20,15 @@
     }
 
     img {
-      width: 100%;
+      width: 300px;
+      max-width: 100%;
       display: block;
       margin: 0 auto;
       height: auto;
     }
 
     &.placeholder {
-      background: $email-light-bg;
+      background-color: $email-light-bg;
 
       a {
         padding: $vertical-height 0;
@@ -39,17 +41,19 @@
   }
 
   .info-holder {
-    float: left;
-    margin: 0 0 0 7%;
-    padding: 0;
-    width: 58%;
-    list-style-type: none;
-    display: block;
-
+    margin: 0;
+    width: 66%;
+    vertical-align: top;
+    ul {
+      list-style-type: none;
+      display: block;
+      margin: 0;
+      padding: 8px 8px 8px 32px;
+    }
     li {
       margin: (0.5 * $vertical-height) 0 0 0;
       padding: 0 0 0 0;
-      text-indent: -5%;
+      text-indent: -16px;
       display: block;
       list-style: none;
       line-height: 1.5em;
