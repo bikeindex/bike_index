@@ -3,7 +3,7 @@
 - if !current_organization.hot_sheet_on?
   .alert.alert-info
     %h3.uncap
-      Hot Sheets are not enabled!
+      Stolen Bike Hot Sheets are not enabled!
     - if current_user.admin_of?(current_organization)
       %p
         Enable them on the
@@ -11,40 +11,41 @@
 
 - else
   %h1.uncap
-    #{current_organization.short_name} Hot Sheet
-  %h3.uncap.mb-0.d-inline-block
-    -# Skipping implementing these buttons for now, because whatever
-    -# %span.switch-day-link
-    -#   - unless @next.blank?
-    -#     = link_to "&lt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @next.sheet_date)
-    %span.sheet-day-text
-      - if @current
-        Current hotsheet
-      - else
-        - unless @hot_sheet.present?
-          No hotsheet
-        for
-        %strong
-          = @day.strftime("%A, %b %-d")
-          - if @day.year != Time.current.year
-            = @day.year
-    -# Skipping implementing these buttons for now, because whatever
-    -# %span.switch-day-link
-    -#   - unless @previous.blank?
-    -#     = link_to "&gt;", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @previous.sheet_date)
+    #{current_organization.short_name} Hot Sheets
+  .row
+    .col-md-8
+      %h3.hot-sheet-current-title
+        - unless @current
+          -# Link to current sheet if no next sheet
+          - next_day = @hot_sheet.next_sheet.blank? ? nil : @hot_sheet.next_sheet.sheet_date
+          = link_to "<", organization_hot_sheet_path(organization_id: current_organization.to_param, day: next_day), class: "btn btn-secondary hot-sheet-day-link hot-sheet-day-next"
+        %span.sheet-day-text
+          - if @current
+            Current Hot Bikes
+          - else
+            - if @hot_sheet.present?
+              Hot Bike Sheet for
+            - else
+              No Hot Sheet for
+            %strong
+              = @day.strftime("%A, %b %-d")
+              - if @day.year != Time.current.year
+                = @day.year
+        - unless @hot_sheet.previous_sheet.blank?
+          = link_to ">", organization_hot_sheet_path(organization_id: current_organization.to_param, day: @hot_sheet.previous_sheet.sheet_date), class: "btn btn-secondary hot-sheet-day-link hot-sheet-day-previous"
 
   - if current_user.member_of?(current_organization, no_superuser_override: true)
-    .row
+    .row.mb-4
       .col-lg-8
-        .alert.hot-sheet-notification-panel
-          %h3.uncap #{current_organization.short_name} Hot Sheet Notification preferences
+        .hot-sheet-notification-panel
+          %h4.uncap #{current_organization.short_name} Hot Sheet Notification preferences
           = form_for current_user, multipart: true do |f|
             = hidden_field_tag :hot_sheet_organization_ids, current_organization.id
             %label
               = check_box_tag "hot_sheet_notifications[#{current_organization.id}]", true, current_user.memberships.where(organization_id: current_organization.id).first&.notification_daily?
               Email daily #{current_organization.short_name} Hot Sheets to
               %em= current_user.email
-            = submit_tag "update preferences", class: "btn btn-sm btn-primary ml-2"
+            = submit_tag "update preferences", class: "btn btn-sm btn-primary"
 
   - if @hot_sheet.present?
     .row

@@ -1,7 +1,8 @@
 -# TODO: translations
 
-%h1.uncap
+%h1.uncap{ style: "margin-bottom: 1rem;" }
   = @hot_sheet.subject
+
 - @stolen_records.each do |stolen_record|
   - bike = stolen_record.bike
   - thumb_url = bike.thumb_path || bike.stock_photo_url
@@ -43,10 +44,20 @@
 
     .clearstuffdiv
 
+- if @organization.overview_dashboard?
+  .clear-org-buttons
+    = link_to "View #{@organization.short_name} Dashboard", organization_dashboard_index_url(organization_id: @organization.to_param), class: "org-button"
+
 .email-hot-sheet-link-footer
   %p
-    = link_to organization_hot_sheet_url(organization_id: @organization.to_param, day: @hot_sheet.sheet_date) do
-      View this
-      %em
-        Stolen Bike Hot Sheet
-      on Bike Index
+    View this
+    %em
+      = link_to "Stolen Bike Hot Sheet", organization_hot_sheet_url(organization_id: @organization.to_param, day: @hot_sheet.sheet_date)
+    on Bike Index
+
+  .clear-org-buttons
+    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: "#{@organization.city}, #{@organization.country&.iso}"), class: "org-button"
+
+  %p.hot-sheet-notification-change
+    %small.less-strong
+      Don't want to receive hot sheets emails? Update your email preferences on #{link_to "your account page", edit_my_account_url}.

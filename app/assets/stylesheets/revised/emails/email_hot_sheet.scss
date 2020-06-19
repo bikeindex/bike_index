@@ -1,5 +1,30 @@
 .email-hot-sheet-link-footer {
-  margin-top: 24px;
-  border-top: 1px solid #bbb;
+  margin-top: 34px;
+  border-top: 1px solid #ddd;
+  p {
+    text-align: center;
+  }
+  .hot-sheet-notification-change {
+    clear: both;
+    margin-top: 2rem;
+  }
+}
+
+.clear-org-buttons {
+  padding: 1rem 0;
+  display: block;
+  position: relative;
   text-align: center;
+  .org-button {
+    display: inline-block;
+    padding: 0.75rem 1rem;
+    border: 1px solid darken(#aaa, 5%);
+    background: #aaa;
+    font-weight: bold;
+    border-radius: 3px;
+    max-width: 100%;
+    color: #fff !important;
+    text-decoration: none;
+    line-height: 1;
+  }
 }

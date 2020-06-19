@@ -2099,7 +2099,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2125,7 +2125,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3696,8 +3696,6 @@ en:
       getting_started: Getting started
       graduated_notifications: Graduated notifications
       help: Help
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet configuration
       impounded_bikes: Impounded Bikes
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
@@ -3716,6 +3714,8 @@ en:
       resources: Resources
       search_bikes: Search bikes
       sign_up: Sign up
+      stolen_hot_sheet: Stolen Bike Hot Sheet
+      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       super_admin_view: Super Admin view %{org_name}
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
@@ -5055,8 +5055,6 @@ en:
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet config
       how_integration_works: how the integration works
       impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations
@@ -5078,6 +5076,8 @@ en:
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       registration_stickers: Registration stickers
       resources: Resources
+      stolen_hot_sheet: Stolen Hot Sheet
+      stolen_hot_sheet_configuration: Stolen Hot Sheet config
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
         page
       use_ascend: Use Ascend?
