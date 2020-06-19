@@ -125,4 +125,6 @@ module Geocodeable
     return super unless val.is_a?(String)
     self.country = Country.fuzzy_find(val)
   end
+
+  def metric_units?; country.blank? || !country.united_states? end
 end

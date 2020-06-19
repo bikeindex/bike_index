@@ -11,19 +11,36 @@
 }
 
 .binx-header {
-  height: $header-height;
   width: 100%;
   background: $gray-darker;
+  border: 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+  tr,
+  td {
+    padding: 0;
+    border-spacing: 0;
+  }
+  td {
+    height: $header-height;
+  }
 
   img {
     display: block;
-    margin: (0.5 * $vertical-height) (1.5 * $vertical-height) 0 0;
+    margin: (0.3 * $vertical-height) (1.5 * $vertical-height)
+      (0.2 * $vertical-height) 0;
     float: right;
     height: $header-height - $vertical-height;
 
     // This is also manually set in HTML attrs because of outlook
     max-height: $header-height - $vertical-height;
     width: auto;
+  }
+
+  // Manually set the bike index logo header height if a partner is present, because futziness
+  .partner-header .bike-index-logo {
+    margin-top: 6px;
+    margin-bottom: 0;
   }
 
   .partner-logo-wrapper {

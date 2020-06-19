@@ -23,7 +23,7 @@
         - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
         = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
 
-    - hot_sheet_organizations = current_user.organizations.select { |o| o.hot_sheet_enabled? }
+    - hot_sheet_organizations = current_user.organizations.select { |o| o.hot_sheet_on? }
     - if hot_sheet_organizations.any?
       = hidden_field_tag :hot_sheet_organization_ids, hot_sheet_organizations.pluck(:id).join(",")
     - hot_sheet_organizations.each do |organization|
@@ -31,7 +31,7 @@
         %label.form-well-label
         %label.form-well-input{ style: "line-height: 1.5em;" }
           = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.memberships.where(organization_id: organization.id).first&.notification_daily?
-          - hot_sheets_link = link_to(t(".hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
+          - hot_sheets_link = link_to(t(".stolen_hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
           = t(".daily_hot_sheet_notifications_html", org_name: organization.short_name, hot_sheets_link: hot_sheets_link)
 
   .form-group.row.mt-2

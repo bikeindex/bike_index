@@ -1128,8 +1128,8 @@ CREATE TABLE public.hot_sheet_configurations (
     organization_id bigint,
     send_seconds_past_midnight integer,
     timezone_str character varying,
-    search_radius_miles integer,
-    is_enabled boolean DEFAULT false,
+    search_radius_miles double precision,
+    is_on boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -4969,6 +4969,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200611040757'),
 ('20200616144000'),
 ('20200616144002'),
-('20200616144623');
+('20200616144623'),
+('20200619141947');
 
 

@@ -11,7 +11,7 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
   end
 
   describe "perform" do
-    let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+    let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
     let!(:organization1) { hot_sheet_configuration.organization }
     let!(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }

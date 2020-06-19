@@ -227,4 +227,14 @@ FactoryBot.define do
     state
     country { Country.canada }
   end
+
+  trait :in_edmonton do
+    latitude { 53.5069377 }
+    longitude { -113.5508765 }
+    street { "9330 Groat Rd NW" }
+    zipcode { "AB T6G 2B3" }
+    city { "Edmonton" }
+    state
+    country { Country.canada }
+  end
 end

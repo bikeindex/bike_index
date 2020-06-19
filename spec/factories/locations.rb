@@ -49,5 +49,7 @@ FactoryBot.define do
       latitude { 34.05223 }
       longitude { -118.24368 }
     end
+
+    factory :location_edmonton, traits: [:in_edmonton]
   end
 end

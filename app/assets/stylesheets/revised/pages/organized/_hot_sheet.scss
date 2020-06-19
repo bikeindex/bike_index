@@ -70,11 +70,56 @@
   }
 }
 
+.hot-sheet-current-title {
+  @extend .uncap;
+  font-size: 20px;
+  margin: 24px 0;
+  position: relative;
+
+  .sheet-day-text {
+    padding: 0 3rem;
+  }
+  .hot-sheet-day-link {
+    padding: 0.25rem;
+    font-size: 125%;
+    line-height: 1;
+    opacity: 0.8;
+    display: block;
+    position: absolute;
+    top: -0.5rem;
+    &:hover,
+    &:active,
+    &:focus,
+    &.active {
+      opacity: 1;
+    }
+    &.hot-sheet-day-next {
+      left: 0;
+    }
+    &.hot-sheet-day-previous {
+      right: 0;
+    }
+  }
+}
+
 // Basically like alert, but the text isn't colored by default
 .hot-sheet-notification-panel {
+  @extend .alert;
   border: 1px solid #3498db;
   margin-top: 30px;
-  h3 {
+  h4 {
     color: #3498db;
+    font-size: 16px;
+    margin: 0 0 1rem;
+  }
+  form {
+    label {
+      margin-bottom: 0;
+      font-size: 14px;
+    }
+    .btn {
+      margin-left: 1rem;
+      font-size: 14px;
+    }
   }
 }
