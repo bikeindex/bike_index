@@ -56,7 +56,9 @@
     on Bike Index
 
   .clear-org-buttons
-    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: "#{@organization.city}, #{@organization.country&.name}"), class: "org-button"
+    - location = [@organization.city]
+    - location += [@organization.country&.name] unless @organization.country.united_states?
+    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: location.reject(&:blank?).join(", ")), class: "org-button"
 
   %p.hot-sheet-notification-change
     %small.less-strong
