@@ -9,10 +9,10 @@ $blue-light: #92c8ec;
 $blue-faint: #fffffff5;
 
 $gray-darkest: #1a1a1a;
-$gray-darker: #333;
-$gray-dark: #222;
-$gray: #666;
-$gray-subtle: #999;
+$gray-darker: #333333; // note: can't be 333 because outlook won't render
+$gray-dark: #222222;
+$gray: #666666;
+$gray-subtle: #999999;
 $gray-light: #a4a4a4;
 $gray-lightish: #e4e4e4;
 
@@ -30,9 +30,9 @@ $header-font-color: #0f466b;
 $header-font-nocolor: $gray-dark;
 $less-strong-font-color: $gray-light;
 
-$black-off: #111;
-$black: #000;
-$white: #fff;
+$black-off: #111111;
+$black: #000000;
+$white: #ffffff;
 
 // Nav colors
 $primary-nav-background: $black-off;
