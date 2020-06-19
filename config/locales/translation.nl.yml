@@ -4161,8 +4161,8 @@ nl:
       impounded_bikes: In beslag genomen fietsen
       customize_emails: Pas e-mails aan
       graduated_notifications: Gegradueerde meldingen
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet configuratie
+      stolen_hot_sheet: Stolen Bike Hot Sheet
+      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
     application_bikehub:
       contact: contact
       home: Thuis
@@ -5092,8 +5092,8 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       customize_emails: Pas e-mails aan
       graduated_notifications: Gegradueerde meldingen
-      hot_sheet: Hot Sheet
-      hot_sheet_configuration: Hot Sheet-configuratie
+      stolen_hot_sheet: Gestolen Hot Sheet
+      stolen_hot_sheet_configuration: Gestolen Hot Sheet-configuratie
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
