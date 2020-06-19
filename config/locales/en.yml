@@ -5241,7 +5241,6 @@ en:
         <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
-      hot_sheets: Hot Sheets
       make_primary_email: Make primary email
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
@@ -5251,6 +5250,7 @@ en:
       remove_email: Remove email
       resend_confirmation: Resend confirmation
       state: State
+      stolen_hot_sheets: Stolen Bike Hot Sheets
       unconfirmed_emails: Unconfirmed emails
       why_you_should_text: Read why you should
       zipcode: Postal code

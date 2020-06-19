@@ -56,7 +56,7 @@
     on Bike Index
 
   .clear-org-buttons
-    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: "#{@organization.city}, #{@organization.country&.iso}"), class: "org-button"
+    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: "#{@organization.city}, #{@organization.country&.name}"), class: "org-button"
 
   %p.hot-sheet-notification-change
     %small.less-strong
