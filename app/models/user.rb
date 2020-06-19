@@ -44,6 +44,7 @@ class User < ApplicationRecord
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superusers, -> { where(superuser: true) }
   scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
+  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
 
   validates_uniqueness_of :username, case_sensitive: false
 

@@ -90,7 +90,7 @@
                 - if passive_organization.enabled?("hot_sheet")
                   - additional_divider = true
                   %li
-                    = active_link t(".hot_sheet"), organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
+                    = active_link t(".stolen_hot_sheet"), organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
                 - if passive_organization.enabled?("csv_exports")
                   - additional_divider = true
                   %li
@@ -113,7 +113,7 @@
                       = active_link t(".customize_emails"), organization_emails_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
                   - if passive_organization.enabled?("hot_sheet")
                     %li
-                      = active_link t(".hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
+                      = active_link t(".stolen_hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
                   - if passive_organization.appointment_functionality_enabled?
                     %li
                       = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"

@@ -22,7 +22,7 @@ class HotSheet < ApplicationRecord
 
   def email_success?; delivery_status == "email_success" end
 
-  def subject; "Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
+  def subject; "Stolen Bike Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
 
   def recipient_emails; fetch_recipients.pluck(:email) end
 
@@ -31,12 +31,14 @@ class HotSheet < ApplicationRecord
 
   def next_sheet
     return nil if current?
-    HotSheet.where(organization_id: organization_id, sheet_date: sheet_date + 1.day).first
+    HotSheet.where(organization_id: organization_id).where("sheet_date > ?", sheet_date)
+            .reorder(:sheet_date).first
   end
 
   def previous_sheet
-    prev_date = current? ? Time.current.to_date : (sheet_date - 1.day)
-    HotSheet.where(organization_id: organization_id, sheet_date: prev_date).first
+    sdate = current? ? (Time.current.to_date + 1.day) : (sheet_date)
+    HotSheet.where(organization_id: organization_id).where("sheet_date < ?", sdate)
+            .reorder(:sheet_date).last
   end
 
   def fetch_stolen_records

@@ -26,6 +26,12 @@ FactoryBot.define do
       end
     end
 
+    trait :in_edmonton do
+      after(:create) do |org|
+        FactoryBot.create(:location_edmonton, organization: org)
+      end
+    end
+
     trait :with_locations do
       after(:create) do |organization|
         2.times do |n|

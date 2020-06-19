@@ -758,7 +758,7 @@ RSpec.describe UsersController, type: :controller do
 
     context "organization with hotsheet" do
       let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:membership) { user.memberships.first }
       it "updates hotsheet" do
@@ -767,17 +767,17 @@ RSpec.describe UsersController, type: :controller do
         request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
         # Doesn't include the parameter because when false, it doesn't include
         patch :update, params: {
-          id: user.username,
-          hot_sheet_organization_ids: organization.id.to_s,
-          hot_sheet_notifications: { organization.id.to_s => "1" }
-        }
+                   id: user.username,
+                   hot_sheet_organization_ids: organization.id.to_s,
+                   hot_sheet_notifications: { organization.id.to_s => "1" },
+                 }
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
         membership.reload
         expect(membership.notification_daily?).to be_truthy
       end
       context "with other parameters too" do
-        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
         let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
@@ -785,14 +785,14 @@ RSpec.describe UsersController, type: :controller do
           expect(membership.notification_never?).to be_truthy
           expect(membership2.notification_daily?).to be_truthy
           put :update, params: {
-                     id: user.username,
-                     hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
-                     hot_sheet_notifications: { organization.id.to_s => "1" },
-                     user: {
-                       notification_newsletters: "true",
-                       notification_unstolen: "false",
-                     },
-                   }
+                         id: user.username,
+                         hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
+                         hot_sheet_notifications: { organization.id.to_s => "1" },
+                         user: {
+                           notification_newsletters: "true",
+                           notification_unstolen: "false",
+                         },
+                       }
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url
           membership.reload

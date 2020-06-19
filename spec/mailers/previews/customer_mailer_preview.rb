@@ -8,6 +8,10 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.confirmation_email(preview_user)
   end
 
+  def confirmation_email_partner
+    CustomerMailer.confirmation_email(User.partner_sign_up.last)
+  end
+
   def password_reset_email
     CustomerMailer.password_reset_email(preview_user)
   end

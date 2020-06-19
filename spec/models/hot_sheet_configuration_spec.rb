@@ -14,9 +14,49 @@ RSpec.describe HotSheetConfiguration, type: :model do
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
     it "ensures there is a search location" do
       expect(hot_sheet_configuration.valid?).to be_truthy
-      hot_sheet_configuration.is_enabled = true
+      hot_sheet_configuration.is_on = true
       expect(hot_sheet_configuration.save).to be_falsey
       expect(hot_sheet_configuration.errors.full_messages.to_s).to match(/location/)
+    end
+  end
+
+  describe "send_hour" do
+    let(:hot_sheet_configuration) { HotSheetConfiguration.new }
+    it "makes things integers, makes 0 if invalid" do
+      hot_sheet_configuration.send_hour = 12.5
+      expect(hot_sheet_configuration.send_hour).to eq 12
+      hot_sheet_configuration.send_hour = 24
+      expect(hot_sheet_configuration.send_hour).to eq 0
+      hot_sheet_configuration.send_hour = -1
+      expect(hot_sheet_configuration.send_hour).to eq 0
+    end
+  end
+
+  describe "search_radius_metric_units?" do
+    let(:hot_sheet_configuration) { HotSheetConfiguration.new }
+    it "is false, but you can still set kilometers" do
+      expect(hot_sheet_configuration.search_radius_metric_units?).to be_falsey
+      hot_sheet_configuration.search_radius_kilometers = 400
+      expect(hot_sheet_configuration.search_radius_kilometers).to eq 400
+    end
+    context "not US organization" do
+      let(:organization) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:location) { organization.locations.first }
+      let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
+      it "is truthy" do
+        expect(location.country).to eq Country.canada
+        expect(location.state).to be_blank # Because we're fucking this up :(
+        expect(location.latitude).to be_within(0.1).of 53.5069377
+
+        expect(hot_sheet_configuration.search_radius_metric_units?).to be_truthy
+        hot_sheet_configuration.search_radius_kilometers = 400
+        expect(hot_sheet_configuration.search_radius_kilometers).to eq 400
+
+        # Also, set default to a round number
+        hot_sheet_configuration.search_radius_miles = nil
+        hot_sheet_configuration.set_calculated_attributes
+        expect(hot_sheet_configuration.search_radius_kilometers).to eq 100
+      end
     end
   end
 
@@ -31,7 +71,7 @@ RSpec.describe HotSheetConfiguration, type: :model do
         FactoryBot.create(:hot_sheet_configuration,
                           send_seconds_past_midnight: send_seconds,
                           timezone_str: "America/Halifax",
-                          is_enabled: true)
+                          is_on: true)
       end
       it "is falsey" do
         expect(hot_sheet_configuration.time_in_zone.to_i).to be_within(1).of Time.current.utc.to_i # OMG Time math is so hard

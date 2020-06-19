@@ -89,6 +89,7 @@ class Organization < ApplicationRecord
     :state_id,
     :street,
     :zipcode,
+    :metric_units?,
     to: :default_location,
     allow_nil: true
 
@@ -177,7 +178,7 @@ class Organization < ApplicationRecord
 
   def appointment_functionality_enabled?; any_enabled?(PaidFeature::APPOINTMENT_FEATURES) end
 
-  def hot_sheet_enabled?; hot_sheet_configuration.present? && hot_sheet_configuration.enabled? end
+  def hot_sheet_on?; hot_sheet_configuration.present? && hot_sheet_configuration.on? end
 
   def current_invoices; invoices.active end
 

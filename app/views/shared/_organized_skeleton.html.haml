@@ -72,7 +72,7 @@
               = t(".registration_stickers")
           - if current_organization.enabled?("hot_sheet")
             %li
-              = active_link t(".hot_sheet"), organization_hot_sheet_path(organization_id: current_organization.to_param), class: "menu-item"
+              = active_link t(".stolen_hot_sheet"), organization_hot_sheet_path(organization_id: current_organization.to_param), class: "menu-item"
         - if current_organization.enabled?("csv_exports")
           %li
             = active_link t(".exports"), organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
@@ -91,7 +91,7 @@
               = active_link t(".customize_emails"), organization_emails_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           - if current_organization.enabled?("hot_sheet")
             %li
-              = active_link t(".hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: current_organization.to_param), class: "menu-item"
+              = active_link t(".stolen_hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: current_organization.to_param), class: "menu-item"
           - if current_organization.appointment_functionality_enabled?
             %li
               = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
