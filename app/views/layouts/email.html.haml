@@ -13,18 +13,20 @@
 
   %body
     .binx-wrapper
-      .binx-header
-        %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
+      %table.binx-header
+        %tbody
+          %td
+            %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
 
-        - if @partner
-          %span.partner-logo-wrapper
-            = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo.png",
-              height: "50",
-              alt: "BikeHub Logo",
-              class: "partner-header-logo"
+            - if @partner
+              %span.partner-logo-wrapper
+                = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo.png",
+                  height: "50",
+                  alt: "BikeHub Logo",
+                  class: "partner-header-logo"
 
-            %span.logo-plus
-              +
+                %span.logo-plus
+                  +
 
       .binx-body
         -# We only render snippets for organized messages - or if we're doing a preview
