@@ -14,7 +14,7 @@ RSpec.shared_examples "geocodeable" do
       expect(obj_with_strings.state).to eq state
       obj_with_strings.state = "wyoming"
       expect(obj_with_strings.state).to eq state
-      expect(object.metric_units?).to be_falsey # Because US
+      expect(obj_with_strings.metric_units?).to be_falsey # Because US
 
       expect(obj_with_objects.country).to eq country
       expect(obj_with_objects.state).to eq state

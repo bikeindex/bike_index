@@ -758,7 +758,7 @@ RSpec.describe UsersController, type: :controller do
 
     context "organization with hotsheet" do
       let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_enabled: true) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:membership) { user.memberships.first }
       it "updates hotsheet" do
@@ -777,7 +777,7 @@ RSpec.describe UsersController, type: :controller do
         expect(membership.notification_daily?).to be_truthy
       end
       context "with other parameters too" do
-        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_enabled: true) }
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
         let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
