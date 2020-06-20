@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe OrgPublic::LinesController, type: :request do
-  let(:base_url) { "/partners/#{current_organization.to_param}/line" }
+RSpec.describe OrgPublic::CustomerLinesController, type: :request do
+  let(:base_url) { "/#{current_organization.to_param}/customer_line" }
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
     expect do
-      get "/partners/some-known-organization/line"
+      get "/some-known-organization/customer_line"
     end.to raise_error(ActiveRecord::RecordNotFound)
   end
 

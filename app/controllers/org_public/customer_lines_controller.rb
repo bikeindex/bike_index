@@ -1,5 +1,5 @@
 module OrgPublic
-  class LinesController < OrgPublic::BaseController
+  class CustomerLinesController < OrgPublic::BaseController
     before_action :ensure_access_to_virtual_line!
 
     def show
