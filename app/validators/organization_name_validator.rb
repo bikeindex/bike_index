@@ -9,7 +9,7 @@ class OrganizationNameValidator < ActiveModel::Validator
                      my_account news o oauth organizations ownerships pages payments privacy protect_your_bike
                      public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
                      stolen stolen_notifications store support_bike_index support_the_bike_index support_the_index terms
-                     theft_alerts university update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where].freeze
+                     theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where].freeze
 
   def self.valid?(str)
     slugged = Slugifyer.slugify(str)
