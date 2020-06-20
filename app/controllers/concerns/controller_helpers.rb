@@ -239,8 +239,8 @@ module ControllerHelpers
     return @current_location = nil unless current_organization.present?
     if params[:location_id].present?
       @current_location = current_organization.locations.friendly_find(params[:location_id])
-    else # If the organization only has one location, we don't need to find the location
-      @current_location = current_organization.locations.first if current_organization.locations.count == 1
+    elsif current_organization.locations.count == 1 # If there is only one location, just use that one
+      @current_location = current_organization.locations.first if current_organization
     end
     @current_location
   end
