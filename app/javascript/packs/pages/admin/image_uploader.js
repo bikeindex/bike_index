@@ -63,18 +63,18 @@ function BinxAdminImageUploader() {
       const alt = image.name;
       const src = image.image.url;
       const id = image.id;
-      return `<li>
+      return `<li class="mt-1 col-sm-6">
           <div class='card bg-light admin-public-image'>
             <div class='card-body pt-1 pb-0'>
               <div class='row'>
-                <div class='col-2'>
+                <div class='col-3'>
                   <div class='img-box'>
                     <img src='${src}' alt='${alt}'/>
                   </div>
                   <p>${alt}</p>
                 </div>
               </div>
-              <div class='col-8'>
+              <div class='col-9'>
                 <textarea class='form-control'> &lt;img class='post-image' src='${src}' alt='ENTER YOUR TEXT HERE'&gt; </textarea>
               </div>
             </div>
