@@ -1,4 +1,15 @@
 class InfoController < ApplicationController
+  def show
+    @blog = Blog.friendly_find(params[:id])
+    if @blog.blank?
+      flash[:error] = "unable to find that page"
+      redirect_to news_path and return
+    elsif @blog.blog?
+      redirect_to news_path(@blog.to_param) and return
+    end
+    @blogger = @blog.user
+  end
+
   def about
   end
 

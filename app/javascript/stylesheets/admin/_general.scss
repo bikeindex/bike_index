@@ -123,12 +123,12 @@
 }
 
 .admin-public-image {
+  font-size: 12px;
   img {
     max-width: 100%;
     width: 85px;
     height: auto;
   }
-  font-size: 12px;
   @include media-breakpoint-down(sm) {
     max-height: 100%;
     .img-box {

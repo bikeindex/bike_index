@@ -82,6 +82,7 @@ class Admin::NewsController < Admin::BaseController
       :update_title,
       :user_email,
       :user_id,
+      :is_info,
     )
   end
 

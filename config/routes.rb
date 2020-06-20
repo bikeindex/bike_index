@@ -300,6 +300,7 @@ Rails.application.routes.draw do
     get page, controller: "info", action: page
   end
   get "lightspeed_integration", to: redirect("/lightspeed")
+  resources :info, only: [:show]
 
   %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect("/resources") }
 

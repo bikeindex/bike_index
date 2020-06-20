@@ -1,0 +1,29 @@
+= content_for :header do
+  %link{rel: :canonical, href: canonical_url(@blog) }
+
+#news_display
+  .blog-header
+    %h1.global-title
+      = @blog.title
+
+    %article.blogger-info
+      %h4
+        By
+
+        %a.blog-poster{href: @blogger.userlink}
+          = @blogger.name.presence
+      %h4.pub-date
+        - if @blog.published_at > Time.current - 1.week
+          = l(@blog.published_at, format: :standard_display)
+        - else
+          = l(@blog.published_at, format: :no_day_with_year)
+
+- if @blog.is_listicle
+  - @blog.listicles.each_with_index do |list_item, i|
+    - unless i == 0
+      %hr.listicle-separator
+    = listicle_html(list_item)
+
+- else
+  :markdown
+    #{@blog.body}

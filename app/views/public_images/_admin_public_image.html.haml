@@ -1,32 +1,28 @@
 - skip_order ||= false
-%li
+%li.mt-1
   .card.bg-light.admin-public-image
-    .card-body
+    .card-body.pt-1.pb-0
       .row
-        .col-md-2.col-sm-6.mt-auto
+        .col-sm-2
+          .img-box
+            = image_tag(public_image.image_url(:small)) if public_image.image?
           %p
             = public_image.name.truncate(18)
-        .col-md-8.col-sm-6.mt-auto
+        .col-sm-2
           - if public_image.imageable_type != 'Blog'
             %textarea.form-control
               \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
           - else
             %textarea.form-control
               \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-        .col-md-2.col-sm-12
-          .img-box
-            = image_tag(public_image.image_url(:small)) if public_image.image?
       %hr
       .row.mt-2
-        .col-md-2
+        .col-6
           - if public_image.imageable_type == 'Blog'
             = link_to "Delete", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete
-        .col-md-8
-          %p
-            %span
-              Copy the above text and paste it where you'd like it to appear in the post
-        .col-md-2
+        .col-6.text-right
           - unless skip_order
-            .index-image-select
-              %input{:class => "index_image_#{public_image.id}", :name => "index_image_id", :type => "radio", :value => "#{public_image.id}"}/
+            %label.index-image-select.form-check-inline
+              %input{ class: "index_image_#{public_image.id}", name: "index_image_id", type: "radio", value: "#{public_image.id}" }
+              %em.ml-1 primary image
 

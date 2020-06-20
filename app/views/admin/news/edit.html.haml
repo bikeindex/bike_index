@@ -36,18 +36,41 @@
       .row
         .col-md-6
           .form-group
-            %label
-              Published Date:
-            .form-check.form-check-inline
-              = f.check_box :post_now, class: "form-check-input"
-              = f.label :post_now, class: "form-check-label"
-            %p
-              = @blog.published_at.strftime("%m-%d-%Y")
-            / JS Stuff
-            %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
-              edit
+            = f.label :user_email, "Author email"
+            = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email, class: "form-control"
+            - user = User.fuzzy_email_find(@blog.user.email)
+            - unless user.present? && user.userlink.present?
+              Please #{link_to "turn on your personal page", edit_my_account_url, target: '_blank'}, or link your twitter!
+        .col-md-6
+          .row
+            .col-sm-6
+              .form-group
+                %span.less-strong
+                  Publish Date:
+                %span.convertTime
+                  = l @blog.published_at, format: :convert_time
+            .col-sm-6
+              .form-group
+                .form-check.form-check-inline
+                  = f.check_box :published, class: "form-check-input"
+                  = f.label :published, "Published", class: "form-check-label"
+            .col-sm-6
+              .form-group
+                .form-check.form-check-inline
+                  = f.check_box :is_info, class: "form-check-input"
+                  = f.label :is_info, class: "form-check-label" do
+                    Info post
+                    %small.less-strong
+                      not blog/news
+            .col-sm-6
+              .form-check.form-check-inline
+                = f.check_box :post_now, class: "form-check-input"
+                = f.label :post_now, "Publish now", class: "form-check-label"
 
-          .form-group#blog-date{style: "display: none"}
+                %a.small.ml-2{ href: "#", "data-toggle" => "collapse", "data-target" => ".blog-date-toggle" }
+                  manually edit date
+
+          .form-group.blog-date-toggle.collapse
             = label :post_date, "Post date", class: "control-label"
             #post-date-field
               - @blog.post_date = TimeParser.round(@blog.published_at || Time.current, "seconds")
@@ -55,69 +78,66 @@
               = f.datetime_local_field :post_date, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
         .col-md-6
           .form-group
-            .form-check.form-check-inline
-              = f.check_box :published, class: "form-check-input"
-              = f.label :published, "Published", class: "form-check-label"
-          .form-group
-            = f.label :user_email, "Author email"
-            = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email, class: "form-control"
-            - user = User.fuzzy_email_find(@blog.user.email)
-            - unless user.present? && user.userlink.present?
-              Please #{link_to "turn on your personal page", edit_my_account_url, target: '_blank'}, or link your twitter!
-      .row
+            = f.label :tags, class: "control-label" do
+              Tags
+              %small.less-strong
+                Should include a main category: Tech, Design, or Update"
+            = f.text_area :tags, placeholder: "Separate tags with commas", class: "form-control"
         .col-md-6
           .form-group
-            = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
-            = f.text_area :tags, placeholder: "Separate tags with commas", class: "form-control"
+            = f.label :canonical_url, class: "control-label" do
+              Canonical URL
+              %small.less-strong (e.g. https://blogspot.com/post/1)
+            = f.text_field :canonical_url, class: "form-control"
+      .row.mt-2
+        .col-md-6
           .form-group
             .form-check.form-check-inline
-            = f.check_box :update_title, class: "form-check-input"
-            = f.label :update_title, "Update URL", class: "form-check-label"
-          %span.text-danger
-            This will break existing links!
+              = f.check_box :update_title, class: "form-check-input"
+              = f.label :update_title, "Update URL", class: "form-check-label"
+            %span.text-danger
+              This will break existing links!
         .col-md-6
           .form-group
             .controls
               %label
                 <input type="radio" name="index_image_id" value="0" class="index_image_0">
                 No primary image
+                %small.less-strong
+                  Otherwise, select a primary image with the radio button next to the image
               = f.hidden_field :index_image_id
-          .form-group
-            = f.label :language, class: "control-label"
-            = f.select :language,
-              options_for_select(language_choices, selected: @blog.language),
-              {},
-              class: "form-control"
-          .form-group
-            = f.label :canonical_url, "Canonical URL (e.g. https://blogspot.com/post/1)", class: "control-label"
-            = f.text_field :canonical_url, class: "form-control"
-
-      .row.mt-4
+      .row.mt-2
         .col-md-6
           .form-group
             = f.label :title, class: "control-label"
             = f.text_field :title, placeholder: "Blog title", class: "form-control"
-          %em.less-strong
-            = @blog.body_abbr
         .col-md-6
           .form-group
             = f.label :description_abbr, "Abbreviated description", class: "control-label"
             = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
+            %em.less-strong.mt-0
+              = @blog.body_abbr
+
       .row.mt-4
-        .col-5
+        .col-sm-4
+          .form-group
+            = f.select :language,
+              options_for_select(language_choices, selected: @blog.language),
+              {},
+              class: "form-control"
+        .col-5.text-center
           %a.btn.btn-primary{target: "_blank", href: blog_url(@blog)}
             preview post
-        .col-3
+        .col-3.text-right
           = f.submit 'Save', class: 'btn btn-success'
 
 
 
 - unless @blog.is_listicle
-  .card.mt-4#blog-image-form
-    .card-body.bg-light
-      %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
-        - if @blog.public_images
-          = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
+  .mt-4#blog-image-form
+    %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
+      - if @blog.public_images
+        = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
   %section.mt-2
     = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
 .alert.alert-info.mt-2
