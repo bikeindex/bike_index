@@ -16,7 +16,7 @@ RSpec.describe Admin::NewsController, type: :request do
   describe "show" do
     it "redirects to edit" do
       get "#{base_url}/#{blog.to_param}"
-      expect(response).to redirect_to(:show)
+      expect(response).to redirect_to(edit_admin_news_path(blog.to_param))
     end
   end
 
