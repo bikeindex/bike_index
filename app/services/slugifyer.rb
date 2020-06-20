@@ -1,9 +1,10 @@
 class Slugifyer
   def self.slugify(string)
-    string.to_s.strip.gsub(/\s/, "-")
-               .gsub(/-&-/, "-amp-") # Replace singular & with amp - since we permit & in names
-               .gsub(/([^A-Za-z0-9_\-]+)/, "") # Remove any weird characters
-               .downcase
+    slug = I18n.transliterate(string.to_s.downcase).strip
+    slug.gsub(/\s/, "-")
+       .gsub(/-&-/, "-amp-") # Replace singular & with amp - since we permit & in names
+       .gsub(/([^A-Za-z0-9_\-]+)/, "") # Remove any weird characters
+       .downcase
   end
 
   def self.book_slug(string)
