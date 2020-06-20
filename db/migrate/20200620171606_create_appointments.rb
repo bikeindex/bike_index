@@ -9,6 +9,7 @@ class CreateAppointments < ActiveRecord::Migration[5.2]
       t.string :email
       t.text :link_token
 
+      t.integer :kind
       t.integer :status
 
       t.string :reason

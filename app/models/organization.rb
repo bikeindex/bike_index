@@ -25,6 +25,7 @@ class Organization < ApplicationRecord
   }.freeze
 
   acts_as_paranoid
+
   mount_uploader :avatar, AvatarUploader
 
   belongs_to :parent_organization, class_name: "Organization"
