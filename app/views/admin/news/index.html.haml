@@ -1,9 +1,9 @@
 .admin-subnav
   .col-md-6
     %h1
-      Our #{@dignified_name}
+      News/Blogs/Info
   .col-md-6
-    = link_to 'New Blog', new_admin_news_url, class: "btn btn-success float-right"
+    = link_to 'New Post', new_admin_news_url, class: "btn btn-success float-right"
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
@@ -14,8 +14,8 @@
         Creator
       %th
         Content
-      %th.d-none.d-lg-table-cell
-        Vignettes
+      %th
+        Kind
       %th
         Language
       %th
@@ -25,7 +25,7 @@
         %tr
           %td
             .less-strong-hold
-              %span.convertTime
+              %small.convertTime
                 = l blog.published_at, format: :convert_time
               - if current_user.developer?
                 %small.less-strong-right
@@ -37,8 +37,11 @@
               = link_to blog.title, edit_admin_news_url(blog)
               %br
               = blog.body_abbr.html_safe if blog.body_abbr
-          %td.table-cell-check
-            = check_mark if blog.is_listicle
+          %td
+            - if blog.info?
+              %span.text-success Info
+            - elsif blog.is_listicle
+              %span.text-warning Vignettes
           %td
             = t(blog.language, scope: [:locales])
           %td.table-cell-check

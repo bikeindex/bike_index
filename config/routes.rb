@@ -12,8 +12,8 @@ Rails.application.routes.draw do
     controllers authorized_applications: "oauth/authorized_applications"
   end
 
-  get "/shop", to: redirect("https://bikeindex.org/news/bike-index-store"), as: :shop
-  get "/store", to: redirect("https://bikeindex.org/news/bike-index-store"), as: :store
+  get "/shop", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :shop
+  get "/store", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :store
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
@@ -300,6 +300,7 @@ Rails.application.routes.draw do
     get page, controller: "info", action: page
   end
   get "lightspeed_integration", to: redirect("/lightspeed")
+  resources :info, only: [:show]
 
   %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect("/resources") }
 

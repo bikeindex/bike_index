@@ -6,8 +6,14 @@ module HeaderTagHelper
   # Everything below here is an internal method, not private for testing purposes
 
   def header_tag_array
-    return default_header_tag_array unless !controller_namespace && SPECIAL_CONTROLLERS.include?(controller_name)
+    return default_header_tag_array unless page_with_custom_header_tags?
     send("#{controller_name}_header_tags")
+  end
+
+  def page_with_custom_header_tags?
+    return false if controller_namespace
+    return true if SPECIAL_CONTROLLERS.include?(controller_name)
+    controller_name == "info" && action_name == "show"
   end
 
   def page_title=(val)
@@ -164,6 +170,23 @@ module HeaderTagHelper
     end
     default_header_tag_array(meta_overrides) +
       [news_auto_discovery_link, tag(:link, rel: "author", href: user_url(@blog.user))]
+  end
+
+  # This only will show up on info/show - and is the same as news, but without the author stuff
+  def info_header_tags
+    self.page_title = @blog.title
+    self.page_description = @blog.description
+    meta_overrides = {
+      "og:type" => "article",
+      "og:published_time" => @blog.created_at.utc,
+      "og:modified_time" => @blog.updated_at.utc,
+    }
+    if @blog.index_image.present?
+      self.page_image = @blog.index_image_lg
+    elsif @blog.public_images.any?
+      self.page_image = @blog.public_images.last.image_url
+    end
+    default_header_tag_array(meta_overrides)
   end
 
   private
