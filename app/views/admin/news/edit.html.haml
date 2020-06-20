@@ -91,12 +91,16 @@
             = f.text_field :canonical_url, class: "form-control"
       .row.mt-2
         .col-md-6
-          .form-group
-            .form-check.form-check-inline
-              = f.check_box :update_title, class: "form-check-input"
-              = f.label :update_title, "Update URL", class: "form-check-label"
-            %span.text-danger
-              This will break existing links!
+          - if @blog.blog?
+            .form-group
+              .form-check.form-check-inline
+                = f.check_box :update_title, class: "form-check-input"
+                = f.label :update_title, "Update URL", class: "form-check-label"
+              %span.text-danger
+                This will break existing links!
+          - else
+            %span.text-warning
+              Can't update the URL because this is an info post.
         .col-md-6
           .form-group
             .controls
@@ -115,8 +119,10 @@
           .form-group
             = f.label :description_abbr, "Abbreviated description", class: "control-label"
             = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
-            %em.less-strong.mt-0
-              = @blog.body_abbr
+            .mt-0
+              Default:
+              %em.less-strong
+                = @blog.body_abbr
 
       .row.mt-4
         .col-sm-4
@@ -135,7 +141,7 @@
 
 - unless @blog.is_listicle
   .mt-4#blog-image-form
-    %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
+    %ul.row.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
       - if @blog.public_images
         = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
   %section.mt-2
