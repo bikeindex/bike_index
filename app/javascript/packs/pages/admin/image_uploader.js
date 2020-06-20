@@ -63,31 +63,30 @@ function BinxAdminImageUploader() {
       const alt = image.name;
       const src = image.image.url;
       const id = image.id;
-      return `<li class="mt-1 col-sm-6">
-          <div class='card bg-light admin-public-image'>
-            <div class='card-body pt-1 pb-0'>
+      return `<li class="admin-public-image collapse show mt-1 col-xl-4 col-sm-6" id="image-${id}" data-imageid="${id}">
+          <div class='card bg-light'>
+            <div class='card-body'>
               <div class='row'>
                 <div class='col-3'>
                   <div class='img-box'>
                     <img src='${src}' alt='${alt}'/>
                   </div>
-                  <p>${alt}</p>
+                  <p class="image-filename">${alt}</p>
+                </div>
+                <div class='col-9'>
+                  <textarea class='form-control'> &lt;img class='post-image' src='${src}' alt='ENTER YOUR TEXT HERE'&gt; </textarea>
                 </div>
               </div>
-              <div class='col-9'>
-                <textarea class='form-control'> &lt;img class='post-image' src='${src}' alt='ENTER YOUR TEXT HERE'&gt; </textarea>
-              </div>
-            </div>
-            <hr/>
-            <div class='row mt-2'>
-              <div class='col-6'>
-                <a href='#' class="image-delete-button"> Delete</a>
-              </div>
-              <div class='col-6'>
-                <label class="index-image-select form-check-inline">
-                  <input class="index_image_${id}" name="index_image_id" type="radio" value="${id}"></input>
-                  <em class="ml-1">primary image</em>
-                </label>
+              <div class='row'>
+                <div class='col-6'>
+                  <a href='#' class="image-delete-button"> Delete</a>
+                </div>
+                <div class='col-6 text-right'>
+                  <label class="index-image-select form-check-inline">
+                    <input class="index_image_${id}" name="index_image_id" type="radio" value="${id}"></input>
+                    <em class="ml-1">primary image</em>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

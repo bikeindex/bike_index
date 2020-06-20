@@ -1,11 +1,11 @@
-.row
-  .col-md-8
+.admin-subnav
+  .col-10.mt-2
     %h1
-      Editing that #{@dignified_name}!
-  .col-md-2
-    = link_to "Delete post", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
-  .col-md-2
-    = link_to "Back to all", admin_news_index_url, class: "btn btn-primary"
+      Editing
+      = @blog.blog? ? "Blog" : "Info piece"
+  .col-2.mt-2.text-right
+    = link_to "Delete", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "btn btn-danger btn-sm"
+
 - if params[:show_photos]
   %p
     - if @blog.is_listicle
@@ -31,38 +31,37 @@
     = render partial: "listicle_form", locals: { f: f }
   - else
     = render partial: "form", locals: { f: f }
-  .card
-    .card-body.bg-light
+
+  - blogOnlyClass = "collapse blogOnlyShow" + (@blog.info? ? "" : " show")
+  - infoOnlyClass = "collapse infoOnlyShow" + (@blog.info? ? " show" : "")
+
+  .card#blog-options-card
+    .card-body
       .row
         .col-md-6
-          .form-group
-            = f.label :user_email, "Author email"
-            = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email, class: "form-control"
-            - user = User.fuzzy_email_find(@blog.user.email)
-            - unless user.present? && user.userlink.present?
-              Please #{link_to "turn on your personal page", edit_my_account_url, target: '_blank'}, or link your twitter!
-        .col-md-6
           .row
-            .col-sm-6
-              .form-group
-                %span.less-strong
-                  Publish Date:
-                %span.convertTime
-                  = l @blog.published_at, format: :convert_time
             .col-sm-6
               .form-group
                 .form-check.form-check-inline
                   = f.check_box :published, class: "form-check-input"
                   = f.label :published, "Published", class: "form-check-label"
+                %div{ class: infoOnlyClass }
+                  %small.less-strong info posts are published at the most recent edit time
             .col-sm-6
               .form-group
-                .form-check.form-check-inline
+                .form-check.form-check-inline#infoCheck
                   = f.check_box :is_info, class: "form-check-input"
                   = f.label :is_info, class: "form-check-label" do
                     Info post
                     %small.less-strong
-                      not blog/news
-            .col-sm-6
+                      static content that's updated
+            .col-sm-6{ class: blogOnlyClass }
+              .form-group
+                %span.less-strong
+                  Publish Date:
+                %span.convertTime
+                  = l @blog.published_at, format: :convert_time
+            .col-sm-6{ class: blogOnlyClass }
               .form-check.form-check-inline
                 = f.check_box :post_now, class: "form-check-input"
                 = f.label :post_now, "Publish now", class: "form-check-label"
@@ -83,24 +82,20 @@
               %small.less-strong
                 Should include a main category: Tech, Design, or Update"
             = f.text_area :tags, placeholder: "Separate tags with commas", class: "form-control"
-        .col-md-6
+        .col-md-6{ class: blogOnlyClass }
+          .form-group
+            = f.label :user_email, "Author email"
+            = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email, class: "form-control"
+            - user = User.fuzzy_email_find(@blog.user.email)
+            - unless user.present? && user.userlink.present?
+              Please #{link_to "turn on your personal page", edit_my_account_url, target: '_blank'}, or link your twitter!
+        .col-md-6{ class: blogOnlyClass }
           .form-group
             = f.label :canonical_url, class: "control-label" do
               Canonical URL
               %small.less-strong (e.g. https://blogspot.com/post/1)
             = f.text_field :canonical_url, class: "form-control"
       .row.mt-2
-        .col-md-6
-          - if @blog.blog?
-            .form-group
-              .form-check.form-check-inline
-                = f.check_box :update_title, class: "form-check-input"
-                = f.label :update_title, "Update URL", class: "form-check-label"
-              %span.text-danger
-                This will break existing links!
-          - else
-            %span.text-warning
-              Can't update the URL because this is an info post.
         .col-md-6
           .form-group
             .controls
@@ -110,6 +105,13 @@
                 %small.less-strong
                   Otherwise, select a primary image with the radio button next to the image
               = f.hidden_field :index_image_id
+        .col-md-6{ class: blogOnlyClass }
+          .form-group
+            .form-check.form-check-inline
+              = f.check_box :update_title, class: "form-check-input"
+              = f.label :update_title, "Update URL", class: "form-check-label"
+            %span.text-danger
+              This will break existing links!
       .row.mt-2
         .col-md-6
           .form-group
@@ -124,20 +126,21 @@
               %em.less-strong
                 = @blog.body_abbr
 
-      .row.mt-4
-        .col-sm-4
+      .row.mt-2
+        .col-sm-3
           .form-group
             = f.select :language,
               options_for_select(language_choices, selected: @blog.language),
               {},
               class: "form-control"
-        .col-5.text-center
-          %a.btn.btn-primary{target: "_blank", href: blog_url(@blog)}
-            preview post
-        .col-3.text-right
+        .col-sm-3.col-6
+          %a.btn.btn-primary{ target: "_blank", href: news_url(@blog.id) }
+            Preview
+        .col-6.text-right
           = f.submit 'Save', class: 'btn btn-success'
-
-
+.alert.alert-info.mt-2
+  %p
+    The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
 
 - unless @blog.is_listicle
   .mt-4#blog-image-form
@@ -146,6 +149,3 @@
         = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
   %section.mt-2
     = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
-.alert.alert-info.mt-2
-  %p
-    The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
