@@ -16,6 +16,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
       context controller_name do
         let(:controller_name) { controller_name }
         it "calls special_controller name" do
+          expect(helper.page_with_custom_header_tags?).to be_truthy
           expect(helper).to receive("#{controller_name}_header_tags".to_sym) { ["tags"] }
           expect(helper.header_tags).to eq "tags"
         end
@@ -389,6 +390,26 @@ RSpec.describe HeaderTagHelper, type: :helper do
           expect(helper.page_image).to eq "http://something.com"
           expect(header_tags.include?(auto_discovery_tag)).to be_truthy
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_truthy
+        end
+      end
+      describe "info post" do
+        let(:controller_name) { "info" }
+        it "returns the info tags" do
+          blog.is_info = true
+          blog.created_at = target_time
+          allow(blog).to receive(:index_image) { target_url }
+          allow(blog).to receive(:index_image_lg) { target_url }
+          @blog = blog
+          header_tags = helper.info_header_tags
+          expect(helper.page_title).to eq "Cool blog"
+          expect(helper.page_description).to eq "Bike Index did something cool"
+          expect(helper.page_image).to eq "http://something.com"
+          expect(header_tags.select { |t| t && t.include?("og:type") }.first).to match "article"
+          expect(header_tags.select { |t| t && t.include?("twitter:creator") }.first).to match "@bikeindex"
+          expect(header_tags.select { |t| t && t.include?("og:published_time") }.first).to match target_time.to_s
+          expect(header_tags.select { |t| t && t.include?("og:modified_time") }.first).to match target_time.to_s
+          expect(header_tags.include?(auto_discovery_tag)).to be_falsey
+          expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_falsey
         end
       end
     end

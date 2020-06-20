@@ -50,6 +50,7 @@ class Blog < ApplicationRecord
     self.published_at ||= Time.current # We need to have a published time...
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
+    self.published_at = Time.current if is_info
     update_title_save
     create_abbreviation
     set_index_image

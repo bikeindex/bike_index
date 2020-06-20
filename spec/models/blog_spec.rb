@@ -54,6 +54,16 @@ RSpec.describe Blog, type: :model do
     end
   end
 
+  describe "info published_at" do
+    let(:blog) { FactoryBot.create(:blog, published_at: Time.current - 2.days) }
+    it "updates the published_at" do
+      blog.update(updated_at: Time.current)
+      expect(blog.published_at).to be < Time.current - 1.day
+      blog.update(is_info: true)
+      expect(blog.published_at).to be_within(2).of Time.current
+    end
+  end
+
   describe "create_abbreviation" do
     it "makes the text 200 char long or less and remove any new lines" do
       @user = FactoryBot.create(:user)

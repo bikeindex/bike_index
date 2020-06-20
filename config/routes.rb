@@ -12,8 +12,8 @@ Rails.application.routes.draw do
     controllers authorized_applications: "oauth/authorized_applications"
   end
 
-  get "/shop", to: redirect("https://bikeindex.org/news/bike-index-store"), as: :shop
-  get "/store", to: redirect("https://bikeindex.org/news/bike-index-store"), as: :store
+  get "/shop", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :shop
+  get "/store", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :store
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 

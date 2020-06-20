@@ -7,12 +7,8 @@
       = @blog.title
 
     %article.blogger-info
-      %h4
-        By
-
-        %a.blog-poster{href: @blogger.userlink}
-          = @blogger.name.presence
       %h4.pub-date
+        updated
         - if @blog.published_at > Time.current - 1.week
           = l(@blog.published_at, format: :standard_display)
         - else

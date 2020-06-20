@@ -134,11 +134,13 @@
               {},
               class: "form-control"
         .col-sm-3.col-6
-          %a.btn.btn-primary{ target: "_blank", href: news_url(@blog.id) }
+          %a.btn.btn-primary{ target: "_blank", href: news_url(@blog.to_param) }
             Preview
         .col-6.text-right
           = f.submit 'Save', class: 'btn btn-success'
-.alert.alert-info.mt-2
+.row.mt-2.mb-2
+  .col-md-6
+.alert.alert-info
   %p
     The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
 

@@ -3,11 +3,19 @@ require "rails_helper"
 RSpec.describe InfoController, type: :request do
   let(:base_url) { "/info" }
   describe "show" do
-    let(:blog) { FactoryBot.create(:blog, is_info: true) }
+    let(:blog) do
+      FactoryBot.create(:blog, is_info: true, title: "Cool info about bike things", description_abbr: "Special info desc")
+    end
     it "renders" do
       get "#{base_url}/#{blog.title_slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
+      # Test some header tag properties
+      html_response = response.body
+      # This is from header tag helpers
+      expect(html_response).to match(/<title>Cool info about bike things</)
+      # This is pulled from the translations file
+      expect(html_response).to match(/<meta.*Special info desc/)
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
