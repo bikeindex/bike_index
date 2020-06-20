@@ -366,6 +366,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(blog).to receive(:index_image) { target_url }
           allow(blog).to receive(:index_image_lg) { target_url }
           @blog = blog
+          expect(helper.page_with_custom_header_tags?).to be_truthy
           header_tags = helper.news_header_tags
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
@@ -385,7 +386,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(blog).to receive(:public_images) { [public_image] }
           allow(blog).to receive(:index_image_lg) { target_url }
           @blog = blog
-          header_tags = helper.news_header_tags
+          header_tags = helper.header_tag_array
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_image).to eq "http://something.com"
           expect(header_tags.include?(auto_discovery_tag)).to be_truthy
@@ -400,7 +401,8 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(blog).to receive(:index_image) { target_url }
           allow(blog).to receive(:index_image_lg) { target_url }
           @blog = blog
-          header_tags = helper.info_header_tags
+          expect(helper.page_with_custom_header_tags?).to be_truthy
+          header_tags = helper.header_tag_array
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
           expect(helper.page_image).to eq "http://something.com"
@@ -412,6 +414,18 @@ RSpec.describe HeaderTagHelper, type: :helper do
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_falsey
         end
       end
+    end
+  end
+
+  describe "about" do
+    let(:controller_name) { "info" }
+    let(:action_name) { "about" }
+    it "returns default about header tags" do
+      # testing a non-show info page, to make sure we aren't doing custom header tags
+      expect(helper.page_with_custom_header_tags?).to be_falsey
+      header_tags = helper.header_tag_array
+      expect(helper.page_title).to eq "Bike Index - Bike registration that works"
+      expect(helper.page_description).to eq "Why we made Bike Index and who we are"
     end
   end
 end
