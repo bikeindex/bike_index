@@ -637,6 +637,7 @@ RSpec.describe User, type: :model do
         expect(user.member_of?(organization, no_superuser_override: true)).to be_truthy
         expect(user.admin_of?(organization)).to be_truthy
         expect(user.admin_of?(organization, no_superuser_override: true)).to be_truthy
+        expect(user.member_of?(nil)).to be_falsey
       end
     end
     context "member of organization" do
