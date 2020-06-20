@@ -16,7 +16,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     return false if slugged.length < 2 # Gotta be at least 2 characters
     return false if INVALID_NAMES.include?(slugged)
     # If it has one extra letter from an invalid name, reject it too (plurals, etc)
-    return false if INVALID_NAMES.include?(slugged.gsub(/.\z/, ""))
+    return false if INVALID_NAMES.include?(slugged.gsub(/s\z/, ""))
     # If you add an s and it's an invalid name, reject it too
     return false if INVALID_NAMES.include?("#{slugged}s")
     true
