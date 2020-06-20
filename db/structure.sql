@@ -170,7 +170,7 @@ CREATE TABLE public.appointment_configurations (
     location_id bigint,
     reasons jsonb,
     virtual_line_on boolean DEFAULT false,
-    customers_on_deck integer,
+    customers_on_deck_count integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -5035,6 +5035,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200616144002'),
 ('20200616144623'),
 ('20200619141947'),
-('20200619141957');
+('20200620170809');
 
 

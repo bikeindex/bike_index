@@ -5,7 +5,7 @@ class CreateAppointmentConfigurations < ActiveRecord::Migration[5.2]
       t.references :location
       t.jsonb :reasons
       t.boolean :virtual_line_on, default: false
-      t.integer :customers_on_deck
+      t.integer :customers_on_deck_count
 
       t.timestamps
     end
