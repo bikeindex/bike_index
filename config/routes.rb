@@ -334,7 +334,7 @@ Rails.application.routes.draw do
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
-    resources :appointments, only: %i[index update]
+    resources :appointments, only: %i[index show update]
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do
@@ -352,6 +352,12 @@ Rails.application.routes.draw do
     end
     resources :appointment_configurations, only: %i[index edit update]
     resources :users, except: [:show]
+  end
+
+  # This is the public organizations section
+  resources :organization, only: [], path: "partners", module: "org_public" do
+    resource :line, only: %i[show]
+    resources :customer_appointments, only: %i[show update create]
   end
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge

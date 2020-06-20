@@ -11,7 +11,7 @@ RSpec.describe "organizations routing", type: :routing do
       )
     end
   end
-  context "organized module" do # At least for now...
+  describe "organized module" do # At least for now...
     describe "root" do
       it "routes to base index action" do
         expect(get: "/o/university").to route_to(
@@ -85,6 +85,26 @@ RSpec.describe "organizations routing", type: :routing do
         controller: "organizations",
         action: "new",
       )
+    end
+  end
+
+  describe "org_public module" do # At least for now...
+    it "routes to line" do
+      expect(get: "/partners/bike_shop/line").to route_to(
+        controller: "org_public/lines",
+        action: "show",
+        organization_id: "bike_shop",
+      )
+    end
+    describe "appointment" do
+      it "routes to appointment" do
+        expect(get: "/partners/california-bikes/customer_appointments/12").to route_to(
+          controller: "org_public/customer_appointments",
+          action: "show",
+          organization_id: "california-bikes",
+          id: "12",
+        )
+      end
     end
   end
 end

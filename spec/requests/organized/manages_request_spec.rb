@@ -230,7 +230,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 params: {
                   organization_id: current_organization.to_param,
                   id: current_organization.to_param,
-                  organization: { kind: "property_management", short_name: "cool short name" }
+                  organization: { kind: "property_management", short_name: "cool short name" },
                 }
 
             expect(assigns[:page_errors]).to be_present
@@ -251,9 +251,9 @@ RSpec.describe Organized::ManagesController, type: :request do
                   params: {
                     organization_id: current_organization.to_param,
                     id: current_organization.to_param,
-                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
                   }
-            # Because we added 1 location and deleted 1 location
+              # Because we added 1 location and deleted 1 location
             end.to change(Location, :count).by 0
 
             current_organization.reload
@@ -281,7 +281,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                     params: {
                       organization_id: current_organization.to_param,
                       id: current_organization.to_param,
-                      organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                      organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
                     }
               end.to raise_error(/appointment/)
 
@@ -293,7 +293,7 @@ RSpec.describe Organized::ManagesController, type: :request do
 
         context "only updating location" do
           let(:update_attributes) do
-           {
+            {
               created_at: Time.current.to_f.to_s,
               name: "new shop",
               zipcode: "60608",
@@ -303,7 +303,7 @@ RSpec.describe Organized::ManagesController, type: :request do
               street: "1300 W 14th Pl",
               phone: "7272772727272",
               email: "stuff@goooo.com",
-              publicly_visible: false
+              publicly_visible: false,
             }
           end
           let(:state) { FactoryBot.create(:state_illinois) }
@@ -317,11 +317,11 @@ RSpec.describe Organized::ManagesController, type: :request do
               Sidekiq::Testing.inline! do
                 expect do
                   patch base_url,
-                      params: {
-                        organization_id: current_organization.to_param,
-                        id: current_organization.to_param,
-                        organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } }
-                      }
+                        params: {
+                          organization_id: current_organization.to_param,
+                          id: current_organization.to_param,
+                          organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } },
+                        }
                 end.to change(Location, :count).by 1
               end
             end

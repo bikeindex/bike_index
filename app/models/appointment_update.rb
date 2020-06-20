@@ -11,7 +11,7 @@ class AppointmentUpdate < ApplicationRecord
   scope :organization_update, -> { where(organization_update: true) }
   scope :customer_update, -> { where(organization_update: false) }
 
-  def signed_in_update?; user_id.present? end
+  def signed_in_user?; user_id.present? end
 
   def organization_update?; organization_update end
 

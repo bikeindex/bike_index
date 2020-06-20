@@ -1722,6 +1722,16 @@ en:
             support@bikeindex.org if this is problematic.
         update:
           updated_membership: Updated membership for %{user_email}.
+    org_public:
+      base:
+        ensure_access_to_virtual_line!:
+          unable_to_find_location: >-
+            Unable to find the location "%{location_id}" for %{org_name}
+          org_does_not_have_access: >-
+            %{org_name} doesn't have access to that, please contact Bike Index
+            support.
+          location_does_not_have_access: >-
+            %{location_name} doesn't have virtual line turned on, please contact %{org_name}.
     ownerships:
       show:
         no_longer_your_bike: >-

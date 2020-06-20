@@ -42,10 +42,5 @@ module Organized
                                   scope: [:controllers, :organized, :base, __method__])
       redirect_to organization_root_path and return
     end
-
-    def ensure_current_organization!
-      return true if current_organization.present?
-      fail ActiveRecord::RecordNotFound
-    end
   end
 end

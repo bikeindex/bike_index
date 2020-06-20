@@ -52,6 +52,8 @@ class Organization < ApplicationRecord
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
+  has_many :appointment_configurations, through: :locations
+  has_many :appointments
   has_one :hot_sheet_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
@@ -155,6 +157,8 @@ class Organization < ApplicationRecord
   def should_be_geocoded?; false end
 
   def to_param; slug end
+
+  def landing_html?; landing_html.present? end
 
   def restrict_invitations?; !enabled?("passwordless_users") && !passwordless_user_domain.present? end
 
