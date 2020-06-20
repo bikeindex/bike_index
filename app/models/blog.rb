@@ -18,6 +18,8 @@ class Blog < ApplicationRecord
 
   scope :published, -> { where(published: true) }
   scope :listicle_blogs, -> { where(is_listicle: true) }
+  scope :blog, -> { where(is_info: false) }
+  scope :info, -> { where(is_info: true) }
   default_scope { order("published_at desc") }
 
   def self.slugify_title(str)
@@ -38,14 +40,17 @@ class Blog < ApplicationRecord
       find_by_title_slug(str) || find_by_title(str)
   end
 
-  def to_param
-    title_slug
-  end
+  def info?; is_info end
+
+  def blog?; !info? end
+
+  def to_param; title_slug end
 
   def set_calculated_attributes
     self.published_at ||= Time.current # We need to have a published time...
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
+    self.published_at = Time.current if is_info
     update_title_save
     create_abbreviation
     set_index_image

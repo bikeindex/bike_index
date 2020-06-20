@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -476,7 +476,8 @@ CREATE TABLE public.blogs (
     index_image_id integer,
     index_image_lg character varying(255),
     language integer DEFAULT 0 NOT NULL,
-    canonical_url character varying
+    canonical_url character varying,
+    is_info boolean DEFAULT false
 );
 
 
@@ -5035,6 +5036,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200616144002'),
 ('20200616144623'),
 ('20200619141947'),
+('20200619234821'),
 ('20200620170809');
 
 

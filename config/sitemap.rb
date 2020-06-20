@@ -17,7 +17,21 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :news) do
     add "/blogs", priority: 0.9, changefreq: "daily"
-    Blog.published.each do |b|
+    Blog.published.info.each do |b|
+      add("/info/#{b.title_slug}",
+          priority: 0.9,
+          news: {
+            publication_name: "Bike Index Information",
+            publication_language: "en",
+            title: b.title,
+            publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+          })
+    end
+  end
+
+  group(filename: :news) do
+    add "/blogs", priority: 0.9, changefreq: "daily"
+    Blog.published.blog.each do |b|
       add("/news/#{b.title_slug}",
           priority: 0.9,
           news: {
@@ -28,6 +42,7 @@ SitemapGenerator::Sitemap.create do
           })
     end
   end
+
   group(filename: :partners) do
     paths = ["where", "organizations/new"]
     paths.each { |i| add "/#{i}", priority: 0.9 }

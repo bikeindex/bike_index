@@ -1,6 +1,6 @@
 class NewsController < ApplicationController
   def index
-    @blogs = Blog.published.in_language(params[:language])
+    @blogs = Blog.published.blog.in_language(params[:language])
     redirect_to news_index_url(format: "atom") if request.format == "xml"
   end
 
@@ -9,6 +9,10 @@ class NewsController < ApplicationController
 
     unless @blog
       raise ActionController::RoutingError.new("Not Found")
+    end
+
+    if @blog.info?
+      redirect_to info_path(@blog.to_param) and return
     end
 
     if @blog.is_listicle

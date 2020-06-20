@@ -123,17 +123,21 @@
 }
 
 .admin-public-image {
-  img {
-    max-width: 100%;
-    width: 85px;
-    height: auto;
-  }
   font-size: 12px;
-  @include media-breakpoint-down(sm) {
-    max-height: 100%;
-    .img-box {
-      text-align: center;
-    }
+  .card-body {
+    padding-top: 0.5rem;
+    padding-bottom: 0;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+  .image-filename {
+    @extend .small;
+    @extend .less-strong;
+    @extend .text-center;
   }
 }
 
