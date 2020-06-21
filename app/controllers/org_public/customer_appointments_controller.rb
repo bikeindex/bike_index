@@ -4,6 +4,8 @@ module OrgPublic
     before_action :ensure_access_to_virtual_line!, except: [:show]
     before_action :find_appointment, except: [:create]
 
+    layout "customer_virtual_line"
+
     def show
     end
 

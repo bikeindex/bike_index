@@ -1,0 +1,59 @@
+.customer-virtual-line-wrapper {
+  background: $white;
+}
+
+// The footer, powered by Bike Index copies the primary nav header styles
+$vertical-height: 12px;
+$primary-logo-fullsize-height: 84px;
+$primary-logo-padding: 0.5 * $vertical-height;
+$primary-logo-padding-mobile: $vertical-height;
+$mainmenu-transform-speed: 200ms;
+$mainmenu-width: 80%;
+$mainmenu-open-zindex: 10;
+
+.customer-virtual-line-body {
+  background: $primary-nav-background;
+  padding-bottom: 20px;
+}
+
+.customer-virtual-line-body .footer-powered-by-bike-index {
+  padding: 6px 0;
+  background: $primary-nav-background;
+  color: $primary-nav-text-color;
+
+  h2 {
+    float: left;
+    font-family: "Open Sans";
+    font-style: italic;
+    font-size: 24px;
+    margin: 10px 12px 0 0;
+  }
+
+  .primary-logo {
+    position: relative;
+    float: left;
+    padding: $primary-logo-padding 0;
+
+    img {
+      display: block;
+      height: 44px;
+      width: auto;
+    }
+  }
+
+  .nonprofit-subtitle {
+    display: block;
+    float: left;
+    padding: 0 6px;
+    border-left: 1px solid #3498db;
+    color: #d8d8d8;
+    line-height: 1.15;
+    font-size: 12px;
+    font-family: "Open Sans";
+    font-style: italic;
+    text-decoration: none;
+    margin: 11px $vertical-height 0 $vertical-height;
+    transition: margin $mainmenu-transform-speed linear;
+    width: 100px;
+  }
+}

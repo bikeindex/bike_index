@@ -14,6 +14,10 @@
   overflow: hidden;
 }
 
+// Revised/Legacy Nav colors
+$primary-nav-background: #111111;
+$primary-nav-text-color: #a4a4a4;
+
 // General styles
 @import "../stylesheets/utils";
 @import "../stylesheets/table_extensions";
@@ -24,6 +28,7 @@
 @import "../stylesheets/admin/general";
 @import "../stylesheets/admin/bikes";
 @import "../stylesheets/period_selection";
+@import "../stylesheets/customer_virtual_line";
 
 // Uppy Styles
 @import "@uppy/core/dist/style.css";
