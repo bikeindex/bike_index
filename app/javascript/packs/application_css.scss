@@ -14,6 +14,17 @@
   overflow: hidden;
 }
 
+// Some font styles
+$body-font-family: "Open Sans", sans-serif;
+$normal-font-weight: 400;
+$strong-font-weight: 700;
+$light-italic-weight: 300;
+
+body {
+  font-family: $body-font-family;
+  font-weight: $normal-font-weight;
+}
+
 // Revised/Legacy Nav colors
 $primary-nav-background: #111111;
 $primary-nav-text-color: #a4a4a4;

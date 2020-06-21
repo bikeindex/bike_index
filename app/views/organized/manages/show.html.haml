@@ -41,19 +41,18 @@
     .col-sm-4
       = f.text_field :website, class: 'form-control'
 
-  - if current_organization.is_paid
-    .form-group.row.avatar-upload-wrapper
-      %label.org-form-label
-        = t(".organization_logo")
-      .col-sm-4
-        - if @organization.avatar?
-          = image_tag(@organization.avatar_url(:thumb))
+  .form-group.row.avatar-upload-wrapper
+    %label.org-form-label
+      = t(".organization_logo")
+    .col-sm-4
+      - if @organization.avatar?
+        = image_tag(@organization.avatar_url(:thumb))
 
-        %label.file
-          = f.file_field :avatar, class: 'avatar-upload-field'
-          %span.file-custom
-            %span.file-upload-text= t(".choose_file")
-          = f.hidden_field :avatar_cache
+      %label.file
+        = f.file_field :avatar, class: 'avatar-upload-field'
+        %span.file-custom
+          %span.file-upload-text= t(".choose_file")
+        = f.hidden_field :avatar_cache
 
   .form-group.row.mt-4
     .form-submit-button

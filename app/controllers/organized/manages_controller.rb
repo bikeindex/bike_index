@@ -46,8 +46,8 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
-                                           show_on_map_if_permitted, permitted_kind, paid_attributes,
+      params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name, :avatar,
+                                           show_on_map_if_permitted, permitted_kind,
                                            locations_attributes: permitted_locations_params)
     end
 
@@ -59,10 +59,6 @@ module Organized
 
     def show_on_map_if_permitted
       current_organization.lock_show_on_map ? [] : [:show_on_map]
-    end
-
-    def paid_attributes
-      current_organization.is_paid ? [:avatar] : []
     end
 
     def permitted_locations_params
