@@ -627,4 +627,29 @@ RSpec.describe Organization, type: :model do
       end
     end
   end
+
+  describe "invalid names" do
+    let(:organization) { FactoryBot.build(:organization, name: "bike") }
+    it "blocks naming something invalid" do
+      expect(organization.save).to be_falsey
+      expect(organization.id).to be_blank
+      organization.update(name: "something else", short_name: "something cool")
+      expect(organization.valid?).to be_truthy
+      expect(organization.id).to be_present
+      valid_names = ["something else", "something cool", "something-cool"]
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(short_name: "bikes")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(name: "bikés")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(name: "400")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+    end
+  end
 end
