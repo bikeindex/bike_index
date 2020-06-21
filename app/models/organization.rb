@@ -67,6 +67,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
+  validates_with OrganizationNameValidator
 
   default_scope { order(:name) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }

@@ -650,7 +650,6 @@ RSpec.describe Organization, type: :model do
       expect(organization.update(name: "400")).to be_falsey
       organization.reload
       expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
-      fail
     end
   end
 end
