@@ -70,7 +70,7 @@ class Location < ApplicationRecord
     name == organization.name ? name : "#{organization.name} - #{name}"
   end
 
-  # Quick and dirty hack to ensure it's block - frontend should prevent doing this normally
+  # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
     raise StandardError, "Can't destroy a location with appointments enabled"
