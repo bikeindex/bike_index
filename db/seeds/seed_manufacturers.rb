@@ -1,5 +1,5 @@
 # A Small sampling of manufacturers to seed!
-# To get the full list download https://github.com/bikeindex/resources/blob/master/manufacturers.csv
+# To get the full list download https://github.com/bikeindex/resources/blob/main/manufacturers.csv
 # You can upload the csv in admin section :)
 #
 #

@@ -6,7 +6,7 @@
     = t(".required_headers_are_html")
 
   %p
-    - link_to_example_csv = link_to t(".our_example_csv_here"), t('.example_csv_url')
+    - link_to_example_csv = link_to t(".our_example_csv_here"), t('.example_csv_url_main')
     = t(".look_at_example_csv_html", link_to_example_csv: link_to_example_csv)
 
   %h5= t(".notes_on_successfully_importing")
@@ -37,7 +37,7 @@
 %ul
   %li= t(".we_support_a_few_additional")
   %li
-    - link_to_example_csv = link_to(t(".example_csv_link"), t(".example_csv_url"))
+    - link_to_example_csv = link_to(t(".example_csv_link"), t(".example_csv_url_main"))
     = t(".view_an_example_csv_html", link_to_example_csv: link_to_example_csv)
   %li= t(".if_only_some_of_your_bikes_html")
   %li

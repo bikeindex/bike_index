@@ -18,7 +18,7 @@ task sm_import_manufacturers: :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
 
-desc "Prepare translations for committing to master"
+desc "Prepare translations for committing to main"
 task prepare_translations: :environment do
   require "i18n/tasks/cli"
   i18n_tasks = I18n::Tasks::CLI.new
