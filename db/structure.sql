@@ -239,6 +239,7 @@ CREATE TABLE public.appointments (
     organization_id bigint,
     user_id bigint,
     bike_id bigint,
+    name character varying,
     email character varying,
     link_token text,
     kind integer,

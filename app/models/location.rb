@@ -9,6 +9,7 @@ class Location < ApplicationRecord
 
   has_many :bikes
   has_one :appointment_configuration
+  has_many :appointments
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -60,6 +61,8 @@ class Location < ApplicationRecord
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update(updated_at: Time.current)
+    # Just in case this changed something here
+    LocationAppointmentsQueueWorker.perform_async(id)
   end
 
   def display_name

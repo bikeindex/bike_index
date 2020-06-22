@@ -2,6 +2,8 @@ module OrgPublic
   class BaseController < ApplicationController
     before_action :ensure_current_organization!
 
+    helper_method :current_appointment
+
     def ensure_access_to_virtual_line!
       return true if current_location&.virtual_line_on?
 
@@ -21,6 +23,13 @@ module OrgPublic
                                                                scope: [:controllers, :org_public, :base, __method__])
 
       redirect_to(url_to_redirect_to || user_root_url) and return
+    end
+
+    def current_appointment
+      return @current_appointment if defined?(@current_appointment)
+      @current_appointment = current_organization.appointments.find_by_link_token(session[:appointment_token])
+      @current_location = @current_appointment.location if @current_appointment.present?
+      @current_appointment
     end
   end
 end

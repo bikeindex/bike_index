@@ -6,6 +6,7 @@ class CreateAppointments < ActiveRecord::Migration[5.2]
       t.references :user
       t.references :bike
 
+      t.string :name
       t.string :email
       t.text :link_token
 

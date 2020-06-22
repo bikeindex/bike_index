@@ -1,1 +1,10 @@
-PARTY
+-# TODO translations
+.text-center
+  %h3
+    You should be redirected automatically
+  %p If not, click this button
+  = form_tag sign_in_with_magic_link_session_path, id: "redirect_to_appointment", method: "post" do
+    = hidden_field_tag :id, params[:id]
+    %input{ type: "submit", value: "View Appointment", class: "btn btn-success btn-lg" }
+  :javascript
+    document.forms["redirect_to_appointment"].submit()

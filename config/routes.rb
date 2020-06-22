@@ -357,7 +357,11 @@ Rails.application.routes.draw do
   # This is the public organizations section
   resources :organization, only: [], path: "", module: "org_public" do
     resource :customer_line, only: %i[show]
-    resources :customer_appointments, only: %i[show update create]
+    resources :customer_appointments, only: %i[show update create] do
+      collection do
+        post :set_current_appointment
+      end
+    end
   end
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge

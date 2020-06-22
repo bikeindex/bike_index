@@ -16,6 +16,24 @@
           %em
             = current_organization.name
           virtual line
+
+      .container
+        .row
+          .col-6
+            %h2
+              = @appointments_in_line.count
+              People in line
+          .col-6
+            %h2
+              On deck
+              %small
+                ie about to be called up
+            %ul
+              - @appointments_in_line.on_deck.each do |appointment|
+                %li= appointment.name
+
+
+      %hr
       .container.pb-4
         = yield
 
