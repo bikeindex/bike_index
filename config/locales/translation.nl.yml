@@ -4456,7 +4456,6 @@ nl:
           maken en de fietsen verwijderen, zonder een groot aantal te verwijderen
           bikes.
         example_csv_link: voorbeeld CSV met alle optionele kolommen hier
-        example_csv_url: https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
         for_best_results: Voor de beste resultaten plaatst u aanhalingstekens rond
           alle cellen.
         if_only_some_of_your_bikes_html: Als slechts enkele van uw fietsen waarden
@@ -4488,6 +4487,7 @@ nl:
         your_headers_must_match_html: Uw kopteksten moeten <em>exact</em> overeenkomen
           met onze kopteksten - als u bijvoorbeeld 'serienummer' als koptekst hebt,
           werkt de import niet.
+        example_csv_url_main: https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
       show:
         ascend_import: Ascending importeren
         bikes: Bikes
