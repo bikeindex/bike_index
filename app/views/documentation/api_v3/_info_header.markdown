@@ -2,7 +2,6 @@
 
 #Bike Index API V3
 
-
 The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/api/v3](https://github.com/bikeindex/bike_index/tree/main/app/controllers/api/v3) and the tests for it are in [spec/api/v3](https://github.com/bikeindex/bike_index/tree/main/spec/api/v3).
 
 If you encounter any errors here (or anywhere on Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
