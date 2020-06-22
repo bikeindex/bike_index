@@ -74,7 +74,6 @@ RSpec.describe Location, type: :model do
       location.reload
       expect(location.default_impound_location).to be_falsey
       # It also enqueues the location appointment worker
-      expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
       expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
     end
   end

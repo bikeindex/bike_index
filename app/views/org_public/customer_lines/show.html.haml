@@ -1,10 +1,19 @@
--# TODO translations
-.text-center
-  %h3
-    You should be redirected automatically
-  %p If not, click this button
-  = form_tag sign_in_with_magic_link_session_path, id: "redirect_to_appointment", method: "post" do
-    = hidden_field_tag :id, params[:id]
-    %input{ type: "submit", value: "View Appointment", class: "btn btn-success btn-lg" }
-  :javascript
-    document.forms["redirect_to_appointment"].submit()
+- if @appointment.id.present?
+  EDIT FORM
+- else
+  = form_for @appointment, { as: :appointment, url: organization_customer_appointments_path(organization_id: current_organization.to_param, location_id: current_location&.id), action: "create", method: "POST" } do |f|
+    = f.hidden_field :location_id, value: current_location&.id
+    .row
+      .form-group.col-sm-6
+        = f.label :name, "Your name"
+        = f.text_field :name, required: true, class: "form-control"
+      .form-group.col-sm-6
+        = f.label :email, "Your email"
+        = f.email_field :email, required: true, class: "form-control"
+    .row
+      .form-group.col-sm-6
+        = f.label :reason, "Main reason for visit"
+        = f.select :kind, @appointment.permitted_reasons, {}, class: "form-control"
+      .form-group.col-sm-6.text-center
+        %label.d-block &nbsp;
+        = f.submit "Get in line!", class: "btn btn-success"

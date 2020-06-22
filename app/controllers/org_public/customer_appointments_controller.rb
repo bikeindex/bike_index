@@ -1,21 +1,27 @@
 module OrgPublic
   class CustomerAppointmentsController < OrgPublic::BaseController
     # If a user has a link to an appointment, render it - even if the org no longer has the functionality enabled
-    before_action :ensure_access_to_virtual_line!, only: [:create]
-    before_action :find_appointment_and_redirect, only: [:show, :set_current_appointment]
+    before_action :find_appointment_and_redirect, only: [:show, :set_current]
 
     layout "customer_virtual_line"
 
     def show; end
 
-    def set_current_appointment; end
+    def set_current; end
 
     def create
-      @appointment = Appointment.create(permitted_create_params)
+      @appointment = Appointment.new(permitted_create_params)
+      if @appointment.save
+        flash[:success] = "You're now in line!"
+        assign_current_appointment(@appointment)
+      else
+        flash[:error] = @appointment.errors.full_messages.to_sentence
+      end
+      redirect_to customer_line_path and return
     end
 
     def update
-      redirect_to path_to_redirect_to
+      redirect_to customer_line_path
     end
 
     private
@@ -26,7 +32,8 @@ module OrgPublic
     end
 
     def find_appointment_and_redirect
-      @appointment ||= current_organization.appointments.find_by_link_token(params[:id])
+      @token = params[:token] || params[:id]
+      @appointment ||= current_organization.appointments.find_by_link_token(@token)
       if @appointment.present?
         # Only assign if the appointment is present, so we don't lose the existing one
         assign_current_appointment(@appointment)
@@ -46,8 +53,8 @@ module OrgPublic
 
     def permitted_create_params
       params.require(:appointment)
-            .permit(:email, :name, :reason, :description)
-            .merge(location_id: current_location.id, organization_id: current_organization.id)
+        .permit(:email, :name, :reason, :description, :location_id)
+        .merge(organization_id: current_organization.id, status: "waiting")
     end
   end
 end

@@ -359,7 +359,7 @@ Rails.application.routes.draw do
     resource :customer_line, only: %i[show]
     resources :customer_appointments, only: %i[show update create] do
       collection do
-        post :set_current_appointment
+        post :set_current
       end
     end
   end
