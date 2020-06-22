@@ -156,7 +156,7 @@ RSpec.describe BulkImportWorker, type: :job do
       let!(:white) { FactoryBot.create(:color, name: "White") }
       let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }

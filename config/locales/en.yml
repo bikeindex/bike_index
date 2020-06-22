@@ -4336,8 +4336,8 @@ en:
           bikes don't import correctly, you can make adjustments and delete the bikes,
           without having to delete a large number of bikes.
         example_csv_link: example CSV with all optional columns here
-        example_csv_url: >-
-          https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
+        example_csv_url_main: >-
+          https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
         for_best_results: For best results, put quotes around all the cells.
         if_only_some_of_your_bikes_html: >-
           If only some of your bikes have values in optional columns, leave the cell
