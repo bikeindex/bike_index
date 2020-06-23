@@ -17,7 +17,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
       session[:appointment_token] = nil
       post :set_current, params: { organization_id: current_organization.to_param, token: appointment.link_token }
       expect(assigns(:current_appointment)).to eq appointment
-      expect(response).to redirect_to(organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param))
+      expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       expect(flash).to be_blank
       expect(session[:appointment_token]).to eq appointment.link_token
     end
@@ -28,7 +28,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
         expect(flash[:error]).to be_present
         session[:appointment_token] = appointment.link_token
         expect(assigns(:current_appointment)).to eq appointment
-        expect(response).to redirect_to(organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param))
+        expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       end
       context "different appointment_token in session" do
         let!(:appointment2) { FactoryBot.create(:appointment, organization: current_organization, location_id: 212221) }
@@ -43,7 +43,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
           expect(session[:appointment_token]).to eq appointment.link_token
           expect(assigns(:current_appointment)).to eq appointment
           expect(assigns(:current_location)).to eq appointment.location
-          expect(response).to redirect_to(organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param))
+          expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
           expect(flash).to be_blank
         end
       end
@@ -72,7 +72,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
 
       expect(assigns(:current_appointment)).to eq new_appointment
       expect(session[:appointment_token]).to eq new_appointment.link_token
-      expect(response).to redirect_to(organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param))
+      expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       expect(flash[:success]).to be_present
       expect(new_appointment.status).to eq "waiting"
       expect(new_appointment.name).to eq appointment_params[:name]

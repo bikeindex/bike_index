@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe OrgPublic::CustomerLinesController, type: :request do
-  let(:base_url) { "/#{current_organization.to_param}/customer_line" }
+RSpec.describe OrgPublic::WalkrightupController, type: :request do
+  let(:base_url) { "/#{current_organization.to_param}/walkrightup" }
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
     expect do
-      get "/some-known-organization/customer_line"
+      get "/some-known-organization/walkrightup"
     end.to raise_error(ActiveRecord::RecordNotFound)
   end
 
@@ -37,7 +37,7 @@ RSpec.describe OrgPublic::CustomerLinesController, type: :request do
       let(:virtual_line_on) { true }
       it "renders" do
         expect(location.virtual_line_on?).to be_truthy
-        get base_url
+        get "/#{current_organization.to_param}/WalkRightUp" # test the casing
         expect(response.status).to eq(200)
         expect(response).to render_template :show
         expect(assigns(:current_location)).to eq location

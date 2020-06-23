@@ -12,7 +12,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(location.virtual_line_on?).to be_truthy
       expect(appointment.link_token).to be_present
       get "#{base_url}/#{appointment.id}"
-      expect(response).to redirect_to organization_customer_line_path(organization_id: current_organization.to_param)
+      expect(response).to redirect_to organization_walkrightup_path(organization_id: current_organization.to_param)
       expect(flash[:error]).to be_present
 
       get "#{base_url}/#{appointment.link_token}"
@@ -20,7 +20,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:passive_organization)).to be_blank # because user isn't signed in
       expect(flash).to be_blank
-      expect(response).to redirect_to organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param)
+      expect(response).to redirect_to organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param)
     end
   end
 
@@ -31,12 +31,12 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:passive_organization)).to be_blank # because user isn't signed in
       expect(flash).to be_blank
-      expect(response).to redirect_to organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param)
+      expect(response).to redirect_to organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param)
     end
   end
 
   describe "create" do
-    let(:appointment_params) { { name: "Sarah h.", email: "something@stuff.com", reason: "Service", location_id: location.id } }
+    let(:appointment_params) { { name: "Sarah h.", email: "something@stuff.com", reason: "Service", location_id: location.id, status: "on_deck" } }
     it "creates and assigns the appointment" do
       current_organization.reload
       location.reload
@@ -56,7 +56,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       new_appointment = location.appointments.last
 
       expect(assigns(:current_appointment)).to eq new_appointment
-      expect(response).to redirect_to(organization_customer_line_path(organization_id: current_organization.to_param, location_id: location.to_param))
+      expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       expect(flash[:success]).to be_present
 
       expect(new_appointment.status).to eq "waiting"
@@ -65,6 +65,21 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(new_appointment.reason).to eq appointment_params[:reason]
       expect(new_appointment.location_id).to eq location.id
       expect(new_appointment.organization_id).to eq current_organization.id
+    end
+  end
+
+  describe "update" do
+    let(:appointment_params) do
+      {
+        name: "Sarah h.",
+        email: "something@stuff.com",
+        reason: "Service",
+        location_id: location.id,
+        status: "on_deck",
+        description: "something cool, etc"
+      }
+    end
+    it "updates" do
     end
   end
 end

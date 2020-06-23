@@ -17,18 +17,20 @@ module OrgPublic
       else
         flash[:error] = @appointment.errors.full_messages.to_sentence
       end
-      redirect_to customer_line_path and return
+      redirect_to walkrightup_route and return
     end
 
     def update
-      redirect_to customer_line_path
+      @appointment = current_organization.appointments.find_by_link_token(params[:token])
+      @appointment.update(permitted_update_params)
+      redirect_to walkrightup_route
     end
 
     private
 
-    def customer_line_path
-      organization_customer_line_path(organization_id: current_organization.to_param,
-                                      location_id: current_appointment&.location&.to_param)
+    def walkrightup_route
+      organization_walkrightup_path(organization_id: current_organization.to_param,
+                                    location_id: current_appointment&.location&.to_param)
     end
 
     def find_appointment_and_redirect
@@ -41,7 +43,7 @@ module OrgPublic
         flash[:error] = "Unable to find that appointment!"
         current_appointment # Grab it if it's around, because at least something
       end
-      redirect_to customer_line_path and return
+      redirect_to walkrightup_route and return
     end
 
     def assign_current_appointment(appointment = nil)

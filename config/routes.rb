@@ -356,7 +356,8 @@ Rails.application.routes.draw do
 
   # This is the public organizations section
   resources :organization, only: [], path: "", module: "org_public" do
-    resource :customer_line, only: %i[show]
+    resource :walkrightup, only: %i[show], controller: "walkrightup" # walkrightups is stupid
+    get "WalkRightUp", to: "walkrightup#show"
     resources :customer_appointments, only: %i[show update create] do
       collection do
         post :set_current

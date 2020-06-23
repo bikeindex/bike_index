@@ -89,12 +89,21 @@ RSpec.describe "organizations routing", type: :routing do
   end
 
   describe "org_public module" do # At least for now...
-    it "routes to line" do
-      expect(get: "/bike_shop/customer_line").to route_to(
-        controller: "org_public/customer_lines",
+    it "routes to walkrightup" do
+      expect(get: "/bike_shop/walkrightup").to route_to(
+        controller: "org_public/walkrightup",
         action: "show",
         organization_id: "bike_shop",
       )
+    end
+    context "capitals" do
+      it "routes to walkrightup" do
+        expect(get: "/bike_shop/WalkRightUp").to route_to(
+          controller: "org_public/walkrightup",
+          action: "show",
+          organization_id: "bike_shop",
+        )
+      end
     end
     describe "appointment" do
       it "routes to appointment" do
