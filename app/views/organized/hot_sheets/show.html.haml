@@ -1,17 +1,21 @@
 -# TODO: translations
 
-- if !current_organization.hot_sheet_on?
-  .alert.alert-info
-    %h3.uncap
-      Stolen Bike Hot Sheets are not turned on!
-    - if current_user.admin_of?(current_organization)
-      %p
-        Enable them on the
-        %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
+%h1.uncap
+  #{current_organization.short_name} Hot Sheets
 
+- if !current_organization.hot_sheet_on?
+  .row
+    .col-md-8
+      .hot-sheet-notification-panel-warning
+        %h3.uncap
+          %em Stolen Bike Hot Sheets
+          are not turned on!
+        - if current_user.admin_of?(current_organization)
+          Enable them on the
+          %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
+        - else
+          ask a #{current_organization.short_name} administrator to turn them on.
 - else
-  %h1.uncap
-    #{current_organization.short_name} Hot Sheets
   .row
     .col-md-8
       %h3.hot-sheet-current-title

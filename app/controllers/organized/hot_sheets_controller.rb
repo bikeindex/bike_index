@@ -2,7 +2,7 @@ module Organized
   class HotSheetsController < Organized::BaseController
     before_action :ensure_admin!, except: [:show]
     before_action :ensure_access_to_hot_sheet!
-    before_action :set_current_hot_sheet_configuration, except: [:show]
+    before_action :set_current_hot_sheet_configuration
 
     def show
       @current = params[:day].blank?
@@ -41,8 +41,7 @@ module Organized
     def set_current_hot_sheet_configuration
       @hot_sheet_configuration = current_organization.hot_sheet_configuration
       unless @hot_sheet_configuration.present?
-        @hot_sheet_configuration = HotSheetConfiguration.new(organization_id: current_organization.id)
-        @hot_sheet_configuration.set_calculated_attributes
+        @hot_sheet_configuration = HotSheetConfiguration.create(organization_id: current_organization.id)
       end
       @hot_sheet_configuration
     end
