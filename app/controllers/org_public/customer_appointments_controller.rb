@@ -21,8 +21,15 @@ module OrgPublic
     end
 
     def update
-      @appointment = current_organization.appointments.find_by_link_token(params[:token])
-      @appointment.update(permitted_update_params)
+      @appointment = current_organization.appointments.find_by_link_token(params[:id])
+      if @appointment.removed?
+        flash[:error] = "We're sorry, that appointment has been removed"
+      elsif @appointment.update(permitted_update_params)
+        assign_current_appointment(@appointment)
+        flash[:success] = "Update successful"
+      else
+        flash[:error] = "Unable to update because: #{@appointment.errors.full_messages.to_sentence}"
+      end
       redirect_to walkrightup_route
     end
 
@@ -30,7 +37,7 @@ module OrgPublic
 
     def walkrightup_route
       organization_walkrightup_path(organization_id: current_organization.to_param,
-                                    location_id: current_appointment&.location&.to_param)
+                                    location_id: current_appointment&.location&.to_param || current_location&.to_param)
     end
 
     def find_appointment_and_redirect
@@ -46,17 +53,26 @@ module OrgPublic
       redirect_to walkrightup_route and return
     end
 
-    def assign_current_appointment(appointment = nil)
-      session[:appointment_token] = appointment.present? ? appointment.link_token : nil
-      return nil unless appointment.present?
-      @current_location = appointment.location
-      @current_appointment = appointment
-    end
-
     def permitted_create_params
       params.require(:appointment)
         .permit(:email, :name, :reason, :description, :location_id)
         .merge(organization_id: current_organization.id, status: "waiting")
+    end
+
+    def permitted_update_params
+      params.require(:appointment)
+        .permit(:email, :name, :reason, :description)
+        .merge(organization_id: current_organization.id,
+               status: permitted_update_status(params.dig(:appointment, :status)))
+    end
+
+    def permitted_update_status(update_status)
+      return update_status if @appointment.status == update_status
+      user_permitted_updates = %w[waiting being_helped abandoned]
+      if @appointment.in_line?
+        return update_status if user_permitted_updates.include?(update_status)
+      end
+      @appointment.status # fallback to current status
     end
   end
 end

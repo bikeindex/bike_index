@@ -24,10 +24,10 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
     context "appointment_token in session" do
       it "falls back to the session appointment, flash errors" do
         session[:appointment_token] = appointment.link_token
-        post :set_current, params: { organization_id: current_organization.to_param, token: "fasdfffdsf" }
+        post :set_current, params: { organization_id: current_organization.to_param, token: "fasdfffdsf", location_id: location.to_param }
         expect(flash[:error]).to be_present
         session[:appointment_token] = appointment.link_token
-        expect(assigns(:current_appointment)).to eq appointment
+        expect(assigns(:current_appointment)).to be_blank
         expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       end
       context "different appointment_token in session" do

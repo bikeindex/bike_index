@@ -1,6 +1,12 @@
 - if @appointment.id.present?
-  = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.id, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
-    = hidden_field_tag :token, @appointment.link_token
+  = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.link_token, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
+    .row
+      .form-group.col-sm-6
+        = f.label :name, "Your name"
+        = f.text_field :name, required: true, class: "form-control"
+      .form-group.col-sm-6
+        = f.label :email, "Your email"
+        = f.email_field :email, required: true, class: "form-control"
     .row.collapse.show.updateLineStatusCollapse
       .form-group.col-sm-6
         = f.label :description, "Additional description"
@@ -20,7 +26,7 @@
         .collapse.updateLineStatusCollapse
           .form-group
             = f.label :status, "Where are you?"
-            - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "left"]]
+            - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "abandoned"]]
             -# Only add on_deck status if the user is on deck, because users can't switch to be there
             -# valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
             = f.select :status, valid_update_statuses, {}, class: "form-control"

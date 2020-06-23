@@ -84,12 +84,25 @@ RSpec.describe OrgPublic::WalkrightupController, type: :request do
         let(:appointment) { FactoryBot.create(:appointment, organization: current_organization) }
         it "renders with the appointment" do
           expect(appointment.location_id).to eq location.id
+          expect(appointment.in_line?).to be_truthy
           get "#{base_url}?token=#{appointment.link_token}"
           expect(response.status).to eq(200)
           expect(response).to render_template :show
           expect(assigns(:current_location)).to eq location
           expect(assigns(:current_organization)).to eq current_organization
           expect(assigns(:appointment).id).to eq appointment.id
+        end
+        context "appointment is not in_line" do
+          let(:appointment) { FactoryBot.create(:appointment, organization: current_organization, status: "being_helped") }
+          it "renders with a new appointment" do
+            expect(appointment.location_id).to eq location.id
+            get "#{base_url}?token=#{appointment.link_token}"
+            expect(response.status).to eq(200)
+            expect(response).to render_template :show
+            expect(assigns(:current_location)).to eq location
+            expect(assigns(:current_organization)).to eq current_organization
+            expect(assigns(:appointment).id).to be_blank
+          end
         end
       end
     end
