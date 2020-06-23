@@ -32,9 +32,24 @@
 .hot-sheet-bike-display {
   padding-top: 2px;
   .bike-display {
+    border: none;
+    background: #eeeeee;
+    // border-left: 0;
+    // border-right: 0;
     td {
       border: none;
       padding: 0;
+    }
+    .info-holder {
+      padding-top: 8px;
+    }
+  }
+  .bike-title {
+    background: #dddddd;
+    a {
+      display: block;
+      padding: 4px 16px 0 16px;
+      font-size: 17px;
     }
   }
 }

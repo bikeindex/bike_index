@@ -1,21 +1,9 @@
 -# TODO: translations
 
 %h1.uncap
-  #{current_organization.short_name} Hot Sheets
+  Stolen Bike Hot Sheet
 
-- if !current_organization.hot_sheet_on?
-  .row
-    .col-md-8
-      .hot-sheet-notification-panel-warning
-        %h3.uncap
-          %em Stolen Bike Hot Sheets
-          are not turned on!
-        - if current_user.admin_of?(current_organization)
-          Enable them on the
-          %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
-        - else
-          ask a #{current_organization.short_name} administrator to turn them on.
-- else
+- if current_organization.hot_sheet_on?
   .row
     .col-md-8
       %h3.hot-sheet-current-title
@@ -51,51 +39,70 @@
               %em= current_user.email
             = submit_tag "update preferences", class: "btn btn-sm btn-primary"
 
-  - if @hot_sheet.present?
-    .row
-      .col-lg-8
-        %ul.hot-sheet-list
-          - @hot_sheet.fetch_stolen_records.each do |stolen_record|
-            - bike = stolen_record.bike
-            - thumb_url = bike.thumb_path || bike.stock_photo_url
-            - bike_link = bike_url(bike, organization_id: current_organization.to_param)
-            %li
-              - unless thumb_url.present?
-                - thumbclass = 'placeholder'
-                - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+- else
+  .row
+    .col-md-8
+      .hot-sheet-notification-panel-warning
+        %h3.uncap
+          %em Stolen Bike Hot Sheets
+          are not turned on!
+        - if current_user.admin_of?(current_organization)
+          Enable them on the
+          %span{ style: "text-decoration: underline;" } #{link_to "Hot Sheet configuration page", edit_organization_hot_sheet_path(organization_id: current_organization.to_param)}
+        - else
+          ask a #{current_organization.short_name} administrator to turn them on.
 
-              .bike-display
-                .bike-image{ class: thumbclass }
-                  %a{ href:  bike_link }
-                    %img{ src: thumb_url }
-                .bike-info
-                  %span.bike-main-info
-                    = link_to organized_bike_text(bike, skip_creation: true), bike_link
+      %h2.uncap
+        %span.text-danger
+          Preview of
+        Stolen Bike Hot Sheet
+
+
+- if @hot_sheet.present?
+  .row
+    .col-lg-8
+      %ul.hot-sheet-list
+        - @hot_sheet.fetch_stolen_records.each do |stolen_record|
+          - bike = stolen_record.bike
+          - thumb_url = bike.thumb_path || bike.stock_photo_url
+          - bike_link = bike_url(bike, organization_id: current_organization.to_param)
+          %li
+            - unless thumb_url.present?
+              - thumbclass = 'placeholder'
+              - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+
+            .bike-display
+              .bike-image{ class: thumbclass }
+                %a{ href:  bike_link }
+                  %img{ src: thumb_url }
+              .bike-info
+                %span.bike-main-info
+                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
+                - if stolen_record.recovered?
+                  .recovered-alert
+                    %h3.uncap Bike was recovered!
+                %table.table-list.mb-0
+                  %tr
+                    %td Serial
+                    %td= bike.serial_display
                   - if stolen_record.recovered?
-                    .recovered-alert
-                      %h3.uncap Bike was recovered!
-                  %table.table-list.mb-0
                     %tr
-                      %td Serial
-                      %td= bike.serial_display
-                    - if stolen_record.recovered?
-                      %tr
-                        %td
-                          %span.text-success Recovered
-                        %td
-                          %span.convertTime.preciseTime
-                            = l stolen_record.recovered_at, format: :convert_time
+                      %td
+                        %span.text-success Recovered
+                      %td
+                        %span.convertTime.preciseTime
+                          = l stolen_record.recovered_at, format: :convert_time
 
-                    - else
-                      %tr
-                        %td
-                          %span.stolen-color Stolen at
-                        %td
-                          %span.convertTime.preciseTime
-                            = l stolen_record.date_stolen, format: :convert_time
+                  - else
+                    %tr
+                      %td
+                        %span.stolen-color Stolen at
+                      %td
+                        %span.convertTime.preciseTime
+                          = l stolen_record.date_stolen, format: :convert_time
 
-                      %tr
-                        %td
-                          %span.stolen-color From
-                        %td
-                          = Geocodeable.address(stolen_record, country: false)
+                    %tr
+                      %td
+                        %span.stolen-color From
+                      %td
+                        = Geocodeable.address(stolen_record, country: false)
