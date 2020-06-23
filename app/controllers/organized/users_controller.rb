@@ -7,7 +7,8 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-
+      @show_user_search = params[:query].present? || current_organization.memberships.count > per_page
+      @show_matching_count = @show_user_search && params[:query].present?
       @memberships =
         matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
           .page(page)

@@ -4529,12 +4529,15 @@ en:
         created: Created
         current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
+        find_by_name_or_email: Find by name or email
         invite_more_users: Invite more users
         is_admin: Admin?
         manage_users: Manage Users
         manually_invite_email: manually invite emails
+        matching_user: Matching user
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
+        search: Search
         sender: Sender
         to: To
         update_email: Update email
