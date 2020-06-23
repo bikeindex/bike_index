@@ -44,8 +44,9 @@ class Membership < ApplicationRecord
 
   def self.admin_text_search(str)
     q = "%#{str.to_s.strip}%"
-    includes(:user).where("users.name ILIKE ? OR users.email ILIKE ?", q, q)
-                    .distinct
+      left_joins(:user)
+        .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
+        .references(:users)
   end
 
   def invited_display_name; user.present? ? user.display_name : invited_email end
