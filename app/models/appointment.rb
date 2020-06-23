@@ -1,6 +1,6 @@
 class Appointment < ApplicationRecord
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
-  STATUS_ENUM = { waiting: 0, on_deck: 1, being_helped: 2, finished: 3, failed_to_find: 4, removed: 5 }.freeze
+  STATUS_ENUM = { waiting: 0, on_deck: 1, being_helped: 2, finished: 3, failed_to_find: 4, removed: 5, left: 6 }.freeze
 
   belongs_to :organization
   belongs_to :location

@@ -1,10 +1,29 @@
 - if @appointment.id.present?
   = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.id, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
     = hidden_field_tag :token, @appointment.link_token
-    .row
+    .row.collapse.show.updateLineStatusCollapse
+      .form-group.col-sm-6
+        = f.label :description, "Additional description"
+        = f.text_area :description, class: "form-control", col: 3
       .form-group.col-sm-6
         = f.label :reason, "Main reason for visit"
         = f.select :reason, @appointment.permitted_reasons, {}, class: "form-control"
+    .row
+      .col-sm-6
+        %p
+          %a#updateLineStatus{ href: "#" }
+            No longer in line?
+          %small.less-strong
+            Let
+            %em= current_organization.short_name
+            know
+        .collapse.updateLineStatusCollapse
+          .form-group
+            = f.label :status, "Where are you?"
+            - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "left"]]
+            -# Only add on_deck status if the user is on deck, because users can't switch to be there
+            -# valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
+            = f.select :status, valid_update_statuses, {}, class: "form-control"
       .form-group.col-sm-6.text-center
         %label.d-block &nbsp;
         = f.submit "Update appointment!", class: "btn btn-success"
