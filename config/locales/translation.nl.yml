@@ -5111,12 +5111,13 @@ nl:
       sign_up_your_organization: Meld uw organisatie aan
       where: Waar
     donation_modal:
-      header: Help onze inspanningen ondersteunen!
       is_a_nonprofit_html: Bike Index is een %{blog_link} <br> <strong>U</strong>
         financiert onze efforst om fietsdiefstal te bestrijden!
       nonprofit_501c3: 501 (c) (3) non-profit
       skip: Overslaan
-      subheader: Als non-profit vertrouwen wij op uw steun.
+      header_june_2020: Halfjaarlijkse inzamelingsactie tot 1 juli
+      subheader_june_2020_html: We zien deze zomer een drastische toename van fietsdiefstal.
+        <br> Help ons meer fietsen te beschermen en te herstellen dan ooit.
     law_enforcement_donation_modal:
       bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
         afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties
