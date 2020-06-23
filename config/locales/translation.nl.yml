@@ -4672,7 +4672,6 @@ nl:
         name: Naam
         org_email_address_html: E-mailadres <em>%{org_name} fietsregistraties</em>
           worden verzonden vanaf
-        org_settings_html: "<em>%{org_name}</em> instellingen"
         organization_logo: Organisatie logo
         organization_type: Organisatie type
         registration_email: Registratie email
@@ -4680,6 +4679,7 @@ nl:
           verwijderen?
         select_email: Selecteer e-mail
         update: Bijwerken
+        org_settings: Instellingen
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
