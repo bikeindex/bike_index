@@ -165,7 +165,7 @@ window.updateSearchBikesHeaderLink = ->
       localStorage.setItem('distance', distance)
 
 renderDonationModal = ->
-  hideModal = localStorage.getItem("hideDonationModal")
+  hideModal = localStorage.getItem("hideDonationModalJune2020")
   unless hideModal == "true"
     $("#donationModal").modal("show")
     new BikeIndex.Payments

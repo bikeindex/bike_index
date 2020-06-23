@@ -1,5 +1,6 @@
 .mb-4
-  %h1= t(".manage_users")
+  %h1.uncap
+    = t(".manage_users")
   - user_count = number_with_delimiter(current_organization.sent_invitation_count)
   - if current_organization.restrict_invitations?
     %p

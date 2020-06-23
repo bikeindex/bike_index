@@ -61,7 +61,7 @@ class HotSheet < ApplicationRecord
 
   def deliver_email
     # This is called from process_hot_sheet_worker, so it can be delivered inline
-    OrganizedMailer.hot_sheet(self).deliver_now
+    OrganizedMailer.hot_sheet(self).deliver_now if recipient_emails.any?
     update(delivery_status: "email_success")
   end
 
