@@ -4601,6 +4601,9 @@ nl:
           die zich aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
           , wordt lid van %{org_name}.
         you_can_also: Je kan ook
+        find_by_name_or_email: Zoek op naam of e-mailadres
+        matching_user: Overeenkomende gebruiker
+        search: Zoeken
       new:
         1_email_per_line: 1 e-mail per regel
         admin_of_organization: Beheerder van organisatie
