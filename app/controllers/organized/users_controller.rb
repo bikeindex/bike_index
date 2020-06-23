@@ -7,11 +7,10 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-
+      @show_user_search = params[:query].present? || current_organization.memberships.count > per_page
+      @show_matching_count = @show_user_search && params[:query].present?
       @memberships =
-        matching_memberships
-          .includes(:user, :sender)
-          .reorder("memberships.#{sort_column} #{sort_direction}")
+        matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
           .page(page)
           .per(per_page)
     end
@@ -77,7 +76,9 @@ module Organized
     end
 
     def matching_memberships
-      current_organization.memberships
+      m_memberships = current_organization.memberships.includes(:user, :sender)
+      return m_memberships unless params[:query].present?
+      m_memberships.admin_text_search(params[:query])
     end
 
     def current_root_path

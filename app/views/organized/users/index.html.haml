@@ -1,6 +1,8 @@
-.mb-4
-  %h1.uncap
-    = t(".manage_users")
+%h1.uncap
+  = t(".manage_users")
+
+
+- unless @show_matching_count
   - user_count = number_with_delimiter(current_organization.sent_invitation_count)
   - if current_organization.restrict_invitations?
     %p
@@ -26,8 +28,25 @@
       = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
       =  link_to t(".update_email"), organization_manage_path(organization_id: current_organization.to_param)
 
-.paginate-container
-  = paginate @memberships
+.row.mb-4.mt-4
+  .col-md-6
+    .paginate-container.text-left
+      = paginate @memberships
+  - if @show_user_search
+    .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
+      = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do
+        = hidden_field_tag :sort, sort_column
+        = hidden_field_tag :sort_direction, sort_direction
+        = hidden_field_tag :organization_id, params[:organization_id]
+        .form-group
+          = text_field_tag :query, params[:query], placeholder: t(".find_by_name_or_email"), class: "form-control mt-2"
+          = submit_tag t(".search"), name: "search", class: "btn btn-primary ml-2 mt-2"
+
+- if @show_matching_count
+  %p.mt-2.mb-2
+    %strong
+      = number_with_delimiter(@memberships.total_count)
+    = t(".matching_user").pluralize(@memberships.total_count)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
