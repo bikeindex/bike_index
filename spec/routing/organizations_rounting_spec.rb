@@ -98,11 +98,10 @@ RSpec.describe "organizations routing", type: :routing do
     end
     context "capitals" do
       it "routes to walkrightup" do
-        expect(get: "/bike_shop/WalkRightUp").to route_to(
-          controller: "org_public/walkrightup",
-          action: "show",
-          organization_id: "bike_shop",
-        )
+        expect(get: "/bike_shop/WalkRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
+        # TODO: ideally, these would work too - but I don't know how :(
+        # expect(get: "/bike_shop/WALKRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
+        # expect(get: "/bike_shop/WALK-Right-Up").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
       end
     end
     describe "appointment" do
