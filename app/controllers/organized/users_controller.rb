@@ -9,9 +9,7 @@ module Organized
       per_page = params[:per_page] || 25
 
       @memberships =
-        matching_memberships
-          .includes(:user, :sender)
-          .reorder("memberships.#{sort_column} #{sort_direction}")
+        matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
           .page(page)
           .per(per_page)
     end
@@ -77,7 +75,9 @@ module Organized
     end
 
     def matching_memberships
-      current_organization.memberships
+      m_memberships = current_organization.memberships.includes(:user, :sender)
+      return m_memberships unless params[:query].present?
+      m_memberships.admin_text_search(params[:query])
     end
 
     def current_root_path
