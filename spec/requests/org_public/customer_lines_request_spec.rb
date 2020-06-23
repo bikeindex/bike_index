@@ -43,6 +43,8 @@ RSpec.describe OrgPublic::CustomerLinesController, type: :request do
         expect(assigns(:current_location)).to eq location
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to be_blank # because user isn't signed in
+        expect(assigns(:appointment).id).to be_blank # Because it's a new appointment
+
         # But - if we remove the organization access, it fails
         appointment_configuration.update(virtual_line_on: false)
         location.reload
@@ -76,6 +78,18 @@ RSpec.describe OrgPublic::CustomerLinesController, type: :request do
           expect(assigns(:current_location)).to eq location
           expect(assigns(:current_organization)).to eq current_organization
           expect(assigns(:passive_organization)).to be_blank # because user isn't signed in
+        end
+      end
+      context "with token" do
+        let(:appointment) { FactoryBot.create(:appointment, organization: current_organization) }
+        it "renders with the appointment" do
+          expect(appointment.location_id).to eq location.id
+          get "#{base_url}?token=#{appointment.link_token}"
+          expect(response.status).to eq(200)
+          expect(response).to render_template :show
+          expect(assigns(:current_location)).to eq location
+          expect(assigns(:current_organization)).to eq current_organization
+          expect(assigns(:appointment).id).to eq appointment.id
         end
       end
     end

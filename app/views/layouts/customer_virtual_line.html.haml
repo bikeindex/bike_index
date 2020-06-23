@@ -22,12 +22,12 @@
           .row
             .col-6
               %h2
-                = @appointments_in_line.count
-                People in line
+                = pluralize(@appointments_in_line.count, "Person")
+                in line
             .col-6
               %h2
                 On deck
-                %small
+                %small.less-strong
                   ie about to be called up
               %ul
                 - @appointments_in_line.on_deck.each do |appointment|

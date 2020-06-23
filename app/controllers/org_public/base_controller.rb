@@ -27,7 +27,8 @@ module OrgPublic
 
     def current_appointment
       return @current_appointment if defined?(@current_appointment)
-      @current_appointment = current_organization.appointments.find_by_link_token(session[:appointment_token])
+      @token ||= session[:appointment_token] || params[:token]
+      @current_appointment = current_organization.appointments.find_by_link_token(@token)
       @current_location = @current_appointment.location if @current_appointment.present?
       @current_appointment
     end
