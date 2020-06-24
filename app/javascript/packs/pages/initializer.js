@@ -1,6 +1,7 @@
 import log from "../utils/log";
 import TimeParser from "../utils/time_parser.js";
 import BinxMapping from "./binx_mapping.js";
+import WalkrightupCustomer from "./walkrightup/customer.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgParkingNotifications from "./binx_org_parking_notifications.js";
@@ -11,8 +12,8 @@ import PeriodSelector from "../utils/period_selector.js";
 
 window.binxApp || (window.binxApp = {});
 
-binxApp.enableFilenameForUploads = function() {
-  $("input.custom-file-input[type=file]").on("change", function(e) {
+binxApp.enableFilenameForUploads = function () {
+  $("input.custom-file-input[type=file]").on("change", function (e) {
     // The issue is that the files list isn't actually an array. So we can't map it
     let files = [];
     let i = 0;
@@ -20,17 +21,14 @@ binxApp.enableFilenameForUploads = function() {
       files.push(e.target.files[i].name);
       i++;
     }
-    $(this)
-      .parent()
-      .find(".custom-file-label")
-      .text(files.join(", "));
+    $(this).parent().find(".custom-file-label").text(files.join(", "));
   });
 };
 
 // I've made the choice to have classes' first letter capitalized
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
-$(document).ready(function() {
+$(document).ready(function () {
   window.timeParser = new TimeParser();
   window.timeParser.localize();
   // Period selector
@@ -42,6 +40,12 @@ $(document).ready(function() {
   if ($("#admin-content").length > 0) {
     const binxAdmin = BinxAdmin();
     binxAdmin.init();
+  }
+
+  // Load admin, whatever
+  if ($("#customer-virtual-line-wrapper").length > 0) {
+    window.walkrightupCustomer = new WalkrightupCustomer();
+    walkrightupCustomer.init();
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;

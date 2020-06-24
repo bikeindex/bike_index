@@ -1,9 +1,11 @@
 class BikeOrganization < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :bike
   belongs_to :organization
+
   validates_presence_of :bike_id, :organization_id
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false
-  acts_as_paranoid
 
   scope :can_edit_claimed, -> { where(can_not_edit_claimed: false) }
 

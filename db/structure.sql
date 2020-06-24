@@ -196,6 +196,83 @@ ALTER SEQUENCE public.appointment_configurations_id_seq OWNED BY public.appointm
 
 
 --
+-- Name: appointment_updates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.appointment_updates (
+    id bigint NOT NULL,
+    appointment_id bigint,
+    user_id bigint,
+    creator_type integer,
+    status integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: appointment_updates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.appointment_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: appointment_updates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.appointment_updates_id_seq OWNED BY public.appointment_updates.id;
+
+
+--
+-- Name: appointments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.appointments (
+    id bigint NOT NULL,
+    location_id bigint,
+    organization_id bigint,
+    user_id bigint,
+    bike_id bigint,
+    name character varying,
+    email character varying,
+    link_token text,
+    creator_type integer,
+    kind integer,
+    status integer,
+    reason character varying,
+    description text,
+    appointment_time timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: appointments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.appointments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: appointments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.appointments_id_seq OWNED BY public.appointments.id;
+
+
+--
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2747,6 +2824,20 @@ ALTER TABLE ONLY public.appointment_configurations ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: appointment_updates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointment_updates ALTER COLUMN id SET DEFAULT nextval('public.appointment_updates_id_seq'::regclass);
+
+
+--
+-- Name: appointments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointments ALTER COLUMN id SET DEFAULT nextval('public.appointments_id_seq'::regclass);
+
+
+--
 -- Name: b_params id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3218,6 +3309,22 @@ ALTER TABLE ONLY public.ambassador_tasks
 
 ALTER TABLE ONLY public.appointment_configurations
     ADD CONSTRAINT appointment_configurations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: appointment_updates appointment_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointment_updates
+    ADD CONSTRAINT appointment_updates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: appointments appointments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.appointments
+    ADD CONSTRAINT appointments_pkey PRIMARY KEY (id);
 
 
 --
@@ -3764,6 +3871,48 @@ CREATE INDEX index_appointment_configurations_on_location_id ON public.appointme
 --
 
 CREATE INDEX index_appointment_configurations_on_organization_id ON public.appointment_configurations USING btree (organization_id);
+
+
+--
+-- Name: index_appointment_updates_on_appointment_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointment_updates_on_appointment_id ON public.appointment_updates USING btree (appointment_id);
+
+
+--
+-- Name: index_appointment_updates_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointment_updates_on_user_id ON public.appointment_updates USING btree (user_id);
+
+
+--
+-- Name: index_appointments_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointments_on_bike_id ON public.appointments USING btree (bike_id);
+
+
+--
+-- Name: index_appointments_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointments_on_location_id ON public.appointments USING btree (location_id);
+
+
+--
+-- Name: index_appointments_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointments_on_organization_id ON public.appointments USING btree (organization_id);
+
+
+--
+-- Name: index_appointments_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_appointments_on_user_id ON public.appointments USING btree (user_id);
 
 
 --
@@ -5037,6 +5186,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200616144623'),
 ('20200619141947'),
 ('20200619234821'),
-('20200620170809');
+('20200620170809'),
+('20200620171606'),
+('20200620172241');
 
 

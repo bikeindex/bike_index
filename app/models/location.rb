@@ -2,12 +2,14 @@ class Location < ApplicationRecord
   include Geocodeable
 
   acts_as_paranoid
+
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
   belongs_to :state
 
   has_many :bikes
   has_one :appointment_configuration
+  has_many :appointments
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -59,6 +61,8 @@ class Location < ApplicationRecord
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update(updated_at: Time.current)
+    # Just in case this changed something here
+    LocationAppointmentsQueueWorker.perform_async(id)
   end
 
   def display_name
@@ -66,7 +70,7 @@ class Location < ApplicationRecord
     name == organization.name ? name : "#{organization.name} - #{name}"
   end
 
-  # Quick and dirty hack to ensure it's block - frontend should prevent doing this normally
+  # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
     raise StandardError, "Can't destroy a location with appointments enabled"
