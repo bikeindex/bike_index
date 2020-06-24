@@ -2099,6 +2099,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
+    - 
     - Jan
     - Feb
     - Mar
@@ -2124,6 +2125,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
+    - 
     - January
     - February
     - March
