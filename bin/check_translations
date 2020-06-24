@@ -47,7 +47,7 @@ else
   git clean --quiet --force -d -x
   git stash
   git checkout -b ${BRANCH}
-  git reset --hard origin/master
+  git reset --hard origin/main
 
   # Commit translation changes
   git stash pop
@@ -72,7 +72,7 @@ else
 
   output "${YELLOW}" "Creating Update Pull Request"
 
-  if [[ "${TRANSLATION_BRANCH}" != "master" ]]; then
+  if [[ "${TRANSLATION_BRANCH}" != "main" ]]; then
     PR_URL="Related PR: ${CIRCLE_PULL_REQUEST}"
   fi
 

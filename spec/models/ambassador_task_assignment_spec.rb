@@ -160,41 +160,41 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
     context "sorting by organization name" do
       it "sorts in ascending order if passed asc" do
-        org1 = FactoryBot.create(:organization_ambassador, name: "A")
+        org1 = FactoryBot.create(:organization_ambassador, name: "A Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org1)
-        org2 = FactoryBot.create(:organization_ambassador, name: "B")
+        org2 = FactoryBot.create(:organization_ambassador, name: "B Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org2)
-        org3 = FactoryBot.create(:organization_ambassador, name: "C")
+        org3 = FactoryBot.create(:organization_ambassador, name: "C Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org3)
 
         # ambassador for group "B" joins group "X"
-        org4 = FactoryBot.create(:organization_ambassador, name: "X")
+        org4 = FactoryBot.create(:organization_ambassador, name: "X Ambassadors")
         FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
         result = described_class.completed_assignments(sort: { organization_name: :asc })
 
         # Tasks should be sorted by name of the ambassador's *current* ambassador org
         names = result.map { |a| a.ambassador.current_ambassador_organization.name }
-        expect(names).to eq(["A", "C", "X"])
+        expect(names).to eq(["A Ambassadors", "C Ambassadors", "X Ambassadors"])
       end
 
       it "sorts in descending order if passed desc" do
-        org1 = FactoryBot.create(:organization_ambassador, name: "X")
+        org1 = FactoryBot.create(:organization_ambassador, name: "X Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org1)
-        org2 = FactoryBot.create(:organization_ambassador, name: "Y")
+        org2 = FactoryBot.create(:organization_ambassador, name: "Y Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org2)
-        org3 = FactoryBot.create(:organization_ambassador, name: "Z")
+        org3 = FactoryBot.create(:organization_ambassador, name: "Z Ambassadors")
         FactoryBot.create(:ambassador_task_assignment, :completed, organization: org3)
 
         # ambassador for group "Y" joins group "B"
-        org4 = FactoryBot.create(:organization_ambassador, name: "B")
+        org4 = FactoryBot.create(:organization_ambassador, name: "B Ambassadors")
         FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
         result = described_class.completed_assignments(sort: { organization_name: :desc })
 
         # Tasks should be sorted by name of the ambassador's *current* ambassador org
         names = result.map { |a| a.ambassador.current_ambassador_organization.name }
-        expect(names).to eq(["Z", "X", "B"])
+        expect(names).to eq(["Z Ambassadors", "X Ambassadors", "B Ambassadors"])
       end
     end
 

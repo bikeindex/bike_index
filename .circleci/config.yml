@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
-    parallelism: 2
+    parallelism: 3
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
@@ -10,7 +10,7 @@ jobs:
       RACK_ENV: test
       COVERAGE: true
       DISABLE_SPRING: true
-      TRANSLATION_BRANCH: master
+      TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
@@ -65,7 +65,6 @@ jobs:
         key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
-
 
       - type: cache-restore
         name: "Git: cache restore"
@@ -138,11 +137,9 @@ jobs:
         paths:
           - ~/.cache/hub
 
-
       - run:
           name: "Bundler: install"
           command: gem install bundler -v 1.17.3
-
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
@@ -161,11 +158,10 @@ jobs:
         paths:
           - ~/.cache/bundle
 
-
       - run:
-          name: Sync translations (only on master by default)
+          name: Sync translations (only on main
+            by default)
           command: bin/check_translations
-
 
       - type: cache-restore
         name: "Node dependencies: cache restore"
@@ -183,7 +179,6 @@ jobs:
         key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
-
 
       - type: cache-restore
         name: "Assets: cache restore"
@@ -207,7 +202,6 @@ jobs:
           - public/packs-test
           - tmp/cache/assets
           - tmp/cache/webpacker
-
 
       - run:
           name: Install Code Climate Test Reporter
@@ -303,4 +297,4 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: main

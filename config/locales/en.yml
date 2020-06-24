@@ -4327,8 +4327,8 @@ en:
           bikes don't import correctly, you can make adjustments and delete the bikes,
           without having to delete a large number of bikes.
         example_csv_link: example CSV with all optional columns here
-        example_csv_url: >-
-          https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
+        example_csv_url_main: >-
+          https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
         for_best_results: For best results, put quotes around all the cells.
         if_only_some_of_your_bikes_html: >-
           If only some of your bikes have values in optional columns, leave the cell
@@ -4452,7 +4452,7 @@ en:
         name: Name
         org_email_address_html: Email address <em>%{org_name}</em> bike registrations
           will be sent from
-        org_settings_html: "<em>%{org_name}</em> settings"
+        org_settings: Settings
         organization_logo: Organization logo
         organization_type: Organization type
         registration_email: Registration email
@@ -4530,19 +4530,22 @@ en:
         created: Created
         current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
+        find_by_name_or_email: Find by name or email
         invite_more_users: Invite more users
         is_admin: Admin?
         manage_users: Manage Users
         manually_invite_email: manually invite emails
+        matching_user: Matching user
+        permitted_domain_info_html: >-
+          You have a permitted domain, anyone signing up with an email address ending
+          in <code>%{email_suffix}</code> will be a member of %{org_name}.
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
+        search: Search
         sender: Sender
         to: To
         update_email: Update email
         user: user
-        whitelisted_domain_info_html: >-
-          You have a whitelisted domain, anyone signing up with an email address ending
-          in <code>%{email_suffix}</code> will be a member of %{org_name}.
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       new:
@@ -4562,11 +4565,11 @@ en:
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         send_invitation: Send invitation
-        signing_in_with_whitelisted_html: >-
+        signing_in_with_permitted_domain_html: >-
           Signing in with an "Emailed sign in link" using an address that ends with
           <code>%{email_suffix}</code> will automatically make you a member of %{org_name}.
         user: user
-        you_have_a_whitelisted_domain: You have a whitelisted domain
+        you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
   organized_mailer:
     custom_message:
@@ -4838,13 +4841,15 @@ en:
       sign_up_your_organization: Sign up your organization
       where: Where
     donation_modal:
-      header: Help support our efforts!
+      header_june_2020: Mid-year fundraising campaign until July 1
       is_a_nonprofit_html: >-
         Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforts to fight
         bike theft!
       nonprofit_501c3: 501(c)(3) nonprofit
       skip: No donation
-      subheader: As a non-profit, we rely on your support.
+      subheader_june_2020_html: >-
+        We’re seeing drastic increases in bike theft this summer.<br>Help us protect
+        and recover more bikes than ever.
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit
@@ -5195,7 +5200,7 @@ en:
       no_day_with_year: "%B %d %Y"
       short_with_hour: "%l%P - %m.%d.%y"
       short_with_year: "%a, %B %d %Y"
-      standard_display: "%A, %B %d"
+      standard_display: "%a, %B %d"
   user_embeds:
     show:
       bike: Bike

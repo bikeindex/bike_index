@@ -311,7 +311,7 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "restrict_invitations?, whitelisted_passwordless_signin, matching_domain" do
+  describe "restrict_invitations?, permitted_domain_passwordless_signin, matching_domain" do
     it "is truthy" do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
@@ -319,7 +319,7 @@ RSpec.describe Organization, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
-        expect(Organization.whitelisted_passwordless_signin.pluck(:id)).to eq([organization.id])
+        expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])
         expect(Organization.passwordless_email_matching("fakeexample.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@example.gov@party.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@éxample.gov")).to be_blank # accent
@@ -625,6 +625,31 @@ RSpec.describe Organization, type: :model do
           expect(organization.include_field_reg_address?(user)).to be_truthy
         end
       end
+    end
+  end
+
+  describe "invalid names" do
+    let(:organization) { FactoryBot.build(:organization, name: "bike") }
+    it "blocks naming something invalid" do
+      expect(organization.save).to be_falsey
+      expect(organization.id).to be_blank
+      organization.update(name: "something else", short_name: "something cool")
+      expect(organization.valid?).to be_truthy
+      expect(organization.id).to be_present
+      valid_names = ["something else", "something cool", "something-cool"]
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(short_name: "bikes")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(name: "bikés")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
+
+      expect(organization.update(name: "400")).to be_falsey
+      organization.reload
+      expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
     end
   end
 end

@@ -14,15 +14,12 @@
   .hot-sheet-bike-display
     %table.bike-display
       %tbody
+        %tr.bike-title
+          %td{ colspan: 2 }
+            = link_to organized_bike_text(bike, skip_creation: true), bike_link
         %tr
-          %td.image-holder{ class: thumbclass }
-            %a{ href:  bike_link }
-              %img{ src: thumb_url }
           %td.info-holder
             %ul
-              %li
-                = link_to organized_bike_text(bike, skip_creation: true), bike_link
-
               %li
                 %strong Serial
                 = bike.serial_display
@@ -43,6 +40,9 @@
                 %strong.stolen-color
                   From
                 = Geocodeable.address(stolen_record, country: false)
+          %td.image-holder{ class: thumbclass }
+            %a{ href:  bike_link }
+              %img{ src: thumb_url }
 
 - if @organization.overview_dashboard?
   .clear-org-buttons

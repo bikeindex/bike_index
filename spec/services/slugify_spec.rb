@@ -28,6 +28,10 @@ RSpec.describe Slugifyer do
       expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
       expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
     end
+    it "handles é" do
+      expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
+      expect(Slugifyer.slugify("pañe rum runner")).to eq("pane-rum-runner")
+    end
   end
 
   describe "manufacturer" do

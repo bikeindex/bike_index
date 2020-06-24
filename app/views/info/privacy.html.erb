@@ -1,5 +1,5 @@
 <% file_path = @view_renderer.lookup_context.find_template(@virtual_path).identifier.gsub(/\A.*\/app\//i, 'app/') %>
-<%- change_history_url = "https://github.com/bikeindex/bike_index/tree/master/#{file_path}" %>
+<%- change_history_url = "https://github.com/bikeindex/bike_index/tree/main/#{file_path}" %>
 <%- terms_link = link_to(t(".terms_of_service"), terms_path) %>
 
 <div id="legal-terms" class="inner-recep legal-content">

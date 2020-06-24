@@ -23,7 +23,7 @@ class ComponentCreator
     { ctype_id: Ctype.other.id, ctype_other: component[:component_type] }
   end
 
-  def whitelist_attributes(component)
+  def permitted_attributes(component)
     comp_attributes = {
       cmodel_name: component[:model_name] || component[:model],
       description: component[:description],
@@ -39,7 +39,7 @@ class ComponentCreator
   end
 
   def create_component(component)
-    Component.create(whitelist_attributes(component).merge(bike_id: @bike.id))
+    Component.create(permitted_attributes(component).merge(bike_id: @bike.id))
   end
 
   def update_components_from_params
@@ -50,7 +50,7 @@ class ComponentCreator
       else
         component = @bike.components.new
       end
-      component.update_attributes(whitelist_attributes(comp.with_indifferent_access))
+      component.update_attributes(permitted_attributes(comp.with_indifferent_access))
     end
   end
 

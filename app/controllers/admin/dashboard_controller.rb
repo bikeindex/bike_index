@@ -37,13 +37,13 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   def tsvs
-    @blacklist = FileCacheMaintainer.blacklist
+    @blocklist = FileCacheMaintainer.blocklist
     @tsvs = FileCacheMaintainer.files
   end
 
-  def update_tsv_blacklist
-    new_blacklist = params[:blacklist].split(/\n|\r/).reject { |t| t.blank? }
-    FileCacheMaintainer.reset_blacklist_ids(new_blacklist)
+  def update_tsv_blocklist
+    new_blocklist = params[:blocklist].split(/\n|\r/).reject { |t| t.blank? }
+    FileCacheMaintainer.reset_blocklist_ids(new_blocklist)
     redirect_to admin_tsvs_path
   end
 end

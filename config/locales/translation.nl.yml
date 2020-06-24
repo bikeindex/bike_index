@@ -4456,7 +4456,6 @@ nl:
           maken en de fietsen verwijderen, zonder een groot aantal te verwijderen
           bikes.
         example_csv_link: voorbeeld CSV met alle optionele kolommen hier
-        example_csv_url: https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
         for_best_results: Voor de beste resultaten plaatst u aanhalingstekens rond
           alle cellen.
         if_only_some_of_your_bikes_html: Als slechts enkele van uw fietsen waarden
@@ -4488,6 +4487,7 @@ nl:
         your_headers_must_match_html: Uw kopteksten moeten <em>exact</em> overeenkomen
           met onze kopteksten - als u bijvoorbeeld 'serienummer' als koptekst hebt,
           werkt de import niet.
+        example_csv_url_main: https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
       show:
         ascend_import: Ascending importeren
         bikes: Bikes
@@ -4597,10 +4597,13 @@ nl:
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
         current_users: Huidige gebruikers
         manually_invite_email: e-mails handmatig uitnodigen
-        whitelisted_domain_info_html: Je hebt een domein op de witte lijst. Iedereen
-          die zich aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
-          , wordt lid van %{org_name}.
         you_can_also: Je kan ook
+        find_by_name_or_email: Zoek op naam of e-mailadres
+        matching_user: Overeenkomende gebruiker
+        search: Zoeken
+        permitted_domain_info_html: Je hebt een toegestaan domein. Iedereen die zich
+          aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
+          , wordt lid van %{org_name}.
       new:
         1_email_per_line: 1 e-mail per regel
         admin_of_organization: Beheerder van organisatie
@@ -4619,10 +4622,10 @@ nl:
         send_invitation: Verstuur uitnodiging
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
-        signing_in_with_whitelisted_html: Als u zich aanmeldt met een "Aanmeldlink
+        signing_in_with_permitted_domain_html: Als u zich aanmeldt met een "Aanmeldlink
           per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
           u automatisch lid van %{org_name}.
-        you_have_a_whitelisted_domain: Je hebt een domein op de witte lijst
+        you_have_a_permitted_domain: Je hebt een toegestaan domein
     parking_notifications:
       index:
         parking_notifications: Verlaten records
@@ -4672,7 +4675,6 @@ nl:
         name: Naam
         org_email_address_html: E-mailadres <em>%{org_name} fietsregistraties</em>
           worden verzonden vanaf
-        org_settings_html: "<em>%{org_name}</em> instellingen"
         organization_logo: Organisatie logo
         organization_type: Organisatie type
         registration_email: Registratie email
@@ -4680,6 +4682,7 @@ nl:
           verwijderen?
         select_email: Selecteer e-mail
         update: Bijwerken
+        org_settings: Instellingen
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
@@ -5111,12 +5114,13 @@ nl:
       sign_up_your_organization: Meld uw organisatie aan
       where: Waar
     donation_modal:
-      header: Help onze inspanningen ondersteunen!
       is_a_nonprofit_html: Bike Index is een %{blog_link} <br> <strong>U</strong>
         financiert onze efforst om fietsdiefstal te bestrijden!
       nonprofit_501c3: 501 (c) (3) non-profit
       skip: Overslaan
-      subheader: Als non-profit vertrouwen wij op uw steun.
+      header_june_2020: Halfjaarlijkse inzamelingsactie tot 1 juli
+      subheader_june_2020_html: We zien deze zomer een drastische toename van fietsdiefstal.
+        <br> Help ons meer fietsen te beschermen en te herstellen dan ooit.
     law_enforcement_donation_modal:
       bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
         afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties

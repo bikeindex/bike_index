@@ -190,11 +190,11 @@ rake task is run. See [PR #1353][pr-1353] for implementation details.
 Pre-Deployment Translation Syncing
 ----------------------------------
 
-When building master, we check for un-synced translations and, if any are found,
-stop the build and open a PR to master with the translation updates.
+When building main, we check for un-synced translations and, if any are found,
+stop the build and open a PR to main with the translation updates.
 
 You'll want to merge this PR (delete the description) to trigger a new build and
-retry deployment on master.
+retry deployment on main.
 
 (See [#1100](https://github.com/bikeindex/bike_index/pull/1100) for details.)
 

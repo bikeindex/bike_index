@@ -17,7 +17,7 @@ class BikeBookUpdateWorker < ApplicationWorker
           end
           component.is_stock = true
           component.setting_is_stock = true
-          component.update_attributes(ComponentCreator.new.whitelist_attributes(bb_comp))
+          component.update_attributes(ComponentCreator.new.permitted_attributes(bb_comp))
         end
       end
     end
