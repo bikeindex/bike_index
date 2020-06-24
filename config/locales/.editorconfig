@@ -1,0 +1,4 @@
+# Do not trim trailing whitespace for translation files, because it breaks normalization
+root = true
+
+trim_trailing_whitespace = false
