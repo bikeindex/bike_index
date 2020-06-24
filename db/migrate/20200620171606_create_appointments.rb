@@ -17,7 +17,7 @@ class CreateAppointments < ActiveRecord::Migration[5.2]
       t.string :reason
       t.text :description
 
-      t.datetime :appointment_time
+      t.integer :line_entry_timestamp
 
       t.timestamps
     end

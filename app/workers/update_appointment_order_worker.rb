@@ -1,5 +1,4 @@
-
-class LocationAppointmentsQueueWorker < ApplicationWorker
+class UpdateAppointmentOrderWorker < ApplicationWorker
   sidekiq_options queue: "high_priority", retry: 1
 
   def perform(location_id, appointment_id = nil)
