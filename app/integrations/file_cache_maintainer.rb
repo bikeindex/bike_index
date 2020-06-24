@@ -1,32 +1,32 @@
 class FileCacheMaintainer
   class << self
-    def assign_blacklist_ids(ids)
+    def assign_blocklist_ids(ids)
       if ids.present?
-        redis.sadd blacklist_id, ids.map { |i| normalized(i) }.reject { |i| i.blank? }
+        redis.sadd blocklist_id, ids.map { |i| normalized(i) }.reject { |i| i.blank? }
       end
     end
 
-    def blacklist
+    def blocklist
       return [] unless redis.type(info_id) == "set"
-      redis.smembers blacklist_id
+      redis.smembers blocklist_id
     end
 
-    def reset_blacklist_ids(ids)
-      redis.expire(blacklist_id, 0)
-      assign_blacklist_ids(ids)
+    def reset_blocklist_ids(ids)
+      redis.expire(blocklist_id, 0)
+      assign_blocklist_ids(ids)
     end
 
-    def blacklist_include?(id)
-      redis.sismember blacklist_id, normalized(id)
+    def blocklist_include?(id)
+      redis.sismember blocklist_id, normalized(id)
     end
 
     def descriptions
       {
         "manufacturers.tsv" => "Manufacturers list",
         "current_stolen_bikes.tsv" => "Stolen",
-        "approved_current_stolen_bikes.tsv" => "Stolen (without blacklisted bikes)",
+        "approved_current_stolen_bikes.tsv" => "Stolen (without blocklisted bikes)",
         "current_stolen_with_reports.tsv" => "Stolen with serials & police reports",
-        "approved_current_stolen_with_reports.tsv" => "Stolen with serials & police reports (without blacklisted bikes)",
+        "approved_current_stolen_with_reports.tsv" => "Stolen with serials & police reports (without blocklisted bikes)",
         "all_stolen_cache.json" => "Cached API response of all stolen bikes",
       }
     end
@@ -79,7 +79,7 @@ class FileCacheMaintainer
       "#{base_id}_info"
     end
 
-    def blacklist_id
+    def blocklist_id
       "#{base_id}_info"
     end
 

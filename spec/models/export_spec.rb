@@ -3,11 +3,11 @@ require "rails_helper"
 RSpec.describe Export, type: :model do
   let(:organization) { export.organization }
 
-  describe "scope and method for stolen_no_blacklist" do
-    let(:export) { FactoryBot.create(:export, options: { with_blacklist: true, headers: %w[party registered_at] }) }
-    it "is with blacklist" do
+  describe "scope and method for stolen_no_blocklist" do
+    let(:export) { FactoryBot.create(:export, options: { with_blocklist: true, headers: %w[party registered_at] }) }
+    it "is with blocklist" do
       expect(export.stolen?).to be_truthy
-      expect(export.option?(:with_blacklist)).to be_truthy
+      expect(export.option?(:with_blocklist)).to be_truthy
       expect(export.option?(:only_serials_and_police_reports)).to be_falsey
       expect(export.description).to eq "Stolen"
       expect(export.headers).to eq(["registered_at"]) # Just checking that we ignore things

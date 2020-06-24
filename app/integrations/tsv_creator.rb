@@ -78,9 +78,9 @@ class TsvCreator
     send_to_uploader(output)
   end
 
-  def create_stolen(blacklist = false, stolen_records: nil)
+  def create_stolen(blocklist = false, stolen_records: nil)
     stolen_records ||= StolenRecord.approveds
-    filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_bikes.tsv"
+    filename = "#{@file_prefix}#{"approved_" if blocklist}current_stolen_bikes.tsv"
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_header
@@ -90,9 +90,9 @@ class TsvCreator
     send_to_uploader(output)
   end
 
-  def create_stolen_with_reports(blacklist = false, stolen_records: nil)
+  def create_stolen_with_reports(blocklist = false, stolen_records: nil)
     stolen_records ||= StolenRecord.approveds_with_reports
-    filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_with_reports.tsv"
+    filename = "#{@file_prefix}#{"approved_" if blocklist}current_stolen_with_reports.tsv"
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header

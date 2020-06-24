@@ -14,7 +14,7 @@ Rails.application.configure do
     }
   end
 
-  # Log times where people pass non-whitelisted params
+  # Log times where people pass non-permitted params
   config.action_controller.action_on_unpermitted_parameters :log
 
   # Code is not reloaded between requests.

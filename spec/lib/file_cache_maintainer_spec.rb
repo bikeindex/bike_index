@@ -17,22 +17,22 @@ RSpec.describe FileCacheMaintainer do
     end
   end
 
-  describe "blacklist_ids" do
+  describe "blocklist_ids" do
     it "gets and sets the ids" do
-      FileCacheMaintainer.reset_blacklist_ids([1, 1, 2, 4, "https://bikeindex.org/admin/bikes/6"])
-      expect(FileCacheMaintainer.blacklist).to eq %w(1 2 4 6)
+      FileCacheMaintainer.reset_blocklist_ids([1, 1, 2, 4, "https://bikeindex.org/admin/bikes/6"])
+      expect(FileCacheMaintainer.blocklist).to eq %w(1 2 4 6)
     end
     it "doesn't break if it's empty" do
-      FileCacheMaintainer.reset_blacklist_ids([])
-      expect(FileCacheMaintainer.blacklist).to eq([])
+      FileCacheMaintainer.reset_blocklist_ids([])
+      expect(FileCacheMaintainer.blocklist).to eq([])
     end
   end
 
-  describe "blacklist_include" do
-    it "checks if blacklist includes something" do
-      FileCacheMaintainer.reset_blacklist_ids([1010101, 2, 4, 6])
-      expect(FileCacheMaintainer.blacklist_include?("http://bikeindex.org/bikes/1010101/edit")).to be_truthy
-      expect(FileCacheMaintainer.blacklist_include?(7)).to be_falsey
+  describe "blocklist_include" do
+    it "checks if blocklist includes something" do
+      FileCacheMaintainer.reset_blocklist_ids([1010101, 2, 4, 6])
+      expect(FileCacheMaintainer.blocklist_include?("http://bikeindex.org/bikes/1010101/edit")).to be_truthy
+      expect(FileCacheMaintainer.blocklist_include?(7)).to be_falsey
     end
   end
 

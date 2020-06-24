@@ -140,7 +140,7 @@ class Organization < ApplicationRecord
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
-  def self.whitelisted_passwordless_signin
+  def self.permitted_domain_passwordless_signin
     where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
   end
 
@@ -148,7 +148,7 @@ class Organization < ApplicationRecord
     str = EmailNormalizer.normalize(str)
     return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
     domain = str.split("@").last
-    whitelisted_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+    permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
   end
 
   # never geocode, use default_location lat/long
