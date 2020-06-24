@@ -1176,6 +1176,12 @@ nl:
       none: Elke vertaling wordt gebruikt.
     usages:
       none: Geen belangrijke toepassingen gevonden.
+    yandex_translate:
+      errors:
+        no_api_key: Stel de Yandex API-sleutel in via de YANDEX_API_KEY-omgevingsvariabele
+          of translation.yandex_api_key in config / i18n-Tasks.yml. Haal de sleutel
+          op https://tech.yandex.com/translate.
+        no_results: Yandex leverde geen resultaten op.
   grape:
     errors:
       format: "%{attributes} %{message}"
