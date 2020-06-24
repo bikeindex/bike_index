@@ -19,7 +19,7 @@
         #{user_count}
       = t(".current_users")
     %p
-      = t(".whitelisted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+      = t(".permitted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
       %em.less-strong
         = t(".you_can_also")
         #{link_to t(".manually_invite_email"), new_organization_user_path(organization_id: current_organization.to_param)}.
