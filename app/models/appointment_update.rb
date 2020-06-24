@@ -18,11 +18,5 @@ class AppointmentUpdate < ApplicationRecord
   enum status: STATUS_ENUM
   enum creator_type: Appointment::CREATOR_TYPE_ENUM
 
-  after_commit :update_appointment_queue, on: [:create]
-
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
-
-  def update_appointment_queue
-    UpdateAppointmentOrder.perform_async(id)
-  end
 end
