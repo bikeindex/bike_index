@@ -87,20 +87,20 @@ RSpec.describe Admin::DashboardController, type: :controller do
         t = Time.current
         FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", t)
         # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
-        blacklist = %w(1010101 2 4 6)
-        FileCacheMaintainer.reset_blacklist_ids(blacklist)
+        blocklist = %w(1010101 2 4 6)
+        FileCacheMaintainer.reset_blocklist_ids(blocklist)
         get :tsvs
         expect(response.code).to eq("200")
         # assigns(:tsvs).should eq(tsvs)
-        expect(assigns(:blacklist).include?("2")).to be_truthy
+        expect(assigns(:blocklist).include?("2")).to be_truthy
       end
     end
 
-    describe "update_tsv_blacklist" do
+    describe "update_tsv_blocklist" do
       it "renders and updates" do
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
-        put :update_tsv_blacklist, params: { blacklist: ids }
-        expect(FileCacheMaintainer.blacklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
+        put :update_tsv_blocklist, params: { blocklist: ids }
+        expect(FileCacheMaintainer.blocklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
       end
     end
   end

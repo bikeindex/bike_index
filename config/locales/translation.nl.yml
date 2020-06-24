@@ -4597,13 +4597,13 @@ nl:
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
         current_users: Huidige gebruikers
         manually_invite_email: e-mails handmatig uitnodigen
-        whitelisted_domain_info_html: Je hebt een domein op de witte lijst. Iedereen
-          die zich aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
-          , wordt lid van %{org_name}.
         you_can_also: Je kan ook
         find_by_name_or_email: Zoek op naam of e-mailadres
         matching_user: Overeenkomende gebruiker
         search: Zoeken
+        permitted_domain_info_html: Je hebt een toegestaan domein. Iedereen die zich
+          aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
+          , wordt lid van %{org_name}.
       new:
         1_email_per_line: 1 e-mail per regel
         admin_of_organization: Beheerder van organisatie
@@ -4622,10 +4622,10 @@ nl:
         send_invitation: Verstuur uitnodiging
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
-        signing_in_with_whitelisted_html: Als u zich aanmeldt met een "Aanmeldlink
+        signing_in_with_permitted_domain_html: Als u zich aanmeldt met een "Aanmeldlink
           per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
           u automatisch lid van %{org_name}.
-        you_have_a_whitelisted_domain: Je hebt een domein op de witte lijst
+        you_have_a_permitted_domain: Je hebt een toegestaan domein
     parking_notifications:
       index:
         parking_notifications: Verlaten records

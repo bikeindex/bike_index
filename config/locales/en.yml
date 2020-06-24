@@ -4545,6 +4545,9 @@ en:
         manage_users: Manage Users
         manually_invite_email: manually invite emails
         matching_user: Matching user
+        permitted_domain_info_html: >-
+          You have a permitted domain, anyone signing up with an email address ending
+          in <code>%{email_suffix}</code> will be a member of %{org_name}.
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         search: Search
@@ -4552,9 +4555,6 @@ en:
         to: To
         update_email: Update email
         user: user
-        whitelisted_domain_info_html: >-
-          You have a whitelisted domain, anyone signing up with an email address ending
-          in <code>%{email_suffix}</code> will be a member of %{org_name}.
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       new:
@@ -4574,11 +4574,11 @@ en:
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         send_invitation: Send invitation
-        signing_in_with_whitelisted_html: >-
+        signing_in_with_permitted_domain_html: >-
           Signing in with an "Emailed sign in link" using an address that ends with
           <code>%{email_suffix}</code> will automatically make you a member of %{org_name}.
         user: user
-        you_have_a_whitelisted_domain: You have a whitelisted domain
+        you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
   organized_mailer:
     custom_message:

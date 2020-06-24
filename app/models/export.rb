@@ -28,7 +28,7 @@ class Export < ApplicationRecord
   def self.default_kind_options
     {
       stolen: {
-        with_blacklist: false,
+        with_blocklist: false,
         only_serials_and_police_reports: false,
       },
       organization: {
@@ -165,7 +165,7 @@ class Export < ApplicationRecord
     if kind == "stolen"
       txt = "Stolen"
       txt += " with serials & police reports" if option?("only_serials_and_police_reports")
-      txt += " (without blacklisted bikes)" unless option?("with_blacklist")
+      txt += " (without blocklisted bikes)" unless option?("with_blocklist")
       txt
     elsif kind == "manufacturer"
       "Manufacturer"

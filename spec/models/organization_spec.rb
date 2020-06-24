@@ -311,7 +311,7 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "restrict_invitations?, whitelisted_passwordless_signin, matching_domain" do
+  describe "restrict_invitations?, permitted_domain_passwordless_signin, matching_domain" do
     it "is truthy" do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
@@ -319,7 +319,7 @@ RSpec.describe Organization, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
-        expect(Organization.whitelisted_passwordless_signin.pluck(:id)).to eq([organization.id])
+        expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])
         expect(Organization.passwordless_email_matching("fakeexample.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@example.gov@party.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@éxample.gov")).to be_blank # accent
