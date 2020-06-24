@@ -14,7 +14,6 @@ module Organized
     end
 
     def update
-      pp permitted_parameters
       if @appointment_configuration.update(permitted_parameters)
         flash[:success] = "Appointments Configuration updated"
         redirect_back(fallback_location: organization_root_url)

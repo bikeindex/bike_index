@@ -56,7 +56,10 @@ module OrgPublic
     def permitted_create_params
       params.require(:appointment)
         .permit(:email, :name, :reason, :description, :location_id)
-        .merge(organization_id: current_organization.id, status: "waiting")
+        .merge(organization_id: current_organization.id,
+               status: "waiting",
+               user_id: current_user&.id,
+               creator_type: current_user.present? ? "signed_in_user" : "no_user")
     end
 
     def permitted_update_params
@@ -69,8 +72,11 @@ module OrgPublic
     def permitted_update_status(update_status)
       return update_status if @appointment.status == update_status
       user_permitted_updates = %w[waiting being_helped abandoned]
-      if @appointment.in_line?
-        return update_status if user_permitted_updates.include?(update_status)
+      if @appointment.in_line? && user_permitted_updates.include?(update_status)
+        @appointment.appointment_updates.create(status: update_status,
+                                                user_id: current_user&.id,
+                                                creator_type: (current_user.present? ? "signed_in_user" : "no_user"))
+        return update_status
       end
       @appointment.status # fallback to current status
     end

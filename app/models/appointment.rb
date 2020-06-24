@@ -1,5 +1,6 @@
 class Appointment < ApplicationRecord
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
+  CREATOR_TYPE_ENUM = { no_user: 0, signed_in_user: 1, organization: 2 }
   STATUS_ENUM = { waiting: 0, on_deck: 1, being_helped: 2, finished: 3, failed_to_find: 4, removed: 5, abandoned: 6 }.freeze
 
   belongs_to :organization
@@ -9,13 +10,14 @@ class Appointment < ApplicationRecord
 
   has_many :appointment_updates, dependent: :destroy
 
-  validates_presence_of :organization_id, :location_id, :email, :name
+  validates_presence_of :organization_id, :location_id, :name
 
   before_validation :set_calculated_attributes
   after_commit :update_appointment_queue
 
   enum status: STATUS_ENUM
   enum kind: KIND_ENUM
+  enum creator_type: CREATOR_TYPE_ENUM
 
   scope :in_line, -> { where(status: in_line_statuses) }
 
@@ -31,8 +33,6 @@ class Appointment < ApplicationRecord
 
   # Deal with deleted locations, etc
   def location; Location.unscoped.find_by_id(location_id) end
-
-  def signed_in_user?; user_id.present? end
 
   def in_line?; self.class.in_line_statuses.include?(status) end
 

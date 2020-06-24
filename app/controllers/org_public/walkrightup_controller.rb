@@ -12,7 +12,10 @@ module OrgPublic
         flash[:info] = "Your last appointment is no longer in line!"
         @appointment = nil
       end
-      @appointment ||= Appointment.new(organization: current_organization, location: current_location)
+      @appointment ||= Appointment.new(organization: current_organization,
+                                       location: current_location,
+                                       email: current_user&.email,
+                                       name: current_user&.name)
     end
   end
 end

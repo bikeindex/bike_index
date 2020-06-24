@@ -4,20 +4,6 @@ class AppointmentUpdate < ApplicationRecord
 
   validates_presence_of :appointment_id
 
-  before_create :set_organization_update
-
   enum status: Appointment::STATUS_ENUM
-
-  scope :organization_update, -> { where(organization_update: true) }
-  scope :customer_update, -> { where(organization_update: false) }
-
-  def signed_in_user?; user_id.present? end
-
-  def organization_update?; organization_update end
-
-  def customer_update?; !organization_update? end
-
-  def set_organization_update
-    self.organization_update = user.present? && user.member_of?(appointment&.organization)
-  end
+  enum creator_type: Appointment::CREATOR_TYPE_ENUM
 end
