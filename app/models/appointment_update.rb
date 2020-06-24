@@ -7,7 +7,7 @@ class AppointmentUpdate < ApplicationRecord
     failed_to_find: 4,
     removed: 5,
     abandoned: 6,
-    organization_reordered: 7
+    organization_reordered: 7,
   }.freeze
 
   belongs_to :appointment
@@ -19,4 +19,8 @@ class AppointmentUpdate < ApplicationRecord
   enum creator_type: Appointment::CREATOR_TYPE_ENUM
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+
+  def self.update_only_statuses; %w[failed_to_find organization_reordered] end
+
+  def update_only_status?; self.class.update_only_statuses.include?(status) end
 end

@@ -1,6 +1,6 @@
 class Appointment < ApplicationRecord
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
-  CREATOR_TYPE_ENUM = { no_user: 0, signed_in_user: 1, organization: 2 }
+  CREATOR_TYPE_ENUM = { no_user: 0, signed_in_user: 1, organization_member: 2 }
 
   belongs_to :organization
   belongs_to :location
@@ -18,6 +18,8 @@ class Appointment < ApplicationRecord
   enum kind: KIND_ENUM
   enum creator_type: CREATOR_TYPE_ENUM
 
+  attr_accessor :skip_update
+
   scope :line_ordered, -> { reorder(line_entry_timestamp: :asc) }
   scope :in_line, -> { line_ordered.where(status: in_line_statuses) }
 
@@ -29,7 +31,11 @@ class Appointment < ApplicationRecord
 
   def self.resolved_statuses; %[finished removed] end
 
-  def permitted_reasons; location.appointment_configuration.reasons end
+  def appointment_configuration; location.appointment_configuration end
+
+  def permitted_reasons; appointment_configuration.reasons end
+
+  def after_failed_to_find_removal_count; appointment_configuration&.after_failed_to_find_removal_count || 2 end
 
   # Deal with deleted locations, etc
   def location; Location.unscoped.find_by_id(location_id) end
@@ -38,9 +44,48 @@ class Appointment < ApplicationRecord
 
   def failed_to_find_attempts; appointment_updates.failed_to_find end
 
-  def move_behind!(appt_or_appt_id)
-    other_appt = appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
+  def other_location_appointments; location.appointments.where.not(id: id) end
+
+  def record_status_update(updator_type:, updator_id: nil, new_status: nil)
+    return nil unless new_status.present? && new_status != status
+    unless updator_type == "organization_member" # If it's not an org update, restrict available status updates
+      # customers can't update their appointment unless it's in line and they're updating to a valid status
+      customer_update_statuses = %w[waiting being_helped abandoned]
+      return nil unless in_line? && customer_update_statuses.include?(new_status)
+    end
+    new_update = appointment_updates.create(creator_type: updator_type, user_id: updator_id, status: new_status)
+
+    # We aren't doing anything for the other update_only_statuses, except failed to find, but seems reasonable to skip
+    self.status = new_status unless AppointmentUpdate.update_only_statuses.include?(new_status)
+    self.skip_update = false # Ensure we run the queue worker
+
+    if new_status == "failed_to_find"
+      update_and_move_for_failed_to_find # This will save the record
+    elsif new_status == "on_deck"
+      move_ahead(other_location_appointments.on_deck.last) # This will save the record
+    else
+      # Because things might've changed, and even if they didn't we still want to run the queue updator
+      self.update(updated_at: Time.current)
+    end
+    new_update # Return the created update
+  end
+
+  def move_behind(appt_or_appt_id)
+    if appt_or_appt_id.present?
+      other_appt = appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
+    else
+      other_appt = other_location_appointments.in_line.last || self # use the last appt in line, fallback to self
+    end
     self.update(line_entry_timestamp: other_appt.line_entry_timestamp + 1)
+  end
+
+  def move_ahead(appt_or_appt_id)
+    if appt_or_appt_id.present?
+      other_appt = appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
+    else
+      other_appt = other_location_appointments.in_line.first || self # use the first appt in line, fallback to self
+    end
+    self.update(line_entry_timestamp: other_appt.line_entry_timestamp - 1)
   end
 
   def set_calculated_attributes
@@ -53,6 +98,19 @@ class Appointment < ApplicationRecord
   end
 
   def update_appointment_queue
+    return true if skip_update
     LocationAppointmentsQueueWorker.perform_async(location_id)
+  end
+
+  private
+
+  def update_and_move_for_failed_to_find
+    if failed_to_find_attempts.count < after_failed_to_find_removal_count
+      self.status = "waiting"
+    else
+      self.status = "removed"
+    end
+    # This will save the record
+    move_behind(other_location_appointments.on_deck.last)
   end
 end

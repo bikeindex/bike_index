@@ -107,6 +107,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
     let(:update_status) { "being_helped" }
     it "updates things" do
       expect(appointment.appointment_updates.count).to eq 0
+      Sidekiq::Worker.clear_all
       put "#{base_url}/#{appointment.link_token}", params: { appointment: appointment_params }
       expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       expect(flash[:success]).to be_present
@@ -119,15 +120,17 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       appointment_update = appointment.appointment_updates.last
       expect(appointment_update.status).to eq "being_helped"
       expect(appointment_update.no_user?).to be_truthy
+      expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
+      expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
     end
     context "unpermitted updates" do
       it "ignores illegal things" do
         put "#{base_url}/#{appointment.link_token}", params: {
-          appointment: appointment_params.merge(status: "on_deck",
-                                                location_id: 2121212,
-                                                user_id: 22222,
-                                                organization_id: 16262)
-        }
+                                                       appointment: appointment_params.merge(status: "on_deck",
+                                                                                             location_id: 2121212,
+                                                                                             user_id: 22222,
+                                                                                             organization_id: 16262),
+                                                     }
         expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
         expect(flash[:success]).to be_present
         appointment.reload

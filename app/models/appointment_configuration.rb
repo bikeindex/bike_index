@@ -13,6 +13,9 @@ class AppointmentConfiguration < ApplicationRecord
 
   def virtual_line_on?; virtual_line_on end
 
+  # Maybe this will be configurable at some point
+  def after_failed_to_find_removal_count; 2 end
+
   def reasons_text; reasons.join(", ") end
 
   def reasons_text=(val)
