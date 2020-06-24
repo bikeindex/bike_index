@@ -232,7 +232,6 @@ module ControllerHelpers
     set_passive_organization(@current_organization)
   end
 
-  # current_location is the location currently being used.
   def current_location
     # We call this multiple times - make sure nil stays nil
     return @current_location if defined?(@current_location)
