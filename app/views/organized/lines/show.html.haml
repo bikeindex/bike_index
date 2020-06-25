@@ -73,7 +73,5 @@
             = link_to "Helping now", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap float-left mb-2"
             - if appointment.on_deck?
               = link_to "unable to find customer", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap float-right ml-2 mb-2"
-              -# %a.btn.btn-sm.btn-warning.uncap.float-right.mb-2{ href: "#" }
-              -#   Unable to find
           .small.less-strong.text-right{ style: "line-height: 0.5;" }
             = link_to "remove", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "removed"), method: "PUT", action: "update", class: "small gray-link"
