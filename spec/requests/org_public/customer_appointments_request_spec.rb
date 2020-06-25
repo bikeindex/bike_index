@@ -52,7 +52,6 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       location.reload
       current_organization.reload
       expect(location.appointments.count).to eq 1
-      # expect(current_organization.appointments.count).to eq 1
       new_appointment = location.appointments.last
 
       expect(assigns(:current_appointment)).to eq new_appointment
@@ -66,6 +65,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(new_appointment.location_id).to eq location.id
       expect(new_appointment.organization_id).to eq current_organization.id
       expect(new_appointment.creator_kind).to eq "no_user"
+      expect(new_appointment.user_id).to be_blank
       expect(new_appointment.appointment_updates.count).to eq 0
     end
     context "no email" do
@@ -165,7 +165,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
 
         expect(assigns(:current_appointment)).to eq appointment
         expect_attrs_to_match_hash(appointment, appointment_params.except(:status))
-        expect(appointment.status).to eq "on_deck" # Ensuring it status put, because we restrict assigning to this
+        expect(appointment.status).to eq "on_deck" # Ensuring status remains, even though we block assigning to on_deck
 
         put "#{base_url}/#{appointment.link_token}", params: { appointment: appointment_params }
         appointment.reload

@@ -24,7 +24,6 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       location.reload
       current_organization.reload
       expect(location.appointments.count).to eq 1
-      # expect(current_organization.appointments.count).to eq 1
       new_appointment = location.appointments.last
 
       expect(response).to redirect_to(organization_line_path(location.to_param, organization_id: current_organization.to_param))
