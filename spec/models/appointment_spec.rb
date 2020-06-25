@@ -101,6 +101,13 @@ RSpec.describe Appointment, type: :model do
       it "does not record on_deck update" do
         expect_no_update(appointment, og_status, new_status, updator_id, updator_kind)
       end
+      context "on_deck" do
+        let(:og_status) { "on_deck" }
+        let(:new_status) { "waiting" }
+        it "does not record waiting update" do
+          expect_no_update(appointment, og_status, new_status, updator_id, updator_kind)
+        end
+      end
       context "new_status being_helped" do
         let(:new_status) { "being_helped" }
         it "updates" do

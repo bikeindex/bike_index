@@ -26,5 +26,10 @@
           Customer visit reasons
           %small.less-strong comma separated
         = f.text_area :reasons_text, class: "form-control"
+      .form-group
+        = f.label :customers_on_deck_count do
+          Number of customers on deck
+          %small.less-strong
+        = f.number_field :customers_on_deck_count, class: "form-control"
       .mt-2
         = submit_tag "Save", class: "btn btn-success btn-md-lg"

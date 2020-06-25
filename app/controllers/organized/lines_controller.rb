@@ -9,12 +9,18 @@ module Organized
     end
 
     def show
+      @appointments = matching_appointments
+      @appointment ||= Appointment.new(location_id: current_location.id, organization_id: current_organization.id)
     end
 
     def update
+      fail "not implemented"
     end
 
-    def create
+    private
+
+    def matching_appointments
+      current_location.appointments.in_line
     end
   end
 end

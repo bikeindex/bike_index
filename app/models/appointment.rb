@@ -46,8 +46,11 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
+  def user_display_name; user&.display_name || name end
+
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && new_status != status
+    return nil if new_status == "waiting" && status == "on_deck" # Don't permit just putting it back into waiting
     # customers can't update their appointment unless it's in line and they're updating to a valid status
     unless updator_kind == "organization_member"
       customer_update_statuses = %w[waiting being_helped abandoned]
@@ -105,12 +108,18 @@ class Appointment < ApplicationRecord
   private
 
   def update_and_move_for_failed_to_find
-    if failed_to_find_attempts.count < after_failed_to_find_removal_count
+    if failed_to_find_attempts.count <= after_failed_to_find_removal_count
       self.status = "waiting"
+      # If we have the exact number of failed_to_find_attempts as the removal count, we want to put the person in the back of the line
+      # Otherwise - put them as the next person before the on_deck people
+      if failed_to_find_attempts.count < after_failed_to_find_removal_count
+        new_position = other_location_appointments.in_line.where.not(status: "on_deck").first
+      end
     else
       self.status = "removed"
     end
+    # Put it as the last record that is around
     # This will save the record
-    move_behind(other_location_appointments.on_deck.last)
+    move_behind(new_position)
   end
 end

@@ -36,7 +36,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:appointment_configuration).permit([:virtual_line_on, :reasons_text])
+      params.require(:appointment_configuration).permit(:virtual_line_on, :reasons_text, :customers_on_deck_count)
     end
   end
 end

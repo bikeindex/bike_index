@@ -68,6 +68,18 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(new_appointment.creator_kind).to eq "no_user"
       expect(new_appointment.appointment_updates.count).to eq 0
     end
+    context "no email" do
+      it "denies" do
+        Sidekiq::Worker.clear_all
+        expect do
+          post base_url, params: {
+            organization_id: current_organization.to_param,
+            appointment: appointment_params.merge(email: " ")
+          }
+        end.to_not change(Appointment, :count)
+        expect(flash[:error]).to be_present
+      end
+    end
     context "current user" do
       include_context :request_spec_logged_in_as_user
       it "creates" do

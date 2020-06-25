@@ -11,7 +11,9 @@ module OrgPublic
 
     def create
       @appointment = Appointment.new(permitted_create_params)
-      if @appointment.save
+      if @appointment.email.blank?
+        flash[:error] = "Email required!"
+      elsif @appointment.save
         flash[:success] = "You're now in line!"
         assign_current_appointment(@appointment)
       else

@@ -23,4 +23,6 @@ class AppointmentUpdate < ApplicationRecord
   def self.update_only_statuses; %w[failed_to_find organization_reordered] end
 
   def update_only_status?; self.class.update_only_statuses.include?(status) end
+
+  def user_display_name; user&.display_name || appointment.name end
 end

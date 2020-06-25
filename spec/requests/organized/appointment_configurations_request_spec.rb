@@ -70,7 +70,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
       end
     end
 
-    describe "updated" do
+    describe "update" do
       it "turns it on" do
         expect(location.appointment_configuration.present?).to be_falsey
         put "#{base_url}/#{location.to_param}", params: {
@@ -78,6 +78,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
                                                   appointment_configuration: {
                                                     virtual_line_on: "true",
                                                     reasons_text: "something, Something ELSE\n aNOTHER,",
+                                                    customers_on_deck_count: "22",
                                                   },
                                                 }
         location.reload
@@ -85,6 +86,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
         appointment_configuration = location.appointment_configuration
         expect(appointment_configuration.virtual_line_on).to be_truthy
         expect(appointment_configuration.reasons).to match_array(["something", "Something ELSE", "aNOTHER"])
+        expect(appointment_configuration.customers_on_deck_count).to eq 22
       end
     end
   end
