@@ -5,8 +5,8 @@ module Organized
     def update
       if params[:status].present?
         appointment_update = @appointment.record_status_update(new_status: params[:status],
-                                          updator_id: current_user.id,
-                                          updator_kind: "organization_member")
+                                                               updator_id: current_user.id,
+                                                               updator_kind: "organization_member")
         if appointment_update.present?
           flash[:success] = "Appointment updated: #{params[:status].humanize}"
         else

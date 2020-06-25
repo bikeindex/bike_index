@@ -67,7 +67,6 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
       location.reload
       current_organization.reload
       expect(location.appointments.count).to eq 1
-      # expect(current_organization.appointments.count).to eq 1
       new_appointment = location.appointments.last
 
       expect(assigns(:current_appointment)).to eq new_appointment

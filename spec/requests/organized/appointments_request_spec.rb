@@ -44,9 +44,9 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       # squeezing in this test here because idgaf
       expect do
         post base_url, params: {
-          organization_id: current_organization.to_param,
-          appointment: appointment_params.merge(email: " ", status: "")
-        }
+                    organization_id: current_organization.to_param,
+                    appointment: appointment_params.merge(email: " ", status: ""),
+                  }
       end.to change(Appointment, :count).by 1
       expect(response).to redirect_to(organization_line_path(location.to_param, organization_id: current_organization.to_param))
       expect(flash[:success]).to be_present
