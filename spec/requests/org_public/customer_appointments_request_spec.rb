@@ -73,9 +73,9 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
         Sidekiq::Worker.clear_all
         expect do
           post base_url, params: {
-                      organization_id: current_organization.to_param,
-                      appointment: appointment_params.merge(email: " "),
-                    }
+                           organization_id: current_organization.to_param,
+                           appointment: appointment_params.merge(email: " "),
+                         }
         end.to_not change(Appointment, :count)
         expect(flash[:error]).to be_present
       end

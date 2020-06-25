@@ -21,7 +21,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
                stripe_token: stripe_token.id,
                stripe_amount: 100,
                stripe_email: current_user.email,
-               stripe_currency: "USD"
+               stripe_currency: "USD",
              }
 
         expect(Payment.count).to eq(1)
@@ -47,7 +47,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
                stripe_token: stripe_token.id,
                stripe_amount: 100,
                stripe_email: current_user.email,
-               stripe_currency: "USD"
+               stripe_currency: "USD",
              }
 
         expect(Payment.count).to eq(0)
@@ -67,7 +67,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
                stripe_token: stripe_token_declined.id,
                stripe_amount: 100,
                stripe_email: current_user.email,
-               stripe_currency: "USD"
+               stripe_currency: "USD",
              }
 
         expect(Payment.count).to eq(0)
