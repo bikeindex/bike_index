@@ -2426,6 +2426,9 @@ nl:
           not_a_member_of_that_org: Je bent geen lid van die organisatie!
         ensure_not_ambassador_organization!:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
+        ensure_access_to_appointments!:
+          must_be_an_admin: Uw organisatie heeft hier geen toegang toe, neem contact
+            op met Bike Index support.
       bikes:
         update:
           unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
@@ -2522,6 +2525,15 @@ nl:
       update:
         cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
           als u denkt dat dit mogelijk zou moeten zijn.
+    org_public:
+      base:
+        ensure_access_to_virtual_line!:
+          location_does_not_have_access: "%{location_name} heeft geen virtuele lijn
+            ingeschakeld, neem contact op met %{org_name}."
+          org_does_not_have_access: "%{org_name} heeft daar geen toegang toe, neem
+            contact op met Bike Index-ondersteuning."
+          unable_to_find_location: Kan de locatie "%{location_id}" voor %{org_name}
+            niet vinden
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4169,6 +4181,8 @@ nl:
       graduated_notifications: Gegradueerde meldingen
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
+      appointment_configuration: Afspraak configuratie
+      virtual_line: Virtuele lijn
     application_bikehub:
       contact: contact
       home: Thuis
@@ -5103,6 +5117,8 @@ nl:
       graduated_notifications: Gegradueerde meldingen
       stolen_hot_sheet: Gestolen Hot Sheet
       stolen_hot_sheet_configuration: Gestolen Hot Sheet-configuratie
+      appointment_configuration: Afspraken configuratie
+      virtual_line: Virtuele lijn
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat

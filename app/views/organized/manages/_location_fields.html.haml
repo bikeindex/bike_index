@@ -34,8 +34,13 @@
               = f.label :publicly_visible
         .col-xs-6
           .remove-control
-            = f.check_box :_destroy, class: "removeFieldsCheck"
-            = f.label :_destroy, t(".remove"), class: 'remove_fields'
+            - if f.object.destroy_forbidden?
+              .text-right
+                %em.small.less-strong
+                  required for appointments
+            - else
+              = f.check_box :_destroy, class: "removeFieldsCheck"
+              = f.label :_destroy, t(".remove"), class: 'remove_fields'
       - if current_organization.enabled?("impound_bikes")
         .checkbox.mb-0.mt-2
           = f.check_box :impound_location, class: "impoundLocationCheck"

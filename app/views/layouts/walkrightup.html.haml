@@ -1,0 +1,48 @@
+!!!
+%html
+  %head
+    = header_tags
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    = javascript_pack_tag "application_standalone"
+    = stylesheet_pack_tag "application_css"
+  %body{ id: page_id, class: "customer-virtual-line-body" }
+    -# TODO translations
+    #customer-virtual-line-wrapper
+      = render "layouts/revised_messages"
+      - if current_organization.present?
+        %h1.virtual-line-header
+          - if current_organization.avatar.present?
+            = image_tag current_organization.avatar_url, alt: "#{current_organization.name} logo"
+          %em
+            = current_organization.name
+          virtual line
+
+      - if current_location.present?
+        .container
+          .row
+            .col-6
+              %h2
+                = pluralize(@appointments_in_line.count, "Person")
+                in line
+            .col-6
+              %h2
+                On deck
+              %ul
+                - @appointments_in_line.on_deck.each do |appointment|
+                  %li= appointment.name
+
+
+      %hr
+      .container.pb-4
+        = yield
+
+    %footer.footer-powered-by-bike-index
+      .container
+        .clearfix
+          .float-right
+            %h2 powered by
+            %a.primary-logo{ href: user_root_url }
+              = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
+            = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
+              the non-profit bike registry
+

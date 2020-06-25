@@ -1,0 +1,64 @@
+-# TODO translations
+- if @appointment.id.present?
+  - if @appointment.on_deck?
+    .row
+      .col-sm-8.offset-sm-2
+        .alert.alert-success
+          %h4 You are on deck!
+          %p
+            Please return to the front of the store,
+            %strong you could be called at any time.
+          %p
+            If you don't answer when called, you will be put back in line, and if not around when this happens again, removed from the line!
+  = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.link_token, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
+    .row
+      .form-group.col-sm-6
+        = f.label :name, "Your name"
+        = f.text_field :name, required: true, class: "form-control"
+      .form-group.col-sm-6
+        = f.label :email, "Your email"
+        = f.email_field :email, required: true, class: "form-control"
+    .row.collapse.show.updateLineStatusCollapse
+      .form-group.col-sm-6
+        = f.label :description, "Additional description"
+        = f.text_area :description, class: "form-control", col: 3
+      .form-group.col-sm-6
+        = f.label :reason, "Main reason for visit"
+        = f.select :reason, @appointment.permitted_reasons, {}, class: "form-control"
+    .row
+      .col-sm-6
+        %p
+          %a#updateLineStatus{ href: "#" }
+            No longer in line?
+          %small.less-strong
+            Let
+            %em= current_organization.short_name
+            know
+        .collapse.updateLineStatusCollapse
+          .form-group
+            = f.label :status, "Where are you?"
+            - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "abandoned"]]
+            -# Only add on_deck status if the user is on deck, because users can't switch to be there
+            -# valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
+            = f.select :status, valid_update_statuses, {}, class: "form-control"
+      .form-group.col-sm-6.text-center
+        %label.d-block &nbsp;
+        = f.submit "Update appointment!", class: "btn btn-success"
+
+- else
+  = form_for @appointment, { as: :appointment, url: organization_customer_appointments_path(organization_id: current_organization.to_param, location_id: current_location&.id), action: "create", method: "POST" } do |f|
+    = f.hidden_field :location_id, value: current_location&.id
+    .row
+      .form-group.col-sm-6
+        = f.label :name, "Your name"
+        = f.text_field :name, required: true, class: "form-control"
+      .form-group.col-sm-6
+        = f.label :email, "Your email"
+        = f.email_field :email, required: true, class: "form-control"
+    .row
+      .form-group.col-sm-6
+        = f.label :reason, "Main reason for visit"
+        = f.select :reason, @appointment.permitted_reasons, {}, class: "form-control"
+      .form-group.col-sm-6.text-center
+        %label.d-block &nbsp;
+        = f.submit "Get in line!", class: "btn btn-success"

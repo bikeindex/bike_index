@@ -230,7 +230,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 params: {
                   organization_id: current_organization.to_param,
                   id: current_organization.to_param,
-                  organization: { kind: "property_management", short_name: "cool short name" }
+                  organization: { kind: "property_management", short_name: "cool short name" },
                 }
 
             expect(assigns[:page_errors]).to be_present
@@ -241,8 +241,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         end
 
         context "removing a location" do
+          before { update_attributes[:locations_attributes]["0"][:_destroy] = 1 }
           it "removes the location" do
-            update_attributes[:locations_attributes]["0"][:_destroy] = 1
             expect(location1).to be_present
             expect(current_organization.locations.count).to eq 1
 
@@ -251,9 +251,9 @@ RSpec.describe Organized::ManagesController, type: :request do
                   params: {
                     organization_id: current_organization.to_param,
                     id: current_organization.to_param,
-                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
                   }
-            # Because we added 1 location and deleted 1 location
+              # Because we added 1 location and deleted 1 location
             end.to change(Location, :count).by 0
 
             current_organization.reload
@@ -267,11 +267,33 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location.longitude).to be_within(0.1).of(-74.0)
             expect(current_organization.to_coordinates).to eq location.to_coordinates
           end
+          context "location has appointment_configuration" do
+            let!(:appointment_configuration) { FactoryBot.create(:appointment_configuration, location: location1, organization: current_organization, virtual_line_on: true) }
+            it "does not remove" do
+              location1.reload
+              expect(location1).to be_present
+              expect(location1.virtual_line_on?).to be_truthy
+              expect(location1.destroy_forbidden?).to be_truthy
+              expect(current_organization.locations.count).to eq 1
+
+              expect do
+                put base_url,
+                    params: {
+                      organization_id: current_organization.to_param,
+                      id: current_organization.to_param,
+                      organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
+                    }
+              end.to raise_error(/appointment/)
+
+              current_organization.reload
+              expect(Location.where(id: location1.id).count).to eq 1
+            end
+          end
         end
 
         context "only updating location" do
           let(:update_attributes) do
-           {
+            {
               created_at: Time.current.to_f.to_s,
               name: "new shop",
               zipcode: "60608",
@@ -281,7 +303,7 @@ RSpec.describe Organized::ManagesController, type: :request do
               street: "1300 W 14th Pl",
               phone: "7272772727272",
               email: "stuff@goooo.com",
-              publicly_visible: false
+              publicly_visible: false,
             }
           end
           let(:state) { FactoryBot.create(:state_illinois) }
@@ -295,11 +317,11 @@ RSpec.describe Organized::ManagesController, type: :request do
               Sidekiq::Testing.inline! do
                 expect do
                   patch base_url,
-                      params: {
-                        organization_id: current_organization.to_param,
-                        id: current_organization.to_param,
-                        organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } }
-                      }
+                        params: {
+                          organization_id: current_organization.to_param,
+                          id: current_organization.to_param,
+                          organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } },
+                        }
                 end.to change(Location, :count).by 1
               end
             end

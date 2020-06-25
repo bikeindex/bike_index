@@ -25,6 +25,7 @@ class Organization < ApplicationRecord
   }.freeze
 
   acts_as_paranoid
+
   mount_uploader :avatar, AvatarUploader
 
   belongs_to :parent_organization, class_name: "Organization"
@@ -51,6 +52,8 @@ class Organization < ApplicationRecord
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
+  has_many :appointment_configurations, through: :locations
+  has_many :appointments
   has_one :hot_sheet_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
@@ -62,6 +65,7 @@ class Organization < ApplicationRecord
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator
 
@@ -156,6 +160,8 @@ class Organization < ApplicationRecord
 
   def to_param; slug end
 
+  def landing_html?; landing_html.present? end
+
   def restrict_invitations?; !enabled?("passwordless_users") && !passwordless_user_domain.present? end
 
   def sent_invitation_count; memberships.count end
@@ -176,6 +182,8 @@ class Organization < ApplicationRecord
   def display_avatar?; is_paid && avatar.present? end
 
   def suspended?; is_suspended? end
+
+  def appointment_functionality_enabled?; any_enabled?(PaidFeature::APPOINTMENT_FEATURES) end
 
   def hot_sheet_on?; hot_sheet_configuration.present? && hot_sheet_configuration.on? end
 

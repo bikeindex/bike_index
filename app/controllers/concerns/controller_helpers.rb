@@ -6,8 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path, :bikehub_url, :show_general_alert
+                  :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
+                  :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert
     before_action :enable_rack_profiler
 
     before_action do
@@ -95,6 +95,11 @@ module ControllerHelpers
 
   def default_bike_search_path
     bikes_path(stolenness: "all")
+  end
+
+  def ensure_current_organization!
+    return true if current_organization.present?
+    fail ActiveRecord::RecordNotFound
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
@@ -225,6 +230,18 @@ module ControllerHelpers
     # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
     return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
     set_passive_organization(@current_organization)
+  end
+
+  def current_location
+    # We call this multiple times - make sure nil stays nil
+    return @current_location if defined?(@current_location)
+    return @current_location = nil unless current_organization.present?
+    if params[:location_id].present?
+      @current_location = current_organization.locations.friendly_find(params[:location_id])
+    elsif current_organization.locations.count == 1 # If there is only one location, just use that one
+      @current_location = current_organization.locations.first if current_organization
+    end
+    @current_location ||= nil
   end
 
   def current_user

@@ -2,10 +2,14 @@ class Location < ApplicationRecord
   include Geocodeable
 
   acts_as_paranoid
+
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
   belongs_to :state
+
   has_many :bikes
+  has_one :appointment_configuration
+  has_many :appointments
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -18,8 +22,12 @@ class Location < ApplicationRecord
 
   before_save :set_calculated_attributes
   after_commit :update_associations
+  before_destroy :ensure_destroy_permitted!
 
   attr_accessor :skip_update
+
+  # For now, doesn't do anything - but eventually we may switch to slugged locations, so prep for it
+  def self.friendly_find(str); find_by_id(str) end
 
   def other_organization_locations; Location.where(organization_id: organization_id).where.not(id: id) end
 
@@ -29,7 +37,13 @@ class Location < ApplicationRecord
 
   def publicly_visible; !not_publicly_visible end
 
-  def publicly_visible=(val); self.not_publicly_visible = !ParamsNormalizer.boolean(val) end
+  def virtual_line_on?; appointment_configuration.present? && appointment_configuration.virtual_line_on? end
+
+  def destroy_forbidden?; virtual_line_on? end # may also block if it's had appointments
+
+  def publicly_visible=(val)
+    self.not_publicly_visible = !ParamsNormalizer.boolean(val)
+  end
 
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(self.phone)
@@ -47,11 +61,19 @@ class Location < ApplicationRecord
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update(updated_at: Time.current)
+    # Just in case this changed something here
+    LocationAppointmentsQueueWorker.perform_async(id)
   end
 
   def display_name
     return "" if organization.blank?
     name == organization.name ? name : "#{organization.name} - #{name}"
+  end
+
+  # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
+  def ensure_destroy_permitted!
+    return true unless destroy_forbidden?
+    raise StandardError, "Can't destroy a location with appointments enabled"
   end
 
   private

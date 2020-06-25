@@ -7,7 +7,7 @@
   .col-md-6
     %ul
       %li.nav-item
-        = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link"
+        = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-outline-success btn-sm"
   %p.subtitle
     View #{link_to @organization.name, admin_organization_path(@organization.to_param)} admin page
 

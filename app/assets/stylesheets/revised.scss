@@ -358,7 +358,7 @@ body {
 
 .float-left,
 .pull-left {
-  float: right;
+  float: left;
 }
 
 .text-right {
@@ -394,7 +394,6 @@ body {
 .text-underline {
   text-decoration: underline;
 }
-
 
 // Taken from bootstrap 4.3.1
 //

@@ -1,8 +1,9 @@
 class Bike < ApplicationRecord
-  acts_as_paranoid without_default_scope: true
   include ActiveModel::Dirty
   include BikeSearchable
   include Geocodeable
+
+  acts_as_paranoid without_default_scope: true
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker

@@ -1588,6 +1588,15 @@ en:
       applications:
         ensure_app_owner!:
           not_your_application: That isn't your application
+    org_public:
+      base:
+        ensure_access_to_virtual_line!:
+          location_does_not_have_access: >-
+            %{location_name} doesn't have virtual line turned on, please contact %{org_name}.
+          org_does_not_have_access: "%{org_name} doesn't have access to that, please
+            contact Bike Index support."
+          unable_to_find_location: Unable to find the location "%{location_id}" for
+            %{org_name}
     organizations:
       create:
         organization_created: Organization Created successfully!
@@ -1612,6 +1621,10 @@ en:
           could_not_update: Could not update activity status. Please try again later.
           status_updated: Activity status updated.
       base:
+        ensure_access_to_appointments!:
+          must_be_an_admin: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
         ensure_admin!:
           must_be_org_admin: You have to be an organization administrator to do that!
         ensure_ambassador_authorized!:
@@ -3688,6 +3701,7 @@ en:
     application:
       about: About
       add_a_bike: Add a bike
+      appointment_configuration: Appointments configuration
       blog: Blog
       customize_emails: Customize emails
       discuss: Discuss
@@ -3721,6 +3735,7 @@ en:
       user_settings: "%{user_email} settings"
       users: Users
       view_org: View %{org_name}
+      virtual_line: Virtual line
       your_bikes: Your bikes
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
@@ -5052,6 +5067,7 @@ en:
         Bike Index provides additional features for verified Law Enforcement organizations.
         Please contact %{email_link} to get them enabled.
       admin_panel: Admin Panel
+      appointment_configuration: Appointments config
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports
@@ -5091,6 +5107,7 @@ en:
       viewing_our_streamlined_page: >-
         You're currently viewing our streamlined Bike Shop registration page, which
         is what we recommend using
+      virtual_line: Virtual line
     period_select:
       all: All
       custom: custom
