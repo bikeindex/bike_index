@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -203,7 +203,7 @@ CREATE TABLE public.appointment_updates (
     id bigint NOT NULL,
     appointment_id bigint,
     user_id bigint,
-    creator_type integer,
+    creator_kind integer,
     status integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -242,7 +242,7 @@ CREATE TABLE public.appointments (
     name character varying,
     email character varying,
     link_token text,
-    creator_type integer,
+    creator_kind integer,
     kind integer,
     status integer,
     reason character varying,

@@ -16,7 +16,7 @@ class AppointmentUpdate < ApplicationRecord
   validates_presence_of :appointment_id
 
   enum status: STATUS_ENUM
-  enum creator_type: Appointment::CREATOR_TYPE_ENUM
+  enum creator_kind: Appointment::CREATOR_KIND_ENUM
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 

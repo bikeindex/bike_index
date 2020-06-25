@@ -60,20 +60,20 @@ module OrgPublic
         .merge(organization_id: current_organization.id,
                status: "waiting",
                user_id: current_user&.id,
-               creator_type: current_user.present? ? "signed_in_user" : "no_user")
+               creator_kind: current_user.present? ? "signed_in_user" : "no_user")
     end
 
     def permitted_update_params
       params.require(:appointment)
         .permit(:email, :name, :reason, :description)
-        .merge(organization_id: current_organization.id)
+        .merge(organization_id: current_organization.id, skip_update: true)
     end
 
     def status_update_params
       {
         new_status: params.dig(:appointment, :status),
         updator_id: current_user&.id,
-        updator_type: current_user.present? ? "signed_in_user" : "no_user",
+        updator_kind: current_user.present? ? "signed_in_user" : "no_user",
       }
     end
   end

@@ -65,7 +65,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(new_appointment.reason).to eq appointment_params[:reason]
       expect(new_appointment.location_id).to eq location.id
       expect(new_appointment.organization_id).to eq current_organization.id
-      expect(new_appointment.creator_type).to eq "no_user"
+      expect(new_appointment.creator_kind).to eq "no_user"
       expect(new_appointment.appointment_updates.count).to eq 0
     end
     context "current user" do
@@ -87,7 +87,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
         expect(new_appointment.reason).to eq appointment_params[:reason]
         expect(new_appointment.location_id).to eq location.id
         expect(new_appointment.organization_id).to eq current_organization.id
-        expect(new_appointment.creator_type).to eq "signed_in_user"
+        expect(new_appointment.creator_kind).to eq "signed_in_user"
         expect(new_appointment.user).to eq current_user
         expect(new_appointment.appointment_updates.count).to eq 0
       end

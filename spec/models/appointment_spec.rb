@@ -61,10 +61,10 @@ RSpec.describe Appointment, type: :model do
     let(:og_status) { "waiting" }
     let(:new_status) { "on_deck" }
 
-    def expect_no_update(appt, og_status, new_status, updator_id, updator_type)
+    def expect_no_update(appt, og_status, new_status, updator_id, updator_kind)
       Sidekiq::Worker.clear_all
       expect do
-        result = appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_type: updator_type)
+        result = appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_kind: updator_kind)
         expect(result).to be_blank
       end.to_not change(AppointmentUpdate, :count)
       expect(LocationAppointmentsQueueWorker.jobs.count).to eq 0
@@ -72,17 +72,17 @@ RSpec.describe Appointment, type: :model do
       expect(appt.status).to eq(og_status)
     end
 
-    def expect_update(appt, og_status, new_status, updator_id, updator_type, target_update_status = nil)
+    def expect_update(appt, og_status, new_status, updator_id, updator_kind, target_update_status = nil)
       Sidekiq::Worker.clear_all
       expect do
-        appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_type: updator_type)
+        appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_kind: updator_kind)
       end.to change(AppointmentUpdate, :count).by 1
       expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
 
       appointment_update = AppointmentUpdate.last
       expect(appointment_update.appointment_id).to eq appt.id
       expect(appointment_update.user_id).to eq updator_id
-      expect(appointment_update.creator_type).to eq updator_type
+      expect(appointment_update.creator_kind).to eq updator_kind
       expect(appointment_update.status).to eq new_status
 
       appt.reload
@@ -96,40 +96,40 @@ RSpec.describe Appointment, type: :model do
     end
 
     context "no_user" do
-      let(:updator_type) { "no_user" }
+      let(:updator_kind) { "no_user" }
       let(:updator_id) { nil }
       it "does not record on_deck update" do
-        expect_no_update(appointment, og_status, new_status, updator_id, updator_type)
+        expect_no_update(appointment, og_status, new_status, updator_id, updator_kind)
       end
       context "new_status being_helped" do
         let(:new_status) { "being_helped" }
         it "updates" do
-          expect_update(appointment, og_status, new_status, updator_id, updator_type)
+          expect_update(appointment, og_status, new_status, updator_id, updator_kind)
         end
       end
       context "status being_helped" do
         let(:og_status) { "being_helped" }
         let(:new_status) { "waiting" }
         it "does not record on_deck update" do
-          expect_no_update(appointment, og_status, new_status, updator_id, updator_type)
+          expect_no_update(appointment, og_status, new_status, updator_id, updator_kind)
         end
       end
     end
     context "signed_in_user" do
-      let(:updator_type) { "signed_in_user" }
+      let(:updator_kind) { "signed_in_user" }
       let(:updator_id) { FactoryBot.create(:user).id }
       it "does not record on_deck update" do
-        expect_no_update(appointment, og_status, new_status, updator_id, updator_type)
+        expect_no_update(appointment, og_status, new_status, updator_id, updator_kind)
       end
       context "new_status abandoned" do
         let(:new_status) { "abandoned" }
         it "updates" do
-          expect_update(appointment, og_status, new_status, updator_id, updator_type)
+          expect_update(appointment, og_status, new_status, updator_id, updator_kind)
         end
       end
     end
     context "organization_member" do
-      let(:updator_type) { "organization_member" }
+      let(:updator_kind) { "organization_member" }
       let(:updator_id) { 12 } # We aren't verifying that it's an org member in this method
       let(:appointment_on_deck) do
         FactoryBot.create(:appointment,
@@ -143,7 +143,7 @@ RSpec.describe Appointment, type: :model do
           appointment.reload
           appointment_on_deck.reload
           expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
-          expect_update(appointment, og_status, new_status, updator_id, updator_type)
+          expect_update(appointment, og_status, new_status, updator_id, updator_kind)
           # Because we've reordered
           expect(appointment_on_deck.line_entry_timestamp).to be > appointment.line_entry_timestamp
           location.reload
@@ -156,7 +156,7 @@ RSpec.describe Appointment, type: :model do
           expect(appointment.after_failed_to_find_removal_count).to eq 2
           expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
           # NOTE: Passing appointment_on_deck, not appointment
-          appointment_update = expect_update(appointment_on_deck, og_status, new_status, updator_id, updator_type, "waiting")
+          appointment_update = expect_update(appointment_on_deck, og_status, new_status, updator_id, updator_kind, "waiting")
           # Because we've reordered!
           appointment.reload
           appointment_on_deck.reload

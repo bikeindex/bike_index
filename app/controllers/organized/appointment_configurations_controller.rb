@@ -25,14 +25,6 @@ module Organized
 
     private
 
-    def ensure_access_to_appointments!
-      # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
-      return true if current_user.superuser? || current_organization.appointment_functionality_enabled?
-
-      flash[:error] = translation(:org_does_not_have_access)
-      redirect_to organization_root_path and return
-    end
-
     def find_appointment_configuration
       @location = current_organization.locations.friendly_find(params[:id])
       fail ActiveRecord::RecordNotFound unless @location.present?

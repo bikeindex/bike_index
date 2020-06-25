@@ -2,8 +2,6 @@ module Organized
   class AppointmentsController < Organized::AdminController
     before_action :find_appointment, except: [:create]
 
-    def show; end
-
     def update
     end
 

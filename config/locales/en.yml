@@ -1632,6 +1632,9 @@ en:
           not_a_member_of_that_org: You're not a member of that organization!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
+        ensure_access_to_appointments!:
+          must_be_an_admin: Your organization doesn't have access to that, please contact Bike Index
+            support.
       bikes:
         update:
           unknown_update_action: Unknown update action. Please contact support@bikeindex.org
@@ -3707,6 +3710,7 @@ en:
       graduated_notifications: Graduated notifications
       help: Help
       impounded_bikes: Impounded Bikes
+      virtual_line: Virtual line
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       log_in: log in
@@ -5074,6 +5078,7 @@ en:
       how_integration_works: how the integration works
       impounded_bikes: Impounded
       incomplete_registrations: Incomplete registrations
+      virtual_line: Virtual line
       integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
       integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
       lightspeed_integration_panel: Lightspeed Integration Panel

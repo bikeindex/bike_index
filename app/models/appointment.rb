@@ -1,6 +1,6 @@
 class Appointment < ApplicationRecord
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
-  CREATOR_TYPE_ENUM = { no_user: 0, signed_in_user: 1, organization_member: 2 }
+  CREATOR_KIND_ENUM = { no_user: 0, signed_in_user: 1, organization_member: 2 }
 
   belongs_to :organization
   belongs_to :location
@@ -16,7 +16,7 @@ class Appointment < ApplicationRecord
 
   enum status: AppointmentUpdate::STATUS_ENUM
   enum kind: KIND_ENUM
-  enum creator_type: CREATOR_TYPE_ENUM
+  enum creator_kind: CREATOR_KIND_ENUM
 
   attr_accessor :skip_update
 
@@ -46,14 +46,14 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
-  def record_status_update(updator_type:, updator_id: nil, new_status: nil)
+  def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && new_status != status
-    unless updator_type == "organization_member" # If it's not an org update, restrict available status updates
-      # customers can't update their appointment unless it's in line and they're updating to a valid status
+    # customers can't update their appointment unless it's in line and they're updating to a valid status
+    unless updator_kind == "organization_member"
       customer_update_statuses = %w[waiting being_helped abandoned]
       return nil unless in_line? && customer_update_statuses.include?(new_status)
     end
-    new_update = appointment_updates.create(creator_type: updator_type, user_id: updator_id, status: new_status)
+    new_update = appointment_updates.create(creator_kind: updator_kind, user_id: updator_id, status: new_status)
 
     # We aren't doing anything for the other update_only_statuses, except failed to find, but seems reasonable to skip
     self.status = new_status unless AppointmentUpdate.update_only_statuses.include?(new_status)
