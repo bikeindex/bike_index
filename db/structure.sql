@@ -203,7 +203,7 @@ CREATE TABLE public.appointment_updates (
     id bigint NOT NULL,
     appointment_id bigint,
     user_id bigint,
-    creator_type integer,
+    creator_kind integer,
     status integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -242,12 +242,12 @@ CREATE TABLE public.appointments (
     name character varying,
     email character varying,
     link_token text,
-    creator_type integer,
+    creator_kind integer,
     kind integer,
     status integer,
     reason character varying,
     description text,
-    appointment_time timestamp without time zone,
+    line_entry_timestamp integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

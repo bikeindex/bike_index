@@ -38,7 +38,7 @@ module OrganizedHelper
   end
 
   def organized_container
-    return "container-fluid" if %w[parking_notifications impound_records graduated_notifications].include?(controller_name)
+    return "container-fluid" if %w[parking_notifications impound_records graduated_notifications lines].include?(controller_name)
     controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
   end
 
@@ -55,7 +55,7 @@ module OrganizedHelper
   def status_display(status)
     status_str = status.gsub("_", " ")
     case status.downcase
-    when "current"
+    when "current", "on_deck"
       content_tag(:span, status_str, class: "text-success")
     when /retrieved/
       content_tag(:span, status_str, class: "text-info")

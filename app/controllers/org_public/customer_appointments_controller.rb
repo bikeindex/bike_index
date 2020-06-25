@@ -11,7 +11,9 @@ module OrgPublic
 
     def create
       @appointment = Appointment.new(permitted_create_params)
-      if @appointment.save
+      if @appointment.email.blank?
+        flash[:error] = "Email required!"
+      elsif @appointment.save
         flash[:success] = "You're now in line!"
         assign_current_appointment(@appointment)
       else
@@ -25,6 +27,7 @@ module OrgPublic
       if @appointment.removed?
         flash[:error] = "We're sorry, that appointment has been removed"
       elsif @appointment.update(permitted_update_params)
+        @appointment.record_status_update(status_update_params)
         assign_current_appointment(@appointment)
         flash[:success] = "Update successful"
       else
@@ -59,26 +62,21 @@ module OrgPublic
         .merge(organization_id: current_organization.id,
                status: "waiting",
                user_id: current_user&.id,
-               creator_type: current_user.present? ? "signed_in_user" : "no_user")
+               creator_kind: current_user.present? ? "signed_in_user" : "no_user")
     end
 
     def permitted_update_params
       params.require(:appointment)
         .permit(:email, :name, :reason, :description)
-        .merge(organization_id: current_organization.id,
-               status: permitted_update_status(params.dig(:appointment, :status)))
+        .merge(organization_id: current_organization.id, skip_update: true)
     end
 
-    def permitted_update_status(update_status)
-      return update_status if @appointment.status == update_status
-      user_permitted_updates = %w[waiting being_helped abandoned]
-      if @appointment.in_line? && user_permitted_updates.include?(update_status)
-        @appointment.appointment_updates.create(status: update_status,
-                                                user_id: current_user&.id,
-                                                creator_type: (current_user.present? ? "signed_in_user" : "no_user"))
-        return update_status
-      end
-      @appointment.status # fallback to current status
+    def status_update_params
+      {
+        new_status: params.dig(:appointment, :status),
+        updator_id: current_user&.id,
+        updator_kind: current_user.present? ? "signed_in_user" : "no_user",
+      }
     end
   end
 end

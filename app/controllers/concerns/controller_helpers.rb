@@ -241,7 +241,7 @@ module ControllerHelpers
     elsif current_organization.locations.count == 1 # If there is only one location, just use that one
       @current_location = current_organization.locations.first if current_organization
     end
-    @current_location
+    @current_location ||= nil
   end
 
   def current_user

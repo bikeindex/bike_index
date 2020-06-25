@@ -42,5 +42,14 @@ module Organized
                                   scope: [:controllers, :organized, :base, __method__])
       redirect_to organization_root_path and return
     end
+
+    def ensure_access_to_appointments!
+      # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
+      return true if current_user.superuser? || current_organization.appointment_functionality_enabled?
+
+      flash[:error] = translation(:org_does_not_have_access,
+                                  scope: [:controllers, :organized, :base, __method__])
+      redirect_to organization_root_path and return
+    end
   end
 end

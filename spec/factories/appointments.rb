@@ -6,7 +6,7 @@ FactoryBot.define do
     sequence(:name) { |n| "some name #{n}" }
     reason { AppointmentConfiguration.default_reasons.first }
     status { "waiting" }
-    creator_type { "no_user" }
+    creator_kind { "no_user" }
     # This is useful for controller specs that require that the organization have things enabled
     factory :appointment_with_virtual_line_on do
       location { FactoryBot.create(:location, :with_virtual_line_on) }
