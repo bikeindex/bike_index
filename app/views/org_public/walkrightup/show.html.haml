@@ -1,4 +1,15 @@
+
 - if @appointment.id.present?
+  - if @appointment.on_deck?
+    .row
+      .col-sm-8.offset-sm-2
+        .alert.alert-success
+          %h4 You are on deck!
+          %p
+            Please return to the front of the store,
+            %strong you could be called at any time.
+          %p
+            If you don't answer when called, you will be put back in line, and if not around when this happens again, removed from the line!
   = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.link_token, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
     .row
       .form-group.col-sm-6
