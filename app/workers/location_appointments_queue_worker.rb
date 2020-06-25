@@ -1,4 +1,3 @@
-
 class LocationAppointmentsQueueWorker < ApplicationWorker
   sidekiq_options queue: "high_priority", retry: 1
 
@@ -14,9 +13,11 @@ class LocationAppointmentsQueueWorker < ApplicationWorker
       appointment = location.appointments.in_line[i]
       current_on_deck_ids << appointment.id
       next if appointment.status == "on_deck"
+      # TODO: make this record an update - because the update is what will trigger notification
       appointment.update(status: "on_deck", skip_update: true)
     end
     location.reload
+    # TODO: make this record an update
     location.appointments.on_deck.where.not(id: current_on_deck_ids)
       .update_all(status: "waiting")
   end

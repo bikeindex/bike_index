@@ -107,6 +107,7 @@ class Appointment < ApplicationRecord
 
   private
 
+  # TODO: better test this
   def update_and_move_for_failed_to_find
     if failed_to_find_attempts.count <= after_failed_to_find_removal_count
       self.status = "waiting"
