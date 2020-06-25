@@ -27,7 +27,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
 
   describe "set_current" do
     it "redirects" do
-      post "#{base_url}/set_current", params: { token: appointment.link_token }
+      post "#{base_url}/set_current", params: { appointment_token: appointment.link_token }
       expect(assigns(:current_location)).to eq location
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:passive_organization)).to be_blank # because user isn't signed in

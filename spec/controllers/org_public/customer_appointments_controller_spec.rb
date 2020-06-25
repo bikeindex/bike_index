@@ -15,18 +15,18 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
       location.reload
       expect(location.virtual_line_on?).to be_truthy
       session[:appointment_token] = nil
-      post :set_current, params: { organization_id: current_organization.to_param, token: appointment.link_token }
+      post :set_current, params: { organization_id: current_organization.to_param, appointment_token: appointment.link_token }
       expect(assigns(:current_appointment)).to eq appointment
       expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       expect(flash).to be_blank
       expect(session[:appointment_token]).to eq appointment.link_token
     end
     context "appointment_token in session" do
-      it "falls back to the session appointment, flash errors" do
+      it "falls back to the session appointment, flash errors, doesn't overwrite existing appointment" do
         session[:appointment_token] = appointment.link_token
-        post :set_current, params: { organization_id: current_organization.to_param, token: "fasdfffdsf", location_id: location.to_param }
+        post :set_current, params: { organization_id: current_organization.to_param, appointment_token: "fasdfffdsf", location_id: location.to_param }
         expect(flash[:error]).to be_present
-        session[:appointment_token] = appointment.link_token
+        expect(session[:appointment_token]).to eq appointment.link_token
         expect(assigns(:current_appointment)).to be_blank
         expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
       end
@@ -38,7 +38,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
           post :set_current, params: {
                                organization_id: current_organization.to_param,
                                location_id: appointment2.location_id,
-                               token: appointment.link_token,
+                               appointment_token: appointment.link_token,
                              }
           expect(session[:appointment_token]).to eq appointment.link_token
           expect(assigns(:current_appointment)).to eq appointment

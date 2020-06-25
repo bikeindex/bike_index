@@ -1,7 +1,8 @@
 module OrgPublic
   class CustomerAppointmentsController < OrgPublic::BaseController
-    # If a user has a link to an appointment, render it - even if the org no longer has the functionality enabled
+    # If a user has a link to an appointment, permit it - even if the org no longer has the functionality enabled
     before_action :find_appointment_and_redirect, only: [:show, :set_current]
+    before_action :find_appointment, only: [:update]
 
     layout "customer_virtual_line"
 
@@ -23,7 +24,6 @@ module OrgPublic
     end
 
     def update
-      @appointment = current_organization.appointments.find_by_link_token(params[:id])
       if @appointment.removed?
         flash[:error] = "We're sorry, that appointment has been removed"
       elsif @appointment.update(permitted_update_params)
@@ -43,9 +43,13 @@ module OrgPublic
                                     location_id: current_appointment&.location&.to_param || current_location&.to_param)
     end
 
+    def find_appointment
+      @appointment_token = params[:appointment_token] || params[:id]
+      @appointment ||= current_organization.appointments.find_by_link_token(@appointment_token)
+    end
+
     def find_appointment_and_redirect
-      @token = params[:token] || params[:id]
-      @appointment ||= current_organization.appointments.find_by_link_token(@token)
+      find_appointment
       if @appointment.present?
         # Only assign if the appointment is present, so we don't lose the existing one
         assign_current_appointment(@appointment)

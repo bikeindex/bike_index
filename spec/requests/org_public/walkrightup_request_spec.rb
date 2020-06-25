@@ -80,12 +80,12 @@ RSpec.describe OrgPublic::WalkrightupController, type: :request do
           expect(assigns(:passive_organization)).to be_blank # because user isn't signed in
         end
       end
-      context "with token" do
+      context "with appointment_token" do
         let(:appointment) { FactoryBot.create(:appointment, organization: current_organization) }
         it "renders with the appointment" do
           expect(appointment.location_id).to eq location.id
           expect(appointment.in_line?).to be_truthy
-          get "#{base_url}?token=#{appointment.link_token}"
+          get "#{base_url}?appointment_token=#{appointment.link_token}"
           expect(response.status).to eq(200)
           expect(response).to render_template :show
           expect(assigns(:current_location)).to eq location
@@ -96,7 +96,7 @@ RSpec.describe OrgPublic::WalkrightupController, type: :request do
           let(:appointment) { FactoryBot.create(:appointment, organization: current_organization, status: "being_helped") }
           it "renders with a new appointment" do
             expect(appointment.location_id).to eq location.id
-            get "#{base_url}?token=#{appointment.link_token}"
+            get "#{base_url}?appointment_token=#{appointment.link_token}"
             expect(response.status).to eq(200)
             expect(response).to render_template :show
             expect(assigns(:current_location)).to eq location
