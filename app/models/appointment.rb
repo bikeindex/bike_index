@@ -1,6 +1,6 @@
 class Appointment < ApplicationRecord
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
-  CREATOR_KIND_ENUM = { no_user: 0, signed_in_user: 1, organization_member: 2 }
+  CREATOR_KIND_ENUM = { no_user: 0, signed_in_user: 1, organization_member: 2 } # Probably move this to update, like status
 
   belongs_to :organization
   belongs_to :location
