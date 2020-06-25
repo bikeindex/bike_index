@@ -13,7 +13,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(location.virtual_line_on?).to be_truthy
       expect(appointment.link_token).to be_present
       get "#{base_url}/#{appointment.id}"
-      expect(response).to redirect_to organization_walkrightup_path(organization_id: current_organization.to_param)
+      expect(response).to redirect_to organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param)
       expect(flash[:error]).to be_present
 
       get "#{base_url}/#{appointment.link_token}"
