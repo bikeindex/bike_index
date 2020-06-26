@@ -149,6 +149,8 @@ class User < ApplicationRecord
 
   def display_name; name.present? ? name : email end
 
+  def first_display_name; display_name.split(" ")&.first end
+
   def donations; payments.sum(:amount_cents) end
 
   def donor?; donations > 900 end

@@ -26,7 +26,7 @@
         %ol
           - @appointments_in_line.each do |appointment|
             %li
-              = appointment.first_user_display_name
+              = appointment.first_display_name
               - if appointment.status == "paging"
                 %span.text-warning #{current_organization.short_name} is ready for them!
               - elsif appointment.status == "on_deck"

@@ -73,7 +73,7 @@
               = appointment.name
               - if appointment.organization_member?
                 %small.less-strong
-                  added by #{appointment.first_user_display_name}
+                  added by #{appointment.user&.first_display_name}
             %td
               - if appointment.waiting?
                 %span.less-strong in line
@@ -97,7 +97,7 @@
                           %em customer
                         - elsif appointment_update.user_id.present?
                           by
-                          %em= appointment_update.first_user_display_name
+                          %em= appointment_update.user&.first_display_name
             %td
               = appointment.reason
               - if appointment.description.present?

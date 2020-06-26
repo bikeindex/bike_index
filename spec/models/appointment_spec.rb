@@ -18,6 +18,20 @@ RSpec.describe Appointment, type: :model do
     end
   end
 
+  describe "first_display_name" do
+    let(:user) { FactoryBot.create(:user, name: "fuck off") }
+    let(:appointment) { Appointment.new(name: "nigger bitch") }
+    it "removes offensive things" do
+      expect(appointment.name).to eq "nigger bitch"
+      expect(appointment.display_name).to eq "nigger bitch"
+      expect(appointment.first_display_name).to eq "******"
+      appointment.name = ""
+      expect(appointment.name).to eq ""
+      expect(appointment.display_name).to eq "fuck off"
+      expect(appointment.first_display_name).to eq "****"
+    end
+  end
+
   context "existing appointments" do
     let(:appt1_status) { "waiting" }
     let(:appt3_status) { "waiting" }
