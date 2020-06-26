@@ -27,7 +27,7 @@ export default class BinxAppOrgParkingNotifications {
 
   initializeRepeatSubmit() {
     const indexView = this.indexView;
-    $("#sendRepeatOrRetrieveFields select").on("change", function(e) {
+    $("#sendRepeatOrRetrieveFields select").on("change", function (e) {
       const pluralText = indexView ? "s" : "";
       const submitText =
         $("#sendRepeatOrRetrieveFields select").val() == "mark_retreived"
@@ -37,13 +37,13 @@ export default class BinxAppOrgParkingNotifications {
     });
 
     // We're letting bootstrap handle the collapsing of the row, make sure to not block
-    $("#toggleSendRepeat").on("click", function(e) {
+    $("#toggleSendRepeat").on("click", function (e) {
       $("#toggleSendRepeat").slideUp();
       $(".multiselect-cell").slideDown();
       return true;
     });
 
-    $("#selectAllSelector").on("click", function(e) {
+    $("#selectAllSelector").on("click", function (e) {
       e.preventDefault();
       window.toggleAllChecked = !window.toggleAllChecked;
       $(".multiselect-cell input").prop("checked", window.toggleAllChecked);
