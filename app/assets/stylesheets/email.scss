@@ -17,7 +17,7 @@ $email-light-bg: #dddddd;
 @import "revised/emails/email_hot_sheet";
 
 .stolen-notification-from {
-  background: $gray-lighter;
+  background-color: $gray-lighter;
   border: 1px solid $gray-lightish;
   padding: 0 1em;
   text-align: center;
@@ -29,4 +29,46 @@ $email-light-bg: #dddddd;
   max-width: 100%;
   height: auto;
   margin: 24px auto;
+}
+
+// Need to include bike-display class to override styles from it
+.table-list,
+.bike-display .table-list {
+  margin-bottom: 0;
+  border: 1px solid #eceeef;
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background-color: transparent;
+  display: table;
+  box-sizing: border-box;
+  border-spacing: 2px;
+
+  tr:nth-of-type(even) {
+    background-color: #ffffff;
+  }
+  tr:first-child td {
+    border-top: none;
+  }
+  tr td {
+    line-height: 1.5;
+    border: 1px solid #eceeef;
+    padding: 4px 4px 4px 4px;
+    &:first-child {
+      font-size: 75%;
+      font-style: italic;
+      text-align: right;
+      padding: 9px 4px 4px;
+      line-height: 1.25;
+    }
+    &:first-child.full-width-data {
+      font-size: 100%;
+      font-style: normal;
+      text-align: left;
+    }
+    // use last, rather than first, to enable full width single rows
+    &:last-child {
+      width: 85%; // This is effectively min-width for tables
+    }
+  }
 }
