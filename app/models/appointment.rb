@@ -53,10 +53,10 @@ class Appointment < ApplicationRecord
   def user_display_name; user&.display_name || name end
 
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
-    return nil unless new_status.present? && new_status != status
-    return nil if new_status == "waiting" && status == "on_deck" # Don't permit just putting it back into waiting
+    return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
     # customers can't update their appointment unless it's in line and they're updating to a valid status
     if AppointmentUpdate.customer_creator_kind?(updator_kind)
+      return nil if status == "on_deck" && new_status == "waiting" # Don't permit customer putting themselves back into waiting
       customer_update_statuses = %w[waiting being_helped abandoned]
       return nil unless in_line? && customer_update_statuses.include?(new_status)
     end

@@ -28,6 +28,12 @@ RSpec.describe Organized::LinesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(flash).to be_blank
+
+        get "#{base_url}/#{location2.id}"
+        expect(assigns(:current_location)&.id).to eq location2.id
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to be_blank
       end
     end
   end
@@ -38,6 +44,33 @@ RSpec.describe Organized::LinesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(flash).to be_blank
+    end
+  end
+
+  describe "update" do
+    let!(:appointment2) { FactoryBot.create(:appointment, status: "on_deck", organization: current_organization, location: location) }
+    it "updates multiple appointments" do
+      expect do
+        put "#{base_url}/#{location.to_param}", params: {
+          status: "being_helped",
+          organization: current_organization.to_param,
+          ids: {
+            appointment.id.to_s => appointment.id.to_s,
+            appointment2.id.to_s => appointment2.id.to_s,
+          }
+        }
+      end.to change(AppointmentUpdate, :count).by 2
+      expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+      expect(flash[:success]).to be_present
+      appointment.reload
+      appointment2.reload
+
+      expect(appointment.status).to eq "being_helped"
+      expect(appointment2.status).to eq "being_helped"
+
+      expect(appointment.appointment_updates.count).to eq 1
+      expect(appointment.appointment_updates.last.organization_member?).to be_truthy
+      expect(appointment2.appointment_updates.last.user_id).to eq current_user.id
     end
   end
 end

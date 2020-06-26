@@ -1,6 +1,7 @@
 module Organized
   class LinesController < Organized::BaseController
     before_action :ensure_access_to_appointments!
+    before_action :assign_current_location, except: [:index]
 
     def index
       if current_location.present?
@@ -14,13 +15,36 @@ module Organized
     end
 
     def update
-      fail "not implemented"
+      if params[:status].present?
+        permitted_appointments.where(id: checked_appointment_ids).each do |appointment|
+          appointment.record_status_update(new_status: params[:status],
+                                           updator_kind: "organization_member",
+                                           updator_id: current_user.id)
+        end
+        flash[:success] = "Updated appointments!"
+      else
+        flash[:error] = "Unknown update action"
+      end
+      redirect_to organization_line_path(current_location.to_param, organization_id: current_organization.to_param)
     end
 
     private
 
+    # assign manually because it's the id parameter, not the location_id parameter
+    def assign_current_location
+      @current_location = current_organization.locations.friendly_find(params[:id])
+    end
+
+    def permitted_appointments
+      current_organization.appointments
+    end
+
     def matching_appointments
       current_location.appointments.in_line
+    end
+
+    def checked_appointment_ids
+      params[:ids].keys
     end
   end
 end

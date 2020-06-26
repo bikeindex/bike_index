@@ -12,6 +12,7 @@ export default class BinxAppOrgLines {
       // so callback afterward to fix the display. Basically total bullshit
       setTimeout(updateCellDisplay, 500);
     });
+
     $("#selectAllSelector").on("click", function (e) {
       e.preventDefault();
       window.toggleAllChecked = !window.toggleAllChecked;
