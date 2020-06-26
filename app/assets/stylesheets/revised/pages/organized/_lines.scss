@@ -21,4 +21,15 @@
     margin: 0.25rem 0 0 0;
     line-height: 1;
   }
+  .update-status-dropdown {
+    .dropdown-toggle {
+      color: lighten($link-color, 10%);
+    }
+    // TODO: old bootstrap fucked this up
+    .dropleft {
+      &.dropdown-menu {
+        left: -50%;
+      }
+    }
+  }
 }
