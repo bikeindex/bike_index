@@ -6,6 +6,7 @@
 }
 
 .organized-appointment-table {
+  line-height: 1.5;
   .multiselect-cell {
     padding: 0;
     vertical-align: center;
@@ -13,5 +14,11 @@
       cursor: pointer;
       padding: 0.3rem;
     }
+  }
+  .status-list {
+    font-size: 80%;
+    padding-left: 1.25rem;
+    margin: 0.25rem 0 0 0;
+    line-height: 1;
   }
 }

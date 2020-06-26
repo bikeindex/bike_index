@@ -59,6 +59,8 @@
         %th Status
         %th Reason
         %th
+        %th
+        %th
       %tbody
         - @appointments.each do |appointment|
           %tr
@@ -71,19 +73,23 @@
             %td
               = appointment.name
               - if appointment.organization_member?
-                %small.less-strong.d-block{ style: "line-height: 1;" }
+                %small.less-strong
                   added by #{appointment.user_display_name.split(" ").first}
             %td
-              - unless appointment.waiting?
+              - if appointment.waiting?
+                %span.less-strong in line
+              - else
                 = status_display(appointment.status)
+
               - if appointment.appointment_updates.any?
-                %ul{ style: "font-size: 80%; padding-left: 1.25rem; margin: 0;" }
-                  - appointment.appointment_updates.each do |appointment_update|
+                %ul.status-list
+                  - appointment.appointment_updates.reorder(id: :desc).each do |appointment_update|
                     %li
-                      %em
-                        %span.less-strong
-                          updated with
+                      %em.less-strong
                         #{appointment_update.status.gsub("_", " ")} -
+                        -# It's too garish - but there needs to be some color differentiation
+                        -# #{status_display(appointment_update.status)} -
+
                       %span.convertTime.preciseTime
                         = l(appointment_update.created_at, format: :convert_time)
                       %small
@@ -92,10 +98,13 @@
               = appointment.reason
               - if appointment.description.present?
                 %small.less-strong= appointment.description
+            %td.text-center
+              - if appointment.paging?
+                = link_to "Helping", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
+              - elsif appointment.on_deck?
+                = link_to "Page", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "paging"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
             %td
-              .clearfix{ style: "display: block; width: 100%; font-size: 80%;" }
-                = link_to "Helping now", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap float-left mb-2"
-                - if appointment.on_deck?
-                  = link_to "unable to find customer", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap float-right ml-2 mb-2"
+              - if appointment.paging?
+                = link_to "can't find", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap ml-2 mb-2"
               .small.less-strong.text-right{ style: "line-height: 0.5;" }
                 = link_to "remove", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "removed"), method: "PUT", action: "update", class: "small gray-link"

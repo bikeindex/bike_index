@@ -55,11 +55,11 @@ module OrganizedHelper
   def status_display(status)
     status_str = status.gsub("_", " ")
     case status.downcase
-    when "current", "on_deck"
+    when "current", "paging", "being_helped"
       content_tag(:span, status_str, class: "text-success")
-    when /retrieved/
+    when /retrieved/, "on_deck"
       content_tag(:span, status_str, class: "text-info")
-    when /removed/, "impounded", "trashed"
+    when /removed/, "impounded", "trashed", "failed_to_find"
       content_tag(:span, status_str, class: "text-danger")
     else
       content_tag(:span, status_str, class: "less-strong")

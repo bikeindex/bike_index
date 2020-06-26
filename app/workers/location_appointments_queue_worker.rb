@@ -6,8 +6,8 @@ class LocationAppointmentsQueueWorker < ApplicationWorker
     return true unless location.virtual_line_on? && location.appointment_configuration.customers_on_deck_count > 0
     desired_on_deck_count = location.appointment_configuration.customers_on_deck_count
 
-    (desired_on_deck_count - location.appointments.on_deck_or_paging.count).times do |i|
-      appointment = location.appointments.line_not_on_deck_or_paging.first
+    (desired_on_deck_count - location.appointments.paging_or_on_deck.count).times do |i|
+      appointment = location.appointments.line_not_paging_or_on_deck.first
       appointment&.record_status_update!(new_status: "on_deck", updator_kind: "queue_worker")
     end
   end

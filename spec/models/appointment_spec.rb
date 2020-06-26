@@ -64,7 +64,7 @@ RSpec.describe Appointment, type: :model do
         # Line ordered first orders by the status priority, than by line_entry_timestamp
         expect(Appointment.line_ordered.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id, appt6.id])
         expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id])
-        expect(Appointment.on_deck_or_paging.pluck(:id)).to eq([appt3.id, appt1.id])
+        expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt1.id])
 
         expect(appt6.after_failed_to_find_removal_count).to eq 2
         # it's possible to failed_to_find something not in line

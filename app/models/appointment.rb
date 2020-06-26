@@ -22,8 +22,8 @@ class Appointment < ApplicationRecord
   # Line ordering is first by the priority of the status, then by line_entry_timestamp
   scope :line_ordered, -> { reorder("status, line_entry_timestamp") }
   scope :in_line, -> { where(status: in_line_statuses).line_ordered }
-  scope :on_deck_or_paging, -> { where(status: %w[on_deck paging]).line_ordered }
-  scope :line_not_on_deck_or_paging, -> { where.not(status: %w[on_deck paging]).in_line }
+  scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).line_ordered }
+  scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
@@ -44,7 +44,7 @@ class Appointment < ApplicationRecord
 
   def in_line?; self.class.in_line_statuses.include?(status) end
 
-  def on_deck_or_paging?; on_deck? || paging? end
+  def paging_or_on_deck?; on_deck? || paging? end
 
   def failed_to_find_attempts; appointment_updates.failed_to_find end
 
@@ -122,7 +122,7 @@ class Appointment < ApplicationRecord
       # If we have the exact number of failed_to_find_attempts as the removal count, we want to put the person in the back of the line
       # Otherwise - put them as the next person before the on_deck people
       if failed_to_find_attempts.count < after_failed_to_find_removal_count
-        new_position = other_location_appointments.line_not_on_deck_or_paging.first
+        new_position = other_location_appointments.line_not_paging_or_on_deck.first
       end
     else
       self.status = "removed"

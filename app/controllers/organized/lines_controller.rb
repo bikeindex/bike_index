@@ -10,7 +10,7 @@ module Organized
     end
 
     def show
-      @appointments = matching_appointments
+      @appointments = matching_appointments.includes(:appointment_updates)
       @appointment ||= Appointment.new(location_id: current_location.id, organization_id: current_organization.id)
     end
 
