@@ -71,6 +71,15 @@ RSpec.describe Organized::LinesController, type: :request do
       expect(appointment.appointment_updates.count).to eq 1
       expect(appointment.appointment_updates.last.organization_member?).to be_truthy
       expect(appointment2.appointment_updates.last.user_id).to eq current_user.id
+      # updating with no ids doesn't break
+      expect do
+        put "#{base_url}/#{location.to_param}", params: {
+          status: "being_helped",
+          organization: current_organization.to_param,
+        }
+      end.to_not change(AppointmentUpdate, :count)
+      expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+      expect(flash[:notice]).to be_present
     end
   end
 end

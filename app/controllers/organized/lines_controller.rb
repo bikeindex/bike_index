@@ -16,14 +16,18 @@ module Organized
 
     def update
       if params[:status].present?
-        permitted_appointments.where(id: checked_appointment_ids).each do |appointment|
-          appointment.record_status_update(new_status: params[:status],
-                                           updator_kind: "organization_member",
-                                           updator_id: current_user.id)
+        if checked_appointment_ids.any?
+          permitted_appointments.where(id: checked_appointment_ids).each do |appointment|
+            appointment.record_status_update(new_status: params[:status],
+                                             updator_kind: "organization_member",
+                                             updator_id: current_user.id)
+          end
+          flash[:success] = "Line updated successfully!"
+        else
+          flash[:notice] = "Nothing was updated! Did you check any boxes?"
         end
-        flash[:success] = "Updated appointments!"
       else
-        flash[:error] = "Unknown update action"
+        flash[:error] = "Unknown update action!"
       end
       redirect_to organization_line_path(current_location.to_param, organization_id: current_organization.to_param)
     end
@@ -44,7 +48,7 @@ module Organized
     end
 
     def checked_appointment_ids
-      params[:ids].keys
+      params[:ids]&.keys || []
     end
   end
 end
