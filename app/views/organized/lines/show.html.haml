@@ -100,7 +100,7 @@
                 %small.less-strong= appointment.description
             %td.text-center
               - if appointment.paging?
-                = link_to "Helping", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
+                = link_to "helping", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
               - elsif appointment.on_deck?
                 = link_to "Page", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "paging"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
             %td
