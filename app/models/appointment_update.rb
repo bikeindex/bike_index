@@ -39,4 +39,6 @@ class AppointmentUpdate < ApplicationRecord
   def update_only_status?; self.class.update_only_statuses.include?(status) end
 
   def user_display_name; user&.display_name || appointment.name end
+
+  def customer_creator?; self.class.customer_creator_kind?(creator_kind) end
 end

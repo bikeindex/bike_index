@@ -71,6 +71,7 @@ RSpec.describe Appointment, type: :model do
         expect do
           appt6.record_status_update(new_status: "failed_to_find", updator_id: 12, updator_kind: "organization_member")
         end.to change(AppointmentUpdate, :count).by 1
+        appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "waiting"
         appointment_update1 = appt6.appointment_updates.last
         expect(appointment_update1.creator_kind).to eq "organization_member"
@@ -81,6 +82,7 @@ RSpec.describe Appointment, type: :model do
         expect do
           appt3.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
         end.to change(AppointmentUpdate, :count).by 1
+        appt3.reload
         expect(appt3.status).to eq "waiting"
         appointment_update2 = appt3.appointment_updates.last
         expect(appointment_update2.creator_kind).to eq "queue_worker"
@@ -91,6 +93,7 @@ RSpec.describe Appointment, type: :model do
         expect do
           appt6.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
         end.to change(AppointmentUpdate, :count).by 1
+        appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "waiting"
         appointment_update4 = appt6.appointment_updates.last
         expect(appointment_update4.creator_kind).to eq "queue_worker"
@@ -101,6 +104,7 @@ RSpec.describe Appointment, type: :model do
         expect do
           appt6.record_status_update(new_status: "failed_to_find", updator_kind: "organization_member", updator_id: 3333)
         end.to change(AppointmentUpdate, :count).by 1
+        appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "removed"
         appointment_update5 = appt6.appointment_updates.last
         expect(appointment_update5.creator_kind).to eq "organization_member"
@@ -202,15 +206,13 @@ RSpec.describe Appointment, type: :model do
                           line_entry_timestamp: (Time.current - 1.hour).to_i)
       end
       context "new_status on_deck" do
-        it "updates and moves to front of the queue" do
+        it "updates and doesn't move to front of the queue" do
           appointment.reload
           appointment_on_deck.reload
           expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
           expect_update(appointment, og_status, new_status, updator_id, updator_kind)
-          # Because we've reordered
-          expect(appointment_on_deck.line_entry_timestamp).to be > appointment.line_entry_timestamp
           location.reload
-          expect(location.appointments.in_line.pluck(:id)).to eq([appointment.id, appointment_on_deck.id])
+          expect(location.appointments.in_line.pluck(:id)).to eq([appointment_on_deck.id, appointment.id])
         end
       end
       context "failed_to_find" do

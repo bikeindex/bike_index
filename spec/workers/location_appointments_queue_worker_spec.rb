@@ -16,18 +16,18 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
     it "sets the correct number of appointments on deck" do
       expect(location.appointment_configuration).to be_blank
       expect(Appointment.on_deck_or_paging.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
-      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
+      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
       # Doesn't change anything, because there is no appointment_configuration
       instance.perform(location.id)
       expect(Appointment.on_deck_or_paging.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
-      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
+      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
       # With appointment_configuration in place, it makes only 1 be on_deck
       expect(appointment_configuration).to be_present
       expect do
         instance.perform(location.id)
       end.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
       expect(Appointment.on_deck_or_paging.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
-      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
+      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
 
       appt1.update(status: "waiting")
       expect do
@@ -46,17 +46,19 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
         appt1.record_status_update!(new_status: "paging", updator_kind: "queue_worker")
         expect(Appointment.on_deck_or_paging.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
         expect(appt1.appointment_updates.count).to eq 1
-        appt1.record_status_update!(new_status: "being_helped")
-        appt1.reload
+        appt1.record_status_update!(new_status: "being_helped") # customer kind
         expect(appt1.appointment_updates.count).to eq 2
         expect(appt1.being_helped?).to be_truthy
-        appointment_update = appt1.appointment_updates.last
-        expect(appointment_update.status).to eq "being_helped"
-        expect(appointment_update.user_id).to be_blank
-        expect(appointment_update.creator_kind).to eq "no_user"
+        appointment_update1 = appt1.appointment_updates.last
+        expect(appointment_update1.status).to eq "being_helped"
+        expect(appointment_update1.user_id).to be_blank
+        expect(appointment_update1.creator_kind).to eq "no_user"
+        expect(appointment_update1.customer_creator?).to be_truthy
         expect(Appointment.on_deck_or_paging.line_ordered.pluck(:id)).to eq([appt2.id, appt3.id, appt4.id])
         expect(Appointment.in_line.pluck(:id)).to eq([appt2.id, appt3.id, appt4.id, appt5.id])
+        # appt was updated because
         appt2.reload
+        expect(appt2.status).to eq "on_deck"
         expect(appt2.appointment_updates.count).to eq 1
         expect(appt2.appointment_updates.first.on_deck?).to be_truthy
         expect(appt2.appointment_updates.first.queue_worker?).to be_truthy
