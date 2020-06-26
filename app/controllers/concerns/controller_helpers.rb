@@ -214,7 +214,7 @@ module ControllerHelpers
     return ensure_member_of!(current_organization) if params[:organization_id].present?
     store_return_to
     flash[:notice] = translation(:please_sign_in,
-                    scope: [:controllers, :concerns, :controller_helpers, __method__])
+                                 scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to new_session_path and return
   end
 
@@ -314,7 +314,7 @@ module ControllerHelpers
       redirect_to accept_vendor_terms_path and return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,
-                                    scope: [:controllers, :concerns, :controller_helpers, __method__])
+                                   scope: [:controllers, :concerns, :controller_helpers, __method__])
       store_return_to
       set_passive_organization(passed_organization)
       sign_in_path = passed_organization.enabled?("passwordless_users") ? magic_link_session_path : new_session_path

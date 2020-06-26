@@ -31,9 +31,7 @@ $email-light-bg: #dddddd;
   margin: 24px auto;
 }
 
-// Need to include bike-display class to override styles from it
-.table-list,
-.bike-display .table-list {
+.table-list {
   margin-bottom: 0;
   border: 1px solid #eceeef;
   width: 100%;

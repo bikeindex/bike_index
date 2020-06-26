@@ -2399,6 +2399,12 @@ nl:
           not_an_org_member: Je bent geen lid van die organisatie!
         return_to_if_present:
           reset_your_password: U bent ingelogd. Stel uw wachtwoord opnieuw in
+        ensure_member_of!:
+          accept_tos_for_orgs: Accepteer de servicevoorwaarden voor organisaties.
+          not_a_member_of_that_org: Je bent geen lid van die organisatie!
+          please_sign_in: Log in alstublieft
+        sign_in_if_not!:
+          please_sign_in: Log in alstublieft
       sessionable:
         sign_in_and_redirect:
           logged_in: Ingelogd!
@@ -2421,9 +2427,6 @@ nl:
           must_be_ambassador: Je moet een ambassadeur zijn om dat te doen!
           must_be_in_ambassador_org: Je moet in een ambassadeursorganisatie zijn om
             dat te zien!
-        ensure_member!:
-          accept_tos_for_orgs: Accepteer de servicevoorwaarden voor organisaties.
-          not_a_member_of_that_org: Je bent geen lid van die organisatie!
         ensure_not_ambassador_organization!:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
         ensure_access_to_appointments!:
