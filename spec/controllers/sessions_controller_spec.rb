@@ -26,6 +26,22 @@ RSpec.describe SessionsController, type: :controller do
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
         end
       end
+      context "stored session/new" do
+        it "redirects and removes bad redirect" do
+          session[:return_to] = "/session/new"
+          get :new
+          expect(response).to redirect_to my_account_path
+          expect(session[:return_to]).to be_blank
+          session[:return_to] = "/users/new/"
+          get :new
+          expect(response).to redirect_to my_account_path
+          expect(session[:return_to]).to be_blank
+          session[:return_to] = "/users/new?something=true"
+          get :new
+          expect(response).to redirect_to my_account_path
+          expect(session[:return_to]).to be_blank
+        end
+      end
     end
     context "setting return_to" do
       it "actually sets it" do

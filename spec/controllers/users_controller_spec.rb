@@ -767,10 +767,10 @@ RSpec.describe UsersController, type: :controller do
         request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
         # Doesn't include the parameter because when false, it doesn't include
         patch :update, params: {
-                   id: user.username,
-                   hot_sheet_organization_ids: organization.id.to_s,
-                   hot_sheet_notifications: { organization.id.to_s => "1" },
-                 }
+                         id: user.username,
+                         hot_sheet_organization_ids: organization.id.to_s,
+                         hot_sheet_notifications: { organization.id.to_s => "1" },
+                       }
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
         membership.reload

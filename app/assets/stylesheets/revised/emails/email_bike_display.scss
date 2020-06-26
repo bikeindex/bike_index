@@ -1,12 +1,12 @@
 .bike-display {
   position: relative;
-  width: 96%;
+  width: 100%;
   margin: $vertical-height auto (2 * $vertical-height);
   padding: $vertical-height;
   border: 1px solid $gray-light;
   border-spacing: unset;
   border-collapse: collapse;
-  td {
+  td.bike-display-wrapper-cell {
     border: none;
     padding: 4px;
   }

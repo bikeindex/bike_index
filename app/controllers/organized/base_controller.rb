@@ -5,20 +5,12 @@ module Organized
     before_action :ensure_member!
 
     def ensure_member!
-      if current_user && current_user.member_of?(current_organization)
-        return true if current_user.accepted_vendor_terms_of_service?
-        flash[:success] = translation(:accept_tos_for_orgs,
-                                      scope: [:controllers, :organized, :base, __method__])
-        redirect_to accept_vendor_terms_path and return
-      end
-      set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
-      flash[:error] = translation(:not_a_member_of_that_org,
-                                  scope: [:controllers, :organized, :base, __method__])
-      redirect_to user_root_url and return
+      ensure_member_of!(current_organization)
     end
 
     def ensure_admin!
       return true if current_user && current_user.admin_of?(current_organization)
+      return false unless ensure_member! # if this fails, we're already redirecting
       flash[:error] = translation(:must_be_org_admin,
                                   scope: [:controllers, :organized, :base, __method__])
       redirect_to organization_root_path and return

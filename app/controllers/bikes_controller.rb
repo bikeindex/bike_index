@@ -5,6 +5,7 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
+  before_action :sign_in_if_not!, only: [:show]
   before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_action :render_ad, only: [:index, :show]

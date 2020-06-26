@@ -6,7 +6,7 @@
 - @stolen_records.each do |stolen_record|
   - bike = stolen_record.bike
   - thumb_url = bike.thumb_path || bike.stock_photo_url
-  - bike_link = bike_url(bike, organization_id: @organization.to_param)
+  - bike_link = bike_url(bike, organization_id: @organization.to_param, sign_in_if_not: true)
 
   - unless thumb_url.present?
     - thumbclass = 'placeholder'
@@ -15,32 +15,42 @@
     %table.bike-display
       %tbody
         %tr.bike-title
-          %td{ colspan: 2 }
+          %td.bike-display-wrapper-cell{ colspan: 2 }
             = link_to organized_bike_text(bike, skip_creation: true), bike_link
         %tr
-          %td.info-holder
-            %ul
-              %li
-                %strong Serial
-                = bike.serial_display
+          %td.info-holder.bike-display-wrapper-cell
+            %table.table-list
+              %tr
+                %td Serial
+                %td
+                  = bike.serial_display
 
-              %li
-                %strong.stolen-color
-                  Stolen at
-                -# Render the hour
-                = stolen_record.date_stolen.strftime("%l%P")
-                - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
-                  %strong Today
-                - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
-                  %strong Yesterday
-                - else
-                  = l stolen_record.date_stolen, format: :standard_display
+              %tr
+                %td
+                  %span.stolen-color Stolen at
+                %td
+                  -# Render the hour
+                  = stolen_record.date_stolen.strftime("%l%P")
+                  - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
+                    %strong Today
+                  - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
+                    %strong Yesterday
+                  - else
+                    = l stolen_record.date_stolen, format: :standard_display
 
-              %li
-                %strong.stolen-color
-                  From
-                = Geocodeable.address(stolen_record, country: false)
-          %td.image-holder{ class: thumbclass }
+              %tr
+                %td From
+                %td
+                  = Geocodeable.address(stolen_record, country: false)
+              %tr
+                %td PD&nbsp;report
+                %td
+                  = stolen_record.police_report_number
+                  -# Only show the department if there is a number, some people put it in anyway
+                  - if stolen_record.police_report_number.present?
+                    %small.less-strong
+                      = stolen_record.police_report_department
+          %td.image-holder.bike-display-wrapper-cell{ class: thumbclass }
             %a{ href:  bike_link }
               %img{ src: thumb_url }
 

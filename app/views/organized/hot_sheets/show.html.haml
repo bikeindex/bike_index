@@ -106,3 +106,21 @@
                         %span.stolen-color From
                       %td
                         = Geocodeable.address(stolen_record, country: false)
+
+                    %tr
+                      %td
+                        PD Report
+                      %td
+                        = stolen_record.police_report_number
+                        -# Only show the department if there is a number, some people put it in otherwise :/
+                        - if stolen_record.police_report_number.present?
+                          %small.less-strong
+                            = stolen_record.police_report_department
+
+                    - if bike.phoneable_by?(current_user)
+                      %tr
+                        %td
+                          Phone
+                        %td
+                          = phone_link(stolen_record.phone)
+

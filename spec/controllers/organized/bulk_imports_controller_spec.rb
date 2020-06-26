@@ -11,7 +11,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       let(:user) { nil }
       it "redirects" do
         get :index, params: { organization_id: organization.to_param }
-        expect(response).to redirect_to(organization_root_path)
+        expect(response).to redirect_to(new_session_path)
       end
     end
 

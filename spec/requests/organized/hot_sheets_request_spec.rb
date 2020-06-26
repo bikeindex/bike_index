@@ -3,6 +3,15 @@ require "rails_helper"
 RSpec.describe Organized::HotSheetsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/hot_sheet" }
 
+  context "not signed in" do
+    let(:current_organization) { FactoryBot.create(:organization) }
+    it "redirects" do
+      get base_url
+      expect(response).to redirect_to(new_session_path)
+      expect(flash[:notice]).to be_present
+    end
+  end
+
   context "organization not enabled" do
     include_context :request_spec_logged_in_as_organization_member
     let(:current_organization) { FactoryBot.create(:organization) }
