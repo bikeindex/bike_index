@@ -103,10 +103,10 @@ module ControllerHelpers
   end
 
   # Generally this is implicitly set - however! it can also be explicitly set
-  def store_return_to(return_to = nil)
+  def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path
-    return_to ||= params[:return_to] || request.env["PATH_INFO"]
-    session[:return_to] = return_to if return_to.present?
+    target ||= params[:return_to] || request.env["PATH_INFO"]
+    session[:return_to] = target unless invalid_return_to?(target)
   end
 
   def return_to_if_present
@@ -114,6 +114,7 @@ module ControllerHelpers
       target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
+      return false if invalid_return_to?(target)
       case target.downcase
       when "password_reset"
         flash[:success] =
@@ -324,6 +325,12 @@ module ControllerHelpers
     flash[:error] = translation(:not_a_member_of_that_org,
                                 scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_root_url and return
+  end
+
+  def invalid_return_to?(target)
+    return true if target.blank?
+    # return_to can't be a sign in/up page, or we'll loop
+    ["/users/new", "/session/new", "/session/magic_link", "/integrations"].any? { |r| target.match?(r) }
   end
 
   def bikehub_url(path)
