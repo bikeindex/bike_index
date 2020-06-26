@@ -38,7 +38,7 @@ class AppointmentUpdate < ApplicationRecord
 
   def update_only_status?; self.class.update_only_statuses.include?(status) end
 
-  def display_name; user&.display_name || appointment.name end
+  def display_name; appointment.name.presence || user&.display_name end
 
   def first_display_name; BadWordCleaner.clean(display_name.split(" ").first) end
 

@@ -50,7 +50,7 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
-  def display_name; name || user&.display_name end
+  def display_name; name.presence || user&.display_name end
 
   def first_display_name; BadWordCleaner.clean(display_name.split(" ").first) end
 
