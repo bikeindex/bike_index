@@ -1,0 +1,17 @@
+.manual-new-appointment-form {
+  .card-body {
+    padding: 1rem 2rem;
+    background: $gray-lighter;
+  }
+}
+
+.organized-appointment-table {
+  .multiselect-cell {
+    padding: 0;
+    vertical-align: center;
+    label {
+      cursor: pointer;
+      padding: 0.3rem;
+    }
+  }
+}

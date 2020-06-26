@@ -68,8 +68,6 @@ class Appointment < ApplicationRecord
 
     if new_status == "failed_to_find"
       update_and_move_for_failed_to_find # This will save the record
-    # elsif new_status == "on_deck"
-    #   move_ahead(other_location_appointments.on_deck.last) # This will save the record
     else
       # Because things might've changed, and even if they didn't we still want to run the queue updator
       self.update(updated_at: Time.current)

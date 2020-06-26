@@ -7,71 +7,95 @@
     %em{ style: "font-size: 50%;" }
       = link_to "customer view", organization_walkrightup_path(organization_id: current_organization.to_param, location_id: current_location.to_param)
 
-.mt-4.mb-4
-  .text-right
-    %a{ href: "#", "data-toggle" => "collapse", "data-target" => "#newAppointmentForm" }
+.row.mt-4.mb-4
+  .col-xs-6.mb-4
+    %a{ href: "#", "data-toggle" => "collapse", "data-target" => ".manual-new-appointment-form" }
       Manually add someone
-  #newAppointmentForm.collapse
-    .card
-      .card-body{ style: "padding: 1rem 2rem; background: #eceeef" }
-        = form_for @appointment, { as: :appointment, url: organization_appointments_path(organization_id: current_organization.to_param, location_id: current_location&.id), action: "create", method: "POST" } do |f|
-          = f.hidden_field :location_id
-          .row
-            .form-group.col-sm-6.col-xl-3
-              = f.label :name, "Customer name"
-              = f.text_field :name, required: true, class: "form-control"
-            .form-group.col-sm-6.col-xl-3
-              = f.label :email, "Customer email"
-              = f.email_field :email, placeholder: "Optional", class: "form-control"
-            .form-group.col-sm-6.col-xl-3
-              = f.label :reason, "Reason for visit"
-              = f.select :reason, @appointment.permitted_reasons, { prompt: " ", allow_blank: true }, class: "form-control"
-            .form-group.col-sm-6.col-xl-3
-              %label.d-block &nbsp;
-              = f.submit "Add to line!", class: "btn btn-success"
+  .col-xs-6.mb-4.text-right
+    %a#toggleUpdateMultiple{ href: "#" }
+      Update multiple
 
+.manual-new-appointment-form.collapse
+  .card
+    .card-body
+      = form_for @appointment, { as: :appointment, url: organization_appointments_path(organization_id: current_organization.to_param, location_id: current_location&.id), action: "create", method: "POST" } do |f|
+        = f.hidden_field :location_id
+        .row
+          .form-group.col-xs-6.col-xl-3
+            = f.label :name, "Customer name"
+            = f.text_field :name, required: true, class: "form-control"
+          .form-group.col-xs-6.col-xl-3
+            = f.label :email, "Customer email"
+            = f.email_field :email, placeholder: "Optional", class: "form-control"
+          .form-group.col-xs-6.col-xl-3
+            = f.label :reason, "Reason for visit"
+            = f.select :reason, @appointment.permitted_reasons, { prompt: " ", allow_blank: true }, class: "form-control"
+          .form-group.col-xs-6.col-xl-3
+            %label.d-block &nbsp;
+            = f.submit "Add to line!", class: "btn btn-success"
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border
-  %thead
-    %th Joined line
-    %th Name
-    %th Status
-    %th Reason
-    %th
-  %tbody
-    - @appointments.each do |appointment|
-      %tr
-        %td
-          %span.convertTime.preciseTime
-            = l(appointment.created_at, format: :convert_time)
-        %td
-          = appointment.name
-          - if appointment.organization_member?
-            %small.less-strong.d-block{ style: "line-height: 1;" }
-              added by #{appointment.user_display_name.split(" ").first}
-        %td
-          - unless appointment.waiting?
-            = status_display(appointment.status)
-          - if appointment.appointment_updates.any?
-            %ul{ style: "font-size: 80%; padding-left: 1.25rem; margin: 0;" }
-              - appointment.appointment_updates.each do |appointment_update|
-                %li
-                  %em
-                    %span.less-strong
-                      updated with
-                    #{appointment_update.status.gsub("_", " ")} -
-                  %span.convertTime.preciseTime
-                    = l(appointment_update.created_at, format: :convert_time)
-                  %small
-                    by #{appointment_update.user_display_name}
-        %td
-          = appointment.reason
-          - if appointment.description.present?
-            %small.less-strong= appointment.description
-        %td
-          .clearfix{ style: "display: block; width: 100%; font-size: 80%;" }
-            = link_to "Helping now", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap float-left mb-2"
-            - if appointment.on_deck?
-              = link_to "unable to find customer", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap float-right ml-2 mb-2"
-          .small.less-strong.text-right{ style: "line-height: 0.5;" }
-            = link_to "remove", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "removed"), method: "PUT", action: "update", class: "small gray-link"
+-# Form needs to wrap the table to get the checked appointment ids
+= form_tag organization_line_path(current_location.to_param, organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :put, action: "update" do
+
+  .showOnMultiSelect.collapse
+    .row.mt-4
+      .col-xs-6
+        .form-group
+          - valid_update_statuses = [["Page - they're needed!", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Being helped", "being_helped"], ["Unable to find", "failed_to_find"], ["Left without being helped", "abandoned"], ["Manually remove from line", "removed"]]
+          = select_tag :status, options_for_select(valid_update_statuses), required: true , class: "form-control"
+      .col-xs-6
+        .form-group
+          = submit_tag "Update checked", class: "btn btn-success"
+
+  .full-screen-table.organized-appointment-table
+    %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+      %thead
+        %th.multiselect-cell.showOnMultiSelect.collapse
+          %label
+            %a#selectAllSelector{ href: "#" }
+              = check_mark
+        %th Joined line
+        %th Name
+        %th Status
+        %th Reason
+        %th
+      %tbody
+        - @appointments.each do |appointment|
+          %tr
+            %td.multiselect-cell.showOnMultiSelect.collapse
+              %label
+                = check_box_tag "ids[#{appointment.id}]", appointment.id
+            %td
+              %span.convertTime.preciseTime
+                = l(appointment.created_at, format: :convert_time)
+            %td
+              = appointment.name
+              - if appointment.organization_member?
+                %small.less-strong.d-block{ style: "line-height: 1;" }
+                  added by #{appointment.user_display_name.split(" ").first}
+            %td
+              - unless appointment.waiting?
+                = status_display(appointment.status)
+              - if appointment.appointment_updates.any?
+                %ul{ style: "font-size: 80%; padding-left: 1.25rem; margin: 0;" }
+                  - appointment.appointment_updates.each do |appointment_update|
+                    %li
+                      %em
+                        %span.less-strong
+                          updated with
+                        #{appointment_update.status.gsub("_", " ")} -
+                      %span.convertTime.preciseTime
+                        = l(appointment_update.created_at, format: :convert_time)
+                      %small
+                        by #{appointment_update.user_display_name}
+            %td
+              = appointment.reason
+              - if appointment.description.present?
+                %small.less-strong= appointment.description
+            %td
+              .clearfix{ style: "display: block; width: 100%; font-size: 80%;" }
+                = link_to "Helping now", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap float-left mb-2"
+                - if appointment.on_deck?
+                  = link_to "unable to find customer", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap float-right ml-2 mb-2"
+              .small.less-strong.text-right{ style: "line-height: 0.5;" }
+                = link_to "remove", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "removed"), method: "PUT", action: "update", class: "small gray-link"
