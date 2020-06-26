@@ -1555,6 +1555,10 @@ en:
             The owner of this %{bike_type} already has an account on Bike Index. Sign
             in to claim it!
           you_have_to_log_in: Sorry, you have to log in.
+        ensure_member_of!:
+          accept_tos_for_orgs: Please accept the terms of service for organizations.
+          not_a_member_of_that_org: You're not a member of that organization!
+          please_sign_in: Please sign in
         require_admin!:
           not_an_org_admin: You have to be an organization administrator to do that!
         require_index_admin!:
@@ -1563,6 +1567,8 @@ en:
           not_an_org_member: You're not a member of that organization!
         return_to_if_present:
           reset_your_password: You've been logged in. Please reset your password
+        sign_in_if_not!:
+          please_sign_in: Please sign in
       sessionable:
         sign_in_and_redirect:
           logged_in: Logged in!
@@ -1631,9 +1637,6 @@ en:
           must_be_ambassador: You have to be an ambassador to do that!
           must_be_in_ambassador_org: You have to be in an ambassador organization
             to see that!
-        ensure_member!:
-          accept_tos_for_orgs: Please accept the terms of service for organizations.
-          not_a_member_of_that_org: You're not a member of that organization!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
       bikes:
@@ -2112,7 +2115,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2138,7 +2141,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

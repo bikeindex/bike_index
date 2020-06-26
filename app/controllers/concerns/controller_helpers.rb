@@ -102,9 +102,10 @@ module ControllerHelpers
     fail ActiveRecord::RecordNotFound
   end
 
-  # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
+  # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(return_to = nil)
-    return_to ||= params[:return_to]
+    # fallback to the return to parameters, or the current path
+    return_to ||= params[:return_to] || request.env["PATH_INFO"]
     session[:return_to] = return_to if return_to.present?
   end
 
@@ -208,6 +209,15 @@ module ControllerHelpers
     @time_range = @start_time..@end_time
   end
 
+  def sign_in_if_not!
+    return true unless params[:sign_in_if_not].present? && current_user.blank?
+    return ensure_member_of!(current_organization) if params[:organization_id].present?
+    store_return_to
+    flash[:notice] = translation(:please_sign_in,
+                    scope: [:controllers, :concerns, :controller_helpers, __method__])
+    redirect_to new_session_path and return
+  end
+
   protected
 
   # passive_organization is the organization set for the user - which is persisted in session
@@ -293,6 +303,26 @@ module ControllerHelpers
     type = "content" if content_accessible.include?(controller_name)
     return true if current_user.present? && current_user.superuser?
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
+    redirect_to user_root_url and return
+  end
+
+  def ensure_member_of!(passed_organization)
+    if current_user && current_user.member_of?(passed_organization)
+      return true if current_user.accepted_vendor_terms_of_service?
+      flash[:success] = translation(:accept_tos_for_orgs,
+                                    scope: [:controllers, :concerns, :controller_helpers, __method__])
+      redirect_to accept_vendor_terms_path and return
+    elsif current_user.blank?
+      flash[:notice] = translation(:please_sign_in,
+                                    scope: [:controllers, :concerns, :controller_helpers, __method__])
+      store_return_to
+      set_passive_organization(passed_organization)
+      sign_in_path = passed_organization.enabled?("passwordless_users") ? magic_link_session_path : new_session_path
+      redirect_to sign_in_path and return
+    end
+    set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
+    flash[:error] = translation(:not_a_member_of_that_org,
+                                scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_root_url and return
   end
 

@@ -150,6 +150,32 @@ RSpec.describe BikesController, type: :controller do
         expect(assigns[:current_organization]).to be_nil
         expect(assigns[:passive_organization]).to be_nil
         expect(session[:passive_organization_id]).to eq "0"
+        # With sign_in_if_not, it does the same thing
+        get :show, params: { id: bike.id, sign_in_if_not: true, organization_id: organization.id }
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to be_decorated
+        expect(flash).to_not be_present
+        expect(assigns[:current_organization]).to be_nil
+        expect(assigns[:passive_organization]).to be_nil
+        expect(session[:passive_organization_id]).to eq "0"
+      end
+    end
+    context "sign_in_if_not" do
+      it "redirects to sign in" do
+        get :show, params: { id: bike.id, sign_in_if_not: 1 }
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}"
+        expect(flash[:notice]).to be_present
+        expect(response).to redirect_to(new_session_path)
+      end
+      context "organization present" do
+        let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"]) }
+        it "redirects to magic link, because organization sign in" do
+          get :show, params: { id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param }
+          expect(session[:return_to]).to eq bike_path(bike.to_param)
+          expect(flash[:notice]).to be_present
+          expect(response).to redirect_to(magic_link_session_path)
+        end
       end
     end
     context "Admin with manually set current_organization" do
