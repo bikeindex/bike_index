@@ -50,7 +50,7 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
-  def user_display_name; user&.display_name || name end
+  def user_display_name; name || user&.display_name end
 
   def first_user_display_name; user_display_name.split(" ").first end
 
