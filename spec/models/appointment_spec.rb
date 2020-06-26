@@ -38,15 +38,15 @@ RSpec.describe Appointment, type: :model do
         expect(Appointment.pluck(:id)).to_not eq(Appointment.line_ordered.pluck(:id))
 
         appt2.move_behind(appt4)
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt6.id, appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
+        expect(Appointment.line_ordered.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id, appt6.id])
 
         # Doing it again doesn't change anything
         appt2.move_behind(appt4)
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt6.id, appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
+        expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
         # nil puts in front of line
         expect(location.appointments.in_line.on_deck.first).to be_blank
         appt3.move_ahead(location.appointments.in_line.on_deck.first) # this is an example of how we use it
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt6.id, appt3.id, appt1.id, appt4.id, appt2.id, appt5.id])
+        expect(Appointment.line_ordered.pluck(:id)).to eq([appt3.id, appt1.id, appt4.id, appt2.id, appt5.id, appt6.id])
 
         # Puts it ahead
         appt4.move_ahead(appt5)
@@ -54,7 +54,7 @@ RSpec.describe Appointment, type: :model do
 
         # nil puts in front of in_line
         appt4.move_ahead(location.appointments.in_line.on_deck.first)
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt6.id, appt4.id, appt3.id, appt1.id, appt2.id, appt5.id])
+        expect(Appointment.line_ordered.pluck(:id)).to eq([appt4.id, appt3.id, appt1.id, appt2.id, appt5.id, appt6.id])
       end
     end
     describe "update_and_move_for_failed_to_find" do
@@ -86,7 +86,7 @@ RSpec.describe Appointment, type: :model do
         expect(appointment_update2.creator_kind).to eq "queue_worker"
         expect(appointment_update2.user_id).to be_blank
         expect(appointment_update2.status).to eq "failed_to_find"
-        expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt6.id, appt3.id, appt4.id, appt5.id])
+        expect(Appointment.line_ordered.pluck(:id)).to eq([appt1.id, appt2.id, appt6.id, appt3.id, appt4.id, appt5.id])
         # Final warning for 6, puts it in back of the waiting queue
         expect do
           appt6.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
