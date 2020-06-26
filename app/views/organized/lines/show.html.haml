@@ -41,7 +41,7 @@
     .row.mt-4
       .col-xs-6
         .form-group
-          - valid_update_statuses = [["Page - they're needed!", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Being helped", "being_helped"], ["Unable to find", "failed_to_find"], ["Left without being helped", "abandoned"], ["Manually remove from line", "removed"]]
+          - valid_update_statuses = [["Manually remove from line", "removed"], ["Being helped", "being_helped"], ["Left without being helped", "abandoned"], ["Page - they're needed", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Unable to find", "failed_to_find"]]
           = select_tag :status, options_for_select(valid_update_statuses), required: true , class: "form-control"
       .col-xs-6
         .form-group
@@ -58,7 +58,6 @@
         %th Name
         %th Status
         %th Reason
-        %th
         %th
         %th
       %tbody
@@ -103,8 +102,6 @@
                 = link_to "helping", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "being_helped"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
               - elsif appointment.on_deck?
                 = link_to "Page", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "paging"), method: "PUT", action: "update", class: "btn btn-sm btn-success uncap mb-2"
-            %td
+            %td.text-center
               - if appointment.paging?
                 = link_to "can't find", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap ml-2 mb-2"
-              .small.less-strong.text-right{ style: "line-height: 0.5;" }
-                = link_to "remove", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "removed"), method: "PUT", action: "update", class: "small gray-link"
