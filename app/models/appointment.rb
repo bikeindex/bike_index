@@ -52,6 +52,8 @@ class Appointment < ApplicationRecord
 
   def user_display_name; user&.display_name || name end
 
+  def first_user_display_name; user_display_name.split(" ").first end
+
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
     # customers can't update their appointment unless it's in line and they're updating to a valid status

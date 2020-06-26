@@ -34,6 +34,7 @@
             %label.d-block &nbsp;
             = f.submit "Add to line!", class: "btn btn-success"
 
+- valid_update_statuses = [["Manually remove from line", "removed"], ["Being helped", "being_helped"], ["Left without being helped", "abandoned"], ["Page - they're needed", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Unable to find", "failed_to_find"]]
 -# Form needs to wrap the table to get the checked appointment ids
 = form_tag organization_line_path(current_location.to_param, organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :put, action: "update" do
 
@@ -73,7 +74,7 @@
               = appointment.name
               - if appointment.organization_member?
                 %small.less-strong
-                  added by #{appointment.user_display_name.split(" ").first}
+                  added by #{appointment.first_user_display_name}
             %td
               - if appointment.waiting?
                 %span.less-strong in line
@@ -84,15 +85,20 @@
                 %ul.status-list
                   - appointment.appointment_updates.reorder(id: :desc).each do |appointment_update|
                     %li
-                      %em.less-strong
+                      %span.less-strong
                         #{appointment_update.status.gsub("_", " ")} -
                         -# It's too garish - but there needs to be some color differentiation
                         -# #{status_display(appointment_update.status)} -
 
-                      %span.convertTime.preciseTime
+                      %em.convertTime.preciseTime
                         = l(appointment_update.created_at, format: :convert_time)
                       %small
-                        by #{appointment_update.user_display_name}
+                        - if appointment_update.customer_creator?
+                          by
+                          %em customer
+                        - elsif appointment_update.user_id.present?
+                          by
+                          %em= appointment_update.first_user_display_name
             %td
               = appointment.reason
               - if appointment.description.present?
@@ -105,3 +111,10 @@
             %td.text-center
               - if appointment.paging?
                 = link_to "can't find", organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: "failed_to_find"), method: "PUT", action: "update", class: "btn btn-sm btn-warning uncap ml-2 mb-2"
+              %small.less-strong
+                %a.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+                  update status
+                .dropdown-menu
+                  - valid_update_statuses.each do |status_display, val|
+                    = link_to status_display, organization_appointment_path(appointment.to_param, organization_id: current_organization.id, status: val), method: "PUT", action: "update"
+

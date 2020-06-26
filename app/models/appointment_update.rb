@@ -40,5 +40,7 @@ class AppointmentUpdate < ApplicationRecord
 
   def user_display_name; user&.display_name || appointment.name end
 
+  def first_user_display_name; user_display_name.split(" ").first end
+
   def customer_creator?; self.class.customer_creator_kind?(creator_kind) end
 end
