@@ -3,7 +3,7 @@ class BadWordCleaner
 
   def self.clean(str)
     return nil unless str.present?
-    BAD_WORDS.each { |w| str.gsub!(w, "*" * w.length) }
+    BAD_WORDS.each { |w| str.gsub!(/#{w}/i, "*" * w.length) }
     str
   end
 end
