@@ -22,15 +22,26 @@
               If you don't answer when called, you will be put back in line, and if not around when this happens again, removed from the line!
   - else
     .row.mt-4.mb-4
-      .col-sm-8.offset-sm-2.text-center
+      .col-md-4
+        %ol
+          - @appointments_in_line.each do |appointment|
+            %li
+              = appointment.first_display_name
+              - if appointment.status == "paging"
+                %span.text-warning #{current_organization.short_name} is ready for them!
+              - elsif appointment.status == "on_deck"
+                %span.text-info on deck
+              - if appointment.id == @appointment.id
+                %span.text-success you!
+      .col-sm-8.text-center
         - appointments_in_front = @appointments_in_line.pluck(:id).index(@appointment.id)
         - appointments_in_front = 0 if appointments_in_front < 0
-        - not_on_deck_in_front_of = @appointments_in_line.line_not_paging_or_on_deck.pluck(:id).index(@appointment.id)
-        -# not_on_deck_in_front_of = 0 if not_on_deck_in_front_of < 0
-
         %h4
           = pluralize(appointments_in_front, "Person")
           are in front of you
+
+        - not_on_deck_in_front_of = @appointments_in_line.line_not_paging_or_on_deck.pluck(:id).index(@appointment.id)
+        - not_on_deck_in_front_of = 0 if not_on_deck_in_front_of < 0
         %p.less-strong
           = pluralize(not_on_deck_in_front_of, "person")
           before you will be "on deck"

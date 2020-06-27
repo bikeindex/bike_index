@@ -30,9 +30,9 @@
               %ul
                 - @appointments_in_line.paging_or_on_deck.each do |appointment|
                   %li
-                    = appointment.name
+                    = appointment.first_display_name
                     - if appointment.paging?
-                      %em.text-warning #{organization.short_name} is ready for you!
+                      %em.text-warning #{current_organization.short_name} is ready for them!
 
 
       %hr

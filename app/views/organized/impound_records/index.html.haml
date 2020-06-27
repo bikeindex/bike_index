@@ -40,16 +40,17 @@
     %em
       = humanized_time_range(@time_range)
   .col-sm-6.offset-lg-3.col-lg-3
-    %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-      = ImpoundRecord.statuses_humanized[@search_status.to_sym] || "All statuses"
-    .dropdown-menu
-      - (ImpoundRecord.statuses + ["all"]).each do |kind|
-        - if kind == "all" # Add a divider before all
-          .dropdown-divider
-        - kind_active = @search_status == kind
-        - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
-        - display_status = ImpoundRecord.statuses_humanized[kind.to_sym] || "All statuses"
-        = link_to display_status, organization_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+    .dropdown
+      %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+        = ImpoundRecord.statuses_humanized[@search_status.to_sym] || "All statuses"
+      .dropdown-menu
+        - (ImpoundRecord.statuses + ["all"]).each do |kind|
+          - if kind == "all" # Add a divider before all
+            .dropdown-divider
+          - kind_active = @search_status == kind
+          - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
+          - display_status = ImpoundRecord.statuses_humanized[kind.to_sym] || "All statuses"
+          = link_to display_status, organization_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
 
 
 - skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)

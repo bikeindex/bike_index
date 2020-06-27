@@ -50,7 +50,9 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
-  def user_display_name; user&.display_name || name end
+  def display_name; name.presence || user&.display_name end
+
+  def first_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
 
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
