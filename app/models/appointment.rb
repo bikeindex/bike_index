@@ -52,7 +52,7 @@ class Appointment < ApplicationRecord
 
   def display_name; name.presence || user&.display_name end
 
-  def first_display_name; BadWordCleaner.clean(display_name.split(" ").first) end
+  def first_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
 
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
