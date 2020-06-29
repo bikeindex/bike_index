@@ -60,6 +60,9 @@
               .less-strong-hold
                 = [bike.year, bike.frame_model].join(' ')
                 = "(#{bike.type})" unless bike.type == 'bike'
+                - if bike.stolen_recovery?
+                  %small
+                    = link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "text-success text-underline"
                 - if bike.paint.present? && bike.paint.color_id.blank?
                   %span.less-strong
                     = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
