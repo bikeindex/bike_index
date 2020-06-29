@@ -1,5 +1,5 @@
 class BadWordCleaner
-  BAD_WORDS = %w[fuck shit ass bitch bastard damn cunt cum nigger chink spic]
+  BAD_WORDS = %w[ass bastard bitch chink cock cum cunt damn dick fuck nigger shit spic]
 
   def self.clean(str)
     return nil unless str.present?
