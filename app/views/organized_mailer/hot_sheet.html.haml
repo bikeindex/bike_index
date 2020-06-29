@@ -5,6 +5,7 @@
 
 - @stolen_records.each do |stolen_record|
   - bike = stolen_record.bike
+  - bike.update(updated_at: Time.current) # Bump bike cached attributes, to be sure we have all the info
   - thumb_url = bike.thumb_path || bike.stock_photo_url
   - bike_link = bike_url(bike, organization_id: @organization.to_param, sign_in_if_not: true)
 
