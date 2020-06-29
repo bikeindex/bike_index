@@ -37,6 +37,12 @@
       width: 85%; // This is effectively min-width for tables
     }
   }
+  tr.active-row {
+    background-color: #ebf5fb !important;
+    a {
+      text-decoration: underline;
+    }
+  }
 }
 
 table {
