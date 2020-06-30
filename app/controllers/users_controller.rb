@@ -25,13 +25,18 @@ class UsersController < ApplicationController
 
   def please_confirm_email
     redirect_to(user_root_url) and return if current_user.present?
+    if params[:require_sign_in].present?
+      redirect_to new_session_path and return unless unconfirmed_current_user.present?
+    end
     @user = unconfirmed_current_user
     layout = sign_in_partner == "bikehub" ? "application_bikehub" : "application"
   end
 
   def resend_confirmation_email
-    if unconfirmed_current_user.present?
-      EmailConfirmationWorker.new.perform(unconfirmed_current_user.id)
+    user_subject = unconfirmed_current_user
+    user_subject ||= User.unconfirmed.fuzzy_unconfirmed_primary_email_find(params[:email])
+    if user_subject.present?
+      EmailConfirmationWorker.new.perform(user_subject.id)
       flash[:success] = translation(:resending_email)
     else
       flash[:error] = translation(:please_sign_in)

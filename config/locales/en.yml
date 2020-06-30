@@ -1822,7 +1822,7 @@ en:
         email_not_found: Sorry, that email address isn't in our system.
         link_no_longer_valid: We're sorry, but that link is no longer valid.
       resend_confirmation_email:
-        please_sign_in: Please sign in to send the confirmation again
+        please_sign_in: Unable to find a user matching that email!
         resending_email: Email confirmation re-sent
       show:
         user_not_sharing: Sorry, that user isn't sharing their bikes.
@@ -5331,10 +5331,11 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     please_confirm_email:
-      did_not_get_an_email: Didn't get an email? Check your spam folder. If you can't
-        find it, you can
+      did_not_get_an_email: >-
+        Didn't get an email? Check your spam folder. If you can't find it, resend
+        the notification here
       please_verify_your_email: Please verify your email
-      resend_confirmation_email: re-send the confirmation email.
+      resend_confirmation_email: re-send the confirmation email
       thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
       we_sent_an_email: >-
         We sent an email with a confirmation link in it. Follow the link in the email
