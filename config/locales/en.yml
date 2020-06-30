@@ -1812,6 +1812,9 @@ en:
       resend_confirmation:
         resend_confirmation: Email confirmation re-sent
     users:
+      resend_confirmation_email:
+        resending_email: Email confirmation re-sent
+        please_sign_in: Please sign in to send the confirmation again
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
       edit_templates:

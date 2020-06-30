@@ -29,6 +29,16 @@ class UsersController < ApplicationController
     layout = sign_in_partner == "bikehub" ? "application_bikehub" : "application"
   end
 
+  def resend_confirmation_email
+    if current_user.present?
+      EmailConfirmationWorker.new.perform(current_user.id)
+      flash[:success] = translation(:resending_email)
+    else
+      flash[:error] = translation(:please_sign_in)
+    end
+    redirect_to please_confirm_email_users_path
+  end
+
   def confirm
     begin
       @user = User.find(params[:id])

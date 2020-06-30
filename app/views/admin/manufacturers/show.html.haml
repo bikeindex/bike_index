@@ -1,4 +1,3 @@
-
 %h1
   = @manufacturer.name
 
@@ -8,38 +7,38 @@
     %table.table-list
       %tbody
         %tr
-          %th
+          %td
             ID
           %td
             = @manufacturer.id
         %tr
-          %th
+          %td
             Slug
           %td
             = @manufacturer.slug
         %tr
-          %th
+          %td
             Open Year
           %td
             = @manufacturer.open_year
         %tr
-          %th
+          %td
             Close Year
           %td
             = @manufacturer.close_year
         - if @manufacturer.website.present?
           %tr
-            %th
+            %td
               Manufacturer website
             %td
               = link_to @manufacturer.website, @manufacturer.website
         %tr
-          %th
+          %td
             Description
           %td
             = @manufacturer.description
         %tr
-          %th
+          %td
             Bikes
           %td
             %a{ href: admin_bikes_path(search_manufacturer_id: @manufacturer.slug) }
@@ -47,17 +46,17 @@
               %small
                 view
         %tr
-          %th
+          %td
             Components
           %td
             = @manufacturer.components.count
-        - if @manufacturer.logo.present?
-          %th
+        %tr
+          %td
             Logo
           %td
-            = image_tag @manufacturer.logo.url(:thumb)
+            = link_to image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url
         %tr
-          %th
+          %td
             Frame Maker?
           %td.table-cell-check
             - if @manufacturer.frame_maker
