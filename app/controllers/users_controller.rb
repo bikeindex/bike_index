@@ -30,8 +30,8 @@ class UsersController < ApplicationController
   end
 
   def resend_confirmation_email
-    if current_user.present?
-      EmailConfirmationWorker.new.perform(current_user.id)
+    if unconfirmed_current_user.present?
+      EmailConfirmationWorker.new.perform(unconfirmed_current_user.id)
       flash[:success] = translation(:resending_email)
     else
       flash[:error] = translation(:please_sign_in)

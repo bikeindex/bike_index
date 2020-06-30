@@ -6,6 +6,9 @@
 
   - if @user.present?
     %p= t(".we_sent_an_email_to_user_email_html", user_email: @user.email)
+    %p
+      = t(".did_not_get_an_email")
+      = link_to t(".resend_confirmation_email"), resend_confirmation_email_users_path, method: "POST"
   - else
     %p= t(".we_sent_an_email")
 

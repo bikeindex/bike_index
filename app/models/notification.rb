@@ -9,5 +9,7 @@ class Notification < ApplicationRecord
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
   def email_success?; delivery_status == "email_success" end
 end
