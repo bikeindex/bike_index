@@ -1803,6 +1803,39 @@ ALTER SEQUENCE public.normalized_serial_segments_id_seq OWNED BY public.normaliz
 
 
 --
+-- Name: notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications (
+    id bigint NOT NULL,
+    user_id bigint,
+    kind integer,
+    delivery_status character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
+
+
+--
 -- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3111,6 +3144,13 @@ ALTER TABLE ONLY public.normalized_serial_segments ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
+
+
+--
 -- Name: oauth_access_grants id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3645,6 +3685,14 @@ ALTER TABLE ONLY public.memberships
 
 ALTER TABLE ONLY public.normalized_serial_segments
     ADD CONSTRAINT normalized_serial_segments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -4368,6 +4416,13 @@ CREATE INDEX index_normalized_serial_segments_on_bike_id ON public.normalized_se
 --
 
 CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON public.normalized_serial_segments USING btree (duplicate_bike_group_id);
+
+
+--
+-- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_user_id ON public.notifications USING btree (user_id);
 
 
 --
@@ -5188,6 +5243,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200619234821'),
 ('20200620170809'),
 ('20200620171606'),
-('20200620172241');
+('20200620172241'),
+('20200630200556');
 
 

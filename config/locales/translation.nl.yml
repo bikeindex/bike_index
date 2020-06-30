@@ -2380,6 +2380,9 @@ nl:
         you_can_use_bike_index: Bedankt! Nu kunt u Bike Index gebruiken.
         you_can_use_bike_index_as_org: Bedankt! Nu kunt u Bike Index gebruiken als
           %{org_name}
+      resend_confirmation_email:
+        please_sign_in: Log in om de bevestiging opnieuw te verzenden
+        resending_email: E-mailbevestiging opnieuw verzonden
     concerns:
       controller_helpers:
         authenticate_user:
@@ -5290,6 +5293,9 @@ nl:
       we_sent_an_email_to_user_email_html: We hebben een e-mail verzonden naar <strong
         class="stolen-color">%{user_email}</strong> met een bevestigingslink erin.
         Volg de link in de e-mail om het aanmelden te voltooien!
+      did_not_get_an_email: Heb je geen e-mail ontvangen? Controleer je spam folder.
+        Als je het niet kunt vinden, kun je het wel
+      resend_confirmation_email: verzend de bevestigingsmail opnieuw.
     request_password_reset:
       enter_the_email_address: Voer het e-mailadres in dat je hebt gebruikt om je
         aan te melden. We sturen u een e-mail met een link om uw wachtwoord opnieuw
