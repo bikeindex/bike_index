@@ -330,7 +330,7 @@ module ControllerHelpers
   def invalid_return_to?(target)
     return true if target.blank?
     # return_to can't be a sign in/up page, or we'll loop
-    ["/users/new", "/session/new", "/session/magic_link", "/integrations"].any? { |r| target.match?(r) }
+    ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }
   end
 
   def bikehub_url(path)

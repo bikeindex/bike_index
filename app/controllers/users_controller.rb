@@ -25,6 +25,9 @@ class UsersController < ApplicationController
 
   def please_confirm_email
     redirect_to(user_root_url) and return if current_user.present?
+    if params[:require_sign_in].present?
+      redirect_to new_session_path and return unless unconfirmed_current_user.present?
+    end
     @user = unconfirmed_current_user
     layout = sign_in_partner == "bikehub" ? "application_bikehub" : "application"
   end
