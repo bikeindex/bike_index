@@ -7,6 +7,7 @@
 
   %body#print-tickets
     .ticket-container
+      - require 'rqrcode'
       - tickets_per_row = (@tickets.count / 3.0).ceil
       - ticket_rows = [@tickets.slice(0, tickets_per_row), @tickets.slice(tickets_per_row, tickets_per_row), @tickets.slice(2*tickets_per_row, tickets_per_row)]
       - tickets_per_row.times do |i|
@@ -14,4 +15,15 @@
           - next unless ticket.present?
           .ticket-wrapper
             .ticket-display
-              = ticket.number
+              -# .organization-name
+              -#   %span.name-text
+              -#     = current_organization.name
+              .ticket-number
+                = ticket.number
+              .qrcode
+                - ticket_link = claim_ticket_organization_customer_appointments_url(organization_id: current_organization.to_param, location_id: current_location&.id, ticket_token: ticket.link_token)
+                - qrcode = RQRCode::QRCode.new(ticket_link, level: :h)
+                -# = qrcode.as_svg(offset: 0, color: '000', shape_rendering: 'crispEdges', module_size: 4, standalone: true).html_safe
+                - png = qrcode.as_png(bit_depth: 1, border_modules: 4, color_mode: ChunkyPNG::COLOR_GRAYSCALE, color: 'black', file: nil, fill: 'white', module_px_size: 6, resize_exactly_to: false, resize_gte_to: false, size: 180)
+                <img src="#{png.to_data_url}" />
+

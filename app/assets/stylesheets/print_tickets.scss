@@ -1,3 +1,5 @@
+// Basic print stylesheet for outputting tickets
+
 #print-tickets .profiler-results {
   display: none !important; // hide the mini-profiler
 }
@@ -11,7 +13,17 @@
 
 @page {
   size: 8.5in 11in;
-  margin: 0.5;
+  margin: 0.25in;
+}
+
+$body-font-family: "Open Sans", sans-serif;
+$normal-font-weight: 400;
+$strong-font-weight: 700;
+$light-italic-weight: 300;
+
+body {
+  font-family: $body-font-family;
+  font-weight: $normal-font-weight;
 }
 
 .ticket-container {
@@ -29,9 +41,48 @@
 }
 
 .ticket-display {
-  display: block;
+  display: flex;
   width: 100%;
   padding: 12px;
-  text-align: center;
   border: 1px solid black;
+}
+
+.ticket-body-wrap {
+  // display: flex;
+  // flex-flow: row wrap;
+}
+
+// .organization-name,
+// .ticket-number,
+// .qrcode {
+//   display: flex;
+//   flex-wrap: wrap;
+// }
+
+.organization-name {
+  flex: 0 0 20%;
+  max-width: 20%;
+  // .name-text {
+  //   transform: rotate(270deg);
+  // }
+}
+
+.ticket-number {
+  // flex: 0 0 50%;
+  // max-width: 50%;
+  font-size: 200%;
+  font-weight: $strong-font-weight;
+}
+
+.qrcode {
+  flex: 0 0 30%;
+  max-width: 30%;
+  position: relative;
+  img {
+    display: inline-block;
+    width: 100%;
+    height: auto;
+    vertical-align: middle;
+    border-style: none;
+  }
 }

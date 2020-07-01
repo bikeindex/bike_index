@@ -365,6 +365,7 @@ Rails.application.routes.draw do
     get "WalkRightUp", to: "walkrightup#show"
     resources :customer_appointments, only: %i[show update create] do
       collection do
+        get :claim_ticket
         post :set_current
       end
     end
