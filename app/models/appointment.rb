@@ -7,6 +7,7 @@ class Appointment < ApplicationRecord
   belongs_to :bike
 
   has_many :appointment_updates, dependent: :destroy
+  has_one :ticket
 
   validates_presence_of :organization_id, :location_id, :name
 

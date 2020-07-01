@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -2591,6 +2591,42 @@ ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
 
 
 --
+-- Name: tickets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tickets (
+    id bigint NOT NULL,
+    organization_id bigint,
+    location_id bigint,
+    appointment_id bigint,
+    number integer,
+    status integer DEFAULT 0,
+    link_token text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tickets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tickets_id_seq OWNED BY public.tickets.id;
+
+
+--
 -- Name: tweets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3277,6 +3313,13 @@ ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: tickets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tickets ALTER COLUMN id SET DEFAULT nextval('public.tickets_id_seq'::regclass);
+
+
+--
 -- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3837,6 +3880,14 @@ ALTER TABLE ONLY public.theft_alert_plans
 
 ALTER TABLE ONLY public.theft_alerts
     ADD CONSTRAINT theft_alerts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tickets tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tickets
+    ADD CONSTRAINT tickets_pkey PRIMARY KEY (id);
 
 
 --
@@ -4657,6 +4708,27 @@ CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (u
 
 
 --
+-- Name: index_tickets_on_appointment_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tickets_on_appointment_id ON public.tickets USING btree (appointment_id);
+
+
+--
+-- Name: index_tickets_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tickets_on_location_id ON public.tickets USING btree (location_id);
+
+
+--
+-- Name: index_tickets_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tickets_on_organization_id ON public.tickets USING btree (organization_id);
+
+
+--
 -- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5244,6 +5316,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620170809'),
 ('20200620171606'),
 ('20200620172241'),
-('20200630200556');
+('20200630200556'),
+('20200701182325');
 
 

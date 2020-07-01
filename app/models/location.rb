@@ -10,6 +10,7 @@ class Location < ApplicationRecord
   has_many :bikes
   has_one :appointment_configuration
   has_many :appointments
+  has_many :tickets
 
   validates :name, :city, :country, :organization, presence: true
 

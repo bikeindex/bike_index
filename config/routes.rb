@@ -336,6 +336,9 @@ Rails.application.routes.draw do
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
     resources :lines, only: %i[index show update]
+    resources :tickets do
+      collection { get :print }
+    end
     resources :appointments, only: %i[create update]
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do

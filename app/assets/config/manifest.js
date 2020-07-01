@@ -14,6 +14,7 @@
 //= link spokecard.css
 //= link documentation_v2.css
 //= link email.css
+//= link print_tickets.css
 //= link og_application.css
 //= link registrations.css
 //= link revised.css

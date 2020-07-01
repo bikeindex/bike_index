@@ -1,0 +1,18 @@
+#print-tickets {
+  .profiler-results {
+    display: none !important; // hide the mini-profiler
+  }
+
+  .ticket-display {
+    display: block;
+    // float: left;
+    padding: 12px;
+    width: 33%;
+    margin: 1rem 1% 0 0;
+    border: 1px solid black;
+  }
+
+  @page {
+    size: 11in 5in landscape;
+  }
+}

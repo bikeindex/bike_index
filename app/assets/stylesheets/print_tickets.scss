@@ -1,0 +1,37 @@
+#print-tickets .profiler-results {
+  display: none !important; // hide the mini-profiler
+}
+
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@page {
+  size: 8.5in 11in;
+  margin: 0.5;
+}
+
+.ticket-container {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.ticket-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 33.33333%;
+  max-width: 33.33333%;
+  padding: 1rem 1rem 0 0;
+  position: relative;
+}
+
+.ticket-display {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid black;
+}

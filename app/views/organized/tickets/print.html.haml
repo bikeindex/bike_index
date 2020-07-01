@@ -1,0 +1,19 @@
+!!!
+%html
+  %head
+    = header_tags
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    = stylesheet_link_tag "print_tickets", media: "all"
+
+  %body#print-tickets
+    .ticket-container
+      - ticket_rows = @tickets.each_slice(@tickets.count / 3).to_a
+      - tickets_rendered = []
+      - ticket_rows.first.count.times do |i|
+        - [ticket_rows[0][i], ticket_rows[1][i], ticket_rows[2][i]].each do |ticket|
+
+          - next unless ticket.present? && !tickets_rendered.include?(ticket.id)
+          - tickets_rendered << ticket.id # This is a gross way of managing this, but... whatever
+          .ticket-wrapper
+            .ticket-display
+              = ticket.number
