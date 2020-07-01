@@ -24,16 +24,22 @@ $light-italic-weight: 300;
 body {
   font-family: $body-font-family;
   font-weight: $normal-font-weight;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.ticket-container {
+.row {
   display: flex;
   flex-flow: row wrap;
 }
 
-.ticket-wrapper {
+.col {
   display: flex;
   flex-wrap: wrap;
+}
+
+.ticket-wrapper {
+  @extend .col;
   flex: 0 0 33.33333%;
   max-width: 33.33333%;
   padding: 1rem 1rem 0 0;
@@ -41,40 +47,35 @@ body {
 }
 
 .ticket-display {
-  display: flex;
   width: 100%;
-  padding: 12px;
+  padding: 0.25rem;
   border: 1px solid black;
 }
 
-.ticket-body-wrap {
-  // display: flex;
-  // flex-flow: row wrap;
-}
-
-// .organization-name,
-// .ticket-number,
-// .qrcode {
-//   display: flex;
-//   flex-wrap: wrap;
-// }
-
-.organization-name {
-  flex: 0 0 20%;
-  max-width: 20%;
-  // .name-text {
-  //   transform: rotate(270deg);
-  // }
+.ticket-text {
+  @extend .col;
+  flex: 0 0 70%;
+  max-width: 70%;
 }
 
 .ticket-number {
-  // flex: 0 0 50%;
-  // max-width: 50%;
+  width: 100%;
+  margin: 0;
   font-size: 200%;
   font-weight: $strong-font-weight;
+  text-align: center;
+}
+
+.organization-name {
+  width: 100%;
+  clear: both;
+  text-align: center;
+  color: #bbb;
+  margin: 0.5rem 0 0;
 }
 
 .qrcode {
+  @extend .col;
   flex: 0 0 30%;
   max-width: 30%;
   position: relative;
