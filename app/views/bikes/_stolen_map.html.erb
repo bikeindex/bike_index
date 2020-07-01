@@ -7,7 +7,7 @@
 
 <script>
   mapboxgl.accessToken = "<%= ENV['MAPBOX_MAPPING'] %>";
-  window.stolenBikeLngLat = [<%= @bike.current_stolen_record.longitude %>, <%= @bike.current_stolen_record.latitude %>];
+  var stolenBikeLngLat = [<%= @bike.current_stolen_record.longitude %>, <%= @bike.current_stolen_record.latitude %>];
 
   var map = new mapboxgl.Map({
     container: "map_canvas",
@@ -16,8 +16,6 @@
     zoom: 13,
     maxZoom: 16,
   });
-
-  window.mapboxMap = map;
 
   map.on("load", function() {
     map.addSource("stolenBikeCircle", {
