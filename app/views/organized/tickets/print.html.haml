@@ -7,13 +7,11 @@
 
   %body#print-tickets
     .ticket-container
-      - ticket_rows = @tickets.each_slice(@tickets.count / 3).to_a
-      - tickets_rendered = []
-      - ticket_rows.first.count.times do |i|
-        - [ticket_rows[0][i], ticket_rows[1][i], ticket_rows[2][i]].each do |ticket|
-
-          - next unless ticket.present? && !tickets_rendered.include?(ticket.id)
-          - tickets_rendered << ticket.id # This is a gross way of managing this, but... whatever
+      - tickets_per_row = (@tickets.count / 3.0).ceil
+      - ticket_rows = [@tickets.slice(0, tickets_per_row), @tickets.slice(tickets_per_row, tickets_per_row), @tickets.slice(2*tickets_per_row, tickets_per_row)]
+      - tickets_per_row.times do |i|
+        - [ticket_rows.first[i], ticket_rows.second[i], ticket_rows.third[i]].each do |ticket|
+          - next unless ticket.present?
           .ticket-wrapper
             .ticket-display
               = ticket.number
