@@ -2,19 +2,54 @@
   <div id="map_canvas"></div>
 </div>
 
-<script src='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' rel='stylesheet' />
-<%= ENV['MAPBOX_MAPPING'] %>
-<%= Rails.env %>
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
 
-<div id='map' style='width: 400px; height: 300px;'></div>
 <script>
   mapboxgl.accessToken = "<%= ENV['MAPBOX_MAPPING'] %>";
+  window.stolenBikeLngLat = [<%= @bike.current_stolen_record.longitude %>, <%= @bike.current_stolen_record.latitude %>];
+
   var map = new mapboxgl.Map({
     container: "map_canvas",
-    style: "mapbox://styles/mapbox/streets-v11", // stylesheet location
-    center: [<%= @bike.current_stolen_record.latitude %>, <%= @bike.current_stolen_record.longitude %>], // starting position [lng, lat]
-    zoom: 13
+    style: "mapbox://styles/mapbox/streets-v11",
+    center: stolenBikeLngLat,
+    zoom: 13,
+    maxZoom: 16,
+  });
+
+  window.mapboxMap = map;
+
+  map.on("load", function() {
+    map.addSource("stolenBikeCircle", {
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": [{
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": stolenBikeLngLat
+          }
+        }]
+      }
+    });
+
+    map.addLayer({
+      "id": "stolenBikeLocation",
+      "type": "circle",
+      "source": "stolenBikeCircle",
+      "paint": {
+        "circle-radius": {
+          stops: [
+            [5, 5],
+            [16, 240]
+          ],
+          base: 2
+        },
+        "circle-color": "red",
+        "circle-opacity": 0.4
+      }
+    });
   });
 </script>
 
