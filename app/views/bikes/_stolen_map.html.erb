@@ -2,32 +2,52 @@
   <div id="map_canvas"></div>
 </div>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS'] %>" type="text/javascript"></script>
-</script>
-<script type="text/javascript">
-  var map;
-  function initialize() {
-    var center = new google.maps.LatLng(<%= @bike.current_stolen_record.latitude %>, <%= @bike.current_stolen_record.longitude %>);
-    var myOptions = {
-      zoom: 13,
-      center: center,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
-    var circleOptions = {
-      strokeColor: "#bf2f2f",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: "#bf2f2f",
-      fillOpacity: 0.25,
-      map: map,
-      center: center,
-      radius: 600
-    };
-    cityCircle = new google.maps.Circle(circleOptions);
-  }
-  $(document).ready(function() {
-    google.maps.event.addDomListener(window, 'load', initialize);
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+
+<script>
+  mapboxgl.accessToken = "<%= ENV['MAPBOX_MAPPING'] %>";
+  var stolenBikeLngLat = [<%= @bike.current_stolen_record.longitude %>, <%= @bike.current_stolen_record.latitude %>];
+
+  var map = new mapboxgl.Map({
+    container: "map_canvas",
+    style: "mapbox://styles/mapbox/streets-v11",
+    center: stolenBikeLngLat,
+    zoom: 13,
+    maxZoom: 16,
+  });
+
+  map.on("load", function() {
+    map.addSource("stolenBikeCircle", {
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": [{
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": stolenBikeLngLat
+          }
+        }]
+      }
+    });
+
+    map.addLayer({
+      "id": "stolenBikeLocation",
+      "type": "circle",
+      "source": "stolenBikeCircle",
+      "paint": {
+        "circle-radius": {
+          stops: [
+            [5, 5],
+            [16, 240]
+          ],
+          base: 2
+        },
+        "circle-color": "red",
+        "circle-opacity": 0.4
+      }
+    });
   });
 </script>
+
