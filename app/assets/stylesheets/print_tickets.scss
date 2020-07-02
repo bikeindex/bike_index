@@ -56,6 +56,15 @@ body {
   @extend .col;
   flex: 0 0 70%;
   max-width: 70%;
+  .ticket-link {
+    display: block;
+    width: 100%;
+    font-size: 80%;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 .ticket-number {

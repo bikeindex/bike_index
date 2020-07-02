@@ -13,6 +13,7 @@
       - tickets_per_row.times do |i|
         - [ticket_rows.first[i], ticket_rows.second[i], ticket_rows.third[i]].each do |ticket|
           - next unless ticket.present?
+          - ticket_link = claim_ticket_organization_customer_appointments_url(organization_id: current_organization.to_param, location_id: current_location&.id, ticket_token: ticket.link_token)
           .ticket-wrapper
             .ticket-display
               .row
@@ -21,10 +22,12 @@
                     = ticket.number
                   .organization-name
                     = current_organization.name
-
+                    - if params[:show_link].present?
+                      = link_to "ticket link", ticket_link, class: "ticket-link"
                 .qrcode
-                  - ticket_link = claim_ticket_organization_customer_appointments_url(organization_id: current_organization.to_param, location_id: current_location&.id, ticket_token: ticket.link_token)
                   - qrcode = RQRCode::QRCode.new(ticket_link, level: :h)
                   - png = qrcode.as_png(bit_depth: 1, border_modules: 0, color_mode: ChunkyPNG::COLOR_GRAYSCALE, color: 'black', file: nil, fill: 'white', module_px_size: 6, resize_exactly_to: false, resize_gte_to: false, size: 240)
                   <img src="#{png.to_data_url}" />
+
+
 

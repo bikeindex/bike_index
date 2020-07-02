@@ -34,6 +34,8 @@ class Appointment < ApplicationRecord
 
   def self.resolved_statuses; %[finished removed] end
 
+  def ticket?; ticket.present? end
+
   def appointment_configuration; location.appointment_configuration end
 
   def permitted_reasons; appointment_configuration.reasons end
@@ -52,12 +54,12 @@ class Appointment < ApplicationRecord
   def other_location_appointments; location.appointments.where.not(id: id) end
 
   def display_name
-    return ticket.number if ticket.present?
+    return ticket.display_number if ticket?
     name.presence || user&.display_name
   end
 
   def first_display_name
-    return ticket.number if ticket.present?
+    return ticket.display_number if ticket?
     BadWordCleaner.clean(display_name.to_s.split(" ").first)
   end
 

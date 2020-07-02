@@ -26,13 +26,17 @@
         %ol
           - @appointments_in_line.each do |appointment|
             %li
-              = appointment.first_display_name
+              - if appointment.ticket?
+                %strong
+                  #{appointment.display_name}
+              - else
+                = appointment.first_display_name
               - if appointment.status == "paging"
                 %span.text-warning #{current_organization.short_name} is ready for them!
               - elsif appointment.status == "on_deck"
                 %span.text-info on deck
               - if appointment.id == @appointment.id
-                %span.text-success you!
+                %em.small.text-success you!
       .col-sm-8.text-center
         - appointments_in_front = @appointments_in_line.pluck(:id).index(@appointment.id)
         - appointments_in_front = 0 if appointments_in_front < 0
@@ -45,15 +49,20 @@
         %p.less-strong
           = pluralize(not_on_deck_in_front_of, "person")
           before you will be "on deck"
+        - if @appointment.ticket?
+          %h3
+            %small.less-strong
+              you're ticket
+            \##{@appointment.display_name}
 
   = form_for @appointment, { as: :appointment, url: organization_customer_appointment_path(@appointment.link_token, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
     .row
       .form-group.col-sm-6
         = f.label :name, "Your name"
-        = f.text_field :name, required: true, class: "form-control"
+        = f.text_field :name, class: "form-control"
       .form-group.col-sm-6
         = f.label :email, "Your email"
-        = f.email_field :email, required: true, class: "form-control"
+        = f.email_field :email, class: "form-control"
     .row.collapse.show.updateLineStatusCollapse
       .form-group.col-sm-6
         = f.label :description, "Additional description"
