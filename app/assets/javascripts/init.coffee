@@ -171,7 +171,7 @@ renderDonationModal = ->
     new BikeIndex.Payments
     # NOTE: This is also set in payments.coffee on payment submission
     $("#donationModal").on 'hide.bs.modal', ->
-      localStorage.setItem("hideDonationModalJune2020", "true")
+      localStorage.setItem("hideDonationModal", "true")
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
