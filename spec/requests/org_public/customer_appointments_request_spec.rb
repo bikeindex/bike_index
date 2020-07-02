@@ -36,6 +36,21 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
     end
   end
 
+  describe "claim_ticket" do
+    let(:ticket) { FactoryBot.create(:ticket, location: location) }
+    it "renders - which will automatically trigger redirect" do
+      expect(ticket.status).to eq "unused"
+      get "#{base_url}/claim_ticket", params: {
+                                        organization_id: current_organization.to_param,
+                                        location_id: location.to_param,
+                                        ticket_token: ticket.link_token,
+                                      }
+      expect(response).to render_template :claim_ticket
+      ticket.reload
+      expect(ticket.status).to eq "unused"
+    end
+  end
+
   describe "create" do
     let(:appointment_params) { { name: "Sarah h.", email: "something@stuff.com", reason: "Service", location_id: location.id, status: "on_deck" } }
     it "creates and assigns the appointment" do
@@ -68,18 +83,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
       expect(new_appointment.user_id).to be_blank
       expect(new_appointment.appointment_updates.count).to eq 0
     end
-    context "no email" do
-      it "denies" do
-        Sidekiq::Worker.clear_all
-        expect do
-          post base_url, params: {
-                           organization_id: current_organization.to_param,
-                           appointment: appointment_params.merge(email: " "),
-                         }
-        end.to_not change(Appointment, :count)
-        expect(flash[:error]).to be_present
-      end
-    end
+
     context "current user" do
       include_context :request_spec_logged_in_as_user
       it "creates" do
@@ -102,6 +106,70 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
         expect(new_appointment.creator_kind).to eq "signed_in_user"
         expect(new_appointment.user).to eq current_user
         expect(new_appointment.appointment_updates.count).to eq 0
+      end
+    end
+    context "with ticket_token" do
+      let!(:ticket) { FactoryBot.create(:ticket, location: location) }
+      it "assigns the ticket" do
+        expect(ticket.status).to eq "unused"
+        expect do
+          post base_url, params: {
+                           organization_id: current_organization.to_param,
+                           ticket_token: ticket.link_token,
+                         }
+        end.to change(Appointment, :count).by 1
+        expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
+        expect(flash[:success]).to be_present
+        ticket.reload
+        expect(ticket.status).to eq "in_line"
+
+        new_appointment = ticket.appointment
+        expect(new_appointment.status).to eq "waiting"
+        expect(new_appointment.name).to be_blank
+        expect(new_appointment.display_name).to eq ticket.display_number
+        expect(new_appointment.email).to be_blank
+        expect(new_appointment.reason).to be_blank
+        expect(new_appointment.location_id).to eq location.id
+        expect(new_appointment.organization_id).to eq current_organization.id
+        expect(new_appointment.creator_kind).to eq "ticket_scan"
+        expect(new_appointment.user).to be_blank
+        expect(new_appointment.appointment_updates.count).to eq 0
+      end
+      context "ticket has already been assigned" do
+        let!(:appointment) { ticket.existing_or_new_appointment }
+        it "redirects to the ticket" do
+          ticket.reload
+          expect(ticket.appointment.present?).to be_truthy
+          expect(ticket.status).to eq "in_line"
+          expect(appointment.creator_kind).to eq "ticket_scan"
+          expect(appointment.ticket).to eq ticket
+          expect do
+            post base_url, params: {
+                             organization_id: current_organization.to_param,
+                             ticket_token: ticket.link_token,
+                           }
+          end.to_not change(Appointment, :count)
+          expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
+        end
+        context "ticket has already been resolved" do
+          it "redirects to the walkrightup path, without an appointment" do
+            appointment.record_status_update(new_status: "being_helped")
+            expect(appointment.in_line?).to be_falsey
+            ticket.reload
+            expect(ticket.appointment.present?).to be_truthy
+            expect(ticket.status).to eq "resolved"
+            expect(appointment.creator_kind).to eq "ticket_scan"
+            expect(appointment.ticket).to eq ticket
+            expect do
+              post base_url, params: {
+                               organization_id: current_organization.to_param,
+                               ticket_token: ticket.link_token,
+                             }
+            end.to_not change(Appointment, :count)
+            expect(response).to redirect_to(organization_walkrightup_path(organization_id: current_organization.to_param, location_id: location.to_param))
+            expect(flash[:error]).to be_present
+          end
+        end
       end
     end
   end

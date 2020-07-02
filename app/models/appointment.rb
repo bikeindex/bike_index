@@ -9,7 +9,7 @@ class Appointment < ApplicationRecord
   has_many :appointment_updates, dependent: :destroy
   has_one :ticket
 
-  validates_presence_of :organization_id, :location_id, :name
+  validates_presence_of :organization_id, :location_id
 
   before_validation :set_calculated_attributes
   after_commit :update_appointment_queue
@@ -51,9 +51,15 @@ class Appointment < ApplicationRecord
 
   def other_location_appointments; location.appointments.where.not(id: id) end
 
-  def display_name; name.presence || user&.display_name end
+  def display_name
+    return ticket.number if ticket.present?
+    name.presence || user&.display_name
+  end
 
-  def first_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
+  def first_display_name
+    return ticket.number if ticket.present?
+    BadWordCleaner.clean(display_name.to_s.split(" ").first)
+  end
 
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
     return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
@@ -74,6 +80,7 @@ class Appointment < ApplicationRecord
     else
       # Because things might've changed, and even if they didn't we still want to run the queue updator
       self.update(updated_at: Time.current)
+      ticket.update(status: "resolved") if !in_line? && ticket&.unresolved?
     end
     new_update # Return the created update
   end

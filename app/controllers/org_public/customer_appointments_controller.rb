@@ -4,21 +4,32 @@ module OrgPublic
     before_action :find_appointment_and_redirect, only: [:show, :set_current]
     before_action :find_appointment, only: [:update]
 
-    layout "customer_virtual_line"
+    layout "walkrightup"
 
     def show; end
 
-    def set_current; end
+    def set_current; end # POST
+
+    def claim_ticket; end # Auto-redirects to create (on load, via JS)
 
     def create
-      @appointment = Appointment.new(permitted_create_params)
-      if @appointment.email.blank?
-        flash[:error] = "Email required!"
-      elsif @appointment.save
-        flash[:success] = "You're now in line!"
-        assign_current_appointment(@appointment)
+      if params[:ticket_token].present?
+        @ticket = ticket_for_token
+        if @ticket.unresolved?
+          @appointment = @ticket.existing_or_new_appointment
+          assign_current_appointment(@appointment)
+          flash[:success] = "You're now in line!"
+        else
+          flash[:error] = "That ticket has already been resolved!"
+        end
       else
-        flash[:error] = @appointment.errors.full_messages.to_sentence
+        @appointment = Appointment.new(permitted_create_params)
+        if @appointment.save
+          flash[:success] = "You're now in line!"
+          assign_current_appointment(@appointment)
+        else
+          flash[:error] = @appointment.errors.full_messages.to_sentence
+        end
       end
       redirect_to walkrightup_route and return
     end
@@ -41,6 +52,10 @@ module OrgPublic
     def walkrightup_route
       organization_walkrightup_path(organization_id: current_organization.to_param,
                                     location_id: current_appointment&.location&.to_param || current_location&.to_param)
+    end
+
+    def ticket_for_token
+      current_organization.tickets.find_by_link_token(params[:ticket_token])
     end
 
     def find_appointment

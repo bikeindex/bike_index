@@ -17,7 +17,7 @@
             = current_organization.name
           virtual line
 
-      - if current_location.present?
+      - if current_location.present? && @appointments_in_line.present?
         .container
           .row
             .col-6

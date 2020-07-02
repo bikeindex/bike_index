@@ -1,0 +1,11 @@
+-# TODO translations
+.text-center
+  %h3
+    You should be redirected automatically
+  %p If not, click this button
+  = form_tag organization_customer_appointments_path(organization_id: current_organization.to_param), id: "redirect_to_appointment", method: "post" do
+    = hidden_field_tag :ticket_token, params[:ticket_token]
+    = hidden_field_tag :location_id, current_location&.id
+    %input{ type: "submit", value: "Claim place in line", class: "btn btn-success btn-lg" }
+  :javascript
+    document.forms["redirect_to_appointment"].submit()

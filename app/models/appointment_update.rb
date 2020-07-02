@@ -13,9 +13,10 @@ class AppointmentUpdate < ApplicationRecord
 
   CREATOR_KIND_ENUM = {
     no_user: 0,
-    signed_in_user: 1,
-    organization_member: 2,
-    queue_worker: 3,
+    ticket_scan: 1,
+    signed_in_user: 2,
+    organization_member: 3,
+    queue_worker: 4,
   }
 
   belongs_to :appointment
