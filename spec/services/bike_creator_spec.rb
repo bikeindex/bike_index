@@ -150,7 +150,7 @@ RSpec.describe BikeCreator do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "Something@GMAIL.com" }
         it "finds a duplicate" do
-          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
@@ -164,7 +164,7 @@ RSpec.describe BikeCreator do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
-          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)

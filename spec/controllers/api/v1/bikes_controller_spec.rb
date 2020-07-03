@@ -57,6 +57,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           organization_slug: organization.slug,
           access_token: organization.access_token,
           bike: {
+            no_duplicate: true,
             owner_email: "example@gmail.com",
             serial_number: "SSOMESERIAL",
             manufacturer: "Specialized",
@@ -80,7 +81,27 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
       before do
         expect([black, red, manufacturer].size).to eq 3
+        expect(bike_hash).to be_present # make sure the things are created before we clear the queues
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
       end
+
+      def expect_matching_created_bike(created_bike)
+        expect(created_bike.manufacturer).to eq manufacturer
+        expect(created_bike.frame_model).to eq "Diverge Elite DSW (58)"
+        expect(created_bike.frame_size).to eq "58cm"
+        expect(created_bike.frame_size_unit).to eq "cm"
+        expect(created_bike.primary_frame_color).to eq black
+        expect(created_bike.paint_description).to eq "Black/Red"
+        expect(created_bike.creation_states.count).to eq 1
+        creation_state = created_bike.creation_state
+        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
+        expect(creation_state.organization).to eq organization
+        expect(creation_state.creator).to eq created_bike.creator
+        expect(creation_state.origin).to eq "api_v1"
+        expect(creation_state.pos_kind).to eq "lightspeed_pos"
+      end
+
       it "creates a bike and does not duplicate" do
         expect do
           post :create, params: bike_hash.as_json
@@ -88,48 +109,58 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
-        expect(bike.manufacturer).to eq manufacturer
-        expect(bike.frame_model).to eq "Diverge Elite DSW (58)"
-        expect(bike.frame_size).to eq "58cm"
-        expect(bike.frame_size_unit).to eq "cm"
-        expect(bike.primary_frame_color).to eq black
-        expect(bike.paint_description).to eq "Black/Red"
-        creation_state = bike.creation_state
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-        expect(creation_state.organization).to eq organization
-        expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.origin).to eq "api_v1"
+        expect_matching_created_bike(bike)
+        og_ownership = bike.current_ownership
+
         expect do
-          updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
-          post :create, params: updated_hash.as_json
+          post :create, params: bike_hash.as_json
         end.to change(Ownership, :count).by 0
+
+        bike.reload
+        expect(bike.current_ownership).to eq og_ownership
+        expect(bike.creation_states.count).to eq 1
+
+        Sidekiq::Worker.drain_all # Not wrapping both in drain_all, because
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
       end
 
       context "new pos_integrator format" do
         # We're switching to use numeric id rather than slug, because the slugs change :(
         it "creates correctly" do
-          expect do
-            post :create, params: bike_hash.merge(organization_slug: organization.id).as_json
-          end.to change(Ownership, :count).by(1)
+          Sidekiq::Testing.inline! do
+            expect do
+              post :create, params: bike_hash.merge(organization_slug: organization.id).as_json
+            end.to change(Ownership, :count).by(1)
+          end
 
           expect(response.code).to eq("200")
           bike = Bike.where(serial_number: "SSOMESERIAL").first
-          expect(bike.manufacturer).to eq manufacturer
-          expect(bike.frame_model).to eq "Diverge Elite DSW (58)"
-          expect(bike.frame_size).to eq "58cm"
-          expect(bike.frame_size_unit).to eq "cm"
-          expect(bike.primary_frame_color).to eq black
-          expect(bike.paint_description).to eq "Black/Red"
-          creation_state = bike.creation_state
-          expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-          expect(creation_state.organization).to eq organization
-          expect(creation_state.creator).to eq bike.creator
-          expect(creation_state.origin).to eq "api_v1"
-          expect(creation_state.pos_kind).to eq "lightspeed_pos"
+          expect_matching_created_bike(bike)
+
           expect do
-            updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
-            post :create, params: updated_hash.as_json
+            # And do it a couple more times
+            post :create, params: bike_hash
+            post :create, params: bike_hash
           end.to change(Ownership, :count).by 0
+
+          Sidekiq::Worker.drain_all
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
+        end
+        context "with risky email" do
+          it "registers but doesn't send an email" do
+            expect do
+              post :create, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
+            end.to change(Ownership, :count).by(1)
+
+            expect(response.code).to eq("200")
+            bike = Bike.where(serial_number: "SSOMESERIAL").first
+            expect_matching_created_bike(bike)
+
+            Sidekiq::Worker.drain_all
+            expect(ActionMailer::Base.deliveries.count).to eq 0
+          end
         end
       end
     end

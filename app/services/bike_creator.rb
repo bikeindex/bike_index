@@ -95,7 +95,7 @@ class BikeCreator
 
   def validate_record(bike)
     return clear_bike(bike) if bike.errors.present?
-    @b_param.find_duplicate_bike(bike) if @b_param.no_duplicate
+    @b_param.find_duplicate_bike(bike) if @b_param.no_duplicate?
     if @b_param.created_bike.present?
       clear_bike(bike)
       @bike = @b_param.created_bike
@@ -112,7 +112,8 @@ class BikeCreator
     @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
 
-    if @bike.present? && @bike.id.present?
+    # We don't want to create an extra creation_state if there was a duplicate
+    if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
