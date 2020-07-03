@@ -5,7 +5,7 @@
 
 - @stolen_records.each do |stolen_record|
   - bike = stolen_record.bike
-  - bike.update(updated_at: Time.current) # Bump bike cached attributes, to be sure we have all the info
+  -# bike.update(updated_at: Time.current) # Bump bike cached attributes, to be sure we have all the info
   - thumb_url = bike.thumb_path || bike.stock_photo_url
   - bike_link = bike_url(bike, organization_id: @organization.to_param, sign_in_if_not: true)
 
@@ -15,16 +15,28 @@
   .hot-sheet-bike-display
     %table.bike-display
       %tbody
-        %tr.bike-title
-          %td.bike-display-wrapper-cell{ colspan: 2 }
-            = link_to organized_bike_text(bike, skip_creation: true), bike_link
+        / %tr.bike-title
+        /   %td.bike-display-wrapper-cell{ colspan: 2 }
+        /     = link_to organized_bike_text(bike, skip_creation: true), bike_link
         %tr
           %td.info-holder.bike-display-wrapper-cell
             %table.table-list
+              %tr.bike-title
+                %td{ colspan: 2 }
+                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
+              / %tr
+              /   %td Make
+              /   %td
+              /     = bike.mnfg_name
               %tr
                 %td Serial
                 %td
-                  = bike.serial_display
+                  - if bike.no_serial?
+                    %em.less-strong
+                      = bike.serial_display&.downcase
+                  - else
+                    %span.serial-display
+                      = bike.serial_display
 
               %tr
                 %td
@@ -51,9 +63,9 @@
                   - if stolen_record.police_report_number.present?
                     %small.less-strong
                       = stolen_record.police_report_department
-          %td.image-holder.bike-display-wrapper-cell{ class: thumbclass }
-            %a{ href:  bike_link }
-              %img{ src: thumb_url }
+            %td.image-holder.bike-display-wrapper-cell{ class: thumbclass }
+              %a{ href:  bike_link }
+                %img{ src: thumb_url }
 
 - if @organization.overview_dashboard?
   .clear-org-buttons

@@ -5,31 +5,7 @@ $font-size: 16px;
 $header-height: 82px;
 $email-light-bg: #dddddd;
 
-//
-// Email specific styles
-//
-@import "revised/emails/email_body";
-@import "revised/emails/email_sections";
-@import "revised/emails/email_components";
-@import "revised/emails/email_bike_display";
-@import "revised/emails/email_stolen_checklist";
-@import "revised/emails/email_partners";
-@import "revised/emails/email_hot_sheet";
-
-.stolen-notification-from {
-  background-color: $gray-lighter;
-  border: 1px solid $gray-lightish;
-  padding: 0 1em;
-  text-align: center;
-  font-style: italic;
-}
-
-.geolocated-message-map {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 24px auto;
-}
+$table-list-offset-color: $email-light-bg;
 
 .table-list {
   margin-bottom: 0;
@@ -43,7 +19,7 @@ $email-light-bg: #dddddd;
   border-spacing: 2px;
 
   tr:nth-of-type(even) {
-    background-color: #ffffff;
+    background-color: $table-list-offset-color;
   }
   tr:first-child td {
     border-top: none;
@@ -69,4 +45,30 @@ $email-light-bg: #dddddd;
       width: 85%; // This is effectively min-width for tables
     }
   }
+}
+
+//
+// Email specific styles
+//
+@import "revised/emails/email_body";
+@import "revised/emails/email_sections";
+@import "revised/emails/email_components";
+@import "revised/emails/email_bike_display";
+@import "revised/emails/email_stolen_checklist";
+@import "revised/emails/email_partners";
+@import "revised/emails/email_hot_sheet";
+
+.stolen-notification-from {
+  background-color: $gray-lighter;
+  border: 1px solid $gray-lightish;
+  padding: 0 1em;
+  text-align: center;
+  font-style: italic;
+}
+
+.geolocated-message-map {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
 }
