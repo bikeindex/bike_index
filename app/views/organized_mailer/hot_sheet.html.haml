@@ -15,19 +15,12 @@
   .hot-sheet-bike-display
     %table.bike-display
       %tbody
-        / %tr.bike-title
-        /   %td.bike-display-wrapper-cell{ colspan: 2 }
-        /     = link_to organized_bike_text(bike, skip_creation: true), bike_link
         %tr
           %td.info-holder.bike-display-wrapper-cell
             %table.table-list
               %tr.bike-title
                 %td{ colspan: 2 }
                   = link_to organized_bike_text(bike, skip_creation: true), bike_link
-              / %tr
-              /   %td Make
-              /   %td
-              /     = bike.mnfg_name
               %tr
                 %td Serial
                 %td

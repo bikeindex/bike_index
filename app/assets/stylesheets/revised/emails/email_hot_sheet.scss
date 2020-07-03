@@ -37,8 +37,6 @@ $hot-sheet-table-border: darken($email-light-bg, 5%);
   .bike-display {
     border: none;
     background-color: #ffffff;
-    // background-color: #eeeeee;
-    // margin-bottom: 12px;
 
     td.bike-display-wrapper-cell {
       border: none;
@@ -52,31 +50,20 @@ $hot-sheet-table-border: darken($email-light-bg, 5%);
   .table-list {
     margin-top: 0;
     border: 1px solid $hot-sheet-table-border;
-    tr {
-      border-left: none;
-    }
     tr td {
       line-height: 1.5;
       border-color: $hot-sheet-table-border;
-      &:first-child {
-        border-left: none;
-      }
     }
     tr:nth-of-type(odd) {
       background-color: #eeeeee;
     }
     .bike-title td {
-      // background-color: $email-light-bg;
-      // td {
-      //   border: 1px solid $hot-sheet-table-border;
-      // }
       text-align: left;
       text-decoration: none;
       font-size: 100%;
       font-style: normal;
       a {
         display: block;
-        // padding: 4px 8px 0 8px;
         font-size: 17px;
       }
     }
