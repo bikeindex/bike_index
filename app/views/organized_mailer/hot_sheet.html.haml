@@ -63,9 +63,9 @@
                   - if stolen_record.police_report_number.present?
                     %small.less-strong
                       = stolen_record.police_report_department
-            %td.image-holder.bike-display-wrapper-cell{ class: thumbclass }
-              %a{ href:  bike_link }
-                %img{ src: thumb_url }
+          %td.image-holder.bike-display-wrapper-cell{ class: thumbclass }
+            %a{ href:  bike_link }
+              %img{ src: thumb_url }
 
 - if @organization.overview_dashboard?
   .clear-org-buttons

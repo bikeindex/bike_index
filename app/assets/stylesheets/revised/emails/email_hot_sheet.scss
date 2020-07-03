@@ -35,10 +35,10 @@ $hot-sheet-table-border: darken($email-light-bg, 5%);
   padding-top: 2px;
 
   .bike-display {
-    border: 1px solid $hot-sheet-table-border;
-    // background-color: #ffffff;
-    background-color: #eeeeee;
-    margin-bottom: 12px;
+    border: none;
+    background-color: #ffffff;
+    // background-color: #eeeeee;
+    // margin-bottom: 12px;
 
     td.bike-display-wrapper-cell {
       border: none;
@@ -62,16 +62,18 @@ $hot-sheet-table-border: darken($email-light-bg, 5%);
         border-left: none;
       }
     }
-    // tr:nth-of-type(odd) {
-    //   background-color: #eeeeee;
-    // }
-    .bike-title {
+    tr:nth-of-type(odd) {
+      background-color: #eeeeee;
+    }
+    .bike-title td {
       // background-color: $email-light-bg;
       // td {
       //   border: 1px solid $hot-sheet-table-border;
       // }
       text-align: left;
       text-decoration: none;
+      font-size: 100%;
+      font-style: normal;
       a {
         display: block;
         // padding: 4px 8px 0 8px;
