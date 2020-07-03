@@ -7,9 +7,11 @@
 
   %body#print-tickets
     .row
-      - require 'rqrcode'
-      - tickets_per_row = (@tickets.count / 3.0).ceil
-      - ticket_rows = [@tickets.slice(0, tickets_per_row), @tickets.slice(tickets_per_row, tickets_per_row), @tickets.slice(2*tickets_per_row, tickets_per_row)]
+      :ruby
+        require 'rqrcode'
+        tickets_per_row = (@tickets.count / 3.0).ceil
+        ticket_rows = [@tickets.slice(0, tickets_per_row), @tickets.slice(tickets_per_row, tickets_per_row), @tickets.slice(2*tickets_per_row, tickets_per_row)]
+
       - tickets_per_row.times do |i|
         - [ticket_rows.first[i], ticket_rows.second[i], ticket_rows.third[i]].each do |ticket|
           - next unless ticket.present?
