@@ -71,8 +71,8 @@ class Ownership < ApplicationRecord
     if bike.present?
       bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
     end
-    # Note: this has to be performed later;
-    # we create ownerships and then delete them, in BikeCreator
+    # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
+    # We need to be sure we don't accidentally send email for ownerships that will be deleted
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
   end
 

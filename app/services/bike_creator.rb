@@ -112,7 +112,8 @@ class BikeCreator
     @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
 
-    # We don't want to create an extra creation_state if there was a duplicate
+    # We don't want to create an extra creation_state if there was a duplicate.
+    # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)

@@ -7,7 +7,6 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
     EmailOwnershipInvitationWorker.new.perform(ownership.id)
     expect(ActionMailer::Base.deliveries).not_to be_empty
   end
-
   context "ownership does not exist" do
     it "does not send an email" do
       ActionMailer::Base.deliveries = []
@@ -25,7 +24,7 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       EmailOwnershipInvitationWorker.new.perform(ownership.id)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
-      expect(ownership.send_email).to be_falsey
+      expect(ownership.calculated_send_email).to be_falsey
     end
   end
   context "creation organization has skip_email" do
