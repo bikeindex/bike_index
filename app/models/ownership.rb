@@ -53,7 +53,7 @@ class Ownership < ApplicationRecord
   end
 
   def calculated_send_email
-    return false if !send_email || bike.blank? || bike.example?
+    return false if !send_email || bike.blank? || bike.example? || spam_risky_email?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     return true unless organization.present?
     !organization.enabled?("skip_ownership_email")
@@ -72,5 +72,14 @@ class Ownership < ApplicationRecord
       bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
     end
     EmailOwnershipInvitationWorker.perform_async(id)
+  end
+
+  private
+
+  def spam_risky_email?
+    risky_domains = ["@yahoo.co", "@hotmail.co"]
+    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless bike.creation_state.present?
+    %w[lightspeed_pos ascend_pos].include?(bike.creation_state.pos_kind)
   end
 end

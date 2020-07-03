@@ -53,7 +53,10 @@
               = link_to organization.kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: organization.kind))
             %td
               - if organization.bike_shop? || organization.any_pos?
-                = link_to organization.pos_kind.to_s.gsub("pos", "").humanize, admin_organizations_path(sortable_search_params.merge(search_pos: organization.pos_kind)), class: "gray-link"
+                - pos_kind = organization.pos_kind.to_s.gsub("pos", "")
+                - link_class = pos_kind.match?("broken") ? "text-warning" : "gray-link"
+                %small
+                  = link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: organization.pos_kind)), class: link_class
             %td
               .less-strong-hold
 
