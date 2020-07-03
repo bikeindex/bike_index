@@ -63,4 +63,10 @@
       }
     }
   }
+
+  // Currently only used in hot-sheet
+  // In general, hot sheet styles probably should be used in the regular display
+  .serial-display {
+    font-family: "Courier";
+  }
 }
