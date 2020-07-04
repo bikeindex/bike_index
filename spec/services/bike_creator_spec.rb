@@ -129,6 +129,7 @@ RSpec.describe BikeCreator do
       expect(b_param).to receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
       BikeCreator.new(b_param).send(:validate_record, bike)
     end
+
     describe "no_duplicate" do
       let(:existing_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: email) }
       let(:new_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: new_email) }
@@ -150,7 +151,7 @@ RSpec.describe BikeCreator do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "Something@GMAIL.com" }
         it "finds a duplicate" do
-          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)
@@ -164,7 +165,7 @@ RSpec.describe BikeCreator do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
-          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
           expect do
             BikeCreator.new(b_param).send(:validate_record, new_bike)

@@ -125,4 +125,57 @@ RSpec.describe Ownership, type: :model do
       end
     end
   end
+
+  describe "spam_risky_email?" do
+    # hotmail and yahoo have been delaying our emails. In an effort to ensure delivery of really important emails (e.g. password resets)
+    # skip sending ownership invitations for POS registrations, just in case
+    let(:bike) { Bike.new(owner_email: email) }
+    let(:ownership) { Ownership.new(bike: bike, owner_email: email) }
+    let(:creation_state) { CreationState.new(pos_kind: pos_kind) }
+    let(:pos_kind) { "lightspeed_pos" }
+    before { allow(bike).to receive(:creation_state) { creation_state } }
+    context "gmail email" do
+      let(:email) { "test@gmail.com" }
+      it "false, calculated_send_email: true" do
+        expect(ownership.send(:spam_risky_email?)).to be_falsey
+        expect(ownership.calculated_send_email).to be_truthy
+      end
+    end
+    context "yahoo email" do
+      let(:email) { "test@yahoo.com" }
+      it "does not send" do
+        expect(ownership.send(:spam_risky_email?)).to be_truthy
+        expect(ownership.calculated_send_email).to be_falsey
+      end
+      context "yahoo.co" do
+        let(:email) { "example@yahoo.co" } # I don't know if these are typos or it's separate, but skip it nonetheless
+        it "does not send" do
+          expect(ownership.send(:spam_risky_email?)).to be_truthy
+          expect(ownership.calculated_send_email).to be_falsey
+        end
+      end
+      context "not pos registration" do
+        let(:pos_kind) { "does_not_need_pos" }
+        it "sends" do
+          expect(ownership.send(:spam_risky_email?)).to be_falsey
+          expect(ownership.calculated_send_email).to be_truthy
+        end
+      end
+    end
+    context "hotmail email" do
+      let(:email) { "test@hotmail.com" }
+      let(:pos_kind) { "ascend_pos" }
+      it "does not send" do
+        expect(ownership.send(:spam_risky_email?)).to be_truthy
+        expect(ownership.calculated_send_email).to be_falsey
+      end
+      context "not pos registration" do
+        let(:pos_kind) { "no_pos" }
+        it "sends" do
+          expect(ownership.send(:spam_risky_email?)).to be_falsey
+          expect(ownership.calculated_send_email).to be_truthy
+        end
+      end
+    end
+  end
 end

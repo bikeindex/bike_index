@@ -136,7 +136,7 @@ class BParam < ApplicationRecord
 
   def is_bulk; bike["is_bulk"] || false end
 
-  def no_duplicate; bike["no_duplicate"] || false end
+  def no_duplicate?; bike["no_duplicate"] || false end
 
   def bike_sticker
     bike["bike_sticker"].presence || bike["bike_code"].presence
@@ -322,7 +322,6 @@ class BParam < ApplicationRecord
   end
 
   def find_duplicate_bike(bike)
-    return nil unless no_duplicate
     dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
       .where.not(id: bike.id).order(:created_at).first
     return nil unless dupe.present?

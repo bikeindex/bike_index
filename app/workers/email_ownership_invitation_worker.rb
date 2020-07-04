@@ -2,8 +2,8 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
   sidekiq_options queue: "notify", retry: 3
 
   def perform(ownership_id)
-    ownership = Ownership.where(id: ownership_id).first
-    return true unless ownership.present?
+    ownership = Ownership.find_by_id(ownership_id)
+    return true unless ownership.present? && ownership.bike.present?
     ownership.bike&.update_attributes(updated_at: Time.current)
     ownership.reload
     if ownership.calculated_send_email
