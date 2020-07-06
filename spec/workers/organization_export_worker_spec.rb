@@ -85,6 +85,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.progress).to eq "finished"
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
+          # NOTE: This header needs to stay exactly the same or the avery export will break
           expect(export.written_headers).to eq(%w[owner_name address city state zipcode assigned_sticker])
           expect(export.bike_stickers_assigned).to eq(["A1111"])
           expect(export.bike_codes_removed?).to be_falsey
