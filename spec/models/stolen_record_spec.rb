@@ -65,8 +65,9 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "given a bike image" do
-      it "returns truthy and persists the alert image" do
+      it "returns truthy, persists the alert image, but destroys it if it is destroyed" do
         stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
+        image = stolen_record.bike.public_images.first
 
         result = stolen_record.generate_alert_image
 
@@ -76,6 +77,13 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.theft_alert_missing_photo?).to be_falsey
         FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
         expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+
+        image.destroy
+        expect(stolen_record.bike.public_images.count).to eq 0
+        result = stolen_record.generate_alert_image
+        expect(result).to be_nil
+        stolen_record.reload
+        expect(stolen_record.alert_image).to be_blank
       end
     end
 

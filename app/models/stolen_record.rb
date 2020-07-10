@@ -264,9 +264,9 @@ class StolenRecord < ApplicationRecord
   # The URL is available immediately - processing is performed in the background.
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
+    alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
     return if (bike_image&.image).blank? && (bike&.stock_photo_url).blank?
 
-    alert_image&.destroy
     new_image = AlertImage.new(stolen_record: self)
     if bike_image&.image.blank?
       new_image.remote_image_url = bike.stock_photo_url

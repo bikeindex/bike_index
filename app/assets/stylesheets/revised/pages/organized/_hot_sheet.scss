@@ -19,8 +19,7 @@
   padding: 0;
   li {
     width: 100%;
-    margin: 1rem 0 0;
-    border: 1px solid #ccc;
+    margin: 2rem 0 0;
   }
   .bike-display {
     display: flex;
@@ -51,10 +50,12 @@
   .bike-info {
     flex: 0 0 66.6666666666%;
     max-width: 66.6666666666%;
-    padding: 6px 12px;
+    padding: 0;
   }
-  .bike-main-info {
-    font-size: 125%;
+  tr.bike-main-info td {
+    font-size: 100%;
+    text-align: left;
+    font-style: normal;
   }
 }
 

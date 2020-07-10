@@ -15,16 +15,21 @@
   .hot-sheet-bike-display
     %table.bike-display
       %tbody
-        %tr.bike-title
-          %td.bike-display-wrapper-cell{ colspan: 2 }
-            = link_to organized_bike_text(bike, skip_creation: true), bike_link
         %tr
           %td.info-holder.bike-display-wrapper-cell
             %table.table-list
+              %tr.bike-title
+                %td{ colspan: 2 }
+                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
               %tr
                 %td Serial
                 %td
-                  = bike.serial_display
+                  - if bike.no_serial?
+                    %em.less-strong
+                      = bike.serial_display&.downcase
+                  - else
+                    %span.serial-display
+                      = bike.serial_display
 
               %tr
                 %td

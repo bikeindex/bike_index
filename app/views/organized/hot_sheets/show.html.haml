@@ -72,16 +72,14 @@
               - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
 
             .bike-display
-              .bike-image{ class: thumbclass }
-                %a{ href:  bike_link }
-                  %img{ src: thumb_url }
               .bike-info
-                %span.bike-main-info
-                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
                 - if stolen_record.recovered?
                   .recovered-alert
                     %h3.uncap Bike was recovered!
                 %table.table-list.mb-0
+                  %tr.bike-main-info
+                    %td{ colspan: 2 }
+                      = link_to organized_bike_text(bike, skip_creation: true), bike_link
                   %tr
                     %td Serial
                     %td= bike.serial_display
@@ -123,4 +121,7 @@
                           Phone
                         %td
                           = phone_link(stolen_record.phone)
+              .bike-image{ class: thumbclass }
+                %a{ href:  bike_link }
+                  %img{ src: thumb_url }
 

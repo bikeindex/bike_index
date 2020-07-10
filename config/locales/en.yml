@@ -4863,15 +4863,13 @@ en:
       sign_up_your_organization: Sign up your organization
       where: Where
     donation_modal:
-      header_june_2020: Mid-year fundraising campaign until July 1
+      header: Help support our efforts!
       is_a_nonprofit_html: >-
         Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforts to fight
         bike theft!
       nonprofit_501c3: 501(c)(3) nonprofit
       skip: No donation
-      subheader_june_2020_html: >-
-        We’re seeing drastic increases in bike theft this summer.<br>Help us protect
-        and recover more bikes than ever.
+      subheader: As a non-profit, we rely on your support.
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit
