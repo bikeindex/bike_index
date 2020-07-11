@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :notifications
+  has_many :appointments
   has_many :memberships, dependent: :destroy
   has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id

@@ -47,6 +47,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       it "associates" do
         expect(instance).to receive(:associate_ownerships)
         expect(instance).to receive(:associate_membership_invites)
+        expect(instance).to receive(:associate_appointments)
         expect do
           instance.perform(user.id, "merged", user: user)
         end.to_not change(AfterUserCreateWorker.jobs, :count)
@@ -56,6 +57,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     context "stage: async" do
       it "calls import" do
         expect(instance).to_not receive(:associate_ownerships)
+        expect(instance).to_not receive(:associate_appointments)
         expect(instance).to receive(:import_user_attributes)
         expect do
           instance.perform(user.id, "async")
@@ -66,6 +68,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         it "calls import and associate_ownerships" do
           expect(instance).to receive(:associate_ownerships)
           expect(instance).to receive(:import_user_attributes)
+          expect(instance).to receive(:associate_appointments)
           expect do
             instance.perform(user.id, "async")
           end.to_not change(AfterUserCreateWorker.jobs, :count)
@@ -96,7 +99,15 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   describe "associate_appointments" do
+    let!(:appointment) { FactoryBot.create(:appointment, email: email) }
+
     it "assigns user id to the appointments" do
+      expect(user.confirmed?).to be_falsey
+      appointment.reload
+      expect(appointment.user_id).to be_blank # Because user wasn't confirmed
+      instance.associate_appointments(user, email)
+      appointment.reload
+      expect(appointment.user_id).to eq user.id
       # Need to ensure that this actually assigns all the appointments for new users
       # Need to ensure it actually assigns for new secondary emails
       # Need to ensure it actually assigns for merged users

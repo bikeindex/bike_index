@@ -10,6 +10,7 @@ RSpec.describe UsersController, type: :request do
       expect(flash).to be_blank
     end
   end
+
   describe "resend_confirmation_email" do
     it "doesn't send anything if no user found" do
       ActionMailer::Base.deliveries = []
@@ -81,6 +82,37 @@ RSpec.describe UsersController, type: :request do
           expect(Notification.count).to eq 0
         end
       end
+    end
+  end
+
+  describe "confirm" do
+    let(:email) { "cool-new-email@example.com" }
+    let!(:user) { FactoryBot.create(:user, email: email) }
+    let!(:appointment) { FactoryBot.create(:appointment, email: email) }
+    let!(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
+    it "confirms the user and associates things" do
+      expect(user.confirmed?).to be_falsey
+      expect(appointment.user_id).to be_blank
+      expect(ownership.user_id).to be_blank
+      expect(ownership.bike.user&.id).to be_blank
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        get "#{base_url}/confirm?id=#{user.id}&code=#{user.confirmation_token}"
+        expect(response).to redirect_to(/my_account/)
+        expect(flash[:success]).to be_present
+      end
+      # We shouldn't have sent any emails
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+      user.reload
+      expect(user.confirmed?).to be_truthy
+      expect(user.appointments.pluck(:id)).to eq([appointment.id])
+      expect(user.ownerships.pluck(:id)).to eq([ownership.id])
+      expect(user.bikes.pluck(:id)).to eq([ownership.bike_id]) # We need to ensure the user has the bike
+      ownership.reload
+      expect(ownership.claimed?).to be_falsey # The ownership isn't claimed, but they can see the bike
+      expect(ownership.bike.user&.id).to eq user.id
+      expect(ownership.user_id).to eq(user.id)
     end
   end
 end
