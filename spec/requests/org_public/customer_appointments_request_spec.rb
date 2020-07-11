@@ -136,7 +136,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :request do
         expect(new_appointment.appointment_updates.count).to eq 0
       end
       context "ticket has already been assigned" do
-        let!(:appointment) { ticket.existing_or_new_appointment }
+        let!(:appointment) { ticket.appointment_current_or_create }
         it "redirects to the ticket" do
           ticket.reload
           expect(ticket.appointment.present?).to be_truthy

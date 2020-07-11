@@ -42,7 +42,9 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_async_jobs(user, email)
     # These jobs don't need to happen immediately
     import_user_attributes(user)
-    associate_ownerships(user, email) if user.confirmed?
+    return true unless user.confirmed?
+    associate_ownerships(user, email)
+    associate_appointments
   end
 
   def send_welcoming_email(user)
@@ -86,6 +88,10 @@ class AfterUserCreateWorker < ApplicationWorker
       user.attributes = address.merge(skip_geocoding: true) if address.present?
     end
     user.save if user.changed?
+  end
+
+  def associate_appointments
+    fail "not implemented yet"
   end
 
   private

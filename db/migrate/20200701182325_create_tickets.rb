@@ -8,6 +8,8 @@ class CreateTickets < ActiveRecord::Migration[5.2]
       t.integer :status, default: 0
       t.text :link_token
 
+      t.datetime :claimed_at
+
       t.timestamps
     end
   end

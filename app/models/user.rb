@@ -119,9 +119,9 @@ class User < ApplicationRecord
     UserEmail.add_emails_for_user_id(id, value)
   end
 
-  def secondary_emails
-    user_emails.where.not(email: email).pluck(:email)
-  end
+  def all_emails; user_emails.pluck(:email) end
+
+  def secondary_emails; all_emails - [email] end
 
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
@@ -150,7 +150,7 @@ class User < ApplicationRecord
 
   def display_name; name.present? ? name : email end
 
-  def first_display_name; display_name.split(" ")&.first end
+  def public_display_name; display_name.split(" ")&.first end
 
   def donations; payments.sum(:amount_cents) end
 

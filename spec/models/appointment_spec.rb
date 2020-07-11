@@ -9,7 +9,9 @@ RSpec.describe Appointment, type: :model do
       expect(appointment.in_line?).to be_truthy
       expect(appointment.signed_in_user?).to be_falsey
       expect(appointment.virtual_line?).to be_truthy
-      expect(appointment.line_entry_timestamp).to be_within(1).of appointment.created_at.to_i
+      expect(appointment.appointment_at).to be_within(1).of appointment.created_at
+      expect(appointment.ticket_number).to be_blank
+      expect(appointment.position_in_line).to be_blank
       # And it updates the queue
       expect do
         appointment.update(updated_at: Time.current)
@@ -18,34 +20,91 @@ RSpec.describe Appointment, type: :model do
     end
   end
 
-  describe "first_display_name" do
+  describe "for_user_attrs & matches_user_attrs?" do
+    it "fails unless passed one arg" do
+      expect do
+        Appointment.for_user_attrs(email: "beth@STuff.com", user_id: 12)
+      end.to raise_error(/one/)
+      expect do
+        Appointment.for_user_attrs(email: " ")
+      end.to raise_error(/one/)
+    end
+    context "with appointments" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "beth@stuff.com") }
+      let(:appt1) { FactoryBot.create(:appointment, email: "BETH@stuff.com") }
+      let(:organization) { appt1.organization }
+      let(:location) { appt1.location }
+      let!(:appt2) { FactoryBot.create(:appointment, organization: organization, location: location, user: user) }
+      let!(:appt3) { FactoryBot.create(:appointment, email: "elizabeth@EXAMPLE.com ") }
+      it "associates and finds them, etc" do
+        # Create secondary email after the fact, so that the user isn't associated
+        FactoryBot.create(:user_email, user: user, email: "elizabeth@example.com")
+        appt1.reload
+        appt2.reload
+        appt3.reload
+        expect(appt1.user_id).to be_blank
+        expect(appt2.user_id).to eq user.id
+        expect(appt3.user_id).to be_blank
+
+        expect(appt1.matches_user_attrs?(email: "beth@stuff.COM ")).to be_truthy
+        expect(appt1.matches_user_attrs?(user_id: user.id)).to be_truthy
+        expect(appt1.matches_user_attrs?(user: user)).to be_truthy
+        # TODO: test that this ticket is assigned in after_user_create_worker
+        # expect(appt1.matches_user_attrs?(email: "elizabeth@example.com ")).to be_truthy
+
+        expect(appt2.matches_user_attrs?(email: "  beth@stuff.COM")).to be_truthy
+        expect(appt2.matches_user_attrs?(user_id: user.id)).to be_truthy
+        expect(appt2.matches_user_attrs?(user: user)).to be_truthy
+        expect(appt2.matches_user_attrs?(email: "elizabeth@example.com ")).to be_truthy
+
+        # TODO: test that this ticket is assigned in after_user_create_worker for secondary email
+        # expect(appt3.matches_user_attrs?(email: "  beth@stuff.COM")).to be_truthy
+        expect(appt3.matches_user_attrs?(user_id: user.id)).to be_truthy
+        expect(appt3.matches_user_attrs?(user: user)).to be_truthy
+        expect(appt3.matches_user_attrs?(email: "elizabeth@example.com ")).to be_truthy
+
+        # Bumping the appointments results in the appointments being assigned
+        appt1.update(updated_at: Time.current)
+        appt3.update(updated_at: Time.current)
+        appt1.reload
+        appt3.reload
+        expect(appt1.user_id).to eq user.id
+        expect(appt3.user_id).to eq user.id
+        expect(Appointment.for_user_attrs(email: "elizabeth@example.com").pluck(:id)).to match_array([appt1.id, appt2.id, appt3.id])
+        expect(Appointment.for_user_attrs(email: "beth@STuff.com").pluck(:id)).to match_array([appt1.id, appt2.id, appt3.id])
+        expect(Appointment.for_user_attrs(user_id: user.id).pluck(:id)).to match_array([appt1.id, appt2.id, appt3.id])
+      end
+    end
+  end
+
+  describe "public_display_name" do
     let(:user) { FactoryBot.build(:user, name: "fuck off") }
     let(:appointment) { Appointment.new(name: "NIggER bitch", user: user) }
     it "removes offensive things" do
       expect(appointment.name).to eq "NIggER bitch"
       expect(appointment.display_name).to eq "NIggER bitch"
-      expect(appointment.first_display_name).to eq "******"
+      expect(appointment.public_display_name).to eq "******"
       appointment.name = ""
       expect(appointment.name).to eq ""
       expect(appointment.display_name).to eq "fuck off"
-      expect(appointment.first_display_name).to eq "****"
+      expect(appointment.public_display_name).to eq "****"
     end
   end
 
   context "existing appointments" do
     let(:appt1_status) { "waiting" }
     let(:appt3_status) { "waiting" }
-    let!(:appt1) { FactoryBot.create(:appointment, status: appt1_status, line_entry_timestamp: (Time.current - 45.minutes).to_i) }
+    let!(:appt1) { FactoryBot.create(:appointment, status: appt1_status, ticket_number: 45) }
     let(:organization) { appt1.organization }
     let(:location) { appt1.location }
     # Shuffle the order when they're actually created around a little bit
-    let!(:appt4) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 10.minutes).to_i, organization: organization, location: location) }
-    let!(:appt5) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 5.minutes).to_i, organization: organization, location: location) }
-    let!(:appt3) { FactoryBot.create(:appointment, status: appt3_status, line_entry_timestamp: (Time.current - 20.minutes).to_i, organization: organization, location: location) }
-    let!(:appt2) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 30.minutes).to_i, organization: organization, location: location) }
-    let!(:appt6) { FactoryBot.create(:appointment, status: "being_helped", line_entry_timestamp: (Time.current - 1.hour).to_i, organization: organization, location: location) }
+    let!(:appt4) { FactoryBot.create(:appointment, ticket_number: 48, organization: organization, location: location) }
+    let!(:appt5) { FactoryBot.create(:appointment, ticket_number: 49, organization: organization, location: location) }
+    let!(:appt3) { FactoryBot.create(:appointment, status: appt3_status, ticket_number: 47, organization: organization, location: location) }
+    let!(:appt2) { FactoryBot.create(:appointment, ticket_number: 46, organization: organization, location: location) }
+    let!(:appt6) { FactoryBot.create(:appointment, status: "being_helped", ticket_number: 44, organization: organization, location: location) }
     describe "line_ordered, move_behind, move_to_back" do
-      it "sorts by line_entry_timestamp" do
+      it "sorts by position_in_line" do
         location.reload
         expect(location.appointments.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
         # Different than default ordering
@@ -75,7 +134,7 @@ RSpec.describe Appointment, type: :model do
       let(:appt1_status) { "on_deck" }
       let(:appt3_status) { "paging" }
       it "puts behind the last on deck twice, then to the back of the line, then removes" do
-        # Line ordered first orders by the status priority, than by line_entry_timestamp
+        # Line ordered first orders by the status priority, then by position_in_line
         expect(Appointment.line_ordered.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id, appt6.id])
         expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id])
         expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt1.id])
@@ -130,7 +189,7 @@ RSpec.describe Appointment, type: :model do
   end
 
   describe "record_status_update" do
-    let!(:appointment) { FactoryBot.create(:appointment, status: og_status, line_entry_timestamp: (Time.current - 30.minutes).to_i) }
+    let!(:appointment) { FactoryBot.create(:appointment, status: og_status, ticket_number: 20) }
     let(:location) { appointment.location }
     let(:og_status) { "waiting" }
     let(:new_status) { "on_deck" }
@@ -217,13 +276,13 @@ RSpec.describe Appointment, type: :model do
                           organization: appointment.organization,
                           location: appointment.location,
                           status: "on_deck",
-                          line_entry_timestamp: (Time.current - 1.hour).to_i)
+                          ticket_number: 2)
       end
       context "new_status on_deck" do
         it "updates and doesn't move to front of the queue" do
           appointment.reload
           appointment_on_deck.reload
-          expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
+          expect(appointment_on_deck.position_in_line).to be < appointment.position_in_line
           expect_update(appointment, og_status, new_status, updator_id, updator_kind)
           location.reload
           expect(location.appointments.in_line.pluck(:id)).to eq([appointment_on_deck.id, appointment.id])
@@ -233,14 +292,14 @@ RSpec.describe Appointment, type: :model do
         let(:new_status) { "failed_to_find" }
         it "updates and moves to front of the queue" do
           expect(appointment.after_failed_to_find_removal_count).to eq 2
-          expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
+          expect(appointment_on_deck.position_in_line).to be < appointment.position_in_line
           # NOTE: Passing appointment_on_deck, not appointment
           appointment_update = expect_update(appointment_on_deck, og_status, new_status, updator_id, updator_kind, "waiting")
           # Because we've reordered!
           appointment.reload
           appointment_on_deck.reload
           expect(appointment_on_deck.failed_to_find_attempts.pluck(:id)).to eq([appointment_update.id])
-          expect(appointment_on_deck.line_entry_timestamp).to be > appointment.line_entry_timestamp
+          expect(appointment_on_deck.position_in_line).to be > appointment.position_in_line
           location.reload
           expect(location.appointments.in_line.pluck(:id)).to eq([appointment.id, appointment_on_deck.id])
         end

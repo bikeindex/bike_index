@@ -247,9 +247,11 @@ CREATE TABLE public.appointments (
     status integer,
     reason character varying,
     description text,
-    line_entry_timestamp integer,
+    position_in_line integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    appointment_at timestamp without time zone,
+    ticket_number integer
 );
 
 
@@ -2602,6 +2604,7 @@ CREATE TABLE public.tickets (
     number integer,
     status integer DEFAULT 0,
     link_token text,
+    claimed_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -5317,6 +5320,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620171606'),
 ('20200620172241'),
 ('20200630200556'),
-('20200701182325');
+('20200701182325'),
+('20200710181523');
 
 

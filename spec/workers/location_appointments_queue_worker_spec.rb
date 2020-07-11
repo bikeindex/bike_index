@@ -4,15 +4,15 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do
-    let!(:appt1) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 45.minutes).to_i) }
+    let!(:appt1) { FactoryBot.create(:appointment, status: "on_deck", ticket_number: 1169) }
     let(:organization) { appt1.organization }
     let(:location) { appt1.location }
     let(:appointment_configuration) { FactoryBot.create(:appointment_configuration, organization: organization, location: location, customers_on_deck_count: 2) }
     # Shuffle the order when they're actually created around a little bit
-    let!(:appt4) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 10.minutes).to_i, organization: organization, location: location) }
-    let!(:appt5) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 5.minutes).to_i, organization: organization, location: location) }
-    let!(:appt3) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 20.minutes).to_i, organization: organization, location: location) }
-    let!(:appt2) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 30.minutes).to_i, organization: organization, location: location) }
+    let!(:appt4) { FactoryBot.create(:appointment, status: "on_deck", ticket_number: 1174, organization: organization, location: location) }
+    let!(:appt5) { FactoryBot.create(:appointment, ticket_number: 1180, organization: organization, location: location) }
+    let!(:appt3) { FactoryBot.create(:appointment, status: "on_deck", ticket_number: 1173, organization: organization, location: location) }
+    let!(:appt2) { FactoryBot.create(:appointment, ticket_number: 1172, organization: organization, location: location) }
     it "sets the correct number of appointments on deck" do
       expect(location.appointment_configuration).to be_blank
       expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])

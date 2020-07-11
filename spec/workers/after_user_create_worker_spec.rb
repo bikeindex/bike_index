@@ -95,6 +95,14 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
   end
 
+  describe "associate_appointments" do
+    it "assigns user id to the appointments" do
+      # Need to ensure that this actually assigns all the appointments for new users
+      # Need to ensure it actually assigns for new secondary emails
+      # Need to ensure it actually assigns for merged users
+    end
+  end
+
   context "extra user attributes" do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }

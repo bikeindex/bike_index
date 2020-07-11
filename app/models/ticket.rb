@@ -13,6 +13,8 @@ class Ticket < ApplicationRecord
   enum status: STATUS_ENUM
 
   scope :number_ordered, -> { reorder(:number) }
+  scope :unclaimed, -> { where(claimed_at: nil) }
+  scope :claimed, -> { where.not(claimed_at: nil) }
   scope :unresolved, -> { where(status: unresolved_statuses) }
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
@@ -21,7 +23,7 @@ class Ticket < ApplicationRecord
 
   def self.create_tickets(number_to_create, initial_number: nil, organization: nil, location:)
     initial_number ||= location.tickets.max_number
-    initial_number += 1 if location.tickets.where(number: initial_number).present?
+    initial_number += 1 if location.tickets.where(number: initial_number).present? || initial_number == 0
 
     number_to_create.times.map do |i|
       create!(
@@ -36,22 +38,35 @@ class Ticket < ApplicationRecord
 
   def self.max_number; maximum(:number) || 0 end
 
+  def claimed?; claimed_at.present? end
+
   def unresolved?; self.class.unresolved_statuses.include?(status) end
 
   def display_number; number end
 
-  def existing_or_new_appointment
-    return appointment if appointment.present?
-    new_appt = Appointment.create!(location_id: location_id,
-                                   organization_id: organization_id,
-                                   creator_kind: "ticket_scan",
-                                   status: "waiting")
-    self.update(appointment_id: new_appt.id, status: "in_line")
-    new_appt
+  def claim(user: nil, user_id: nil, email: nil) # Can just add a phone number here
+    return true if appointment&.matches_user_attrs?(user: user, user_id: user_id, email: email)
+    errors.add(:base, "appointment already claimed") if appointment_id.present?
+
+    return false if errors.any?
+    new_appt = create_new_appointment(user: user, user_id: user_id, email: email)
+    self.update(appointment_id: new_appt.id, claimed_at: Time.current)
+    true
   end
 
   def set_calculated_attributes
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
+    self.claimed_at ||= Time.current if appointment_id.present?
+  end
+
+  def create_new_appointment(email: nil, user_id: nil, user: user)
+    Appointment.create(location_id: location_id,
+                       organization_id: organization_id,
+                       creator_kind: "ticket_claim",
+                       status: "waiting",
+                       email: email,
+                       user_id: user_id || user&.id,
+                       ticket_number: number)
   end
 end

@@ -1,5 +1,6 @@
 # This is a stub. It needs to be expanded to include all the notifications that we send to users
-# (other than graduated_notifications and parking_notifications)
+# (other than graduated_notifications and parking_notifications, which should include notification functionality)
+
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,

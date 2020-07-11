@@ -16,7 +16,7 @@ module OrgPublic
       if params[:ticket_token].present?
         @ticket = ticket_for_token
         if @ticket.unresolved?
-          @appointment = @ticket.existing_or_new_appointment
+          # @appointment = @ticket.appointment_current_or_create
           assign_current_appointment(@appointment)
           flash[:success] = "You're now in line!"
         else
