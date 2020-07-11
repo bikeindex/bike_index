@@ -33,7 +33,7 @@ class AppointmentUpdate < ApplicationRecord
 
   def self.creator_kinds; CREATOR_KIND_ENUM.keys.map(&:to_s) end
 
-  def self.customer_creator_kinds; %w[no_user signed_in_user] end
+  def self.customer_creator_kinds; %w[no_user signed_in_user ticket_claim] end
 
   def self.customer_creator_kind?(kind); customer_creator_kinds.include?(kind) end
 

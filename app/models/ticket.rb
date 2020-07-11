@@ -1,5 +1,6 @@
 class Ticket < ApplicationRecord
   STATUS_ENUM = { unused: 0, in_line: 1, resolved: 2 }.freeze
+  CLAIMED_TICKET_LIMIT = 2
 
   belongs_to :organization
   belongs_to :location
@@ -38,6 +39,16 @@ class Ticket < ApplicationRecord
 
   def self.max_number; maximum(:number) || 0 end
 
+  # Specifically block a customer from claiming a bunch of tickets and marking them abandoned
+  def self.recent_customer_appointment_statuses; Appointment.in_line_statuses + ["abandoned"] end
+
+  def self.too_many_recent_claimed_tickets?(user: nil, user_id: nil, email: nil)
+    recent_appointments = Appointment.for_user_attrs(user: user, user_id: user_id, email: email)
+                                     .where(status: recent_customer_appointment_statuses)
+                                     .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes))
+    recent_appointments.count >= CLAIMED_TICKET_LIMIT
+  end
+
   def claimed?; claimed_at.present? end
 
   def unresolved?; self.class.unresolved_statuses.include?(status) end
@@ -47,10 +58,12 @@ class Ticket < ApplicationRecord
   def claim(user: nil, user_id: nil, email: nil) # Can just add a phone number here
     return true if appointment&.matches_user_attrs?(user: user, user_id: user_id, email: email)
     errors.add(:base, "appointment already claimed") if appointment_id.present?
-
+    if self.class.too_many_recent_claimed_tickets?(user: user, user_id: user_id, email: email)
+      errors.add(:base, "you have already claimed as many tickets as you're allowed!")
+    end
     return false if errors.any?
     new_appt = create_new_appointment(user: user, user_id: user_id, email: email)
-    self.update(appointment_id: new_appt.id, claimed_at: Time.current)
+    self.update(appointment_id: new_appt.id)
     true
   end
 
@@ -60,7 +73,7 @@ class Ticket < ApplicationRecord
     self.claimed_at ||= Time.current if appointment_id.present?
   end
 
-  def create_new_appointment(email: nil, user_id: nil, user: user)
+  def create_new_appointment(email: nil, user_id: nil, user: nil)
     Appointment.create(location_id: location_id,
                        organization_id: organization_id,
                        creator_kind: "ticket_claim",
