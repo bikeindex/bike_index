@@ -4,9 +4,11 @@
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
+    view_claimed_ticket: 10,
   }.freeze
 
   belongs_to :user
+  belongs_to :appointment
 
   enum kind: KIND_ENUM
 
