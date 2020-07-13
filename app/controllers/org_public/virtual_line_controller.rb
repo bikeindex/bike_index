@@ -13,6 +13,7 @@ module OrgPublic
       elsif @ticket&.claimed?
         assign_current_ticket(@ticket)
       end
+      session.keys
     end
 
     def create

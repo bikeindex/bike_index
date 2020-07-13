@@ -1,1 +1,7 @@
 ffffff
+
+%p
+  PPP: "#{session[:ticket_token]}"
+
+%code
+  = @token&.as_json
