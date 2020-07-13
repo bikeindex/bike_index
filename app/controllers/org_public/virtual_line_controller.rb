@@ -1,95 +1,72 @@
 module OrgPublic
-  class CustomerAppointmentsController < OrgPublic::BaseController
-    # If a user has a link to an appointment, permit it - even if the org no longer has the functionality enabled
-    before_action :find_appointment_and_redirect, only: [:show, :set_current]
-    before_action :find_appointment, only: [:update]
+  class VirtualLineController < OrgPublic::BaseController
+    before_action :find_ticket
+    before_action :ensure_access_to_virtual_line!
 
-    layout "walkrightup"
+    layout "virtual_line"
+
+    def index
+      # If the appointment isn't in line, update so they can create a new appointment
+      if @ticket&.resolved? || @appointment&.no_longer_in_line?
+        flash[:info] = "Your last ticket is no longer in line!"
+        assign_current_ticket(nil)
+      elsif @ticket&.claimed?
+        assign_current_ticket(@ticket)
+      end
+    end
 
     def create
-      if params[:ticket_token].present?
-        @ticket = ticket_for_token
-        if @ticket.unresolved?
-          # @appointment = @ticket.appointment_current_or_create # Fail because this doesn't exist anymore
-          assign_current_appointment(@appointment)
-          flash[:success] = "You're now in line!"
-        else
-          flash[:error] = "That ticket has already been resolved!"
-        end
-      else
-        @appointment = Appointment.new(permitted_create_params)
-        if @appointment.save
-          flash[:success] = "You're now in line!"
-          assign_current_appointment(@appointment)
-        else
-          flash[:error] = @appointment.errors.full_messages.to_sentence
-        end
-      end
-      redirect_to walkrightup_route and return
     end
 
     def update
-      if @appointment.removed?
-        flash[:error] = "We're sorry, that appointment has been removed"
-      elsif @appointment.update(permitted_update_params)
-        @appointment.record_status_update(status_update_params)
-        assign_current_appointment(@appointment)
-        flash[:success] = "Update successful"
-      else
-        flash[:error] = "Unable to update because: #{@appointment.errors.full_messages.to_sentence}"
-      end
-      redirect_to walkrightup_route
     end
 
     private
 
-    def walkrightup_route
-      organization_walkrightup_path(organization_id: current_organization.to_param,
-                                    location_id: current_appointment&.location&.to_param || current_location&.to_param)
-    end
-
-    def ticket_for_token
-      current_organization.tickets.find_by_link_token(params[:ticket_token])
-    end
-
-    def find_appointment
-      @appointment_token = params[:appointment_token] || params[:id]
-      @appointment ||= current_organization.appointments.find_by_link_token(@appointment_token)
-    end
-
-    def find_appointment_and_redirect
-      find_appointment
-      if @appointment.present?
-        # Only assign if the appointment is present, so we don't lose the existing one
-        assign_current_appointment(@appointment)
-      else
-        flash[:error] = "Unable to find that appointment!"
-        current_appointment # Grab it if it's around, because at least something
+    def find_ticket
+      @ticket_token ||= params[:ticket_token] || session[:ticket_token]
+      if @ticket_token.present?
+        @ticket = current_organization.tickets.find_by_link_token(@ticket_token)
+        @appointment = @ticket&.appointment
       end
-      redirect_to walkrightup_route and return
+      @current_location = @appointment.location if @appointment.present?
+      @current_ticket = @ticket
     end
 
-    def permitted_create_params
-      params.require(:appointment)
-        .permit(:email, :name, :reason, :description, :location_id)
-        .merge(organization_id: current_organization.id,
-               status: "waiting",
-               user_id: current_user&.id,
-               creator_kind: current_user.present? ? "signed_in_user" : "no_user")
+    def assign_current_ticket(ticket = nil)
+      session[:ticket_token] = ticket&.link_token
+      @ticket = ticket
+      @appointment = ticket&.appointment
+      @current_location = @appointment.location if @appointment.present?
+      @ticket
     end
 
-    def permitted_update_params
-      params.require(:appointment)
-        .permit(:email, :name, :reason, :description)
-        .merge(organization_id: current_organization.id, skip_update: true)
-    end
+    # def current_ticket
+    #   return @current_appointment if defined?(@current_appointment)
+    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
+    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
+    #   @current_appointment = current_organization.appointments.find_by_link_token(@appointment_token)
+    #   @current_location = @current_appointment.location if @current_appointment.present?
+    #   @current_ticket = @appointment.ticket
+    #   @current_appointment
+    # end
 
-    def status_update_params
-      {
-        new_status: params.dig(:appointment, :status),
-        updator_id: current_user&.id,
-        updator_kind: current_user.present? ? "signed_in_user" : "no_user",
-      }
-    end
+    # def current_appointment
+    #   return @current_appointment if defined?(@current_appointment)
+    #   if @current_ticket.present?
+    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
+    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
+    #   @current_appointment = current_organization.appointments.find_by_link_token(@appointment_token)
+    #   @current_location = @current_appointment.location if @current_appointment.present?
+    #   @current_ticket = @appointment.ticket
+    #   @current_appointment
+    # end
+
+    # def assign_current_appointment(appointment = nil)
+    #   session[:appointment_token] = appointment.present? ? appointment.link_token : nil
+    #   return nil unless appointment.present?
+    #   @current_location = appointment.location
+    #   @current_appointment = appointment
+    # end
   end
 end

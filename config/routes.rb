@@ -361,14 +361,7 @@ Rails.application.routes.draw do
 
   # This is the public organizations section
   resources :organization, only: [], path: "", module: "org_public" do
-    resource :walkrightup, only: %i[show], controller: "walkrightup" # walkrightups is stupid
-    get "WalkRightUp", to: "walkrightup#show"
-    resources :customer_appointments, only: %i[show update create] do
-      collection do
-        get :claim_ticket
-        post :set_current
-      end
-    end
+    resources :virtual_line, only: %i[index create update], controller: "virtual_line" # Reads better without pluralization
   end
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge

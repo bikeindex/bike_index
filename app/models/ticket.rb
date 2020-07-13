@@ -53,6 +53,7 @@ class Ticket < ApplicationRecord
 
   def unresolved?; self.class.unresolved_statuses.include?(status) end
 
+  # Might be more complicated in the future
   def display_number; number end
 
   def claim(user: nil, user_id: nil, email: nil) # Can just add a phone number here

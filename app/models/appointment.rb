@@ -61,6 +61,8 @@ class Appointment < ApplicationRecord
 
   def in_line?; self.class.in_line_statuses.include?(status) end
 
+  def no_longer_in_line?; !in_line? end
+
   def paging_or_on_deck?; on_deck? || paging? end
 
   def failed_to_find_attempts; appointment_updates.failed_to_find end
