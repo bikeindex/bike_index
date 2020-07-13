@@ -1,6 +1,6 @@
 module OrgPublic
   class VirtualLineController < OrgPublic::BaseController
-    before_action :find_ticket
+    before_action :find_ticket, except: [:create]
     before_action :ensure_access_to_virtual_line!
 
     layout "virtual_line"
@@ -13,10 +13,21 @@ module OrgPublic
       elsif @ticket&.claimed?
         assign_current_ticket(@ticket)
       end
-      session.keys
     end
 
     def create
+      ticket = current_organization.tickets.unresolved.friendly_find(params[:ticket_number])
+      if ticket.blank?
+        flash[:info] = "That ticket doesn't appear to be in line, please enter a different number"
+      elsif ticket.claimed?
+        @current_location = ticket.location
+        Notification.create_for("view_claimed_ticket", appointment: ticket.appointment)
+        flash[:info] = "That ticket has already been claimed. Please follow the link we sent to access the notification"
+      else
+        flash[:success] = "You've claimed your place in line"
+        assign_current_ticket(ticket)
+      end
+      redirect_to organization_virtual_line_index_path(organization_id: current_organization.to_param, location_id: current_location&.to_param)
     end
 
     def update
@@ -30,7 +41,7 @@ module OrgPublic
         @ticket = current_organization.tickets.find_by_link_token(@ticket_token)
         @appointment = @ticket&.appointment
       end
-      @current_location = @appointment.location if @appointment.present?
+      @current_location = @ticket&.location if @ticket.present?
       @current_ticket = @ticket
     end
 
@@ -38,36 +49,8 @@ module OrgPublic
       session[:ticket_token] = ticket&.link_token
       @ticket = ticket
       @appointment = ticket&.appointment
-      @current_location = @appointment.location if @appointment.present?
+      @current_location = ticket&.location if @ticket.present?
       @ticket
     end
-
-    # def current_ticket
-    #   return @current_appointment if defined?(@current_appointment)
-    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
-    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
-    #   @current_appointment = current_organization.appointments.find_by_link_token(@appointment_token)
-    #   @current_location = @current_appointment.location if @current_appointment.present?
-    #   @current_ticket = @appointment.ticket
-    #   @current_appointment
-    # end
-
-    # def current_appointment
-    #   return @current_appointment if defined?(@current_appointment)
-    #   if @current_ticket.present?
-    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
-    #   @appointment_token ||= params[:appointment_token] || session[:appointment_token]
-    #   @current_appointment = current_organization.appointments.find_by_link_token(@appointment_token)
-    #   @current_location = @current_appointment.location if @current_appointment.present?
-    #   @current_ticket = @appointment.ticket
-    #   @current_appointment
-    # end
-
-    # def assign_current_appointment(appointment = nil)
-    #   session[:appointment_token] = appointment.present? ? appointment.link_token : nil
-    #   return nil unless appointment.present?
-    #   @current_location = appointment.location
-    #   @current_appointment = appointment
-    # end
   end
 end

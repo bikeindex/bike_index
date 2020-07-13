@@ -22,6 +22,11 @@ class Ticket < ApplicationRecord
 
   def self.unresolved_statuses; statuses - ["resolved"] end
 
+  # For now, it's simple, but could become more complicated
+  def self.friendly_find(str)
+    where(number: str.to_s.strip).first
+  end
+
   def self.create_tickets(number_to_create, initial_number: nil, organization: nil, location:)
     initial_number ||= location.tickets.max_number
     initial_number += 1 if location.tickets.where(number: initial_number).present? || initial_number == 0
@@ -42,8 +47,8 @@ class Ticket < ApplicationRecord
   # Specifically block a customer from claiming a bunch of tickets and marking them abandoned
   def self.recent_customer_appointment_statuses; Appointment.in_line_statuses + ["abandoned"] end
 
-  def self.too_many_recent_claimed_tickets?(user: nil, user_id: nil, email: nil)
-    recent_appointments = Appointment.for_user_attrs(user: user, user_id: user_id, email: email)
+  def self.too_many_recent_claimed_tickets?(user: nil, user_id: nil, email: nil, creation_ip: nil)
+    recent_appointments = Appointment.for_user_attrs(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
                                      .where(status: recent_customer_appointment_statuses)
                                      .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes))
     recent_appointments.count >= CLAIMED_TICKET_LIMIT
@@ -56,14 +61,14 @@ class Ticket < ApplicationRecord
   # Might be more complicated in the future
   def display_number; number end
 
-  def claim(user: nil, user_id: nil, email: nil) # Can just add a phone number here
+  def claim(user: nil, user_id: nil, email: nil, creation_ip: nil) # Can just add a phone number here
     return true if appointment&.matches_user_attrs?(user: user, user_id: user_id, email: email)
     errors.add(:base, "appointment already claimed") if appointment_id.present?
     if self.class.too_many_recent_claimed_tickets?(user: user, user_id: user_id, email: email)
       errors.add(:base, "you have already claimed as many tickets as you're allowed!")
     end
     return false if errors.any?
-    new_appt = create_new_appointment(user: user, user_id: user_id, email: email)
+    new_appt = create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
     self.update(appointment_id: new_appt.id)
     true
   end
@@ -74,13 +79,14 @@ class Ticket < ApplicationRecord
     self.claimed_at ||= Time.current if appointment_id.present?
   end
 
-  def create_new_appointment(email: nil, user_id: nil, user: nil)
+  def create_new_appointment(email: nil, user_id: nil, user: nil, creation_ip: nil)
     Appointment.create(location_id: location_id,
                        organization_id: organization_id,
                        creator_kind: "ticket_claim",
                        status: "waiting",
                        email: email,
                        user_id: user_id || user&.id,
+                       creation_ip: creation_ip,
                        ticket_number: number)
   end
 end

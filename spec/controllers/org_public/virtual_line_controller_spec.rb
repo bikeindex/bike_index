@@ -8,9 +8,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
   let(:appointment_configuration) { FactoryBot.create(:appointment_configuration, virtual_line_on: true) }
   let(:current_location) { appointment_configuration.location }
   let(:current_organization) { current_location.organization }
+  let(:ticket) { FactoryBot.create(:ticket, location: current_location) }
 
   describe "index" do
-    let(:ticket) { FactoryBot.create(:ticket, location: current_location) }
     it "renders, doesn't set the ticket_token" do
       current_location.reload
       expect(current_location.virtual_line_on?).to be_truthy
@@ -32,10 +32,10 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
     context "ticket resolved" do
       let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "resolved") }
       it "removes it from the session" do
-        session[:ticket_token] = ticket_older.link_token
+        session[:ticket_token] = ticket.link_token
         get :index, params: { organization_id: current_organization.to_param }
         expect(assigns(:ticket)&.id).to be_blank
-        expect(flash).to match(/line/)
+        expect(flash[:info]).to match(/line/)
         expect(session[:ticket_token]).to be_blank
       end
     end
@@ -54,14 +54,44 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
           session[:ticket_token] = ticket.link_token
           expect(ticket_older.location_id).to_not eq current_location.id
           get :index, params: {
-                               organization_id: current_organization.to_param,
-                               ticket_token: ticket.link_token,
-                             }
+                        organization_id: current_organization.to_param,
+                        ticket_token: ticket.link_token,
+                      }
           expect(flash).to be_blank
           expect(assigns(:ticket)&.id).to eq ticket.id
           expect(session[:ticket_token]).to eq ticket.link_token
           expect(assigns(:current_location)).to eq ticket.location
         end
+      end
+    end
+  end
+
+  describe "create" do
+    it "assigns to session" do
+      expect(ticket.claimed?).to be_falsey
+      post :create, params: {
+                      organization_id: current_organization.to_param,
+                      ticket_number: ticket.number,
+                    }
+      expect(flash[:success]).to be_present
+      expect(assigns(:ticket)&.id).to eq ticket.id
+      expect(session[:ticket_token]).to eq ticket.link_token
+      ticket.reload
+      expect(ticket.claimed?).to be_falsey
+    end
+    context "claimed ticket" do
+      let!(:ticket) { FactoryBot.create(:ticket_claimed, location: current_location) }
+      it "does not assign ticket" do
+        expect(ticket.claimed?).to be_truthy
+        expect do
+          post :create, params: {
+                          organization_id: current_organization.to_param,
+                          ticket_number: ticket.number,
+                        }
+        end.to change(SendNotificationWorker.jobs, :count).by 1
+        expect(assigns(:ticket)&.id).to be_blank
+        expect(session[:ticket_token]).to be_blank
+        expect(flash[:info]).to be_present
       end
     end
   end

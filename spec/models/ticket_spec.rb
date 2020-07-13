@@ -37,7 +37,7 @@ RSpec.describe Ticket, type: :model do
       expect(ticket.claimed?).to be_falsey
       expect(ticket.appointment).to be_blank
       expect do
-        expect(ticket.claim(email: "stuff@example.coM")).to be_truthy
+        expect(ticket.claim(email: "stuff@example.coM", creation_ip: "108.000.215.126")).to be_truthy
       end.to change(Appointment, :count).by 1
       expect(ticket.claimed?).to be_truthy
       expect(ticket.claimed_at).to be_within(1).of Time.current
@@ -49,6 +49,7 @@ RSpec.describe Ticket, type: :model do
       expect(appointment.location).to eq location
       expect(appointment.ticket_number).to eq ticket.number
       expect(appointment.position_in_line).to eq 100
+      expect(appointment.creation_ip.to_s).to eq "108.000.215.126"
       # But - it can claim by the same user again
       expect do
         expect(User.count).to eq 0

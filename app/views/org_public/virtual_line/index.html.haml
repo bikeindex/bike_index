@@ -1,7 +1,12 @@
-ffffff
+- if @ticket.present?
 
-%p
-  PPP: "#{session[:ticket_token]}"
+- else
+  = form_tag organization_virtual_line_index_path(organization_id: current_organization.to_param), action: "create", method: "post" do
+    .row
+      .form-group.col-sm-6
+        = label_tag :ticket_number, "Ticket number"
+        = text_field_tag :ticket_number, nil, class: "form-control"
+      .form-group.col-sm-6.text-center
+        %label.d-block &nbsp;
+        = submit_tag "Get in line!", class: "btn btn-success"
 
-%code
-  = @token&.as_json

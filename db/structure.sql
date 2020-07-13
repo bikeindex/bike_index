@@ -251,7 +251,8 @@ CREATE TABLE public.appointments (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     appointment_at timestamp without time zone,
-    ticket_number integer
+    ticket_number integer,
+    creation_ip character varying
 );
 
 
@@ -1815,7 +1816,7 @@ CREATE TABLE public.notifications (
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    appointments_id bigint
+    appointment_id bigint
 );
 
 
@@ -4474,10 +4475,10 @@ CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON publ
 
 
 --
--- Name: index_notifications_on_appointments_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_notifications_on_appointment_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_notifications_on_appointments_id ON public.notifications USING btree (appointments_id);
+CREATE INDEX index_notifications_on_appointment_id ON public.notifications USING btree (appointment_id);
 
 
 --

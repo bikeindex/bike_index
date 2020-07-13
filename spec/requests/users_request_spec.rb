@@ -69,7 +69,7 @@ RSpec.describe UsersController, type: :request do
         expect(user_subject.notifications.last.confirmation_email?).to be_truthy
       end
       context "user confirmed" do
-        let!(:user_subject) { FactoryBot.create(:user_confirmed, email: "test@stuff.com")}
+        let!(:user_subject) { FactoryBot.create(:user_confirmed, email: "test@stuff.com") }
         it "does not send a notification" do
           expect(user_subject.confirmed?).to be_truthy
           ActionMailer::Base.deliveries = []
