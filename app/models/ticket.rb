@@ -49,13 +49,25 @@ class Ticket < ApplicationRecord
   def self.recent_customer_appointment_statuses; Appointment.in_line_statuses + ["abandoned"] end
 
   def self.too_many_recent_claimed_tickets?(user: nil, user_id: nil, email: nil, creation_ip: nil)
-    recent_appointments = Appointment.for_user_attrs(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
+    # THIS IS GROSS - but just getting it done right now. There is an or query that needs to be done
+    if email.present?
+      recent_appointments = Appointment.for_user_attrs(email: email, creation_ip: creation_ip)
                                      .where(status: recent_customer_appointment_statuses)
-                                     .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes))
-    recent_appointments.count >= CLAIMED_TICKET_LIMIT
+                                     .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).count
+    else
+      recent_appointments = 0
+    end
+    if [user, user_id].any?(&:present?)
+      recent_appointments += Appointment.for_user_attrs(user: user, user_id: user_id, creation_ip: creation_ip)
+                                       .where(status: recent_customer_appointment_statuses)
+                                       .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).count
+    end
+    recent_appointments >= CLAIMED_TICKET_LIMIT
   end
 
   def claimed?; claimed_at.present? end
+
+  def unclaimed?; !claimed? end
 
   def unresolved?; self.class.unresolved_statuses.include?(status) end
 
@@ -63,12 +75,17 @@ class Ticket < ApplicationRecord
   def display_number; number end
 
   def claim(user: nil, user_id: nil, email: nil, creation_ip: nil) # Can just add a phone number here
-    return true if appointment&.matches_user_attrs?(user: user, user_id: user_id, email: email)
-    errors.add(:base, "appointment already claimed") if appointment_id.present?
-    if self.class.too_many_recent_claimed_tickets?(user: user, user_id: user_id, email: email)
-      errors.add(:base, "you have already claimed as many tickets as you're allowed!")
+    if [user, user_id, email].reject(&:blank?).none? # matches_user_attrs throws an error if no email is passed
+      errors.add(:base, "We need your email to contact you about your place in line!")
+    else
+      # THIS IS GROSS - but just getting it done right now. There is an or query that needs to be done
+      return true if appointment&.matches_user_attrs?(user: user, user_id: user_id) if [user, user_id].any?(&:present?)
+      return true if appointment&.matches_user_attrs?(email: email) if email.present?
+      errors.add(:base, "appointment already claimed") if appointment_id.present?
+      if self.class.too_many_recent_claimed_tickets?(user: user, user_id: user_id, email: email)
+        errors.add(:base, "you have already claimed as many tickets as you're allowed!")
+      end
     end
-    errors.add(:base, "We need your email to contact you about your place in line!") unless [user, user_id, email].reject(&:blank?).any?
     return false if errors.any?
     new_appt = create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
     self.update(appointment_id: new_appt.id)

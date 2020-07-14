@@ -62,8 +62,8 @@ RSpec.describe Ticket, type: :model do
     context "no email or user passed" do
       it "errors" do
         expect do
-          expect(ticket.claim(email: " ", creation_ip: "108.000.215.126")).to be_truthy
-        end.to_not change(Appointment, :count).by 1
+          expect(ticket.claim(email: " ", creation_ip: "108.000.215.126")).to be_falsey
+        end.to_not change(Appointment, :count)
         expect(ticket.errors.full_messages.count).to eq 1
         expect(ticket.errors.full_messages.to_s).to match(/email/)
       end

@@ -259,7 +259,6 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
                                                   reason: "Service",
                                                 },
                                               }
-        pp flash
       end.to change(Appointment, :count).by 1
       expect(flash[:success]).to be_present
       expect(response).to redirect_to virtual_line_root_url
@@ -270,23 +269,114 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
       expect(appointment.email).to eq "something@stuff.com"
       expect(appointment.reason).to eq "Service"
       expect(appointment.status).to eq "waiting"
+      expect(appointment.creator_kind).to eq "ticket_claim"
     end
     context "unknown ticket_token" do
       it "flash errors" do
-
+        expect do
+          put "#{base_url}/#{ticket.to_param}", params: {
+                                                organization_id: current_organization.to_param,
+                                                ticket_token: "as7asdf7f7f7ds7afasdf",
+                                                appointment: {
+                                                  email: "something@stuff.COM",
+                                                  reason: "Service",
+                                                },
+                                              }
+        end.to_not change(Appointment, :count)
+        expect(flash[:error]).to be_present
+        ticket.reload
+        expect(assigns(:ticket)).to be_blank
+        expect(ticket.claimed?).to be_falsey
       end
     end
     context "user is not permitted to create another appointment" do
+      let(:ticket1) { FactoryBot.create(:ticket, location: current_location) }
+      let!(:ticket2) { FactoryBot.create(:ticket) }
+      before do
+        ticket1.claim(email: "seraphina@compass.com")
+        ticket2.claim(email: "SERAphina@compass.com")
+      end
       it "flash errors" do
-
+        expect do
+          put "#{base_url}/#{ticket.to_param}", params: {
+                                                organization_id: current_organization.to_param,
+                                                ticket_token: "as7asdf7f7f7ds7afasdf",
+                                                appointment: {
+                                                  email: " seraphina@compass.com   ",
+                                                  reason: "Service",
+                                                },
+                                              }
+        end.to_not change(Appointment, :count)
+        expect(flash[:error]).to be_present
+        ticket.reload
+        expect(assigns(:ticket)).to be_blank
+        expect(ticket.claimed?).to be_falsey
       end
     end
     context "appointment exists" do
-      it "update to status abandoned" do
-        # It does not permit marking them abandoned
+      let(:appointment_params) do
+        {
+          name: "Sarah h.",
+          email: "something@stuff.com",
+          reason: "Service",
+          location_id: current_location.id,
+          status: status,
+          description: "something cool, etc",
+        }
       end
-      context "user signed in" do
-        it "permits marking the ticket abandoned"
+      let(:status) { "on_deck" }
+      let(:ticket) do
+        tick = FactoryBot.create(:ticket, location: current_location)
+        tick.claim(email: appointment_params[:email])
+        tick
+      end
+      let(:appointment) { ticket.appointment }
+      it "updates" do
+        expect do
+          put "#{base_url}/#{ticket.to_param}", params: {
+                                                  organization_id: current_organization.to_param,
+                                                  ticket_token: ticket.link_token,
+                                                  appointment: appointment_params
+                                                }
+        end.to_not change(Appointment, :count)
+        expect(assigns(:ticket)).to eq ticket
+        appointment.reload
+        expect(appointment.status).to eq "waiting"
+        expect(appointment.reason).to eq "Service"
+        expect(appointment.description).to eq "something cool, etc"
+        expect(appointment.name).to eq "Sarah h."
+        expect(appointment.email).to eq "something@stuff.com"
+      end
+      context "status: abandoned" do
+        let(:status) { "abandoned" }
+        it "updates to status abandoned" do
+          put "#{base_url}/#{ticket.to_param}", params: {
+                                                  organization_id: current_organization.to_param,
+                                                  ticket_token: ticket.link_token,
+                                                  appointment: appointment_params
+                                                }
+          expect(assigns(:ticket)).to eq ticket
+          appointment.reload
+          expect(appointment.status).to eq "waiting"
+        end
+        context "user signed in" do
+          include_context :request_spec_logged_in_as_user
+
+          it "permits marking the ticket abandoned" do
+            expect(current_user.appointments.count).to eq 0
+            put "#{base_url}/#{ticket.to_param}", params: {
+                                                  organization_id: current_organization.to_param,
+                                                  ticket_token: ticket.link_token,
+                                                  appointment: appointment_params
+                                                }
+            expect(assigns(:ticket)).to eq ticket
+            appointment.reload
+            expect(appointment.status).to eq "abandoned"
+            expect(appointment.user_id).to eq current_user.id
+            current_user.reload
+            expect(current_user.appointments.count).to eq 1
+          end
+        end
       end
     end
   end
