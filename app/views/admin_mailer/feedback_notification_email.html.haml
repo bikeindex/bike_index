@@ -61,12 +61,18 @@
       Can we share?
       %strong
         = @feedback.feedback_hash["can_share_recovery"] ? "Yes" : "No"
-
-    - if @feedback.feedback_hash["can_share_recovery"]
-      %h3{ style: "font-weight: 400px;" }
-        = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)
+
+
+  - if @feedback.feedback_hash["index_helped_recovery"] && @feedback.feedback_hash["can_share_recovery"]
+    - admins_links_started = true
+
+    %h3.bike-index-administration-links Bike Index admin links
+
+    %p{ style: "font-weight: 400px;" }
+      %span.less-strong Bike Index admin:
+      = link_to "approve sharing", admin_recoveries_url
 
 - elsif @feedback.lead_type.present?
   %p
@@ -107,6 +113,8 @@
   %p
     = feedback_body
 
-%p{ style: "margin-top: 30px;" }
-  %strong
-    = link_to "Read full message", admin_feedback_url(@feedback)
+- unless admins_links_started
+  %h3.bike-index-administration-links Bike Index admin links
+%p{ style: "margin-top: 0;" }
+  %span.less-strong Bike Index admin:
+  = link_to "read full message", admin_feedback_url(@feedback)
