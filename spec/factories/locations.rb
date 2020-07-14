@@ -21,12 +21,16 @@ FactoryBot.define do
     end
 
     trait :with_virtual_line_on do
+      transient do
+        customers_on_deck_count { 0 }
+      end
       organization { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["virtual_line"]) }
-      after(:create) do |location, _evaluator|
+      after(:create) do |location, evaluator|
         FactoryBot.create(:appointment_configuration,
                           location: location,
                           organization: location.organization,
-                          virtual_line_on: true)
+                          virtual_line_on: true,
+                          customers_on_deck_count: evaluator.customers_on_deck_count)
       end
     end
 

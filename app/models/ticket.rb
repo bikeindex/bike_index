@@ -22,6 +22,7 @@ class Ticket < ApplicationRecord
   scope :number_ordered, -> { reorder(:number) }
   scope :in_line, -> { where(status: in_line_statuses).number_ordered }
   scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).number_ordered }
+  scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :unresolved, -> { where(status: unresolved_statuses) }
@@ -116,14 +117,16 @@ class Ticket < ApplicationRecord
     fail "Appointment already created" if appointment_id.present?
     Appointment.new(location_id: location_id,
                     organization_id: organization_id,
-                    creator_kind: "ticket_claim",
                     status: "waiting",
                     ticket_number: number)
   end
 
-  def create_new_appointment(email: nil, user_id: nil, user: nil, creation_ip: nil)
+  def create_new_appointment(email: nil, user_id: nil, user: nil, creation_ip: nil, creator_kind: "ticket_claim")
     self.appointment = new_appointment
-    appointment.update(email: email, user_id: user_id || user&.id, creation_ip: creation_ip)
+    appointment.update(email: email,
+                       user_id: user_id || user&.id,
+                       creation_ip: creation_ip,
+                       creator_kind: creator_kind)
     appointment
   end
 end
