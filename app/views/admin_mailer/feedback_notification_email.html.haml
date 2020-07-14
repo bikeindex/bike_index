@@ -1,5 +1,7 @@
 / SparkPost blocks emails with URIs it disapproves of. We still want to send these emails, at least for now. So just remove urls and tags, so that sparkpost doesn't block them.
 - feedback_body = strip_tags(@feedback.body).gsub(/http[^\s]*/i, '').truncate(200)
+- admin_links = []
+
 - if @feedback.feedback_type == 'serial_update_request'
   %h1{ :style => "font-weight: 400px;" }
     Serial update notification
@@ -66,13 +68,7 @@
 
 
   - if @feedback.feedback_hash["index_helped_recovery"] && @feedback.feedback_hash["can_share_recovery"]
-    - admins_links_started = true
-
-    %h3.bike-index-administration-links Bike Index admin links
-
-    %p{ style: "font-weight: 400px;" }
-      %span.less-strong Bike Index admin:
-      = link_to "approve sharing", admin_recoveries_url
+    - admin_links << link_to("display story", admin_recoveries_url)
 
 - elsif @feedback.lead_type.present?
   %p
@@ -113,8 +109,10 @@
   %p
     = feedback_body
 
-- unless admins_links_started
-  %h3.bike-index-administration-links Bike Index admin links
-%p{ style: "margin-top: 0;" }
-  %span.less-strong Bike Index admin:
+%p.bike-index-administration-links
+  Bike Index administrator links:
+  - admin_links.each do |link|
+    = link
+    %span{ style: "inline-block; padding: 0 0.3rem;" }
+      \|
   = link_to "read full message", admin_feedback_url(@feedback)
