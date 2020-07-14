@@ -52,17 +52,17 @@ class Ticket < ApplicationRecord
     # THIS IS GROSS - but just getting it done right now. There is an or query that needs to be done
     if email.present?
       recent_appointments = Appointment.for_user_attrs(email: email, creation_ip: creation_ip)
-                                     .where(status: recent_customer_appointment_statuses)
-                                     .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).count
+        .where(status: recent_customer_appointment_statuses)
+        .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).pluck(:id)
     else
-      recent_appointments = 0
+      recent_appointments = []
     end
     if [user, user_id].any?(&:present?)
       recent_appointments += Appointment.for_user_attrs(user: user, user_id: user_id, creation_ip: creation_ip)
-                                       .where(status: recent_customer_appointment_statuses)
-                                       .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).count
+        .where(status: recent_customer_appointment_statuses)
+        .where(appointment_at: (Time.current - 1.hour)..(Time.current + 30.minutes)).pluck(:id)
     end
-    recent_appointments >= CLAIMED_TICKET_LIMIT
+    recent_appointments.uniq.count >= CLAIMED_TICKET_LIMIT
   end
 
   def claimed?; claimed_at.present? end
@@ -87,33 +87,31 @@ class Ticket < ApplicationRecord
       end
     end
     return false if errors.any?
-    new_appt = create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
-    self.update(appointment_id: new_appt.id)
+    create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
+    self.update(claimed_at: Time.current)
     true
   end
 
   def set_calculated_attributes
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
-    self.claimed_at ||= Time.current if appointment_id.present?
-    self.status = calculated_status
+    return true unless appointment_id.present?
+    self.claimed_at ||= Time.current
+    self.status = appointment&.in_line? ? "in_line" : "resolved"
+  end
+
+  def new_appointment
+    fail "Appointment already created" if appointment_id.present?
+    Appointment.new(location_id: location_id,
+                    organization_id: organization_id,
+                    creator_kind: "ticket_claim",
+                    status: "waiting",
+                    ticket_number: number)
   end
 
   def create_new_appointment(email: nil, user_id: nil, user: nil, creation_ip: nil)
-    Appointment.create(location_id: location_id,
-                       organization_id: organization_id,
-                       creator_kind: "ticket_claim",
-                       status: "waiting",
-                       email: email,
-                       user_id: user_id || user&.id,
-                       creation_ip: creation_ip,
-                       ticket_number: number)
-  end
-
-  private
-
-  def calculated_status
-    return status unless appointment.present?
-    appointment.in_line? ? "in_line" : "resolved"
+    self.appointment = new_appointment
+    appointment.update(email: email, user_id: user_id || user&.id, creation_ip: creation_ip)
+    appointment
   end
 end

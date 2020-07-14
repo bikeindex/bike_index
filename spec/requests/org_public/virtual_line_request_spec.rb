@@ -174,7 +174,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
                          ticket_number: ticket.number,
                        }
       end.to_not change(Notification, :count)
-      expect(flash[:success]).to be_present
+      expect(flash).to be_blank
       expect(assigns(:ticket)&.id).to eq ticket.id
       ticket.reload
       expect(ticket.claimed?).to be_falsey
@@ -275,37 +275,13 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
       it "flash errors" do
         expect do
           put "#{base_url}/#{ticket.to_param}", params: {
-                                                organization_id: current_organization.to_param,
-                                                ticket_token: "as7asdf7f7f7ds7afasdf",
-                                                appointment: {
-                                                  email: "something@stuff.COM",
-                                                  reason: "Service",
-                                                },
-                                              }
-        end.to_not change(Appointment, :count)
-        expect(flash[:error]).to be_present
-        ticket.reload
-        expect(assigns(:ticket)).to be_blank
-        expect(ticket.claimed?).to be_falsey
-      end
-    end
-    context "user is not permitted to create another appointment" do
-      let(:ticket1) { FactoryBot.create(:ticket, location: current_location) }
-      let!(:ticket2) { FactoryBot.create(:ticket) }
-      before do
-        ticket1.claim(email: "seraphina@compass.com")
-        ticket2.claim(email: "SERAphina@compass.com")
-      end
-      it "flash errors" do
-        expect do
-          put "#{base_url}/#{ticket.to_param}", params: {
-                                                organization_id: current_organization.to_param,
-                                                ticket_token: "as7asdf7f7f7ds7afasdf",
-                                                appointment: {
-                                                  email: " seraphina@compass.com   ",
-                                                  reason: "Service",
-                                                },
-                                              }
+                                                  organization_id: current_organization.to_param,
+                                                  ticket_token: "as7asdf7f7f7ds7afasdf",
+                                                  appointment: {
+                                                    email: "something@stuff.COM",
+                                                    reason: "Service",
+                                                  },
+                                                }
         end.to_not change(Appointment, :count)
         expect(flash[:error]).to be_present
         ticket.reload
@@ -336,7 +312,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           put "#{base_url}/#{ticket.to_param}", params: {
                                                   organization_id: current_organization.to_param,
                                                   ticket_token: ticket.link_token,
-                                                  appointment: appointment_params
+                                                  appointment: appointment_params,
                                                 }
         end.to_not change(Appointment, :count)
         expect(assigns(:ticket)).to eq ticket
@@ -353,7 +329,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           put "#{base_url}/#{ticket.to_param}", params: {
                                                   organization_id: current_organization.to_param,
                                                   ticket_token: ticket.link_token,
-                                                  appointment: appointment_params
+                                                  appointment: appointment_params,
                                                 }
           expect(assigns(:ticket)).to eq ticket
           appointment.reload
@@ -365,10 +341,10 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           it "permits marking the ticket abandoned" do
             expect(current_user.appointments.count).to eq 0
             put "#{base_url}/#{ticket.to_param}", params: {
-                                                  organization_id: current_organization.to_param,
-                                                  ticket_token: ticket.link_token,
-                                                  appointment: appointment_params
-                                                }
+                                                    organization_id: current_organization.to_param,
+                                                    ticket_token: ticket.link_token,
+                                                    appointment: appointment_params,
+                                                  }
             expect(assigns(:ticket)).to eq ticket
             appointment.reload
             expect(appointment.status).to eq "abandoned"

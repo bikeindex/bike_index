@@ -73,7 +73,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
                       organization_id: current_organization.to_param,
                       ticket_number: ticket.number,
                     }
-      expect(flash[:success]).to be_present
+      expect(flash).to be_blank
       expect(assigns(:ticket)&.id).to eq ticket.id
       expect(session[:ticket_token]).to eq ticket.link_token
       ticket.reload
@@ -92,6 +92,36 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
         expect(assigns(:ticket)&.id).to be_blank
         expect(session[:ticket_token]).to be_blank
         expect(flash[:info]).to be_present
+      end
+    end
+  end
+
+  describe "update" do
+    context "user is not permitted to create another appointment" do
+      let(:ticket1) { FactoryBot.create(:ticket, location: current_location) }
+      let!(:ticket2) { FactoryBot.create(:ticket) }
+      before do
+        ticket1.claim(email: "seraphina@compass.com")
+        ticket2.claim(email: "SERAphina@compass.com")
+      end
+      it "flash errors" do
+        session[:ticket_token] = ticket.link_token
+        expect do
+          patch :update, params: {
+                           id: ticket.id,
+                           organization_id: current_organization.to_param,
+                           ticket_token: ticket.link_token,
+                           appointment: {
+                             email: " seraphina@compass.com   ",
+                             reason: "Service",
+                           },
+                         }
+        end.to_not change(Appointment, :count)
+        expect(flash[:error]).to be_present
+        ticket.reload
+        expect(assigns(:ticket)).to be_blank
+        expect(ticket.claimed?).to be_falsey
+        expect(session[:ticket_token]).to be_blank
       end
     end
   end

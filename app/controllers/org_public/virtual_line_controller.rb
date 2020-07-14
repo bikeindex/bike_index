@@ -12,6 +12,8 @@ module OrgPublic
         assign_current_ticket(nil)
       elsif @ticket&.claimed?
         assign_current_ticket(@ticket)
+      elsif @ticket.present? # unclaimed ticket
+        @appointment = @ticket.new_appointment
       end
     end
 
@@ -27,7 +29,6 @@ module OrgPublic
         Notification.create_for("view_claimed_ticket", appointment: appointment)
         flash[:info] = "That ticket has already been claimed. Please follow the link we sent to update your place in line"
       else
-        flash[:success] = "You've claimed your place in line"
         assign_current_ticket(ticket)
       end
       redirect_to organization_virtual_line_index_path(organization_id: current_organization.to_param, location_id: current_location&.to_param)
@@ -45,6 +46,7 @@ module OrgPublic
         end
         if @ticket.errors.present?
           flash[:error] = @ticket.errors.full_messages.to_sentence
+          assign_current_ticket(nil)
         else
           @ticket.appointment.user ||= current_user
           @ticket.appointment.update(permitted_params)

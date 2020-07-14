@@ -1,7 +1,7 @@
 import log from "../utils/log";
 import TimeParser from "../utils/time_parser.js";
 import BinxMapping from "./binx_mapping.js";
-import WalkrightupCustomer from "./walkrightup/customer.js";
+import VirtualLineCustomer from "./virtual_line/customer.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgLines from "./binx_org_lines.js";
@@ -45,8 +45,8 @@ $(document).ready(function () {
 
   // Load admin, whatever
   if ($("#customer-virtual-line-wrapper").length > 0) {
-    window.walkrightupCustomer = new WalkrightupCustomer();
-    walkrightupCustomer.init();
+    window.virtualLineCustomer = new VirtualLineCustomer();
+    virtualLineCustomer.init();
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
