@@ -1,5 +1,11 @@
 class Ticket < ApplicationRecord
-  STATUS_ENUM = { unused: 0, in_line: 1, resolved: 2 }.freeze
+  STATUS_ENUM = {
+    unused: 0,
+    waiting: 1,
+    paging: 2,
+    on_deck: 3,
+    resolved: 4,
+  }.freeze
   CLAIMED_TICKET_LIMIT = 2
 
   belongs_to :organization
@@ -14,11 +20,15 @@ class Ticket < ApplicationRecord
   enum status: STATUS_ENUM
 
   scope :number_ordered, -> { reorder(:number) }
+  scope :in_line, -> { where(status: in_line_statuses).number_ordered }
+  scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).number_ordered }
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :unresolved, -> { where(status: unresolved_statuses) }
 
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+
+  def self.in_line_statuses; statuses - %w[unused resolved] end
 
   def self.unresolved_statuses; statuses - ["resolved"] end
 
@@ -69,6 +79,8 @@ class Ticket < ApplicationRecord
 
   def unclaimed?; !claimed? end
 
+  def in_line?; self.class.in_line_statuses.include?(status) end
+
   def unresolved?; self.class.unresolved_statuses.include?(status) end
 
   # Might be more complicated in the future
@@ -95,9 +107,9 @@ class Ticket < ApplicationRecord
   def set_calculated_attributes
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
-    return true unless appointment_id.present?
+    return true unless appointment.present?
     self.claimed_at ||= Time.current
-    self.status = appointment&.in_line? ? "in_line" : "resolved"
+    self.status = appointment.in_line? ? appointment.status : "resolved"
   end
 
   def new_appointment

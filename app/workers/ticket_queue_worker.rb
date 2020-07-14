@@ -7,7 +7,7 @@ class TicketQueueWorker < ApplicationWorker
     location = ticket.location
     location.tickets.number_ordered.unused
             .where(number: ticket.number...(ticket.number + DEFAULT_TICKETS_IN_LINE_COUNT))
-            .update_all(status: "in_line")
+            .update_all(status: "waiting")
     return true unless resolve_earlier_tickets
     location.tickets.number_ordered.in_line
             .where("number < ?", ticket.number)

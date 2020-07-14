@@ -19,7 +19,7 @@ RSpec.describe TicketQueueWorker, type: :job do
       ticket1.reload
       expect(ticket1.status).to eq "unused"
       ticket2.reload
-      expect(ticket2.status).to eq "in_line"
+      expect(ticket2.status).to eq "waiting"
       expect(organization.tickets.unused.count).to eq 5
       expect(organization.tickets.in_line.count).to eq 5
       ticket3 = organization.tickets.friendly_find(103)
@@ -35,7 +35,7 @@ RSpec.describe TicketQueueWorker, type: :job do
       ticket2.reload
       expect(ticket2.status).to eq "resolved"
       ticket3.reload
-      expect(ticket3.status).to eq "in_line"
+      expect(ticket3.status).to eq "waiting"
       expect(organization.tickets.unused.count).to eq 4
       expect(organization.tickets.in_line.count).to eq 5
       expect(organization.tickets.resolved.count).to eq 1

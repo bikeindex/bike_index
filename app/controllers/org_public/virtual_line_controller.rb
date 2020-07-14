@@ -15,6 +15,8 @@ module OrgPublic
       elsif @ticket.present? # unclaimed ticket
         @appointment = @ticket.new_appointment
       end
+
+      @tickets_in_line = current_location.tickets.in_line
     end
 
     def create

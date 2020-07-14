@@ -11,30 +11,26 @@
       = render "layouts/revised_messages"
       %h2.text-center
         Current line info box
-      / - if current_organization.present?
-      /   %h1.virtual-line-header
-      /     - if current_organization.avatar.present?
-      /       = image_tag current_organization.avatar_url, alt: "#{current_organization.name} logo"
-      /     %em
-      /       = current_organization.name
-      /     virtual line
+      - if current_organization.present?
+        %h1.virtual-line-header
+          - if current_organization.avatar.present?
+            = image_tag current_organization.avatar_url, alt: "#{current_organization.name} logo"
+          %em
+            = current_organization.name
+          virtual line
 
-      / - if current_location.present? && @appointments_in_line.present?
-      /   .container
-      /     .row
-      /       .col-6
-      /         %h2
-      /           = pluralize(@appointments_in_line.count, "Person")
-      /           in line
-      /       .col-6
-      /         %h2
-      /           On deck
-      /         %ul
-      /           - @appointments_in_line.paging_or_on_deck.each do |appointment|
-      /             %li
-      /               = appointment.public_display_name
-      /               - if appointment.paging?
-      /                 %em.text-warning #{current_organization.short_name} is ready for them!
+      - if current_location.present? && @tickets_in_line.present?
+        .container
+          .row
+            .col-6
+              %h2
+                On deck
+              %ul
+                - @tickets_in_line.paging_or_on_deck.each do |ticket|
+                  %li
+                    = ticket.display_number
+                    - if ticket.paging?
+                      %em.text-warning #{current_organization.short_name} is ready for them!
 
 
       %hr
