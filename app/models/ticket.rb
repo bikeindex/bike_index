@@ -27,7 +27,8 @@ class Ticket < ApplicationRecord
     where(number: str.to_s.strip).first
   end
 
-  def self.create_tickets(number_to_create, initial_number: nil, organization: nil, location:)
+  def self.create_tickets(number_to_create, initial_number: nil, organization: nil, location: nil)
+    location ||= organization.locations.first
     initial_number ||= location.tickets.max_number
     initial_number += 1 if location.tickets.where(number: initial_number).present? || initial_number == 0
 

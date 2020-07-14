@@ -30,7 +30,7 @@
 
       .binx-body
         -# We only render snippets for organized messages - or if we're doing a preview
-        - render_organization_snippets = @organization.present? && (%w[organized_mailer customer_appointments_mailer].include?(controller_path) || @email_preview)
+        - render_organization_snippets = @organization.present? && (%w[organized_mailer appointments_mailer].include?(controller_path) || @email_preview)
         - if render_organization_snippets && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
 

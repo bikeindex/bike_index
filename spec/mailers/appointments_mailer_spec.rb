@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe CustomerAppointmentsMailer, type: :mailer do
+RSpec.describe AppointmentsMailer, type: :mailer do
   let(:location) { FactoryBot.create(:location, :with_virtual_line_on) }
   let(:organization) { location.organization }
   let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
@@ -21,7 +21,7 @@ RSpec.describe CustomerAppointmentsMailer, type: :mailer do
       expect(header_mail_snippet).to be_present
       organization.reload
       expect(organization.auto_user).to eq organization_member
-      mail = CustomerAppointmentsMailer.view_claimed_ticket(ticket)
+      mail = AppointmentsMailer.view_claimed_ticket(appointment)
       expect(mail.subject).to eq("View your place in the #{organization.short_name} line")
       expect(appointment.email).to eq user.email
       expect(mail.to).to eq([user.email])

@@ -5,6 +5,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   let(:appointment_configuration) { FactoryBot.create(:appointment_configuration, virtual_line_on: true) }
   let(:current_location) { appointment_configuration.location }
   let(:current_organization) { current_location.organization }
+  let(:virtual_line_root_url) { organization_virtual_line_index_path(organization_id: current_organization.to_param, location_id: current_location.to_param) }
 
   context "current_organization not found" do
     it "redirects" do
@@ -164,8 +165,99 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   end
 
   describe "create" do
+    let!(:ticket) { FactoryBot.create(:ticket, location: current_location) }
     it "sends back with the ticket assigned" do
+      expect(ticket.claimed?).to be_falsey
+      expect do
+        post base_url, params: {
+                        organization_id: current_organization.to_param,
+                        ticket_number: ticket.number,
+                      }
+      end.to_not change(Notification, :count)
+      expect(flash[:success]).to be_present
+      expect(assigns(:ticket)&.id).to eq ticket.id
+      ticket.reload
+      expect(ticket.claimed?).to be_falsey
+    end
+    context "resolved ticket" do
+      let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "resolved") }
+      it "redirects with flash, no ticket" do
+        expect do
+          post base_url, params: {
+                        organization_id: current_organization.to_param,
+                        ticket_number: "#{ticket.number}",
+                      }
+        end.to_not change(Notification, :count)
+        expect(flash[:info]).to match(/resolved/)
+        expect(response).to redirect_to virtual_line_root_url
+        expect(assigns(:ticket)&.id).to be_blank
+      end
+    end
+    context "unknown ticket" do
+      it "behaves the same as resolved" do
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect do
+          post base_url, params: {
+                        organization_id: current_organization.to_param,
+                        ticket_number: 2222222,
+                      }
+        end.to_not change(Notification, :count)
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to virtual_line_root_url
+        expect(assigns(:ticket)&.id).to be_blank
+      end
+    end
+    context "claimed ticket" do
+      let!(:ticket) { FactoryBot.create(:ticket_claimed, location: current_location) }
+      it "redirects with flash, no ticket" do
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect do
+          post base_url, params: {
+                        organization_id: current_organization.to_param,
+                        ticket_number: ticket.number,
+                      }
+        end.to change(Notification, :count).by 1
+        expect(flash[:info]).to be_present
+        expect(response).to redirect_to virtual_line_root_url
+        expect(assigns(:ticket)&.id).to be_blank
+        expect(SendNotificationWorker.jobs.count).to eq 1
+        SendNotificationWorker.drain
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(ActionMailer::Base.deliveries.last.subject).to eq "View your place in the #{current_organization.short_name} line"
+      end
+      context "appointment is resolved" do
+        let(:appointment) { ticket.appointment }
+        it "behaves the same way as resolved" do
+          appointment.record_status_update(new_status: "being_helped")
+          appointment.reload
+          expect(appointment.no_longer_in_line?).to be_truthy
+          expect do
+            post base_url, params: {
+                          organization_id: current_organization.to_param,
+                          ticket_number: "#{ticket.number}",
+                        }
+          end.to_not change(Notification, :count)
+          expect(flash[:info]).to match(/helped already/)
+          expect(response).to redirect_to virtual_line_root_url
+          expect(assigns(:ticket)&.id).to be_blank
+        end
+      end
+    end
+  end
 
+  describe "update" do
+    it "creates an appointment" do
+    end
+    context "unknown ticket_token" do
+      it "flash errors"
+    end
+    it "status abandoned" do
+      # It does not permit marking them abandoned
+    end
+    context "user signed in" do
+      it "permits marking the ticket abandoned"
     end
   end
 end

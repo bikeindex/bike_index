@@ -6,7 +6,9 @@ class SendNotificationWorker < ApplicationWorker
     return false unless notification.present?
     # If we already sent it, don't send again
     return false if notification.email_success?
-    fail "we need to actually deliver email here"
+    if notification.view_claimed_ticket?
+      AppointmentsMailer.view_claimed_ticket(notification.appointment).deliver_now
+    end
     notification.update(delivery_status: "email_success") # I'm not sure how to make this more representative
   end
 end

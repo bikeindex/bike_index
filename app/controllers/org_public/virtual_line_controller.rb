@@ -16,13 +16,20 @@ module OrgPublic
     end
 
     def create
-      ticket = current_organization.tickets.unresolved.friendly_find(params[:ticket_number])
+      ticket = current_organization.tickets.friendly_find(params[:ticket_number])
+      appointment = ticket&.appointment
       if ticket.blank?
-        flash[:info] = "That ticket doesn't appear to be in line, please enter a different number"
+        flash[:error] = "That ticket doesn't appear to be in line, please enter a different number"
+      elsif ticket.resolved? || appointment&.no_longer_in_line?
+        if appointment&.present?
+          ticket_verb = "helped already" if appointment.being_helped?
+          ticket_verb = "marked abandoned" if appointment.abandoned?
+        end
+        flash[:info] = "That ticket was in line, but was #{ticket_verb || 'resolved'}"
       elsif ticket.claimed?
         @current_location = ticket.location
-        Notification.create_for("view_claimed_ticket", appointment: ticket.appointment)
-        flash[:info] = "That ticket has already been claimed. Please follow the link we sent to access the notification"
+        Notification.create_for("view_claimed_ticket", appointment: appointment)
+        flash[:info] = "That ticket has already been claimed. Please follow the link we sent to update your place in line"
       else
         flash[:success] = "You've claimed your place in line"
         assign_current_ticket(ticket)

@@ -1,7 +1,7 @@
-class CustomerAppointmentsMailer < OrganizedMailer
-  def view_claimed_ticket(ticket)
-    @ticket = ticket
-    @appointment = @ticket.appointment
+class AppointmentsMailer < OrganizedMailer
+  def view_claimed_ticket(appointment)
+    @appointment = appointment
+    @ticket = @appointment.ticket
     @organization = @appointment.organization
     @location = @appointment.location
 
