@@ -111,16 +111,15 @@
                   - if bike.creation_state.bulk_import.ascend?
                     %small
                       Ascend
-          - unless @bike.stolen?
-            %tr
-              %td
-                Address
-              %td
-                %small
-                  = @bike.address
-                  %span.only-dev-visible.ml-2
-                    manual:
-                    = @bike.address_set_manually
+          %tr
+            %td
+              Address
+            %td
+              %small
+                = @bike.address
+                %span.only-dev-visible.ml-2
+                  manual:
+                  = @bike.address_set_manually
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger
