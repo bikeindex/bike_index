@@ -9,6 +9,7 @@ class CreateTickets < ActiveRecord::Migration[5.2]
       t.text :link_token
 
       t.datetime :claimed_at
+      t.datetime :resolved_at
 
       t.timestamps
     end

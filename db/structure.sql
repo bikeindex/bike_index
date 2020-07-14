@@ -252,7 +252,7 @@ CREATE TABLE public.appointments (
     updated_at timestamp without time zone NOT NULL,
     appointment_at timestamp without time zone,
     ticket_number integer,
-    creation_ip character varying
+    creation_ip inet
 );
 
 
@@ -2607,6 +2607,7 @@ CREATE TABLE public.tickets (
     status integer DEFAULT 0,
     link_token text,
     claimed_at timestamp without time zone,
+    resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

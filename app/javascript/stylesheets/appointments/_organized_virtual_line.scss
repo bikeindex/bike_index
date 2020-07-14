@@ -1,0 +1,34 @@
+.organized-virtual-line-body {
+  h2 {
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+  }
+  .ticket-row {
+    width: 100%;
+    display: block;
+    padding: 1rem 0;
+    position: relative;
+    border: 1px solid #ccc;
+    margin: 12px 0 0 0;
+    h4 {
+      text-align: center;
+    }
+    a {
+      position: absolute;
+      top: 0;
+      padding: 1.5rem 1rem 0 1rem;
+      font-weight: bold;
+      font-size: 120%;
+      line-height: 1;
+      &.remove {
+        left: 0;
+      }
+      &.help {
+        right: 0;
+      }
+    }
+    &.on-deck-ticket {
+      font-size: 200%;
+    }
+  }
+}

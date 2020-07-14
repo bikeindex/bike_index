@@ -108,9 +108,11 @@ class Ticket < ApplicationRecord
   def set_calculated_attributes
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
-    return true unless appointment.present?
-    self.claimed_at ||= Time.current
-    self.status = appointment.in_line? ? appointment.status : "resolved"
+    if appointment.present?
+      self.claimed_at ||= Time.current
+      self.status = appointment.in_line? ? appointment.status : "resolved"
+    end
+    self.resolved_at ||= Time.current if resolved?
   end
 
   def new_appointment

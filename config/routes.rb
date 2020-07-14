@@ -335,7 +335,9 @@ Rails.application.routes.draw do
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
-    resources :lines, only: %i[index show update]
+    resources :lines, only: %i[index show update] do
+      member { get :simple_view }
+    end
     resources :tickets do
       collection { get :print }
     end

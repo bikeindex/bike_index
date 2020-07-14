@@ -165,7 +165,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   end
 
   describe "create" do
-    let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "in_line") }
+    let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "waiting") }
     it "sends back with the ticket assigned" do
       expect(ticket.claimed?).to be_falsey
       expect do

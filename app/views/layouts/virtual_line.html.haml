@@ -9,8 +9,6 @@
     -# TODO translations
     #customer-virtual-line-wrapper
       = render "layouts/revised_messages"
-      %h2.text-center
-        Current line info box
       - if current_organization.present?
         %h1.virtual-line-header
           - if current_organization.avatar.present?
@@ -23,7 +21,7 @@
         .container
           .row
             .col-6
-              %h2
+              %h2{ style: "font-size: 150%;" }
                 On deck
               %ul
                 - @tickets_in_line.paging_or_on_deck.each do |ticket|

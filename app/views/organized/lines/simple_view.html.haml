@@ -1,0 +1,30 @@
+!!!
+%html
+  %head
+    = header_tags
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    = javascript_pack_tag "application_standalone"
+    = stylesheet_pack_tag "application_css"
+  %body{ id: page_id, class: "organized-virtual-line-body" }
+    -# TODO translations
+    #organized-virtual-line-wrapper
+      %h2 Next customers to help
+      - @tickets.paging_or_on_deck.each do |ticket|
+        .ticket-row.on-deck-ticket
+          %a.remove{ href: "#" }
+            X
+          %h4
+            = ticket.number
+          %a.help{ href: "#" }
+            = check_mark
+
+      %h2 Upcoming
+
+      - @tickets.line_not_paging_or_on_deck.each do |ticket|
+        .ticket-row
+          %a.remove{ href: "#" }
+            X
+          %h4
+            = ticket.number
+          %a.help{ href: "#" }
+            = check_mark

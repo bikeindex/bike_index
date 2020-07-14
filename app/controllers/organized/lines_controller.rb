@@ -9,6 +9,12 @@ module Organized
       end
     end
 
+    def simple_view
+      @tickets = current_location.tickets.in_line
+      @last_ticket_helped = current_location.tickets.resolved.reorder(:resolved_at).last
+      render layout: false
+    end
+
     def show
       @appointments = matching_appointments.includes(:appointment_updates)
       @appointment ||= Appointment.new(location_id: current_location.id, organization_id: current_organization.id)
