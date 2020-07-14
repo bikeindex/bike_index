@@ -9,6 +9,8 @@
     -# TODO translations
     #customer-virtual-line-wrapper
       = render "layouts/revised_messages"
+      %h2.text-center
+        Current line info box
       - if current_organization.present?
         %h1.virtual-line-header
           - if current_organization.avatar.present?
@@ -17,21 +19,17 @@
             = current_organization.name
           virtual line
 
-      - if current_location.present? && @appointments_in_line.present?
+      - if current_location.present? && @tickets_in_line.present?
         .container
           .row
             .col-6
               %h2
-                = pluralize(@appointments_in_line.count, "Person")
-                in line
-            .col-6
-              %h2
                 On deck
               %ul
-                - @appointments_in_line.paging_or_on_deck.each do |appointment|
+                - @tickets_in_line.paging_or_on_deck.each do |ticket|
                   %li
-                    = appointment.public_display_name
-                    - if appointment.paging?
+                    = ticket.display_number
+                    - if ticket.paging?
                       %em.text-warning #{current_organization.short_name} is ready for them!
 
 

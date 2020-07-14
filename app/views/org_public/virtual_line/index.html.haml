@@ -1,0 +1,53 @@
+-# TODO translations
+- if @ticket.blank?
+  = form_tag organization_virtual_line_index_path(organization_id: current_organization.to_param), action: "create", method: "post" do
+    .row
+      .form-group.col-8
+        = label_tag :ticket_number, "Ticket number"
+        = text_field_tag :ticket_number, nil, class: "form-control"
+      .form-group.col-4.text-center
+        %label.d-block &nbsp;
+        = submit_tag "Get in line!", class: "btn btn-success"
+- else
+  = form_for @appointment, { as: :appointment, url: organization_virtual_line_path(@ticket, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
+    = hidden_field_tag :ticket_token, @ticket.link_token
+    .row
+      .form-group.col-8
+        = f.label :reason, "Main reason for visit"
+        = f.select :reason, @appointment.permitted_reasons, {}, class: "form-control"
+      .form-group.col-4
+        = f.label :ticket_number, "Ticket #"
+        = f.text_field :ticket_number, disabled: true, class: "form-control"
+      .form-group.col-sm-6
+        = f.label :email do
+          Your email
+          %small.less-strong
+            to let you know when it's your turn
+        = f.email_field :email, required: true, class: "form-control"
+      - if @ticket.claimed?
+        .form-group.col-sm-6
+          = f.label :name, "Your name"
+          = f.text_field :name, class: "form-control"
+        .form-group.col-sm-6
+          = f.label :description, "Additional description"
+          = f.text_area :description, class: "form-control", col: 3
+      .form-group.col-sm-6.text-center
+        %label.d-block &nbsp;
+        = f.submit "Update appointment!", class: "btn btn-success"
+
+      - if @ticket.claimed? && current_user.present?
+        .col-sm-6
+          %p
+            %a#updateLineStatus{ href: "#" }
+              No longer in line?
+            %small.less-strong
+              Let
+              %em= current_organization.short_name
+              know
+          .collapse.updateLineStatusCollapse
+            .form-group
+              = f.label :status, "Where are you?"
+              - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "abandoned"]]
+              -# Only add on_deck status if the user is on deck, because users can't switch to be there
+              - valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
+              = f.select :status, valid_update_statuses, {}, class: "form-control"

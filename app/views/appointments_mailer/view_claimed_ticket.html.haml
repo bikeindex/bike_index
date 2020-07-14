@@ -1,0 +1,10 @@
+%h2
+  Ticket #{@ticket.display_number} is #{@appointment.status.humanize} at
+  - if @organization.locations.count > 1
+    %em.small
+      = @location.name
+  = @organization.name
+
+%p{ style: "margin-top: 40px;" }
+  View and update
+  = link_to "your place in line", organization_virtual_line_index_url(organization_id: @organization.to_param, location_id: @location.to_param, ticket_token: @ticket.link_token)

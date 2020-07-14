@@ -27,7 +27,7 @@ RSpec.describe Ticket, type: :model do
     end
   end
 
-  describe "claim!" do
+  describe "claim" do
     let(:ticket) { Ticket.create_tickets(1, location: location).first }
     let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@example.com") }
 
@@ -37,7 +37,7 @@ RSpec.describe Ticket, type: :model do
       expect(ticket.claimed?).to be_falsey
       expect(ticket.appointment).to be_blank
       expect do
-        expect(ticket.claim(email: "stuff@example.coM")).to be_truthy
+        expect(ticket.claim(email: "stuff@example.coM", creation_ip: "108.000.215.126")).to be_truthy
       end.to change(Appointment, :count).by 1
       expect(ticket.claimed?).to be_truthy
       expect(ticket.claimed_at).to be_within(1).of Time.current
@@ -49,6 +49,7 @@ RSpec.describe Ticket, type: :model do
       expect(appointment.location).to eq location
       expect(appointment.ticket_number).to eq ticket.number
       expect(appointment.position_in_line).to eq 100
+      expect(appointment.creation_ip.to_s).to eq "108.000.215.126"
       # But - it can claim by the same user again
       expect do
         expect(User.count).to eq 0
@@ -57,6 +58,15 @@ RSpec.describe Ticket, type: :model do
       end.to_not change(Appointment, :count)
       ticket.reload
       expect(ticket.appointment).to eq appointment
+    end
+    context "no email or user passed" do
+      it "errors" do
+        expect do
+          expect(ticket.claim(email: " ", creation_ip: "108.000.215.126")).to be_falsey
+        end.to_not change(Appointment, :count)
+        expect(ticket.errors.full_messages.count).to eq 1
+        expect(ticket.errors.full_messages.to_s).to match(/email/)
+      end
     end
     context "appointment already created" do
       let!(:appointment) do

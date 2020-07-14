@@ -35,7 +35,7 @@ class Appointment < ApplicationRecord
   def self.resolved_statuses; %[finished removed] end
 
   # This will be more sophisticated in the future, when we add phone, etc
-  def self.for_user_attrs(user: nil, user_id: nil, email: nil)
+  def self.for_user_attrs(user: nil, user_id: nil, email: nil, creation_ip: nil)
     unless [user, user_id, email].reject(&:blank?).count == 1
       fail "pass exactly one of: user, user_id, email"
     end
@@ -60,6 +60,8 @@ class Appointment < ApplicationRecord
   def location; Location.unscoped.find_by_id(location_id) end
 
   def in_line?; self.class.in_line_statuses.include?(status) end
+
+  def no_longer_in_line?; !in_line? end
 
   def paging_or_on_deck?; on_deck? || paging? end
 
@@ -146,6 +148,7 @@ class Appointment < ApplicationRecord
   def set_calculated_attributes
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
     self.kind = self.class.kinds.first # Because we're only doing virtual_line for now
+    self.email ||= user&.email
     self.email = EmailNormalizer.normalize(email)
     self.user_id ||= User.fuzzy_email_find(email)&.id if email.present?
     # for now, appointment_at is just the created at. This is setup for when appointments can be scheduled

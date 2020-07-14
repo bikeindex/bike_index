@@ -35,7 +35,7 @@ RSpec.describe Appointment, type: :model do
       let(:organization) { appt1.organization }
       let(:location) { appt1.location }
       let!(:appt2) { FactoryBot.create(:appointment, organization: organization, location: location, user: user) }
-      let!(:appt3) { FactoryBot.create(:appointment, email: "elizabeth@EXAMPLE.com ") }
+      let!(:appt3) { FactoryBot.create(:appointment, email: "elizabeth@EXAMPLE.com ", creation_ip: "108.000.215.126") }
       it "associates and finds them, etc" do
         # Create secondary email after the fact, so that the user isn't associated
         FactoryBot.create(:user_email, user: user, email: "elizabeth@example.com")
@@ -45,6 +45,7 @@ RSpec.describe Appointment, type: :model do
         expect(appt1.user_id).to be_blank
         expect(appt2.user_id).to eq user.id
         expect(appt3.user_id).to be_blank
+        expect(appt3.creation_ip.to_s).to eq "108.000.215.126"
 
         expect(appt1.matches_user_attrs?(email: "beth@stuff.COM ")).to be_truthy
         expect(appt1.matches_user_attrs?(user_id: user.id)).to be_truthy
@@ -243,8 +244,14 @@ RSpec.describe Appointment, type: :model do
       end
       context "new_status being_helped" do
         let(:new_status) { "being_helped" }
-        it "updates" do
+        let!(:ticket) { FactoryBot.create(:ticket, location: appointment.location, appointment: appointment) }
+        it "updates - and updates ticket" do
+          expect(appointment.ticket).to eq ticket
+          expect(ticket.appointment).to eq appointment
+          expect(ticket.status).to eq "in_line"
           expect_update(appointment, og_status, new_status, updator_id, updator_kind)
+          ticket.reload
+          expect(ticket.status).to eq "resolved"
         end
       end
       context "status being_helped" do

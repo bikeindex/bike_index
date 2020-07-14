@@ -251,7 +251,8 @@ CREATE TABLE public.appointments (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     appointment_at timestamp without time zone,
-    ticket_number integer
+    ticket_number integer,
+    creation_ip character varying
 );
 
 
@@ -1814,7 +1815,8 @@ CREATE TABLE public.notifications (
     kind integer,
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    appointment_id bigint
 );
 
 
@@ -4473,6 +4475,13 @@ CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON publ
 
 
 --
+-- Name: index_notifications_on_appointment_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_appointment_id ON public.notifications USING btree (appointment_id);
+
+
+--
 -- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5321,6 +5330,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620172241'),
 ('20200630200556'),
 ('20200701182325'),
-('20200710181523');
+('20200710181523'),
+('20200713173823');
 
 
