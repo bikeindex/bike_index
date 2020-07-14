@@ -236,10 +236,15 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
         expect(flash[:info]).to be_present
         expect(response).to redirect_to virtual_line_root_url
         expect(assigns(:ticket)&.id).to be_blank
+        notification = Notification.last
+        expect(notification.view_claimed_ticket?).to be_truthy
+        expect(notification.email_success?).to be_falsey
         expect(SendNotificationWorker.jobs.count).to eq 1
         SendNotificationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(ActionMailer::Base.deliveries.last.subject).to eq "View your place in the #{current_organization.short_name} line"
+        notification.reload
+        expect(notification.email_success?).to be_truthy
       end
       context "appointment is resolved" do
         let(:appointment) { ticket.appointment }

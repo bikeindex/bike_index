@@ -5,7 +5,8 @@ module OrgPublic
     def ensure_access_to_virtual_line!
       return true if current_location&.virtual_line_on?
       # Fallback onto appointment if location_id isn't passed
-      return true if @appointment&.location&.virtual_line_on?
+      fallback_location = @ticket&.location || @appointment&.location
+      return true if fallback_location&.virtual_line_on?
 
       if current_location.blank?
         flash[:error] = translation(:unable_to_find_location, location_id: params[:location_id], org_name: current_organization.short_name,

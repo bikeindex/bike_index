@@ -7,7 +7,7 @@
       .form-group.col-4.text-center
         %label.d-block &nbsp;
         = submit_tag "Get in line!", class: "btn btn-success"
-- else # Ticket is present!
+- else
   = form_for @appointment, { as: :appointment, url: organization_virtual_line_path(@ticket, organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PUT" } do |f|
     = hidden_field_tag :ticket_token, @ticket.link_token
     .row
@@ -48,5 +48,5 @@
               = f.label :status, "Where are you?"
               - valid_update_statuses = [["I'm still waiting", "waiting"], ["I'm being helped", "being_helped"], ["I left without being helped", "abandoned"]]
               -# Only add on_deck status if the user is on deck, because users can't switch to be there
-              -# valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
+              - valid_update_statuses << ["I'm on deck", "on_deck"] if @appointment.on_deck?
               = f.select :status, valid_update_statuses, {}, class: "form-control"
