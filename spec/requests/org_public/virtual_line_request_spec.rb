@@ -165,7 +165,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   end
 
   describe "create" do
-    let!(:ticket) { FactoryBot.create(:ticket, location: current_location) }
+    let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "in_line") }
     it "sends back with the ticket assigned" do
       expect(ticket.claimed?).to be_falsey
       expect do
@@ -193,10 +193,24 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
         expect(assigns(:ticket)&.id).to be_blank
       end
     end
+    context "unused ticket" do
+      let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "unused") }
+      it "redirects with flash, no ticket" do
+        Sidekiq::Worker.clear_all
+        expect do
+          post base_url, params: {
+                           organization_id: current_organization.to_param,
+                           ticket_number: ticket.number,
+                         }
+        end.to_not change(Notification, :count)
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to virtual_line_root_url
+        expect(assigns(:ticket)&.id).to be_blank
+      end
+    end
     context "unknown ticket" do
       it "behaves the same as resolved" do
         Sidekiq::Worker.clear_all
-        ActionMailer::Base.deliveries = []
         expect do
           post base_url, params: {
                            organization_id: current_organization.to_param,
@@ -248,7 +262,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   end
 
   describe "update" do
-    let!(:ticket) { FactoryBot.create(:ticket, location: current_location) }
+    let!(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "unused") }
     it "creates an appointment" do
       expect do
         put "#{base_url}/#{ticket.to_param}", params: {
@@ -265,6 +279,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
       expect(assigns(:ticket)).to eq ticket
       ticket.reload
       expect(ticket.claimed?).to be_truthy
+      expect(ticket.status).to eq "in_line" # This updates because the link_token was passed correctly
       appointment = ticket.appointment
       expect(appointment.email).to eq "something@stuff.com"
       expect(appointment.reason).to eq "Service"
@@ -317,15 +332,16 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
         end.to_not change(Appointment, :count)
         expect(assigns(:ticket)).to eq ticket
         appointment.reload
-        expect(appointment.status).to eq "waiting"
+        expect(appointment.status).to eq "waiting" # Doesn't update to on_deck status
         expect(appointment.reason).to eq "Service"
         expect(appointment.description).to eq "something cool, etc"
         expect(appointment.name).to eq "Sarah h."
         expect(appointment.email).to eq "something@stuff.com"
       end
-      context "status: abandoned" do
+      context "update status: abandoned" do
         let(:status) { "abandoned" }
-        it "updates to status abandoned" do
+        it "does not update status" do
+          Sidekiq::Worker.clear_all
           put "#{base_url}/#{ticket.to_param}", params: {
                                                   organization_id: current_organization.to_param,
                                                   ticket_token: ticket.link_token,
@@ -334,11 +350,12 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           expect(assigns(:ticket)).to eq ticket
           appointment.reload
           expect(appointment.status).to eq "waiting"
+          expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
         end
         context "user signed in" do
           include_context :request_spec_logged_in_as_user
-
           it "permits marking the ticket abandoned" do
+            Sidekiq::Worker.clear_all
             expect(current_user.appointments.count).to eq 0
             put "#{base_url}/#{ticket.to_param}", params: {
                                                     organization_id: current_organization.to_param,
@@ -351,6 +368,15 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
             expect(appointment.user_id).to eq current_user.id
             current_user.reload
             expect(current_user.appointments.count).to eq 1
+
+            expect(appointment.appointment_updates.count).to eq 1
+            appointment_update = appointment.appointment_updates.last
+            expect(appointment_update.status).to eq "abandoned"
+            expect(appointment_update.creator_kind).to eq "signed_in_user"
+            expect(appointment_update.user_id).to eq current_user.id
+
+            expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
+            expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
           end
         end
       end

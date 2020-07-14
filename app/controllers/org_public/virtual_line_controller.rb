@@ -20,7 +20,7 @@ module OrgPublic
     def create
       ticket = current_organization.tickets.friendly_find(params[:ticket_number])
       appointment = ticket&.appointment
-      if ticket.blank?
+      if ticket.blank? || ticket.unused?
         flash[:error] = "That ticket doesn't appear to be in line, please enter a different number"
       elsif ticket.resolved? || appointment&.no_longer_in_line?
         flash[:info] = ticket_resolved_message(ticket)
