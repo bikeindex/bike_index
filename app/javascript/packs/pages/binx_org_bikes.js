@@ -9,11 +9,11 @@ function BinxAppOrgBikes() {
       let self = this;
       this.selectStoredVisibleColumns();
       this.updateVisibleColumns();
-      $("#organizedSearchSettings input").on("change", function(e) {
+      $("#organizedSearchSettings input").on("change", function (e) {
         self.updateVisibleColumns();
       });
       // Make the stolenness toggle work
-      $(".organized-bikes-stolenness-toggle").on("click", function(e) {
+      $(".organized-bikes-stolenness-toggle").on("click", function (e) {
         e.preventDefault();
         const stolenness = $(".organized-bikes-stolenness-toggle").attr(
           "data-stolenness"
@@ -24,6 +24,9 @@ function BinxAppOrgBikes() {
     },
 
     selectStoredVisibleColumns() {
+      if (!$("#organizedSearchSettings").length) {
+        return false;
+      }
       const defaultCells = JSON.parse(
         $("#organizedSearchSettings").attr("data-defaultcols")
       );
