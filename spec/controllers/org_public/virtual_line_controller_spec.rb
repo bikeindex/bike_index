@@ -8,7 +8,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :controller do
   let(:appointment_configuration) { FactoryBot.create(:appointment_configuration, virtual_line_on: true) }
   let(:current_location) { appointment_configuration.location }
   let(:current_organization) { current_location.organization }
-  let(:ticket) { FactoryBot.create(:ticket, location: current_location) }
+  let(:ticket) { FactoryBot.create(:ticket, location: current_location, status: "in_line") }
 
   describe "index" do
     it "renders, doesn't set the ticket_token" do
