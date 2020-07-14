@@ -68,6 +68,7 @@ class Ticket < ApplicationRecord
     if self.class.too_many_recent_claimed_tickets?(user: user, user_id: user_id, email: email)
       errors.add(:base, "you have already claimed as many tickets as you're allowed!")
     end
+    errors.add(:base, "We need your email to contact you about your place in line!") unless [user, user_id, email].reject(&:blank?).any?
     return false if errors.any?
     new_appt = create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
     self.update(appointment_id: new_appt.id)

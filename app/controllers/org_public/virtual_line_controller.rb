@@ -25,7 +25,7 @@ module OrgPublic
           ticket_verb = "helped already" if appointment.being_helped?
           ticket_verb = "marked abandoned" if appointment.abandoned?
         end
-        flash[:info] = "That ticket was in line, but was #{ticket_verb || 'resolved'}"
+        flash[:info] = "That ticket was in line, but was #{ticket_verb || "resolved"}"
       elsif ticket.claimed?
         @current_location = ticket.location
         Notification.create_for("view_claimed_ticket", appointment: appointment)
@@ -38,6 +38,17 @@ module OrgPublic
     end
 
     def update
+      if @ticket.present?
+        @ticket.claim(user: current_user, email: params.dig(:appointment, :email), creation_ip: forwarded_ip_address)
+        if @ticket.errors.present?
+          flash[:error] = @ticket.errors.full_messages.to_sentence
+        else
+          flash[:success] = "Ticket is claimed!"
+        end
+      else
+        flash[:error] = "Unable to find that ticket"
+      end
+      redirect_to organization_virtual_line_index_path(organization_id: current_organization.to_param, location_id: current_location&.to_param)
     end
 
     private

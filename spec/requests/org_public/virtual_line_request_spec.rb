@@ -170,9 +170,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
       expect(ticket.claimed?).to be_falsey
       expect do
         post base_url, params: {
-                        organization_id: current_organization.to_param,
-                        ticket_number: ticket.number,
-                      }
+                         organization_id: current_organization.to_param,
+                         ticket_number: ticket.number,
+                       }
       end.to_not change(Notification, :count)
       expect(flash[:success]).to be_present
       expect(assigns(:ticket)&.id).to eq ticket.id
@@ -184,9 +184,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
       it "redirects with flash, no ticket" do
         expect do
           post base_url, params: {
-                        organization_id: current_organization.to_param,
-                        ticket_number: "#{ticket.number}",
-                      }
+                           organization_id: current_organization.to_param,
+                           ticket_number: "#{ticket.number}",
+                         }
         end.to_not change(Notification, :count)
         expect(flash[:info]).to match(/resolved/)
         expect(response).to redirect_to virtual_line_root_url
@@ -199,9 +199,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
         ActionMailer::Base.deliveries = []
         expect do
           post base_url, params: {
-                        organization_id: current_organization.to_param,
-                        ticket_number: 2222222,
-                      }
+                           organization_id: current_organization.to_param,
+                           ticket_number: 2222222,
+                         }
         end.to_not change(Notification, :count)
         expect(flash[:error]).to be_present
         expect(response).to redirect_to virtual_line_root_url
@@ -215,9 +215,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
         ActionMailer::Base.deliveries = []
         expect do
           post base_url, params: {
-                        organization_id: current_organization.to_param,
-                        ticket_number: ticket.number,
-                      }
+                           organization_id: current_organization.to_param,
+                           ticket_number: ticket.number,
+                         }
         end.to change(Notification, :count).by 1
         expect(flash[:info]).to be_present
         expect(response).to redirect_to virtual_line_root_url
@@ -235,9 +235,9 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           expect(appointment.no_longer_in_line?).to be_truthy
           expect do
             post base_url, params: {
-                          organization_id: current_organization.to_param,
-                          ticket_number: "#{ticket.number}",
-                        }
+                             organization_id: current_organization.to_param,
+                             ticket_number: "#{ticket.number}",
+                           }
           end.to_not change(Notification, :count)
           expect(flash[:info]).to match(/helped already/)
           expect(response).to redirect_to virtual_line_root_url
@@ -248,16 +248,46 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
   end
 
   describe "update" do
+    let!(:ticket) { FactoryBot.create(:ticket, location: current_location) }
     it "creates an appointment" do
+      expect do
+        put "#{base_url}/#{ticket.to_param}", params: {
+                                                organization_id: current_organization.to_param,
+                                                ticket_token: ticket.link_token,
+                                                appointment: {
+                                                  email: "something@stuff.COM",
+                                                  reason: "Service",
+                                                },
+                                              }
+        pp flash
+      end.to change(Appointment, :count).by 1
+      expect(flash[:success]).to be_present
+      expect(response).to redirect_to virtual_line_root_url
+      expect(assigns(:ticket)).to eq ticket
+      ticket.reload
+      expect(ticket.claimed?).to be_truthy
+      appointment = ticket.appointment
+      expect(appointment.email).to eq "something@stuff.com"
+      expect(appointment.reason).to eq "Service"
+      expect(appointment.status).to eq "waiting"
     end
     context "unknown ticket_token" do
-      it "flash errors"
+      it "flash errors" do
+
+      end
     end
-    it "status abandoned" do
-      # It does not permit marking them abandoned
+    context "user is not permitted to create another appointment" do
+      it "flash errors" do
+
+      end
     end
-    context "user signed in" do
-      it "permits marking the ticket abandoned"
+    context "appointment exists" do
+      it "update to status abandoned" do
+        # It does not permit marking them abandoned
+      end
+      context "user signed in" do
+        it "permits marking the ticket abandoned"
+      end
     end
   end
 end

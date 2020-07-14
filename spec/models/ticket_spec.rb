@@ -27,7 +27,7 @@ RSpec.describe Ticket, type: :model do
     end
   end
 
-  describe "claim!" do
+  describe "claim" do
     let(:ticket) { Ticket.create_tickets(1, location: location).first }
     let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@example.com") }
 
@@ -58,6 +58,15 @@ RSpec.describe Ticket, type: :model do
       end.to_not change(Appointment, :count)
       ticket.reload
       expect(ticket.appointment).to eq appointment
+    end
+    context "no email or user passed" do
+      it "errors" do
+        expect do
+          expect(ticket.claim(email: " ", creation_ip: "108.000.215.126")).to be_truthy
+        end.to_not change(Appointment, :count).by 1
+        expect(ticket.errors.full_messages.count).to eq 1
+        expect(ticket.errors.full_messages.to_s).to match(/email/)
+      end
     end
     context "appointment already created" do
       let!(:appointment) do
