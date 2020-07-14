@@ -147,13 +147,13 @@ class Admin::BikesController < Admin::BaseController
     else
       bikes = Bike.unscoped
       # do example here because it doesn't work w/ @user and also unscopes
-      bikes = bikes.example if params[:search_example].present?
+      bikes = bikes.example if params[:search_example] == "example_only"
     end
     if params[:search_manufacturer_id].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer_id])
       bikes = bikes.where(manufacturer_id: @manufacturer&.id)
     end
-    bikes = bikes.non_example if params[:search_non_example].present?
+    bikes = bikes.non_example if params[:search_example] == "non_example_only"
     if current_organization.present?
       if params[:search_only_creation_organization].present?
         bikes = bikes.includes(:creation_states).where(creation_states: { organization_id: current_organization.id })
@@ -162,7 +162,10 @@ class Admin::BikesController < Admin::BaseController
       end
     end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
-    bikes = bikes.stolen if params[:search_stolen].present?
+    if params[:search_stolen].present?
+      bikes = bikes.stolen if params[:search_stolen] == "stolen_only"
+      bikes = bikes.non_stolen if params[:search_stolen] == "non_stolen_only"
+    end
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = CreationState.origins.include?(params[:search_origin]) ? params[:search_origin] : nil

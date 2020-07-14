@@ -1562,7 +1562,8 @@ en:
         require_admin!:
           not_an_org_admin: You have to be an organization administrator to do that!
         require_index_admin!:
-          not_permitted_to_do_that: You don't have permission to do that!
+          not_permitted_to_do_that: You have to be a Bike Index administrator to do
+            that
         require_member!:
           not_an_org_member: You're not a member of that organization!
         return_to_if_present:
