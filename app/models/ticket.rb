@@ -96,6 +96,7 @@ class Ticket < ApplicationRecord
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
     self.claimed_at ||= Time.current if appointment_id.present?
+    self.status = calculated_status
   end
 
   def create_new_appointment(email: nil, user_id: nil, user: nil, creation_ip: nil)
@@ -107,5 +108,12 @@ class Ticket < ApplicationRecord
                        user_id: user_id || user&.id,
                        creation_ip: creation_ip,
                        ticket_number: number)
+  end
+
+  private
+
+  def calculated_status
+    return status unless appointment.present?
+    appointment.in_line? ? "in_line" : "resolved"
   end
 end

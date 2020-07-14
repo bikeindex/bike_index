@@ -244,8 +244,14 @@ RSpec.describe Appointment, type: :model do
       end
       context "new_status being_helped" do
         let(:new_status) { "being_helped" }
-        it "updates" do
+        let!(:ticket) { FactoryBot.create(:ticket, location: appointment.location, appointment: appointment) }
+        it "updates - and updates ticket" do
+          expect(appointment.ticket).to eq ticket
+          expect(ticket.appointment).to eq appointment
+          expect(ticket.status).to eq "in_line"
           expect_update(appointment, og_status, new_status, updator_id, updator_kind)
+          ticket.reload
+          expect(ticket.status).to eq "resolved"
         end
       end
       context "status being_helped" do
