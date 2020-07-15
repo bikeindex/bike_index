@@ -32,7 +32,7 @@ module OrganizedHelper
     extended_description = {
       "web" => "Registered with self registration process",
       "org reg" => "Registered by internal, organization member form",
-      "partial" => "Registration begun with partial registration, via organization landing page",
+      "landing page" => "Registration began with incomplete registration, via organization landing page",
       "bulk reg" => "Registered by spreadsheet import",
     }
     origin_title = "Automatically registered by bike shop point of sale (#{creation_description} POS)" if %w[Lightspeed Ascend].include?(creation_description)

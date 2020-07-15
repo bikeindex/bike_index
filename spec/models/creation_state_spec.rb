@@ -66,7 +66,7 @@ RSpec.describe CreationState, type: :model do
     context "embed_partial" do
       let(:creation_state) { CreationState.new(origin: "embed_partial") }
       it "returns landing page" do
-        expect(creation_state.creation_description).to eq "partial"
+        expect(creation_state.creation_description).to eq "landing page"
       end
     end
   end

@@ -35,9 +35,9 @@ RSpec.describe OrganizedHelper, type: :helper do
   end
 
   describe "origin_display" do
-    let(:target) { "<span title=\"Registration begun with partial registration, via organization landing page\">partial</span>" }
+    let(:target) { "<span title=\"Registration began with incomplete registration, via organization landing page\">landing page</span>" }
     it "renders with title" do
-      expect(origin_display("partial")).to eq target
+      expect(origin_display("landing page")).to eq target
     end
     context "lightspeed" do
       let(:target) { "<span title=\"Automatically registered by bike shop point of sale (Lightspeed POS)\">Lightspeed</span>" }
