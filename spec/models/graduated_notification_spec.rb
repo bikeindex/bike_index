@@ -207,6 +207,28 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification2.reload
         expect(graduated_notification2.primary_notification?).to be_falsey
       end
+      context "multiple without primary_notification_id" do
+        let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization) }
+        it "does not associate them" do
+          # There was a bug where notifications without primary_notification_id were being associated with each other
+          graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
+          graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
+          graduated_notification3 = GraduatedNotification.create(organization: organization, bike: bike3)
+          graduated_notification1.reload
+          graduated_notification2.reload
+          graduated_notification3.reload
+          expect(graduated_notification1.primary_notification_id).to eq graduated_notification1.id
+          expect(graduated_notification1.primary_notification?).to be_truthy
+          expect(graduated_notification2.primary_notification_id).to be_blank
+          expect(graduated_notification2.primary_notification?).to be_falsey
+          expect(graduated_notification3.primary_notification_id).to be_blank
+          expect(graduated_notification3.primary_notification?).to be_falsey
+
+          expect(graduated_notification1.associated_notifications.pluck(:id)).to match_array([graduated_notification1.id, graduated_notification2.id])
+          expect(graduated_notification2.associated_notifications.pluck(:id)).to match_array([graduated_notification1.id, graduated_notification2.id])
+          expect(graduated_notification3.associated_notifications.pluck(:id)).to eq([])
+        end
+      end
     end
     context "not user" do
       let(:email) { "stuff@example.com" }
