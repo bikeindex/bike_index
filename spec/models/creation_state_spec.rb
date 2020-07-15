@@ -31,12 +31,6 @@ RSpec.describe CreationState, type: :model do
         expect(creation_state.is_pos).to be_falsey
       end
     end
-    context "web" do
-      let(:creation_state) { CreationState.new(origin: "web") }
-      it "returns web" do
-        expect(creation_state.creation_description).to eq "web"
-      end
-    end
     context "pos" do
       let(:creation_state) { CreationState.new(is_pos: true, pos_kind: "lightspeed_pos", origin: "embed_extended") }
       before { creation_state.set_calculated_attributes }
@@ -49,6 +43,12 @@ RSpec.describe CreationState, type: :model do
         it "returns pos reg" do
           expect(creation_state.creation_description).to eq "Ascend"
         end
+      end
+    end
+    context "web" do
+      let(:creation_state) { CreationState.new(origin: "web") }
+      it "returns web" do
+        expect(creation_state.creation_description).to eq "web"
       end
     end
     context "embed_extended" do
