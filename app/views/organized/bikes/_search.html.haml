@@ -184,7 +184,7 @@
                   = t(".email_hidden")
               - if bike.creation_description
                 %small.less-strong
-                  = bike.creation_description
+                  = origin_display(bike.creation_description)
             %td.hiddenColumn.owner_name_cell.hidden-xs-down
               - if bike.owner_name.present?
                 %em

@@ -3,8 +3,9 @@ require "rails_helper"
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:creation_organization_bike) }
+    let(:target_origin) { "<span title=\"Registered with self registration process\">web</span>" }
     let(:target_text) do
-      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">web</small></span>"
+      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">#{target_origin}</small></span>"
     end
     it "renders" do
       expect(organized_bike_text).to be_nil
@@ -29,6 +30,19 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "renders with deleted" do
         expect(bike.deleted?).to be_truthy
         expect(organized_bike_text(bike)).to eq target_text
+      end
+    end
+  end
+
+  describe "origin_display" do
+    let(:target) { "<span title=\"Registration begun with partial registration, via organization landing page\">partial</span>" }
+    it "renders with title" do
+      expect(origin_display("partial")).to eq target
+    end
+    context "lightspeed" do
+      let(:target) { "<span title=\"Automatically registered by bike shop point of sale (Lightspeed POS)\">Lightspeed</span>" }
+      it "renders with title" do
+        expect(origin_display("Lightspeed")).to eq target
       end
     end
   end

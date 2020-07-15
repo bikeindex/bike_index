@@ -74,6 +74,6 @@
           = bike.first_owner_email
           %small.less-strong
             - if bike.creation_description
-              = bike.creation_description
+              = origin_display(bike.creation_description)
             - unless bike.owner_email == bike.first_owner_email
               = t(".sent_to_a_new_owner")
