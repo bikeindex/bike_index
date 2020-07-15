@@ -33,11 +33,14 @@ module Organized
 
     def incompletes
       redirect_to current_root_path and return unless current_organization.enabled?("show_partial_registrations")
+      set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
+      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+      @b_params_total = b_params.where(created_at: @time_range)
+      @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
     end
 
     def new
@@ -121,6 +124,7 @@ module Organized
     end
 
     def search_organization_bikes
+      set_period
       @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
