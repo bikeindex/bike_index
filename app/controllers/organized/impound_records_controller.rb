@@ -9,6 +9,7 @@ module Organized
       @per_page = params[:per_page] || 25
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
 
       @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
                           .page(@page).per(@per_page)
@@ -26,6 +27,8 @@ module Organized
         render :show
       end
     end
+
+    helper_method :available_impound_records
 
     private
 
