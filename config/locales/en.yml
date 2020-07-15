@@ -4426,6 +4426,7 @@ en:
         not_assigned: not assigned
         pending: pending...
         progress: Progress
+        registration_types: Registration types
         shared_alert_body: You'll be automatically redirected to the labels once processing
           is finished
         show_bikes_in_export: Show bikes in export

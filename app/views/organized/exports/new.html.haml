@@ -31,15 +31,6 @@
                 -# This will break when a new reg field is added - which is a plus ☺️
                 = header.titleize
     .form-group.row.mt-4
-      = f.label :custom_bike_ids, "Specific bikes list", class: "org-form-label"
-      .col-sm-8
-        %a.field-expander{ href: "#expandCustomBikeIds" }
-          Add specific bikes to export
-        .collapsed-fields
-          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control"
-          %span.below-input-help
-            For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
-    .form-group.row.mt-4
       = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4
         %a.field-expander{ href: "#" }
@@ -57,10 +48,38 @@
           = f.datetime_local_field :end_at, step: 60, class: "form-control"
           %a.field-collapser{ href: "#" }
             remove
+    .form-group.row
+      = f.label :custom_bike_ids, "Bikes to export", class: "org-form-label"
+      .col-sm-8
+        .row
+          - if current_organization.enabled?("show_partial_registrations")
+            - include_full = @export.partial_registrations != "only"
+            - include_partial = @export.partial_registrations != false
+            .col-xs-4.mb-0.hiddenOnAveryExport{ style: "line-height: 1.25;" }
+              %label.checkbox
+                = check_box_tag :include_full_registrations, true, include_full
+                Registered bikes
+            .col-xs-4.mb-0.hiddenOnAveryExport{ style: "line-height: 1.25;" }
+              %label.checkbox
+                = check_box_tag :include_partial_registrations, true, include_partial
+                Incomplete registrations
+          .col-xs-4.mb-0
+            %a.field-expander{ href: "#expandCustomBikeIds" }
+              Add specific bikes to export
+        .collapsed-fields
+          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control"
+          %span.below-input-help
+            For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
     .form-group.row.mt-2.hiddenOnAveryExport
       = f.label :format, "Export file format", class: "org-form-label"
       .col-sm-4
         = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
+
+
+      / .form-group.row.mt-4
+      /   %label.org-form-label Export
+
+
     .row.mt-4
       .form-submit-button
         = f.submit "Create export", class: "btn btn-success btn-lg"

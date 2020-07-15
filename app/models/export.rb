@@ -74,6 +74,8 @@ class Export < ApplicationRecord
 
   def custom_bike_ids; options["custom_bike_ids"] end
 
+  def partial_registrations; options["partial_registrations"].blank? ? false : options["partial_registrations"] end
+
   # NOTE: Only does the first 100 bikes, in case there is a huge export
   def exported_bike_ids; options["exported_bike_ids"] end
 
