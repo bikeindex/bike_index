@@ -45,10 +45,28 @@ RSpec.describe CreationState, type: :model do
         end
       end
     end
+    context "web" do
+      let(:creation_state) { CreationState.new(origin: "web") }
+      it "returns web" do
+        expect(creation_state.creation_description).to eq "web"
+      end
+    end
     context "embed_extended" do
       let(:creation_state) { CreationState.new(origin: "embed_extended") }
-      it "returns pos reg" do
-        expect(creation_state.creation_description).to eq "embed extended"
+      it "returns org internal" do
+        expect(creation_state.creation_description).to eq "org reg"
+      end
+    end
+    context "organization_form" do
+      let(:creation_state) { CreationState.new(origin: "organization_form") }
+      it "returns org internal" do
+        expect(creation_state.creation_description).to eq "org reg"
+      end
+    end
+    context "embed_partial" do
+      let(:creation_state) { CreationState.new(origin: "embed_partial") }
+      it "returns landing page" do
+        expect(creation_state.creation_description).to eq "landing page"
       end
     end
   end
