@@ -107,7 +107,7 @@
                   %td
                     = @bike.creator&.display_name
                     %em.small.less-strong
-                      = @bike.creation_description
+                      = origin_display(@bike.creation_description)
                 - passive_organization.additional_registration_fields.each do |reg_field|
                   - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
                   - if bike_attr == "registration_address"

@@ -22,9 +22,22 @@ module OrganizedHelper
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
       elsif !skip_creation && bike.creation_description.present?
         concat(", ")
-        concat(content_tag(:small, bike.creation_description, class: "less-strong"))
+        concat(content_tag(:small, origin_display(bike.creation_description), class: "less-strong"))
       end
     end
+  end
+
+  def origin_display(creation_description)
+    return "" unless creation_description.present?
+    extended_description = {
+      "web" => "Registered with self registration process",
+      "org reg" => "Registered by internal, organization member form",
+      "landing page" => "Registration began with incomplete registration, via organization landing page",
+      "bulk reg" => "Registered by spreadsheet import",
+    }
+    origin_title = "Automatically registered by bike shop point of sale (#{creation_description} POS)" if %w[Lightspeed Ascend].include?(creation_description)
+    origin_title ||= extended_description[creation_description] || "Registered via #{creation_description}"
+    content_tag(:span, creation_description, title: origin_title)
   end
 
   # Used in two places, so... putting it here. Probably is a better place somewhere else
