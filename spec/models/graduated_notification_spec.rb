@@ -216,8 +216,7 @@ RSpec.describe GraduatedNotification, type: :model do
         end
         it "does not associate them" do
           expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike3.id, bike4.id, bike1.id, bike2.id])
-          # There was a bug where notifications without primary_notification_id were being associated with each other
-          # When their primary notifications are created they should associate, but this still shouldn't be a bug
+          # Notifications without primary_notification_id were being associated with each other (fixed in PR#1671)
           graduated_notification4 = GraduatedNotification.create(organization: organization, bike: bike4)
           graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
 
@@ -229,7 +228,7 @@ RSpec.describe GraduatedNotification, type: :model do
           expect(GraduatedNotification.associated_notifications_including_self(graduated_notification2).pluck(:id)).to eq([graduated_notification2.id])
           expect(GraduatedNotification.associated_notifications_including_self(graduated_notification4).pluck(:id)).to eq([graduated_notification4.id])
 
-          # ... and creating the primary notifications fixes everything
+          # ... creating the primary notifications fixes everything
           graduated_notification3 = GraduatedNotification.create(organization: organization, bike: bike3)
           graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
           graduated_notification4.reload
