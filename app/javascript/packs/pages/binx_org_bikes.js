@@ -3,6 +3,13 @@ import log from "../utils/log";
 function BinxAppOrgBikes() {
   return {
     init() {
+      // If there aren't search settings on the page, don't do anything
+      if ($("#organizedSearchSettings").length) {
+        this.initSearchColumns();
+      }
+    },
+
+    initSearchColumns() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
       // To prevent that, only hide columns after adding this class
       $("#organized_bikes_index").addClass("javascriptFunctioning");
@@ -24,9 +31,6 @@ function BinxAppOrgBikes() {
     },
 
     selectStoredVisibleColumns() {
-      if (!$("#organizedSearchSettings").length) {
-        return false;
-      }
       const defaultCells = JSON.parse(
         $("#organizedSearchSettings").attr("data-defaultcols")
       );

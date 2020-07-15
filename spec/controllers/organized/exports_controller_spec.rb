@@ -41,9 +41,9 @@ RSpec.describe Organized::ExportsController, type: :controller do
   end
 
   context "organization with csv_exports" do
-    let!(:organization) { FactoryBot.create(:organization) }
+    let(:enabled_feature_slugs) { ["csv_exports"] }
+    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    before { organization.update_column :enabled_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
 
     describe "index" do
       it "renders" do
@@ -94,8 +94,8 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
       context "organization has all feature slugs" do
+        let(:enabled_feature_slugs) { ["csv_exports"] + PaidFeature::REG_FIELDS }
         it "renders still" do
-          organization.update_column :enabled_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
           get :new, params: { organization_id: organization.to_param }
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)
@@ -163,6 +163,23 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export.end_at).to_not be_present
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
       end
+      # context "with partial export" do
+      #   let(:organization)
+      #   it "creates with partial export" do
+      #     expect do
+      #       post :create, params: { export: valid_attrs, organization_id: organization.to_param }
+      #     end.to change(Export, :count).by 1
+      #     expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+      #     export = Export.last
+      #     expect(export.kind).to eq "organization"
+      #     expect(export.file_format).to eq "xlsx"
+      #     expect(export.user).to eq user
+      #     expect(export.headers).to eq valid_attrs[:headers]
+      #     expect(export.start_at.to_i).to be_within(1).of start_at
+      #     expect(export.end_at).to_not be_present
+      #     expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+      #   end
+      # end
       context "avery export without feature" do
         it "fails" do
           expect do
@@ -172,7 +189,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         end
       end
       context "organization with avery export" do
-        before { organization.update_columns(enabled_feature_slugs: %w[csv_exports avery_export parking_notifications bike_stickers]) } # Stub organization having features
+        let(:enabled_feature_slugs) { %w[csv_exports avery_export parking_notifications bike_stickers] }
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.enabled?("avery_export")).to be_truthy

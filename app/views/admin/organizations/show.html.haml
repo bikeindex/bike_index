@@ -178,7 +178,7 @@
           %td
             Paid
           %td
-            -if @organization.is_paid
+            -if @organization.paid?
               %strong
                 True
             -else
@@ -190,7 +190,7 @@
             %em.less-strong
               Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
 
-        - if @organization.is_paid
+        - if @organization.paid?
           %tr
             %td Bike Search
             %td

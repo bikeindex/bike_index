@@ -58,7 +58,7 @@
     .form-submit-button
       = f.submit t(".update"), class: 'btn btn-success btn-lg'
 
-- unless current_organization.is_paid
+- unless current_organization.paid?
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }

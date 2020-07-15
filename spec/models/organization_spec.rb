@@ -503,13 +503,6 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "display_avatar?" do
-    context "unpaid" do
-      it "does not display" do
-        organization = Organization.new(is_paid: false)
-        allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar?).to be_falsey
-      end
-    end
     context "paid" do
       it "displays" do
         organization = Organization.new(is_paid: true)

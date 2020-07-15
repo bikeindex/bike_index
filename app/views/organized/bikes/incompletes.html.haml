@@ -6,7 +6,7 @@
 .text-right.mb-2
   %a.btn.btn-sm.less-strong.btn-outline-secondary{ href: incompletes_organization_bikes_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)), class: (@render_chart ? "active" : "") }
     Render chart
-= render partial: "/shared/period_select", locals: { render_chart_btn: true }
+= render partial: "/shared/period_select"
 
 %p.mt-4
   %strong

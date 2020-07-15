@@ -179,7 +179,9 @@ class Organization < ApplicationRecord
 
   def allowed_show?; show_on_map && approved end
 
-  def display_avatar?; is_paid && avatar.present? end
+  def paid?; is_paid end
+
+  def display_avatar?; avatar.present? end
 
   def suspended?; is_suspended? end
 

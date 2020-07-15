@@ -6,11 +6,13 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
         search_organization_bikes
       else
-        @bikes = organization_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+        @available_bikes = organization_bikes.where(created_at: @time_range)
+        @bikes = @available_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
       end
     end
 
@@ -124,8 +126,8 @@ module Organized
     end
 
     def search_organization_bikes
-      set_period
-      @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
+      @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
+      @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
@@ -141,7 +143,8 @@ module Organized
       else
         @search_stickers = false
       end
-      @bikes = bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
+      @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
+      @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
