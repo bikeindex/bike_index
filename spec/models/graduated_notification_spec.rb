@@ -207,26 +207,37 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification2.reload
         expect(graduated_notification2.primary_notification?).to be_falsey
       end
-      context "multiple without primary_notification_id" do
-        let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization) }
+      context "multiple secondary created, without primary_notification_id" do
+        let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "test@example.edu") }
+        let(:bike4) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "test@example.edu") }
+        before do
+          bike4.current_ownership.update_attributes(created_at: Time.current - 13.months)
+          bike3.current_ownership.update_attributes(created_at: Time.current - 14.months)
+        end
         it "does not associate them" do
+          expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike3.id, bike4.id, bike1.id, bike2.id])
           # There was a bug where notifications without primary_notification_id were being associated with each other
+          # When their primary notifications are created they should associate, but this still shouldn't be a bug
+          graduated_notification4 = GraduatedNotification.create(organization: organization, bike: bike4)
           graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-          graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-          graduated_notification3 = GraduatedNotification.create(organization: organization, bike: bike3)
-          graduated_notification1.reload
-          graduated_notification2.reload
-          graduated_notification3.reload
-          expect(graduated_notification1.primary_notification_id).to eq graduated_notification1.id
-          expect(graduated_notification1.primary_notification?).to be_truthy
-          expect(graduated_notification2.primary_notification_id).to be_blank
-          expect(graduated_notification2.primary_notification?).to be_falsey
-          expect(graduated_notification3.primary_notification_id).to be_blank
-          expect(graduated_notification3.primary_notification?).to be_falsey
 
-          expect(graduated_notification1.associated_notifications.pluck(:id)).to match_array([graduated_notification1.id, graduated_notification2.id])
-          expect(graduated_notification2.associated_notifications.pluck(:id)).to match_array([graduated_notification1.id, graduated_notification2.id])
-          expect(graduated_notification3.associated_notifications.pluck(:id)).to eq([])
+          graduated_notification2.reload
+          graduated_notification4.reload
+          expect(graduated_notification2.primary_notification_id).to be_blank
+          expect(graduated_notification4.primary_notification_id).to be_blank
+
+          expect(GraduatedNotification.associated_notifications_including_self(graduated_notification2).pluck(:id)).to eq([graduated_notification2.id])
+          expect(GraduatedNotification.associated_notifications_including_self(graduated_notification4).pluck(:id)).to eq([graduated_notification4.id])
+
+          # ... and creating the primary notifications fixes everything
+          graduated_notification3 = GraduatedNotification.create(organization: organization, bike: bike3)
+          graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
+          graduated_notification4.reload
+          graduated_notification2.reload
+          expect(graduated_notification4.primary_notification_id).to eq graduated_notification3.id
+          expect(graduated_notification4.associated_notifications.pluck(:id)).to eq([graduated_notification3.id])
+          expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
+          expect(graduated_notification2.associated_notifications.pluck(:id)).to eq([graduated_notification1.id])
         end
       end
     end

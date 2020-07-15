@@ -36,10 +36,12 @@ class GraduatedNotification < ApplicationRecord
   def self.unprocessed_statuses; statuses - processed_statuses end
 
   def self.associated_notifications_including_self(graduated_notification)
-    where(organization_id: graduated_notification.organization_id,
+    notification_matches = where(organization_id: graduated_notification.organization_id,
           primary_bike_id: graduated_notification.primary_bike_id,
           primary_notification_id: nil)
-      .or(where(primary_notification_id: graduated_notification.primary_notification_id))
+    # Don't match all graduated_notifications with blank primary_notification_id
+    return notification_matches if graduated_notification.primary_notification_id.blank?
+    notification_matches.or(where(primary_notification_id: graduated_notification.primary_notification_id))
   end
 
   def self.associated_notifications(graduated_notification)
