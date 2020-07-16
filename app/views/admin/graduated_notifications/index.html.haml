@@ -31,8 +31,8 @@
         = link_to current_organization.short_name, admin_organization_path(current_organization)
 
 - if @render_chart
-  - graph_column = @search_status == "marked_remaining" ? "marked_remaining_at" : "created_at"
-  = column_chart time_range_counts(collection: matching_graduated_notifications, column: graph_column), stacked: true, thousands: ",", defer: true
+  - time_range_column = @search_status == "marked_remaining" ? "marked_remaining_at" : "created_at"
+  = column_chart time_range_counts(collection: matching_graduated_notifications, column: time_range_column), stacked: true, thousands: ",", defer: true
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"
