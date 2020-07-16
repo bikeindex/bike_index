@@ -64,7 +64,7 @@
                   %small= bike_sticker_batch.notes
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_bike_stickers, column: @chart_column), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_bike_stickers, column: @time_range_column), stacked: true, thousands: ",", defer: true
 
 .mt-2
   = render partial: "/shared/period_select"
@@ -72,13 +72,14 @@
 .row.mt-4
   .col-md-6
     %p
-      - unless params[:search_claimed].present?
-        = number_with_delimiter(@bike_stickers.total_count)
-        matching stickers,
-      %span.less-strong
-        = number_with_delimiter(matching_bike_stickers.claimed.count)
-        claimed
+      = number_with_delimiter(@bike_stickers.total_count)
+      matching stickers
+      - unless @search_claimed
+        %span.less-strong
+          = number_with_delimiter(matching_bike_stickers.claimed.count)
+          claimed
       %em
+        = humanized_time_range_column(@time_range_column)
         = humanized_time_range(@time_range)
       - if sortable_search_params?
         \-
@@ -116,6 +117,10 @@
     = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :render_chart, @render_chart
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :end_time, params[:end_time]
+      = hidden_field_tag :start_time, params[:start_time]
       = hidden_field_tag :organization_id, params[:organization_id]
       = hidden_field_tag :search_bike_sticker_batch_id, params[:search_bike_sticker_batch_id]
       .form-check.ml-auto.ml-2
