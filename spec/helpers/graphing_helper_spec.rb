@@ -85,6 +85,8 @@ RSpec.describe GraphingHelper, type: :helper do
   describe "humanized_time_range_column" do
     it "humanizes created_at" do
       expect(humanized_time_range_column("created_at")).to eq "created"
+      @period = "all"
+      expect(humanized_time_range_column("created_at")).to be_blank
     end
     it "humanizes start_at and end_at" do
       expect(humanized_time_range_column("start_at")).to eq "started"
