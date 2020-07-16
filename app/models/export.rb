@@ -184,6 +184,17 @@ class Export < ApplicationRecord
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
 
+  def incompletes_scoped
+    return BParam.none unless partial_registrations.present?
+    incompletes = organization.incomplete_b_params
+    return incompletes unless option?("start_at") || option?("end_at")
+    if option?("start_at")
+      option?("end_at") ? incompletes.where(created_at: start_at..end_at) : incompletes.where("b_params.created_at > ?", start_at)
+    elsif option?("end_at") # If only end_at is present
+      incompletes.where("b_params.created_at < ?", end_at)
+    end
+  end
+
   def set_calculated_attributes
     self.options = validated_options(options)
     errors.add :organization_id, :required if kind == "organization" && organization_id.blank?
@@ -207,12 +218,11 @@ class Export < ApplicationRecord
   private
 
   def bikes_within_time(bikes)
+    return bikes unless option?("start_at") || option?("end_at")
     if option?("start_at")
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
       bikes.where("bikes.created_at < ?", end_at)
-    else
-      bikes
     end
   end
 end

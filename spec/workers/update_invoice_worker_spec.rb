@@ -15,7 +15,7 @@ RSpec.describe UpdateInvoiceWorker, type: :job do
     let(:organization1) { invoice_active.organization }
     let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.current - 2.weeks) }
     let(:organization2) { invoice_expired.organization }
-    let(:invoice_to_activate)  { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.2) }
+    let(:invoice_to_activate) { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.2) }
     let(:organization3) { invoice_to_activate.organization }
     it "schedules all the workers" do
       expect(invoice_to_activate.future?).to be_truthy

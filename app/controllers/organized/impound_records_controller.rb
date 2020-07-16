@@ -12,8 +12,8 @@ module Organized
       @render_chart = ParamsNormalizer.boolean(params[:render_chart])
 
       @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-                          .page(@page).per(@per_page)
-                          .includes(:user, :bike, :location)
+        .page(@page).per(@per_page)
+        .includes(:user, :bike, :location)
     end
 
     def show; end

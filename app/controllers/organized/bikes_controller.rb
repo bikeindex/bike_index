@@ -101,7 +101,7 @@ module Organized
       phash = params.as_json
       {
         origin: "organization_form",
-        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
+        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id)),
       }
     end
 

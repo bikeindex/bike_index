@@ -54,12 +54,17 @@ class OrganizationExportWorker < ApplicationWorker
     require "csv"
     file.write(comma_wrapped_string(export_headers))
     row_index = 0
-    pp bikes_scoped.pluck(:id)
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
       row_index += 1
       file.write(comma_wrapped_string(bike_to_row(bike)))
+    end
+    @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
+      check_export_ebrake(row_index) # Run first thing in case it's already broken
+      next unless export_bike?(b_param)
+      row_index += 1
+      file.write(comma_wrapped_string(b_param_to_row(b_param)))
     end
     true
   end
@@ -72,16 +77,32 @@ class OrganizationExportWorker < ApplicationWorker
 
   # If we have to load the bike record to check if it's a valid export, check conditions here
   # Currently avery_exports are the only ones that need to do this
-  def export_bike?(bike)
+  def export_bike?(bike_or_b_param)
     return false if @export_ebraked
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    Export.avery_export_bike?(bike)
+    Export.avery_export_bike?(bike_or_b_param)
   end
 
   def bike_to_row(bike)
     export_headers.map { |header| value_for_header(header, bike) }
+  end
+
+  def b_param_to_row(b_param)
+    export_headers.map do |header|
+      case header
+      when "registered_at" then b_param.created_at.utc
+      when "manufacturer" then b_param.manufacturer&.name
+      when "color"
+        %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map do |key|
+          color_id = b_param.bike[key]
+          color_id.present? ? Color.find(color_id).name : nil
+        end.compact.join(", ")
+      when "owner_email" then b_param.owner_email
+      when "partial_registration" then true
+      end
+    end
   end
 
   def export_headers

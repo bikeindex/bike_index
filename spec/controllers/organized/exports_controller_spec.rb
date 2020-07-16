@@ -152,11 +152,11 @@ RSpec.describe Organized::ExportsController, type: :controller do
       it "creates the expected export" do
         expect do
           post :create, params: {
-            export: valid_attrs,
-            organization_id: organization.to_param,
-            include_partial_registrations: 1,
-            include_full_registrations: 0,
-          }
+                          export: valid_attrs,
+                          organization_id: organization.to_param,
+                          include_partial_registrations: 1,
+                          include_full_registrations: 0,
+                        }
         end.to change(Export, :count).by 1
         expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
         export = Export.last
@@ -174,10 +174,10 @@ RSpec.describe Organized::ExportsController, type: :controller do
         it "creates with partial only export" do
           expect do
             post :create, params: {
-              export: valid_attrs,
-              organization_id: organization.to_param,
-              include_partial_registrations: "true",
-            }
+                            export: valid_attrs,
+                            organization_id: organization.to_param,
+                            include_partial_registrations: "true",
+                          }
           end.to change(Export, :count).by 1
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
           export = Export.last
@@ -195,11 +195,11 @@ RSpec.describe Organized::ExportsController, type: :controller do
           it "creates with both" do
             expect do
               post :create, params: {
-                export: valid_attrs,
-                organization_id: organization.to_param,
-                include_partial_registrations: "1",
-                include_full_registrations: "1",
-              }
+                              export: valid_attrs,
+                              organization_id: organization.to_param,
+                              include_partial_registrations: "1",
+                              include_full_registrations: "1",
+                            }
             end.to change(Export, :count).by 1
             expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
             export = Export.last
@@ -282,11 +282,11 @@ RSpec.describe Organized::ExportsController, type: :controller do
           it "makes the avery export" do
             expect do
               post :create, params: {
-                export: avery_params,
-                organization_id: organization.to_param,
-                include_partial_registrations: 1,
-                include_full_registrations: 0,
-              }
+                              export: avery_params,
+                              organization_id: organization.to_param,
+                              include_partial_registrations: 1,
+                              include_full_registrations: 0,
+                            }
             end.to change(Export, :count).by 1
             export = Export.last
             expect(response).to redirect_to organization_export_path(organization_id: organization.to_param, id: export.id, avery_redirect: true)
