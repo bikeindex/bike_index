@@ -46,9 +46,10 @@ class Export < ApplicationRecord
     return PERMITTED_HEADERS unless organization_or_overide.present?
     if organization_or_overide == "include_paid" # passing include_paid overrides
       additional_headers = PaidFeature::REG_FIELDS + ["sticker"]
-    else
+    elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
       additional_headers += ["sticker"] if organization_or_overide.enabled?("bike_stickers")
+      additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too
@@ -178,6 +179,7 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
+    return Bike.none if partial_registrations == "only"
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end

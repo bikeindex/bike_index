@@ -54,6 +54,7 @@ class OrganizationExportWorker < ApplicationWorker
     require "csv"
     file.write(comma_wrapped_string(export_headers))
     row_index = 0
+    pp bikes_scoped.pluck(:id)
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
@@ -90,6 +91,7 @@ class OrganizationExportWorker < ApplicationWorker
       # Remove address and readd, because we want to keep them in line
       @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
     end
+    @export_headers += ["partial_registration"] if @export.partial_registrations.present?
     if @export.assign_bike_codes?
       @export_headers << "assigned_sticker"
       @bike_stickers = []

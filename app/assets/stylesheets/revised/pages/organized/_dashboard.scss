@@ -93,7 +93,7 @@
 
 // Fix little issue with button underlines
 .organized-body {
-  .active.btn.btn-outline-primary {
-    text-decoration: none;
+  .active.btn {
+    text-decoration: none !important;
   }
 }

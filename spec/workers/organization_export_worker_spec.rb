@@ -100,8 +100,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
     context "bulk import already processed" do
       let(:export) { FactoryBot.create(:export, progress: "finished") }
       it "returns true" do
-        # TODO: does not implement create_csv
-        # expect(instance).to_not receive(:create_csv)
         instance.perform(export.id)
       end
     end
@@ -168,8 +166,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
     end
     context "special headers" do
-      let(:user) { FactoryBot.create(:organization_member) }
-      let(:organization) { user.organizations.first }
+      let(:enabled_feature_slugs) { ["csv_exports"] }
+      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { { bike: { address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member" } } }
@@ -209,8 +208,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(bike_sticker.user).to eq user
         end
       end
-      context "including every available field stickers" do
-        before { organization.update_column :enabled_feature_slugs, PaidFeature::REG_FIELDS + ["bike_stickers"] } # Stub organization having all the meaningful paid feature
+      context "including every available field + stickers" do
+        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + ["bike_stickers"] }
         let(:export_options) { { headers: Export.permitted_headers(organization) } }
         let(:target_row) do
           {
@@ -258,6 +257,64 @@ RSpec.describe OrganizationExportWorker, type: :job do
           bike_line = generated_csv_string.split("\n").last
           expect(bike_line.split(",").count).to eq target_row.keys.count
           expect(bike_line).to eq instance.comma_wrapped_string(target_row.values).strip
+        end
+      end
+      context "with partial registrations, every available field without sticker" do
+        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
+        let(:export_options) { { headers: Export.permitted_headers(organization), partial_registrations: true } }
+        let(:partial_reg_attrs) do
+          {
+            manufacturer_id: Manufacturer.other.id,
+            primary_frame_color_id: Color.black.id,
+            owner_email: "something@stuff.com",
+            creation_organization_id: organization.id,
+          }
+        end
+        let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs }, origin: "embed_partial") }
+        let(:target_full_row) { target_row.merge(sticker: nil, address: nil, city: nil, state: nil, zipcode: nil, partial_registration: nil) }
+        let(:target_partial_row) do
+          {
+            link: nil,
+            registered_at: partial_registration.created_at.utc,
+            manufacturer: bike.mnfg_name,
+            model: nil,
+            color: "Black",
+            serial: nil,
+            is_stolen: nil,
+            thumbnail: nil,
+            extra_registration_number: nil,
+            registered_by: nil,
+            owner_email: "something@stuff.com",
+            owner_name: nil,
+            organization_affiliation: nil,
+            phone: nil,
+            sticker: nil,
+            address: nil,
+            city: nil,
+            state: nil,
+            zipcode: nil,
+            partial_registration: true,
+          }
+        end
+        xit "returns expected values" do
+          expect(export.exported_bike_ids).to eq([bike.id])
+        end
+        context "partial registrations only" do
+          let(:export_options) { { headers: Export.permitted_headers(organization), partial_registrations: "only" } }
+          it "returns expected values" do
+            expect(export.bikes_scoped.pluck(:id)).to eq([])
+            expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
+            instance.perform(export.id)
+            export.reload
+            expect(instance.export_headers).to eq export.written_headers
+            expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
+            expect(export.progress).to eq "finished"
+            generated_csv_string = export.file.read
+            bike_line = generated_csv_string.split("\n").last
+            expect(bike_line.split(",").count).to eq target_partial_row.keys.count
+            expect(bike_line).to eq instance.comma_wrapped_string(target_partial_row.values).strip
+            expect(export.exported_bike_ids).to eq([])
+          end
         end
       end
     end
