@@ -16,6 +16,8 @@
         %th= t(".color")
         %th= t(".sent_to")
         -# %th Claimed
+        - if current_organization.enabled?("bike_stickers")
+          %th Stickers
         - if @bike_sticker.present?
           %th
             = t(".link")
@@ -39,6 +41,14 @@
                 = origin_display(bike.creation_description)
               - unless bike.owner_email == bike.first_owner_email
                 = "(#{t('.sent_to_a_new_owner')})"
+          - if current_organization.enabled?("bike_stickers")
+            %td
+              - bike.bike_stickers.each_with_index do |bike_sticker, index|
+                - if bike_sticker.organization.present? && bike_sticker.organization_id == current_organization.id
+                  = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param), class: "small"
+                - else
+                  %small
+                    = bike_sticker.code
           - if @bike_sticker.present?
             %td
               %small
