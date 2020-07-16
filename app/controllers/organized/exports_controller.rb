@@ -23,6 +23,7 @@ module Organized
         create_avery_export
       else
         @export = Export.new(permitted_parameters)
+        @export.options[:partial_registrations] = partial_registration_params
       end
       if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportWorker.perform_async(@export.id)
@@ -60,7 +61,7 @@ module Organized
 
     def create_avery_export
       if current_organization.enabled?("avery_export")
-        @export = Export.new(avery_export_parameters)
+        @export = Export.new(avery_export_parameters) # Note: avery export can't include partials
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
         if bike_sticker.present? && bike_sticker.claimed?
           flash[:error] = translation(:sticker_already_assigned)
@@ -85,6 +86,15 @@ module Organized
 
     def exports
       Export.where(organization_id: current_organization.id, kind: "organization")
+    end
+
+    def partial_registration_params
+      return false unless current_organization.enabled?("show_partial_registrations")
+      include_full = ParamsNormalizer.boolean(params[:include_full_registrations])
+      include_partial = ParamsNormalizer.boolean(params[:include_partial_registrations])
+      return false unless include_full || include_partial
+      return "only" if !include_full && include_partial
+      include_partial ? true : false
     end
 
     def ensure_access_to_exports!

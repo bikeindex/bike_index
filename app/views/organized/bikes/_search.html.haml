@@ -91,7 +91,8 @@
     = t(".registered_bikes_html",
     bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")),
     org_name: current_organization.short_name)
-
+  %em
+    = humanized_time_range(@time_range)
   - unless skip_view_just_stolen
     - if @stolenness == 'all'
       %a.float-right.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'stolen')), data: { stolenness: 'stolen' } }

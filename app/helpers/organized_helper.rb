@@ -59,6 +59,7 @@ module OrganizedHelper
     return true if organized_container == "container-fluid"
     [
       %w[bikes recoveries],
+      %w[bikes incompletes],
       %w[exports show],
       %w[users new],
       %w[dashboard index],

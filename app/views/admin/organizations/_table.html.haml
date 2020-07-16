@@ -39,7 +39,7 @@
             %td
               = link_to organization.name, admin_organization_url(organization)
               %small.less-strong
-                = "paid" if organization.is_paid
+                = "paid" if organization.paid?
             %td.table-cell-check
               = check_mark if organization.approved
             %td

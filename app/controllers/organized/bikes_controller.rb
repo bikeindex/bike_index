@@ -6,11 +6,13 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
         search_organization_bikes
       else
-        @bikes = organization_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+        @available_bikes = organization_bikes.where(created_at: @time_range)
+        @bikes = @available_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
       end
     end
 
@@ -33,11 +35,14 @@ module Organized
 
     def incompletes
       redirect_to current_root_path and return unless current_organization.enabled?("show_partial_registrations")
+      set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
+      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+      @b_params_total = b_params.where(created_at: @time_range)
+      @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
     end
 
     def new
@@ -96,7 +101,7 @@ module Organized
       phash = params.as_json
       {
         origin: "organization_form",
-        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
+        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id)),
       }
     end
 
@@ -121,7 +126,8 @@ module Organized
     end
 
     def search_organization_bikes
-      @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
+      @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
+      @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
@@ -137,7 +143,8 @@ module Organized
       else
         @search_stickers = false
       end
-      @bikes = bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
+      @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
+      @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
