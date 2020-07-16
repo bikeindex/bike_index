@@ -4566,6 +4566,7 @@ nl:
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
+        registration_types: Registratietypen
     stickers:
       edit:
         bike: Fiets
