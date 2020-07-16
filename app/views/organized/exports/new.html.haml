@@ -75,11 +75,6 @@
       .col-sm-4
         = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
 
-
-      / .form-group.row.mt-4
-      /   %label.org-form-label Export
-
-
     .row.mt-4
       .form-submit-button
         = f.submit "Create export", class: "btn btn-success btn-lg"

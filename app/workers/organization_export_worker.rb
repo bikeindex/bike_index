@@ -42,6 +42,12 @@ class OrganizationExportWorker < ApplicationWorker
         row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
+      @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
+        check_export_ebrake(row_index) # Run first thing in case it's already broken
+        next unless export_bike?(b_param)
+        row_index += 1
+        sheet.add_row(b_param_to_row(b_param))
+      end
       @export.rows = row_index
     end
     return if @export_ebraked

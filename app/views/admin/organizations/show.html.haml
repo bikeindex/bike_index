@@ -178,10 +178,10 @@
           %td
             Paid
           %td
-            -if @organization.paid?
+            - if @organization.paid?
               %strong
                 True
-            -else
+            - else
               - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
                 %p.text-danger
                   IS NOT MARKED PAID BUT HAS A LANDING PAGE
