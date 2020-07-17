@@ -4860,7 +4860,6 @@ nl:
     import_csv_file: CSV-bestand van registraties importeren uit eerder systeem
     landing_page: Landingspagina voor merkregistratie
     mailing_stickers: Elk postadres opgemaakt XLS-export voor poststickers
-    nest_organizations: Nest meerdere organisaties in één
     ongoing_programming: Doorlopende programmering, hosting en ondersteuning
     qr_sticker: QR sticker scannen en berichten verzenden
     search_bikes_in_organization: Zoek fietsen in organisatieaccount

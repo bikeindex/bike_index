@@ -4748,7 +4748,6 @@ en:
     import_csv_file: Import CSV file of registrations from former system
     landing_page: Branded registration landing page
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
-    nest_organizations: Nest multiple organizations in one
     ongoing_programming: Ongoing programming, hosting, and support
     organization_dashboard: >-
       City and Police dashboard - analyze statistics on local registration based on
