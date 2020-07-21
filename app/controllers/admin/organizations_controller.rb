@@ -110,11 +110,12 @@ class Admin::OrganizationsController < Admin::BaseController
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
     @search_paid = ParamsNormalizer.boolean(params[:search_paid])
-    matching_organizations = Organization.unscoped
+    matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
+    matching_organizations = matching_organizations.where(approved: (sort_direction == "desc" ? true : false)) if sort_column == "approved"
     @matching_organizations = matching_organizations
   end
 
