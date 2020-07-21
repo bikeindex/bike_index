@@ -41,7 +41,7 @@
 .row.mb-4
   .col-md-5
     %p
-      = number_with_delimiter(@organizations.total_count)
+      = number_with_delimiter(matching_organizations.count)
       - if sortable_search_params?
         %em
           matching
