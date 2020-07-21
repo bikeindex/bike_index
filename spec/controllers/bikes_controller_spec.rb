@@ -1099,6 +1099,7 @@ RSpec.describe BikesController, type: :controller do
         get :edit, params: { id: bike.id }
         expect(response).to redirect_to bike_path(bike)
         expect(flash[:error]).to be_present
+        expect(session[:return_to]).to eq(edit_bike_path(bike))
       end
     end
     context "user present" do
@@ -1110,6 +1111,7 @@ RSpec.describe BikesController, type: :controller do
           get :edit, params: { id: bike.id }
           expect(response).to redirect_to bike_path(bike)
           expect(flash[:error]).to be_present
+          expect(session[:return_to]).to be_blank
         end
       end
       context "user present but hasn't claimed the bike" do
@@ -1121,6 +1123,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.owner).to eq user
           expect(response).to be_ok
           expect(assigns(:edit_template)).to eq "bike_details"
+          expect(session[:return_to]).to be_blank
         end
       end
       context "not-creator but member of creation_organization" do
@@ -1133,6 +1136,7 @@ RSpec.describe BikesController, type: :controller do
           get :edit, params: { id: bike.id }
           expect(response).to be_ok
           expect(assigns(:edit_template)).to eq "bike_details"
+          expect(session[:return_to]).to be_blank
         end
       end
     end
@@ -1152,6 +1156,7 @@ RSpec.describe BikesController, type: :controller do
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template "edit_bike_details"
               expect(assigns(:show_general_alert)).to be_truthy
+              expect(session[:return_to]).to be_blank
             end
           end
           context "stolen bike" do
@@ -1695,25 +1700,21 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.editable_organizations.pluck(:id)).to eq([])
         end
 
-        context "removes creation organization" do
-          it "updates the bike with allowed_attributes and removes the creation organization" do
+        context "removing creation organization" do
+          it "removes creation organization, adds new organization " do
             expect(bike.bike_organization_ids).to eq([organization.id])
             expect(bike.creation_organization_id).to eq organization.id
             put :update,
-              params: {
-                id: bike.id,
-                edit_template: "groups",
-                bike: {
-                  bike_organization_ids: "#{organization2.id}",
-                },
-                organization_ids_can_edit_claimed: "true",
-              }
+              params: { id: bike.id, edit_template: "groups", organization_ids_can_edit_claimed: "true",
+                       bike: {
+                bike_organization_ids: "#{organization2.id}",
+              } }
             expect(response).to redirect_to edit_bike_url(bike, page: "groups")
             expect(assigns(:bike)).to be_decorated
             bike.reload
             expect(bike.creation_organization_id).to eq organization.id
             expect(bike.bike_organization_ids).to match_array([organization2.id])
-            expect(bike.editable_organizations.pluck(:id)).to eq([]) # By default it is false
+            expect(bike.editable_organizations.pluck(:id)).to eq([]) # when adding a new organization, it starts out without editing
           end
         end
       end

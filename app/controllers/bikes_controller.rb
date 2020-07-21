@@ -357,6 +357,7 @@ class BikesController < ApplicationController
     if current_user.present?
       error = translation(:you_dont_own_that, bike_type: type)
     else
+      store_return_to
       if @current_ownership && @bike.current_ownership.claimed
         error = translation(:you_have_to_sign_in, bike_type: type)
       else
