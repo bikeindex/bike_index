@@ -84,6 +84,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             auto_user_id: current_user.id,
             show_on_map: false,
             api_access_approved: false,
+            approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
             is_paid: false,
@@ -99,6 +100,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             auto_user_id: current_user.id,
             embedable_user_email: user_2.email,
             api_access_approved: true,
+            approved: true,
             access_token: "things7",
             website: " www.drseuss.org",
             name: "some new name",
@@ -116,6 +118,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           current_organization.update_attributes(org_attributes)
         end
         it "updates, sends message about maps" do
+          expect(current_organization.approved).to be_falsey
           put base_url, params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
@@ -131,6 +134,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           org_attributes.except(*permitted_update_keys).each do |key, value|
             expect(current_organization.send(key)).to eq value
           end
+          expect(current_organization.approved).to be_falsey
         end
       end
       context "with locations and normal show_on_map" do
