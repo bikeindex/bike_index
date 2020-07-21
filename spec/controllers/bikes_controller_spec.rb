@@ -1615,7 +1615,7 @@ RSpec.describe BikesController, type: :controller do
       let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
       let(:bike) { ownership.bike }
       let(:organization) { bike.organizations.first }
-      let(:organization_2) { FactoryBot.create(:organization) }
+      let(:organization2) { FactoryBot.create(:organization) }
       let(:allowed_attributes) do
         {
           description: "69 description",
@@ -1634,7 +1634,7 @@ RSpec.describe BikesController, type: :controller do
           frame_size: "56cm",
           name: "a sweet name for a bike",
           extra_registration_number: "some weird other number",
-          bike_organization_ids: "#{organization_2.id}, #{organization.id}",
+          bike_organization_ids: "#{organization2.id}, #{organization.id}",
         }
       end
       let(:skipped_attrs) { %w[marked_user_hidden bike_organization_ids].map(&:to_sym) }
@@ -1644,7 +1644,7 @@ RSpec.describe BikesController, type: :controller do
         expect(ownership.owner).to eq user
       end
       it "updates the bike with the allowed_attributes" do
-        put :update, params: { id: bike.id, bike: allowed_attributes, organization_ids_can_edit_claimed: [organization_2.id] }
+        put :update, params: { id: bike.id, bike: allowed_attributes, organization_ids_can_edit_claimed: [organization2.id] }
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1653,8 +1653,8 @@ RSpec.describe BikesController, type: :controller do
           pp value, key unless bike.send(key) == value
           expect(bike.send(key)).to eq value
         end
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
+        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
       end
 
       # There is no way to encode an empty array using an HTML form (e.g. Content-Type: url-form-encoded).
@@ -1675,7 +1675,7 @@ RSpec.describe BikesController, type: :controller do
             pp value, key unless bike.send(key) == value
             expect(bike.send(key)).to eq value
           end
-          expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+          expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
           expect(bike.editable_organizations.pluck(:id)).to eq([])
         end
       end
@@ -1691,8 +1691,30 @@ RSpec.describe BikesController, type: :controller do
             pp value, key unless bike.send(key) == value
             expect(bike.send(key)).to eq value
           end
-          expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+          expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
           expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
+
+        context "removes creation organization" do
+          it "updates the bike with allowed_attributes and removes the creation organization" do
+            expect(bike.bike_organization_ids).to eq([organization.id])
+            expect(bike.creation_organization_id).to eq organization.id
+            put :update,
+              params: {
+                id: bike.id,
+                edit_template: "groups",
+                bike: {
+                  bike_organization_ids: "#{organization2.id}",
+                },
+                organization_ids_can_edit_claimed: "true",
+              }
+            expect(response).to redirect_to edit_bike_url(bike, page: "groups")
+            expect(assigns(:bike)).to be_decorated
+            bike.reload
+            expect(bike.creation_organization_id).to eq organization.id
+            expect(bike.bike_organization_ids).to match_array([organization2.id])
+            expect(bike.editable_organizations.pluck(:id)).to eq([]) # By default it is false
+          end
         end
       end
     end

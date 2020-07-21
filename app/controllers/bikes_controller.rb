@@ -9,7 +9,6 @@ class BikesController < ApplicationController
   before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_action :render_ad, only: [:index, :show]
-  before_action :store_return_to, only: [:edit]
   before_action :remove_subdomain, only: [:index]
   before_action :assign_current_organization, only: [:index, :show, :edit]
 
@@ -202,10 +201,12 @@ class BikesController < ApplicationController
   end
 
   def update
-    begin
-      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
-    rescue => e
-      flash[:error] = e.message
+    if params[:bike].present?
+      begin
+        @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
+      rescue => e
+        flash[:error] = e.message
+      end
     end
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
@@ -372,7 +373,7 @@ class BikesController < ApplicationController
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)
-    organization_ids = organization_ids.presence.to_a.map(&:to_i)
+    organization_ids = Array(organization_ids).map(&:to_i)
     bike.bike_organizations.each do |bike_organization|
       bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
     end

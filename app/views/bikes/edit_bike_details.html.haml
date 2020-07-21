@@ -118,7 +118,7 @@
                     = t(".existing_stickers")
                   %p.form-well-input-static
 
-                    - @bike.bike_stickers.each do |bike_sticker|
+                    - @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
                       = bike_sticker.pretty_code
                       %br
               .form-group.row.no-divider-row.mb-0
