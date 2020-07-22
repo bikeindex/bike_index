@@ -11,13 +11,13 @@ RSpec.describe Ticket, type: :model do
       end.to change(Ticket, :count).by 3
       expect(Ticket.distinct.pluck(:organization_id)).to eq([organization.id])
       expect(Ticket.distinct.pluck(:location_id)).to eq([location.id])
-      ticket0 = Ticket.number_ordered.first
-      ticket1 = Ticket.number_ordered.second
-      ticket2 = Ticket.number_ordered.third
+      ticket0 = Ticket.line_ordered.first
+      ticket1 = Ticket.line_ordered.second
+      ticket2 = Ticket.line_ordered.third
       expect(ticket0.number).to eq 200
       expect(ticket1.number).to eq 201
       expect(ticket2.number).to eq 202
-      expect(ticket0.status).to eq "unused"
+      expect(ticket0.status).to eq "pending"
 
       ticket3 = Ticket.create_tickets(1, location: location, organization: organization).first
       expect(ticket3.number).to eq 203
@@ -37,11 +37,12 @@ RSpec.describe Ticket, type: :model do
       expect(ticket.claimed?).to be_falsey
       expect(ticket.appointment).to be_blank
       expect do
-        expect(ticket.claim(email: "stuff@example.coM", creation_ip: "108.000.215.126")).to be_truthy
+        expect(ticket.claim(email: "stuff@example.coM", creation_ip: "108.100.215.126")).to be_truthy
       end.to change(Appointment, :count).by 1
       expect(ticket.claimed?).to be_truthy
       expect(ticket.claimed_at).to be_within(1).of Time.current
       appointment = ticket.appointment
+      ticket.reload
       expect(appointment.appointment_at).to be_within(1).of Time.current
       expect(appointment.email).to eq "stuff@example.com"
       expect(appointment.status).to eq "waiting"
@@ -49,7 +50,7 @@ RSpec.describe Ticket, type: :model do
       expect(appointment.location).to eq location
       expect(appointment.ticket_number).to eq ticket.number
       expect(appointment.position_in_line).to eq 100
-      expect(appointment.creation_ip.to_s).to eq "108.000.215.126"
+      expect(appointment.creation_ip.to_s).to eq "108.100.215.126"
       # But - it can claim by the same user again
       expect do
         expect(User.count).to eq 0
@@ -62,7 +63,7 @@ RSpec.describe Ticket, type: :model do
     context "no email or user passed" do
       it "errors" do
         expect do
-          expect(ticket.claim(email: " ", creation_ip: "108.000.215.126")).to be_falsey
+          expect(ticket.claim(email: " ", creation_ip: "108.100.215.126")).to be_falsey
         end.to_not change(Appointment, :count)
         expect(ticket.errors.full_messages.count).to eq 1
         expect(ticket.errors.full_messages.to_s).to match(/email/)

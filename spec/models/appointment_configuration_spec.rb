@@ -23,8 +23,8 @@ RSpec.describe AppointmentConfiguration, type: :model do
       # And it updates the queue
       expect do
         appointment_configuration.update(updated_at: Time.current)
-      end.to change(LocationAppointmentsQueueWorker.jobs, :count)
-      expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([location.id])
+      end.to change(TicketQueueWorker.jobs, :count)
+      expect(TicketQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([location.id])
     end
   end
 end

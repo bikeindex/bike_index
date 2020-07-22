@@ -20,7 +20,7 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       expect do
         post base_url, params: { organization_id: current_organization.to_param, appointment: appointment_params }
       end.to change(Appointment, :count).by 1
-      expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
+      expect(TicketQueueWorker.jobs.count).to eq 1
       location.reload
       current_organization.reload
       expect(location.appointments.count).to eq 1

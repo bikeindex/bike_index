@@ -355,7 +355,7 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
           expect(assigns(:ticket)).to eq ticket
           appointment.reload
           expect(appointment.status).to eq "waiting"
-          expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
+          expect(TicketQueueWorker.jobs.count).to eq 1
         end
         context "user signed in" do
           include_context :request_spec_logged_in_as_user
@@ -380,8 +380,8 @@ RSpec.describe OrgPublic::VirtualLineController, type: :request do
             expect(appointment_update.creator_kind).to eq "signed_in_user"
             expect(appointment_update.user_id).to eq current_user.id
 
-            expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
-            expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
+            expect(TicketQueueWorker.jobs.count).to eq 1
+            expect(TicketQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
           end
         end
       end

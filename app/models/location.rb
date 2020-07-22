@@ -63,7 +63,7 @@ class Location < ApplicationRecord
     # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update(updated_at: Time.current)
     # Just in case this changed something here
-    LocationAppointmentsQueueWorker.perform_async(id)
+    TicketQueueWorker.perform_async(id)
   end
 
   def display_name

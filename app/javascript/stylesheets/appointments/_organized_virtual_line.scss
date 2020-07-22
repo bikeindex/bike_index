@@ -1,7 +1,9 @@
 .organized-virtual-line-body {
+  background: #ccc;
   h2 {
     margin-top: 3rem;
     margin-bottom: 0.5rem;
+    padding: 0 1rem;
   }
   .ticket-row {
     width: 100%;
@@ -30,5 +32,12 @@
     &.on-deck-ticket {
       font-size: 200%;
     }
+  }
+
+  #organized-virtual-line-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 1rem 0;
   }
 }

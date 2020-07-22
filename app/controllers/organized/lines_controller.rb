@@ -10,8 +10,9 @@ module Organized
     end
 
     def simple_view
+      @appointment_configuration
       @tickets = current_location.tickets.in_line
-      @last_ticket_helped = current_location.tickets.resolved.reorder(:resolved_at).last
+      # @last_ticket_helped = current_location.tickets.resolved.reorder(:resolved_at).last
       render layout: false
     end
 
@@ -21,7 +22,9 @@ module Organized
     end
 
     def update
-      if params[:status].present?
+      if params[:id] == "set_next_ticket"
+        update_next_ticket(params[:next_ticket_number])
+      elsif params[:status].present?
         if checked_appointment_ids.any?
           permitted_appointments.where(id: checked_appointment_ids).each do |appointment|
             appointment.record_status_update(new_status: params[:status],
@@ -55,6 +58,10 @@ module Organized
 
     def checked_appointment_ids
       params[:ids]&.keys || []
+    end
+
+    def update_next_ticket(next_ticket_number)
+
     end
   end
 end

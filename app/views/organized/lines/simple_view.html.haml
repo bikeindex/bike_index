@@ -7,24 +7,57 @@
     = stylesheet_pack_tag "application_css"
   %body{ id: page_id, class: "organized-virtual-line-body" }
     -# TODO translations
+
+    = javascript_pack_tag "appointments/organized_simple_view/index"
+
     #organized-virtual-line-wrapper
-      %h2 Next customers to help
-      - @tickets.paging_or_on_deck.each do |ticket|
-        .ticket-row.on-deck-ticket
-          %a.remove{ href: "#" }
-            X
-          %h4
-            = ticket.number
-          %a.help{ href: "#" }
-            = check_mark
+      - if @tickets.any?
+        %h2
+          %a{ href: "#", "data-toggle" => "modal", "data-target" => "#setNextTicketModal" }
+            Next
+            = "ticket".pluralize(current_location.appointment_configuration.customers_on_deck_count)
+          to help
+      - else
+        %h2.text-center
+          %a{ href: "#", "data-toggle" => "modal", "data-target" => "#setNextTicketModal"  }
+            Set first ticket in line
 
-      %h2 Upcoming
+      #simpleViewJs
 
-      - @tickets.line_not_paging_or_on_deck.each do |ticket|
-        .ticket-row
-          %a.remove{ href: "#" }
-            X
-          %h4
-            = ticket.number
-          %a.help{ href: "#" }
-            = check_mark
+      / - @tickets.paging_or_on_deck.each do |ticket|
+      /   .ticket-row.on-deck-ticket
+      /     %a.remove{ href: "#" }
+      /       X
+      /     %h4
+      /       = ticket.number
+      /     %a.help{ href: "#" }
+      /       = check_mark
+
+      / %h2 Upcoming
+
+      / - @tickets.line_not_paging_or_on_deck.each do |ticket|
+      /   .ticket-row
+      /     %a.remove{ href: "#" }
+      /       X
+      /     %h4
+      /       = ticket.number
+      /     %a.help{ href: "#" }
+      /       = check_mark
+    .modal.fade#setNextTicketModal{ role: "dialog" }
+      .modal-dialog{ role: "document" }
+        .modal-content
+          .modal-header
+            %h5.modal-title
+              Set next ticket
+            %button.close{ type: "button", "data-dismiss" => "modal", "aria-label" => "Close" }
+              %span{ "aria-hidden" => "true"} &times;
+          .modal-body
+            = form_tag organization_line_path("set_next_ticket", organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PATCH" do |f|
+              .row
+                .form-group.col-6
+                  = label_tag :next_ticket_number, "Next ticket number"
+                  = number_field_tag :next_ticket_number, nil, required: true, class: "form-control"
+                .form-group.col-6.text-center
+                  %label.d-block &nbsp;
+                  = submit_tag "Set next ticket", class: "btn btn-success"
+

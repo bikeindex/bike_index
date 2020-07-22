@@ -252,7 +252,7 @@ CREATE TABLE public.appointments (
     updated_at timestamp without time zone NOT NULL,
     appointment_at timestamp without time zone,
     ticket_number integer,
-    creation_ip inet
+    creation_ip_address inet
 );
 
 

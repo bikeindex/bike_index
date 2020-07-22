@@ -1,4 +1,6 @@
 class Appointment < ApplicationRecord
+  include AppointmentStatusable
+
   KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
 
   belongs_to :organization
@@ -12,27 +14,14 @@ class Appointment < ApplicationRecord
   validates_presence_of :organization_id, :location_id
 
   before_validation :set_calculated_attributes
-  after_commit :update_appointment_queue
 
   enum kind: KIND_ENUM
-  enum status: AppointmentUpdate::STATUS_ENUM
   enum creator_kind: AppointmentUpdate::CREATOR_KIND_ENUM
-
-  attr_accessor :skip_update
 
   # Line ordering is first by the priority of the status, then by line_entry_timestamp
   scope :line_ordered, -> { reorder("status, position_in_line") }
-  scope :in_line, -> { where(status: in_line_statuses).line_ordered }
-  scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).line_ordered }
-  scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
-
-  def self.statuses; AppointmentUpdate.statuses end
-
-  def self.in_line_statuses; %w[waiting on_deck paging] end
-
-  def self.resolved_statuses; %[finished removed] end
 
   # This will be more sophisticated in the future, when we add phone, etc
   def self.for_user_attrs(user: nil, user_id: nil, email: nil, creation_ip: nil)
@@ -59,15 +48,19 @@ class Appointment < ApplicationRecord
   # Deal with deleted locations, etc
   def location; Location.unscoped.find_by_id(location_id) end
 
-  def in_line?; self.class.in_line_statuses.include?(status) end
-
-  def no_longer_in_line?; !in_line? end
-
-  def paging_or_on_deck?; on_deck? || paging? end
-
   def failed_to_find_attempts; appointment_updates.failed_to_find end
 
   def other_location_appointments; location.appointments.where.not(id: id) end
+
+  # in most places we're treating IP addresses like strings. Let's keep doing that, at least for now
+  def creation_ip=(val)
+    new_ip_addr = val.present? ? IPAddr.new(val) : nil
+    self.creation_ip_address = new_ip_addr
+  rescue IPAddr::Error # We don't want to shit the bed on invalid IP addresses, for now
+    nil
+  end
+
+  def creation_ip; creation_ip_address.to_s end
 
   # same parameters as for_user_attrs - args are in passed_args so they don't override model attributes
   def matches_user_attrs?(passed_args = {})
@@ -108,14 +101,13 @@ class Appointment < ApplicationRecord
 
     # We aren't doing anything for the other update_only_statuses, except failed to find, but seems reasonable to skip
     self.status = new_status unless AppointmentUpdate.update_only_statuses.include?(new_status)
-    self.skip_update = false # Ensure we run the queue worker
 
     if new_status == "failed_to_find"
       update_and_move_for_failed_to_find # This will save the record
     else
       # Because things might've changed, and even if they didn't we still want to run the queue updator
       self.update(updated_at: Time.current)
-      ticket.update(status: "resolved") if !in_line? && ticket&.unresolved?
+      ticket.update(status: new_status) if ticket.present?
     end
     new_update # Return the created update
   end
@@ -146,6 +138,7 @@ class Appointment < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.creation_ip = creation_ip.present? ? IPAddr.new(creation_ip) : nil
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
     self.kind = self.class.kinds.first # Because we're only doing virtual_line for now
     self.email ||= user&.email
@@ -158,11 +151,6 @@ class Appointment < ApplicationRecord
     self.position_in_line ||= calculated_initial_position_in_line
     # TODO: ensure location matches organization
     # errors.add(:base, "bad location!") unless location&.organization_id == organization_id
-  end
-
-  def update_appointment_queue
-    return true if skip_update
-    LocationAppointmentsQueueWorker.perform_async(location_id)
   end
 
   private
