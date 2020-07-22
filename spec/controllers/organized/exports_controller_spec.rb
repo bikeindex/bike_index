@@ -41,9 +41,9 @@ RSpec.describe Organized::ExportsController, type: :controller do
   end
 
   context "organization with csv_exports" do
-    let!(:organization) { FactoryBot.create(:organization) }
+    let(:enabled_feature_slugs) { ["csv_exports"] }
+    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    before { organization.update_column :enabled_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
 
     describe "index" do
       it "renders" do
@@ -94,8 +94,8 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
       context "organization has all feature slugs" do
+        let(:enabled_feature_slugs) { ["csv_exports"] + PaidFeature::REG_FIELDS }
         it "renders still" do
-          organization.update_column :enabled_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
           get :new, params: { organization_id: organization.to_param }
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)
@@ -151,7 +151,12 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
       it "creates the expected export" do
         expect do
-          post :create, params: { export: valid_attrs, organization_id: organization.to_param }
+          post :create, params: {
+                          export: valid_attrs,
+                          organization_id: organization.to_param,
+                          include_partial_registrations: 1,
+                          include_full_registrations: 0,
+                        }
         end.to change(Export, :count).by 1
         expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
         export = Export.last
@@ -161,7 +166,53 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export.headers).to eq valid_attrs[:headers]
         expect(export.start_at.to_i).to be_within(1).of start_at
         expect(export.end_at).to_not be_present
+        expect(export.options["partial_registrations"]).to be_falsey
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+      end
+      context "with partial export" do
+        let(:enabled_feature_slugs) { %w[csv_exports show_partial_registrations] }
+        it "creates with partial only export" do
+          expect do
+            post :create, params: {
+                            export: valid_attrs,
+                            organization_id: organization.to_param,
+                            include_partial_registrations: "true",
+                          }
+          end.to change(Export, :count).by 1
+          expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+          export = Export.last
+          expect(export.kind).to eq "organization"
+          expect(export.file_format).to eq "xlsx"
+          expect(export.user).to eq user
+          expect(export.headers).to eq valid_attrs[:headers]
+          expect(export.start_at.to_i).to be_within(1).of start_at
+          expect(export.end_at).to_not be_present
+          expect(export.options["partial_registrations"]).to eq "only"
+          expect(export.partial_registrations).to eq "only"
+          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+        end
+        context "with include_full_registrations" do
+          it "creates with both" do
+            expect do
+              post :create, params: {
+                              export: valid_attrs,
+                              organization_id: organization.to_param,
+                              include_partial_registrations: "1",
+                              include_full_registrations: "1",
+                            }
+            end.to change(Export, :count).by 1
+            expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+            export = Export.last
+            expect(export.kind).to eq "organization"
+            expect(export.file_format).to eq "xlsx"
+            expect(export.user).to eq user
+            expect(export.headers).to eq valid_attrs[:headers]
+            expect(export.start_at.to_i).to be_within(1).of start_at
+            expect(export.end_at).to_not be_present
+            expect(export.options["partial_registrations"]).to be_truthy
+            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          end
+        end
       end
       context "avery export without feature" do
         it "fails" do
@@ -172,14 +223,16 @@ RSpec.describe Organized::ExportsController, type: :controller do
         end
       end
       context "organization with avery export" do
-        before { organization.update_columns(enabled_feature_slugs: %w[csv_exports avery_export parking_notifications bike_stickers]) } # Stub organization having features
+        let(:enabled_feature_slugs) { %w[csv_exports avery_export parking_notifications bike_stickers show_partial_registrations] }
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.enabled?("avery_export")).to be_truthy
           expect do
             post :create, params: {
                             export: export_params.merge(bike_code_start: 1, custom_bike_ids: "1222, https://bikeindex.org/bikes/999"),
-                            organization_id: organization.to_param
+                            organization_id: organization.to_param,
+                            include_partial_registrations: false,
+                            include_full_registrations: 0,
                           }
           end.to change(Export, :count).by 1
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
@@ -191,6 +244,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(export.start_at.to_i).to be_within(1).of start_at
           expect(export.end_at.to_i).to be_within(1).of start_at + 2.days.to_i
           expect(export.bike_code_start).to be_nil
+          expect(export.options["partial_registrations"]).to be_falsey # Both were false, so it defaults to just full
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
           expect(export.custom_bike_ids).to eq([1222, 999])
@@ -227,7 +281,12 @@ RSpec.describe Organized::ExportsController, type: :controller do
           let(:end_at) { 1457431200 }
           it "makes the avery export" do
             expect do
-              post :create, params: { export: avery_params, organization_id: organization.to_param }
+              post :create, params: {
+                              export: avery_params,
+                              organization_id: organization.to_param,
+                              include_partial_registrations: 1,
+                              include_full_registrations: 0,
+                            }
             end.to change(Export, :count).by 1
             export = Export.last
             expect(response).to redirect_to organization_export_path(organization_id: organization.to_param, id: export.id, avery_redirect: true)
@@ -238,6 +297,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
             expect(export.avery_export?).to be_truthy
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at.to_i).to be_within(1).of end_at
+            expect(export.options["partial_registrations"]).to be_falsey # Avery exports can't include partials
             expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end

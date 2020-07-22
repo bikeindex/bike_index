@@ -1,10 +1,9 @@
-.organized-page-header
-  %h1= t(".org_bikes_html", org_name: current_organization.name)
-
-  %p
-    - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-    - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
-    = t(".num_bikes_registered_html", num_bikes: num_bikes)
+%p
+  - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
+  - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
+  = t(".num_bikes_registered_html", num_bikes: num_bikes)
+  %em
+    = humanized_time_range(@time_range)
 .full-screen-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
@@ -17,6 +16,8 @@
         %th= t(".color")
         %th= t(".sent_to")
         -# %th Claimed
+        - if current_organization.enabled?("bike_stickers")
+          %th Stickers
         - if @bike_sticker.present?
           %th
             = t(".link")
@@ -37,9 +38,17 @@
             = bike.first_owner_email
             %small.less-strong
               - if bike.creation_description
-                = bike.creation_description
+                = origin_display(bike.creation_description)
               - unless bike.owner_email == bike.first_owner_email
                 = "(#{t('.sent_to_a_new_owner')})"
+          - if current_organization.enabled?("bike_stickers")
+            %td
+              - bike.bike_stickers.each_with_index do |bike_sticker, index|
+                - if bike_sticker.organization.present? && bike_sticker.organization_id == current_organization.id
+                  = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param), class: "small"
+                - else
+                  %small
+                    = bike_sticker.code
           - if @bike_sticker.present?
             %td
               %small

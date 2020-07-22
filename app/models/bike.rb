@@ -719,7 +719,7 @@ class Bike < ApplicationRecord
   end
 
   def components_cache_string
-    components.all.map.each do |c|
+    components.includes(:manufacturer, :ctype).map.each do |c|
       [
         c.year,
         (c.manufacturer && c.manufacturer.name),

@@ -1,9 +1,19 @@
 = render partial: "bike_show_overlays"
 
 .container
+  -# If there's a passive organization, display bike title at the top too, otherwise you can't tell what bike you're looking at without scrolling down
+  - if current_user.present?
+    - if passive_organization.present? && current_user.authorized?(passive_organization) || current_user.superuser
+      .row
+        .col-md-8
+          - if passive_organization.present?
+            %h1= @bike.title_u
+        - if current_user.superuser
+          .col-md-4
+            = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
+
+
   - if current_user&.superuser
-    %p.mb-4.text-center
-      = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
     - if !@bike.created_by_parking_notification && @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
@@ -49,7 +59,8 @@
           %strong.stolen
             = t(".abandoned") if @bike.abandoned
             = t(".stolen")
-        = @bike.title_u
+        %span.uncap
+          = @bike.title_u
       - if @bike.stolen && @stolen_record.present?
         %p
           %strong

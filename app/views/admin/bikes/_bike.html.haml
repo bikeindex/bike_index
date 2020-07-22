@@ -102,7 +102,8 @@
               - if bike.creation_description.present?
                 \-
                 %em
-                  Via #{bike.creation_description}
+                  Via
+                  = origin_display(bike.creation_description)
               - if bike.creation_state&.bulk_import.present?
                 %br
                 Import
@@ -111,6 +112,15 @@
                   - if bike.creation_state.bulk_import.ascend?
                     %small
                       Ascend
+          %tr
+            %td
+              Address
+            %td
+              %small
+                = @bike.address
+                %span.only-dev-visible.ml-2
+                  manual:
+                  = @bike.address_set_manually
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger

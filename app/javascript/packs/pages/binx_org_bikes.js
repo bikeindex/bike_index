@@ -3,17 +3,24 @@ import log from "../utils/log";
 function BinxAppOrgBikes() {
   return {
     init() {
+      // If there aren't search settings on the page, don't do anything
+      if ($("#organizedSearchSettings").length) {
+        this.initSearchColumns();
+      }
+    },
+
+    initSearchColumns() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
       // To prevent that, only hide columns after adding this class
       $("#organized_bikes_index").addClass("javascriptFunctioning");
       let self = this;
       this.selectStoredVisibleColumns();
       this.updateVisibleColumns();
-      $("#organizedSearchSettings input").on("change", function(e) {
+      $("#organizedSearchSettings input").on("change", function (e) {
         self.updateVisibleColumns();
       });
       // Make the stolenness toggle work
-      $(".organized-bikes-stolenness-toggle").on("click", function(e) {
+      $(".organized-bikes-stolenness-toggle").on("click", function (e) {
         e.preventDefault();
         const stolenness = $(".organized-bikes-stolenness-toggle").attr(
           "data-stolenness"

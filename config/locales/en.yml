@@ -1562,7 +1562,8 @@ en:
         require_admin!:
           not_an_org_admin: You have to be an organization administrator to do that!
         require_index_admin!:
-          not_permitted_to_do_that: You don't have permission to do that!
+          not_permitted_to_do_that: You have to be a Bike Index administrator to do
+            that
         require_member!:
           not_an_org_member: You're not a member of that organization!
         return_to_if_present:
@@ -4279,7 +4280,6 @@ en:
         manufacturer: Manufacturer
         model: Model
         num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
-        org_bikes_html: "<em>%{org_name}</em> bikes"
         sent_to: Sent to
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
@@ -4426,6 +4426,7 @@ en:
         not_assigned: not assigned
         pending: pending...
         progress: Progress
+        registration_types: Registration types
         shared_alert_body: You'll be automatically redirected to the labels once processing
           is finished
         show_bikes_in_export: Show bikes in export
@@ -4747,7 +4748,6 @@ en:
     import_csv_file: Import CSV file of registrations from former system
     landing_page: Branded registration landing page
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
-    nest_organizations: Nest multiple organizations in one
     ongoing_programming: Ongoing programming, hosting, and support
     organization_dashboard: >-
       City and Police dashboard - analyze statistics on local registration based on

@@ -80,6 +80,6 @@
                 - if bike.creation_description
                   %span.less-strong-right
                     - if bike.bulk_import.present?
-                      = link_to bike.creation_description, admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+                      = link_to origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "less-strong"
                     - else
-                      = bike.creation_description
+                      = origin_display(bike.creation_description)
