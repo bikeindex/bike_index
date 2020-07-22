@@ -46,9 +46,10 @@ class Export < ApplicationRecord
     return PERMITTED_HEADERS unless organization_or_overide.present?
     if organization_or_overide == "include_paid" # passing include_paid overrides
       additional_headers = PaidFeature::REG_FIELDS + ["sticker"]
-    else
+    elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
       additional_headers += ["sticker"] if organization_or_overide.enabled?("bike_stickers")
+      additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too
@@ -73,6 +74,8 @@ class Export < ApplicationRecord
   def bike_codes_removed?; option?("bike_codes_removed") end
 
   def custom_bike_ids; options["custom_bike_ids"] end
+
+  def partial_registrations; options["partial_registrations"].blank? ? false : options["partial_registrations"] end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export
   def exported_bike_ids; options["exported_bike_ids"] end
@@ -176,8 +179,20 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
+    return Bike.none if partial_registrations == "only"
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
+  end
+
+  def incompletes_scoped
+    return BParam.none unless partial_registrations.present?
+    incompletes = organization.incomplete_b_params
+    return incompletes unless option?("start_at") || option?("end_at")
+    if option?("start_at")
+      option?("end_at") ? incompletes.where(created_at: start_at..end_at) : incompletes.where("b_params.created_at > ?", start_at)
+    elsif option?("end_at") # If only end_at is present
+      incompletes.where("b_params.created_at < ?", end_at)
+    end
   end
 
   def set_calculated_attributes
@@ -203,12 +218,11 @@ class Export < ApplicationRecord
   private
 
   def bikes_within_time(bikes)
+    return bikes unless option?("start_at") || option?("end_at")
     if option?("start_at")
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
       bikes.where("bikes.created_at < ?", end_at)
-    else
-      bikes
     end
   end
 end

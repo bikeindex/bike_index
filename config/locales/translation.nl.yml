@@ -4414,7 +4414,6 @@ nl:
         manufacturer: Fabrikant
         model: Model
         num_bikes_registered_html: "<strong>%{num_bikes}</strong> geregistreerd"
-        org_bikes_html: "<em>%{org_name}</em> fietsen"
         sent_to: Verzonden naar
         sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
         sticker: Sticker
@@ -4567,6 +4566,7 @@ nl:
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
+        registration_types: Registratietypen
     stickers:
       edit:
         bike: Fiets
@@ -4860,7 +4860,6 @@ nl:
     import_csv_file: CSV-bestand van registraties importeren uit eerder systeem
     landing_page: Landingspagina voor merkregistratie
     mailing_stickers: Elk postadres opgemaakt XLS-export voor poststickers
-    nest_organizations: Nest meerdere organisaties in één
     ongoing_programming: Doorlopende programmering, hosting en ondersteuning
     qr_sticker: QR sticker scannen en berichten verzenden
     search_bikes_in_organization: Zoek fietsen in organisatieaccount

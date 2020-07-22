@@ -34,6 +34,24 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "partial_registrations" do
+    it "returns false if not present" do
+      expect(Export.new.partial_registrations).to be_falsey
+    end
+    context "true" do
+      let(:export) { Export.new(options: { partial_registrations: true }.as_json) }
+      it "returns true if true" do
+        expect(export.partial_registrations).to eq true
+      end
+    end
+    context "only" do
+      let(:export) { Export.new(options: { partial_registrations: "only" }.as_json) }
+      it "returns true if true" do
+        expect(export.partial_registrations).to eq "only"
+      end
+    end
+  end
+
   describe "calculated_progress" do
     let(:export) { Export.new(created_at: Time.current, progress: "pending") }
     it "returns the progress it is given" do
