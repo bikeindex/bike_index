@@ -29,6 +29,6 @@ class AppointmentConfiguration < ApplicationRecord
   end
 
   def update_appointment_queue
-    LocationAppointmentsQueueWorker.perform_async(location_id)
+    TicketQueueWorker.perform_async(location_id)
   end
 end

@@ -48,6 +48,29 @@ RSpec.describe Organized::LinesController, type: :request do
   end
 
   describe "update" do
+    context "set_next_ticket" do
+      it "creates new tickets" do
+        TicketQueueWorker.new # Instantiate
+        stub_const("TicketQueueWorker::DEFAULT_TICKETS_IN_LINE_COUNT", 10)
+        Sidekiq::Worker.clear_all
+        expect(location.tickets.count).to eq 0
+        expect do
+          put "#{base_url}/#{location.to_param}", params: {
+            next_ticket_number: 101,
+            organization: current_organization.to_param,
+          }
+        end.to change(TicketQueueWorker.jobs, :count).by 1
+
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+
+        TicketQueueWorker.drain
+        location.reload
+        expect(location.tickets.count).to eq 10
+        expect(location.tickets.waiting.count).to eq 10
+        expect(location.tickets.line_ordered.first.number).to eq 101
+      end
+    end
     let!(:appointment2) { FactoryBot.create(:appointment, status: "on_deck", organization: current_organization, location: location) }
     it "updates multiple appointments" do
       expect do

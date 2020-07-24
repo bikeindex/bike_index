@@ -1,5 +1,6 @@
 class AppointmentUpdate < ApplicationRecord
   STATUS_ENUM = {
+    pending: 0,
     waiting: 1,
     paging: 2,
     on_deck: 3,
@@ -30,6 +31,12 @@ class AppointmentUpdate < ApplicationRecord
   def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
 
   def self.update_only_statuses; %w[failed_to_find organization_reordered] end
+
+  def self.in_line_statuses; %w[waiting on_deck paging] end
+
+  def self.resolved_statuses; %w[finished removed being_helped abandoned] end
+
+  def self.unresolved_statuses; statuses - resolved_statuses end
 
   def self.creator_kinds; CREATOR_KIND_ENUM.keys.map(&:to_s) end
 

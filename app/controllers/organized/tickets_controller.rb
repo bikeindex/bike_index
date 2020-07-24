@@ -11,7 +11,7 @@ module Organized
     private
 
     def find_tickets
-      @tickets = current_location.tickets.limit(10)
+      @tickets = current_location.tickets.limit(12)
     end
   end
 end

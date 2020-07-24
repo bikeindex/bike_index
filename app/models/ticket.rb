@@ -1,11 +1,5 @@
 class Ticket < ApplicationRecord
-  STATUS_ENUM = {
-    unused: 0,
-    waiting: 1,
-    paging: 2,
-    on_deck: 3,
-    resolved: 4,
-  }.freeze
+  include AppointmentStatusable
   CLAIMED_TICKET_LIMIT = 2
 
   belongs_to :organization
@@ -17,21 +11,11 @@ class Ticket < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum status: STATUS_ENUM
-
-  scope :number_ordered, -> { reorder(:number) }
-  scope :in_line, -> { where(status: in_line_statuses).number_ordered }
-  scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).number_ordered }
-  scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
+  scope :line_ordered, -> { reorder(:number) }
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
-  scope :unresolved, -> { where(status: unresolved_statuses) }
 
-  def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
-
-  def self.in_line_statuses; statuses - %w[unused resolved] end
-
-  def self.unresolved_statuses; statuses - ["resolved"] end
+  attr_accessor :skip_update
 
   # For now, it's simple, but could become more complicated
   def self.friendly_find(str)
@@ -80,10 +64,6 @@ class Ticket < ApplicationRecord
 
   def unclaimed?; !claimed? end
 
-  def in_line?; self.class.in_line_statuses.include?(status) end
-
-  def unresolved?; self.class.unresolved_statuses.include?(status) end
-
   # Might be more complicated in the future
   def display_number; number end
 
@@ -102,15 +82,18 @@ class Ticket < ApplicationRecord
     return false if errors.any?
     create_new_appointment(user: user, user_id: user_id, email: email, creation_ip: creation_ip)
     self.update(claimed_at: Time.current)
+
     true
   end
 
   def set_calculated_attributes
     self.organization_id ||= location&.organization_id
     self.link_token ||= SecurityTokenizer.new_token # We always need a link_token
-    return true unless appointment.present?
-    self.claimed_at ||= Time.current
-    self.status = appointment.in_line? ? appointment.status : "resolved"
+    if appointment.present?
+      self.claimed_at ||= Time.current
+      self.status = appointment.status
+    end
+    self.resolved_at ||= Time.current if resolved?
   end
 
   def new_appointment
@@ -125,7 +108,7 @@ class Ticket < ApplicationRecord
     self.appointment = new_appointment
     appointment.update(email: email,
                        user_id: user_id || user&.id,
-                       creation_ip: creation_ip,
+                       creation_ip: IPAddr.new(creation_ip),
                        creator_kind: creator_kind)
     appointment
   end
