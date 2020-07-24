@@ -456,7 +456,6 @@ ignore:
   - spec/requests/api/v3/organizations_request_spec.rb
   - spec/requests/api/v3/search_request_spec.rb
   - spec/requests/bikes_request_spec.rb
-  - spec/requests/info_request_spec.rb
   - spec/requests/landing_pages_request_spec.rb
   - spec/requests/locale_detection_request_spec.rb
   - spec/requests/news_request_spec.rb
