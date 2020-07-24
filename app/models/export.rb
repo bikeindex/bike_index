@@ -19,26 +19,28 @@ class Export < ApplicationRecord
   attr_accessor :timezone # permit assignment
   attr_reader :avery_export
 
-  def self.default_headers; DEFAULT_HEADERS end
+  def self.default_headers
+    DEFAULT_HEADERS
+  end
 
   def self.default_options(kind)
-    { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
+    {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
   end
 
   def self.default_kind_options
     {
       stolen: {
         with_blocklist: false,
-        only_serials_and_police_reports: false,
+        only_serials_and_police_reports: false
       },
       organization: {
         partial_registrations: false,
         start_at: nil,
-        end_at: nil,
+        end_at: nil
       },
       manufacturer: {
-        frame_only: false,
-      },
+        frame_only: false
+      }
     }.as_json.freeze
   end
 
@@ -61,27 +63,47 @@ class Export < ApplicationRecord
     bike.owner_name.present? && bike.valid_registration_address_present?
   end
 
-  def finished_processing?; %w[finished errored].include?(progress) end
+  def finished_processing?
+    %w[finished errored].include?(progress)
+  end
 
-  def headers; options["headers"] end
+  def headers
+    options["headers"]
+  end
 
-  def avery_export?; option?("avery_export") end
+  def avery_export?
+    option?("avery_export")
+  end
 
-  def bike_code_start; options["bike_code_start"] end
+  def bike_code_start
+    options["bike_code_start"]
+  end
 
-  def assign_bike_codes?; bike_code_start.present? end
+  def assign_bike_codes?
+    bike_code_start.present?
+  end
 
-  def bike_codes_removed?; option?("bike_codes_removed") end
+  def bike_codes_removed?
+    option?("bike_codes_removed")
+  end
 
-  def custom_bike_ids; options["custom_bike_ids"] end
+  def custom_bike_ids
+    options["custom_bike_ids"]
+  end
 
-  def partial_registrations; options["partial_registrations"].blank? ? false : options["partial_registrations"] end
+  def partial_registrations
+    options["partial_registrations"].blank? ? false : options["partial_registrations"]
+  end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export
-  def exported_bike_ids; options["exported_bike_ids"] end
+  def exported_bike_ids
+    options["exported_bike_ids"]
+  end
 
   # 'options' is a weird place to put the assigned bike_stickers - but whatever, it's there, just using it
-  def bike_stickers_assigned; options["bike_codes_assigned"] || [] end
+  def bike_stickers_assigned
+    options["bike_codes_assigned"] || []
+  end
 
   def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
@@ -107,7 +129,7 @@ class Export < ApplicationRecord
   def avery_export=(val)
     if val
       self.options = options.merge(avery_export: true)
-      self.attributes = { file_format: "xlsx", headers: AVERY_HEADERS }
+      self.attributes = {file_format: "xlsx", headers: AVERY_HEADERS}
     end
   end
 
@@ -117,10 +139,10 @@ class Export < ApplicationRecord
   end
 
   def custom_bike_ids=(val)
-    custom_ids = val.split(/\s+|,/).map do |cid|
+    custom_ids = val.split(/\s+|,/).map { |cid|
       id = cid.gsub(/\D*/, "")
       id.present? ? id.to_i : nil
-    end.compact.uniq
+    }.compact.uniq
     custom_ids = nil unless custom_ids.any?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end

@@ -19,35 +19,53 @@ class BulkImport < ApplicationRecord
 
   before_save :set_calculated_attributes
 
-  def self.ascend_api_token; ENV["ASCEND_API_TOKEN"] end
+  def self.ascend_api_token
+    ENV["ASCEND_API_TOKEN"]
+  end
 
-  def file_import_errors; import_errors["file"] || import_errors["ascend"] end
+  def file_import_errors
+    import_errors["file"] || import_errors["ascend"]
+  end
 
-  def line_import_errors; import_errors["line"] end
+  def line_import_errors
+    import_errors["line"]
+  end
 
   def file_import_errors_with_lines
     return nil unless file_import_errors.present?
-    ([file_import_errors].flatten).zip(file_import_error_lines)
+    [file_import_errors].flatten.zip(file_import_error_lines)
   end
 
   # Always return an array, because it's simpler to deal with - NOTE: different from above error methods which return nil
-  def file_import_error_lines; import_errors["file_lines"] || [] end
+  def file_import_error_lines
+    import_errors["file_lines"] || []
+  end
 
-  def import_errors?; line_import_errors.present? || file_import_errors.present? end
+  def import_errors?
+    line_import_errors.present? || file_import_errors.present?
+  end
 
-  def blocking_error?; file_import_errors.present? || pending? && created_at && created_at < Time.current - 5.minutes end
+  def blocking_error?
+    file_import_errors.present? || pending? && created_at && created_at < Time.current - 5.minutes
+  end
 
-  def no_bikes?; import_errors["bikes"] == "none_imported" end
+  def no_bikes?
+    import_errors["bikes"] == "none_imported"
+  end
 
-  def ascend?; is_ascend end
+  def ascend?
+    is_ascend
+  end
 
-  def ascend_unprocessable?; ascend? && organization_id.blank? end
+  def ascend_unprocessable?
+    ascend? && organization_id.blank?
+  end
 
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
     updated_file_error_data = {
       "file" => [file_import_errors, error_msg.to_s].compact.flatten,
-      "file_lines" => [file_import_error_lines, line_error].flatten,
+      "file_lines" => [file_import_error_lines, line_error].flatten
     }
     return true if skip_save # Don't get stuck in a loop during creation
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
@@ -84,7 +102,7 @@ class BulkImport < ApplicationRecord
     self.import_errors = (import_errors || {}).except("ascend")
     self.organization_id ||= organization_for_ascend_name&.id
     return true if organization_id.present?
-    self.import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
+    import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
     save
     UnknownOrganizationForAscendImportWorker.perform_async(id)
     false
@@ -94,9 +112,9 @@ class BulkImport < ApplicationRecord
     org = Organization.where(ascend_name: ascend_name).first
     return org if org.present?
     regex_matcher = ascend_name.gsub(/-|_|\s/, "")
-    Organization.ascend_pos.select do |org|
+    Organization.ascend_pos.select { |org|
       org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
-    end.first
+    }.first
   end
 
   def set_calculated_attributes
@@ -107,7 +125,7 @@ class BulkImport < ApplicationRecord
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
     if finished? && bikes.count == 0
-      self.import_errors["bikes"] = "none_imported"
+      import_errors["bikes"] = "none_imported"
     end
     true
   end

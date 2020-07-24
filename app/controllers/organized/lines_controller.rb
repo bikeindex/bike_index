@@ -5,7 +5,7 @@ module Organized
 
     def index
       if current_location.present?
-        redirect_to organization_line_path(current_location.to_param, organization_id: current_organization.to_param) and return
+        redirect_to(organization_line_path(current_location.to_param, organization_id: current_organization.to_param)) && return
       end
     end
 

@@ -4,6 +4,6 @@ unless Rails.env.test?
     address: "smtp.sparkpostmail.com",
     user_name: ENV["SPARKPOST_USERNAME"],
     password: ENV["SPARKPOST_PASSWORD"],
-    authentication: :plain,
+    authentication: :plain
   }
 end

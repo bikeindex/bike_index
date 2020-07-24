@@ -1,11 +1,11 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
-  enum status: { pending: 0, active: 1, inactive: 2 }.freeze
+  enum status: {pending: 0, active: 1, inactive: 2}.freeze
 
   validates :theft_alert_plan,
-            :status,
-            :creator,
-            presence: true
+    :status,
+    :creator,
+    presence: true
 
   validate :alert_cannot_begin_in_past_or_after_ends
 
@@ -13,8 +13,8 @@ class TheftAlert < ApplicationRecord
   belongs_to :theft_alert_plan
   belongs_to :payment
   belongs_to :creator,
-             class_name: "User",
-             foreign_key: :user_id
+    class_name: "User",
+    foreign_key: :user_id
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
@@ -28,9 +28,13 @@ class TheftAlert < ApplicationRecord
     StolenRecord.unscoped.find_by_id(stolen_record_id)
   end
 
-  def bike; stolen_record&.bike end
+  def bike
+    stolen_record&.bike
+  end
 
-  def recovered?; stolen_record&.recovered? end
+  def recovered?
+    stolen_record&.recovered?
+  end
 
   private
 

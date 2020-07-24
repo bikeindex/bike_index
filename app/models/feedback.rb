@@ -10,7 +10,7 @@ class Feedback < ApplicationRecord
   scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
 
   def self.no_notification_types
-    %w(manufacturer_update_request serial_update_request bike_delete_request)
+    %w[manufacturer_update_request serial_update_request bike_delete_request]
   end
 
   def self.bike(bike_or_bike_id = nil)
@@ -38,7 +38,9 @@ class Feedback < ApplicationRecord
     EmailFeedbackNotificationWorker.perform_async(id)
   end
 
-  def delete_request?; feedback_type == "bike_delete_request" end
+  def delete_request?
+    feedback_type == "bike_delete_request"
+  end
 
   def bike_id
     (feedback_hash || {})["bike_id"]
@@ -84,7 +86,9 @@ class Feedback < ApplicationRecord
     self.email ||= user.email
   end
 
-  def lead?; feedback_type && feedback_type =~ /lead_for_/ end
+  def lead?
+    feedback_type && feedback_type =~ /lead_for_/
+  end
 
   def lead_type
     return nil unless lead?

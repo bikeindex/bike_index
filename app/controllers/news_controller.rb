@@ -12,7 +12,7 @@ class NewsController < ApplicationController
     end
 
     if @blog.info?
-      redirect_to info_path(@blog.to_param) and return
+      redirect_to(info_path(@blog.to_param)) && return
     end
 
     if @blog.is_listicle

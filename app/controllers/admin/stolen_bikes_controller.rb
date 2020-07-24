@@ -8,7 +8,7 @@ class Admin::StolenBikesController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @stolen_records = available_stolen_records.page(page).per(per_page).includes(:bike)
-                      .reorder("stolen_records.#{sort_column} #{sort_direction}")
+      .reorder("stolen_records.#{sort_column} #{sort_direction}")
   end
 
   def approve
@@ -32,10 +32,10 @@ class Admin::StolenBikesController < Admin::BaseController
     if params[:public_image_id].present?
       update_image
     else
-      BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
+      BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
       @bike = @bike.decorate
       if @bike.update_attributes(permitted_parameters)
-        SerialNormalizer.new({ serial: @bike.serial_number }).save_segments(@bike.id)
+        SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
         redirect_to edit_admin_stolen_bike_url(@bike)
       else

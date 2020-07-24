@@ -5,7 +5,7 @@ module Api
       skip_before_action :verify_authenticity_token
 
       def show
-        info = { name: @organization.name, can_add_bikes: false, id: @organization.id }
+        info = {name: @organization.name, can_add_bikes: false, id: @organization.id}
         info[:can_add_bikes] = true if @organization.auto_user_id.present?
         render json: info
       end
@@ -13,7 +13,7 @@ module Api
       def update
         @organization = Organization.friendly_find(params[:id])
         if @organization.blank?
-          redirect_to api_v1_not_found_url and return
+          redirect_to(api_v1_not_found_url) && return
         elsif params[:access_token] == @organization.access_token
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
             if params[:manual_pos_kind] == "no_pos"
@@ -22,13 +22,13 @@ module Api
               @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
             end
             UpdateOrganizationPosKindWorker.perform_async(@organization.id)
-            render json: { manual_pos_kind: @organization.manual_pos_kind }
+            render json: {manual_pos_kind: @organization.manual_pos_kind}
           else
-            message = { :'406' => "Not permitted POS kind" }
-            render json: message, status: 406 and return
+            message = {'406': "Not permitted POS kind"}
+            render(json: message, status: 406) && return
           end
         else
-          render json: message, status: :unauthorized and return
+          render(json: message, status: :unauthorized) && return
         end
       end
 
@@ -36,13 +36,13 @@ module Api
 
       def verify_organizations_token
         @organization = Organization.friendly_find(params[:id])
-        redirect_to api_v1_not_found_url and return unless @organization.present?
+        redirect_to(api_v1_not_found_url) && return unless @organization.present?
         if params[:access_token].present?
           return true if params[:access_token] == ENV["ORGANIZATIONS_API_ACCESS_TOKEN"]
           return true if params[:access_token] == @organization.access_token
         end
-        message = { :'401' => "Not permitted" }
-        respond_with message, status: :unauthorized and return
+        message = {'401': "Not permitted"}
+        respond_with(message, status: :unauthorized) && return
       end
     end
   end

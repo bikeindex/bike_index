@@ -14,11 +14,9 @@ class BikeUpdator
   end
 
   def find_bike
-    begin
-      return Bike.unscoped.find(@bike_params["id"])
-    rescue
-      raise BikeUpdatorError, "Oh no! We couldn't find that bike"
-    end
+    Bike.unscoped.find(@bike_params["id"])
+  rescue
+    raise BikeUpdatorError, "Oh no! We couldn't find that bike"
   end
 
   def update_ownership

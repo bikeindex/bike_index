@@ -30,7 +30,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
       bike = find_or_initialize_by(
         external_id: attrs["ObjectNumber"].presence,
         serial_number: parse_serial_number(description),
-        type: to_s,
+        type: to_s
       )
 
       bike.cycle_type = "bike"
@@ -41,11 +41,11 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
       bike.date_stolen = parse_date_found(description, attrs["RegistrationDate"].presence)
       bike.mnfg_name = brand(attrs["Brand"].presence)
       bike.frame_colors = colors(attrs["Color"].presence)
-      bike.info_hash = { object_id: attrs["ObjectId"] }
+      bike.info_hash = {object_id: attrs["ObjectId"]}
 
       bike.location_found = [
         parse_location_found(description, attrs["StorageLocation"]),
-        bike.country.iso,
+        bike.country.iso
       ].select(&:present?).join(" - ")
 
       bike

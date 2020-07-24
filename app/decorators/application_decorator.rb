@@ -33,7 +33,7 @@ class ApplicationDecorator < Draper::Decorator
     description = if_present(attribute)
     return nil unless description
     title = attribute.titleize unless title.present?
-    self.dl_list_item(description, title)
+    dl_list_item(description, title)
   end
 
   def dl_from_attribute_othered(attribute, title = nil)
@@ -44,7 +44,7 @@ class ApplicationDecorator < Draper::Decorator
       description = other if other.present?
     end
     title = attribute.titleize unless title.present?
-    self.dl_list_item(description, title)
+    dl_list_item(description, title)
   end
 
   def if_present(attribute, action = nil)

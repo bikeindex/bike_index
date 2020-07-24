@@ -9,7 +9,7 @@ class BikeStickersController < ApplicationController
       else
         flash[:success] = "#{@bike_sticker.kind.titleize} #{@bike_sticker.code} - #{@bike_sticker.claimed? ? "claimed" : "unclaimed"}"
         if @bike_sticker.bike.present?
-          redirect_to bike_path(@bike_sticker.bike_id) and return
+          redirect_to(bike_path(@bike_sticker.bike_id)) && return
         end
       end
     else
@@ -35,6 +35,6 @@ class BikeStickersController < ApplicationController
     @bike_sticker = bike_sticker if bike_sticker.present? && bike_sticker.claimable_by?(current_user)
     return @bike_sticker if @bike_sticker.present?
     flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
-    redirect_back(fallback_location: root_url) and return
+    redirect_back(fallback_location: root_url) && return
   end
 end

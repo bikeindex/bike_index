@@ -21,7 +21,7 @@ class UserEmail < ActiveRecord::Base
     email_list.to_s.split(",").reject(&:blank?).each do |str|
       email = EmailNormalizer.normalize(str)
       next if where(user_id: user_id, email: email).present?
-      ue = self.new(user_id: user_id, email: email)
+      ue = new(user_id: user_id, email: email)
       ue.generate_confirmation
       ue.save
       ue.send_confirmation_email
@@ -35,21 +35,29 @@ class UserEmail < ActiveRecord::Base
 
   def self.fuzzy_user_id_find(str)
     ue = fuzzy_find(str)
-    ue && ue.user_id
+    ue&.user_id
   end
 
   def self.fuzzy_user_find(str)
     ue = fuzzy_find(str)
-    ue && ue.user
+    ue&.user
   end
 
-  def confirmed?; confirmation_token.blank? end
+  def confirmed?
+    confirmation_token.blank?
+  end
 
-  def unconfirmed?; !confirmed? end
+  def unconfirmed?
+    !confirmed?
+  end
 
-  def primary?; confirmed? && user.email == email end
+  def primary?
+    confirmed? && user.email == email
+  end
 
-  def expired?; created_at > Time.current - 2.hours end
+  def expired?
+    created_at > Time.current - 2.hours
+  end
 
   def make_primary
     return false unless confirmed? && !primary?
@@ -64,7 +72,7 @@ class UserEmail < ActiveRecord::Base
     if token == confirmation_token
       update_attribute :confirmation_token, nil
       MergeAdditionalEmailWorker.perform_async(id)
-      return true
+      true
     end
   end
 
@@ -73,6 +81,6 @@ class UserEmail < ActiveRecord::Base
   end
 
   def generate_confirmation
-    self.update_attribute :confirmation_token, (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
+    update_attribute :confirmation_token, (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current}")
   end
 end

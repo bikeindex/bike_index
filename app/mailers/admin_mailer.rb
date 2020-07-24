@@ -17,7 +17,7 @@ class AdminMailer < ApplicationMailer
         send_to = "bryan@bikeindex.org"
       end
     end
-    mail("Reply-To" => feedback.email, to: send_to, subject: feedback.title)
+    mail("Reply-To" => feedback.email, :to => send_to, :subject => feedback.title)
   end
 
   def no_admins_notification_email(organization)

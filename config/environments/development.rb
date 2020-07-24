@@ -21,11 +21,11 @@ Rails.application.configure do
     config.cache_store = :dalli_store, {
       namespace: Bikeindex,
       expires_in: 0,
-      compress: true,
+      compress: true
     }
 
     config.public_file_server.headers = {
-      "Cache-Control" => "public, max-age=#{2.days.to_i}",
+      "Cache-Control" => "public, max-age=#{2.days.to_i}"
     }
   else
     config.action_controller.perform_caching = false
@@ -38,7 +38,7 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: "localhost", port: 3001 }
+  config.action_mailer.default_url_options = {host: "localhost", port: 3001}
   if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = false
     config.action_mailer.delivery_method = :smtp
@@ -79,7 +79,7 @@ Rails.application.configure do
   config.lograge.custom_options = lambda do |event|
     {
       remote_ip: event.payload[:ip],
-      params: event.payload[:params].except("controller", "action", "format", "id"),
+      params: event.payload[:params].except("controller", "action", "format", "id")
     }
   end
 
@@ -99,7 +99,7 @@ Rails.application.configure do
 
   # Make sure we reload the API after every request!
   @last_api_change = Time.current
-  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) do |reloader|
+  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) { |reloader|
     times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
     files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
 
@@ -114,7 +114,7 @@ Rails.application.configure do
     Rails.application.reload_routes!
     Rails.application.routes_reloader.reload!
     Rails.application.eager_load!
-  end
+  }
 
   ActiveSupport::Reloader.to_prepare do
     api_reloader.execute_if_updated

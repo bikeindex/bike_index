@@ -13,7 +13,7 @@ class ExternalRegistryCredential::Project529Credential < ExternalRegistryCredent
     update(
       refresh_token: credentials[:refresh_token],
       access_token: credentials[:access_token],
-      access_token_expires_at: Time.at(expires_at_unix).utc,
+      access_token_expires_at: Time.at(expires_at_unix).utc
     )
   end
 

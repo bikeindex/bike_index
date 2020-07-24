@@ -11,7 +11,7 @@ class RegistrationsController < ApplicationController
 
   def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere
     @organization = current_organization
-    @owner_email = current_user && current_user.email
+    @owner_email = current_user&.email
     @selectable_child_organizations = find_selectable_child_organizations
     @stolen = params[:stolen] ? 1 : 0
     creation_organization_id = @selectable_child_organizations.any? ? nil : @organization&.id
@@ -44,12 +44,12 @@ class RegistrationsController < ApplicationController
 
   def permitted_params
     params.require(:b_param).permit(:manufacturer_id,
-                                    :owner_email,
-                                    :creation_organization_id,
-                                    :stolen,
-                                    :primary_frame_color_id,
-                                    :secondary_frame_color_id,
-                                    :tertiary_frame_color_id)
-          .merge(origin: "embed_partial")
+      :owner_email,
+      :creation_organization_id,
+      :stolen,
+      :primary_frame_color_id,
+      :secondary_frame_color_id,
+      :tertiary_frame_color_id)
+      .merge(origin: "embed_partial")
   end
 end

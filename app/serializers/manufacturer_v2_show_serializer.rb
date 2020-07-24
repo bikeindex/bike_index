@@ -20,5 +20,7 @@ class ManufacturerV2ShowSerializer < ApplicationSerializer
     object.logo_url
   end
 
-  def short_name; object.simple_name end
+  def short_name
+    object.simple_name
+  end
 end

@@ -12,25 +12,45 @@ class HotSheetConfiguration < ApplicationRecord
 
   scope :on, -> { where(is_on: true) }
 
-  def on?; is_on end
+  def on?
+    is_on
+  end
 
-  def off?; !on? end
+  def off?
+    !on?
+  end
 
-  def current_recipients; organization.users.where(id: current_recipient_ids) end
+  def current_recipients
+    organization.users.where(id: current_recipient_ids)
+  end
 
-  def current_recipient_ids; organization.memberships.claimed.notification_daily.pluck(:user_id) end
+  def current_recipient_ids
+    organization.memberships.claimed.notification_daily.pluck(:user_id)
+  end
 
-  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles) end
+  def bounding_box
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
+  end
 
-  def timezone; TimeParser.parse_timezone(timezone_str) end
+  def timezone
+    TimeParser.parse_timezone(timezone_str)
+  end
 
-  def time_in_zone; Time.current.in_time_zone(timezone) end
+  def time_in_zone
+    Time.current.in_time_zone(timezone)
+  end
 
-  def search_radius_metric_units?; organization&.metric_units? end
+  def search_radius_metric_units?
+    organization&.metric_units?
+  end
 
-  def send_today_at; time_in_zone.beginning_of_day + send_seconds_past_midnight end
+  def send_today_at
+    time_in_zone.beginning_of_day + send_seconds_past_midnight
+  end
 
-  def send_hour; send_seconds_past_midnight / 3600 end
+  def send_hour
+    send_seconds_past_midnight / 3600
+  end
 
   def send_today_now?
     return false if off?
@@ -44,7 +64,9 @@ class HotSheetConfiguration < ApplicationRecord
     self.send_seconds_past_midnight = hour * 3600
   end
 
-  def search_radius_kilometers; (search_radius_miles.to_d / "1.609344".to_d).to_i end
+  def search_radius_kilometers
+    (search_radius_miles.to_d / "1.609344".to_d).to_i
+  end
 
   def search_radius_kilometers=(val)
     self.search_radius_miles = val.to_d * "1.609344".to_d

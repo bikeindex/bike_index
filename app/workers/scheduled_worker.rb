@@ -48,9 +48,9 @@ class ScheduledWorker < ApplicationWorker
   end
 
   def self.redis_pool
-    @redis ||= ConnectionPool.new(timeout: 1, size: 2) do
+    @redis ||= ConnectionPool.new(timeout: 1, size: 2) {
       Redis.new
-    end
+    }
   end
 
   def record_scheduler_started

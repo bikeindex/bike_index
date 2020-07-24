@@ -13,7 +13,7 @@ class Ctype < ApplicationRecord
 
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, self.name.underscore]
+    translation_scope = [:activerecord, :select_options, name.underscore]
 
     pluck(:id, :name).map do |id, name|
       localized_name = I18n.t(normalize.call(name), scope: translation_scope)
@@ -28,7 +28,7 @@ class Ctype < ApplicationRecord
   before_create :set_calculated_attributes
 
   def set_calculated_attributes
-    return true unless self.cgroup_name.present?
+    return true unless cgroup_name.present?
     self.cgroup_id = Cgroup.friendly_find(cgroup_name)&.id
   end
 end

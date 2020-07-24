@@ -14,7 +14,7 @@ class OrganizedMailer < ApplicationMailer
       mail(
         reply_to: reply_to,
         to: @b_param.owner_email,
-        subject: default_i18n_subject(default_subject_vars),
+        subject: default_i18n_subject(default_subject_vars)
       )
     end
   end
@@ -28,7 +28,7 @@ class OrganizedMailer < ApplicationMailer
       new_bike: (@bike.ownerships.count == 1),
       email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-      registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id),
+      registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
     }
     @organization = @ownership.organization
     @vars[:donation_message] = @bike.stolen? && !(@organization && !@organization.is_paid?)
@@ -43,7 +43,7 @@ class OrganizedMailer < ApplicationMailer
     @membership = membership
     @organization = @membership.organization
     @sender = @membership.sender
-    @vars = { email: @membership.invited_email }
+    @vars = {email: @membership.invited_email}
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
 
     I18n.with_locale(@sender&.preferred_language) do
@@ -56,10 +56,8 @@ class OrganizedMailer < ApplicationMailer
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
     @sender = @parking_notification.user
-    if @parking_notification.retrieval_link_token.present?
-      @retrieval_link_url = bike_url(@bike.to_param, parking_notification_retrieved: @parking_notification.retrieval_link_token)
-    else
-      @retrieval_link_url = nil
+    @retrieval_link_url = if @parking_notification.retrieval_link_token.present?
+      bike_url(@bike.to_param, parking_notification_retrieved: @parking_notification.retrieval_link_token)
     end
 
     I18n.with_locale(@sender&.preferred_language) do
@@ -76,10 +74,8 @@ class OrganizedMailer < ApplicationMailer
     @graduated_notification = graduated_notification
     @organization = @graduated_notification.organization
     @bike = @graduated_notification.bike
-    if @graduated_notification.marked_remaining_link_token.present?
-      @retrieval_link_url = bike_url(@bike.to_param, graduated_notification_remaining: @graduated_notification.marked_remaining_link_token)
-    else
-      @retrieval_link_url = nil
+    @retrieval_link_url = if @graduated_notification.marked_remaining_link_token.present?
+      bike_url(@bike.to_param, graduated_notification_remaining: @graduated_notification.marked_remaining_link_token)
     end
 
     I18n.with_locale(@user&.preferred_language) do
@@ -95,7 +91,7 @@ class OrganizedMailer < ApplicationMailer
     recipient_emails = Array(override_emails || @hot_sheet.recipient_emails)
     # Ensure we only email people once
     if recipient_emails.include?(reply_to)
-      recipient_emails = recipient_emails - [reply_to] # remove original to address from
+      recipient_emails -= [reply_to] # remove original to address from
       direct_to = reply_to
     else
       direct_to = recipient_emails.shift
@@ -117,7 +113,7 @@ class OrganizedMailer < ApplicationMailer
   def default_subject_vars
     {
       organization_name: @organization && "#{@organization.short_name} ",
-      bike_type: @bike && "#{@bike.type} ",
+      bike_type: @bike && "#{@bike.type} "
     }
   end
 

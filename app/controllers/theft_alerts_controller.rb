@@ -6,7 +6,7 @@ class TheftAlertsController < ApplicationController
     theft_alert = TheftAlert.create!(
       stolen_record: @bike.current_stolen_record,
       theft_alert_plan: theft_alert_plan,
-      creator: current_user,
+      creator: current_user
     )
 
     payment = TheftAlertPaymentCreator.create!(
@@ -14,20 +14,20 @@ class TheftAlertsController < ApplicationController
       stripe_email: params[:stripe_email],
       stripe_token: params[:stripe_token],
       stripe_amount: params[:stripe_amount],
-      stripe_currency: params[:stripe_currency],
+      stripe_currency: params[:stripe_currency]
     )
 
     theft_alert.update(payment: payment)
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
     flash[:error] = translation(:unable_to_process_order)
-    redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
+    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
   rescue Stripe::CardError
     EmailTheftAlertNotificationWorker.perform_async(theft_alert.id)
     flash[:error] = translation(:order_is_pending)
-    redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
+    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
   else
     EmailTheftAlertNotificationWorker.perform_async(theft_alert.id)
-    redirect_to edit_bike_url(@bike, params: { page: :alert_purchase_confirmation })
+    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase_confirmation})
   end
 
   private
@@ -38,6 +38,6 @@ class TheftAlertsController < ApplicationController
     return true if @bike&.authorize_and_claim_for_user(current_user)
 
     flash[:error] = translation(:unauthorized)
-    redirect_to bikes_url and return
+    redirect_to(bikes_url) && return
   end
 end

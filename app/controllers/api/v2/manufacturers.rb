@@ -15,7 +15,7 @@ module API
         end
 
         desc "Manufacturer matching ID or name", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             You can request a manufacturer by either their name or their ID
           NOTE
         }

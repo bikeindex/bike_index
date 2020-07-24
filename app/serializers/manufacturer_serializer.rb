@@ -9,5 +9,7 @@ class ManufacturerSerializer < ApplicationSerializer
     object.website
   end
 
-  def short_name; object.simple_name end
+  def short_name
+    object.simple_name
+  end
 end

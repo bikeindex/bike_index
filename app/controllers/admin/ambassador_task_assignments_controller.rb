@@ -4,8 +4,8 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   def index
     matching_assignments =
       AmbassadorTaskAssignment
-        .includes(:ambassador_task, ambassador: { memberships: :organization })
-        .completed_assignments(filters: filter_params, sort: { sort_column => sort_direction })
+        .includes(:ambassador_task, ambassador: {memberships: :organization})
+        .completed_assignments(filters: filter_params, sort: {sort_column => sort_direction})
 
     @ambassador_task_assignments =
       Kaminari

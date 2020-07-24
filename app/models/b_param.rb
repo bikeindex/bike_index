@@ -21,14 +21,14 @@ class BParam < ApplicationRecord
   before_save :clean_params
 
   def self.v2_params(hash)
-    h = hash["bike"].present? ? hash : { "bike" => hash.with_indifferent_access }
+    h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
     # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
     h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
-    org = Organization.friendly_find(h["bike"].delete "organization_slug")
+    org = Organization.friendly_find(h["bike"].delete("organization_slug"))
     h["bike"]["creation_organization_id"] = org.id if org.present?
     # Move un-nested params outside of bike
-    %w(test id components).each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
+    %w[test id components].each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
     stolen_attrs = h["bike"].delete "stolen_record"
     if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
       h["bike"]["stolen"] = true
@@ -41,7 +41,7 @@ class BParam < ApplicationRecord
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
     b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
     b ||= with_organization_or_no_creator(toke)
-    b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+    b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
     b.creator_id ||= user_id
     # If the org_id is present, add it to the params. Only save it if the b_param is created_at
     if organization_id.present? && b.creation_organization_id != organization_id
@@ -63,14 +63,14 @@ class BParam < ApplicationRecord
   end
 
   def self.assignable_attrs
-    %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-       stolen abandoned serial_number made_without_serial
-       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
+    %w[manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
+      stolen abandoned serial_number made_without_serial
+      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id]
   end
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
-       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country)
+    %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
+      is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
   end
 
   def self.email_search(str)
@@ -107,62 +107,114 @@ class BParam < ApplicationRecord
     params["bike"]["tertiary_frame_color_id"] = val
   end
 
-  def with_bike?; created_bike_id.present? end
+  def with_bike?
+    created_bike_id.present?
+  end
 
   # Get it unscoped, because unregistered_bike notifications
-  def created_bike; @created_bike ||= created_bike_id.present? ? Bike.unscoped.find_by_id(created_bike_id) : nil end
+  def created_bike
+    @created_bike ||= created_bike_id.present? ? Bike.unscoped.find_by_id(created_bike_id) : nil
+  end
 
-  def bike; (params && params["bike"] || {}).with_indifferent_access end
+  def bike
+    (params && params["bike"] || {}).with_indifferent_access
+  end
 
-  def status; Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first end
+  def status
+    Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first
+  end
 
-  def status_abandoned?; bike["status"] == "status_abandoned" end
+  def status_abandoned?
+    bike["status"] == "status_abandoned"
+  end
 
-  def unregistered_parking_notification?; parking_notification_params.present? end
+  def unregistered_parking_notification?
+    parking_notification_params.present?
+  end
 
-  def primary_frame_color_id; bike["primary_frame_color_id"] end
+  def primary_frame_color_id
+    bike["primary_frame_color_id"]
+  end
 
-  def secondary_frame_color_id; bike["secondary_frame_color_id"] end
+  def secondary_frame_color_id
+    bike["secondary_frame_color_id"]
+  end
 
-  def tertiary_frame_color_id; bike["tertiary_frame_color_id"] end
+  def tertiary_frame_color_id
+    bike["tertiary_frame_color_id"]
+  end
 
-  def manufacturer_id; bike["manufacturer_id"] end
+  def manufacturer_id
+    bike["manufacturer_id"]
+  end
 
-  def stolen; bike["stolen"] end
+  def stolen
+    bike["stolen"]
+  end
 
-  def is_pos; bike["is_pos"] || false end
+  def is_pos
+    bike["is_pos"] || false
+  end
 
-  def is_new; bike["is_new"] || false end
+  def is_new
+    bike["is_new"] || false
+  end
 
-  def is_bulk; bike["is_bulk"] || false end
+  def is_bulk
+    bike["is_bulk"] || false
+  end
 
-  def no_duplicate?; bike["no_duplicate"] || false end
+  def no_duplicate?
+    bike["no_duplicate"] || false
+  end
 
   def bike_sticker
     bike["bike_sticker"].presence || bike["bike_code"].presence
   end
 
-  def phone; bike["phone"] end
+  def phone
+    bike["phone"]
+  end
 
-  def user_name; bike["user_name"] end
+  def user_name
+    bike["user_name"]
+  end
 
-  def creation_organization; Organization.friendly_find(creation_organization_id) end
+  def creation_organization
+    Organization.friendly_find(creation_organization_id)
+  end
 
-  def manufacturer; bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"]) end
+  def manufacturer
+    bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
+  end
 
-  def partial_registration?; origin == "embed_partial" end
+  def partial_registration?
+    origin == "embed_partial"
+  end
 
-  def primary_frame_color; primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name end
+  def primary_frame_color
+    primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name
+  end
 
-  def revised_new?; params && params["revised_new"] end
+  def revised_new?
+    params && params["revised_new"]
+  end
 
-  def creation_organization_id; bike && bike["creation_organization_id"] || params && params["creation_organization_id"] end
+  def creation_organization_id
+    bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
+  end
 
-  def owner_email; bike && bike["owner_email"] end
+  def owner_email
+    bike && bike["owner_email"]
+  end
 
-  def organization_affiliation; bike["organization_affiliation"] end
+  def organization_affiliation
+    bike["organization_affiliation"]
+  end
 
-  def external_image_urls; bike["external_image_urls"] || [] end
+  def external_image_urls
+    bike["external_image_urls"] || []
+  end
 
   # Deal with the legacy address concerns
   def address(field)
@@ -174,16 +226,20 @@ class BParam < ApplicationRecord
     end
   end
 
-  def address_hash; %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h end
+  def address_hash
+    %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h
+  end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
-  def display_email?; true unless owner_email.present? && bike_errors.blank? end
+  def display_email?
+    true unless owner_email.present? && bike_errors.blank?
+  end
 
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
   # write illegal things to the bikes
   def clean_params(updated_params = {}) # So we can pass in the params
-    self.params ||= { bike: {} } # ensure valid json object
+    self.params ||= {bike: {}} # ensure valid json object
     process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
@@ -313,10 +369,10 @@ class BParam < ApplicationRecord
     end
 
     unless bike["primary_frame_color_id"].present?
-      if paint.color_id.present?
-        params["bike"]["primary_frame_color_id"] = paint.color.id
+      params["bike"]["primary_frame_color_id"] = if paint.color_id.present?
+        paint.color.id
       else
-        params["bike"]["primary_frame_color_id"] = Color.find_by_name("Black").id
+        Color.find_by_name("Black").id
       end
     end
   end
@@ -325,7 +381,7 @@ class BParam < ApplicationRecord
     dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
       .where.not(id: bike.id).order(:created_at).first
     return nil unless dupe.present?
-    self.update_attribute :created_bike_id, dupe.id
+    update_attribute :created_bike_id, dupe.id
   end
 
   def mnfg_name
@@ -344,8 +400,8 @@ class BParam < ApplicationRecord
   def parking_notification_params
     return nil unless params["parking_notification"].present?
     attrs = params["parking_notification"].with_indifferent_access
-              .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
-                     :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
+      .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
+        :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
     attrs.merge(organization_id: creation_organization_id,
                 user_id: creator_id,
                 bike_id: created_bike_id,
@@ -358,26 +414,26 @@ class BParam < ApplicationRecord
   # Set the protected attrs separately from the params hash and merging over the passed params
   # Now that we're on rails 4, this is just a giant headache.
   def bike_from_attrs(is_stolen: nil, abandoned: nil)
-    is_stolen = params["bike"]["stolen"] if params["bike"] && params["bike"].keys.include?("stolen")
-    Bike.new(safe_bike_attrs({ "stolen" => is_stolen, "abandoned" => abandoned }).as_json)
+    is_stolen = params["bike"]["stolen"] if params["bike"]&.keys&.include?("stolen")
+    Bike.new(safe_bike_attrs({"stolen" => is_stolen, "abandoned" => abandoned}).as_json)
   end
 
   def safe_bike_attrs(param_overrides)
     bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-        .merge("b_param_id" => id,
-               "creator_id" => creator_id)
+      .merge("b_param_id" => id,
+             "creator_id" => creator_id)
   end
 
   def fetch_formatted_address
     return {} unless bike["street"].present? || bike["address"].present?
     return params["formatted_address"] if params["formatted_address"].present?
     if address("city").present?
-      formatted_address = { street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json
+      formatted_address = {street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode")}.as_json
     else # We're dealing with legacy data in the b_param
       fallback_address = address("street")
       formatted_address = Geohelper.formatted_address_hash(fallback_address)
       # return at least something from legacy entries that don't have enough info to guess address
-      formatted_address = { street: fallback_address } if formatted_address.blank? && fallback_address.present?
+      formatted_address = {street: fallback_address} if formatted_address.blank? && fallback_address.present?
     end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)

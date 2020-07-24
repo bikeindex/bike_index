@@ -37,10 +37,10 @@ class TwitterTweeterIntegration
 
     posted_tweet =
       post_tweet_with_account(nearest_twitter_account,
-                              build_bike_status,
-                              lat: stolen_record.latitude,
-                              long: stolen_record.longitude,
-                              display_coordinates: "true")
+        build_bike_status,
+        lat: stolen_record.latitude,
+        long: stolen_record.longitude,
+        display_coordinates: "true")
 
     return if posted_tweet.blank?
 
@@ -48,10 +48,10 @@ class TwitterTweeterIntegration
       twitter_id: posted_tweet.id,
       twitter_account_id: nearest_twitter_account&.id,
       stolen_record_id: stolen_record&.id,
-      twitter_response: posted_tweet.to_json,
+      twitter_response: posted_tweet.to_json
     )
 
-    if !tweet.save
+    unless tweet.save
       nearest_twitter_account.set_error(tweet.errors.full_messages.to_sentence)
     end
 
@@ -74,10 +74,10 @@ class TwitterTweeterIntegration
         twitter_id: posted_retweet.id,
         twitter_account_id: twitter_account.id,
         stolen_record_id: stolen_record.id,
-        original_tweet_id: tweet.id,
+        original_tweet_id: tweet.id
       )
 
-      if !retweet.save
+      unless retweet.save
         twitter_account.set_error(retweet.errors.full_messages.to_sentence)
       end
     end

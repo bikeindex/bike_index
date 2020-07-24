@@ -36,11 +36,11 @@ module Bikes
     def find_bike
       @bike = Bike.unscoped.find(params[:bike_id])
     rescue ActiveRecord::StatementInvalid => e
-      raise e.to_s =~ /PG..NumericValueOutOfRange/ ? ActiveRecord::RecordNotFound : e
+      raise /PG..NumericValueOutOfRange/.match?(e.to_s)) ? ActiveRecord::RecordNotFound : e
     end
 
     def ensure_token_match!
-      @stolen_record = StolenRecord.find_matching_token(bike_id: @bike && @bike.id,
+      @stolen_record = StolenRecord.find_matching_token(bike_id: @bike&.id,
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
@@ -48,7 +48,7 @@ module Bikes
       else
         flash[:error] = translation(:incorrect_token)
       end
-      redirect_to bike_path(@bike) and return
+      redirect_to(bike_path(@bike)) && return
     end
   end
 end

@@ -2,8 +2,8 @@ class Component < ApplicationRecord
   include ActiveModel::Dirty
 
   def self.old_attr_accessible
-    %w(id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
-       manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy).map(&:to_sym).freeze
+    %w[id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
+      manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy].map(&:to_sym).freeze
   end
 
   attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
@@ -19,11 +19,11 @@ class Component < ApplicationRecord
   before_save :set_front_or_rear
 
   def set_front_or_rear
-    return true unless self.front_or_rear.present?
-    position = self.front_or_rear.downcase.strip
+    return true unless front_or_rear.present?
+    position = front_or_rear.downcase.strip
     self.front_or_rear = ""
     if position == "both"
-      f = self.dup
+      f = dup
       f.front = true
       f.save
       self.rear = true
@@ -44,7 +44,7 @@ class Component < ApplicationRecord
   end
 
   def cgroup_id
-    ctype.present? ? self.ctype.cgroup_id : Cgroup.additional_parts.id
+    ctype.present? ? ctype.cgroup_id : Cgroup.additional_parts.id
   end
 
   def component_group
@@ -56,7 +56,7 @@ class Component < ApplicationRecord
     if manufacturer && manufacturer.name == "Other" && manufacturer_other.present?
       manufacturer_other
     else
-      manufacturer && manufacturer.name
+      manufacturer&.name
     end
   end
 

@@ -10,7 +10,7 @@ module SortableTable
   end
 
   def sort_direction
-    %w(asc desc).include?(params[:direction]) ? params[:direction] : default_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : default_direction
   end
 
   def default_direction # So it can be overridden

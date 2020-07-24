@@ -18,38 +18,48 @@ class HotSheet < ApplicationRecord
 
   delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
 
-  def current?; sheet_date.blank? end
+  def current?
+    sheet_date.blank?
+  end
 
-  def email_success?; delivery_status == "email_success" end
+  def email_success?
+    delivery_status == "email_success"
+  end
 
-  def subject; "Stolen Bike Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}" end
+  def subject
+    "Stolen Bike Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}"
+  end
 
-  def recipient_emails; fetch_recipients.pluck(:email) end
+  def recipient_emails
+    fetch_recipients.pluck(:email)
+  end
 
   # This may become a configurable option
-  def max_bikes; 10 end
+  def max_bikes
+    10
+  end
 
   def next_sheet
     return nil if current?
     HotSheet.where(organization_id: organization_id).where("sheet_date > ?", sheet_date)
-            .reorder(:sheet_date).first
+      .reorder(:sheet_date).first
   end
 
   def previous_sheet
-    sdate = current? ? (Time.current.to_date + 1.day) : (sheet_date)
+    sdate = current? ? (Time.current.to_date + 1.day) : sheet_date
     HotSheet.where(organization_id: organization_id).where("sheet_date < ?", sdate)
-            .reorder(:sheet_date).last
+      .reorder(:sheet_date).last
   end
 
   def fetch_stolen_records
     if stolen_record_ids.is_a?(Array)
       stolen_records = StolenRecord.unscoped.where(id: stolen_record_ids)
-                                   .reorder(date_stolen: :desc)
+        .reorder(date_stolen: :desc)
     else
       stolen_records = calculated_stolen_records
       update(stolen_record_ids: stolen_records.pluck(:id))
     end
-    stolen_records.joins(:bike).where(bikes: { deleted_at: nil })
+    stolen_records.joins(:bike).where(bikes: {deleted_at: nil})
   end
 
   def fetch_recipients
@@ -69,8 +79,8 @@ class HotSheet < ApplicationRecord
 
   def calculated_stolen_records
     StolenRecord.current.within_bounding_box(bounding_box)
-                .reorder(date_stolen: :desc)
-                .joins(:bike).where(bikes: { deleted_at: nil })
-                .limit(max_bikes)
+      .reorder(date_stolen: :desc)
+      .joins(:bike).where(bikes: {deleted_at: nil})
+      .limit(max_bikes)
   end
 end

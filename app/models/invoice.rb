@@ -36,39 +36,76 @@ class Invoice < ApplicationRecord
     includes(:paid_features).pluck(:feature_slugs).flatten.uniq
   end
 
-  def subscription_duration; 1.year end # Static, at least for now
+  # Static, at least for now
+  def subscription_duration
+    1.year
+  end
 
-  def renewal_invoice?; first_invoice_id.present? end
+  def renewal_invoice?
+    first_invoice_id.present?
+  end
 
-  def active?; is_active end # Alias - don't directly access the db attribute, because it might change
+  # Alias - don't directly access the db attribute, because it might change
+  def active?
+    is_active
+  end
 
-  def expired?; subscription_end_at && subscription_end_at < Time.current end
+  def expired?
+    subscription_end_at && subscription_end_at < Time.current
+  end
 
-  def future?; subscription_start_at && subscription_start_at > Time.current end
+  def future?
+    subscription_start_at && subscription_start_at > Time.current
+  end
 
-  def current?; active? && !expired? && !future? end
+  def current?
+    active? && !expired? && !future?
+  end
 
-  def was_active?; !future? && (expired? && force_active || subscription_start_at.present? && paid_in_full?) end
+  def was_active?
+    !future? && (expired? && force_active || subscription_start_at.present? && paid_in_full?)
+  end
 
-  def should_expire?; is_active && expired? end # Use db attribute here, because that's what matters
+  # Use db attribute here, because that's what matters
+  def should_expire?
+    is_active && expired?
+  end
 
-  def discount_cents; feature_cost_cents - (amount_due_cents || 0) end
+  def discount_cents
+    feature_cost_cents - (amount_due_cents || 0)
+  end
 
-  def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
+  def paid_in_full?
+    amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
+  end
 
-  def subscription_first_invoice_id; first_invoice_id || id end
+  def subscription_first_invoice_id
+    first_invoice_id || id
+  end
 
-  def subscription_first_invoice; first_invoice || self end
+  def subscription_first_invoice
+    first_invoice || self
+  end
 
-  def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id) end
+  def subscription_invoices
+    self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id)
+  end
 
-  def display_name; "Invoice ##{id}" end
+  def display_name
+    "Invoice ##{id}"
+  end
 
-  def start_at; subscription_start_at end
+  def start_at
+    subscription_start_at
+  end
 
-  def start_at; subscription_end_at end
+  def start_at
+    subscription_end_at
+  end
 
-  def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
+  def paid_feature_ids
+    invoice_paid_features.pluck(:paid_feature_id)
+  end
 
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves
@@ -94,7 +131,9 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def child_enabled_feature_slugs_string; (child_enabled_feature_slugs || []).join(", ") end
+  def child_enabled_feature_slugs_string
+    (child_enabled_feature_slugs || []).join(", ")
+  end
 
   def child_enabled_feature_slugs_string=(val)
     return true if val.blank?
@@ -106,9 +145,13 @@ class Invoice < ApplicationRecord
   end
 
   # So that we can read and write
-  def start_at; subscription_start_at end
+  def start_at
+    subscription_start_at
+  end
 
-  def end_at; subscription_end_at end
+  def end_at
+    subscription_end_at
+  end
 
   def start_at=(val)
     self.subscription_start_at = TimeParser.parse(val, timezone)

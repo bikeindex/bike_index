@@ -38,30 +38,30 @@ module Organized
     def create
       if current_organization.restrict_invitations? && current_organization.remaining_invitation_count < 1
         flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
-        redirect_to current_root_path and return
+        redirect_to(current_root_path) && return
       end
       @membership = Membership.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
         if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
           flash[:error] = translation(:insufficient_invitations,
-                                      invite_count: multiple_emails_invited.count,
-                                      org_name: current_organization.name,
-                                      remaining_invite_count: current_organization.remaining_invitation_count)
+            invite_count: multiple_emails_invited.count,
+            org_name: current_organization.name,
+            remaining_invite_count: current_organization.remaining_invitation_count)
           render :new
         else
           flash[:success] = translation(:users_invited,
-                                        invite_count: multiple_emails_invited.count,
-                                        org_name: current_organization.name)
+            invite_count: multiple_emails_invited.count,
+            org_name: current_organization.name)
           multiple_emails_invited
             .each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
 
-          redirect_to current_root_path and return
+          redirect_to(current_root_path) && return
         end
       else
         if @membership.save
           flash[:success] = translation(:user_was_invited,
-                                        invited_email: @membership.invited_email,
-                                        org_name: current_organization.name)
+            invited_email: @membership.invited_email,
+            org_name: current_organization.name)
           redirect_to current_root_path
         else
           render :new
@@ -92,7 +92,7 @@ module Organized
     def reject_self_updates
       if @membership && @membership.user == current_user
         flash[:error] = translation(:cannot_remove_yourself)
-        redirect_to organization_users_path(organization_id: current_organization) and return
+        redirect_to(organization_users_path(organization_id: current_organization)) && return
       end
     end
 
@@ -106,11 +106,11 @@ module Organized
 
     def permitted_create_params
       params.require(:membership).permit(:role, :invited_email)
-            .merge(organization: current_organization, sender: current_user)
+        .merge(organization: current_organization, sender: current_user)
     end
 
     def update_membership_params
-      { role: params.dig(:membership, :role) }
+      {role: params.dig(:membership, :role)}
     end
   end
 end

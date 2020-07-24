@@ -15,7 +15,7 @@ class Color < ApplicationRecord
 
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, self.name.underscore]
+    translation_scope = [:activerecord, :select_options, name.underscore]
 
     pluck(:id, :name).map do |id, name|
       localized_name = I18n.t(normalize.call(name), scope: translation_scope)
@@ -32,8 +32,8 @@ class Color < ApplicationRecord
       data: {
         priority: 1000,
         display: display,
-        search_id: search_id,
-      },
+        search_id: search_id
+      }
     }.as_json
   end
 
@@ -42,7 +42,7 @@ class Color < ApplicationRecord
   end
 
   def update_display_format
-    u = display.match(/\#[^(\'|\")]*/)
+    u = display.match(/\#[^('|")]*/)
     update_attribute :display, (u.present? ? u[0] : nil)
   end
 end

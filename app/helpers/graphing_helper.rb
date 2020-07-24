@@ -5,16 +5,16 @@ module GraphingHelper
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
     collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
-              .count
+      .count
   end
 
   def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
     collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
-              .sum(amount_column)
-              .map { |k, v| [k, (v.to_f / 100.00).round(2)] } # Convert cents to dollars
-              .to_h
+      .sum(amount_column)
+      .map { |k, v| [k, (v.to_f / 100.00).round(2)] } # Convert cents to dollars
+      .to_h
   end
 
   def group_by_method(time_range)
@@ -41,8 +41,6 @@ module GraphingHelper
       "%a %-m-%-d"
     elsif group_period == :group_by_month
       "%Y-%-m"
-    else
-      nil # Let it fallback to the default handling
     end
   end
 
@@ -57,12 +55,12 @@ module GraphingHelper
     return nil if @period == "all"
     return "in the past #{@period}" unless @period == "custom"
     group_period = group_by_method(time_range)
-    if group_period == :group_by_minute
-      precision_class = "preciseTimeSeconds"
+    precision_class = if group_period == :group_by_minute
+      "preciseTimeSeconds"
     elsif group_period == :group_by_hour
-      precision_class = "preciseTime"
+      "preciseTime"
     else
-      precision_class = ""
+      ""
     end
     content_tag(:span) do
       concat "from "
@@ -79,15 +77,15 @@ module GraphingHelper
   def organization_dashboard_bikes_graph_data
     org_registrations = {
       name: "Organization registrations",
-      data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at"),
+      data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at")
     }
     return [org_registrations] unless current_organization.regional?
     [
       org_registrations,
       {
         name: "Self registrations",
-        data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at"),
-      },
+        data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at")
+      }
     ]
   end
 end

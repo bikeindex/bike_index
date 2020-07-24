@@ -18,10 +18,10 @@ module Organized
         render template: "/organized_mailer/graduated_notification", layout: "email"
       elsif @kind == "partial_registration"
         build_partial_email
-        render template: "/organized_mailer/partial_registration" , layout: "email"
+        render template: "/organized_mailer/partial_registration", layout: "email"
       else # Default to finished email
         build_finished_email
-        render template: "/organized_mailer/finished_registration" , layout: "email"
+        render template: "/organized_mailer/finished_registration", layout: "email"
       end
     end
 
@@ -89,7 +89,7 @@ module Organized
         new_bike: (@bike.ownerships.count == 1),
         email: @ownership.owner_email,
         new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-        registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id),
+        registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
       }
     end
 

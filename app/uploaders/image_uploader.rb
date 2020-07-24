@@ -10,7 +10,7 @@ class ImageUploader < ApplicationUploader
   end
 
   def extension_white_list
-    %w(jpg jpeg gif png tiff tif)
+    %w[jpg jpeg gif png tiff tif]
   end
 
   process :validate_dimensions

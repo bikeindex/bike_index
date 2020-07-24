@@ -27,7 +27,7 @@ class FileCacheMaintainer
         "approved_current_stolen_bikes.tsv" => "Stolen (without blocklisted bikes)",
         "current_stolen_with_reports.tsv" => "Stolen with serials & police reports",
         "approved_current_stolen_with_reports.tsv" => "Stolen with serials & police reports (without blocklisted bikes)",
-        "all_stolen_cache.json" => "Cached API response of all stolen bikes",
+        "all_stolen_cache.json" => "Cached API response of all stolen bikes"
       }
     end
 
@@ -55,7 +55,7 @@ class FileCacheMaintainer
         filename: path.basename.to_s,
         daily: daily_export,
         updated_at: @result[k],
-        description: descriptions[path.basename.to_s],
+        description: descriptions[path.basename.to_s]
       }
     end
 
@@ -63,12 +63,12 @@ class FileCacheMaintainer
       return [] unless redis.type(info_id) == "hash"
       @result = redis.hgetall(info_id)
       @result.keys.map { |k| file_info_hash(k).with_indifferent_access }
-             .sort_by { |t| t[:filename] }.sort_by { |t| t[:daily] ? 1 : 0 }
+        .sort_by { |t| t[:filename] }.sort_by { |t| t[:daily] ? 1 : 0 }
     end
 
     def cached_all_stolen
       files.select { |t| t["filename"] =~ /all_stolen_cache\.json/ }
-           .sort { |x, y| x["filename"] <=> y["filename"] }.last
+        .max_by { |a| a["filename"] }
     end
 
     def normalized(id)
@@ -92,7 +92,7 @@ class FileCacheMaintainer
     end
 
     def uploader_from_filename(filename)
-      filename =~ /\.json/ ? JsonUploader.new : TsvUploader.new
+      /\.json/.match?(filename) ? JsonUploader.new : TsvUploader.new
     end
 
     def remove_file(file_info_hash)

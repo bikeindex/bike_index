@@ -34,10 +34,10 @@ class Paint < ApplicationRecord
   end
 
   def paint_name_parser(paint_str)
-    paint_str.gsub!(/[\\\/\"\-\()\?,\&\+\;\.]/, " ")
+    paint_str.gsub!(/[\\\/"\-()?,&+;.]/, " ")
 
     # RAL colors. See wikipedia table for rough groupings. Many of the reds are pink, greys are brown, etc. by whatever
-    paint_str.gsub!(/ral\s?([1-8])\d{3}/) {
+    paint_str.gsub!(/ral\s?([1-8])\d{3}/) do
       case Regexp.last_match[1].to_i
       when 1 then "yellow"
       when 2 then "orange"
@@ -48,7 +48,7 @@ class Paint < ApplicationRecord
       when 7 then "silver"
       when 8 then "brown"
       end
-    }
+    end
 
     paint_str.gsub!(/bluish/, "blue")
     paint_str.gsub!(/reddish/, "red")

@@ -26,7 +26,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
       bike = find_or_initialize_by(
         external_id: attrs["id"],
         serial_number: attrs["serial_number"],
-        type: to_s,
+        type: to_s
       )
 
       bike.cycle_type = "bike"
@@ -51,7 +51,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
       {
         url: attrs["url"],
         image_url: photo["original_url"],
-        thumb_url: photo["medium_url"],
+        thumb_url: photo["medium_url"]
       }
     end
 

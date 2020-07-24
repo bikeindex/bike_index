@@ -72,7 +72,7 @@ module API
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
-            is_new: params[:is_new],
+            is_new: params[:is_new]
           }.as_json
         end
 
@@ -96,8 +96,8 @@ module API
         end
 
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
-          authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE,
+          authorizations: {oauth2: [{scope: :write_bikes}]},
+          notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
             <hr>
@@ -134,14 +134,14 @@ module API
           # Search for a bike matching the provided serial number / owner email
           found_bike = BikeFinder.find_matching(
             serial: params[:serial],
-            owner_email: params[:owner_email],
+            owner_email: params[:owner_email]
           )
 
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
-            declared_p = { "declared_params" => declared(params, include_missing: false) }
+            declared_p = {"declared_params" => declared(params, include_missing: false)}
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
             b_param.clean_params
             @bike = found_bike
@@ -163,7 +163,7 @@ module API
             return @bike.reload
           end
 
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+          declared_p = {"declared_params" => declared(params, include_missing: false).merge(creation_state_params)}
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
           b_param.save
@@ -179,8 +179,8 @@ module API
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
-          authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE,
+          authorizations: {oauth2: [{scope: :write_bikes}]},
+          notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
             Update a bike owned by the access token you're using.
@@ -198,7 +198,7 @@ module API
           end
         end
         put ":id", serializer: BikeV2ShowSerializer, root: "bike" do
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
+          declared_p = {"declared_params" => declared(params, include_missing: false)}
           find_bike
           authorize_bike_for_user
           b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
@@ -214,8 +214,8 @@ module API
         end
 
         desc "Add an image to a bike", {
-          authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE,
+          authorizations: {oauth2: [{scope: :write_bikes}]},
+          notes: <<-NOTE
 
             To post a file to the API with curl:
 
@@ -229,10 +229,10 @@ module API
         }
         params do
           requires :id, type: Integer, desc: "Bike ID"
-          requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
+          requires :file, type: Rack::Multipart::UploadedFile, desc: "Attachment."
         end
         post ":id/image", serializer: PublicImageSerializer, root: "image" do
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
+          declared_p = {"declared_params" => declared(params, include_missing: false)}
           find_bike
           authorize_bike_for_user
           public_image = PublicImage.new(imageable: @bike, image: params[:file])
@@ -244,8 +244,8 @@ module API
         end
 
         desc "Remove an image from a bike", {
-          authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE,
+          authorizations: {oauth2: [{scope: :write_bikes}]},
+          notes: <<-NOTE
 
             Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
 
@@ -268,8 +268,8 @@ module API
         end
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {
-          authorizations: { oauth2: [{ scope: :read_user }] },
-          notes: <<-NOTE,
+          authorizations: {oauth2: [{scope: :read_user}]},
+          notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
             <hr>

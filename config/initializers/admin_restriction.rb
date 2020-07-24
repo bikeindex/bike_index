@@ -5,7 +5,7 @@ class AdminRestriction
 
     auth =
       Rack::Session::Cookie::Base64::JSON.new.decode(cookie) ||
-        Rack::Session::Cookie::Base64::Marshal.new.decode(cookie)
+      Rack::Session::Cookie::Base64::Marshal.new.decode(cookie)
 
     user = User.from_auth(auth)
 

@@ -3,9 +3,9 @@ class InfoController < ApplicationController
     @blog = Blog.friendly_find(params[:id])
     if @blog.blank?
       flash[:error] = "unable to find that page"
-      redirect_to news_path and return
+      redirect_to(news_path) && return
     elsif @blog.blog?
-      redirect_to news_path(@blog.to_param) and return
+      redirect_to(news_path(@blog.to_param)) && return
     end
     @blogger = @blog.user
   end

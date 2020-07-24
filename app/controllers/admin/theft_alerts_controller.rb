@@ -12,9 +12,12 @@ class Admin::TheftAlertsController < Admin::BaseController
         .per(params.fetch(:per_page, 25))
   end
 
-  def show; redirect_to edit_admin_theft_alert_path end
+  def show
+    redirect_to edit_admin_theft_alert_path
+  end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @theft_alert.update(set_alert_timestamps(theft_alert_params))

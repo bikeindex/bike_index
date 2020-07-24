@@ -1,6 +1,6 @@
 class ImpoundRecord < ApplicationRecord
   # These statuses overlap with impound_record_updates
-  STATUS_ENUM = { current: 0, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred_to_new_owner: 4 }.freeze
+  STATUS_ENUM = {current: 0, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred_to_new_owner: 4}.freeze
 
   belongs_to :bike
   belongs_to :user
@@ -22,35 +22,59 @@ class ImpoundRecord < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
 
-  def self.active_statuses; %w[current] end
+  def self.active_statuses
+    %w[current]
+  end
 
-  def self.resolved_statuses; statuses - active_statuses end
+  def self.resolved_statuses
+    statuses - active_statuses
+  end
 
-  def self.statuses_humanized; ImpoundRecordUpdate.kinds_humanized end
+  def self.statuses_humanized
+    ImpoundRecordUpdate.kinds_humanized
+  end
 
-  def self.statuses_humanized_short; ImpoundRecordUpdate.kinds_humanized_short end
+  def self.statuses_humanized_short
+    ImpoundRecordUpdate.kinds_humanized_short
+  end
 
   def self.bikes
     Bike.unscoped.includes(:impound_records)
-        .where(impound_records: { id: pluck(:id) })
+      .where(impound_records: {id: pluck(:id)})
   end
 
   # Get it unscoped, because unregistered_bike notifications
-  def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
+  def bike
+    @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
 
-  def creator; parking_notification&.user end
+  def creator
+    parking_notification&.user
+  end
 
-  def active?; self.class.active_statuses.include?(status) end
+  def active?
+    self.class.active_statuses.include?(status)
+  end
 
-  def resolved?; !active? end
+  def resolved?
+    !active?
+  end
 
-  def resolving_update; impound_record_updates.resolved.order(:id).first end
+  def resolving_update
+    impound_record_updates.resolved.order(:id).first
+  end
 
-  def status_humanized; self.class.statuses_humanized[status.to_sym] end
+  def status_humanized
+    self.class.statuses_humanized[status.to_sym]
+  end
 
-  def status_humanized_short; self.class.statuses_humanized_short[status.to_sym] end
+  def status_humanized_short
+    self.class.statuses_humanized_short[status.to_sym]
+  end
 
   def update_kinds
     organization.enabled?("impound_bikes_locations") ? ImpoundRecordUpdate.kinds : ImpoundRecordUpdate.kinds_without_location

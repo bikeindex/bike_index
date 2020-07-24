@@ -12,19 +12,19 @@ module API
         end
 
         desc "Add an Organization to Bike Index<span class='accstr'>*</span>", {
-          authorizations: { oauth2: [{ scope: :write_organizations }] },
-          notes: <<-NOTES,
+          authorizations: {oauth2: [{scope: :write_organizations}]},
+          notes: <<-NOTES
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr>
           **Location:** You may optionally include `locations` for the organization.
 
           <hr>
           **Note:** Access to this endpoint is only available to select api clients.
-        NOTES
+          NOTES
         }
         params do
           requires :name, type: String, desc: "The organization name"
-          requires :website, type: String, desc: "The organization website", regexp: URI::regexp(%w(http https))
+          requires :website, type: String, desc: "The organization website", regexp: URI::DEFAULT_PARSER.make_regexp(%w[http https])
           requires :kind, type: String, desc: "The kind of organization", values: Organization.user_creatable_kinds
 
           optional :locations, type: Array, desc: "The organization locations" do
@@ -40,7 +40,7 @@ module API
 
         # POST /api/v3/organizations
         post serializer: OrganizationSerializer, root: "organization" do
-          error!("Unauthorized. Cannot write organizations", 401) if !allowed_write_organizations
+          error!("Unauthorized. Cannot write organizations", 401) unless allowed_write_organizations
 
           permitted = declared(params, include_missing: false)
           organization = Organization.new(
@@ -48,11 +48,11 @@ module API
           )
 
           if locations = permitted.locations
-            relations = locations.map do |loc|
+            relations = locations.map { |loc|
               state = State.where(name: loc.state).first
               country = Country.where(name: loc.country).first
               loc.merge(state: state, country: country).to_h
-            end
+            }
             organization.locations.build(relations)
           end
 

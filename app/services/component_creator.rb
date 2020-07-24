@@ -12,15 +12,15 @@ class ComponentCreator
     mnfg_input = component[:manufacturer_id] || component[:manufacturer] || component[:mnfg_name]
     return {} unless mnfg_input.present?
     manufacturer = Manufacturer.friendly_find(mnfg_input)
-    return { manufacturer_id: manufacturer.id } if manufacturer.present?
-    { manufacturer_id: Manufacturer.other.id, manufacturer_other: mnfg_input }
+    return {manufacturer_id: manufacturer.id} if manufacturer.present?
+    {manufacturer_id: Manufacturer.other.id, manufacturer_other: mnfg_input}
   end
 
   def component_type_hash(component)
     return component.slice(:ctype_id, :ctype_other) unless component[:component_type].present?
     ctype = Ctype.friendly_find(component[:component_type])
-    return { ctype_id: ctype.id } if ctype.present?
-    { ctype_id: Ctype.other.id, ctype_other: component[:component_type] }
+    return {ctype_id: ctype.id} if ctype.present?
+    {ctype_id: Ctype.other.id, ctype_other: component[:component_type]}
   end
 
   def permitted_attributes(component)
@@ -33,7 +33,7 @@ class ComponentCreator
       rear: component[:rear],
       front_or_rear: component[:front_or_rear],
       ctype_id: component[:ctype_id],
-      ctype_other: component[:ctype_other],
+      ctype_other: component[:ctype_other]
     }.merge(manufacturer_hash(component)).merge(component_type_hash(component))
     comp_attributes.select { |k, v| v.present? }
   end
@@ -57,10 +57,10 @@ class ComponentCreator
   def create_components_from_params
     if @b_param.present? && @b_param.params.present? && @b_param.params["components"].present?
       (0...@b_param.params["components"].count).to_a.each do |c_number|
-        if @b_param.params["components"].kind_of?(Array)
-          component = @b_param.params["components"][c_number].with_indifferent_access
+        component = if @b_param.params["components"].is_a?(Array)
+          @b_param.params["components"][c_number].with_indifferent_access
         else
-          component = @b_param.params["components"][c_number.to_s].with_indifferent_access
+          @b_param.params["components"][c_number.to_s].with_indifferent_access
         end
         create_component(component)
       end

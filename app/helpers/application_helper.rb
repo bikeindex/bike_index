@@ -26,7 +26,7 @@ module ApplicationHelper
         link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
         Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
       rescue # This mainly fails in testing - but why not rescue always
-        return false
+        false
       end
     else
       current_page?(link_path)
@@ -42,14 +42,14 @@ module ApplicationHelper
     return nil if @force_landing_page_render
     case controller_name
     when "bikes"
-      "edit_bike_skeleton" if %w(edit update).include?(action_name)
+      "edit_bike_skeleton" if %w[edit update].include?(action_name)
     when "info"
-      "content_skeleton" unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
+      "content_skeleton" unless %w[terms vendor_terms privacy support_the_index].include?(action_name)
     when "welcome"
-      "content_skeleton" if %w(goodbye).include?(action_name)
+      "content_skeleton" if %w[goodbye].include?(action_name)
     when "organizations"
-      "content_skeleton" if %w(lightspeed_integration).include?(action_name)
-    when *%w(news feedbacks manufacturers errors registrations)
+      "content_skeleton" if %w[lightspeed_integration].include?(action_name)
+    when "news", "feedbacks", "manufacturers", "errors", "registrations"
       "content_skeleton"
     end
   end
@@ -85,7 +85,7 @@ module ApplicationHelper
         class_name = "active" if link_text == "Payments"
       end
     else
-      class_name = controller_name == link_text.downcase.gsub(" ", "_") ? "active" : ""
+      class_name = controller_name == link_text.downcase.tr(" ", "_") ? "active" : ""
     end
     (link_to link_text, link_path, class: class_name).html_safe
   end
@@ -93,29 +93,29 @@ module ApplicationHelper
   def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
     new_object = f.object.send(association).klass.new(obj_attrs)
     id = new_object.object_id
-    filename ||= association.to_s.singularize + '_fields'
-    fields = f.fields_for(association, new_object, child_index: id) do |builder|
+    filename ||= association.to_s.singularize + "_fields"
+    fields = f.fields_for(association, new_object, child_index: id) { |builder|
       render(filename, f: builder)
-    end
-    link_to name, '#', class: "add_fields #{class_name}",
-                       data: { id: id, fields: fields.delete("\n") }
+    }
+    link_to name, "#", class: "add_fields #{class_name}",
+                       data: {id: id, fields: fields.delete("\n")}
   end
 
   def revised_link_to_add_components(name, f, association)
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
-    fields = f.fields_for(association, new_object, child_index: id) do |builder|
+    fields = f.fields_for(association, new_object, child_index: id) { |builder|
       render("/bikes/bike_fields/revised_component_fields", f: builder, ctype_id: Ctype.other.id)
-    end
+    }
     text = "<span class='context-display-help'>+</span>#{name}"
-    link_to(text.html_safe, "#", class: "add_fields", data: { id: id, fields: fields.gsub("\n", "") })
+    link_to(text.html_safe, "#", class: "add_fields", data: {id: id, fields: fields.delete("\n")})
   end
 
   def listicle_html(list_item)
     c = content_tag(:h2, list_item.title, class: "list-item-title")
     if list_item.image_credits.present?
       c = content_tag(:div, list_item.image_credits_html.html_safe,
-                      class: "listicle-image-credit") << c
+        class: "listicle-image-credit") << c
     end
     if list_item.image.present?
       c = image_tag(list_item.image_url(:large)) << c
@@ -156,8 +156,8 @@ module ApplicationHelper
       button_label,
       organization_ambassador_task_assignment_url(current_organization, ambassador_task_assignment),
       method: :put,
-      params: { completed: !is_complete },
-      class: "btn btn-primary",
+      params: {completed: !is_complete},
+      class: "btn btn-primary"
     )
   end
 
@@ -171,11 +171,11 @@ module ApplicationHelper
     return "" if phone.blank?
     phone_d = phone_display(phone)
     # Switch extension to be pause in link
-    link_to(phone_d, "tel:#{phone_d.gsub("x", ";")}", html_options)
+    link_to(phone_d, "tel:#{phone_d.tr("x", ";")}", html_options)
   end
 
   def twitterable(user)
-    if user.show_twitter and user.twitter
+    if user.show_twitter && user.twitter
       link_to "Twitter", "https://twitter.com/#{user.twitter}"
     end
   end
@@ -186,13 +186,13 @@ module ApplicationHelper
   end
 
   def websiteable(user)
-    if user.show_website and user.website
+    if user.show_website && user.website
       link_to "Website", user.website
     end
   end
 
   def show_twitter_and_website(user)
-    if twitterable(user) or websiteable(user)
+    if twitterable(user) || websiteable(user)
       html = ""
       if twitterable(user)
         html << twitterable(user)

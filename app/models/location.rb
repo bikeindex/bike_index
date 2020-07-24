@@ -27,26 +27,41 @@ class Location < ApplicationRecord
   attr_accessor :skip_update
 
   # For now, doesn't do anything - but eventually we may switch to slugged locations, so prep for it
-  def self.friendly_find(str); find_by_id(str) end
+  def self.friendly_find(str)
+    find_by_id(str)
+  end
 
-  def other_organization_locations; Location.where(organization_id: organization_id).where.not(id: id) end
+  def other_organization_locations
+    Location.where(organization_id: organization_id).where.not(id: id)
+  end
 
-  def address; Geocodeable.address(self, country: %i[name]) end
+  def address
+    Geocodeable.address(self, country: %i[name])
+  end
 
-  def org_location_id; "#{self.organization_id}_#{self.id}" end
+  def org_location_id
+    "#{organization_id}_#{id}"
+  end
 
-  def publicly_visible; !not_publicly_visible end
+  def publicly_visible
+    !not_publicly_visible
+  end
 
-  def virtual_line_on?; appointment_configuration.present? && appointment_configuration.virtual_line_on? end
+  def virtual_line_on?
+    appointment_configuration.present? && appointment_configuration.virtual_line_on?
+  end
 
-  def destroy_forbidden?; virtual_line_on? end # may also block if it's had appointments
+  # may also block if it's had appointments
+  def destroy_forbidden?
+    virtual_line_on?
+  end
 
   def publicly_visible=(val)
     self.not_publicly_visible = !ParamsNormalizer.boolean(val)
   end
 
   def set_calculated_attributes
-    self.phone = Phonifyer.phonify(self.phone)
+    self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
   end
 

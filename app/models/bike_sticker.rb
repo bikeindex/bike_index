@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BikeSticker < ApplicationRecord
-  KIND_ENUM = { sticker: 0, spokecard: 1 }.freeze
+  KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
   MAX_UNORGANIZED = 10
   belongs_to :bike
   belongs_to :organization
@@ -29,9 +29,13 @@ class BikeSticker < ApplicationRecord
     code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
 
-  def self.calculated_code_integer(str); str.present? ? str.gsub(/\A\D+/, "").to_i : nil end
+  def self.calculated_code_integer(str)
+    str.present? ? str.gsub(/\A\D+/, "").to_i : nil
+  end
 
-  def self.calculated_code_prefix(str); str.present? ? str.gsub(/\d+\z/, "").upcase : nil end
+  def self.calculated_code_prefix(str)
+    str.present? ? str.gsub(/\d+\z/, "").upcase : nil
+  end
 
   def self.code_integer_and_prefix_search(str)
     code_integer = calculated_code_integer(str)
@@ -83,14 +87,18 @@ class BikeSticker < ApplicationRecord
     unclaimed.reorder(:id).where("id > ?", after_id || 1).first
   end
 
-  def claimed?; bike_id.present? && bike.present? end
+  def claimed?
+    bike_id.present? && bike.present?
+  end
 
-  def unclaimed?; !claimed? end
+  def unclaimed?
+    !claimed?
+  end
 
   def url
     [
       "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
-      organization.present? ? "?organization_id=#{organization.slug}" : nil,
+      organization.present? ? "?organization_id=#{organization.slug}" : nil
     ].compact.join("")
   end
 

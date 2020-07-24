@@ -6,7 +6,8 @@ module Organized
       @organization.ensure_auto_user
     end
 
-    def locations; end
+    def locations
+    end
 
     def update
       if @organization.update_attributes(permitted_parameters)
@@ -23,7 +24,7 @@ module Organized
       organization_name = current_organization.name
       if current_organization.paid?
         flash[:info] = translation(:contact_support_to_delete, org_name: organization_name)
-        redirect_to current_root_path and return
+        redirect_to(current_root_path) && return
       end
       notify_admins("organization_destroyed")
       current_organization.destroy
@@ -47,8 +48,8 @@ module Organized
 
     def permitted_parameters
       params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name, :avatar,
-                                           show_on_map_if_permitted, permitted_kind,
-                                           locations_attributes: permitted_locations_params)
+        show_on_map_if_permitted, permitted_kind,
+        locations_attributes: permitted_locations_params)
     end
 
     def permitted_kind
@@ -62,8 +63,8 @@ module Organized
     end
 
     def permitted_locations_params
-      %i(name zipcode city state_id country_id street phone email id _destroy publicly_visible
-         impound_location default_impound_location)
+      %i[name zipcode city state_id country_id street phone email id _destroy publicly_visible
+        impound_location default_impound_location]
     end
 
     def notify_admins(type)
