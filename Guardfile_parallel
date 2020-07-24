@@ -36,14 +36,4 @@ group :red_green_refactor, halt_on_fail: true do
     # watch("app/decorators/application_decorator.rb") { "spec/decorators" }
     # watch("app/decorators/application_helper.rb") { "spec/helpers" }
   end
-
-  guard :rubocop, all_on_start: false do
-    watch(%r{^app/(.+)\.rb$})
-    watch(%r{^spec/(.+)\.rb$})
-    watch(%r{^config/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rake$})
-    watch(%r{^db/(.+)\.rb$})
-    watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
-  end
 end

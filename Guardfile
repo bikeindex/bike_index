@@ -32,14 +32,4 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^app/controllers/(.+)_controller\.rb$}) { |m| "spec/requests/#{m[1]}_request_spec.rb" }
     watch(%r{^app/controllers/(.+)_controller\.rb$}) { |m| "spec/requests/#{m[1]}_controller_spec.rb" }
   end
-
-  guard :rubocop, all_on_start: false do
-    watch(%r{^app/(.+)\.rb$})
-    watch(%r{^spec/(.+)\.rb$})
-    watch(%r{^config/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rake$})
-    watch(%r{^db/(.+)\.rb$})
-    watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
-  end
 end
