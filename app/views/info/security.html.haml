@@ -1,0 +1,20 @@
+- file_path = @view_renderer.lookup_context.find_template(@virtual_path).identifier.gsub(/\A.*\/app\//i, 'app/')
+- change_history_url = "https://github.com/bikeindex/bike_index/tree/main/#{file_path}"
+- contact_email_link = link_to("contact@bikeindex.org", "mailto:contact@bikeindex.org")
+- contact_link = link_to("contact us", contact_us_path)
+
+.inner-recep.legal-content#legal-terms
+
+  -# TODO: translations
+  %header
+    %h1
+      Security Policy
+    %p
+      Last updated July 24th, 2020. Previous versions and the change history is
+      = link_to("available here", change_history_url)
+
+  %h2
+    Purpose
+
+  %p
+    This document outlines Bike Index’s IT security recommendations, our expectations for security research, what we do to protect against data loss and downtime, and what we will do in the case of a breach.

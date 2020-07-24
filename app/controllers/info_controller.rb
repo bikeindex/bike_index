@@ -34,7 +34,7 @@ class InfoController < ApplicationController
   def terms
   end
 
-  def security_policy
+  def security
   end
 
   def vendor_terms

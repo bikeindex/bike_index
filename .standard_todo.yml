@@ -2,73 +2,11 @@
 # Remove from this list as you refactor files.
 ---
 ignore:
-  - app/controllers/admin/customer_contacts_controller.rb
-  - app/controllers/admin/feedbacks_controller.rb
-  - app/controllers/admin/graphs_controller.rb
-  - app/controllers/admin/invoices_controller.rb
-  - app/controllers/admin/manufacturers_controller.rb
-  - app/controllers/admin/recoveries_controller.rb
-  - app/controllers/api/v2/bikes.rb
-  - app/controllers/api/v2/me.rb
-  - app/controllers/api/v2/users.rb
-  - app/controllers/api/v3/organizations.rb
-  - app/controllers/bikes/recovery_controller.rb
-  - app/controllers/bikes_controller.rb
-  - app/controllers/concerns/controller_helpers.rb
-  - app/controllers/concerns/sortable_table.rb
-  - app/controllers/locks_controller.rb
-  - app/controllers/organized/bulk_imports_controller.rb
-  - app/controllers/organized/users_controller.rb
-  - app/controllers/registrations_controller.rb
-  - app/controllers/users_controller.rb
-  - app/decorators/application_decorator.rb
-  - app/helpers/application_helper.rb
-  - app/helpers/header_tag_helper.rb
-  - app/integrations/twitter_tweeter_integration.rb
-  - app/models/appointment_update.rb
-  - app/models/b_param.rb
-  - app/models/bike.rb
-  - app/models/bike_sticker.rb
-  - app/models/blog.rb
-  - app/models/bulk_import.rb
-  - app/models/concerns/bike_searchable.rb
-  - app/models/concerns/geocodeable.rb
-  - app/models/export.rb
-  - app/models/hot_sheet_configuration.rb
-  - app/models/invoice.rb
-  - app/models/parking_notification.rb
-  - app/models/single_sign_on.rb
-  - app/models/stolen_notification.rb
-  - app/models/twitter_client.rb
-  - app/models/user.rb
-  - app/services/bike_updator.rb
-  - app/services/phonifyer.rb
-  - app/uploaders/alert_image_uploader.rb
-  - app/uploaders/avatar_uploader.rb
-  - app/workers/email_ownership_invitation_worker.rb
-  - app/workers/impound_update_bike_worker.rb
-  - config/initializers/forwarded_ip_address.rb
-  - spec/controllers/admin/tweets_controller_spec.rb
-  - spec/controllers/organized/exports_controller_spec.rb
-  - spec/helpers/admin_helper_spec.rb
-  - spec/helpers/header_tag_helper_spec.rb
-  - spec/lib/integrations/bike_book_integration_spec.rb
-  - spec/models/b_param_spec.rb
-  - spec/models/bike_sticker_spec.rb
-  - spec/models/blog_spec.rb
-  - spec/models/manufacturer_spec.rb
-  - spec/rails_helper.rb
-  - spec/requests/admin/bikes_request_spec.rb
-  - spec/requests/api/v1/organizations_request_spec.rb
-  - spec/requests/api/v2/users_request_spec.rb
-  - spec/requests/organized/bikes_request_spec.rb
-  - spec/services/bike_searcher_spec.rb
-  - spec/services/bike_updator_spec.rb
-  - spec/workers/bulk_import_worker_spec.rb
   - app/controllers/admin/ambassador_task_assignments_controller.rb
   - app/controllers/admin/ambassador_tasks_controller.rb
   - app/controllers/admin/bikes_controller.rb
   - app/controllers/admin/bulk_imports_controller.rb
+  - app/controllers/admin/customer_contacts_controller.rb
   - app/controllers/admin/dashboard_controller.rb
   - app/controllers/admin/exchange_rates_controller.rb
   - app/controllers/admin/exports_controller.rb
@@ -78,6 +16,7 @@ ignore:
   - app/controllers/admin/graphs_controller.rb
   - app/controllers/admin/invoices_controller.rb
   - app/controllers/admin/mail_snippets_controller.rb
+  - app/controllers/admin/manufacturers_controller.rb
   - app/controllers/admin/news_controller.rb
   - app/controllers/admin/organizations/custom_layouts_controller.rb
   - app/controllers/admin/organizations/invoices_controller.rb
@@ -153,7 +92,6 @@ ignore:
   - app/controllers/welcome_controller.rb
   - app/decorators/application_decorator.rb
   - app/helpers/admin_helper.rb
-  - app/helpers/application_helper.rb
   - app/helpers/graphing_helper.rb
   - app/helpers/header_tag_helper.rb
   - app/helpers/localization_helper.rb
@@ -282,8 +220,10 @@ ignore:
   - app/workers/bulk_import_worker.rb
   - app/workers/carrier_wave_store_worker.rb
   - app/workers/create_graduated_notification_worker.rb
+  - app/workers/email_ownership_invitation_worker.rb
   - app/workers/file_cache_maintenance_worker.rb
   - app/workers/get_manufacturer_logo_worker.rb
+  - app/workers/impound_update_bike_worker.rb
   - app/workers/merge_additional_email_worker.rb
   - app/workers/organization_export_worker.rb
   - app/workers/process_hot_sheet_worker.rb
@@ -300,6 +240,7 @@ ignore:
   - config/initializers/carrierwave.rb
   - config/initializers/content_security_policy.rb
   - config/initializers/customize_error.rb
+  - config/initializers/forwarded_ip_address.rb
   - config/initializers/geocoder.rb
   - config/initializers/grape_values.rb
   - config/initializers/instrumentation.rb
@@ -308,7 +249,6 @@ ignore:
   - config/initializers/session_store.rb
   - config/initializers/sidekiq.rb
   - config/initializers/stripe.rb
-  - config/puma.rb
   - db/migrate/20190206044915_add_listing_order_index_to_bikes.rb
   - db/migrate/20190617174200_add_unique_index_to_ambassador_task_assignments.rb
   - db/migrate/20190829221522_create_twitter_accounts.rb
@@ -321,7 +261,6 @@ ignore:
   - db/seeds/seed_wheel_sizes.rb
   - lib/tasks/rake_tasks.rake
   - lib/tasks/seed_tasks.rake
-  - script/rails
   - spec/controllers/admin/ambassador_tasks_controller_spec.rb
   - spec/controllers/admin/bikes_controller_spec.rb
   - spec/controllers/admin/bulk_imports_controller_spec.rb
@@ -388,7 +327,6 @@ ignore:
   - spec/factories/twitter_accounts.rb
   - spec/factories/users.rb
   - spec/helpers/admin_helper_spec.rb
-  - spec/helpers/application_helper_spec.rb
   - spec/helpers/graphing_helper_spec.rb
   - spec/helpers/header_tag_helper_spec.rb
   - spec/helpers/localization_helper_spec.rb
@@ -404,6 +342,8 @@ ignore:
   - spec/models/b_param_spec.rb
   - spec/models/bike_spec.rb
   - spec/models/bike_sticker_batch_spec.rb
+  - spec/models/bike_sticker_spec.rb
+  - spec/models/blog_spec.rb
   - spec/models/bulk_import_spec.rb
   - spec/models/color_spec.rb
   - spec/models/counts_spec.rb
