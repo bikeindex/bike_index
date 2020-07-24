@@ -1,4 +1,4 @@
-directories %w(app spec lib config)
+directories %w[app spec lib config]
 
 group :red_green_refactor, halt_on_fail: true do
   rspec_options = {
@@ -6,10 +6,10 @@ group :red_green_refactor, halt_on_fail: true do
     cmd_additional_args: "--require rails_helper --no-profile --order defined'",
     run_all: {
       cmd: "bin/parallel_rspec --quiet --test-options='-f documentation -o /dev/null -f progress",
-      cmd_additional_args: "'",
+      cmd_additional_args: "'"
     },
     failed_mode: :focus,
-    all_after_pass: false,
+    all_after_pass: false
   }
 
   guard :rspec, rspec_options do
