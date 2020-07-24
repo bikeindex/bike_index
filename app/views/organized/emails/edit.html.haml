@@ -45,8 +45,15 @@
       = f.text_field :subject, class: "form-control"
     .form-group
       = f.label :body, class: "control-label" do
-        Custom message to add to the email
-        %em.less-strong HTML is permitted
+        Custom HTML message to add to the email
+        %small
+          %strong.text-warning
+            HTML is required
+          to do <em>any</em> formatting (for instance line breaks).
+          %em.less-strong.d-block{ style: "line-height: 1;" }
+            Need help with HTML? Check out
+            = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started"
+            \- or email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
       = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
 
     .form-group
