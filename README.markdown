@@ -108,8 +108,7 @@ We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the
 We use the following tools to automate code formatting and linting:
 
 - [EditorConfig](https://editorconfig.org/)
-- [Rufo](https://github.com/ruby-formatter/rufo)
-- [Rubocop](https://github.com/rubocop-hq/rubocop)
+- [StandardRB](https://github.com/testdouble/standard)
 - [ESlint](https://eslint.org/)
 
 ### EditorConfig
@@ -120,28 +119,13 @@ appropriate to your editor.
 
 [editorconfig-plugin]: https://editorconfig.org/#download
 
-### Rufo
+### StandardRB
 
-Rufo is an opinionated Ruby formatter we use to maintain consistent style with
-minimum configuration. See the [Editor support][rufo-plugin] section of the
-project README to find a suitable editor plugin.
+StandardRB is an opinionated Ruby style guide, linter, and formatter - it is "a spiritual port of [StandardJS](https://standardjs.com/)".
 
-[rufo-plugin]: https://github.com/ruby-formatter/rufo#editor-support
+See the [how do I run standard in my editor](standardrb-plugin) section of the StandardRB docs to find an appropriate plugin for on-the-fly linting.
 
-### RuboCop
-
-RuboCop is configured to ignore Ruby style and layout (deferring to Rufo) and focus
-on code complexity, performance, and suggested best practices.
-
-To run it from the command line, issue `bin/rubocop`, optionally passing
-a specific file(s). For a performance boost, you can also start a rubocop daemon
-with `bundle exec rubocop-daemon start`, in which case you'd lint with
-`bundle exec rubocop-daemon exec`.
-
-See the [Editor integration][rubocop-editor] section of the rubocop docs to find
-an appropriate plugin for on-the-fly linting.
-
-[rubocop-editor]: https://rubocop.readthedocs.io/en/latest/integration_with_other_tools/#editor-integration
+[standardrb-plugin]: https://github.com/testdouble/standard#how-do-i-run-standard-in-my-editor
 
 ### ESLint
 
