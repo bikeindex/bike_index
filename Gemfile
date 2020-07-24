@@ -145,9 +145,7 @@ group :development do
   gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
-  gem "guard-rubocop", require: false
   gem "letter_opener"
-  gem "parser", "2.6.3.0" # for Ruby 2.5.5. Unlock version when upgrading Ruby.
   gem "rerun"
   gem "terminal-notifier"
 end
@@ -164,9 +162,6 @@ group :development, :test do
   gem "rspec", "~> 3.4"
   gem "rspec-rails", "~> 3.8"
   gem "rspec_junit_formatter" # For circle ci
-  gem "rubocop", "~> 0.67", require: false
-  gem "rubocop-daemon", "~> 0.3.1", require: false
-  gem "rubocop-performance", "~> 1.1.0", require: false
   gem "standard"
   # I18n - localization/translation
   gem "i18n-tasks"

@@ -109,7 +109,6 @@ We use the following tools to automate code formatting and linting:
 
 - [EditorConfig](https://editorconfig.org/)
 - [StandardRB](https://github.com/testdouble/standard)
-- [Rubocop](https://github.com/rubocop-hq/rubocop)
 - [ESlint](https://eslint.org/)
 
 ### EditorConfig
@@ -123,21 +122,6 @@ appropriate to your editor.
 ### StandardRB
 
 Ruby style guide, linter, and formatter.
-
-### RuboCop
-
-RuboCop is configured to ignore Ruby style and layout (deferring to StandardRB) and focus
-on code complexity, performance, and suggested best practices.
-
-To run it from the command line, issue `bin/rubocop`, optionally passing
-a specific file(s). For a performance boost, you can also start a rubocop daemon
-with `bundle exec rubocop-daemon start`, in which case you'd lint with
-`bundle exec rubocop-daemon exec`.
-
-See the [Editor integration][rubocop-editor] section of the rubocop docs to find
-an appropriate plugin for on-the-fly linting.
-
-[rubocop-editor]: https://rubocop.readthedocs.io/en/latest/integration_with_other_tools/#editor-integration
 
 ### ESLint
 
