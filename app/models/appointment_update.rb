@@ -1,14 +1,15 @@
 class AppointmentUpdate < ApplicationRecord
   STATUS_ENUM = {
-    paging: 0,
-    on_deck: 1,
-    waiting: 2,
-    being_helped: 3,
-    finished: 4,
-    failed_to_find: 5,
-    removed: 6,
-    abandoned: 7,
-    organization_reordered: 8,
+    pending: 0,
+    waiting: 1,
+    paging: 2,
+    on_deck: 3,
+    being_helped: 4,
+    finished: 5,
+    failed_to_find: 6,
+    removed: 7,
+    abandoned: 8,
+    organization_reordered: 9,
   }.freeze
 
   CREATOR_KIND_ENUM = {

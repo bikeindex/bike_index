@@ -1,5 +1,26 @@
 require "rails_helper"
 
 RSpec.describe Notification, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "send_notification" do
+    it "doesn't send for confirmation_email" do
+      expect do
+        FactoryBot.create(:notification, kind: "confirmation_email")
+      end.to_not change(SendNotificationWorker.jobs, :count)
+    end
+    context "view_appointment" do
+      let(:ticket) { FactoryBot.create(:appointment) }
+      let(:notification) { FactoryBot.build(:notification, kind: "view_appointment", appointment: appointment, user: nil) }
+      it "sends only on creation" do
+        Sidekiq::Worker.clear_all
+        expect do
+          notification.save
+        end.to change(SendNotificationWorker.jobs, :count).by 1
+        expect(SendNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([notification.id])
+        expect do
+          notification.update(updated_at: Time.current)
+          notification.destroy
+        end.to_not change(SendNotificationWorker.jobs, :count)
+      end
+    end
+  end
 end

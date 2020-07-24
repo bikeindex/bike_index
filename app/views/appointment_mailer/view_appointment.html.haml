@@ -1,0 +1,10 @@
+%h2
+  Line number: #{@appointment.line_number} is #{@appointment.status.humanize} at
+  - if @organization.locations.count > 1
+    %em.small
+      = @location.name
+  = @organization.name
+
+%p{ style: "margin-top: 40px;" }
+  View and update
+  = link_to "your place in line", organization_customer_appointment_url(@appointment, organization_id: @organization.to_param, location_id: @location.to_param, appointment_token: @appointment.link_token)
