@@ -15,6 +15,8 @@ class Ticket < ApplicationRecord
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
 
+  attr_accessor :skip_update
+
   # For now, it's simple, but could become more complicated
   def self.friendly_find(str)
     where(number: str.to_s.strip).first

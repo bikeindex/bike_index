@@ -52,7 +52,7 @@
             %button.close{ type: "button", "data-dismiss" => "modal", "aria-label" => "Close" }
               %span{ "aria-hidden" => "true"} &times;
           .modal-body
-            = form_tag organization_line_path("set_next_ticket", organization_id: current_organization.to_param, location_id: current_location&.id), action: "update", method: "PATCH" do |f|
+            = form_tag organization_line_path(current_location&.id, organization_id: current_organization.to_param), action: "update", method: "PATCH" do |f|
               .row
                 .form-group.col-6
                   = label_tag :next_ticket_number, "Next ticket number"
