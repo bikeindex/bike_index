@@ -19,13 +19,13 @@ SitemapGenerator::Sitemap.create do
     add "/blogs", priority: 0.9, changefreq: "daily"
     Blog.published.info.each do |b|
       add("/info/#{b.title_slug}",
-          priority: 0.9,
-          news: {
-            publication_name: "Bike Index Information",
-            publication_language: "en",
-            title: b.title,
-            publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-          })
+        priority: 0.9,
+        news: {
+          publication_name: "Bike Index Information",
+          publication_language: "en",
+          title: b.title,
+          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        })
     end
   end
 
@@ -33,13 +33,13 @@ SitemapGenerator::Sitemap.create do
     add "/blogs", priority: 0.9, changefreq: "daily"
     Blog.published.blog.each do |b|
       add("/news/#{b.title_slug}",
-          priority: 0.9,
-          news: {
-            publication_name: "Bike Index Blog",
-            publication_language: "en",
-            title: b.title,
-            publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-          })
+        priority: 0.9,
+        news: {
+          publication_name: "Bike Index Blog",
+          publication_language: "en",
+          title: b.title,
+          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        })
     end
   end
 
@@ -60,7 +60,7 @@ SitemapGenerator::Sitemap.create do
     PublicImage.bikes.each do |i|
       bike = Bike.where(id: i.imageable_id).first
       if bike.present?
-        add(bike_path(i.imageable), images: [{ loc: i.image_url, title: i.name }])
+        add(bike_path(i.imageable), images: [{loc: i.image_url, title: i.name}])
       end
     end
   end
@@ -79,7 +79,7 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :resources) do
-    paths = %w(resources serials stolen image_resources protect_your_bike how_not_to_buy_stolen)
+    paths = %w[resources serials stolen image_resources protect_your_bike how_not_to_buy_stolen]
     paths.each { |i| add "/#{i}" }
   end
 end
