@@ -111,7 +111,6 @@ ignore:
   - app/controllers/api/v3/organizations.rb
   - app/controllers/api/v3/root_v3.rb
   - app/controllers/api/v3/search.rb
-  - app/controllers/bike_stickers_controller.rb
   - app/controllers/bikes/recovery_controller.rb
   - app/controllers/bikes_controller.rb
   - app/controllers/concerns/controller_helpers.rb
@@ -345,7 +344,6 @@ ignore:
   - spec/controllers/api/v1/bikes_controller_spec.rb
   - spec/controllers/api/v1/notifications_controller_spec.rb
   - spec/controllers/api/v1/users_controller_spec.rb
-  - spec/controllers/bike_stickers_controller_spec.rb
   - spec/controllers/bikes/recovery_controller_spec.rb
   - spec/controllers/bikes_controller_spec.rb
   - spec/controllers/blogs_controller_spec.rb
