@@ -1,7 +1,5 @@
 - file_path = @view_renderer.lookup_context.find_template(@virtual_path).identifier.gsub(/\A.*\/app\//i, 'app/')
 - change_history_url = "https://github.com/bikeindex/bike_index/tree/main/#{file_path}"
-- contact_email_link = link_to("contact@bikeindex.org", "mailto:contact@bikeindex.org")
-- contact_link = link_to("contact us", contact_us_path)
 
 .inner-recep.legal-content#legal-terms
 
@@ -10,11 +8,54 @@
     %h1
       Security Policy
     %p
-      Last updated July 24th, 2020. Previous versions and the change history is
-      = link_to("available here", change_history_url)
+      Last updated July 24th, 2020. Previous versions and the change history is #{link_to("available here", change_history_url)}.
 
   %h2
     Purpose
 
   %p
     This document outlines Bike Index’s IT security recommendations, our expectations for security research, what we do to protect against data loss and downtime, and what we will do in the case of a breach.
+
+  %h2
+    Security Guidelines
+  %p
+    All persons accessing Bike Index hosting tools access the tools from their own accounts. We require multi-factor authentication for all services that offer it. All individuals with access to hosting tools must use a password manager and use separate passwords for each service.
+  %p
+    We automate fixes for operating system CVEs and web framework CVEs on the Bike Index webapp, to ensure applicable fixes are live as quickly as possible.
+  %p
+    All Bike Index data is encrypted both at rest and in transmission, using industry standard encryption.
+  %p
+    To protect our customers’ privacy, Bike Index only collects the minimum information required to provide the service and tools we offer.
+  %p
+    Bike Index does not store healthcare or credit card information and therefore PCI and HIPAA compliance are not necessary.
+  %p
+    Bike Index complies with all applicable legal and regulatory requirements for data protection, security and privacy for the services that we provide.
+  %p
+    We limit and control access to each organization account.   Unauthorized access to organizational and user data is strictly prohibited.
+
+  %h2
+    Security research
+  %p
+    Bike Index is primarily an open source project and we welcome responsible security testing and vulnerability disclosure. If your report contains sensitive data, please contact #{link_to "admin@bikeindex.org", "mailto:admin@bikeindex.org"} (preferably using #{link_to "this GPG key", "#", "data-target" => "#gpgKey", "data-toggle" => "collapse"}).
+  .collapse#gpgKey
+    %pre{ style: "background: #f7f7f9; border: 1px solid #EEEEEE; width: 45em; padding: 1em; line-height: 1.2; font-size: 90%;" }
+      = render partial: "security_gpg_key.txt"
+  %p
+    When researching, please don't: Spam us, DOS or DDOS us or social engineer (including phishing) our staff or contractors.
+
+  %h2
+    Protecting against data loss and downtime
+  %p
+    Bike Index backs up its database hourly and daily and stores the encrypted backups on a secure system, separate from our application servers.
+  %p
+    Bike Index is hosted on virtualized servers in the cloud. We have failover systems prepared and the ability to redeploy a cloned version of the service using our database backups, to ensure that even in the case of a total server loss, recovery is easily possible. We historically have provided 99.99% uptime and strive to maintain 99.9% in any given month period.
+
+
+  %h2
+    In the case of a breach
+  %p
+    If Bike Index discovers a breach or exposure, we will analyze the breach or exposure to determine the root cause. Bike Index will then work with the appropriate parties to remediate the root cause of the breach or exposure. Once the root cause has been resolved, we will individually contact any affected parties and will publicly share what happened and what we can do to prevent similar events in the future.
+
+  .mt-4
+  %p.less-strong
+    Questions about the Terms of Service should be sent to #{link_to("contact@bikeindex.org", "mailto:contact@bikeindex.org")}.
