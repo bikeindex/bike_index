@@ -6,10 +6,19 @@ AllCops:
     - "db/migrate/**/*"
     - "node_modules/**/*"
 
-Layout:
+Lint/DeprecatedOpenSSLConstant:
   Enabled: false
 
-Metrics/LineLength:
+Lint/MixedRegexpCaptureTypes:
+  Enabled: false
+
+Lint/RaiseException:
+  Enabled: false
+
+Lint/StructNewOverride:
+  Enabled: false
+
+Layout:
   Enabled: false
 
 Metrics/MethodLength:

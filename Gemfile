@@ -145,6 +145,7 @@ group :development do
   gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
+  gem "guard-rubocop", require: false
   gem "letter_opener"
   gem "rerun"
   gem "terminal-notifier"

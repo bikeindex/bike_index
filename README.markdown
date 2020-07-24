@@ -121,7 +121,11 @@ appropriate to your editor.
 
 ### StandardRB
 
-Ruby style guide, linter, and formatter.
+StandardRB is an opinionated Ruby style guide, linter, and formatter - it is "a spiritual port of [StandardJS](https://standardjs.com/)".
+
+See the [how do I run standard in my editor](standardrb-plugin) section of the StandardRB docs to find an appropriate plugin for on-the-fly linting.
+
+[standardrb-plugin]: https://github.com/testdouble/standard#how-do-i-run-standard-in-my-editor
 
 ### ESLint
 
