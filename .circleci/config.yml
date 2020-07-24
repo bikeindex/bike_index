@@ -139,7 +139,7 @@ jobs:
 
       - run:
           name: "Bundler: install"
-          command: gem install bundler -v 1.17.3
+          command: gem install bundler -v 2.1.4
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
