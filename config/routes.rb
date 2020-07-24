@@ -25,7 +25,7 @@ Rails.application.routes.draw do
     end
   end
 
-  get "/", to: redirect(:root_url, subdomain: false), constraints: { subdomain: "stolen" }
+  get "/", to: redirect(:root_url, subdomain: false), constraints: {subdomain: "stolen"}
   root to: "welcome#index"
 
   get "/user_root_url_redirect", to: "welcome#user_root_url_redirect", as: :user_root_url_redirect
@@ -34,7 +34,7 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  %w(
+  %w[
     ambassadors_current
     ambassadors_how_to
     ascend
@@ -46,7 +46,7 @@ Rails.application.routes.draw do
     for_cities
     for_law_enforcement
     for_schools
-  ).freeze.each do |page|
+  ].freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
@@ -55,7 +55,7 @@ Rails.application.routes.draw do
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
-  %w(update_browser choose_registration goodbye bike_creation_graph).freeze.each do |page|
+  %w[update_browser choose_registration goodbye bike_creation_graph].freeze.each do |page|
     get page, controller: "welcome", action: page
   end
 
@@ -95,7 +95,7 @@ Rails.application.routes.draw do
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
-  %w(support contact contact_us).each { |p| get p, to: redirect("/help") }
+  %w[support contact contact_us].each { |p| get p, to: redirect("/help") }
 
   resources :users, only: %i[new create show edit update] do
     collection do
@@ -153,7 +153,7 @@ Rails.application.routes.draw do
   get "stickers/:scanned_id", to: "bikes#scanned"
 
   resources :bike_stickers, only: [:update]
-  resources :locks, except: %[show index]
+  resources :locks, except: %(show index)
 
   namespace :admin do
     root to: "dashboard#index", as: :root
@@ -186,8 +186,8 @@ Rails.application.routes.draw do
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers,
-              :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
-              :ctypes, :parking_notifications, :impound_records, :graduated_notifications
+      :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
+      :ctypes, :parking_notifications, :impound_records, :graduated_notifications
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
@@ -239,11 +239,11 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :edit, :update, :destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-          constraints: AdminRestriction,
-          as: :feature_flags
+          :constraints => AdminRestriction,
+          :as => :feature_flags
   end
 
-  namespace :api, defaults: { format: "json" } do
+  namespace :api, defaults: {format: "json"} do
     get "/", to: redirect("/documentation")
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
@@ -295,15 +295,15 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "integrations#create"
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
-  %w(support_bike_index support_the_index support_the_bike_index protect_your_bike
-     serials about where vendor_terms resources image_resources privacy terms
-     how_not_to_buy_stolen dev_and_design lightspeed).freeze.each do |page|
+  %w[support_bike_index support_the_index support_the_bike_index protect_your_bike
+    serials about where vendor_terms resources image_resources privacy terms security_policy
+    how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end
   get "lightspeed_integration", to: redirect("/lightspeed")
   resources :info, only: [:show]
 
-  %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect("/resources") }
+  %w[stolen_bikes roadmap security spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
 
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all
@@ -311,7 +311,7 @@ Rails.application.routes.draw do
   get "/422", to: "errors#unprocessable_entity", via: :all
   get "/500", to: "errors#server_error", via: :all
 
-  mount Sidekiq::Web => "/sidekiq", constraints: AdminRestriction
+  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
 
   # No actions are defined here, this `resources` declaration
   # prepends a :organization_id/ to every nested URL.

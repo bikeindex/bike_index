@@ -119,7 +119,6 @@ ignore:
   - app/controllers/concerns/sortable_table.rb
   - app/controllers/discourse_authentication_controller.rb
   - app/controllers/feedbacks_controller.rb
-  - app/controllers/info_controller.rb
   - app/controllers/integrations_controller.rb
   - app/controllers/locks_controller.rb
   - app/controllers/news_controller.rb
@@ -311,8 +310,6 @@ ignore:
   - config/initializers/sidekiq.rb
   - config/initializers/stripe.rb
   - config/puma.rb
-  - config/routes.rb
-  - config/sitemap.rb
   - db/migrate/20190206044915_add_listing_order_index_to_bikes.rb
   - db/migrate/20190617174200_add_unique_index_to_ambassador_task_assignments.rb
   - db/migrate/20190829221522_create_twitter_accounts.rb
