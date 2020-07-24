@@ -22,18 +22,18 @@ RSpec.describe Integration, type: :model do
       end
 
       it "creates a user, associate it if the emails match and run new user tasks" do
-        expect do
+        expect {
           expect_any_instance_of(AfterUserCreateWorker).to receive(:perform_confirmed_jobs)
           FactoryBot.create(:integration, information: info)
-        end.to change(User, :count).by 1
+        }.to change(User, :count).by 1
       end
 
       it "deletes previous integrations with the same service" do
         integration = FactoryBot.create(:integration, information: info)
         expect(integration.user.confirmed).to be_truthy
-        expect do
+        expect {
           FactoryBot.create(:integration, information: info)
-        end.to change(Integration, :count).by 0
+        }.to change(Integration, :count).by 0
       end
     end
 
@@ -54,18 +54,18 @@ RSpec.describe Integration, type: :model do
       end
 
       it "creates a user, associate it if the emails match and run new user tasks" do
-        expect do
+        expect {
           expect_any_instance_of(AfterUserCreateWorker).to receive(:perform_confirmed_jobs)
           FactoryBot.create(:integration, information: info)
-        end.to change(User, :count).by 1
+        }.to change(User, :count).by 1
       end
 
       it "deletes previous integrations with the same service" do
         integration = FactoryBot.create(:integration, information: info)
         expect(integration.user.confirmed).to be_truthy
-        expect do
+        expect {
           FactoryBot.create(:integration, information: info)
-        end.to change(Integration, :count).by 0
+        }.to change(Integration, :count).by 0
       end
     end
   end

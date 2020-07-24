@@ -41,7 +41,7 @@ RSpec.describe Manufacturer, type: :model do
     it "returns what we expect" do
       manufacturer = FactoryBot.create(:manufacturer)
       result = manufacturer.autocomplete_hash
-      expect(result.keys).to eq(%w(id text category priority data))
+      expect(result.keys).to eq(%w[id text category priority data])
       expect(result["data"]["slug"]).to eq manufacturer.slug
       expect(result["data"]["search_id"]).to eq("m_#{manufacturer.id}")
     end
@@ -85,9 +85,9 @@ RSpec.describe Manufacturer, type: :model do
   describe "import csv" do
     it "adds manufacturers to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
-      expect do
+      expect {
         Manufacturer.import(import_file)
-      end.to change(Manufacturer, :count).by(2)
+      }.to change(Manufacturer, :count).by(2)
     end
 
     it "adds in all the attributes that are listed" do

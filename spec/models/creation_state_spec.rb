@@ -102,18 +102,18 @@ RSpec.describe CreationState, type: :model do
     context "no organization" do
       let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
       it "returns true" do
-        expect do
+        expect {
           creation_state.create_bike_organization
-        end.to change(BikeOrganization, :count).by 0
+        }.to change(BikeOrganization, :count).by 0
       end
     end
     context "with organization" do
       let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
       it "creates the bike_organization" do
         creation_state.organization = organization
-        expect do
+        expect {
           creation_state.create_bike_organization
-        end.to change(BikeOrganization, :count).by 1
+        }.to change(BikeOrganization, :count).by 1
         expect(bike.bike_organizations.first.organization).to eq organization
       end
     end
@@ -126,9 +126,9 @@ RSpec.describe CreationState, type: :model do
       it "does not error or duplicate" do
         FactoryBot.create(:bike_organization, bike: bike, organization: organization)
         creation_state.organization = organization
-        expect do
+        expect {
           creation_state.create_bike_organization
-        end.to change(BikeOrganization, :count).by 0
+        }.to change(BikeOrganization, :count).by 0
       end
     end
     it "has an after_create callback" do
