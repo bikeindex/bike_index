@@ -22,9 +22,9 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "appears_abandoned_notification" do
         let!(:parking_notification) do
           FactoryBot.create(:parking_notification_organized,
-                            organization: current_organization,
-                            kind: "appears_abandoned_notification",
-                            bike: bike)
+            organization: current_organization,
+            kind: "appears_abandoned_notification",
+            bike: bike)
         end
         it "renders" do
           get "#{base_url}/appears_abandoned_notification"
@@ -75,7 +75,7 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "passed id" do
         let!(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization, kind: "parked_incorrectly_notification") }
         it "renders passed id" do
-          get "#{base_url}/parked_incorrectly_notification", params: { parking_notification_id: parking_notification.id }
+          get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification)).to eq parking_notification
@@ -85,16 +85,16 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:parking_notification) { FactoryBot.create(:parking_notification) }
           it "404s" do
-            expect do
-              get "#{base_url}/appears_abandoned_notification", params: { parking_notification_id: parking_notification.id }
-            end.to raise_error(ActiveRecord::RecordNotFound)
+            expect {
+              get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
+            }.to raise_error(ActiveRecord::RecordNotFound)
           end
         end
       end
       context "graduated_notification passed id" do
         let!(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: current_organization) }
         it "renders" do
-          get "#{base_url}/graduated_notification", params: { graduated_notification_id: graduated_notification.id }
+          get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/graduated_notification")
           expect(assigns(:graduated_notification).id).to eq graduated_notification.id
@@ -104,9 +104,9 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:graduated_notification) { FactoryBot.create(:graduated_notification) }
           it "404s" do
-            expect do
-              get "#{base_url}/graduated_notification", params: { graduated_notification_id: graduated_notification.id }
-            end.to raise_error(ActiveRecord::RecordNotFound)
+            expect {
+              get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
+            }.to raise_error(ActiveRecord::RecordNotFound)
           end
         end
       end
@@ -153,14 +153,14 @@ RSpec.describe Organized::EmailsController, type: :request do
       it "creates" do
         expect(current_organization.mail_snippets.count).to eq 0
         put "#{base_url}/impound_notification", params: {
-                                                  organization_id: current_organization.to_param,
-                                                  id: "impound_notification",
-                                                  mail_snippet: {
-                                                    subject: "a fancy custom subject",
-                                                    body: "cool new things",
-                                                    is_enabled: "true",
-                                                  },
-                                                }
+          organization_id: current_organization.to_param,
+          id: "impound_notification",
+          mail_snippet: {
+            subject: "a fancy custom subject",
+            body: "cool new things",
+            is_enabled: "true"
+          }
+        }
         expect(current_organization.mail_snippets.count).to eq 1
         mail_snippet = current_organization.mail_snippets.last
         expect(mail_snippet.kind).to eq "impound_notification"
@@ -171,22 +171,22 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "existing" do
         let!(:mail_snippet) do
           FactoryBot.create(:mail_snippet,
-                            kind: "appears_abandoned_notification",
-                            organization: current_organization,
-                            is_enabled: true,
-                            body: "party")
+            kind: "appears_abandoned_notification",
+            organization: current_organization,
+            is_enabled: true,
+            body: "party")
         end
         it "updates" do
           expect(current_organization.mail_snippets.count).to eq 1
           put "#{base_url}/appears_abandoned_notification", params: {
-                                                    organization_id: current_organization.to_param,
-                                                    id: "appears_abandoned_notification",
-                                                    mail_snippet: {
-                                                      subject: "a fancy custom subject",
-                                                      body: "cool new things",
-                                                      is_enabled: "0",
-                                                    },
-                                                  }
+            organization_id: current_organization.to_param,
+            id: "appears_abandoned_notification",
+            mail_snippet: {
+              subject: "a fancy custom subject",
+              body: "cool new things",
+              is_enabled: "0"
+            }
+          }
           expect(current_organization.mail_snippets.count).to eq 1
           mail_snippet.reload
           expect(mail_snippet.kind).to eq "appears_abandoned_notification"

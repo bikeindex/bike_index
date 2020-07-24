@@ -61,7 +61,7 @@ VCR.configure do |config|
 
   config.default_cassette_options = {
     record: :new_episodes,
-    match_requests_on: [:method, :host, :path],
+    match_requests_on: [:method, :host, :path]
   }
 
   config.before_record do |i|

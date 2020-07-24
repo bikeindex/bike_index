@@ -14,7 +14,7 @@ RSpec.describe Admin::FeedbacksController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, params: { id: subject.to_param }
+      get :show, params: {id: subject.to_param}
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end

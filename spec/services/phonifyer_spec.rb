@@ -91,15 +91,15 @@ RSpec.describe Phonifyer do
 
   describe "components" do
     it "separates into components" do
-      expect(Phonifyer.components("8004782111")).to eq({ number: "8004782111" })
-      expect(Phonifyer.components("8004782111 x1111")).to eq({ number: "8004782111", extension: "1111" })
-      expect(Phonifyer.components("+1 8004782111 x1111")).to eq({ country_code: "1", number: "8004782111", extension: "1111" })
-      expect(Phonifyer.components("+19865352717,;984989999#")).to eq({ country_code: "1", number: "9865352717,;984989999#" })
-      expect(Phonifyer.components("+447802730000 ext.121222")).to eq({ country_code: "44", number: "7802730000", extension: "121222" })
+      expect(Phonifyer.components("8004782111")).to eq({number: "8004782111"})
+      expect(Phonifyer.components("8004782111 x1111")).to eq({number: "8004782111", extension: "1111"})
+      expect(Phonifyer.components("+1 8004782111 x1111")).to eq({country_code: "1", number: "8004782111", extension: "1111"})
+      expect(Phonifyer.components("+19865352717,;984989999#")).to eq({country_code: "1", number: "9865352717,;984989999#"})
+      expect(Phonifyer.components("+447802730000 ext.121222")).to eq({country_code: "44", number: "7802730000", extension: "121222"})
     end
     it "does 7 digit numbers" do
-      expect(Phonifyer.components("0000000")).to eq({ number: "0000000" })
-      expect(Phonifyer.components("0000000 x89999")).to eq({ number: "0000000", extension: "89999" })
+      expect(Phonifyer.components("0000000")).to eq({number: "0000000"})
+      expect(Phonifyer.components("0000000 x89999")).to eq({number: "0000000", extension: "89999"})
     end
   end
 end

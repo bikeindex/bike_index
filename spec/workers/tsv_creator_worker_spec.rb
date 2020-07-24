@@ -21,14 +21,14 @@ RSpec.describe TsvCreatorWorker, type: :job do
         ["create_manufacturer"],
         ["create_stolen_with_reports", true],
         ["create_stolen", true],
-        ["create_daily_tsvs"],
+        ["create_daily_tsvs"]
       ]
     end
     it "creates jobs for the TSV creation" do
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         described_class.new.perform
-      end.to change(described_class.jobs, :size).by(4)
+      }.to change(described_class.jobs, :size).by(4)
       expect(described_class.jobs.map { |j| j["args"] }).to match_array(target_args)
     end
   end

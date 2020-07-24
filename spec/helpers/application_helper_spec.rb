@@ -106,7 +106,7 @@ RSpec.describe ApplicationHelper, type: :helper do
           expect(helper.current_page_skeleton).to be_nil
         end
       end
-      %w(for_law_enfocement for_schools).each do |action|
+      %w[for_law_enfocement for_schools].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -117,7 +117,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "bikes controller" do
       before { allow(view).to receive(:controller_name) { "bikes" } }
-      %w(new create).each do |action|
+      %w[new create].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -125,7 +125,7 @@ RSpec.describe ApplicationHelper, type: :helper do
           end
         end
       end
-      %w(edit update).each do |action|
+      %w[edit update].each do |action|
         context action do
           it "returns edit_bike_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -136,7 +136,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "registrations controller" do
       before { allow(view).to receive(:controller_name) { "registrations" } }
-      %w(new).each do |action|
+      %w[new].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -147,7 +147,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "info controller" do
       before { allow(view).to receive(:controller_name) { "info" } }
-      %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |action|
+      %w[about protect_your_bike where serials image_resources resources dev_and_design].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -161,7 +161,7 @@ RSpec.describe ApplicationHelper, type: :helper do
           expect(helper.current_page_skeleton).to be_nil
         end
       end
-      %w(terms vendor_terms privacy).each do |action|
+      %w[terms vendor_terms privacy].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -172,7 +172,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "news controller" do
       before { allow(view).to receive(:controller_name) { "news" } }
-      %w(index show).each do |action|
+      %w[index show].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -183,7 +183,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "payments controller" do
       before { allow(view).to receive(:controller_name) { "payments" } }
-      %w(new create).each do |action|
+      %w[new create].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -194,7 +194,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "feedbacks controller" do
       before { allow(view).to receive(:controller_name) { "feedbacks" } }
-      %w(index).each do |action|
+      %w[index].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -205,7 +205,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "manufacturers controller" do
       before { allow(view).to receive(:controller_name) { "manufacturers" } }
-      %w(index).each do |action|
+      %w[index].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -216,7 +216,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "welcome controller" do
       before { allow(view).to receive(:controller_name) { "welcome" } }
-      %w(goodbye).each do |action|
+      %w[goodbye].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -266,7 +266,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "stolen controller" do
       before { allow(view).to receive(:controller_name) { "stolen" } }
-      %w(index).each do |action|
+      %w[index].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -277,7 +277,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "errors controller" do
       before { allow(view).to receive(:controller_name) { "errors" } }
-      %w(bad_request not_found unprocessable_entity server_error unauthorized).each do |action|
+      %w[bad_request not_found unprocessable_entity server_error unauthorized].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -354,22 +354,22 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe "sortable_search_params" do
     before { controller.params = ActionController::Parameters.new(passed_params) }
     context "no sortable_search_params" do
-      let(:passed_params) { { party: "stuff" } }
+      let(:passed_params) { {party: "stuff"} }
       it "returns an empty hash" do
         expect(sortable_search_params.to_unsafe_h).to eq({})
       end
     end
     context "direction, sort" do
-      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long" } }
-      let(:target) { { direction: "asc", sort: "stolen" } }
+      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long"} }
+      let(:target) { {direction: "asc", sort: "stolen"} }
       it "returns target hash" do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end
     end
     context "direction, sort, search param" do
       let(:time) { Time.current.to_i }
-      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom" } }
-      let(:target) { { direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom" } }
+      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom"} }
+      let(:target) { {direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom"} }
       it "returns target hash" do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end

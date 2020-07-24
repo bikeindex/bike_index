@@ -8,7 +8,7 @@ RSpec.describe "Bikes API V3", type: :request do
   describe "find by id" do
     it "returns one with from an id" do
       bike = FactoryBot.create(:bike)
-      get "/api/v3/bikes/#{bike.id}", params: { format: :json }
+      get "/api/v3/bikes/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
       expect(json_result["bike"]["id"]).to eq(bike.id)
       expect(response.headers["Content-Type"].match("json")).to be_present
@@ -17,7 +17,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "responds with missing" do
-      get "/api/v3/bikes/10", params: { format: :json }
+      get "/api/v3/bikes/10", params: {format: :json}
       expect(response.code).to eq("404")
       expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Content-Type"].match("json")).to be_present
@@ -36,7 +36,7 @@ RSpec.describe "Bikes API V3", type: :request do
         color: color.name,
         year: "1969",
         owner_email: "fun_times@examples.com",
-        frame_material: "steel",
+        frame_material: "steel"
       }
     end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
@@ -111,7 +111,7 @@ RSpec.describe "Bikes API V3", type: :request do
             rear_wheel_size: old_wheel_size,
             front_wheel_size: old_wheel_size,
             rear_tire_narrow: false,
-            frame_material: "aluminum",
+            frame_material: "aluminum"
           )
           FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
 
@@ -125,7 +125,7 @@ RSpec.describe "Bikes API V3", type: :request do
             year: new_year,
             owner_email: user.email,
             frame_material: "steel",
-            cycle_type_name: new_cycle_type.slug.to_s,
+            cycle_type_name: new_cycle_type.slug.to_s
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
           bike2 = json_result["bike"]
@@ -153,7 +153,7 @@ RSpec.describe "Bikes API V3", type: :request do
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: bike.year,
-            owner_email: bike.owner_email,
+            owner_email: bike.owner_email
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -173,7 +173,7 @@ RSpec.describe "Bikes API V3", type: :request do
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: bike.year,
-            owner_email: bike.owner_email,
+            owner_email: bike.owner_email
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -195,14 +195,14 @@ RSpec.describe "Bikes API V3", type: :request do
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: "2012",
-            owner_email: bike.owner_email,
+            owner_email: bike.owner_email
           }
         end
         it "updates" do
           expect(bike.year).to_not eq 2012
-          expect do
+          expect {
             post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-          end.to_not change(Bike, :count)
+          }.to_not change(Bike, :count)
 
           returned_bike = json_result["bike"]
           expect(response.status).to eq(302)
@@ -216,9 +216,9 @@ RSpec.describe "Bikes API V3", type: :request do
           let(:can_edit_claimed) { false }
           it "creates a new bike" do
             expect(bike.year).to_not eq 2012
-            expect do
+            expect {
               post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-            end.to change(Bike, :count).by 1
+            }.to change(Bike, :count).by 1
 
             returned_bike = json_result["bike"]
             expect(response.status).to eq(201)
@@ -238,7 +238,7 @@ RSpec.describe "Bikes API V3", type: :request do
           manufacturer: manufacturer.name,
           color: color.name,
           year: "1969",
-          owner_email: "bike-serial-01@examples.com",
+          owner_email: "bike-serial-01@examples.com"
         }
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -263,7 +263,7 @@ RSpec.describe "Bikes API V3", type: :request do
           manufacturer: manufacturer.name,
           color: color.name,
           year: "1969",
-          owner_email: "bike-serial-01@example.com",
+          owner_email: "bike-serial-01@example.com"
         }
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -291,7 +291,7 @@ RSpec.describe "Bikes API V3", type: :request do
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,
-          owner_email: user.secondary_emails.first,
+          owner_email: user.secondary_emails.first
         }
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -311,7 +311,7 @@ RSpec.describe "Bikes API V3", type: :request do
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,
-          owner_email: "some-other-owner@example.com",
+          owner_email: "some-other-owner@example.com"
         }
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
@@ -335,13 +335,13 @@ RSpec.describe "Bikes API V3", type: :request do
           component_type: "headset",
           description: "yeah yay!",
           serial_number: "69",
-          model: "Richie rich",
+          model: "Richie rich"
         },
         {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Both",
-          component_type: "wheel",
-        },
+          component_type: "wheel"
+        }
       ]
       bike_attrs.merge!(components: components,
                         front_gear_type_slug: front_gear_type.slug,
@@ -352,9 +352,9 @@ RSpec.describe "Bikes API V3", type: :request do
                         is_pos: true,
                         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
                         description: "<svg/onload=alert(document.cookie)>")
-      expect do
+      expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
       result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
@@ -422,11 +422,11 @@ RSpec.describe "Bikes API V3", type: :request do
         show_address: true,
         state: "NY",
         police_report_number: "99999999",
-        police_report_department: "New York",
+        police_report_department: "New York"
       }
-      expect do
+      expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(json_result).to include("bike")
       expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -446,11 +446,11 @@ RSpec.describe "Bikes API V3", type: :request do
       bike_attrs[:stolen_record] = {
         phone: "",
         theft_description: "I was away for a little bit and suddenly the bike was gone",
-        city: "Chicago",
+        city: "Chicago"
       }
-      expect do
+      expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(json_result).to include("bike")
       expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -479,7 +479,7 @@ RSpec.describe "Bikes API V3", type: :request do
         year: "1969",
         owner_email: "fun_times@examples.com",
         organization_slug: organization.slug,
-        cycle_type: "bike",
+        cycle_type: "bike"
       }
     end
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
@@ -528,9 +528,9 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(ownership.claimed).to be_falsey
             ActionMailer::Base.deliveries = []
             Sidekiq::Worker.clear_all
-            expect do
+            expect {
               post tokenized_url, params: bike_attrs.to_json, headers: json_headers
-            end.to change(Bike, :count).by 1
+            }.to change(Bike, :count).by 1
             result = json_result["bike"]
 
             expect(response.code).to eq("201")
@@ -583,7 +583,7 @@ RSpec.describe "Bikes API V3", type: :request do
         tertiary_frame_color: "orange",
         front_gear_type_slug: "2",
         rear_gear_type_slug: "3",
-        handlebar_type_slug: "front",
+        handlebar_type_slug: "front"
       }
     end
 
@@ -622,14 +622,14 @@ RSpec.describe "Bikes API V3", type: :request do
         city: "Chicago",
         phone: "1234567890",
         show_address: true,
-        police_report_number: "999999",
+        police_report_number: "999999"
       }
       params[:owner_email] = "foo@new_owner.com"
       params[:primary_frame_color] = "orange"
 
-      expect do
+      expect {
         put url, params: params.to_json, headers: json_headers
-      end.to change(Ownership, :count).by(1)
+      }.to change(Ownership, :count).by(1)
 
       expect(response.status).to eq(200)
       expect(bike.reload.year).to eq(params[:year])
@@ -658,31 +658,31 @@ RSpec.describe "Bikes API V3", type: :request do
           year: "1999",
           component_type: "headset",
           description: "C-2",
-          model: "Sram GXP Eagle",
+          model: "Sram GXP Eagle"
         },
         {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
-          description: "C-3",
+          description: "C-3"
         },
         {
           id: comp.id,
-          destroy: true,
+          destroy: true
         },
         {
           id: comp2.id,
           manufacturer: mfg2.id,
           year: "1999",
           serial: "updated-serial",
-          description: "C-1",
-        },
+          description: "C-1"
+        }
       ]
       params[:is_for_sale] = true
       params[:components] = components
 
-      expect do
+      expect {
         put url, params: params.to_json, headers: json_headers
-      end.to change(Ownership, :count).by(0)
+      }.to change(Ownership, :count).by(0)
 
       expect(response.status).to eq(200)
 
@@ -697,13 +697,13 @@ RSpec.describe "Bikes API V3", type: :request do
 
       manufacturers = components.map { |c| [c.description, c.manufacturer&.name] }.compact
       expect(manufacturers).to(match_array([["C-1", "new manufacturer"],
-                                            ["C-2", "new manufacturer"],
-                                            ["C-3", "Other"]]))
+        ["C-2", "new manufacturer"],
+        ["C-3", "Other"]]))
 
       serials = components.map { |c| [c.description, c.serial_number] }.compact
       expect(serials).to(match_array([["C-1", "updated-serial"],
-                                      ["C-2", nil],
-                                      ["C-3", nil]]))
+        ["C-2", nil],
+        ["C-3", nil]]))
     end
 
     it "doesn't remove components that aren't the bikes" do
@@ -713,11 +713,11 @@ RSpec.describe "Bikes API V3", type: :request do
       components = [
         {
           id: comp.id,
-          year: 1999,
+          year: 1999
         }, {
           id: not_urs.id,
-          destroy: true,
-        },
+          destroy: true
+        }
       ]
       params[:components] = components
 
@@ -752,7 +752,7 @@ RSpec.describe "Bikes API V3", type: :request do
       let(:organization) { FactoryBot.create(:organization) }
       let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:params) { { year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"] } }
+      let(:params) { {year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"]} }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
       it "permits updating" do
         bike.reload
@@ -791,9 +791,9 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.user).to eq user
         expect(bike.authorized?(user)).to be_truthy
         expect(bike.owner).not_to eq user
-        expect do
-          put url, params: { owner_email: "newuser@EXAMPLE.com " }.to_json, headers: json_headers
-        end.to change(Ownership, :count).by(1)
+        expect {
+          put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json, headers: json_headers
+        }.to change(Ownership, :count).by(1)
         expect(response.code).to eq("200")
         expect(response.headers["Content-Type"].match("json")).to be_present
         bike.reload
@@ -824,7 +824,7 @@ RSpec.describe "Bikes API V3", type: :request do
       file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
-      post url, params: { file: Rack::Test::UploadedFile.new(file) }
+      post url, params: {file: Rack::Test::UploadedFile.new(file)}
       expect(response.code).to eq("403")
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(bike.reload.public_images.count).to eq(0)
@@ -835,7 +835,7 @@ RSpec.describe "Bikes API V3", type: :request do
       file = File.open(File.join(Rails.root, "spec", "spec_helper.rb"))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
-      post url, params: { file: Rack::Test::UploadedFile.new(file) }
+      post url, params: {file: Rack::Test::UploadedFile.new(file)}
       expect(response.body.match(/not allowed to upload .?.rb/i)).to be_present
       expect(response.code).to eq("401")
       expect(bike.reload.public_images.count).to eq(0)
@@ -846,7 +846,7 @@ RSpec.describe "Bikes API V3", type: :request do
       file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
-      post url, params: { file: Rack::Test::UploadedFile.new(file) }
+      post url, params: {file: Rack::Test::UploadedFile.new(file)}
       expect(response.code).to eq("201")
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(bike.reload.public_images.count).to eq(1)
@@ -880,7 +880,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
   describe "send_stolen_notification" do
     let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
-    let(:params) { { message: "Something I'm sending you" } }
+    let(:params) { {message: "Something I'm sending you"} }
     let(:url) { "/api/v3/bikes/#{bike.id}/send_stolen_notification?access_token=#{token.token}" }
     let!(:token) { create_doorkeeper_token(scopes: "read_user") }
     before { bike.update_attribute :stolen, true }
@@ -909,9 +909,9 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "sends a notification" do
-      expect do
+      expect {
         post url, params: params.to_json, headers: json_headers
-      end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+      }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
     end
   end

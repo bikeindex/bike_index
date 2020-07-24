@@ -4,10 +4,10 @@ FactoryBot.define do
       owner_email { "bike_owner@example.com" }
     end
     creator { FactoryBot.create(:user) }
-    params { { bike: { owner_email: owner_email } } }
+    params { {bike: {owner_email: owner_email}} }
 
     factory :b_param_stolen do
-      params { { bike: { owner_email: owner_email, stolen: true } } }
+      params { {bike: {owner_email: owner_email, stolen: true}} }
     end
 
     factory :organized do
@@ -26,8 +26,8 @@ FactoryBot.define do
               revised_new: true,
               manufacturer_id: manufacturer.id,
               owner_email: owner_email,
-              creation_organization_id: organization.id,
-            },
+              creation_organization_id: organization.id
+            }
           }
         end
       end
@@ -36,8 +36,8 @@ FactoryBot.define do
           {
             bike: {
               owner_email: owner_email,
-              creation_organization_id: organization.id,
-            },
+              creation_organization_id: organization.id
+            }
           }
         end
       end
@@ -47,8 +47,8 @@ FactoryBot.define do
             bike: {
               owner_email: owner_email,
               creation_organization_id: organization.id,
-              stolen: true,
-            },
+              stolen: true
+            }
           }
         end
       end

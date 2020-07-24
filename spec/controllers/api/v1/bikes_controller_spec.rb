@@ -4,7 +4,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "index" do
     it "loads the page and have the correct headers" do
       FactoryBot.create(:bike)
-      get :index, params: { format: :json }
+      get :index, params: {format: :json}
       expect(response.code).to eq("200")
     end
   end
@@ -12,7 +12,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "stolen_ids" do
     it "returns correct code if no org" do
       FactoryBot.create(:color)
-      get :stolen_ids, params: { format: :json }
+      get :stolen_ids, params: {format: :json}
       expect(response.code).to eq("401")
     end
 
@@ -23,7 +23,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       organization = FactoryBot.create(:organization)
       user = FactoryBot.create(:user)
       FactoryBot.create(:membership_claimed, user: user, organization: organization)
-      options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
+      options = {stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
       get :stolen_ids, params: options.as_json
       expect(response.code).to eq("200")
       bikes = JSON.parse(response.body)["bikes"]
@@ -35,7 +35,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "show" do
     it "loads the page" do
       bike = FactoryBot.create(:bike)
-      get :show, params: { id: bike.id, format: :json }
+      get :show, params: {id: bike.id, format: :json}
       expect(response.code).to eq("200")
     end
   end
@@ -75,8 +75,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             description: "Diverge Elite DSW (58)",
             is_pos: true,
             is_new: true,
-            is_bulk: true,
-          },
+            is_bulk: true
+          }
         }
       end
       before do
@@ -103,18 +103,18 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
 
       it "creates a bike and does not duplicate" do
-        expect do
+        expect {
           post :create, params: bike_hash.as_json
-        end.to change(Ownership, :count).by(1)
+        }.to change(Ownership, :count).by(1)
 
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
         expect_matching_created_bike(bike)
         og_ownership = bike.current_ownership
 
-        expect do
+        expect {
           post :create, params: bike_hash.as_json
-        end.to change(Ownership, :count).by 0
+        }.to change(Ownership, :count).by 0
 
         bike.reload
         expect(bike.current_ownership).to eq og_ownership
@@ -129,20 +129,20 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         # We're switching to use numeric id rather than slug, because the slugs change :(
         it "creates correctly" do
           Sidekiq::Testing.inline! do
-            expect do
+            expect {
               post :create, params: bike_hash.merge(organization_slug: organization.id).as_json
-            end.to change(Ownership, :count).by(1)
+            }.to change(Ownership, :count).by(1)
           end
 
           expect(response.code).to eq("200")
           bike = Bike.where(serial_number: "SSOMESERIAL").first
           expect_matching_created_bike(bike)
 
-          expect do
+          expect {
             # And do it a couple more times
             post :create, params: bike_hash
             post :create, params: bike_hash
-          end.to change(Ownership, :count).by 0
+          }.to change(Ownership, :count).by 0
 
           Sidekiq::Worker.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -150,9 +150,9 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         end
         context "with risky email" do
           it "registers but doesn't send an email" do
-            expect do
+            expect {
               post :create, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
-            end.to change(Ownership, :count).by(1)
+            }.to change(Ownership, :count).by(1)
 
             expect(response.code).to eq("200")
             bike = Bike.where(serial_number: "SSOMESERIAL").first
@@ -175,21 +175,21 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "returns correct code if not logged in" do
         c = FactoryBot.create(:color)
-        post :create, params: { bike: { serial_number: "69", color: c.name } }
+        post :create, params: {bike: {serial_number: "69", color: c.name}}
         expect(response.code).to eq("401")
       end
 
       it "returns correct code if bike has errors" do
         c = FactoryBot.create(:color)
-        post :create, params: { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+        post :create, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
         expect(response.code).to eq("422")
       end
 
       it "emails us if it can't create a record" do
         c = FactoryBot.create(:color)
-        expect do
-          post :create, params: { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
-        end.to change(Feedback, :count).by(1)
+        expect {
+          post :create, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
+        }.to change(Feedback, :count).by(1)
       end
 
       it "creates a record and reset example" do
@@ -214,7 +214,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           rear_gear_type_slug: rear_gear_type.slug,
           front_gear_type_slug: front_gear_type.slug,
           handlebar_type_slug: "forward",
-          registered_new: true,
+          registered_new: true
         }
         components = [
           {
@@ -224,25 +224,25 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             cgroup: "Frame and fork",
             description: "yeah yay!",
             serial_number: "69",
-            model_name: "Richie rich",
+            model_name: "Richie rich"
           },
           {
             manufacturer: "BLUE TEETH",
             front_or_rear: "Both",
             cgroup: "Wheels",
-            component_type: "wheel",
-          },
+            component_type: "wheel"
+          }
         ]
         photos = [
           "http://i.imgur.com/lybYl1l.jpg",
-          "http://i.imgur.com/3BGQeJh.jpg",
+          "http://i.imgur.com/3BGQeJh.jpg"
         ]
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          expect do
-            post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos }
-          end.to change(Ownership, :count).by(1)
+          expect {
+            post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
+          }.to change(Ownership, :count).by(1)
         end
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
@@ -260,7 +260,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(component.cmodel_name).to eq("Richie rich")
         expect(bike.public_images.count).to eq(2)
         expect(f_count).to eq(Feedback.count)
-        skipped = %w(send_email frame_size_unit rear_wheel_bsd color example rear_gear_type_slug front_gear_type_slug handlebar_type_slug)
+        skipped = %w[send_email frame_size_unit rear_wheel_bsd color example rear_gear_type_slug front_gear_type_slug handlebar_type_slug]
         bike_attrs.except(*skipped.map(&:to_sym)).each do |attr_name, value|
           pp attr_name unless bike.send(attr_name).to_s == value.to_s
           expect(bike.send(attr_name).to_s).to eq value.to_s
@@ -289,13 +289,13 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           example: true,
           year: "1969",
           owner_email: "fun_times@examples.com",
-          cycle_type: "wheelchair",
+          cycle_type: "wheelchair"
         }
         photos = [
           "http://i.imgur.com/lybYl1l.jpg",
-          "http://bikeindex.org/not_actually_a_thing_404_and_shit",
+          "http://bikeindex.org/not_actually_a_thing_404_and_shit"
         ]
-        post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos }
+        post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
         bike = Bike.where(serial_number: "69 photo-test").first
         expect(bike.public_images.count).to eq(1)
         expect(bike.creation_state.origin).to eq "api_v1"
@@ -320,7 +320,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             owner_email: "fun_times@examples.com",
             stolen: "true",
             phone: "9999999",
-            cycle_type_slug: "bike",
+            cycle_type_slug: "bike"
           }
           stolen_record = {
             date_stolen: "03-01-2013",
@@ -332,13 +332,13 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             police_report_number: "99999999",
             police_report_department: "Chicago",
             locking_description: "some locking description",
-            lock_defeat_description: "broken in some crazy way",
+            lock_defeat_description: "broken in some crazy way"
           }
           ActionMailer::Base.deliveries = []
           Sidekiq::Worker.clear_all
-          expect do
-            post :create, params: { bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
-          end.to change(Ownership, :count).by(1)
+          expect {
+            post :create, params: {bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token}
+          }.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
           expect(bike.creation_state.origin).to eq "api_v1"
@@ -372,13 +372,13 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           frame_material_slug: "Steel",
           handlebar_type_slug: "Other",
           description: "something else",
-          owner_email: "fun_times@examples.com",
+          owner_email: "fun_times@examples.com"
         }
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
-        expect do
-          post :create, params: { bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token }
-        end.to change(Ownership, :count).by(1)
+        expect {
+          post :create, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
+        }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
@@ -405,14 +405,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           rear_wheel_bsd: "559",
           color: FactoryBot.create(:color).name,
           owner_email: "jsoned@examples.com",
-          cycle_type: "tandem",
+          cycle_type: "tandem"
         }
-        options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        options = {bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           post :create, params: options
-        end.to change(Ownership, :count).by(1)
+        }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
@@ -431,14 +431,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           color: FactoryBot.create(:color).name,
           owner_email: "jsoned@examples.com",
           send_email: "false",
-          cycle_type_name: " trailer ",
+          cycle_type_name: " trailer "
         }
-        options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        options = {bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           post :create, params: options
-        end.to change(Ownership, :count).by(1)
+        }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")

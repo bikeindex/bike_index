@@ -1,13 +1,13 @@
 require "rails_helper"
 
-RSpec.describe BikeSerializer, type: :lib  do
+RSpec.describe BikeSerializer, type: :lib do
   let(:subject) { described_class }
-  let(:bike) { FactoryBot.create(:bike, frame_size: '42') }
+  let(:bike) { FactoryBot.create(:bike, frame_size: "42") }
   let(:serializer) { subject.new(bike) }
 
   describe "standard validations" do
     let!(:component) { FactoryBot.create(:component, bike: bike) }
-    let!(:public_image) { FactoryBot.create(:public_image, imageable_type: 'Bike', imageable_id: bike.id) }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable_type: "Bike", imageable_id: bike.id) }
     it "is as expected" do
       expect(serializer.manufacturer_name).to eq(bike.mnfg_name)
       expect(serializer.manufacturer_id).to eq(bike.manufacturer_id)
@@ -27,7 +27,7 @@ RSpec.describe BikeSerializer, type: :lib  do
       expect(serializer.front_gear_type).to eq(bike.front_gear_type)
       expect(serializer.rear_gear_type).to eq(bike.rear_gear_type)
       expect(serializer.stolen_record).to eq(bike.current_stolen_record)
-      expect(serializer.frame_size).to eq('42cm')
+      expect(serializer.frame_size).to eq("42cm")
       # expect(serializer.photo).to == bike.reload.public_images.first.image_url(:large)
       # expect(serializer.thumb).to == bike.reload.public_images.first.image_url(:small)
     end

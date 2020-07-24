@@ -34,13 +34,13 @@ RSpec.describe PaymentsController, type: :controller do
         set_current_user(user)
       end
       it "makes a onetime payment with current user (and renders with revised_layout if suppose to)" do
-        expect do
+        expect {
           post :create, params: {
-                          stripe_token: stripe_token.id,
-                          stripe_email: user.email,
-                          stripe_amount: 4000
-                        }
-        end.to change(Payment, :count).by(1)
+            stripe_token: stripe_token.id,
+            stripe_email: user.email,
+            stripe_amount: 4000
+          }
+        }.to change(Payment, :count).by(1)
         payment = Payment.last
         expect(payment.user_id).to eq(user.id)
         user.reload
@@ -51,15 +51,15 @@ RSpec.describe PaymentsController, type: :controller do
       end
 
       it "signs up for a plan" do
-        expect do
+        expect {
           post :create, params: {
-                          stripe_token: stripe_token.id,
-                          stripe_email: user.email,
-                          stripe_amount: 4000,
-                          stripe_subscription: 1,
-                          stripe_plan: "01"
-                        }
-        end.to change(Payment, :count).by(1)
+            stripe_token: stripe_token.id,
+            stripe_email: user.email,
+            stripe_amount: 4000,
+            stripe_subscription: 1,
+            stripe_plan: "01"
+          }
+        }.to change(Payment, :count).by(1)
         payment = Payment.last
         expect(payment.is_recurring).to be_truthy
         expect(payment.user_id).to eq user.id
@@ -73,15 +73,15 @@ RSpec.describe PaymentsController, type: :controller do
 
     context "email of signed up user" do
       it "makes a onetime payment with email for signed up user" do
-        expect do
+        expect {
           post :create, params: {
-                          stripe_token: stripe_token.id,
-                          stripe_amount: 4000,
-                          stripe_email: user.email,
-                          stripe_plan: "",
-                          stripe_subscription: ""
-                        }
-        end.to change(Payment, :count).by(1)
+            stripe_token: stripe_token.id,
+            stripe_amount: 4000,
+            stripe_email: user.email,
+            stripe_plan: "",
+            stripe_subscription: ""
+          }
+        }.to change(Payment, :count).by(1)
         payment = Payment.last
         expect(payment.user_id).to eq(user.id)
         user.reload
@@ -94,14 +94,14 @@ RSpec.describe PaymentsController, type: :controller do
     end
     context "no user email on file" do
       it "makes a onetime payment with no user, but associate with stripe" do
-        expect do
+        expect {
           post :create, params: {
-                          stripe_token: stripe_token.id,
-                          stripe_amount: 4000,
-                          stripe_email: "test_user@test.com",
-                          is_payment: 1
-                        }
-        end.to change(Payment, :count).by(1)
+            stripe_token: stripe_token.id,
+            stripe_amount: 4000,
+            stripe_email: "test_user@test.com",
+            is_payment: 1
+          }
+        }.to change(Payment, :count).by(1)
         payment = Payment.last
         expect(payment.email).to eq("test_user@test.com")
         expect(payment.stripe_id).to be_present

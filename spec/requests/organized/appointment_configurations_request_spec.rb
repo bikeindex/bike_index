@@ -74,13 +74,13 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
       it "turns it on" do
         expect(location.appointment_configuration.present?).to be_falsey
         put "#{base_url}/#{location.to_param}", params: {
-                                                  id: location.to_param,
-                                                  appointment_configuration: {
-                                                    virtual_line_on: "true",
-                                                    reasons_text: "something, Something ELSE\n aNOTHER,",
-                                                    customers_on_deck_count: "22",
-                                                  },
-                                                }
+          id: location.to_param,
+          appointment_configuration: {
+            virtual_line_on: "true",
+            reasons_text: "something, Something ELSE\n aNOTHER,",
+            customers_on_deck_count: "22"
+          }
+        }
         location.reload
         expect(location.appointment_configuration.present?).to be_truthy
         appointment_configuration = location.appointment_configuration

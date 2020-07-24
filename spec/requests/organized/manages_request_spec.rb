@@ -35,9 +35,9 @@ RSpec.describe Organized::ManagesController, type: :request do
 
     describe "standard organization" do
       it "does not destroy" do
-        expect do
+        expect {
           delete base_url
-        end.to change(Organization, :count).by(0)
+        }.to change(Organization, :count).by(0)
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -87,7 +87,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false,
+            is_paid: false
           }
         end
         let(:user_2) { FactoryBot.create(:organization_member, organization: current_organization) }
@@ -108,7 +108,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
-            locations_attributes: [],
+            locations_attributes: []
           }
         end
         # Website is also permitted, but we're manually setting it
@@ -118,7 +118,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           current_organization.update_attributes(org_attributes)
         end
         it "updates, sends message about maps" do
-          put base_url, params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
+          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes}
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
@@ -163,7 +163,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 publicly_visible: "1",
                 impound_location: "false",
                 default_impound_location: "0",
-                _destroy: 0,
+                _destroy: 0
               },
               Time.current.to_i.to_s => {
                 created_at: Time.current.to_f.to_s,
@@ -180,9 +180,9 @@ RSpec.describe Organized::ManagesController, type: :request do
                 organization_id: 844,
                 publicly_visible: "0",
                 impound_location: "true",
-                default_impound_location: "0",
-              },
-            },
+                default_impound_location: "0"
+              }
+            }
           }
         end
         before do
@@ -193,16 +193,16 @@ RSpec.describe Organized::ManagesController, type: :request do
         context "update" do
           it "updates and adds the locations and shows on map" do
             expect(current_organization.kind).to_not eq "ambassador"
-            expect do
-              put base_url, params: { organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes }
-            end.to change(Location, :count).by 1
+            expect {
+              put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes}
+            }.to change(Location, :count).by 1
             current_organization.reload
             expect(current_organization.show_on_map).to be_truthy
             expect(current_organization.kind).to_not eq "ambassador"
             # Existing location is updated
             location1.reload
             expect(location1.organization).to eq current_organization
-            skipped_location_attrs = %i(latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location)
+            skipped_location_attrs = %i[latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location]
             expect_attrs_to_match_hash(location1, update_attributes[:locations_attributes]["0"].except(*skipped_location_attrs))
             expect(location1.publicly_visible).to be_truthy
             expect(location1.impound_location).to be_falsey
@@ -229,11 +229,11 @@ RSpec.describe Organized::ManagesController, type: :request do
           let!(:organization2) { FactoryBot.create(:organization, short_name: "cool short name") }
           it "doesn't update" do
             put base_url,
-                params: {
-                  organization_id: current_organization.to_param,
-                  id: current_organization.to_param,
-                  organization: { kind: "property_management", short_name: "cool short name" },
-                }
+              params: {
+                organization_id: current_organization.to_param,
+                id: current_organization.to_param,
+                organization: {kind: "property_management", short_name: "cool short name"}
+              }
 
             expect(assigns[:page_errors]).to be_present
             current_organization.reload
@@ -248,15 +248,15 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location1).to be_present
             expect(current_organization.locations.count).to eq 1
 
-            expect do
+            expect {
               put base_url,
-                  params: {
-                    organization_id: current_organization.to_param,
-                    id: current_organization.to_param,
-                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
-                  }
+                params: {
+                  organization_id: current_organization.to_param,
+                  id: current_organization.to_param,
+                  organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                }
               # Because we added 1 location and deleted 1 location
-            end.to change(Location, :count).by 0
+            }.to change(Location, :count).by 0
 
             current_organization.reload
             expect(Location.where(id: location1.id).count).to eq 0
@@ -278,14 +278,14 @@ RSpec.describe Organized::ManagesController, type: :request do
               expect(location1.destroy_forbidden?).to be_truthy
               expect(current_organization.locations.count).to eq 1
 
-              expect do
+              expect {
                 put base_url,
-                    params: {
-                      organization_id: current_organization.to_param,
-                      id: current_organization.to_param,
-                      organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name"),
-                    }
-              end.to raise_error(/appointment/)
+                  params: {
+                    organization_id: current_organization.to_param,
+                    id: current_organization.to_param,
+                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                  }
+              }.to raise_error(/appointment/)
 
               current_organization.reload
               expect(Location.where(id: location1.id).count).to eq 1
@@ -305,7 +305,7 @@ RSpec.describe Organized::ManagesController, type: :request do
               street: "1300 W 14th Pl",
               phone: "7272772727272",
               email: "stuff@goooo.com",
-              publicly_visible: false,
+              publicly_visible: false
             }
           end
           let(:state) { FactoryBot.create(:state_illinois) }
@@ -317,14 +317,14 @@ RSpec.describe Organized::ManagesController, type: :request do
               Sidekiq::Worker.clear_all
               # Need to inline to process UpdateOrganizationAssociationsWorker
               Sidekiq::Testing.inline! do
-                expect do
+                expect {
                   patch base_url,
-                        params: {
-                          organization_id: current_organization.to_param,
-                          id: current_organization.to_param,
-                          organization: { locations_attributes: { Time.current.to_i.to_s => update_attributes } },
-                        }
-                end.to change(Location, :count).by 1
+                    params: {
+                      organization_id: current_organization.to_param,
+                      id: current_organization.to_param,
+                      organization: {locations_attributes: {Time.current.to_i.to_s => update_attributes}}
+                    }
+                }.to change(Location, :count).by 1
               end
             end
 
@@ -347,9 +347,9 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "standard organization" do
         it "destroys" do
           expect_any_instance_of(AdminNotifier).to receive(:for_organization).with(organization: current_organization, user: current_user, type: "organization_destroyed")
-          expect do
+          expect {
             delete base_url
-          end.to change(Organization, :count).by(-1)
+          }.to change(Organization, :count).by(-1)
           expect(response).to redirect_to user_root_url
           expect(flash[:info]).to be_present
         end
@@ -357,9 +357,9 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "paid organization" do
         it "does not destroy" do
           current_organization.update_attribute :is_paid, true
-          expect do
+          expect {
             delete base_url
-          end.to change(Organization, :count).by(0)
+          }.to change(Organization, :count).by(0)
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:info]).to be_present
         end

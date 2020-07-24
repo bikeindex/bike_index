@@ -13,7 +13,7 @@ RSpec.shared_context :geocoder_default_location do
       neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
-      zipcode: "10007",
+      zipcode: "10007"
     }
   end
 
@@ -26,14 +26,14 @@ RSpec.shared_context :geocoder_default_location do
       zipcode: "10007",
       country: "US",
       latitude: 40.7143528,
-      longitude: -74.0059731,
+      longitude: -74.0059731
     }.as_json
   end
 
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],
-      cache_hit: true,
+      cache_hit: true
     }
   end
   let(:legacy_production_ip_search_result) { [geo_hash] }
@@ -45,7 +45,7 @@ RSpec.shared_context :geocoder_default_location do
       39.989124784445764,
       -74.96065051723293,
       41.43644261555424,
-      -73.05123208276707,
+      -73.05123208276707
     ]
   end
 

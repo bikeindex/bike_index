@@ -15,19 +15,19 @@ RSpec.describe AdminHelper, type: :helper do
     end
 
     context "period all" do
-      let(:passed_params) { { period: "all", timezone: "Party" } }
+      let(:passed_params) { {period: "all", timezone: "Party"} }
       it "is false" do
         expect(helper.admin_nav_select_link_active[:match_controller]).to be_truthy
         expect(helper.admin_nav_display_view_all).to be_falsey
       end
       context "with sort" do
-        let(:passed_params) { { direction: "desc", render_chart: "true", sort: "manufacturer_id" } }
+        let(:passed_params) { {direction: "desc", render_chart: "true", sort: "manufacturer_id"} }
         it "is false" do
           expect(helper.admin_nav_display_view_all).to be_falsey
         end
       end
       context "with period != all" do
-        let(:passed_params) { { period: "week", timezone: "Party" } }
+        let(:passed_params) { {period: "week", timezone: "Party"} }
         it "is true" do
           expect(helper.admin_nav_display_view_all).to be_truthy
         end

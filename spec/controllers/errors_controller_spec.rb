@@ -11,7 +11,7 @@ RSpec.describe ErrorsController, type: :controller do
 
   describe "unauthorized" do
     it "renders" do
-      get :unauthorized, params: { format: :json }
+      get :unauthorized, params: {format: :json}
       expect(response.status).to eq(401)
       expect(response).to render_template(:unauthorized)
     end
@@ -27,7 +27,7 @@ RSpec.describe ErrorsController, type: :controller do
 
   describe "unprocessable_entity" do
     it "renders" do
-      get :unprocessable_entity, params: { format: :json }
+      get :unprocessable_entity, params: {format: :json}
       expect(response.status).to eq(422)
       expect(response).to render_template(:unprocessable_entity)
     end

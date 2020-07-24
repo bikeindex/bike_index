@@ -94,16 +94,16 @@ RSpec.describe Organized::HotSheetsController, type: :request do
               is_on: true,
               send_hour: current_hour.floor.to_s,
               timezone_str: "America/Guatemala",
-              search_radius_miles: "1000.1",
-            },
+              search_radius_miles: "1000.1"
+            }
           }
         end
         it "creates and enables the features we expect" do
           expect(current_organization.hot_sheet_configuration).to be_blank
           Sidekiq::Worker.clear_all
-          expect do
+          expect {
             put base_url, params: enabled_params
-          end.to change(HotSheetConfiguration, :count).by 1
+          }.to change(HotSheetConfiguration, :count).by 1
           expect(flash[:success]).to be_present
           current_organization.reload
           expect(current_organization.hot_sheet_on?).to be_truthy
@@ -122,9 +122,9 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           it "does not send again" do
             expect(current_organization.hot_sheet_configuration).to eq hot_sheet_configuration
             Sidekiq::Worker.clear_all
-            expect do
+            expect {
               put base_url, params: enabled_params
-            end.to_not change(HotSheetConfiguration, :count)
+            }.to_not change(HotSheetConfiguration, :count)
             expect(flash[:success]).to be_present
             current_organization.reload
             hot_sheet_configuration.reload
@@ -146,16 +146,16 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         it "turns off if set off" do
           current_organization.update(search_radius: 101)
           Sidekiq::Worker.clear_all
-          expect do
+          expect {
             put base_url, params: {
-                            hot_sheet_configuration: {
-                              is_on: "false",
-                              send_hour: 26,
-                              timezone_str: "Some weird thing",
-                              search_radius_kilometers: 401.5,
-                            },
-                          }
-          end.to_not change(HotSheetConfiguration, :count)
+              hot_sheet_configuration: {
+                is_on: "false",
+                send_hour: 26,
+                timezone_str: "Some weird thing",
+                search_radius_kilometers: 401.5
+              }
+            }
+          }.to_not change(HotSheetConfiguration, :count)
           expect(flash[:success]).to be_present
           current_organization.reload
           hot_sheet_configuration.reload

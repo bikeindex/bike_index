@@ -5,9 +5,9 @@ RSpec.describe OrgPublic::WalkrightupController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
-    expect do
+    expect {
       get "/some-known-organization/walkrightup"
-    end.to raise_error(ActiveRecord::RecordNotFound)
+    }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   context "organization not found" do

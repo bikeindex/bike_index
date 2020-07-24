@@ -26,7 +26,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
           name: @manufacturer.name,
           company_url: "",
           id: @manufacturer.id,
-          short_name: "AAGiant",
+          short_name: "AAGiant"
         }
       end
       it "responds with frame_makers only" do

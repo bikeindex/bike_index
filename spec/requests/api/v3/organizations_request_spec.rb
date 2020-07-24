@@ -16,7 +16,7 @@ RSpec.describe "Organization API V3", type: :request do
         city: "Portland",
         country: state.country.name,
         state: state.name,
-        zipcode: "97215",
+        zipcode: "97215"
       }
     }
     let(:location_2) {
@@ -27,7 +27,7 @@ RSpec.describe "Organization API V3", type: :request do
         city: "Portland",
         state: state.name,
         country: state.country.name,
-        zipcode: "97214",
+        zipcode: "97214"
       }
     }
     let(:organization_attrs) do
@@ -35,7 +35,7 @@ RSpec.describe "Organization API V3", type: :request do
         name: "Geoff's Bike Shop",
         kind: "bike_shop",
         website: "https://bikes.geoffereth.com",
-        locations: [location_1, location_2],
+        locations: [location_1, location_2]
       }
     end
     let(:organization_json) { organization_attrs.to_json }
@@ -63,7 +63,7 @@ RSpec.describe "Organization API V3", type: :request do
           ENV["ALLOWED_WRITE_ORGANIZATIONS"] = "some-other-uid"
           post url, params: organization_json, headers: json_headers
           expect(response.code).to eq("401")
-          expect(json_result.except("trace")).to eq({ error: "Unauthorized. Cannot write organizations" }.as_json)
+          expect(json_result.except("trace")).to eq({error: "Unauthorized. Cannot write organizations"}.as_json)
         end
       end
     end
@@ -77,28 +77,28 @@ RSpec.describe "Organization API V3", type: :request do
         post url, params: {}, headers: json_headers
         expect(response).to_not be_successful
         expect(response.code).to eq("400")
-        expect(json_result.except("trace")).to eq({ error: "name is missing, website is missing, kind is missing, kind does not have a valid value" }.as_json)
+        expect(json_result.except("trace")).to eq({error: "name is missing, website is missing, kind is missing, kind does not have a valid value"}.as_json)
       end
 
       it "requires a valid kind" do
         org_json = organization_attrs.merge(kind: "The best kind ever").to_json
         post url, params: org_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(json_result.except("trace")).to eq({ error: "kind does not have a valid value" }.as_json)
+        expect(json_result.except("trace")).to eq({error: "kind does not have a valid value"}.as_json)
       end
 
       it "forbids creating non-privileged organization kinds" do
         org_json = organization_attrs.merge(kind: "ambassador").to_json
         post url, params: org_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(json_result.except("trace")).to eq({ error: "kind does not have a valid value"  }.as_json)
+        expect(json_result.except("trace")).to eq({error: "kind does not have a valid value"}.as_json)
       end
 
       it "requires a valid website" do
         org_json = organization_attrs.merge(website: "funtimes://everyday.com").to_json
         post url, params: org_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(json_result.except("trace")).to eq({ error: "website is invalid" }.as_json)
+        expect(json_result.except("trace")).to eq({error: "website is invalid"}.as_json)
       end
 
       context "successful" do
@@ -109,16 +109,16 @@ RSpec.describe "Organization API V3", type: :request do
               website: "https://bikes.geoffereth.com",
               kind: "bike_shop",
               locations: [
-                { address: "1111 SE Belmont Street, Portland, OR 97215, United States" }.merge(location_1),
-                { address: "2222 SE Morrison Street, Portland, OR 97214, United States" }.merge(location_2),
-              ],
+                {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
+                {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
+              ]
             }
           }
         end
         it "creates a new organization with locations" do
-          expect do
+          expect {
             post url, params: organization_json, headers: json_headers
-          end.to change(Organization, :count).by 1
+          }.to change(Organization, :count).by 1
           expect(response).to be_created
           expect(response.code).to eq("201")
           expect(json_result).to eq target_response.as_json
@@ -133,11 +133,11 @@ RSpec.describe "Organization API V3", type: :request do
         end
 
         context "invalid state" do
-          let(:target_response) {{ error: "locations[0][state] does not have a valid value, locations[0][country] does not have a valid value" }}
+          let(:target_response) { {error: "locations[0][state] does not have a valid value, locations[0][country] does not have a valid value"} }
           it "requires a valid state and country name" do
             location_attrs = location_1.merge(
               state: "The best state ever",
-              country: "The best country ever",
+              country: "The best country ever"
             )
             org_json = organization_attrs.merge(locations: [location_attrs]).to_json
             post url, params: org_json, headers: json_headers
@@ -148,9 +148,9 @@ RSpec.describe "Organization API V3", type: :request do
         end
 
         context "missing things" do
-          let(:target_response) {{ error: "locations[0][name] is missing, locations[0][street] is missing, locations[0][city] is missing, locations[0][state] is missing, locations[0][country] is missing" }}
+          let(:target_response) { {error: "locations[0][name] is missing, locations[0][street] is missing, locations[0][city] is missing, locations[0][state] is missing, locations[0][country] is missing"} }
           it "requires name, street, city, state, and country" do
-            org_json = organization_attrs.merge!(locations: [{ foo: "bar" }]).to_json
+            org_json = organization_attrs.merge!(locations: [{foo: "bar"}]).to_json
             post url, params: org_json, headers: json_headers
             expect(response).to_not be_successful
             expect(response.code).to eq("400")

@@ -19,18 +19,18 @@ RSpec.describe EmailConfirmationWorker, type: :job do
       expect(user1.email).to eq user2.email
       expect(user1.id).to be < user2.id
       ActionMailer::Base.deliveries = []
-      expect do
+      expect {
         EmailConfirmationWorker.new.perform(user2.id)
-      end.to change(User, :count).by(-1)
+      }.to change(User, :count).by(-1)
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
     end
     context "calling other user" do
       it "does not delete the other user" do
         expect(user1.id).to be < user2.id
         ActionMailer::Base.deliveries = []
-        expect do
+        expect {
           EmailConfirmationWorker.new.perform(user1.id)
-        end.to change(User, :count).by(0)
+        }.to change(User, :count).by(0)
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
     end
@@ -41,18 +41,18 @@ RSpec.describe EmailConfirmationWorker, type: :job do
       let(:created_at) { Time.current - 30.seconds }
       it "doesn't resend" do
         ActionMailer::Base.deliveries = []
-        expect do
+        expect {
           EmailConfirmationWorker.new.perform(user.id)
-        end.to change(Notification, :count).by(0)
+        }.to change(Notification, :count).by(0)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
       context "sent 1:10 seconds ago" do
         let(:created_at) { Time.current - 70.seconds }
         it "resends" do
           ActionMailer::Base.deliveries = []
-          expect do
+          expect {
             EmailConfirmationWorker.new.perform(user.id)
-          end.to change(Notification, :count).by(1)
+          }.to change(Notification, :count).by(1)
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           notification2 = Notification.last
           expect(notification2.user).to eq user
@@ -63,9 +63,9 @@ RSpec.describe EmailConfirmationWorker, type: :job do
         let(:delivery_status) { nil }
         it "resends, updates existing notification" do
           ActionMailer::Base.deliveries = []
-          expect do
+          expect {
             EmailConfirmationWorker.new.perform(user.id)
-          end.to change(Notification, :count).by(0)
+          }.to change(Notification, :count).by(0)
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           notification.reload
           expect(notification.email_success?).to be_truthy

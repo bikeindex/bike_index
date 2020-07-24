@@ -12,12 +12,12 @@ RSpec.describe Admin::CustomerContactsController, type: :controller do
         bike_id: stolen_record.bike.id,
         title: "some title",
         body: "some message",
-        kind: :stolen_contact,
+        kind: :stolen_contact
       }
       set_current_user(user)
-      expect do
-        post :create, params: { customer_contact: customer_contact }
-      end.to change(EmailAdminContactStolenWorker.jobs, :size).by(1)
+      expect {
+        post :create, params: {customer_contact: customer_contact}
+      }.to change(EmailAdminContactStolenWorker.jobs, :size).by(1)
       expect(response).to redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
     end
   end

@@ -96,7 +96,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         tweet_account_name: "Bike Index",
         tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
         location: "Everywhere",
-        retweet_screen_names: %w(someother_screename and_another),
+        retweet_screen_names: %w[someother_screename and_another]
       }
     end
     let(:customer_contact) { FactoryBot.create(:customer_contact, info_hash: notification_hash, title: "CUSTOM CUSTOMER contact Title", bike: bike) }

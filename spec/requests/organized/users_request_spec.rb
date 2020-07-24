@@ -6,7 +6,7 @@ RSpec.describe Organized::UsersController, type: :request do
     include_context :request_spec_logged_in_as_organization_member
     describe "index" do
       it "redirects" do
-        get base_url, params: { organization_id: current_organization.to_param }
+        get base_url, params: {organization_id: current_organization.to_param}
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -14,7 +14,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "new" do
       it "redirects" do
-        get "#{base_url}/new", params: { organization_id: current_organization.to_param }
+        get "#{base_url}/new", params: {organization_id: current_organization.to_param}
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -27,14 +27,14 @@ RSpec.describe Organized::UsersController, type: :request do
           {
             role: "admin",
             name: "something",
-            invited_email: "new_bike_email@bike_shop.com",
+            invited_email: "new_bike_email@bike_shop.com"
           }
         end
         it "does not update" do
           put "#{base_url}/#{membership.id}", params: {
-                                                organization_id: current_organization.to_param,
-                                                membership: membership_params,
-                                              }
+            organization_id: current_organization.to_param,
+            membership: membership_params
+          }
           expect(response).to redirect_to(organization_root_path)
           expect(flash[:error]).to be_present
           expect(membership.role).to eq "member"
@@ -57,7 +57,7 @@ RSpec.describe Organized::UsersController, type: :request do
         expect(current_organization.memberships.admin_text_search("jill").pluck(:user_id)).to eq([user2.id])
         expect(current_organization.memberships.admin_text_search("monica").pluck(:user_id)).to eq([user2.id])
 
-        get base_url, params: { query: "jill@" }
+        get base_url, params: {query: "jill@"}
         expect(assigns(:memberships).pluck(:user_id)).to match_array([user2.id])
 
         get "#{base_url}?query=mo"
@@ -67,7 +67,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "new" do
       it "renders the page" do
-        get "#{base_url}/new", params: { organization_id: current_organization.to_param }
+        get "#{base_url}/new", params: {organization_id: current_organization.to_param}
         expect(response.code).to eq("200")
         expect(response).to render_template :new
       end
@@ -77,7 +77,7 @@ RSpec.describe Organized::UsersController, type: :request do
       context "membership" do
         let(:membership) { FactoryBot.create(:membership_claimed, organization: current_organization) }
         it "renders the page" do
-          get "#{base_url}/#{membership.id}/edit", params: { organization_id: current_organization.to_param }
+          get "#{base_url}/#{membership.id}/edit", params: {organization_id: current_organization.to_param}
           expect(assigns(:membership)).to eq membership
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
@@ -89,10 +89,10 @@ RSpec.describe Organized::UsersController, type: :request do
       context "membership" do
         context "other valid membership" do
           let(:membership) { FactoryBot.create(:membership_claimed, organization: current_organization, role: "member") }
-          let(:membership_params) { { role: "admin", user_id: 333 } }
+          let(:membership_params) { {role: "admin", user_id: 333} }
           it "updates the role" do
             og_user = membership.user
-            put "#{base_url}/#{membership.id}", params: { membership: membership_params }
+            put "#{base_url}/#{membership.id}", params: {membership: membership_params}
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
             membership.reload
@@ -103,7 +103,7 @@ RSpec.describe Organized::UsersController, type: :request do
         context "marking self member" do
           let(:membership) { current_user.memberships.first }
           it "does not update the membership" do
-            put "#{base_url}/#{membership.id}", params: { organization_id: current_organization.to_param, membership: { role: "member" } }
+            put "#{base_url}/#{membership.id}", params: {organization_id: current_organization.to_param, membership: {role: "member"}}
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
             membership.reload
@@ -120,9 +120,9 @@ RSpec.describe Organized::UsersController, type: :request do
         it "destroys" do
           expect(membership.claimed?).to be_falsey
           count = current_organization.remaining_invitation_count
-          expect do
+          expect {
             delete "#{base_url}/#{membership.id}"
-          end.to change(Membership, :count).by(-1)
+          }.to change(Membership, :count).by(-1)
           expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
@@ -135,9 +135,9 @@ RSpec.describe Organized::UsersController, type: :request do
           it "destroys the membership" do
             expect(membership.claimed?).to be_truthy
             count = current_organization.remaining_invitation_count
-            expect do
+            expect {
               delete "#{base_url}/#{membership.id}"
-            end.to change(Membership, :count).by(-1)
+            }.to change(Membership, :count).by(-1)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
             current_organization.reload
@@ -148,9 +148,9 @@ RSpec.describe Organized::UsersController, type: :request do
           let(:membership) { current_user.memberships.first }
           it "does not destroy" do
             count = current_organization.remaining_invitation_count
-            expect do
+            expect {
               delete "#{base_url}/#{membership.id}"
-            end.to change(Membership, :count).by(0)
+            }.to change(Membership, :count).by(0)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
             current_organization.reload
@@ -165,14 +165,14 @@ RSpec.describe Organized::UsersController, type: :request do
       let(:membership_params) do
         {
           role: "member",
-          invited_email: "bike_email@bike_shop.com",
+          invited_email: "bike_email@bike_shop.com"
         }
       end
       context "no email" do
         it "fails" do
-          expect do
-            post base_url, params: { membership: membership_params.merge(invited_email: " ") }
-          end.to change(Membership, :count).by(0)
+          expect {
+            post base_url, params: {membership: membership_params.merge(invited_email: " ")}
+          }.to change(Membership, :count).by(0)
           expect(assigns(:membership).errors.full_messages).to be_present
         end
       end
@@ -182,9 +182,9 @@ RSpec.describe Organized::UsersController, type: :request do
             ActionMailer::Base.deliveries = []
             expect(current_organization.remaining_invitation_count).to eq 4
             expect(User.count).to eq 2
-            expect do
-              post base_url, params: { membership: membership_params }
-            end.to change(Membership, :count).by(1)
+            expect {
+              post base_url, params: {membership: membership_params}
+            }.to change(Membership, :count).by(1)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
             current_organization.reload
@@ -204,9 +204,9 @@ RSpec.describe Organized::UsersController, type: :request do
       context "no available invitations" do
         let(:current_organization) { FactoryBot.create(:organization, available_invitation_count: 1) }
         it "does not create a new membership" do
-          expect do
-            post base_url, params: { membership: membership_params }
-          end.to change(Membership, :count).by(0)
+          expect {
+            post base_url, params: {membership: membership_params}
+          }.to change(Membership, :count).by(0)
           expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
           expect(flash[:error]).to be_present
         end
@@ -218,9 +218,9 @@ RSpec.describe Organized::UsersController, type: :request do
             ActionMailer::Base.deliveries = []
             expect(current_organization.remaining_invitation_count).to eq 0
             expect(current_organization.restrict_invitations?).to be_falsey
-            expect do
-              post base_url, params: { membership: membership_params }
-            end.to change(Membership, :count).by 1
+            expect {
+              post base_url, params: {membership: membership_params}
+            }.to change(Membership, :count).by 1
             expect(ActionMailer::Base.deliveries.count).to eq 0 # Because passwordless users
           end
         end
@@ -232,12 +232,12 @@ RSpec.describe Organized::UsersController, type: :request do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
             expect(current_organization.remaining_invitation_count).to eq 4
-            expect do
+            expect {
               post base_url, params: {
-                               membership: membership_params,
-                               multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
-                             }
-            end.to change(Membership, :count).by 4
+                membership: membership_params,
+                multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+              }
+            }.to change(Membership, :count).by 4
             expect(current_organization.remaining_invitation_count).to eq 0
             expect(current_organization.sent_invitation_count).to eq 5
             expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
@@ -250,12 +250,12 @@ RSpec.describe Organized::UsersController, type: :request do
           it "renders error, doesn't create any" do
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []
-              expect do
+              expect {
                 post base_url, params: {
-                                 membership: membership_params,
-                                 multiple_emails_invited: multiple_emails_invited.join("\n"),
-                               }
-              end.to_not change(Membership, :count)
+                  membership: membership_params,
+                  multiple_emails_invited: multiple_emails_invited.join("\n")
+                }
+              }.to_not change(Membership, :count)
               expect(ActionMailer::Base.deliveries.count).to eq 0
             end
           end
@@ -265,12 +265,12 @@ RSpec.describe Organized::UsersController, type: :request do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []
                 expect(current_organization.remaining_invitation_count).to eq 0
-                expect do
+                expect {
                   post base_url, params: {
-                                   membership: membership_params,
-                                   multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
-                                 }
-                end.to change(Membership, :count).by 4
+                    membership: membership_params,
+                    multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+                  }
+                }.to change(Membership, :count).by 4
                 expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
                 expect(current_organization.users.count).to eq 5
                 expect(ActionMailer::Base.deliveries.empty?).to be_truthy
@@ -293,12 +293,12 @@ RSpec.describe Organized::UsersController, type: :request do
               expect(current_organization.users.count).to eq 1
               expect(current_organization.users.confirmed.count).to eq 1
 
-              expect do
+              expect {
                 post base_url, params: {
-                                 membership: membership_params,
-                                 multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
-                               }
-              end.to change(Membership, :count).by 4
+                  membership: membership_params,
+                  multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+                }
+              }.to change(Membership, :count).by 4
 
               expect(current_organization.remaining_invitation_count).to eq 0
               expect(current_organization.sent_invitation_count).to eq 5

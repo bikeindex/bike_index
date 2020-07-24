@@ -24,7 +24,7 @@ RSpec.describe LandingPagesController, type: :request do
     ambassadors_how_to: "Become a Bike Index Ambassador",
     bike_shop_packages: "Bike Index for Bike Shops - Features and Pricing",
     campus_packages: "Bike Index for Schools - Features and Pricing",
-    cities_packages: "Bike Index for Cities - Features and Pricing",
+    cities_packages: "Bike Index for Cities - Features and Pricing"
   }.each_pair do |controller_action, page_title|
     describe "##{controller_action}" do
       it "renders the correct template with the correct title" do

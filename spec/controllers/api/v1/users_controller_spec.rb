@@ -37,7 +37,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
             request_type: "bike_delete_request",
             user_id: user.id,
             request_bike_id: bike.id,
-            request_reason: "Some reason",
+            request_reason: "Some reason"
           }
           set_current_user(user)
           ActionMailer::Base.deliveries = []
@@ -63,7 +63,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
               request_type: "bike_delete_request",
               user_id: user.id,
               request_bike_id: bike.id,
-              request_reason: "Some reason",
+              request_reason: "Some reason"
             }
             set_current_user(user)
             ActionMailer::Base.deliveries = []
@@ -87,7 +87,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           user_id: user.id,
           request_bike_id: bike.id,
           request_reason: "Need to update manufacturer",
-          manufacturer_update_manufacturer: manufacturer.slug,
+          manufacturer_update_manufacturer: manufacturer.slug
         }
         set_current_user(user)
         post :send_request, params: update_manufacturer_request
@@ -107,7 +107,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           user_id: user.id,
           request_bike_id: bike.id,
           request_reason: "Need to update manufacturer",
-          manufacturer_update_manufacturer: "doadsfizxcv",
+          manufacturer_update_manufacturer: "doadsfizxcv"
         }
         set_current_user(user)
         post :send_request, params: update_manufacturer_request
@@ -127,13 +127,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           user_id: user.id,
           request_bike_id: bike.id,
           request_reason: "Some reason",
-          serial_update_serial: "some new serial",
+          serial_update_serial: "some new serial"
         }
         set_current_user(user)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        expect do
+        expect {
           post :send_request, params: serial_request
-        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+        }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
         expect(response.code).to eq("200")
         expect(bike.reload.serial_number).to eq("some new serial")
       end
@@ -152,7 +152,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         user_id: user.id,
         request_bike_id: bike.id,
         request_reason: "Some reason",
-        serial_update_serial: "some new serial",
+        serial_update_serial: "some new serial"
       }
       set_current_user(user)
       expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
@@ -177,7 +177,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           request_reason: "Some reason",
           index_helped_recovery: "true",
           can_share_recovery: "true",
-          mark_recovered_stolen_record_id: stolen_record.id,
+          mark_recovered_stolen_record_id: stolen_record.id
         }
       end
 
@@ -201,8 +201,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         expect(bike.updated_at).to be > og_updated_at
         expect(feedback.body).to eq recovery_request[:request_reason]
         expect(feedback.feedback_hash).to eq recovery_request
-                                               .slice(:index_helped_recovery, :can_share_recovery)
-                                               .merge(bike_id: bike.id.to_s).as_json
+          .slice(:index_helped_recovery, :can_share_recovery)
+          .merge(bike_id: bike.id.to_s).as_json
         expect(bike.status).to eq "status_with_owner"
         expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
@@ -247,7 +247,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     it "does not create a new serial request mailer if a user isn't present" do
       bike = FactoryBot.create(:bike)
-      message = { request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason" }
+      message = {request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason"}
       post :send_request, params: message.merge(format: :json)
       expect(response.code).to eq("403")
     end
@@ -257,7 +257,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       bike = o.bike
       user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
-      params = { request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason" }
+      params = {request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason"}
       post :send_request, params: params
       expect(response.code).to eq("403")
     end

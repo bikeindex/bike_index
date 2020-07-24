@@ -52,7 +52,7 @@ RSpec.describe NewsController, type: :request do
           FactoryBot.create(:blog, :published)
           FactoryBot.create(:blog, :published, :dutch)
 
-          get base_url, params: { language: "nl" }
+          get base_url, params: {language: "nl"}
 
           expect(response.status).to eq(200)
           expect(response).to render_template("index")
@@ -61,13 +61,13 @@ RSpec.describe NewsController, type: :request do
       end
       context "xml" do
         it "redirects to atom" do
-          get base_url, params: { format: :xml }
+          get base_url, params: {format: :xml}
           expect(response).to redirect_to(news_index_path(format: "atom"))
         end
       end
       context "atom" do
         it "renders" do
-          get base_url, params: { format: :atom }
+          get base_url, params: {format: :atom}
           expect(response.status).to eq(200)
         end
       end

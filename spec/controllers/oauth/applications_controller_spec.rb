@@ -32,9 +32,9 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
       v2_access_id
       app_attrs = {
         name: "Some app",
-        redirect_uri: "urn:ietf:wg:oauth:2.0:oob",
+        redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
       }
-      post :create, params: { doorkeeper_application: app_attrs }
+      post :create, params: {doorkeeper_application: app_attrs}
       app = user.oauth_applications.first
       expect(app.name).to eq(app_attrs[:name])
       expect(app.access_tokens.count).to eq(1)
@@ -49,7 +49,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
 
     describe "edit" do
       it "redirects if no user present" do
-        get :edit, params: { id: doorkeeper_app.id }
+        get :edit, params: {id: doorkeeper_app.id}
         expect(response).to redirect_to new_session_url
         expect(flash).to be_present
       end
@@ -58,7 +58,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
         before { set_current_user(user) } # Do separately from logged_in_as, pulling doorkeeper user
         it "renders if owned by user" do
           expect(doorkeeper_app.owner_id).to eq user.id
-          get :edit, params: { id: doorkeeper_app.id }
+          get :edit, params: {id: doorkeeper_app.id}
           expect(response.code).to eq("200")
           expect(flash).not_to be_present
         end
@@ -67,7 +67,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
           let(:user) { FactoryBot.create(:user_confirmed) }
           it "redirects if not owned by user" do
             expect(doorkeeper_app.owner_id).to_not eq user.id
-            get :edit, params: { id: doorkeeper_app.id }
+            get :edit, params: {id: doorkeeper_app.id}
             expect(response).to redirect_to oauth_applications_url
             expect(flash).to be_present
           end
@@ -77,7 +77,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
           let(:user) { FactoryBot.create(:admin) }
           it "renders if superuser" do
             expect(doorkeeper_app.owner_id).to_not eq user.id
-            get :edit, params: { id: doorkeeper_app.id }
+            get :edit, params: {id: doorkeeper_app.id}
             expect(response.code).to eq("200")
             expect(flash).not_to be_present
           end
@@ -89,7 +89,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
       before { set_current_user(user) } # Do separately from logged_in_as, pulling doorkeeper user
       it "renders if owned by user" do
         expect(doorkeeper_app.owner_id).to eq user.id
-        put :update, params: { id: doorkeeper_app.id, doorkeeper_application: { name: "new thing" } }
+        put :update, params: {id: doorkeeper_app.id, doorkeeper_application: {name: "new thing"}}
         doorkeeper_app.reload
         expect(doorkeeper_app.name).to eq("new thing")
       end
@@ -99,7 +99,7 @@ RSpec.describe Oauth::ApplicationsController, type: :controller do
         it "doesn't update" do
           og_name = doorkeeper_app.name
           expect(doorkeeper_app.owner_id).to_not eq user.id
-          put :update, params: { id: doorkeeper_app.id, doorkeeper_application: { name: "new thing" } }
+          put :update, params: {id: doorkeeper_app.id, doorkeeper_application: {name: "new thing"}}
           doorkeeper_app.reload
           expect(doorkeeper_app.name).to eq(og_name)
           expect(response).to redirect_to oauth_applications_url

@@ -12,13 +12,13 @@ RSpec.describe GraphingHelper, type: :helper do
       @time_range = start_time..(start_time + 3.minutes)
     end
     describe "time_range_counts" do
-      let(:target_counts) { { " 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0 } }
+      let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "returns the thing with want" do
         expect(time_range_counts(collection: Payment.all)).to eq target_counts
       end
     end
     describe "time_range_counts" do
-      let(:target_counts) { { " 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0 } }
+      let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "returns the thing with want" do
         expect(time_range_amounts(collection: Payment.all)).to eq target_counts
       end
@@ -123,7 +123,7 @@ RSpec.describe GraphingHelper, type: :helper do
             'from <em class="convertTime preciseTimeSeconds">',
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime preciseTimeSeconds">',
-            end_time.strftime("%FT%T%z") + '</em>'
+            end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
         it "returns with preciseTimeSeconds" do
@@ -138,7 +138,7 @@ RSpec.describe GraphingHelper, type: :helper do
             'from <em class="convertTime preciseTime">',
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime preciseTime">',
-            end_time.strftime("%FT%T%z") + '</em>'
+            end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
         it "returns time in precise time" do
@@ -160,7 +160,7 @@ RSpec.describe GraphingHelper, type: :helper do
             'from <em class="convertTime ">',
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime ">',
-            end_time.strftime("%FT%T%z") + '</em>'
+            end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
         it "returns with preciseTimeSeconds" do

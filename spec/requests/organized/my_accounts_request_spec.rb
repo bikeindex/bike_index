@@ -71,7 +71,7 @@ RSpec.describe MyAccountsController, type: :request do
             allow_any_instance_of(User).to receive(:locks) { [lock] }
           end
           it "renders and user things are assigned" do
-            get base_url, params: { per_page: 1 }
+            get base_url, params: {per_page: 1}
             expect(response.status).to eq(200)
             expect(response).to render_template("show")
             expect(assigns(:bikes).count).to eq 1
