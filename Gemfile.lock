@@ -546,7 +546,6 @@ GEM
       rubocop (>= 0.67.0)
     ruby-progressbar (1.10.1)
     rubyzip (1.3.0)
-    rufo (0.7.0)
     safe_yaml (1.0.5)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
@@ -606,6 +605,8 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stackprof (0.2.14)
+    standard (0.0.36)
+      rubocop (>= 0.63)
     stripe (3.3.2)
       faraday (~> 0.9)
     temple (0.8.2)
@@ -776,7 +777,6 @@ DEPENDENCIES
   rubocop (~> 0.67)
   rubocop-daemon (~> 0.3.1)
   rubocop-performance (~> 1.1.0)
-  rufo (~> 0.7.0)
   sass-rails
   secure_headers (~> 2.5.0)
   sidekiq (~> 5.1.0)
@@ -789,6 +789,7 @@ DEPENDENCIES
   sprockets (= 4.0.0)
   sprockets-rails
   stackprof
+  standard
   stripe (~> 3.3.2)
   swagger-ui_rails!
   terminal-notifier

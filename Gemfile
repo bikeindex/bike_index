@@ -167,7 +167,7 @@ group :development, :test do
   gem "rubocop", "~> 0.67", require: false
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
-  gem "rufo", "~> 0.7.0", require: false
+  gem "standard"
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

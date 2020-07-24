@@ -108,7 +108,7 @@ We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the
 We use the following tools to automate code formatting and linting:
 
 - [EditorConfig](https://editorconfig.org/)
-- [Rufo](https://github.com/ruby-formatter/rufo)
+- [StandardRB](https://github.com/testdouble/standard)
 - [Rubocop](https://github.com/rubocop-hq/rubocop)
 - [ESlint](https://eslint.org/)
 
@@ -120,17 +120,13 @@ appropriate to your editor.
 
 [editorconfig-plugin]: https://editorconfig.org/#download
 
-### Rufo
+### StandardRB
 
-Rufo is an opinionated Ruby formatter we use to maintain consistent style with
-minimum configuration. See the [Editor support][rufo-plugin] section of the
-project README to find a suitable editor plugin.
-
-[rufo-plugin]: https://github.com/ruby-formatter/rufo#editor-support
+Ruby style guide, linter, and formatter.
 
 ### RuboCop
 
-RuboCop is configured to ignore Ruby style and layout (deferring to Rufo) and focus
+RuboCop is configured to ignore Ruby style and layout (deferring to StandardRB) and focus
 on code complexity, performance, and suggested best practices.
 
 To run it from the command line, issue `bin/rubocop`, optionally passing
