@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :appointment do
     organization { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
     location { organization.locations.first }
+    # if user is present, saving the appointment will assign users email
     sequence(:email) { |n| user.present? ? nil : "bike_owner#{n}@example.com" }
     sequence(:name) { |n| "some name #{n}" }
     reason { AppointmentConfiguration.default_reasons.first }

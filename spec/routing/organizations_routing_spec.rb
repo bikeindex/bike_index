@@ -7,7 +7,7 @@ RSpec.describe "organizations routing", type: :routing do
       expect(get: "/university").to route_to(
         controller: "landing_pages",
         organization_id: "university",
-        action: "show",
+        action: "show"
       )
     end
   end
@@ -17,7 +17,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/o/university").to route_to(
           controller: "organized/dashboard",
           action: "root",
-          organization_id: "university",
+          organization_id: "university"
         )
       end
     end
@@ -26,7 +26,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/o/university/dashboard").to route_to(
           controller: "organized/dashboard",
           action: "index",
-          organization_id: "university",
+          organization_id: "university"
         )
       end
     end
@@ -35,7 +35,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/o/university/users/new").to route_to(
           controller: "organized/users",
           action: "new",
-          organization_id: "university",
+          organization_id: "university"
         )
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/o/university/manage").to route_to(
           controller: "organized/manages",
           action: "show",
-          organization_id: "university",
+          organization_id: "university"
         )
       end
     end
@@ -53,7 +53,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/o/university/manage/locations").to route_to(
           controller: "organized/manages",
           action: "locations",
-          organization_id: "university",
+          organization_id: "university"
         )
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/organizations/bike_store/embed").to route_to(
           controller: "organizations",
           action: "embed",
-          id: "bike_store",
+          id: "bike_store"
         )
       end
     end
@@ -74,7 +74,7 @@ RSpec.describe "organizations routing", type: :routing do
         expect(get: "/organizations/cool_cats/embed_extended").to route_to(
           controller: "organizations",
           action: "embed_extended",
-          id: "cool_cats",
+          id: "cool_cats"
         )
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe "organizations routing", type: :routing do
     it "routes to organizations new" do
       expect(get: "/organizations/new").to route_to(
         controller: "organizations",
-        action: "new",
+        action: "new"
       )
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe "organizations routing", type: :routing do
       expect(get: "/bike_shop/walkrightup").to route_to(
         controller: "org_public/walkrightup",
         action: "show",
-        organization_id: "bike_shop",
+        organization_id: "bike_shop"
       )
     end
     context "capitals" do
@@ -110,7 +110,7 @@ RSpec.describe "organizations routing", type: :routing do
           controller: "org_public/customer_appointments",
           action: "show",
           organization_id: "california-bikes",
-          id: "12",
+          id: "12"
         )
       end
     end

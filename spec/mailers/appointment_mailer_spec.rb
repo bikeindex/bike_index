@@ -7,9 +7,9 @@ RSpec.describe AppointmentMailer, type: :mailer do
   before { organization.update(auto_user: organization_member) }
   let(:header_mail_snippet) do
     FactoryBot.create(:organization_mail_snippet,
-                      kind: "header",
-                      organization: organization,
-                      body: "<p>HEADERXSNIPPET</p>")
+      kind: "header",
+      organization: organization,
+      body: "<p>HEADERXSNIPPET</p>")
   end
 
   let(:user) { FactoryBot.create(:user_confirmed) }

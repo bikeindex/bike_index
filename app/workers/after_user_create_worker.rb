@@ -31,6 +31,7 @@ class AfterUserCreateWorker < ApplicationWorker
     # Also, we we need to process with the previous email, not the user's current email
     associate_membership_invites(user, email, skip_confirm: true)
     associate_ownerships(user, email)
+    associate_appointments(user, email)
   end
 
   def perform_confirmed_jobs(user, email)
@@ -42,7 +43,9 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_async_jobs(user, email)
     # These jobs don't need to happen immediately
     import_user_attributes(user)
-    associate_ownerships(user, email) if user.confirmed?
+    return true unless user.confirmed?
+    associate_ownerships(user, email)
+    associate_appointments(user, email)
   end
 
   def send_welcoming_email(user)
@@ -86,6 +89,12 @@ class AfterUserCreateWorker < ApplicationWorker
       user.attributes = address.merge(skip_geocoding: true) if address.present?
     end
     user.save if user.changed?
+  end
+
+  def associate_appointments(user, email)
+    Appointment.where(email: email).each do |appointment|
+      appointment.update_attributes(user_id: user.id)
+    end
   end
 
   private

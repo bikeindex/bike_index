@@ -77,17 +77,17 @@ RSpec.describe Appointment, type: :model do
     end
   end
 
-  describe "first_display_name" do
+  describe "public_display_name" do
     let(:user) { FactoryBot.build(:user, name: "fuck off") }
     let(:appointment) { Appointment.new(name: "NIggER bitch", user: user) }
     it "removes offensive things" do
       expect(appointment.name).to eq "NIggER bitch"
       expect(appointment.display_name).to eq "NIggER bitch"
-      expect(appointment.first_display_name).to eq "******"
+      expect(appointment.public_display_name).to eq "******"
       appointment.name = ""
       expect(appointment.name).to eq ""
       expect(appointment.display_name).to eq "fuck off"
-      expect(appointment.first_display_name).to eq "****"
+      expect(appointment.public_display_name).to eq "****"
     end
   end
 

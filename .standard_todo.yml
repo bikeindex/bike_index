@@ -413,9 +413,7 @@ ignore:
   - spec/requests/organized/users_request_spec.rb
   - spec/requests/sessions_request_spec.rb
   - spec/requests/theft_alerts_request_spec.rb
-  - spec/requests/users_request_spec.rb
   - spec/routing/bikes_routing_spec.rb
-  - spec/routing/organizations_rounting_spec.rb
   - spec/serializers/bike_serializer_spec.rb
   - spec/serializers/bike_v2_show_serializer_spec.rb
   - spec/serializers/membership_serializer_spec.rb
@@ -441,7 +439,6 @@ ignore:
   - spec/support/shared_examples/geocodeable.rb
   - spec/support/stripe_helpers.rb
   - spec/workers/after_bike_save_worker_spec.rb
-  - spec/workers/after_user_create_worker_spec.rb
   - spec/workers/bike_book_update_worker_spec.rb
   - spec/workers/bike_deleter_worker_spec.rb
   - spec/workers/bulk_import_worker_spec.rb

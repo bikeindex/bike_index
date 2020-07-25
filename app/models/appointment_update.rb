@@ -41,7 +41,7 @@ class AppointmentUpdate < ApplicationRecord
 
   def display_name; user&.display_name end
 
-  def first_display_name; BadWordCleaner.clean(display_name&.to_s.split(" ").first) end
+  def public_display_name; BadWordCleaner.clean(display_name&.to_s.split(" ").first) end
 
   def customer_creator?; self.class.customer_creator_kind?(creator_kind) end
 end

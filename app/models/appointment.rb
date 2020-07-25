@@ -31,7 +31,7 @@ class Appointment < ApplicationRecord
 
   def self.in_line_statuses; %w[waiting on_deck paging] end
 
-  def self.resolved_statuses; %[finished removed] end
+  def self.resolved_statuses; %[finished removed being_helped abandoned] end
 
   # This will be more sophisticated in the future, when we add phone, etc
   def self.for_user_attrs(user: nil, user_id: nil, email: nil, creation_ip: nil)
@@ -76,7 +76,7 @@ class Appointment < ApplicationRecord
 
   def display_name; name.presence || user&.display_name end
 
-  def first_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
+  def public_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
 
   # same parameters as for_user_attrs - args are in passed_args so they don't override model attributes
   def matches_user_attrs?(passed_args = {})

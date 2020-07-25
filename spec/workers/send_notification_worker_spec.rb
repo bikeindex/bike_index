@@ -9,9 +9,9 @@ RSpec.describe SendNotificationWorker, type: :job do
     let(:notification) { FactoryBot.create(:notification, kind: "view_appointment", appointment: appointment, user: nil) }
     it "sends an email" do
       expect(notification.email_success?).to be_falsey
-      expect do
+      expect {
         instance.perform(notification.id)
-      end.to change(ActionMailer::Base.deliveries, :count).by 1
+      }.to change(ActionMailer::Base.deliveries, :count).by 1
       notification.reload
       expect(notification.email_success?).to be_truthy
     end
@@ -22,9 +22,9 @@ RSpec.describe SendNotificationWorker, type: :job do
     it "doesn't send, doesn't update" do
       expect(notification.email_success?).to be_falsey
       instance.perform(notification.id)
-      expect do
+      expect {
         instance.perform(notification.id)
-      end.to_not change(ActionMailer::Base.deliveries, :count)
+      }.to_not change(ActionMailer::Base.deliveries, :count)
       notification.reload
       expect(notification.email_success?).to be_falsey
     end
