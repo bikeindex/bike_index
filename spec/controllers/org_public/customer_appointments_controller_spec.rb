@@ -57,6 +57,7 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
       location.reload
       expect(current_organization.appointments.count).to eq 0
       expect(location.appointments.count).to eq 0
+      Sidekiq::Worker.clear_all
       expect do
         post :create, params: {
                         organization_id: current_organization.to_param,
@@ -68,6 +69,10 @@ RSpec.describe OrgPublic::CustomerAppointmentsController, type: :controller do
       current_organization.reload
       expect(location.appointments.count).to eq 1
       new_appointment = location.appointments.last
+      expect(new_appointment.notifications.count).to eq 1
+
+      expect(SendNotificationWorker.jobs.count).to eq 1
+      expect(SendNotificationWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([new_appointment.notifications.first.id])
 
       expect(assigns(:current_appointment)).to eq new_appointment
       expect(session[:appointment_token]).to eq new_appointment.link_token

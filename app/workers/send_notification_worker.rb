@@ -11,8 +11,8 @@ class SendNotificationWorker < ApplicationWorker
   end
 
   def deliver_email(notification)
-    if notification.view_claimed_ticket?
-      AppointmentsMailer.view_claimed_ticket(notification.appointment).deliver_now
+    if notification.view_appointment?
+      AppointmentMailer.view_appointment(notification.appointment).deliver_now
     else
       false
     end

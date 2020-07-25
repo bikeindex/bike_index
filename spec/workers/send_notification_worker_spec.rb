@@ -5,7 +5,7 @@ RSpec.describe SendNotificationWorker, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   context "view_appointment" do
-    let(:ticket) { FactoryBot.create(:appointment) }
+    let(:appointment) { FactoryBot.create(:appointment) }
     let(:notification) { FactoryBot.create(:notification, kind: "view_appointment", appointment: appointment, user: nil) }
     it "sends an email" do
       expect(notification.email_success?).to be_falsey
