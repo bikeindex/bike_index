@@ -1,5 +1,6 @@
 class Admin::BulkImportsController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_bulk_import, only: [:show, :update]
 
   def index
@@ -47,6 +48,10 @@ class Admin::BulkImportsController < Admin::BaseController
     params.require(:bulk_import).permit(%i(organization_id file no_notify))
   end
 
+  def default_period
+    "month"
+  end
+
   def find_bulk_import
     @bulk_import = BulkImport.find(params[:id])
   end
@@ -67,6 +72,6 @@ class Admin::BulkImportsController < Admin::BaseController
     if params[:organization_id].present?
       bulk_imports = bulk_imports.where(organization_id: current_organization.id)
     end
-    @matching_bulk_imports = bulk_imports
+    @matching_bulk_imports = bulk_imports.where(created_at: @time_range)
   end
 end

@@ -1,5 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -51,10 +52,16 @@ class Admin::UsersController < Admin::BaseController
     redirect_to admin_users_url, notice: "User Deleted."
   end
 
+  helper_method :matching_users
+
   protected
 
   def sortable_columns
     %w[created_at email]
+  end
+
+  def earliest_period_date
+    Time.at(1357912007)
   end
 
   def find_user
@@ -73,6 +80,6 @@ class Admin::UsersController < Admin::BaseController
     users = users.ambassadors if @search_ambassadors
     users = users.superusers if @search_superusers
     users = users.admin_text_search(params[:query]) if params[:query].present?
-    users
+    users.where(created_at: @time_range)
   end
 end
