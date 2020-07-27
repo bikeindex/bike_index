@@ -76,7 +76,7 @@
           = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
           = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
       .col-md-6
-        .form-group
+        .form-group#subscriptionEndsAt.collapse{ class: (@invoice.endless? ? "" : "show") }
           = f.label :end_at, "Coverage ends"
           - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
           = f.datetime_local_field :end_at, step: 60, required: true, class: "form-control"
@@ -85,9 +85,15 @@
         .form-group
           = f.label :notes
           = f.text_area :notes, rows: 4, class: "form-control"
-      .col-md-6
+      .col-md-3.col-6
         .form-group
           = f.submit "Save", class: 'btn btn-lg btn-success mt-4'
+      .col-md-3.col-6
+        .form-group#endlessCheckBox.text-right
+          .form-check.mt-4.mr-2
+            = f.check_box :is_endless
+            = f.label :is_endless, "Coverage never ends"
+
 
     %hr
     .row.mt-4

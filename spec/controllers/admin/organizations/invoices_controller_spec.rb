@@ -117,6 +117,24 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.notes).to eq params[:notes]
         expect(invoice.child_enabled_feature_slugs).to eq enabled_feature_slugs
       end
+      context "endless" do
+        it "marks the invoice endless" do
+          expect(enabled_feature_slugs.count).to eq 2
+          invoice.paid_feature_ids = [paid_feature3.id]
+          invoice.reload
+          expect(invoice.paid_features.pluck(:id)).to eq([paid_feature3.id])
+          put :update, params: {organization_id: organization.to_param, id: invoice.to_param, invoice: update_params.merge(is_endless: "true")}
+          invoice.reload
+          expect(invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
+          expect(invoice.amount_due).to eq 1220
+          # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
+          expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
+          expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
+          expect(invoice.notes).to eq params[:notes]
+          expect(invoice.child_enabled_feature_slugs).to eq enabled_feature_slugs
+          expect(invoice.endless?).to be_truthy
+        end
+      end
       context "create_following_invoice" do
         let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.current - 2.years, force_active: true) }
         it "creates following invoice" do

@@ -33,10 +33,14 @@ class Admin::InvoicesController < Admin::BaseController
     else
       Invoice
     end
-    @search_endless = ParamsNormalizer.boolean(params[:search_endless])
-    invoices = invoices.endless if @search_endless
-    if %w[subscription_start_at subscription_end_at].include?(sort_column)
-      @time_range_column = sort_column
+    if %w[endless_only not_endless].include?(params[:search_endless])
+      @search_endless = params[:search_endless]
+      invoices = @search_endless == "endless_only" ? invoices.endless : invoices.not_endless
+    end
+
+    if %w[subscription_start_at subscription_end_at].include?(params[:time_range_column])
+      @time_range_column = params[:time_range_column]
+      invoices = invoices.not_endless if @time_range_column == "subscription_end_at"
     else
       @time_range_column = "created_at"
     end

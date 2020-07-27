@@ -56,7 +56,8 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:invoice).permit(:paid_feature_ids, :amount_due, :notes, :timezone, :start_at, :end_at, :child_enabled_feature_slugs_string)
+    params.require(:invoice).permit(:paid_feature_ids, :amount_due, :notes, :timezone, :start_at, :end_at,
+      :child_enabled_feature_slugs_string, :is_endless)
   end
 
   def find_organization
