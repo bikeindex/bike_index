@@ -117,10 +117,19 @@
               Address
             %td
               %small
-                = @bike.address
+                = bike.registration_address || bike.address
                 %span.only-dev-visible.ml-2
                   manual:
-                  = @bike.address_set_manually
+                  = bike.address_set_manually
+
+          -# Only show phone if no stolen record
+          - if stolen_record.blank? && bike.phone.present?
+            %tr
+              %td
+                Phone
+              %td
+                = phone_display(bike.phone)
+
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger
