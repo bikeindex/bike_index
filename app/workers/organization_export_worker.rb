@@ -128,7 +128,7 @@ class OrganizationExportWorker < ApplicationWorker
     @export_headers
   end
 
-  MATCHING_KEYS = %w[owner_email year phone extra_registration_number organization_affiliation].freeze
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation].freeze
 
   def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)
@@ -148,7 +148,6 @@ class OrganizationExportWorker < ApplicationWorker
     when "zipcode" then bike.registration_address["zipcode"]
     when "sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
-    when "owner_email" then bike.user_name
     end
   end
 
