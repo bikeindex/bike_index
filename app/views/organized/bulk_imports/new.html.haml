@@ -6,7 +6,7 @@
     = t(".required_headers_are_html")
 
   %p
-    - link_to_example_csv = link_to t(".our_example_csv_here"), t('.example_csv_url_main')
+    - link_to_example_csv = link_to t(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
     = t(".look_at_example_csv_html", link_to_example_csv: link_to_example_csv)
 
   %h5= t(".notes_on_successfully_importing")
@@ -37,7 +37,7 @@
 %ul
   %li= t(".we_support_a_few_additional")
   %li
-    - link_to_example_csv = link_to(t(".example_csv_link"), t(".example_csv_url_main"))
+    - link_to_example_csv = link_to(t(".example_csv_link"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv")
     = t(".view_an_example_csv_html", link_to_example_csv: link_to_example_csv)
   %li= t(".if_only_some_of_your_bikes_html")
   %li
