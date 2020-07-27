@@ -5,7 +5,6 @@ ignore:
   - app/controllers/admin/ambassador_task_assignments_controller.rb
   - app/controllers/admin/ambassador_tasks_controller.rb
   - app/controllers/admin/bikes_controller.rb
-  - app/controllers/admin/bulk_imports_controller.rb
   - app/controllers/admin/customer_contacts_controller.rb
   - app/controllers/admin/dashboard_controller.rb
   - app/controllers/admin/exchange_rates_controller.rb
@@ -31,7 +30,6 @@ ignore:
   - app/controllers/admin/theft_alerts_controller.rb
   - app/controllers/admin/tweets_controller.rb
   - app/controllers/admin/twitter_accounts_controller.rb
-  - app/controllers/admin/users_controller.rb
   - app/controllers/api/base.rb
   - app/controllers/api/v1/api_v1_controller.rb
   - app/controllers/api/v1/bikes_controller.rb
@@ -262,7 +260,6 @@ ignore:
   - lib/tasks/seed_tasks.rake
   - spec/controllers/admin/ambassador_tasks_controller_spec.rb
   - spec/controllers/admin/bikes_controller_spec.rb
-  - spec/controllers/admin/bulk_imports_controller_spec.rb
   - spec/controllers/admin/customer_contacts_controller_spec.rb
   - spec/controllers/admin/dashboard_controller_spec.rb
   - spec/controllers/admin/failed_bikes_controller_spec.rb
@@ -379,7 +376,6 @@ ignore:
   - spec/requests/admin/stolen_bikes_request_spec.rb
   - spec/requests/admin/theft_alert_plans_request_spec.rb
   - spec/requests/admin/theft_alerts_request_spec.rb
-  - spec/requests/admin/users_request_spec.rb
   - spec/requests/api/v1/organizations_request_spec.rb
   - spec/requests/api/v2/bikes_request_spec.rb
   - spec/requests/api/v2/bikes_search_request_spec.rb

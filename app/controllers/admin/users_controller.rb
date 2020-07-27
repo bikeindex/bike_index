@@ -1,5 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -18,10 +19,10 @@ class Admin::UsersController < Admin::BaseController
       redirect_to edit_admin_user_path(@user.id)
     end
     # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-    if @user.rough_approx_bikes.count > 25
-      bikes = @user.rough_approx_bikes
+    bikes = if @user.rough_approx_bikes.count > 25
+      @user.rough_approx_bikes
     else
-      bikes = @user.bikes
+      @user.bikes
     end
     @bikescount = @user.bikes.count
     @bikes = bikes.reorder(created_at: :desc).limit(10)
@@ -51,10 +52,16 @@ class Admin::UsersController < Admin::BaseController
     redirect_to admin_users_url, notice: "User Deleted."
   end
 
+  helper_method :matching_users
+
   protected
 
   def sortable_columns
     %w[created_at email]
+  end
+
+  def earliest_period_date
+    Time.at(1357912007)
   end
 
   def find_user
@@ -65,14 +72,14 @@ class Admin::UsersController < Admin::BaseController
   def matching_users
     @search_ambassadors = ParamsNormalizer.boolean(params[:search_ambassadors])
     @search_superusers = ParamsNormalizer.boolean(params[:search_superusers])
-    if current_organization.present?
-      users = current_organization.users
+    users = if current_organization.present?
+      current_organization.users
     else
-      users = User
+      User
     end
     users = users.ambassadors if @search_ambassadors
     users = users.superusers if @search_superusers
     users = users.admin_text_search(params[:query]) if params[:query].present?
-    users
+    users.where(created_at: @time_range)
   end
 end
