@@ -1,15 +1,14 @@
 #news_show {
-  h1,
-  h2,
-  h3,
-  h4 {
+  h1 {
     @extend .uncap;
   }
-
-  h2,
-  h3,
-  h4 {
-    color: #000;
+  .primary-content-block {
+    h2,
+    h3,
+    h4 {
+      @extend .uncap;
+      color: #000;
+    }
   }
 
   .post-image {
