@@ -133,9 +133,9 @@ class Blog < ApplicationRecord
         pi = public_images.find(index_image_id)
       end
     elsif is_listicle && listicles.present? && listicles.first.image.present?
-        li = listicles.first
-        # self.index_image = listicles.first.image_url(:medium)
-        self.index_image_id = li.id
+      li = listicles.first
+      # self.index_image = listicles.first.image_url(:medium)
+      self.index_image_id = li.id
     elsif public_images.present?
       pi = public_images.last
       self.index_image_id = public_images.last.id
