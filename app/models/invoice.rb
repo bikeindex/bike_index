@@ -109,7 +109,7 @@ class Invoice < ApplicationRecord
     subscription_start_at
   end
 
-  def start_at
+  def end_at
     subscription_end_at
   end
 

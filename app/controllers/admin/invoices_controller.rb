@@ -44,6 +44,6 @@ class Admin::InvoicesController < Admin::BaseController
     else
       @time_range_column = "created_at"
     end
-    invoices = invoices.where(@time_range_column => @time_range)
+    invoices.where(@time_range_column => @time_range)
   end
 end
