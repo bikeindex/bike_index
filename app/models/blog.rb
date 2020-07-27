@@ -23,7 +23,7 @@ class Blog < ApplicationRecord
   default_scope { order("published_at desc") }
 
   include PgSearch::Model
-  pg_search_scope :text_search, against: { title: "A", body: "B" }
+  pg_search_scope :text_search, against: {title: "A", body: "B"}
 
   def self.slugify_title(str)
     # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
@@ -132,15 +132,13 @@ class Blog < ApplicationRecord
       else
         pi = public_images.find(index_image_id)
       end
-    else
-      if is_listicle && listicles.present? && listicles.first.image.present?
+    elsif is_listicle && listicles.present? && listicles.first.image.present?
         li = listicles.first
         # self.index_image = listicles.first.image_url(:medium)
         self.index_image_id = li.id
-      elsif public_images.present?
-        pi = public_images.last
-        self.index_image_id = public_images.last.id
-      end
+    elsif public_images.present?
+      pi = public_images.last
+      self.index_image_id = public_images.last.id
     end
     if li.present?
       self.index_image = li.image_url(:medium)
