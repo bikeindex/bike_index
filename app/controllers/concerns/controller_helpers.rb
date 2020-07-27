@@ -178,7 +178,7 @@ module ControllerHelpers
     @controller_namespace ||= self.class.parent.name != "Object" ? self.class.parent.name.downcase : nil
   end
 
-  # This is overridden in FeedbacksController
+  # This is overridden in FeedbacksController and InfoController
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
   end

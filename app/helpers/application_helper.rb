@@ -79,10 +79,10 @@ module ApplicationHelper
         class_name = "active"
       end
     elsif controller_name == "payments"
-      if action_name == "invoices"
-        class_name = "active" if link_text == "Invoices"
-      else
-        class_name = "active" if link_text == "Payments"
+      if action_name == "invoices" && link_text == "Invoices"
+        class_name = "active"
+      elsif link_text == "Payments"
+        class_name = "active"
       end
     else
       class_name = controller_name == link_text.downcase.tr(" ", "_") ? "active" : ""
@@ -144,7 +144,7 @@ module ApplicationHelper
   end
 
   def sortable_search_params
-    search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
+    search_param_keys = params.keys.select { |k| k.to_s.start_with?(/search_/) }
     params.permit(:direction, :sort, :user_id, :organization_id, :period, :start_time, :end_time, :query, :render_chart, *search_param_keys)
   end
 

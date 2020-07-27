@@ -4514,7 +4514,6 @@ nl:
         your_headers_must_match_html: Uw kopteksten moeten <em>exact</em> overeenkomen
           met onze kopteksten - als u bijvoorbeeld 'serienummer' als koptekst hebt,
           werkt de import niet.
-        example_csv_url_main: https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
       show:
         ascend_import: Ascending importeren
         bikes: Bikes

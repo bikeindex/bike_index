@@ -15,6 +15,7 @@ RSpec.describe Blog, type: :model do
       # blog2 = FactoryBot.create(:blog, title: "an elder statesman")
       # expect(blog2).to be_present
       # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog2.id
+      expect(Blog.text_search("good").pluck(:id)).to eq([blog.id])
     end
   end
 
@@ -68,7 +69,7 @@ RSpec.describe Blog, type: :model do
     it "makes the text 200 char long or less and remove any new lines" do
       @user = FactoryBot.create(:user)
       blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.current)
-      blog.body = "" "
+      blog.body = "
       Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod
 
 
@@ -81,7 +82,7 @@ RSpec.describe Blog, type: :model do
 
       proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       lorem
-      " ""
+      "
       blog.save
       expect(blog.body_abbr).to eq("Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ...")
     end

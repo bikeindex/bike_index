@@ -22,10 +22,13 @@ class Blog < ApplicationRecord
   scope :info, -> { where(is_info: true) }
   default_scope { order("published_at desc") }
 
+  include PgSearch::Model
+  pg_search_scope :text_search, against: {title: "A", body: "B"}
+
   def self.slugify_title(str)
     # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
     return nil unless str.present?
-    Slugifyer.slugify(str)[0, 70].gsub(/\-$/, "")
+    Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
   end
 
   def self.integer_slug?(n)
@@ -40,11 +43,17 @@ class Blog < ApplicationRecord
       find_by_title_slug(str) || find_by_title(str)
   end
 
-  def info?; is_info end
+  def info?
+    is_info
+  end
 
-  def blog?; !info? end
+  def blog?
+    !info?
+  end
 
-  def to_param; title_slug end
+  def to_param
+    title_slug
+  end
 
   def set_calculated_attributes
     self.published_at ||= Time.current # We need to have a published time...
@@ -57,11 +66,11 @@ class Blog < ApplicationRecord
   end
 
   def set_published_at_and_published
-    if self.post_date.present?
+    if post_date.present?
       self.published_at = TimeParser.parse(post_date, timezone)
     end
-    self.published_at = Time.current if self.post_now == "1"
-    if self.user_email.present?
+    self.published_at = Time.current if post_now == "1"
+    if user_email.present?
       u = User.fuzzy_email_find(user_email)
       self.user_id = u.id if u.present?
     end
@@ -85,7 +94,7 @@ class Blog < ApplicationRecord
   def update_title_save
     return true unless update_title.present?
     return true if update_title == false || update_title == "0"
-    self.old_title_slug = self.title_slug
+    self.old_title_slug = title_slug
     set_title_slug
   end
 
@@ -107,7 +116,7 @@ class Blog < ApplicationRecord
       end
       abbr = strip_tags(body_html)
       # strip tags, then remove extra spaces
-      abbr = abbr.gsub(/\n/, " ").gsub(/\s+/, " ").strip if abbr.present?
+      abbr = abbr.tr("\n", " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)
     end
     true
@@ -123,15 +132,13 @@ class Blog < ApplicationRecord
       else
         pi = public_images.find(index_image_id)
       end
-    else
-      if is_listicle && listicles.present? && listicles.first.image.present?
+    elsif is_listicle && listicles.present? && listicles.first.image.present?
         li = listicles.first
         # self.index_image = listicles.first.image_url(:medium)
         self.index_image_id = li.id
-      elsif public_images.present?
-        pi = public_images.last
-        self.index_image_id = public_images.last.id
-      end
+    elsif public_images.present?
+      pi = public_images.last
+      self.index_image_id = public_images.last.id
     end
     if li.present?
       self.index_image = li.image_url(:medium)
