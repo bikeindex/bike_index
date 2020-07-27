@@ -10,15 +10,31 @@
   .col-md-6
     %ul
       - if sortable_search_params?
-        %li
+        %li.nav-item
           = link_to "view all", admin_invoices_path, class: "nav-link"
-      %li
-        = link_to "active", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "nav-link #{params[:query] == "active" ? "active" : ""}"
-      %li
-        = link_to "inactive", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "nav-link #{params[:query] == "inactive" ? "active" : ""}"
-  %p.subtitle
-    = @invoices.total_count
-    = "matching invoice".pluralize(@invoices.total_count)
+      %li.nav-item
+        = link_to "active", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "nav-link #{params[:query] == 'active' ? 'active' : ''}"
+      %li.nav-item
+        = link_to "inactive", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "nav-link #{params[:query] == 'inactive' ? 'active' : ''}"
+      %li.nav-item
+        = link_to "endless", admin_invoices_path(sortable_search_params.merge(search_endless: !@search_endless)), class: "nav-link #{@search_endless ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ",", defer: true
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+%p
+  = @invoices.total_count
+  = "matching invoice".pluralize(@invoices.total_count)
+  %em
+    %strong
+      = humanized_time_range_column(@time_range_column)
+    = humanized_time_range(@time_range)
+
 %p.less-strong
   Go to individual organizations to create new invoices
 
