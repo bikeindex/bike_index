@@ -17,6 +17,7 @@ RSpec.describe Invoice, type: :model do
       let(:invoice) { Invoice.new(subscription_start_at: Time.current.yesterday - 1.year, amount_due: 0) }
       it "is not active" do
         invoice.set_calculated_attributes
+        expect(invoice.end_at).to be_within(100).of invoice.start_at + invoice.subscription_duration
         expect(invoice.expired?).to be_truthy
         expect(invoice.paid_in_full?).to be_truthy
         expect(invoice.future?).to be_falsey
@@ -31,6 +32,18 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.paid_in_full?).to be_truthy
         expect(invoice.future?).to be_truthy
         expect(invoice.was_active?).to be_falsey
+      end
+    end
+    context "endless" do
+      let(:invoice) { Invoice.new(subscription_start_at: Time.current.yesterday - 1.year, amount_due: 0, is_endless: true) }
+      it "is not active" do
+        invoice.set_calculated_attributes
+        expect(invoice.end_at).to be_within(100).of invoice.start_at + invoice.subscription_duration
+        expect(invoice.endless?).to be_truthy
+        expect(invoice.expired?).to be_falsey
+        expect(invoice.paid_in_full?).to be_truthy
+        expect(invoice.future?).to be_falsey
+        expect(invoice.was_active?).to be_truthy
       end
     end
   end

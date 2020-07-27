@@ -19,12 +19,12 @@ class Admin::InvoicesController < Admin::BaseController
   end
 
   def matching_invoices
-    if params[:query] == "active"
-      invoices = Invoice.active
+    invoices = if params[:query] == "active"
+      Invoice.active
     elsif params[:query] == "inactive"
-      invoices = Invoice.inactive
+      Invoice.inactive
     else
-      invoices = Invoice
+      Invoice
     end
   end
 end

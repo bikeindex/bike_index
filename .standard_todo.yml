@@ -13,12 +13,10 @@ ignore:
   - app/controllers/admin/external_registry_credentials_controller.rb
   - app/controllers/admin/feedbacks_controller.rb
   - app/controllers/admin/graphs_controller.rb
-  - app/controllers/admin/invoices_controller.rb
   - app/controllers/admin/mail_snippets_controller.rb
   - app/controllers/admin/manufacturers_controller.rb
   - app/controllers/admin/news_controller.rb
   - app/controllers/admin/organizations/custom_layouts_controller.rb
-  - app/controllers/admin/organizations/invoices_controller.rb
   - app/controllers/admin/organizations_controller.rb
   - app/controllers/admin/paid_features_controller.rb
   - app/controllers/admin/paints_controller.rb
@@ -145,7 +143,6 @@ ignore:
   - app/models/hot_sheet_configuration.rb
   - app/models/impound_record.rb
   - app/models/impound_record_update.rb
-  - app/models/invoice.rb
   - app/models/location.rb
   - app/models/lock.rb
   - app/models/mail_snippet.rb
@@ -267,7 +264,6 @@ ignore:
   - spec/controllers/admin/graphs_controller_spec.rb
   - spec/controllers/admin/manufacturer_controller_spec.rb
   - spec/controllers/admin/organizations/custom_layouts_controller_spec.rb
-  - spec/controllers/admin/organizations/invoices_controller_spec.rb
   - spec/controllers/admin/paid_features_controller_spec.rb
   - spec/controllers/admin/paints_controller_spec.rb
   - spec/controllers/admin/payments_controller_spec.rb
