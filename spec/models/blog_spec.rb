@@ -15,6 +15,7 @@ RSpec.describe Blog, type: :model do
       # blog2 = FactoryBot.create(:blog, title: "an elder statesman")
       # expect(blog2).to be_present
       # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog2.id
+      expect(Blog.text_search("good").pluck(:id)).to eq([blog.id])
     end
   end
 
