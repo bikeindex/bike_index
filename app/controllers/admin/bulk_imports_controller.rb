@@ -7,11 +7,12 @@ class Admin::BulkImportsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 10
     @bulk_imports = matching_bulk_imports.includes(:organization, :user, :creation_states)
-                                         .reorder(sort_column + " " + sort_direction)
-                                         .page(page).per(per_page)
+      .reorder(sort_column + " " + sort_direction)
+      .page(page).per(per_page)
   end
 
-  def show; end
+  def show
+  end
 
   def new
     organization_id = Organization.friendly_find(params[:organization_id])&.id
@@ -45,7 +46,7 @@ class Admin::BulkImportsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:bulk_import).permit(%i(organization_id file no_notify))
+    params.require(:bulk_import).permit(%i[organization_id file no_notify])
   end
 
   def default_period

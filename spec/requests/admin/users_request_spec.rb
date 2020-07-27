@@ -23,9 +23,9 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
-        expect do
+        expect {
           get "#{base_url}/STUFFFFFF/edit"
-        end.to raise_error(ActiveRecord::RecordNotFound)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
     context "username" do
@@ -45,16 +45,16 @@ RSpec.describe Admin::UsersController, type: :request do
       let(:user_subject) { FactoryBot.create(:user, confirmed: false) }
       it "updates all the things that can be edited (finding via user id)" do
         put "#{base_url}/#{user_subject.id}", params: {
-                                                user: {
-                                                                                        name: "New Name",
-                                                                                        email: "newemailexample.com",
-                                                                                        confirmed: true,
-                                                                                        superuser: true,
-                                                                                        developer: true,
-                                                                                        can_send_many_stolen_notifications: true,
-                                                                                        banned: true,
-                                                                                        phone: "9876543210",
-                                                                                      }
+          user: {
+            name: "New Name",
+            email: "newemailexample.com",
+            confirmed: true,
+            superuser: true,
+            developer: true,
+            can_send_many_stolen_notifications: true,
+            banned: true,
+            phone: "9876543210"
+          }
         }
         expect(user_subject.reload.name).to eq("New Name")
         expect(user_subject.email).to eq("newemailexample.com")
@@ -70,13 +70,13 @@ RSpec.describe Admin::UsersController, type: :request do
       let(:current_user) { FactoryBot.create(:admin_developer) }
       it "updates developer" do
         put "#{base_url}/#{user_subject.id}", params: {
-                                                user: {
-                                                                                        developer: true,
-                                                                                        email: user_subject.email,
-                                                                                        superuser: false,
-                                                                                        can_send_many_stolen_notifications: true,
-                                                                                        banned: true,
-                                                                                      }
+          user: {
+            developer: true,
+            email: user_subject.email,
+            superuser: false,
+            can_send_many_stolen_notifications: true,
+            banned: true
+          }
         }
         user_subject.reload
         expect(user_subject.developer).to be_truthy
