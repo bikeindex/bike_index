@@ -7,6 +7,7 @@ class InfoController < ApplicationController
     elsif @blog.blog?
       redirect_to(news_path(@blog.to_param)) && return
     end
+    @page_id = "news_show" # Override to make styles same as blog
     @blogger = @blog.user
   end
 

@@ -16,6 +16,7 @@ RSpec.describe InfoController, type: :request do
       expect(html_response).to match(/<title>Cool info about bike things</)
       # This is pulled from the translations file
       expect(html_response).to match(/<meta.*Special info desc/)
+      expect(assigns(:page_id)).to eq "news_show"
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
