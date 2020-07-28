@@ -133,7 +133,7 @@ RSpec.describe Organized::BikesController, type: :request do
         creation_state = bike.creation_state
         expect(creation_state.organization).to eq current_organization
         expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.origin).to eq "organization_form"
+        expect(creation_state.origin).to eq "unregistered_parking_notification"
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.parking_notifications.first
@@ -209,7 +209,7 @@ RSpec.describe Organized::BikesController, type: :request do
           creation_state = bike.creation_state
           expect(creation_state.organization).to eq current_organization
           expect(creation_state.creator).to eq bike.creator
-          expect(creation_state.origin).to eq "organization_form"
+          expect(creation_state.origin).to eq "unregistered_parking_notification"
 
           expect(ParkingNotification.where(bike_id: bike.id).count).to eq 1
           parking_notification = ParkingNotification.where(bike_id: bike.id).first
