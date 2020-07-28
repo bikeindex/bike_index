@@ -1,18 +1,18 @@
 class ParkingNotificationSerializer < ApplicationSerializer
   attributes :id,
-             :kind,
-             :kind_humanized,
-             :status,
-             :created_at,
-             :lat,
-             :lng,
-             :user_id,
-             :user_display_name,
-             :bike,
-             :notification_number,
-             :impound_record_id,
-             :unregistered_bike,
-             :resolved_at
+    :kind,
+    :kind_humanized,
+    :status,
+    :created_at,
+    :lat,
+    :lng,
+    :user_id,
+    :user_display_name,
+    :bike,
+    :notification_number,
+    :impound_record_id,
+    :unregistered_bike,
+    :resolved_at
 
   def created_at
     object.created_at.to_i
@@ -46,7 +46,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
     bike_obj = object.bike
     {
       id: bike_obj&.id,
-      title: bike_obj&.title_string,
+      title: bike_obj&.title_string
     }
   end
 end

@@ -513,6 +513,37 @@ RSpec.describe BikesController, type: :request do
     end
   end
 
+  describe "edit" do
+    it "renders" do
+      get "#{base_url}/#{bike.id}/edit"
+      expect(flash).to be_blank
+      expect(response).to render_template(:edit_bike_details)
+      expect(assigns(:bike).id).to eq bike.id
+    end
+    context "with impound_record" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike)}
+      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id)}
+      it "redirects with flash error" do
+        bike.reload
+        expect(bike.status).to eq "status_impounded"
+        get "#{base_url}/#{bike.id}/edit"
+        expect(flash[:error]).to match(/impounded/i)
+        expect(response).to redirect_to(bike_path(bike.id))
+      end
+      context "organization member" do
+        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization)}
+        it "renders" do
+          bike.reload
+          expect(bike.status).to eq "status_impounded"
+          get "#{base_url}/#{bike.id}/edit"
+          expect(flash).to be_blank
+          expect(response).to render_template(:edit_bike_details)
+          expect(assigns(:bike).id).to eq bike.id
+        end
+      end
+    end
+  end
+
   describe "update" do
     context "setting a bike_sticker" do
       it "gracefully fails if the number is weird" do
@@ -592,6 +623,40 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.to_coordinates.compact).to eq([])
           expect(stolen_record.date_stolen).to be_within(5).of Time.current
         end
+      end
+    end
+    context "unregistered_parking_notification email update" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+      let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+      let(:parking_notification) do
+        current_organization.update_attributes(auto_user: auto_user)
+        FactoryBot.create(:unregistered_parking_notification, organization: current_organization, user: current_organization.auto_user)
+      end
+      let!(:bike) { parking_notification.bike }
+      let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+      it "updates email and marks not user hidden" do
+        bike.reload
+        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.unregistered_parking_notification?).to be_truthy
+        expect(bike.user_hidden).to be_truthy
+        expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+        expect(bike.ownerships.count).to eq 1
+        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        Sidekiq::Worker.clear_all
+        expect {
+          patch "#{base_url}/#{bike.id}", params: {
+                                            bike: { owner_email: "newuser@example.com" },
+                                          }
+          expect(flash[:success]).to be_present
+        }.to change(Ownership, :count).by 1
+        bike.reload
+        expect(bike.current_ownership.user_id).to be_blank
+        expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
+        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
       end
     end
     context "adding location to a stolen bike" do

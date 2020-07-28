@@ -10,6 +10,12 @@
       = @bike.mnfg_name
       = @bike.frame_model
       = @bike.type unless @bike.type == 'bike'
+      - if @bike.deleted?
+        %em.text-danger.uncap
+          This #{@bike.type} was deleted
+          - if @bike.deleted_at.present?
+            %span.convertTime.preciseTime
+              = l(@bike.deleted_at, format: :convert_time)
 
     - unless @bike.user?
       %p.mb-0

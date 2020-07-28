@@ -16,7 +16,8 @@ module Organized
         .includes(:user, :bike, :location)
     end
 
-    def show; end
+    def show
+    end
 
     def update
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
@@ -58,6 +59,8 @@ module Organized
         bikes = a_impound_records.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
+      elsif params[:search_bike_id].present?
+        a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)
@@ -71,8 +74,8 @@ module Organized
 
     def permitted_parameters
       params.require(:impound_record_update)
-            .permit(:kind, :notes, :location_id, :transfer_email)
-            .merge(user_id: current_user.id)
+        .permit(:kind, :notes, :location_id, :transfer_email)
+        .merge(user_id: current_user.id)
     end
   end
 end

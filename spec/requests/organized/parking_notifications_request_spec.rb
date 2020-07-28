@@ -16,7 +16,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
     context "json" do
       it "returns empty" do
-        get base_url, params: { format: :json }
+        get base_url, params: {format: :json}
         expect(response.status).to eq(200)
         expect(json_result).to eq("parking_notifications" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
@@ -26,10 +26,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:impound_record) { FactoryBot.create(:impound_record) }
         let!(:parking_notification1) do
           FactoryBot.create(:parking_notification_organized,
-                            organization: current_organization,
-                            bike: bike,
-                            created_at: Time.current - 1.hour,
-                            impound_record: impound_record)
+            organization: current_organization,
+            bike: bike,
+            created_at: Time.current - 1.hour,
+            impound_record: impound_record)
         end
         let(:target) do
           {
@@ -48,12 +48,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             notification_number: 1,
             bike: {
               id: bike.id,
-              title: bike.title_string,
-            },
+              title: bike.title_string
+            }
           }
         end
         it "renders json, no cors present" do
-          get base_url, params: { search_status: "all", format: :json }
+          get base_url, params: {search_status: "all", format: :json}
           expect(response.status).to eq(200)
           parking_notifications = json_result["parking_notifications"]
           expect(parking_notifications.count).to eq 1
@@ -62,7 +62,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(response.headers["Access-Control-Request-Method"]).not_to be_present
 
           # Also test that current is default scope
-          get base_url, params: { format: :json }
+          get base_url, params: {format: :json}
           expect(response.status).to eq(200)
           parking_notifications = json_result["parking_notifications"]
           expect(parking_notifications.count).to eq 0
@@ -75,12 +75,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       let(:bike) { parking_notification2.bike }
       it "renders" do
         expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
-        get base_url, params: { search_bike_id: bike.id }, headers: json_headers
+        get base_url, params: {search_bike_id: bike.id}, headers: json_headers
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
 
-        get base_url, params: { search_email: bike.owner_email }, headers: json_headers
+        get base_url, params: {search_email: bike.owner_email}, headers: json_headers
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
@@ -107,7 +107,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
         message: "Some message to the user",
-        accuracy: 12.0,
+        accuracy: 12.0
       }
     end
 
@@ -116,26 +116,26 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
-          expect do
+          expect {
             post base_url, params: {
-                             organization_id: current_organization.to_param,
-                             parking_notification: parking_notification_params,
-                           }
+              organization_id: current_organization.to_param,
+              parking_notification: parking_notification_params
+            }
             expect(response).to redirect_to user_root_url
             expect(flash[:error]).to be_present
-          end.to_not change(ParkingNotification, :count)
+          }.to_not change(ParkingNotification, :count)
         end
       end
 
       context "without a required param" do
         it "fails and renders error" do
-          expect do
+          expect {
             post base_url, params: {
-                             organization_id: current_organization.to_param,
-                             parking_notification: parking_notification_params.except(:latitude),
-                           }
+              organization_id: current_organization.to_param,
+              parking_notification: parking_notification_params.except(:latitude)
+            }
             expect(flash[:error]).to match(/address/i)
-          end.to_not change(ParkingNotification, :count)
+          }.to_not change(ParkingNotification, :count)
         end
       end
 
@@ -148,13 +148,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(invoice.paid_in_full?).to be_truthy
           expect(current_organization.is_paid).to be_truthy
           expect(current_organization.enabled?("parking_notifications")).to be_falsey
-          expect do
+          expect {
             post base_url, params: {
-                             organization_id: current_organization.to_param, parking_notification: parking_notification_params,
-                           }
+              organization_id: current_organization.to_param, parking_notification: parking_notification_params
+            }
             expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
-          end.to_not change(ParkingNotification, :count)
+          }.to_not change(ParkingNotification, :count)
         end
       end
 
@@ -163,14 +163,14 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(current_organization.enabled?("parking_notifications")).to be_truthy
         bike.reload
         expect(bike.status).to eq "status_with_owner"
-        expect do
+        expect {
           post base_url, params: {
-                           organization_id: current_organization.to_param,
-                           parking_notification: parking_notification_params,
-                         }
+            organization_id: current_organization.to_param,
+            parking_notification: parking_notification_params
+          }
           expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
-        end.to change(ParkingNotification, :count).by(1)
+        }.to change(ParkingNotification, :count).by(1)
         parking_notification = ParkingNotification.last
 
         expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
@@ -202,7 +202,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             city: "Oakland",
             zipcode: "94612",
             state_id: state.id.to_s,
-            country_id: Country.united_states.id,
+            country_id: Country.united_states.id
           }
         end
         include_context :geocoder_real
@@ -212,14 +212,14 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(bike.status).to eq "status_with_owner"
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
-            expect do
+            expect {
               post base_url, params: {
-                               organization_id: current_organization.to_param,
-                               parking_notification: parking_notification_params,
-                             }
+                organization_id: current_organization.to_param,
+                parking_notification: parking_notification_params
+              }
               expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
               expect(flash[:success]).to be_present
-            end.to change(ParkingNotification, :count).by(1)
+            }.to change(ParkingNotification, :count).by(1)
           end
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           parking_notification = ParkingNotification.last
@@ -236,10 +236,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.status).to eq "impounded"
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
+          expect(parking_notification.resolved_at).to be_within(5).of parking_notification.created_at
 
           parking_notification_initial.reload
           expect(parking_notification_initial.status).to eq "impounded"
           expect(parking_notification_initial.impound_record_id).to eq parking_notification.impound_record_id
+          expect(parking_notification_initial.resolved_at).to be_within(5).of parking_notification.impound_record.created_at
 
           bike.reload
           expect(bike.status).to eq "status_impounded"
@@ -252,12 +254,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "send_additional" do
     let!(:parking_notification_initial) do
       FactoryBot.create(:parking_notification,
-                        :in_los_angeles,
-                        bike: bike,
-                        organization: current_organization,
-                        message: "some message to the user",
-                        delivery_status: "failed for unknown reason",
-                        kind: "parked_incorrectly_notification")
+        :in_los_angeles,
+        bike: bike,
+        organization: current_organization,
+        message: "some message to the user",
+        delivery_status: "failed for unknown reason",
+        kind: "parked_incorrectly_notification")
     end
     it "sends another notification" do
       bike.reload
@@ -270,10 +272,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         post base_url, params: {
-                         organization_id: current_organization.to_param,
-                         kind: "parked_incorrectly_notification",
-                         ids: parking_notification_initial.id,
-                       }
+          organization_id: current_organization.to_param,
+          kind: "parked_incorrectly_notification",
+          ids: parking_notification_initial.id
+        }
         expect(ParkingNotification.count).to eq 2
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
@@ -307,13 +309,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification_initial.active?).to be_falsey
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
-          expect do
+          expect {
             post base_url, params: {
-                             organization_id: current_organization.to_param,
-                             kind: "parked_incorrectly_notification",
-                             ids: parking_notification_initial.id,
-                           }
-          end.to_not change(ParkingNotification, :count)
+              organization_id: current_organization.to_param,
+              kind: "parked_incorrectly_notification",
+              ids: parking_notification_initial.id
+            }
+          }.to_not change(ParkingNotification, :count)
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([parking_notification_initial.id])
           expect(assigns(:notifications_repeated)).to eq([])
@@ -323,11 +325,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "replaced" do
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification,
-                          :in_chicago,
-                          bike: bike,
-                          initial_record_id: parking_notification_initial.id,
-                          organization: current_organization,
-                          kind: "parked_incorrectly_notification")
+          :in_chicago,
+          bike: bike,
+          initial_record_id: parking_notification_initial.id,
+          organization: current_organization,
+          kind: "parked_incorrectly_notification")
       end
 
       before { ProcessParkingNotificationWorker.new.perform(parking_notification2.id) }
@@ -370,17 +372,17 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
-                           organization_id: current_organization.to_param,
-                           kind: "appears_abandoned_notification",
-                           ids: parking_notification_initial.id,
-                         }
+            organization_id: current_organization.to_param,
+            kind: "appears_abandoned_notification",
+            ids: parking_notification_initial.id
+          }
         end
         expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
         expect(response).to redirect_to organization_parking_notification_path(ParkingNotification.last.id, organization_id: current_organization.to_param)
       end
       context "multiple for one notification stream" do
         # This is how the ids look, for some reason
-        let(:ids_params) { { parking_notification_initial.id.to_s => parking_notification_initial.id.to_s, parking_notification2.id.to_s => parking_notification2.id.to_s } }
+        let(:ids_params) { {parking_notification_initial.id.to_s => parking_notification_initial.id.to_s, parking_notification2.id.to_s => parking_notification2.id.to_s} }
         it "only sends one" do
           parking_notification2.reload
           parking_notification_initial.reload
@@ -389,10 +391,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
-                             organization_id: current_organization.to_param,
-                             kind: "appears_abandoned_notification",
-                             ids: ids_params,
-                           }
+              organization_id: current_organization.to_param,
+              kind: "appears_abandoned_notification",
+              ids: ids_params
+            }
           end
           expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
           expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
@@ -413,13 +415,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(current_organization.parking_notifications.active.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
-        expect do
+        expect {
           post base_url, params: {
-                           organization_id: current_organization.to_param,
-                           kind: "impound_notification",
-                           ids: "#{parking_notification_initial.id}, #{parking_notification2.id}",
-                         }
-        end.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
+            organization_id: current_organization.to_param,
+            kind: "impound_notification",
+            ids: "#{parking_notification_initial.id}, #{parking_notification2.id}"
+          }
+        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
         ProcessParkingNotificationWorker.drain
         expect(ParkingNotification.count).to eq 4
         expect(ActionMailer::Base.deliveries.count).to eq 2

@@ -13,27 +13,27 @@ RSpec.describe Feedback, type: :model do
   end
   describe "create" do
     it "enqueues an email job" do
-      expect do
+      expect {
         FactoryBot.create(:feedback)
-      end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
     end
 
     it "doesn't send email" do
-      expect do
+      expect {
         FactoryBot.create(:feedback, feedback_type: "bike_delete_request")
-      end.to_not change(EmailFeedbackNotificationWorker.jobs, :size)
+      }.to_not change(EmailFeedbackNotificationWorker.jobs, :size)
     end
 
     it "doesn't enqueue an email job for serial updates" do
-      expect do
+      expect {
         FactoryBot.create(:feedback, feedback_type: "serial_update_request")
-      end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
     end
 
     it "doesn't enqueue an email job for manufacturer updates" do
-      expect do
+      expect {
         FactoryBot.create(:feedback, feedback_type: "manufacturer_update_request")
-      end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
     end
 
     it "auto sets the body for a lead_type" do
@@ -89,6 +89,27 @@ RSpec.describe Feedback, type: :model do
       bike.reload
       expect(bike.deleted_at).to be_present
       expect(bike.paranoia_destroyed?).to be_truthy
+    end
+    context "bike is impounded" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      it "marks the impound_record removed_from_bike_index" do
+        expect(impound_record.active?).to be_truthy
+        expect(impound_record.impound_record_updates.count).to eq 0
+        expect(bike.paranoia_destroyed?).to be_falsey
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          feedback.update(user_id: FactoryBot.create(:user).id) # ImpoundRecordUpdate requires a user_id
+        end
+        bike.reload
+        impound_record.reload
+        expect(impound_record.removed_from_bike_index?).to be_truthy
+        expect(impound_record.impound_record_updates.count).to eq 1
+        impound_record_update = impound_record.impound_record_updates.last
+        expect(impound_record_update.user).to eq feedback.user
+        expect(impound_record_update.kind).to eq "removed_from_bike_index"
+        expect(bike.deleted_at).to be_present
+        expect(bike.paranoia_destroyed?).to be_truthy
+      end
     end
   end
 end

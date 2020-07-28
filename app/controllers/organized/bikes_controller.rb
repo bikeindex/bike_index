@@ -17,7 +17,7 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_root_path and return unless current_organization.enabled?("show_recoveries")
+      redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -34,7 +34,7 @@ module Organized
     end
 
     def incompletes
-      redirect_to current_root_path and return unless current_organization.enabled?("show_partial_registrations")
+      redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -59,11 +59,12 @@ module Organized
       render layout: "embed_layout"
     end
 
-    def multi_serial_search; end
+    def multi_serial_search
+    end
 
     def create
       @b_param = find_or_new_b_param
-      iframe_redirect_params = { organization_id: current_organization.to_param }
+      iframe_redirect_params = {organization_id: current_organization.to_param}
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
@@ -91,7 +92,7 @@ module Organized
     def find_or_new_b_param
       token = params[:b_param_token]
       token ||= params[:bike] && params[:bike][:b_param_id_token]
-      b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id, organization_id: current_organization.id)
+      b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id, organization_id: current_organization.id)
       b_param.origin = "organization_form"
       b_param
     end
@@ -101,7 +102,7 @@ module Organized
       phash = params.as_json
       {
         origin: "organization_form",
-        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id)),
+        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
       }
     end
 

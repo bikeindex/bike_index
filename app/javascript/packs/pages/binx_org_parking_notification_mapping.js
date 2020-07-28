@@ -112,9 +112,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     $("#recordsTable").on("click", ".map-cell a", (e) => {
       e.preventDefault();
       let recordId = parseInt(
-        $(e.target)
-          .parents("tr")
-          .attr("data-recordid"),
+        $(e.target).parents("tr").attr("data-recordid"),
         10
       );
       if (isNaN(recordId)) {
@@ -125,11 +123,11 @@ export default class BinxAppOrgParkingNotificationMapping {
       }
       let record = _.find(
         binxAppOrgParkingNotificationMapping.records,
-        function(record) {
+        function (record) {
           return recordId == record.id;
         }
       );
-      let marker = _.find(binxMapping.markersRendered, function(marker) {
+      let marker = _.find(binxMapping.markersRendered, function (marker) {
         return recordId == marker.binxId;
       });
       binxMapping.openInfoWindow(marker, recordId, record);
@@ -146,7 +144,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     binxMapping.addMarkers({ fitMap: true });
     this.mapRendered = true;
     // Add a trigger to the map when the viewport changes (after it has finished moving)
-    google.maps.event.addListener(binxMap, "idle", function() {
+    google.maps.event.addListener(binxMap, "idle", function () {
       // This is grabbing the markers in viewport and logging the ids for them.
       // We actually need to rerender the the marker table
       log.debug("rerendering table because map");
@@ -170,9 +168,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     }</a>`;
     const impoundLink =
       record.impund_record_id !== undefined
-        ? `<a href="${record.impund_record_id}" class="convertTime">${
-            record.resolved_at
-          }</a>`
+        ? `<a href="${record.impund_record_id}" class="convertTime">${record.resolved_at}</a>`
         : "";
     const retrievedAtSpan = record.resolved_at
       ? `<span class="convertTime preciseTime">${record.resolved_at}</span>`
@@ -187,21 +183,18 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.notification_number > 1
         ? "- notification #" + record.notification_number
         : ""
-    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span> <em class="small extended-col-info d-block status-cell">${
-      record.status
-    } status</em>
+    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span>
     ${
       impoundLink.length
         ? "<strong class='small extended-col-info d-block'>Impounded: " +
-          impoundLink
-        : "</strong>"
+          impoundLink +
+          "</strong>"
+        : ""
     }
-    ${
-      retrievedAtSpan.length
-        ? "<strong class='small extended-col-info d-block'>Retrieved: " +
-          retrievedAtSpan
-        : "</strong>"
-    }
+    <strong class='small extended-col-info d-block'>
+      ${record.status === "retrieved" ? "Retrieved" : ""}
+      ${record.status !== "impounded" ? retrievedAtSpan : ""}
+    </strong>
       </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
     }</em></td><td class="hidden-sm-cells">${
@@ -210,7 +203,7 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${
       record.status
-    }</td><td class="hidden-sm-cells">${impoundLink}</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
+    }</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
       record.id
     }]" id="ids_${record.id}" value="${record.id}"></td>
@@ -256,7 +249,7 @@ export default class BinxAppOrgParkingNotificationMapping {
   }
 
   addMarkerPointsForRecords(records) {
-    binxMapping.markerPointsToRender = records.map(function(record) {
+    binxMapping.markerPointsToRender = records.map(function (record) {
       return {
         id: record.id,
         lat: record.lat,

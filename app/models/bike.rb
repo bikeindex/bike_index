@@ -14,7 +14,7 @@ class Bike < ApplicationRecord
     status_stolen: 1,
     status_abandoned: 2,
     status_impounded: 3,
-    unregistered_parking_notification: 4,
+    unregistered_parking_notification: 4
   }
 
   belongs_to :manufacturer
@@ -68,9 +68,9 @@ class Bike < ApplicationRecord
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
-                :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
-                :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
+    :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
+    :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
+    :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -80,23 +80,23 @@ class Bike < ApplicationRecord
   enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
-  default_scope {
+  default_scope do
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
       .current
       .order("listing_order desc")
-  }
+  end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
-  scope :impounded, -> { includes(:impound_records).where(impound_records: { resolved_at: nil }).where.not(impound_records: { id: nil }) }
+  scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :non_abandoned, -> { where(abandoned: false) }
-  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: "lightspeed_pos" }) }
-  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: "ascend_pos" }) }
-  scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: "no_pos" }) }
-  scope :no_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: "no_pos" }) }
+  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
+  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
+  scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
+  scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
@@ -104,36 +104,37 @@ class Bike < ApplicationRecord
 
   include PgSearch::Model
   pg_search_scope :pg_search, against: {
-                                serial_number: "A",
-                                cached_data: "B",
-                                all_description: "C",
-                              }
+    serial_number: "A",
+    cached_data: "B",
+    all_description: "C"
+  }
 
   pg_search_scope :admin_search,
-                  against: { owner_email: "A" },
-                  associated_against: { ownerships: :owner_email, creator: :email },
-                  using: { tsearch: { dictionary: "english", prefix: true } }
+    against: {owner_email: "A"},
+    associated_against: {ownerships: :owner_email, creator: :email},
+    using: {tsearch: {dictionary: "english", prefix: true}}
 
   class << self
     def old_attr_accessible
-      (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized made_without_serial extra_registration_number
-          creation_organization_id manufacturer year thumb_path name stolen
-          current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-          handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
-          rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-          primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-          propulsion_type street zipcode country_id state_id city belt_drive
-          coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-          timezone date_stolen receive_notifications phone creator creator_id image
-          components_attributes b_param_id embeded embeded_extended example hidden
-          stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
-          marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
-      ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
-                         components_attributes: Component.old_attr_accessible]).freeze
+      (%w[manufacturer_id manufacturer_other serial_number
+        serial_normalized made_without_serial extra_registration_number
+        creation_organization_id manufacturer year thumb_path name stolen
+        current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
+        handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
+        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
+        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
+        propulsion_type street zipcode country_id state_id city belt_drive
+        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
+        timezone date_stolen receive_notifications phone creator creator_id image
+        components_attributes b_param_id embeded embeded_extended example hidden
+        stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
+        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids].map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
+                                                                                                                     components_attributes: Component.old_attr_accessible]).freeze
     end
 
-    def statuses; STATUS_ENUM.keys.map(&:to_s) end
+    def statuses
+      STATUS_ENUM.keys.map(&:to_s)
+    end
 
     def text_search(query)
       query.present? ? pg_search(query) : all
@@ -151,7 +152,7 @@ class Bike < ApplicationRecord
     def friendly_find(bike_str)
       return nil unless bike_str.present?
       bike_str = bike_str.to_s.strip
-      if bike_str.match(/^\d+\z/) # it's only numbers, so it's a timestamp
+      if /^\d+\z/.match?(bike_str) # it's only numbers, so it's a timestamp
         bike_id = bike_str
       else
         bike_id = bike_str.match(/bikes\/\d*/i)
@@ -160,18 +161,20 @@ class Bike < ApplicationRecord
       where(id: bike_id).first
     end
 
-    def bike_sticker(organization_id = nil) # This method only accepts numerical org ids
-      return includes(:bike_stickers).where.not(bike_stickers: { bike_id: nil }) if organization_id.blank?
-      includes(:bike_stickers).where(bike_stickers: { organization_id: organization_id })
+    # This method only accepts numerical org ids
+    def bike_sticker(organization_id = nil)
+      return includes(:bike_stickers).where.not(bike_stickers: {bike_id: nil}) if organization_id.blank?
+      includes(:bike_stickers).where(bike_stickers: {organization_id: organization_id})
     end
 
-    def no_bike_sticker # This method doesn't accept org_id because Seth got lazy
-      includes(:bike_stickers).where(bike_stickers: { bike_id: nil })
+    # This method doesn't accept org_id because Seth got lazy
+    def no_bike_sticker
+      includes(:bike_stickers).where(bike_stickers: {bike_id: nil})
     end
 
     def organization(org_or_org_ids)
       ids = org_or_org_ids.is_a?(Organization) ? Organization.friendly_find(org_or_org_ids)&.id : org_or_org_ids
-      includes(:bike_organizations).where(bike_organizations: { organization_id: ids })
+      includes(:bike_organizations).where(bike_organizations: {organization_id: ids})
     end
 
     # Possibly-found bikes are stolen bikes that have a counterpart record(s)
@@ -243,7 +246,7 @@ class Bike < ApplicationRecord
     # and/or country. `city`, `state` and `country` are accepted as strings /
     # symbols of the name or abbreviation, and are matched conjointly.
     def currently_stolen_in(city: nil, state: nil, country: nil)
-      location = { city: city, state: state, country: country }.select { |_, v| v.present? }
+      location = {city: city, state: state, country: country}.select { |_, v| v.present? }
       location[:state] &&= State.find_by("name = ? OR abbreviation = ?", state, state)
       location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
       return none if location.values.any?(&:blank?)
@@ -257,7 +260,8 @@ class Bike < ApplicationRecord
     end
   end
 
-  def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+  # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+  def cleaned_error_messages
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
@@ -267,41 +271,73 @@ class Bike < ApplicationRecord
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
-  def creation_state; creation_states.first end
+  def creation_state
+    creation_states.first
+  end
 
-  def creation_description; creation_state&.creation_description end
+  def creation_description
+    creation_state&.creation_description
+  end
 
-  def bulk_import; creation_state&.bulk_import end
+  def bulk_import
+    creation_state&.bulk_import
+  end
 
-  def pos_kind; creation_state&.pos_kind end
+  def pos_kind
+    creation_state&.pos_kind
+  end
 
-  def pos?; pos_kind != "no_pos" end
+  def pos?
+    pos_kind != "no_pos"
+  end
 
-  def current_ownership; ownerships.reorder(:id).last end
+  def current_ownership
+    ownerships.reorder(:id).last
+  end
 
   # Use present? to ensure true/false rather than nil
-  def claimed?; current_ownership.present? && current_ownership.claimed.present? end
+  def claimed?
+    current_ownership.present? && current_ownership.claimed.present?
+  end
 
   # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
-  def owner; current_ownership&.owner end
+  def owner
+    current_ownership&.owner
+  end
 
   # This can be nil!
-  def user; current_ownership&.user end
+  def user
+    current_ownership&.user
+  end
 
-  def user?; user.present? end
+  def user?
+    user.present?
+  end
 
-  def stolen_recovery?; recovered_records.any? end
+  def stolen_recovery?
+    recovered_records.any?
+  end
 
-  def current_impound_record; impound_records.current.last end
+  def current_impound_record
+    impound_records.current.last
+  end
 
-  def impounded?; current_impound_record.present? end
+  def impounded?
+    current_impound_record.present?
+  end
 
-  def current_parking_notification; parking_notifications.current.first end
+  def current_parking_notification
+    parking_notifications.current.first
+  end
 
   # Small helper because we call this a lot
-  def type; cycle_type && cycle_type_name.downcase end
+  def type
+    cycle_type && cycle_type_name.downcase
+  end
 
-  def user_hidden; hidden && current_ownership&.user_hidden end
+  def user_hidden
+    hidden && current_ownership&.user_hidden
+  end
 
   def email_visible_for?(org)
     organizations.include?(org)
@@ -314,11 +350,17 @@ class Bike < ApplicationRecord
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.
-  def made_without_serial?; made_without_serial end
+  def made_without_serial?
+    made_without_serial
+  end
 
-  def serial_unknown?; serial_number == "unknown" end
+  def serial_unknown?
+    serial_number == "unknown"
+  end
 
-  def no_serial?; made_without_serial? || serial_unknown? end
+  def no_serial?
+    made_without_serial? || serial_unknown?
+  end
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
@@ -333,7 +375,9 @@ class Bike < ApplicationRecord
     owner&.name
   end
 
-  def first_ownership; ownerships.reorder(:id).first end
+  def first_ownership
+    ownerships.reorder(:id).first
+  end
 
   def organized?(org = nil)
     if org.present?
@@ -353,9 +397,13 @@ class Bike < ApplicationRecord
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
-  def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
+  def first_ownership?
+    current_ownership&.blank? || current_ownership == first_ownership
+  end
 
   def editable_organizations
+    # Only the impound organization can edit it if it's impounded
+    return Organization.where(id: current_impound_record.organization_id) if current_impound_record.present?
     return organizations if first_ownership? && organized? && !claimed?
     can_edit_claimed_organizations
   end
@@ -372,15 +420,17 @@ class Bike < ApplicationRecord
     editable_organizations.any? { |o| u.member_of?(o) }
   end
 
-  def first_owner_email; first_ownership.owner_email end
+  def first_owner_email
+    first_ownership.owner_email
+  end
 
   def claimable_by?(u)
-    return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
+    return false if u.blank? || current_ownership.blank? || current_ownership.claimed? || current_impound_record.present?
     user == u || current_ownership.claimable_by?(u)
   end
 
   def authorized?(u)
-    return true if u == owner || claimable_by?(u)
+    return true unless current_impound_record.present? || !(u == owner || claimable_by?(u))
     return false if u.blank?
     authorized_by_organization?(u: u)
   end
@@ -391,10 +441,13 @@ class Bike < ApplicationRecord
     true
   end
 
-  def sticker_organizations; organizations.with_enabled_feature_slugs("bike_stickers") end
+  def sticker_organizations
+    organizations.with_enabled_feature_slugs("bike_stickers")
+  end
 
-  def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
-    bike_stickers.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
+  # This method only accepts numerical org ids
+  def bike_sticker?(organization_id = nil)
+    bike_stickers.where(organization_id.present? ? {organization_id: organization_id} : {}).any?
   end
 
   def display_contact_owner?(u = nil)
@@ -463,11 +516,11 @@ class Bike < ApplicationRecord
   end
 
   def stolen_string
-    return nil unless stolen and current_stolen_record.present?
+    return nil unless stolen && current_stolen_record.present?
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. ",
+      current_stolen_record.address && "from #{current_stolen_record.address}. "
     ].compact.join(" ")
   end
 
@@ -475,9 +528,7 @@ class Bike < ApplicationRecord
     if video_embed.present?
       code = Nokogiri::HTML(video_embed)
       src = code.xpath("//iframe/@src")
-      if src[0]
-        src[0].value
-      end
+      src[0]&.value
     end
   end
 
@@ -495,8 +546,6 @@ class Bike < ApplicationRecord
     bike_organizations
       .reject { |bo| org_ids.include?(bo.organization_id) }
       .each(&:destroy)
-
-    true
   end
 
   def validated_organization_id(organization_id)
@@ -517,22 +566,22 @@ class Bike < ApplicationRecord
   end
 
   def set_mnfg_name
-    if manufacturer.blank?
-      n = ""
+    n = if manufacturer.blank?
+      ""
     elsif manufacturer.name == "Other" && manufacturer_other.present?
-      n = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
-      n = manufacturer.simple_name
+      manufacturer.simple_name
     end
     self.mnfg_name = n.strip.truncate(60)
   end
 
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
-    if marked_user_hidden.present? && marked_user_hidden.to_s != "0"
+    if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
       self.hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && marked_user_unhidden.to_s != "0"
+    elsif marked_user_unhidden.present? && ParamsNormalizer.boolean(marked_user_unhidden)
       self.hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
@@ -540,10 +589,10 @@ class Bike < ApplicationRecord
   end
 
   def normalize_emails
-    if User.fuzzy_email_find(owner_email)
-      self.owner_email = User.fuzzy_email_find(owner_email).email
+    self.owner_email = if User.fuzzy_email_find(owner_email)
+      User.fuzzy_email_find(owner_email).email
     else
-      self.owner_email = EmailNormalizer.normalize(owner_email)
+      EmailNormalizer.normalize(owner_email)
     end
     true
   end
@@ -583,21 +632,21 @@ class Bike < ApplicationRecord
     end
 
     unless frame_size_unit.present?
-      if frame_size_number.present?
+      self.frame_size_unit = if frame_size_number.present?
         if frame_size_number < 30 # Good guessing?
-          self.frame_size_unit = "in"
+          "in"
         else
-          self.frame_size_unit = "cm"
+          "cm"
         end
       else
-        self.frame_size_unit = "ordinal"
+        "ordinal"
       end
     end
 
-    if frame_size_number.present?
-      self.frame_size = frame_size_number.to_s.gsub(".0", "") + frame_size_unit
+    self.frame_size = if frame_size_number.present?
+      frame_size_number.to_s.gsub(".0", "") + frame_size_unit
     else
-      self.frame_size = case frame_size.downcase
+      case frame_size.downcase
                         when /x*sma/, "xs"
                           "xs"
                         when /sma/, "s"
@@ -608,17 +657,15 @@ class Bike < ApplicationRecord
                           "l"
                         when /x*l/, "xl"
                           "xl"
-                        else
-                          nil
-                        end
+      end
     end
     true
   end
 
   def set_paints
-    self.paint_id = nil if paint_id.present? && paint_name.blank? && paint_name != nil
+    self.paint_id = nil if paint_id.present? && paint_name.blank? && !paint_name.nil?
     return true unless paint_name.present?
-    self.paint_name = paint_name[0] if paint_name.kind_of?(Array)
+    self.paint_name = paint_name[0] if paint_name.is_a?(Array)
     return true if Color.friendly_find(paint_name).present?
     paint = Paint.friendly_find(paint_name)
     paint = Paint.create(name: paint_name) unless paint.present?
@@ -634,12 +681,13 @@ class Bike < ApplicationRecord
     registration_address["street"].present? && registration_address["city"].present?
   end
 
-  def registration_address # Goes along with organization additional_registration_fields
+  # Goes along with organization additional_registration_fields
+  def registration_address
     return @registration_address if defined?(@registration_address)
-    if user&.address_present?
-      @registration_address = user&.address_hash
+    @registration_address = if user&.address_present?
+      user&.address_hash
     else
-      @registration_address = b_params_address || {}
+      b_params_address || {}
     end
   end
 
@@ -652,10 +700,10 @@ class Bike < ApplicationRecord
     if current_stolen_record.present?
       # If there is a current stolen - even if it has a blank location - use it
       # It's used for searching and displaying stolen bikes, we don't want other information leaking
-      if address_set_manually # Only set coordinates if the address is set manually
-        self.attributes = current_stolen_record.attributes.slice("latitude", "longitude")
+      self.attributes = if address_set_manually # Only set coordinates if the address is set manually
+        current_stolen_record.attributes.slice("latitude", "longitude")
       else # Set the whole address from the stolen record
-        self.attributes = current_stolen_record.address_hash
+        current_stolen_record.address_hash
       end
     else
       return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
@@ -686,13 +734,14 @@ class Bike < ApplicationRecord
 
   def frame_colors
     [
-      primary_frame_color && primary_frame_color.name,
-      secondary_frame_color && secondary_frame_color.name,
-      tertiary_frame_color && tertiary_frame_color.name,
+      primary_frame_color&.name,
+      secondary_frame_color&.name,
+      tertiary_frame_color&.name
     ].compact
   end
 
-  def cgroup_array # list of cgroups so that we can arrange them
+  # list of cgroups so that we can arrange them
+  def cgroup_array
     components.map(&:cgroup_id).uniq
   end
 
@@ -706,7 +755,13 @@ class Bike < ApplicationRecord
     set_location_info
     self.listing_order = calculated_listing_order
     # Quick hack to store the fact that it was creation for parking notification
-    self.created_by_parking_notification = true if unregistered_parking_notification?
+    if unregistered_parking_notification?
+      self.created_by_parking_notification = true
+      # TODO: Switch to using creation_state, rather than this boolean, ASAP
+      if creation_state.present? && creation_state.origin != "unregistered_parking_notification"
+        creation_state.update(origin: "unregistered_parking_notification")
+      end
+    end
     self.status = calculated_status unless skip_status_update
     self.abandoned = true if status_abandoned? # Quick hack to manage prior to status update
     clean_frame_size
@@ -720,19 +775,21 @@ class Bike < ApplicationRecord
 
   def components_cache_string
     components.includes(:manufacturer, :ctype).map.each do |c|
-      [
-        c.year,
-        (c.manufacturer && c.manufacturer.name),
-        c.component_type,
-      ] if c.ctype.present? && c.ctype.name.present?
+      if c.ctype.present? && c.ctype.name.present?
+        [
+          c.year,
+          c.manufacturer&.name,
+          c.component_type
+        ]
+      end
     end
   end
 
   def cache_stolen_attributes
     self.all_description =
       [description, current_stolen_record&.theft_description]
-        .reject(&:blank?)
-        .join(" ")
+      .reject(&:blank?)
+      .join(" ")
   end
 
   def cache_bike
@@ -752,7 +809,7 @@ class Bike < ApplicationRecord
       (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
       extra_registration_number,
       (type == "bike" ? nil : type),
-      components_cache_string,
+      components_cache_string
     ].flatten.reject(&:blank?).join(" ")
   end
 
@@ -780,9 +837,8 @@ class Bike < ApplicationRecord
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_status
-    # NOTE: If it's impounded, status is still unregistered_parking_notification. This should probably be fixed
-    return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_impounded" if current_impound_record.present?
+    return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     return "status_stolen" if current_stolen_record.present?
 
@@ -802,7 +858,7 @@ class Bike < ApplicationRecord
     location_record = [
       current_parking_notification,
       creation_organization&.default_location,
-      owner,
+      owner
     ].compact.find { |rec| rec.latitude.present? }
     location_record.present? ? location_record.address_hash : b_params_address
   end

@@ -15,7 +15,7 @@ class CreationState < ApplicationRecord
 
   # Probably should be switched to enum at some point
   def self.origins
-    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form].freeze
+    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification].freeze
   end
 
   def creation_description
@@ -26,6 +26,7 @@ class CreationState < ApplicationRecord
     elsif origin.present?
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
+      return "parking notification" if origin == "unregistered_parking_notification"
       origin.humanize.downcase
     end
   end
@@ -46,7 +47,7 @@ class CreationState < ApplicationRecord
   end
 
   def set_reflexive_association
-    # Just for the time being, to make migration easier
+    # TODO: stop doing this, it was suppose to be temporary, to make migration easier
     b = Bike.unscoped.where(id: bike_id).first
     b.update_attribute(:creation_state_id, id) if b.present? && b&.creation_state_id != id
     true

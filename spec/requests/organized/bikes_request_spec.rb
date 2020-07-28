@@ -13,7 +13,7 @@ RSpec.describe Organized::BikesController, type: :request do
     end
     context "parking_notification" do
       it "renders with unregistered_parking_notification" do
-        get "#{base_url}/new", params: { parking_notification: 1 }
+        get "#{base_url}/new", params: {parking_notification: 1}
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
         expect(response).to render_template(:new)
@@ -21,7 +21,7 @@ RSpec.describe Organized::BikesController, type: :request do
       context "with feature" do
         let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["parking_notifications"]) }
         it "renders with unregistered_parking_notification" do
-          get "#{base_url}/new", params: { parking_notification: 1 }
+          get "#{base_url}/new", params: {parking_notification: 1}
           expect(response.status).to eq(200)
           expect(assigns(:unregistered_parking_notification)).to be_truthy
           expect(response).to render_template(:new)
@@ -32,7 +32,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
   describe "new_iframe" do
     it "renders" do
-      get "#{base_url}/new_iframe", params: { parking_notification: 1 }
+      get "#{base_url}/new_iframe", params: {parking_notification: 1}
       expect(response.status).to eq(200)
       expect(response).to render_template(:new_iframe)
     end
@@ -40,7 +40,7 @@ RSpec.describe Organized::BikesController, type: :request do
       include_context :request_spec_logged_in_as_user
       it "redirects (unlike normal iframe)" do
         expect(current_user.organizations).to eq([])
-        get "#{base_url}/new_iframe", params: { parking_notification: 1 }
+        get "#{base_url}/new_iframe", params: {parking_notification: 1}
         expect(response).to redirect_to user_root_url
         expect(flash[:error]).to be_present
       end
@@ -50,7 +50,7 @@ RSpec.describe Organized::BikesController, type: :request do
   describe "create" do
     before { current_organization.update_attributes(auto_user: auto_user) }
     let(:auto_user) { current_user }
-    let(:b_param) { BParam.create(creator_id: current_organization.auto_user.id, params: { creation_organization_id: current_organization.id, embeded: true }) }
+    let(:b_param) { BParam.create(creator_id: current_organization.auto_user.id, params: {creation_organization_id: current_organization.id, embeded: true}) }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:color) { FactoryBot.create(:color, name: "black") }
     let!(:state) { FactoryBot.create(:state_new_york) }
@@ -73,7 +73,7 @@ RSpec.describe Organized::BikesController, type: :request do
           accuracy: "14.2",
           zipcode: "10007",
           state_id: state.id.to_s,
-          country_id: Country.united_states.id,
+          country_id: Country.united_states.id
         }
       end
       let(:bike_params) do
@@ -84,7 +84,7 @@ RSpec.describe Organized::BikesController, type: :request do
           manufacturer_id: manufacturer.id,
           primary_frame_color_id: color.id,
           latitude: default_location[:latitude],
-          longitude: default_location[:longitude],
+          longitude: default_location[:longitude]
         }
       end
       let(:test_photo) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
@@ -94,11 +94,11 @@ RSpec.describe Organized::BikesController, type: :request do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          expect do
-            post base_url, params: { bike: bike_params.merge(image: test_photo), parking_notification: parking_notification }
+          expect {
+            post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
             expect(flash[:success]).to match(/tricycle/i)
             expect(response).to redirect_to new_iframe_organization_bikes_path(organization_id: current_organization.to_param)
-          end.to change(Ownership, :count).by 1
+          }.to change(Ownership, :count).by 1
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
         # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
@@ -118,6 +118,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creation_organization).to eq current_organization
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.user_hidden).to be_truthy
+        expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.public_images.count).to eq 1
 
         testable_bike_params.except(:serial_number).each do |k, v|
@@ -132,7 +133,7 @@ RSpec.describe Organized::BikesController, type: :request do
         creation_state = bike.creation_state
         expect(creation_state.organization).to eq current_organization
         expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.origin).to eq "organization_form"
+        expect(creation_state.origin).to eq "unregistered_parking_notification"
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.parking_notifications.first
@@ -168,11 +169,11 @@ RSpec.describe Organized::BikesController, type: :request do
           VCR.use_cassette("organized_bikes_controller-create-impound-record-edmonton", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []
-              expect do
-                post base_url, params: { bike: bike_params, parking_notification: parking_notification_abandoned }
+              expect {
+                post base_url, params: {bike: bike_params, parking_notification: parking_notification_abandoned}
                 expect(flash[:success]).to match(/tricycle/i)
                 expect(response).to redirect_to new_iframe_organization_bikes_path(organization_id: current_organization.to_param)
-              end.to change(Ownership, :count).by 1
+              }.to change(Ownership, :count).by 1
               expect(ActionMailer::Base.deliveries.count).to eq 0
             end
           end
@@ -189,8 +190,10 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.cycle_type).to eq "tricycle"
           expect(bike.creation_organization).to eq current_organization
-          expect(bike.user_hidden).to be_truthy
-          expect(bike.status).to eq "unregistered_parking_notification"
+          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
+          expect(bike.status).to eq "status_impounded"
+          expect(bike.created_by_parking_notification).to be_truthy
 
           testable_bike_params.except(:serial_number).each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
@@ -206,12 +209,12 @@ RSpec.describe Organized::BikesController, type: :request do
           creation_state = bike.creation_state
           expect(creation_state.organization).to eq current_organization
           expect(creation_state.creator).to eq bike.creator
-          expect(creation_state.origin).to eq "organization_form"
+          expect(creation_state.origin).to eq "unregistered_parking_notification"
 
           expect(ParkingNotification.where(bike_id: bike.id).count).to eq 1
           parking_notification = ParkingNotification.where(bike_id: bike.id).first
           expect(bike.parking_notifications.count).to eq 1
-          parking_notification = bike.parking_notifications.first
+          expect(bike.parking_notifications.first.id).to eq parking_notification.id
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.kind).to eq "impound_notification"
           expect(parking_notification.internal_notes).to eq "Impounded it!"
@@ -224,7 +227,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(parking_notification.state_id).to be_blank
           expect(parking_notification.zipcode).to eq "T6E 2A4"
           expect(parking_notification.latitude).to eq 53.5183943
-          expect(parking_notification.longitude).to eq -113.5023587
+          expect(parking_notification.longitude).to eq(-113.5023587)
 
           impound_record = bike.current_impound_record
           expect(impound_record.parking_notification).to eq parking_notification

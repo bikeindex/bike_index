@@ -7,8 +7,8 @@ FactoryBot.define do
       status { "retrieved_by_owner" }
       after(:create) do |impound_record, evaluator|
         FactoryBot.create(:impound_record_update,
-                          impound_record: impound_record,
-                          kind: evaluator.status)
+          impound_record: impound_record,
+          kind: evaluator.status)
       end
     end
   end
