@@ -88,7 +88,6 @@ ignore:
   - app/controllers/welcome_controller.rb
   - app/decorators/application_decorator.rb
   - app/helpers/admin_helper.rb
-  - app/helpers/graphing_helper.rb
   - app/helpers/header_tag_helper.rb
   - app/helpers/localization_helper.rb
   - app/helpers/money_helper.rb
@@ -319,7 +318,6 @@ ignore:
   - spec/factories/twitter_accounts.rb
   - spec/factories/users.rb
   - spec/helpers/admin_helper_spec.rb
-  - spec/helpers/graphing_helper_spec.rb
   - spec/helpers/header_tag_helper_spec.rb
   - spec/helpers/localization_helper_spec.rb
   - spec/helpers/money_helper_spec.rb
