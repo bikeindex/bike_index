@@ -118,6 +118,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creation_organization).to eq current_organization
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.user_hidden).to be_truthy
+        expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.public_images.count).to eq 1
 
         testable_bike_params.except(:serial_number).each do |k, v|
@@ -189,8 +190,10 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.cycle_type).to eq "tricycle"
           expect(bike.creation_organization).to eq current_organization
-          expect(bike.user_hidden).to be_truthy
+          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
+          expect(bike.created_by_parking_notification).to be_truthy
 
           testable_bike_params.except(:serial_number).each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
