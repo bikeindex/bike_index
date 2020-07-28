@@ -9,7 +9,7 @@ RSpec.describe AdminHelper, type: :helper do
       allow(helper).to receive(:request) { double("request", url: bikes_path) }
       allow(helper).to receive(:dev_nav_select_links) { [] } # Can't get current_user to stub :(
       controller.params = ActionController::Parameters.new(passed_params)
-      admin_nav_active = helper.admin_nav_select_links.select { |v| v[:title] == "Bikes" }.first
+      admin_nav_active = helper.admin_nav_select_links.find { |v| v[:title] == "Bikes" }
       allow(helper).to receive(:admin_nav_select_link_active) { admin_nav_active }
       allow(view).to receive(:current_page?) { true }
     end

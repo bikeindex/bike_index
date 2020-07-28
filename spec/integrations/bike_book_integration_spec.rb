@@ -7,7 +7,7 @@ RSpec.describe BikeBookIntegration do
       bike = {manufacturer: manufacturer.name, frame_model: "Americano Rohloff", year: 2014}
       response = BikeBookIntegration.new.get_model(bike)
       expect(response[:bike][:frame_model]).to eq("Americano Rohloff")
-      fork = {ctype: "fork", description: "Easton EC 90X"}
+      # fork = {ctype: "fork", description: "Easton EC 90X"}
       expect(response[:components].count).to eq(8)
     end
 

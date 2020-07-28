@@ -310,11 +310,11 @@ RSpec.describe HeaderTagHelper, type: :helper do
           header_tags = helper.bikes_header_tags
           expect(helper.page_title).to eq "Stolen Something special 1969"
           expect(helper.page_description).not_to eq "Blank"
-          og_image = header_tags.select { |t| t && t[/og.image/] }.first
-          twitter_image = header_tags.select { |t| t&.include?("twitter:image") }.first
+          og_image = header_tags.find { |t| t && t[/og.image/] }
+          twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
           expect(og_image.include?("http://something.com")).to be_truthy
           expect(twitter_image.include?("http://something.com")).to be_truthy
-          expect(header_tags.select { |t| t && t.include?("twitter:card") }.first).to match "summary_large_image"
+          expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary_large_image"
         end
       end
       context "twitter present and shown" do
@@ -323,7 +323,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(bike).to receive(:owner).and_return(user)
           @bike = bike # So that it's assigned in the helper
           header_tags = helper.bikes_header_tags
-          expect(header_tags.select { |t| t && t.include?("twitter:creator") }.first).to match "@coolio"
+          expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@coolio"
         end
       end
       context "twitter present and not shown" do
@@ -332,7 +332,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(bike).to receive(:owner).and_return(user)
           @bike = bike # So that it's assigned in the helper
           header_tags = helper.bikes_header_tags
-          expect(header_tags.select { |t| t && t.include?("twitter:creator") }.first).to match "@bikeindex"
+          expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@bikeindex"
         end
       end
     end
@@ -371,10 +371,10 @@ RSpec.describe HeaderTagHelper, type: :helper do
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
           expect(helper.page_image).to eq "http://something.com"
-          expect(header_tags.select { |t| t && t.include?("og:type") }.first).to match "article"
-          expect(header_tags.select { |t| t && t.include?("twitter:creator") }.first).to match "@stolenbikereg"
-          expect(header_tags.select { |t| t && t.include?("og:published_time") }.first).to match target_time.to_s
-          expect(header_tags.select { |t| t && t.include?("og:modified_time") }.first).to match target_time.to_s
+          expect(header_tags.find { |t| t && t.include?("og:type") }).to match "article"
+          expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@stolenbikereg"
+          expect(header_tags.find { |t| t && t.include?("og:published_time") }).to match target_time.to_s
+          expect(header_tags.find { |t| t && t.include?("og:modified_time") }).to match target_time.to_s
           expect(header_tags.include?(auto_discovery_tag)).to be_truthy
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_truthy
         end
@@ -406,10 +406,10 @@ RSpec.describe HeaderTagHelper, type: :helper do
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
           expect(helper.page_image).to eq "http://something.com"
-          expect(header_tags.select { |t| t && t.include?("og:type") }.first).to match "article"
-          expect(header_tags.select { |t| t && t.include?("twitter:creator") }.first).to match "@bikeindex"
-          expect(header_tags.select { |t| t && t.include?("og:published_time") }.first).to match target_time.to_s
-          expect(header_tags.select { |t| t && t.include?("og:modified_time") }.first).to match target_time.to_s
+          expect(header_tags.find { |t| t && t.include?("og:type") }).to match "article"
+          expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@bikeindex"
+          expect(header_tags.find { |t| t && t.include?("og:published_time") }).to match target_time.to_s
+          expect(header_tags.find { |t| t && t.include?("og:modified_time") }).to match target_time.to_s
           expect(header_tags.include?(auto_discovery_tag)).to be_falsey
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_falsey
         end
@@ -423,7 +423,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
     it "returns default about header tags" do
       # testing a non-show info page, to make sure we aren't doing custom header tags
       expect(helper.page_with_custom_header_tags?).to be_falsey
-      header_tags = helper.header_tag_array
+      helper.header_tag_array
       expect(helper.page_title).to eq "Bike Index - Bike registration that works"
       expect(helper.page_description).to eq "Why we made Bike Index and who we are"
     end
