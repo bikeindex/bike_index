@@ -21,18 +21,18 @@
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_endless.present? ? "active" : "") }
           = @search_endless.present? ? @search_endless.humanize : "endless-ness"
         .dropdown-menu
-          - endless_only_active = params[:search_endless] == "endless_only"
+          - endless_only_active = @search_endless == "endless_only"
           = link_to "Endless only", admin_invoices_path(sortable_search_params.merge(search_endless: endless_only_active ? nil : "endless_only")), class: "dropdown-item #{endless_only_active ? 'active' : ''}"
-          - not_endless_active = params[:search_endless] == "not_endless"
+          - not_endless_active = @search_endless == "not_endless"
           = link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}"
 
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@time_range_column == 'created_at' ? '' : 'active') }
-          Matching time for #{humanized_time_range_column(@time_range_column) || "created"}
+          #{humanized_time_range_column(@time_range_column, return_value_for_all: true)} in timerange
         .dropdown-menu
-          = link_to "Matching time for created", admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), class: "dropdown-item #{@time_range_column == 'created_at' ? 'active' : ''}"
-          = link_to "Matching time by subscription ended", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), class: "dropdown-item #{@time_range_column == 'subscription_end_at' ? 'active' : ''}"
-          = link_to "Matching time by subscription started", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}"
+          = link_to "Created in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), class: "dropdown-item #{@time_range_column == 'created_at' ? 'active' : ''}"
+          = link_to "Subscription ended in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), class: "dropdown-item #{@time_range_column == 'subscription_end_at' ? 'active' : ''}"
+          = link_to "Subscription started in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
@@ -40,7 +40,7 @@
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ",", defer: true
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render partial: "/shared/period_select", locals: { include_future: true }
 
 %p
   = @invoices.total_count
