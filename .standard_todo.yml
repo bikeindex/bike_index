@@ -63,7 +63,6 @@ ignore:
   - app/controllers/organized/ambassador_dashboards_controller.rb
   - app/controllers/organized/appointment_configurations_controller.rb
   - app/controllers/organized/base_controller.rb
-  - app/controllers/organized/bikes_controller.rb
   - app/controllers/organized/bulk_imports_controller.rb
   - app/controllers/organized/emails_controller.rb
   - app/controllers/organized/exports_controller.rb
@@ -285,7 +284,6 @@ ignore:
   - spec/controllers/org_public/customer_appointments_controller_spec.rb
   - spec/controllers/organizations_controller_spec.rb
   - spec/controllers/organized/ambassador_task_assignments_controller_spec.rb
-  - spec/controllers/organized/bikes_controller_spec.rb
   - spec/controllers/organized/bulk_imports_controller_spec.rb
   - spec/controllers/organized/exports_controller_spec.rb
   - spec/controllers/organized/manages_controller_spec.rb
@@ -385,7 +383,6 @@ ignore:
   - spec/requests/org_public/walkrightup_request_spec.rb
   - spec/requests/organized/appointment_configurations_request_spec.rb
   - spec/requests/organized/appointments_request_spec.rb
-  - spec/requests/organized/bikes_request_spec.rb
   - spec/requests/organized/emails_request_spec.rb
   - spec/requests/organized/graduated_notifications_request_spec.rb
   - spec/requests/organized/hot_sheets_request_spec.rb

@@ -190,7 +190,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.cycle_type).to eq "tricycle"
           expect(bike.creation_organization).to eq current_organization
           expect(bike.user_hidden).to be_truthy
-          expect(bike.status).to eq "unregistered_parking_notification"
+          expect(bike.status).to eq "status_impounded"
 
           testable_bike_params.except(:serial_number).each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s

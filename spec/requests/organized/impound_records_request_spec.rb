@@ -219,7 +219,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.bike_id).to eq bike.id
           expect(parking_notification.unregistered_bike).to be_truthy
           expect(bike.created_by_parking_notification).to be_truthy
-          expect(bike.status).to eq "unregistered_parking_notification"
+          expect(bike.status).to eq "status_impounded"
           expect(bike.current_impound_record).to eq impound_record
           expect(impound_record.current?).to be_truthy
           expect(bike.ownerships.count).to eq 1

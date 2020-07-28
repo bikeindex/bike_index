@@ -780,7 +780,6 @@ class Bike < ApplicationRecord
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_status
-    # NOTE: If it's impounded, status is still unregistered_parking_notification. This should probably be fixed
     return "status_impounded" if current_impound_record.present?
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
     return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?

@@ -293,7 +293,7 @@ class ParkingNotification < ActiveRecord::Base
   private
 
   def calculated_unregistered_parking_notification
-    bike&.unregistered_parking_notification? || initial_record&.unregistered_bike?
+    bike&.unregistered_parking_notification? || initial_record&.unregistered_bike? || false
   end
 
   def calculated_status
