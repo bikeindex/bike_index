@@ -93,7 +93,10 @@
             .card-body#impoundRecordUpdateForm
               .row
                 .col-sm-6
+                  = @parking_notification.unregistered_bike?
                   - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(locations_enabled ? nil : :move_location)
+                  -# If this is for an unregistered bike, we don't want to show "retrieved by owner"
+                  - kinds_for_select = kinds_for_select.except(:retrieved_by_owner) if @parking_notification.unregistered_bike?
                   = f.select :kind,
                     options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }),
                     {},

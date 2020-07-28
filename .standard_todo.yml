@@ -72,7 +72,6 @@ ignore:
   - app/controllers/organized/impound_records_controller.rb
   - app/controllers/organized/lines_controller.rb
   - app/controllers/organized/manages_controller.rb
-  - app/controllers/organized/parking_notifications_controller.rb
   - app/controllers/organized/stickers_controller.rb
   - app/controllers/organized/users_controller.rb
   - app/controllers/ownerships_controller.rb
@@ -152,7 +151,6 @@ ignore:
   - app/models/ownership.rb
   - app/models/paid_feature.rb
   - app/models/paint.rb
-  - app/models/parking_notification.rb
   - app/models/payment.rb
   - app/models/propulsion_type.rb
   - app/models/single_sign_on.rb
@@ -174,7 +172,6 @@ ignore:
   - app/serializers/manufacturer_serializer.rb
   - app/serializers/manufacturer_v2_show_serializer.rb
   - app/serializers/membership_serializer.rb
-  - app/serializers/parking_notification_serializer.rb
   - app/serializers/stolen_record_v2_serializer.rb
   - app/services/admin_notifier.rb
   - app/services/alert_image_generator.rb
@@ -350,7 +347,6 @@ ignore:
   - spec/models/manufacturer_spec.rb
   - spec/models/membership_spec.rb
   - spec/models/organization_spec.rb
-  - spec/models/parking_notification_spec.rb
   - spec/models/payment_spec.rb
   - spec/models/public_image_spec.rb
   - spec/models/stolen_notification_spec.rb
@@ -397,7 +393,6 @@ ignore:
   - spec/requests/organized/lines_request_spec.rb
   - spec/requests/organized/manages_request_spec.rb
   - spec/requests/organized/my_accounts_request_spec.rb
-  - spec/requests/organized/parking_notifications_request_spec.rb
   - spec/requests/organized/users_request_spec.rb
   - spec/requests/sessions_request_spec.rb
   - spec/requests/theft_alerts_request_spec.rb
@@ -448,7 +443,6 @@ ignore:
   - spec/workers/process_graduated_notification_worker_spec.rb
   - spec/workers/process_hot_sheet_worker_spec.rb
   - spec/workers/process_membership_worker_spec.rb
-  - spec/workers/process_parking_notification_worker_spec.rb
   - spec/workers/send_newsletter_worker_spec.rb
   - spec/workers/tsv_creator_worker_spec.rb
   - spec/workers/unused_ownership_removal_worker_spec.rb
