@@ -29,14 +29,13 @@ RSpec.describe BikeSearcher do
       searcher = BikeSearcher.new(params)
       searcher.matching_manufacturer(Bike.all)
       searcher.matching_colors(Bike.all)
-      opts =
-        target = [
-          manufacturer.autocomplete_result_hash,
-          color_1.autocomplete_result_hash,
-          color_2.autocomplete_result_hash,
-          {id: "serial", search_id: "s#8xcvxcvcx#", text: "8xcvxcvcx"},
-          {text: "something+cool", search_id: "something+cool"}
-        ].as_json
+      target = [
+        manufacturer.autocomplete_result_hash,
+        color_1.autocomplete_result_hash,
+        color_2.autocomplete_result_hash,
+        {id: "serial", search_id: "s#8xcvxcvcx#", text: "8xcvxcvcx"},
+        {text: "something+cool", search_id: "something+cool"}
+      ].as_json
       result = searcher.selectize_items
       expect(result).to eq target
       result.each { |t| expect(target.include?(t)).to be_truthy }
@@ -90,7 +89,7 @@ RSpec.describe BikeSearcher do
 
     it "does not return any bikes if we can't find the manufacturer" do
       manufacturer = FactoryBot.create(:manufacturer, name: "Special bikes co.")
-      bike = FactoryBot.create(:bike, manufacturer: manufacturer)
+      FactoryBot.create(:bike, manufacturer: manufacturer)
       search = BikeSearcher.new(manufacturer: "69696969", query: "")
       expect(search.matching_manufacturer(Bike.all).count).to eq(0)
     end

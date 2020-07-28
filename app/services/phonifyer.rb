@@ -18,7 +18,7 @@ class Phonifyer
   end
 
   def self.split_with_country_code(number)
-    return [number] unless number.match?(/\A\+/) # skip if it doesn't look like it has a country code!
+    return [number] unless number.start_with?(/\+/) # skip if it doesn't look like it has a country code!
     # grab the country_code
     country_code = number[/\A\+\d*/]
     if country_code.length > 10 # Looks like the whole number is in country code

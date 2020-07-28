@@ -159,7 +159,7 @@ RSpec.describe BikeUpdator do
     bike = FactoryBot.create(:bike, stolen: true)
     ownership = FactoryBot.create(:ownership, bike: bike)
     user = ownership.creator
-    new_creator = FactoryBot.create(:user)
+    FactoryBot.create(:user)
     bike_params = {stolen: false}
     update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json)
     expect(update_bike).to receive(:update_ownership).and_return(true)
