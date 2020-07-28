@@ -1,4 +1,3 @@
-# coding: utf-8
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
@@ -22,7 +21,7 @@ module MoneyHelper
     I18n.available_locales.map do |locale|
       [
         I18n.with_locale(locale) { number_to_currency(1, format: "%u") },
-        "(#{t(locale, scope: [:money, :currencies])})",
+        "(#{t(locale, scope: [:money, :currencies])})"
       ].join(" ")
     end
   end

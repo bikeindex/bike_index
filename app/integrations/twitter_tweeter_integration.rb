@@ -192,7 +192,7 @@ class TwitterTweeterIntegration
     if bike_photo_url.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
-        foto.write open(bike_photo_url).read # TODO: Refactor this.
+        foto.write URI.open(bike_photo_url).read # TODO: Refactor this.
         foto.rewind
         tweet = account.tweet(text, foto, opts)
       end

@@ -164,7 +164,7 @@ RSpec.describe BulkImportWorker, type: :job do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
         VCR.use_cassette("bulk_import-perform-success") do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { open(file_url) }
+          allow_any_instance_of(BulkImport).to receive(:open_file) { URI.open(file_url) }
           expect {
             instance.perform(bulk_import.id)
           }.to change(Bike, :count).by 2

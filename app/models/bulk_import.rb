@@ -121,7 +121,7 @@ class BulkImport < ApplicationRecord
   # To enable stream processing, so that we aren't loading the whole file into memory all at once
   # also so we can separately deal with the header line
   def open_file
-    @open_file ||= local_file? ? File.open(file.path, "r") : open(file.url)
+    @open_file ||= local_file? ? File.open(file.path, "r") : URI.open(file.url)
   rescue => e
     add_file_error(e.message)
     raise e
