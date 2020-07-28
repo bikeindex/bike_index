@@ -16,7 +16,8 @@ module Organized
         .includes(:user, :bike, :location)
     end
 
-    def show; end
+    def show
+    end
 
     def update
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
@@ -71,8 +72,8 @@ module Organized
 
     def permitted_parameters
       params.require(:impound_record_update)
-            .permit(:kind, :notes, :location_id, :transfer_email)
-            .merge(user_id: current_user.id)
+        .permit(:kind, :notes, :location_id, :transfer_email)
+        .merge(user_id: current_user.id)
     end
   end
 end

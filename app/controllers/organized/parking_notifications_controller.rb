@@ -152,8 +152,7 @@ module Organized
     def ensure_access_to_parking_notifications!
       return true if current_organization.enabled?("parking_notifications")
       flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      nil
+      redirect_to organization_bikes_path(organization_id: current_organization.to_param) && return
     end
 
     def bike_search_params_present?

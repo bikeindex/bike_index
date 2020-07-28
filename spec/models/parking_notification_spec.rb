@@ -147,14 +147,23 @@ RSpec.describe ParkingNotification, type: :model do
     let(:parking_notification1) { FactoryBot.create(:unregistered_parking_notification, kind: "parked_incorrectly_notification") }
     let(:organization) { parking_notification1.organization }
     let!(:bike) { parking_notification1.bike }
-    let(:parking_notification2) { parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification") }
     it "sets the impound record" do
-      ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+      bike.reload
+      expect(bike.status).to eq "unregistered_parking_notification"
+      expect(bike.hidden).to be_truthy
+      expect(bike.user_hidden).to be_truthy
+      Sidekiq::Worker.clear_all
+      parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
+      Sidekiq::Testing.inline! do
+        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+      end
       bike.reload
       parking_notification2.reload
       expect(parking_notification2.impound_record).to be_present
       expect(bike.status).to eq "status_impounded"
       expect(parking_notification2.unregistered_bike?).to be_truthy
+      expect(bike.hidden).to be_falsey
+      expect(bike.user_hidden).to be_falsey
     end
   end
 

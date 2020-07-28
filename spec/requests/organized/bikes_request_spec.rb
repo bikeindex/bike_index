@@ -211,7 +211,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(ParkingNotification.where(bike_id: bike.id).count).to eq 1
           parking_notification = ParkingNotification.where(bike_id: bike.id).first
           expect(bike.parking_notifications.count).to eq 1
-          parking_notification = bike.parking_notifications.first
+          expect(bike.parking_notifications.first.id).to eq parking_notification.id
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.kind).to eq "impound_notification"
           expect(parking_notification.internal_notes).to eq "Impounded it!"

@@ -68,7 +68,6 @@ ignore:
   - app/controllers/organized/exports_controller.rb
   - app/controllers/organized/graduated_notifications_controller.rb
   - app/controllers/organized/hot_sheets_controller.rb
-  - app/controllers/organized/impound_records_controller.rb
   - app/controllers/organized/lines_controller.rb
   - app/controllers/organized/manages_controller.rb
   - app/controllers/organized/stickers_controller.rb
@@ -138,8 +137,6 @@ ignore:
   - app/models/handlebar_type.rb
   - app/models/hot_sheet.rb
   - app/models/hot_sheet_configuration.rb
-  - app/models/impound_record.rb
-  - app/models/impound_record_update.rb
   - app/models/location.rb
   - app/models/lock.rb
   - app/models/mail_snippet.rb
@@ -306,7 +303,6 @@ ignore:
   - spec/factories/external_registry_credentials.rb
   - spec/factories/feedbacks.rb
   - spec/factories/graduated_notifications.rb
-  - spec/factories/impound_records.rb
   - spec/factories/locations.rb
   - spec/factories/organizations.rb
   - spec/factories/stolen_records.rb
@@ -339,7 +335,6 @@ ignore:
   - spec/models/feedback_spec.rb
   - spec/models/graduated_notification_spec.rb
   - spec/models/hot_sheet_configuration_spec.rb
-  - spec/models/impound_record_update_spec.rb
   - spec/models/integration_spec.rb
   - spec/models/location_spec.rb
   - spec/models/manufacturer_spec.rb
@@ -386,7 +381,6 @@ ignore:
   - spec/requests/organized/emails_request_spec.rb
   - spec/requests/organized/graduated_notifications_request_spec.rb
   - spec/requests/organized/hot_sheets_request_spec.rb
-  - spec/requests/organized/impound_records_request_spec.rb
   - spec/requests/organized/lines_request_spec.rb
   - spec/requests/organized/manages_request_spec.rb
   - spec/requests/organized/my_accounts_request_spec.rb

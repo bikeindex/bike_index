@@ -31,6 +31,8 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
       impound_record_update.update(resolved: true, skip_update: true)
     end
     impound_record.update_attributes(skip_update: true)
+    # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
+    impound_record.bike.marked_user_unhidden = true if impound_record.unregistered_bike?
     impound_record.bike&.update(updated_at: Time.current)
     impound_record.bike&.reload
   end
