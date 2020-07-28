@@ -354,7 +354,9 @@ class BikesController < ApplicationController
 
     return true if @bike.authorize_and_claim_for_user(current_user)
 
-    if current_user.present?
+    if @bike.current_impound_record.present?
+      error = translation(:bike_impounded, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+    elsif current_user.present?
       error = translation(:you_dont_own_that, bike_type: type)
     else
       store_return_to

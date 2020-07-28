@@ -8,15 +8,15 @@ module Organized
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         map_center_lat: current_organization.map_focus_coordinates[:latitude],
-        map_center_lng: current_organization.map_focus_coordinates[:longitude],
+        map_center_lng: current_organization.map_focus_coordinates[:longitude]
       }
 
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
-      if params[:search_status] == "all"
-        @search_status = "all"
+      @search_status = if params[:search_status] == "all"
+        "all"
       else
-        @search_status = ParkingNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+        ParkingNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
       end
 
       respond_to do |format|
@@ -92,9 +92,9 @@ module Organized
     def permitted_parameters
       use_entered_address = ParamsNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
       params.require(:parking_notification)
-            .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :latitude, :longitude, :accuracy,
-                    :street, :city, :zipcode, :state_id, :country_id)
-            .merge(user_id: current_user.id, organization_id: current_organization.id, use_entered_address: use_entered_address)
+        .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :latitude, :longitude, :accuracy,
+          :street, :city, :zipcode, :state_id, :country_id)
+        .merge(user_id: current_user.id, organization_id: current_organization.id, use_entered_address: use_entered_address)
     end
 
     def create_and_send_repeats(kind, ids)
@@ -141,11 +141,11 @@ module Organized
       notifications_repeated_ids = session.delete(:notifications_repeated_ids)
       if notifications_failed_resolved_ids.present?
         @notifications_failed_resolved = parking_notifications.where(id: notifications_failed_resolved_ids)
-                                                              .includes(:user, :bike, :impound_record)
+          .includes(:user, :bike, :impound_record)
       end
       if notifications_repeated_ids.present?
         @notifications_repeated = parking_notifications.where(id: notifications_repeated_ids)
-                                                       .includes(:user, :bike, :impound_record)
+          .includes(:user, :bike, :impound_record)
       end
     end
 
@@ -153,7 +153,7 @@ module Organized
       return true if current_organization.enabled?("parking_notifications")
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      return
+      nil
     end
 
     def bike_search_params_present?

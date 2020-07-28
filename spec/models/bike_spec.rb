@@ -101,7 +101,7 @@ RSpec.describe Bike, type: :model do
       no_serials = [
         "custom bike no serial has a unique frame design",
         "custom built",
-        "custom",
+        "custom"
       ]
       no_serials.each do |value|
         it "('#{value}') sets the 'made_without_serial' state correctly" do
@@ -129,7 +129,7 @@ RSpec.describe Bike, type: :model do
         "no serial",
         "none",
         "probably has one don't know it",
-        "unknown",
+        "unknown"
       ]
       unknown_serials.each do |value|
         it "('#{value}') sets the 'unknown' state correctly" do
@@ -158,17 +158,17 @@ RSpec.describe Bike, type: :model do
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
       pair0 = [
         FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
-        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
+        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o")
       ]
 
       pair1 = [
         FactoryBot.create(:bike, stolen: true, serial_number: "he110"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO")
       ]
 
       pair2 = [
         FactoryBot.create(:bike, stolen: true, serial_number: "1100ll"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11")
       ]
 
       results = Bike.possibly_found_with_match
@@ -184,17 +184,17 @@ RSpec.describe Bike, type: :model do
     it "returns stolen bikes with a matching normalized serial on an external-registry bike" do
       pair0 = [
         FactoryBot.create(:stolen_bike, serial_number: "He10o"),
-        FactoryBot.create(:external_registry_bike, serial_number: "He10o"),
+        FactoryBot.create(:external_registry_bike, serial_number: "He10o")
       ]
 
       pair1 = [
         FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "he110"),
-        FactoryBot.create(:external_registry_bike, serial_number: "He1lo"),
+        FactoryBot.create(:external_registry_bike, serial_number: "He1lo")
       ]
 
       pair2 = [
         FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "1100ll"),
-        FactoryBot.create(:external_registry_bike, serial_number: "IIOO11"),
+        FactoryBot.create(:external_registry_bike, serial_number: "IIOO11")
       ]
 
       results = Bike.possibly_found_externally_with_match(country_iso: "NL")
@@ -513,9 +513,9 @@ RSpec.describe Bike, type: :model do
       let(:can_edit_claimed) { false }
       let(:ownership) do
         FactoryBot.create(:ownership_organization_bike,
-                          user: owner,
-                          organization: organization,
-                          can_edit_claimed: can_edit_claimed)
+          user: owner,
+          organization: organization,
+          can_edit_claimed: can_edit_claimed)
       end
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
@@ -610,6 +610,62 @@ RSpec.describe Bike, type: :model do
             expect(bike.authorize_and_claim_for_user(member)).to be_truthy
             expect(bike.claimed?).to be_falsey
           end
+        end
+      end
+    end
+    context "impound record" do
+      let(:ownership) { FactoryBot.create(:ownership, user: user) }
+      let(:impound_record) { FactoryBot.build(:impound_record, bike: bike) }
+      let(:organization) { impound_record.organization }
+      let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+      it "returns falsey if impound record is current unless user is organization_member" do
+        expect(ownership.claimed?).to be_falsey
+        expect(bike.claimed?).to be_falsey
+        expect(ownership.owner).to eq creator
+        expect(bike.claimable_by?(user)).to be_truthy
+        expect(bike.editable_organizations.pluck(:id)).to eq([])
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          impound_record.save
+          bike.reload
+          expect(bike.status).to eq "status_impounded"
+          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
+          expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
+          expect(bike.authorized?(organization_member)).to be_truthy
+          impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
+        end
+        impound_record.reload
+        expect(impound_record.resolved?).to be_truthy
+        bike.reload
+        expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
+        expect(bike.authorized?(user)).to be_truthy
+      end
+      context "ownership claimed" do
+        let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+        it "returns falsey" do
+          expect(bike.claimed?).to be_truthy
+          expect(bike.authorized?(creator)).to be_falsey
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            impound_record.save
+            bike.reload
+            expect(bike.status).to eq "status_impounded"
+            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
+            expect(bike.authorized?(user)).to be_falsey
+            expect(bike.authorized?(organization_member)).to be_truthy
+            impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
+          end
+          impound_record.reload
+          expect(impound_record.resolved?).to be_truthy
+          bike.reload
+          expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
+          expect(bike.status).to eq "status_with_owner"
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(organization_member)).to be_falsey # Because no organization membership
         end
       end
     end
@@ -962,8 +1018,8 @@ RSpec.describe Bike, type: :model do
     context "with registration_address" do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:bike) { FactoryBot.create(:bike) }
-      let(:b_param_params) { { bike: { street: "2864 Milwaukee Ave" } } }
-      let(:target) { { street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "US", latitude: 41.933238, longitude: -87.71476299999999 } }
+      let(:b_param_params) { {bike: {street: "2864 Milwaukee Ave"}} }
+      let(:target) { {street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "US", latitude: 41.933238, longitude: -87.71476299999999} }
       include_context :geocoder_real
       it "returns the fetched address" do
         FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)
@@ -987,7 +1043,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "legacy address (street -> address)" do
-        let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
+        let(:b_param_params) { {bike: {address: "2864 Milwaukee Ave"}} }
         it "returns the fetched address" do
           bike.reload
           expect(bike.b_params.pluck(:id)).to eq([b_param.id])
@@ -1001,8 +1057,8 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with multiple b_params" do
-        let!(:b_param_params) { { formatted_address: target, bike: { address: "2864 Milwaukee Ave" } } }
-        let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "" } }) }
+        let!(:b_param_params) { {formatted_address: target, bike: {address: "2864 Milwaukee Ave"}} }
+        let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: {address: ""}}) }
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
           bike.reload
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
@@ -1065,7 +1121,7 @@ RSpec.describe Bike, type: :model do
     end
     context "b_param" do
       let(:ownership) { Ownership.new }
-      let(:b_param) { BParam.new(params: { bike: { user_name: "Jane Yung" } }) }
+      let(:b_param) { BParam.new(params: {bike: {user_name: "Jane Yung"}}) }
       before do
         allow(bike).to receive(:current_ownership) { ownership }
         allow(bike).to receive(:b_params) { [b_param] }
@@ -1103,7 +1159,7 @@ RSpec.describe Bike, type: :model do
     end
     context "b_param" do
       let(:ownership) { Ownership.new }
-      let(:b_param) { BParam.new(params: { bike: { phone: "888.888.8888" } }) }
+      let(:b_param) { BParam.new(params: {bike: {phone: "888.888.8888"}}) }
       before do
         allow(bike).to receive(:current_ownership) { ownership }
         allow(bike).to receive(:b_params) { [b_param] }
@@ -1454,7 +1510,7 @@ RSpec.describe Bike, type: :model do
           stolen_record.reload
           # stolen_record.skip_geocoding = false
           Sidekiq::Testing.inline! do
-            stolen_record.attributes = { street: "", city: "", zipcode: "" }
+            stolen_record.attributes = {street: "", city: "", zipcode: ""}
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
           end
@@ -1462,11 +1518,11 @@ RSpec.describe Bike, type: :model do
           bike.reload
           # Doesn't have coordinates, see geocodeable for additional information
           expect(stolen_record.to_coordinates.compact).to eq([])
-          expect(stolen_record.address_hash.compact).to eq({ country: "US", state: "IL" }.as_json)
+          expect(stolen_record.address_hash.compact).to eq({country: "US", state: "IL"}.as_json)
           expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
           expect(stolen_record.should_be_geocoded?).to be_falsey
 
-          expect(bike.address_hash).to eq({ country: "US", state: "IL", street: nil, city: nil, zipcode: nil, latitude: nil, longitude: nil }.as_json)
+          expect(bike.address_hash).to eq({country: "US", state: "IL", street: nil, city: nil, zipcode: nil, latitude: nil, longitude: nil}.as_json)
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.should_be_geocoded?).to be_falsey
         end

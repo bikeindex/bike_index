@@ -2214,6 +2214,8 @@ nl:
           het jouw %{bike_type} is, meld je dan aan en je kunt het bewerken!
         you_dont_own_that: Oh nee! Het lijkt erop dat je dat niet bezit %{bike_type}.
         you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
+        bike_impounded: "%{org_name} heeft dat %{bike_type} in beslag genomen. Praat
+          met hen om toegang te krijgen tot deze %{bike_type}."
       index:
         we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
           een andere locatie om gestolen fietsen in de buurt te zoeken.
@@ -4664,10 +4666,9 @@ nl:
         bike: Fiets
         by: Door
         created: Gemaakt
-        impounded: In beslag genomen bij
         address: Adres
         notification_number: Kennisgeving#
-        retrieved: Opgehaald
+        resolved: Vastbesloten
       show_details:
         address: Adres
         bike: Fiets

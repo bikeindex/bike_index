@@ -14,11 +14,9 @@ class BikeUpdator
   end
 
   def find_bike
-    begin
-      return Bike.unscoped.find(@bike_params["id"])
-    rescue
-      raise BikeUpdatorError, "Oh no! We couldn't find that bike"
-    end
+    Bike.unscoped.find(@bike_params["id"])
+  rescue
+    raise BikeUpdatorError, "Oh no! We couldn't find that bike"
   end
 
   def update_ownership
@@ -35,6 +33,8 @@ class BikeUpdator
                          bike: @bike,
                          creator: @user,
                          send_email: !skip_email).create_ownership
+    # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
+    @bike.update(status: "status_with_owner", marked_user_unhidden: true) if @bike.unregistered_parking_notification?
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
     @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
   end
@@ -53,13 +53,11 @@ class BikeUpdator
     @bike.reload
     if @bike_params["bike"] && @bike_params["bike"]["date_stolen"]
       StolenRecordUpdator.new(bike: @bike, date_stolen: @bike_params["bike"]["date_stolen"]).update_records
-    else
-      if @bike_params["stolen_record"] || @bike_params["bike"]["stolen_records_attributes"]
-        StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
-        @bike.reload
-      elsif @currently_stolen != @bike.stolen
-        StolenRecordUpdator.new(bike: @bike).update_records
-      end
+    elsif @bike_params["stolen_record"] || @bike_params["bike"]["stolen_records_attributes"]
+      StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
+      @bike.reload
+    elsif @currently_stolen != @bike.stolen
+      StolenRecordUpdator.new(bike: @bike).update_records
     end
   end
 

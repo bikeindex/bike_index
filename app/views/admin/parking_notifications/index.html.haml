@@ -82,7 +82,10 @@
               = parking_notification.notification_number
         %td
           - if parking_notification.status == "impounded"
-            = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+            - if parking_notification.impound_record_id.present?
+              = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+            - else
+              %span.text-danger no impound record!
           - else
             %em.small
               = status_display(parking_notification.status)
