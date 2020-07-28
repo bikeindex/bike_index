@@ -240,7 +240,22 @@
                     = link_to  organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
                     %small.less-strong
                       = duplicate_bike.normalized_serial_segments.considered_for_duplicate.pluck(:segment).join(", ")
+      -# if the bike was initially an unregistered parking notification, but no longer is, show that information
+      - if @bike.created_by_parking_notification && !@bike.unregistered_parking_notification? && @bike.parking_notifications.reorder(:created_at).first.organization_id == passive_organization.id
+        - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
+        .small
+          %em
+            %span.text-warning
+              Bike originally registered by an
+              = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-warning text-underline"
+              notification
+            but was sent to a new owner, so is now a normal #{@bike.type} on Bike Index.
 
+
+      - if @bike.impound_records.resolved.where(organization_id: passive_organization.id).any?
+        %p
+          %strong Previously impounded
+          \- #{link_to "view impound records", organization_impound_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id, search_status: "all")}!
 
 - # TODO: add translations
 - if passive_organization.enabled?("graduated_notifications")
@@ -254,16 +269,35 @@
 - if passive_organization.enabled?("parking_notifications")
   - parking_notifications = passive_organization.parking_notifications.where(bike_id: @bike.id).order(id: :desc)
   .parking-notifications-wrap
-    %h3.mt-2.mb-2 Parking notifications
+    .row.mt-2.mb-2
+      .col-xs-8.col-md-6
+        %h3.uncap
+          Parking notifications
+      .col-xs-4.col-md-6
+        .text-right
+          %em
+            = link_to organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id, search_status: "all") do
+              view map
+              .d-none.d-md-inline
+                of
+                = "notifications".pluralize(parking_notifications.count)
 
-    - if parking_notifications.any?
-      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.limit(4), skip_bike: true, skip_map_cell: true, render_address: true }
+    %p{ style: "margin-top: -12px;" }
+      = pluralize number_with_delimiter(parking_notifications.current.count), "current notification"
+      - if parking_notifications.resolved.count > 0
+        \-
+        %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }
+          show
+          = pluralize number_with_delimiter(parking_notifications.resolved.count), "resolved notification"
+      for #{@bike.type}
+    - if parking_notifications.current.any?
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true }
 
-      %p{ style: "margin-top: -12px;" }
-        = pluralize number_with_delimiter(parking_notifications.count), "total notification"
-        for #{@bike.type} -
-        %em
-          = link_to "view all on map", organization_parking_notifications_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id)
+    - if parking_notifications.resolved.any?
+      .collapse#resolvedParkingNotificationTable
+        %p.mb-0
+          %strong Resolved notifications
+        = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.resolved.limit(10), skip_bike: true, skip_map_cell: true, render_address: true }
 
     - if @bike.status_impounded?
       %hr

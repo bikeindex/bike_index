@@ -594,6 +594,40 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+    context "unregistered_parking_notification email update" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+      let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+      let(:parking_notification) do
+        current_organization.update_attributes(auto_user: auto_user)
+        FactoryBot.create(:unregistered_parking_notification, organization: current_organization, user: current_organization.auto_user)
+      end
+      let!(:bike) { parking_notification.bike }
+      let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+      it "updates email and marks not user hidden" do
+        bike.reload
+        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.unregistered_parking_notification?).to be_truthy
+        expect(bike.user_hidden).to be_truthy
+        expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+        expect(bike.ownerships.count).to eq 1
+        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        Sidekiq::Worker.clear_all
+        expect {
+          patch "#{base_url}/#{bike.id}", params: {
+                                            bike: { owner_email: "newuser@example.com" },
+                                          }
+          expect(flash[:success]).to be_present
+        }.to change(Ownership, :count).by 1
+        bike.reload
+        expect(bike.current_ownership.user_id).to be_blank
+        expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
+        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
+      end
+    end
     context "adding location to a stolen bike" do
       let(:bike) { FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg") }
       let(:ownership) { FactoryBot.create(:ownership, bike: bike) }

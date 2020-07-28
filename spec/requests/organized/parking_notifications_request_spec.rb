@@ -236,10 +236,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.status).to eq "impounded"
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
+          expect(parking_notification.resolved_at).to be_within(5).of parking_notification.created_at
 
           parking_notification_initial.reload
           expect(parking_notification_initial.status).to eq "impounded"
           expect(parking_notification_initial.impound_record_id).to eq parking_notification.impound_record_id
+          expect(parking_notification_initial.resolved_at).to be_within(5).of parking_notification.impound_record.created_at
 
           bike.reload
           expect(bike.status).to eq "status_impounded"

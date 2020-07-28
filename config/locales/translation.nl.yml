@@ -4664,10 +4664,9 @@ nl:
         bike: Fiets
         by: Door
         created: Gemaakt
-        impounded: In beslag genomen bij
         address: Adres
         notification_number: Kennisgeving#
-        retrieved: Opgehaald
+        resolved: Vastbesloten
       show_details:
         address: Adres
         bike: Fiets

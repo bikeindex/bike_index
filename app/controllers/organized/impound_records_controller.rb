@@ -59,6 +59,8 @@ module Organized
         bikes = a_impound_records.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
+      elsif params[:search_bike_id].present?
+        a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)

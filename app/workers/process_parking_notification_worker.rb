@@ -9,7 +9,8 @@ class ProcessParkingNotificationWorker < ApplicationWorker
                                              user_id: parking_notification.user_id,
                                              organization_id: parking_notification.organization_id,
                                              skip_update: true)
-      parking_notification.update_attributes(impound_record_id: impound_record.id)
+      parking_notification.resolved_at ||= Time.current
+      parking_notification.update_attributes(impound_record_id: impound_record.id,)
       ImpoundUpdateBikeWorker.new.perform(impound_record.id)
     end
 

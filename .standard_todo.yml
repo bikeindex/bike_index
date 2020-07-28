@@ -177,7 +177,6 @@ ignore:
   - app/services/bike_creator_organizer.rb
   - app/services/bike_creator_verifier.rb
   - app/services/bike_searcher.rb
-  - app/services/bike_updator.rb
   - app/services/component_creator.rb
   - app/services/exchange_rate_updator.rb
   - app/services/geohelper.rb

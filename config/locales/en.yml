@@ -4501,9 +4501,8 @@ en:
         bike: Bike
         by: By
         created: Created
-        impounded: Impounded
         notification_number: Notification#
-        retrieved: Retrieved
+        resolved: Resolved
     stickers:
       edit:
         bike: Bike

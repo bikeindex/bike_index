@@ -19,6 +19,7 @@ class ImpoundRecord < ApplicationRecord
   enum status: STATUS_ENUM
 
   scope :active, -> { where(status: active_statuses) }
+  scope :resolved, -> { where(status: resolved_statuses) }
 
   attr_accessor :skip_update
 
