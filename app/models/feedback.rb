@@ -94,7 +94,7 @@ class Feedback < ApplicationRecord
   end
 
   def lead?
-    feedback_type && feedback_type =~ /lead_for_/
+    feedback_type&.match?(/lead_for_/)
   end
 
   def lead_type

@@ -158,7 +158,6 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification2.unregistered_bike?).to be_truthy
       Sidekiq::Testing.inline! do
         parking_notification2.process_notification
-        # ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
       end
       bike.reload
       parking_notification2.reload
