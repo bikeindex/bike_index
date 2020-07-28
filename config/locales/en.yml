@@ -1514,6 +1514,9 @@ en:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
+        bike_impounded: >-
+          %{org_name} has impounded that %{bike_type}. Please speak with them to access
+          this %{bike_type}.
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
       index:

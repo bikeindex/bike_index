@@ -237,9 +237,10 @@
                     %span.convertTime
                       = l duplicate_bike.created_at, format: :convert_time
                   %td
-                    = link_to  organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
+                    = link_to organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
                     %small.less-strong
                       = duplicate_bike.normalized_serial_segments.considered_for_duplicate.pluck(:segment).join(", ")
+      - # TODO: add translations
       -# if the bike was initially an unregistered parking notification, but no longer is, show that information
       - if @bike.created_by_parking_notification && !@bike.unregistered_parking_notification? && @bike.parking_notifications.reorder(:created_at).first.organization_id == passive_organization.id
         - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first

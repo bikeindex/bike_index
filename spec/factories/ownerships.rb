@@ -1,5 +1,5 @@
 # Recently added the :with_ownership trait to bikes
-# Most places where this factory is used should instead use that
+# Most places where this factory is used should instead use that instead
 FactoryBot.define do
   factory :ownership do
     creator { FactoryBot.create(:user_confirmed) }

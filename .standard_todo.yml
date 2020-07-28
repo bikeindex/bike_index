@@ -101,7 +101,6 @@ ignore:
   - app/models/appointment_configuration.rb
   - app/models/appointment_update.rb
   - app/models/b_param.rb
-  - app/models/bike.rb
   - app/models/bike_organization.rb
   - app/models/bike_sticker.rb
   - app/models/bike_sticker_batch.rb
@@ -131,7 +130,6 @@ ignore:
   - app/models/external_registry_client/verloren_of_gevonden_client.rb
   - app/models/external_registry_credential.rb
   - app/models/external_registry_credential/project529_credential.rb
-  - app/models/feedback.rb
   - app/models/frame_material.rb
   - app/models/graduated_notification.rb
   - app/models/handlebar_type.rb
@@ -320,7 +318,6 @@ ignore:
   - spec/models/appointment_configuration_spec.rb
   - spec/models/appointment_spec.rb
   - spec/models/b_param_spec.rb
-  - spec/models/bike_spec.rb
   - spec/models/bike_sticker_batch_spec.rb
   - spec/models/bike_sticker_spec.rb
   - spec/models/bulk_import_spec.rb
@@ -331,7 +328,6 @@ ignore:
   - spec/models/external_registry_bike/stop_heling_bike_spec.rb
   - spec/models/external_registry_bike_spec.rb
   - spec/models/external_registry_client/stop_heling_client_spec.rb
-  - spec/models/feedback_spec.rb
   - spec/models/graduated_notification_spec.rb
   - spec/models/hot_sheet_configuration_spec.rb
   - spec/models/integration_spec.rb

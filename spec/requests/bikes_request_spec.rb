@@ -513,6 +513,37 @@ RSpec.describe BikesController, type: :request do
     end
   end
 
+  describe "edit" do
+    it "renders" do
+      get "#{base_url}/#{bike.id}/edit"
+      expect(flash).to be_blank
+      expect(response).to render_template(:edit_bike_details)
+      expect(assigns(:bike).id).to eq bike.id
+    end
+    context "with impound_record" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike)}
+      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id)}
+      it "redirects with flash error" do
+        bike.reload
+        expect(bike.status).to eq "status_impounded"
+        get "#{base_url}/#{bike.id}/edit"
+        expect(flash[:error]).to match(/impounded/i)
+        expect(response).to redirect_to(bike_path(bike.id))
+      end
+      context "organization member" do
+        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization)}
+        it "renders" do
+          bike.reload
+          expect(bike.status).to eq "status_impounded"
+          get "#{base_url}/#{bike.id}/edit"
+          expect(flash).to be_blank
+          expect(response).to render_template(:edit_bike_details)
+          expect(assigns(:bike).id).to eq bike.id
+        end
+      end
+    end
+  end
+
   describe "update" do
     context "setting a bike_sticker" do
       it "gracefully fails if the number is weird" do
