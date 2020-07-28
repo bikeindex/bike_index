@@ -149,7 +149,10 @@ RSpec.describe ParkingNotification, type: :model do
     let!(:bike) { parking_notification1.bike }
     let(:parking_notification2) { parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification") }
     it "sets the impound record" do
+      ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
       bike.reload
+      parking_notification2.reload
+      expect(parking_notification2.impound_record).to be_present
       expect(bike.status).to eq "status_impounded"
       expect(parking_notification2.unregistered_bike?).to be_truthy
     end
