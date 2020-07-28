@@ -2,19 +2,23 @@ function BinxAdminInvoices() {
   return {
     init() {
       this.updateInvoiceCalculations();
-      $(".inputTriggerRecalculation").on("change paste keyup", e =>
+      $(".inputTriggerRecalculation").on("change paste keyup", (e) =>
         this.updateInvoiceCalculations()
       );
-      $("#invoiceForm .paidFeatureCheck input").on("change", e =>
+      $("#invoiceForm .paidFeatureCheck input").on("change", (e) =>
         this.updateInvoiceCalculations()
       );
+      $("#invoice_is_endless").on("change", (e) => {
+        const checked = $("#invoice_is_endless").prop("checked");
+        $("#subscriptionEndsAt").collapse(checked ? "hide" : "show");
+      });
     },
 
     updateInvoiceCalculations() {
       let oneTimeCost, recurringCost;
       const recurring = $(".paidFeatureCheck input.recurring:checked")
         .get()
-        .map(i => parseInt($(i).attr("data-amount"), 10));
+        .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (recurring.length > 0) {
         recurringCost = recurring.reduce((x, y) => x + y);
       } else {
@@ -22,7 +26,7 @@ function BinxAdminInvoices() {
       }
       const oneTime = $(".paidFeatureCheck input.oneTime:checked")
         .get()
-        .map(i => parseInt($(i).attr("data-amount"), 10));
+        .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (oneTime.length > 0) {
         oneTimeCost = oneTime.reduce((x, y) => x + y);
       } else {
@@ -38,9 +42,9 @@ function BinxAdminInvoices() {
 
       const checked_ids = $(".paidFeatureCheck input:checked")
         .get()
-        .map(i => $(i).attr("data-id"));
+        .map((i) => $(i).attr("data-id"));
       $("#invoice_paid_feature_ids").val(checked_ids);
-    }
+    },
   };
 }
 

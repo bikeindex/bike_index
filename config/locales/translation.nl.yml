@@ -5046,6 +5046,7 @@ nl:
       where_we_are: Waar we zijn
       who_we_serve: Wie we dienen
       change_preferred_language: voorkeurstaal wijzigen
+      security: veiligheid
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:

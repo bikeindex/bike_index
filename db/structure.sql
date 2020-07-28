@@ -1460,7 +1460,8 @@ CREATE TABLE public.invoices (
     updated_at timestamp without time zone NOT NULL,
     notes text,
     child_enabled_feature_slugs jsonb,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency character varying DEFAULT 'USD'::character varying NOT NULL,
+    is_endless boolean DEFAULT false
 );
 
 
@@ -5244,6 +5245,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620170809'),
 ('20200620171606'),
 ('20200620172241'),
-('20200630200556');
+('20200630200556'),
+('20200727213018');
 
 

@@ -48,9 +48,10 @@ module GraphingHelper
 
   def humanized_time_range_column(time_range_column)
     return nil if @period == "all"
-    return "started" if time_range_column == "start_at"
-    return "ended" if time_range_column == "end_at"
-    time_range_column.to_s.gsub("_at", "").humanize.downcase
+    humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
+    return humanized_text.gsub("start", "started") if time_range_column.match?("start_at")
+    return humanized_text.gsub("end", "ended") if time_range_column.match?("end_at")
+    humanized_text
   end
 
   def humanized_time_range(time_range)
