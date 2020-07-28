@@ -161,12 +161,14 @@ class Bike < ApplicationRecord
       where(id: bike_id).first
     end
 
-    def bike_sticker(organization_id = nil) # This method only accepts numerical org ids
+    # This method only accepts numerical org ids
+    def bike_sticker(organization_id = nil)
       return includes(:bike_stickers).where.not(bike_stickers: {bike_id: nil}) if organization_id.blank?
       includes(:bike_stickers).where(bike_stickers: {organization_id: organization_id})
     end
 
-    def no_bike_sticker # This method doesn't accept org_id because Seth got lazy
+    # This method doesn't accept org_id because Seth got lazy
+    def no_bike_sticker
       includes(:bike_stickers).where(bike_stickers: {bike_id: nil})
     end
 
@@ -258,7 +260,8 @@ class Bike < ApplicationRecord
     end
   end
 
-  def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+  # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+  def cleaned_error_messages
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
@@ -442,7 +445,8 @@ class Bike < ApplicationRecord
     organizations.with_enabled_feature_slugs("bike_stickers")
   end
 
-  def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
+  # This method only accepts numerical org ids
+  def bike_sticker?(organization_id = nil)
     bike_stickers.where(organization_id.present? ? {organization_id: organization_id} : {}).any?
   end
 
@@ -542,8 +546,6 @@ class Bike < ApplicationRecord
     bike_organizations
       .reject { |bo| org_ids.include?(bo.organization_id) }
       .each(&:destroy)
-
-    true
   end
 
   def validated_organization_id(organization_id)
@@ -679,7 +681,8 @@ class Bike < ApplicationRecord
     registration_address["street"].present? && registration_address["city"].present?
   end
 
-  def registration_address # Goes along with organization additional_registration_fields
+  # Goes along with organization additional_registration_fields
+  def registration_address
     return @registration_address if defined?(@registration_address)
     @registration_address = if user&.address_present?
       user&.address_hash
@@ -737,7 +740,8 @@ class Bike < ApplicationRecord
     ].compact
   end
 
-  def cgroup_array # list of cgroups so that we can arrange them
+  # list of cgroups so that we can arrange them
+  def cgroup_array
     components.map(&:cgroup_id).uniq
   end
 
