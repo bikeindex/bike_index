@@ -14,7 +14,7 @@ group :red_green_refactor, halt_on_fail: true do
 
   guard :rspec, rspec_options do
     watch(%r{^spec/.+_spec\.rb$})
-    watch(%r{^lib/(.+)\.rb$}) { |m| "spec/lib/#{m[1]}_spec.rb" }
+    watch(%r{^app/integrations/(.+)\.rb$}) { |m| "spec/integrations/#{m[1]}_spec.rb" }
     watch(%r{^config/initializers/(.+)\.rb$}) { |m| "spec/initializers/#{m[1]}_spec.rb" }
 
     watch("spec/spec_helper.rb") { "spec" }

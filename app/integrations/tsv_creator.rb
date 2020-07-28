@@ -29,7 +29,7 @@ class TsvCreator
     row << bike.first_ownership.user&.name if bike.first_ownership.user
     row << "\t#{bike.first_owner_email}"
     row << "\t#{ENV["BASE_URL"]}/bikes/#{bike.id}\n"
-    "#{row}"
+    row.to_s
   end
 
   def manufacturer_row(mnfg)
@@ -41,12 +41,12 @@ class TsvCreator
     row = "#{mnfg.id}\t#{mnfg.name}\t"
     row << (mnfg.frame_maker ? "Frame manufacturer" : "Manufacturer")
     row << "\t"
-    row << "#{popularity}"
+    row << popularity.to_s
     row << "\t"
-    row << "#{mnfg.website}"
+    row << mnfg.website.to_s
     row << "\t"
-    row << "#{mnfg.logo}" if mnfg.logo.present?
-    "#{row}"
+    row << mnfg.logo.to_s if mnfg.logo.present?
+    row.to_s
   end
 
   def create_org_count(organization, start_date = nil)
@@ -108,10 +108,10 @@ class TsvCreator
     uploader = TsvUploader.new
     uploader.store!(output)
     output.close
-    if TsvUploader.storage.to_s.match(/fog/i) # If we're in fog, we need to open via a URL
-      path = uploader.url
+    path = if /fog/i.match?(TsvUploader.storage.to_s) # If we're in fog, we need to open via a URL
+      uploader.url
     else
-      path = uploader.current_path
+      uploader.current_path
     end
     FileCacheMaintainer.update_file_info(path)
     output

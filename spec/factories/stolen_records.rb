@@ -18,9 +18,9 @@ FactoryBot.define do
 
       after(:create) do |stolen_record, evaluator|
         FactoryBot.create(:alert_image,
-                          :with_image,
-                          stolen_record: stolen_record,
-                          filename: evaluator.filename)
+          :with_image,
+          stolen_record: stolen_record,
+          filename: evaluator.filename)
       end
     end
 
