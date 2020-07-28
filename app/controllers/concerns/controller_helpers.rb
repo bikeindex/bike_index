@@ -178,7 +178,7 @@ module ControllerHelpers
     @controller_namespace ||= self.class.parent.name != "Object" ? self.class.parent.name.downcase : nil
   end
 
-  # This is overridden in FeedbacksController
+  # This is overridden in FeedbacksController and InfoController
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
   end
@@ -341,7 +341,7 @@ module ControllerHelpers
   end
 
   def set_time_range_from_period
-    @period = default_period unless %w[hour day month year week all].include?(@period)
+    @period = default_period unless %w[hour day month year week all next_week next_month].include?(@period)
     case @period
     when "hour"
       @start_time = Time.current - 1.hour
@@ -353,14 +353,25 @@ module ControllerHelpers
       @start_time = Time.current.beginning_of_day - 1.year
     when "week"
       @start_time = Time.current.beginning_of_day - 1.week
+    when "next_month"
+      @start_time ||= Time.current
+      @end_time = Time.current.beginning_of_day + 30.days
+    when "next_week"
+      @start_time = Time.current
+      @end_time = Time.current.beginning_of_day + 1.week
     when "all"
       @start_time = earliest_period_date
     end
-    @end_time ||= Time.current
+    @end_time ||= latest_period_date
   end
 
   def default_period # Separate method so it can be overridden on per controller basis
     "all"
+  end
+
+  # Separate method so it can be overriden, specifically in invoices
+  def latest_period_date
+    Time.current
   end
 
   def earliest_period_date # Separate method so it can be overridden on per controller basis
