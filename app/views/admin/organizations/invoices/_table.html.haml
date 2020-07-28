@@ -42,7 +42,7 @@
         Features
     %tbody
       - invoices.each do |invoice|
-        - organization = invoice.organization
+        - organization = Organization.unscoped.find(invoice.organization_id)
         %tr
           %td
             - if organization.present?
@@ -53,12 +53,13 @@
             - if invoice.previous_invoice.present?
               %small.less-strong{ style: "display: block; margin-top: 1rem;" }
                 Follows ##{invoice.previous_invoice.id}
-          - if display_organization && organization.present?
+          - if display_organization
             %td
-              = link_to organization.short_name, admin_organization_path(organization.to_param)
-              - unless invoice.organization.present?
-                %small.text-danger
-                  organization is deleted!
+              - if organization.present?
+                = link_to organization.short_name, admin_organization_path(organization.to_param)
+                - unless invoice.organization.present?
+                  %small.text-danger
+                    organization is deleted!
           %td
             - if invoice.subscription_start_at.present?
               %span.convertTime
