@@ -356,11 +356,16 @@ module ControllerHelpers
     when "all"
       @start_time = earliest_period_date
     end
-    @end_time ||= Time.current
+    @end_time ||= latest_period_date
   end
 
   def default_period # Separate method so it can be overridden on per controller basis
     "all"
+  end
+
+  # Separate method so it can be overriden, specifically in invoices
+  def latest_period_date
+    Time.current
   end
 
   def earliest_period_date # Separate method so it can be overridden on per controller basis

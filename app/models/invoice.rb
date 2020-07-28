@@ -139,7 +139,7 @@ class Invoice < ApplicationRecord
   end
 
   def child_enabled_feature_slugs_string=(val)
-    return nil if val.blank?
+    return if val.blank?
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end

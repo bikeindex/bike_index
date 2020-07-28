@@ -22,7 +22,11 @@ class Admin::InvoicesController < Admin::BaseController
   end
 
   def earliest_period_date
-    Time.at(1528767966)
+    Time.at(1528767966) # First invoice
+  end
+
+  def latest_period_date
+    Invoice.maximum(:subscription_end_at) || Time.current
   end
 
   def matching_invoices
@@ -33,6 +37,7 @@ class Admin::InvoicesController < Admin::BaseController
     else
       Invoice
     end
+
     if %w[endless_only not_endless].include?(params[:search_endless])
       @search_endless = params[:search_endless]
       invoices = @search_endless == "endless_only" ? invoices.endless : invoices.not_endless
@@ -40,10 +45,12 @@ class Admin::InvoicesController < Admin::BaseController
 
     if %w[subscription_start_at subscription_end_at].include?(params[:time_range_column])
       @time_range_column = params[:time_range_column]
+      @search_endless = "endless_only"
       invoices = invoices.not_endless if @time_range_column == "subscription_end_at"
     else
       @time_range_column = "created_at"
     end
+
     invoices.where(@time_range_column => @time_range)
   end
 end
