@@ -5070,6 +5070,7 @@ nl:
       from: uit
       to: Naar
       update: Bijwerken
+      next: Volgende
     edit_bike_skeleton:
       abandoned: Verlaten
       edit: Bewerken

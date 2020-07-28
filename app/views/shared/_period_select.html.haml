@@ -1,6 +1,14 @@
 - skip_submission ||= false
+- include_future ||= false
 
 #timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{skip_submission}" }
+  - if include_future
+    %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "next_week"), data: { period: "next_week" } }
+      %span.d-none.d-md-inline-block= t(".next")
+      = t(".seven_days")
+    %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "next_month"), data: { period: "next_month" } }
+      %span.d-none.d-md-inline-block= t(".next")
+      = t(".thirty_days")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), data: { period: "hour" } }
     %span.d-none.d-md-inline-block= t(".past")
     = t(".hour")

@@ -5117,6 +5117,7 @@ en:
       day: day
       from: From
       hour: hour
+      next: next
       past: past
       seven_days: 7 days
       thirty_days: 30 days
