@@ -200,14 +200,13 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   # Doesn't require a user because email recovery doesn't require a user
-  def mark_retrieved!(retrieved_kind:, retrieved_by_id: nil, resolved_at: nil)
+  # args are (retrieved_kind:, retrieved_by_id: nil, resolved_at: nil) - using passed args to avoid overriding methods
+  def mark_retrieved!(passed_args = {})
     return self if retrieved?
-    # Doesn't seem like binding.local_variable_get does anything here, but I still think it's a good practice
-    resolved_at = binding.local_variable_get(:resolved_at) || Time.current
     # Assign here because of calculated_state
-    self.retrieved_kind = binding.local_variable_get(:retrieved_kind)
-    update_attributes!(retrieved_by_id: binding.local_variable_get(:retrieved_by_id),
-                       resolved_at: resolved_at)
+    self.retrieved_kind = passed_args[:retrieved_kind]
+    update_attributes!(retrieved_by_id: passed_args[:retrieved_by_id],
+                       resolved_at: passed_args[:resolved_at] || Time.current)
     process_notification
     self
   end
