@@ -152,10 +152,13 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.status).to eq "unregistered_parking_notification"
       expect(bike.hidden).to be_truthy
       expect(bike.user_hidden).to be_truthy
+      expect(parking_notification1.unregistered_bike?).to be_truthy
       Sidekiq::Worker.clear_all
       parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
+      expect(parking_notification2.unregistered_bike?).to be_truthy
       Sidekiq::Testing.inline! do
-        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+        parking_notification2.process_notification
+        # ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
       end
       bike.reload
       parking_notification2.reload
