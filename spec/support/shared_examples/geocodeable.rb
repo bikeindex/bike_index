@@ -32,7 +32,7 @@ RSpec.shared_examples "geocodeable" do
         city: "New York",
         state: FactoryBot.build_stubbed(:state_new_york),
         zipcode: "10016",
-        country: FactoryBot.build_stubbed(:country_us),
+        country: FactoryBot.build_stubbed(:country_us)
       )
     end
     context "given booleans for address components" do

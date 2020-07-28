@@ -5,10 +5,10 @@ class BikeCreatorAssociator
 
   def create_ownership(bike)
     passed_send_email = @b_param.params.dig("bike", "send_email")
-    if passed_send_email == false || passed_send_email.present? && passed_send_email.to_s[/false/i]
-      send_email = false
+    send_email = if passed_send_email == false || passed_send_email.present? && passed_send_email.to_s[/false/i]
+      false
     else
-      send_email = true
+      true
     end
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
   end
@@ -23,11 +23,11 @@ class BikeCreatorAssociator
   end
 
   def create_parking_notification(b_param, bike)
-    parking_notification_attrs = b_param.bike.slice(*%w[latitude longitude street city state_id zipcode country_id accuracy])
+    parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
-                                  bike_id: bike.id,
-                                  user_id: bike.creator.id,
-                                  organization_id: b_param.creation_organization_id)
+                                      bike_id: bike.id,
+                                      user_id: bike.creator.id,
+                                      organization_id: b_param.creation_organization_id)
     ParkingNotification.create(parking_notification_attrs)
   end
 

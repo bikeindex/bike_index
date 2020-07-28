@@ -45,7 +45,7 @@ class BikeCreator
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,
-      organization_id: @bike.creation_organization_id,
+      organization_id: @bike.creation_organization_id
     }
   end
 
@@ -58,7 +58,7 @@ class BikeCreator
     bb_data = BikeBookIntegration.new.get_model({
       manufacturer: Manufacturer.find(@b_param.bike["manufacturer_id"]).name,
       year: @b_param.bike["year"],
-      frame_model: @b_param.bike["frame_model"],
+      frame_model: @b_param.bike["frame_model"]
     })
 
     return true unless bb_data && bb_data["bike"].present?
@@ -119,7 +119,7 @@ class BikeCreator
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
-        bike_sticker && bike_sticker.claim(@bike.creator, @bike.id)
+        bike_sticker&.claim(@bike.creator, @bike.id)
       end
       if @b_param.unregistered_parking_notification?
         # We skipped setting address, with default_parking_notification_attrs, notification will update it

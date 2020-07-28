@@ -29,7 +29,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:old_membership) { FactoryBot.create(:membership_claimed, user: old_user, organization: third_organization) }
       let(:new_membership) { FactoryBot.create(:membership_claimed, user: user, organization: third_organization) }
 
-      let(:integration) { FactoryBot.create(:integration, user: old_user, information: { "info" => { "email" => email, name: "blargh" } }) }
+      let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
       let(:payment) { FactoryBot.create(:payment, user: old_user) }
       let(:customer_contact) { FactoryBot.create(:customer_contact, user: old_user, creator: old_user) }

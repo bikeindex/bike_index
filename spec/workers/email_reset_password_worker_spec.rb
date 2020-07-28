@@ -16,9 +16,9 @@ RSpec.describe EmailResetPasswordWorker, type: :job do
       user = FactoryBot.create(:user)
       expect(user.password_reset_token).to be_blank
       ActionMailer::Base.deliveries = []
-      expect do
+      expect {
         described_class.new.perform(user.id)
-      end.to raise_error(/#{user.id}.*password_reset_token/)
+      }.to raise_error(/#{user.id}.*password_reset_token/)
       user.reload
       expect(user.magic_link_token).to be_blank
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy

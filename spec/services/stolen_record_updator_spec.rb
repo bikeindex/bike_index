@@ -86,10 +86,10 @@ RSpec.describe StolenRecordUpdator do
         theft_description: "blah blah blah",
         street: "some address",
         city: "Big town",
-        zipcode: "60666",
+        zipcode: "60666"
       }
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)
+      allow(b_param).to receive(:params).and_return({stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
@@ -107,10 +107,10 @@ RSpec.describe StolenRecordUpdator do
       state = FactoryBot.create(:state, country: country)
       sr = {
         state: state.abbreviation,
-        country: country.iso,
+        country: country.iso
       }
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)
+      allow(b_param).to receive(:params).and_return({stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)

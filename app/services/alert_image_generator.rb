@@ -38,12 +38,12 @@ class AlertImageGenerator
     end
 
     # Compose template with bike image
-    alert_image = template_image.composite(bike_image) do |alert|
+    alert_image = template_image.composite(bike_image) { |alert|
       alert.gravity "Center"
       alert.compose "Over"
       # right-offset to account for LHS banner
       alert.geometry "+#{banner_width}+0"
-    end
+    }
 
     # Compose with caption image if a location is available
     if stolen_record_location.present?
@@ -59,12 +59,12 @@ class AlertImageGenerator
         end
       end
 
-      alert_image = alert_image.composite(caption_image) do |alert|
+      alert_image = alert_image.composite(caption_image) { |alert|
         alert.gravity "Southeast"
         alert.compose "Over"
         alert.size "x100"
         alert.geometry "+0+5"
-      end
+      }
     end
 
     alert_image
@@ -80,18 +80,18 @@ class AlertImageGenerator
     bike_image = self.bike_image.tap do |bike|
       dimensions = [
         template_image.width,
-        template_image.height - header_height - footer_height,
+        template_image.height - header_height - footer_height
       ].map { |dim| dim - padding }.join("x")
 
       bike.resize(dimensions)
     end
 
     # Compose bike image onto alert template
-    alert_image = template_image.composite(bike_image) do |alert|
+    alert_image = template_image.composite(bike_image) { |alert|
       alert.gravity "Center"
       alert.compose "Over"
       alert.geometry "+0+#{header_height - footer_height}"
-    end
+    }
 
     alert_image.combine_options do |alert|
       alert.fill "#FFFFFF"

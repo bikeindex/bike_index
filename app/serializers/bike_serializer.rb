@@ -72,8 +72,6 @@ class BikeSerializer < ApplicationSerializer
       object.public_images.first.image_url(:large)
     elsif object.stock_photo_url.present?
       object.stock_photo_url
-    else
-      nil
     end
   end
 
@@ -84,8 +82,6 @@ class BikeSerializer < ApplicationSerializer
       small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop
       small.join("/") + ext
-    else
-      nil
     end
   end
 

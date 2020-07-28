@@ -56,11 +56,11 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def rear_wheel_size_iso_bsd
-    object.rear_wheel_size && object.rear_wheel_size.iso_bsd
+    object.rear_wheel_size&.iso_bsd
   end
 
   def front_wheel_size_iso_bsd
-    object.front_wheel_size && object.front_wheel_size.iso_bsd
+    object.front_wheel_size&.iso_bsd
   end
 
   def handlebar_type_slug
@@ -68,11 +68,11 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def front_gear_type_slug
-    object.front_gear_type && object.front_gear_type.slug
+    object.front_gear_type&.slug
   end
 
   def rear_gear_type_slug
-    object.rear_gear_type && object.rear_gear_type.slug
+    object.rear_gear_type&.slug
   end
 
   def frame_material_slug

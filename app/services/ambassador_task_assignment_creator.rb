@@ -3,7 +3,7 @@ module AmbassadorTaskAssignmentCreator
     already_assigned_ambassador_ids =
       Ambassador
         .includes(ambassador_task_assignments: :ambassador_task)
-        .where(ambassador_task_assignments: { ambassador_task: ambassador_task })
+        .where(ambassador_task_assignments: {ambassador_task: ambassador_task})
         .select(:id)
 
     unassigned_ambassadors =

@@ -34,10 +34,10 @@ class MembershipSerializer < ApplicationSerializer
   def locations
     if object.organization.locations && object.organization.locations.length > 1
       object.organization.locations.map do |location|
-        { name: location.name, id: location.id }
+        {name: location.name, id: location.id}
       end
     else
-      [{ name: organization_name, id: nil }]
+      [{name: organization_name, id: nil}]
     end
   end
 end

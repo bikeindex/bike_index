@@ -12,9 +12,9 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
   describe "enqueuing jobs" do
     let(:bike_id) { FactoryBot.create(:ownership, user_hidden: true).bike_id }
     it "enqueues the duplicate_bike_finder_worker" do
-      expect do
+      expect {
         instance.perform(bike_id)
-      end.to change(DuplicateBikeFinderWorker.jobs, :size).by 1
+      }.to change(DuplicateBikeFinderWorker.jobs, :size).by 1
     end
   end
 
@@ -47,13 +47,13 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     let(:bike) { FactoryBot.create(:bike) }
     let!(:b_param) do
       FactoryBot.create(:b_param,
-                        created_bike_id: bike.id,
-                        params: { bike: { owner_email: bike.owner_email, external_image_urls: passed_external_image_urls } })
+        created_bike_id: bike.id,
+        params: {bike: {owner_email: bike.owner_email, external_image_urls: passed_external_image_urls}})
     end
     it "creates and downloads the images" do
-      expect do
+      expect {
         instance.perform(bike.id)
-      end.to change(PublicImage, :count).by 2
+      }.to change(PublicImage, :count).by 2
       bike.reload
       # The public images have been created with the matching urls
       expect(bike.public_images.pluck(:external_image_url)).to match_array external_image_urls.uniq
@@ -67,9 +67,9 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         external_image_urls.uniq.each { |url| bike.public_images.create(external_image_url: url) }
         bike.reload
         expect(bike.external_image_urls).to eq external_image_urls.uniq
-        expect do
+        expect {
           instance.perform(bike.id)
-        end.to_not change(PublicImage, :count)
+        }.to_not change(PublicImage, :count)
         bike.reload
       end
     end

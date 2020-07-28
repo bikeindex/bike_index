@@ -16,7 +16,6 @@ class OwnershipCreator
     @bike.ownerships.count > 0 ? @creator.id : @bike.creator&.id
   end
 
-
   def new_ownership_params
     {
       bike_id: @bike.id,
@@ -25,7 +24,7 @@ class OwnershipCreator
       example: @bike.example,
       current: true,
       send_email: @send_email,
-      user_hidden: @user_hidden,
+      user_hidden: @user_hidden
     }
   end
 

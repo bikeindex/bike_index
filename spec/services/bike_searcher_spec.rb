@@ -4,7 +4,7 @@ RSpec.describe BikeSearcher do
   describe "initialize" do
     context "basic serial array" do
       it "deletes the serial gsub expression if it is present" do
-        params = { query: "m_940%2Cs%23sdfc%23%2Cc_1" }
+        params = {query: "m_940%2Cs%23sdfc%23%2Cc_1"}
         searcher = BikeSearcher.new(params)
         expect(searcher.params[:serial]).to eq("sdfc")
         expect(searcher.params[:query]).to eq("m_940%2C%2Cc_1")
@@ -12,7 +12,7 @@ RSpec.describe BikeSearcher do
     end
     context "troublesome 1" do
       it "deletes the serial gsub expression if it is present" do
-        params = { query: "s#R910860723#" }
+        params = {query: "s#R910860723#"}
         searcher = BikeSearcher.new(params)
         expect(searcher.params[:serial]).to eq("R910860723")
         expect(searcher.params[:query]).to eq("")
@@ -25,7 +25,7 @@ RSpec.describe BikeSearcher do
       manufacturer = FactoryBot.create(:manufacturer)
       color_1 = FactoryBot.create(:color)
       color_2 = FactoryBot.create(:color)
-      params = { query: "c_#{color_1.id},c_#{color_2.id}%2Cm_#{manufacturer.id}%2Csomething+cool%2Cs%238xcvxcvcx%23" }
+      params = {query: "c_#{color_1.id},c_#{color_2.id}%2Cm_#{manufacturer.id}%2Csomething+cool%2Cs%238xcvxcvcx%23"}
       searcher = BikeSearcher.new(params)
       searcher.matching_manufacturer(Bike.all)
       searcher.matching_colors(Bike.all)
@@ -34,8 +34,8 @@ RSpec.describe BikeSearcher do
           manufacturer.autocomplete_result_hash,
           color_1.autocomplete_result_hash,
           color_2.autocomplete_result_hash,
-          { id: "serial", search_id: "s#8xcvxcvcx#", text: "8xcvxcvcx" },
-          { text: "something+cool", search_id: "something+cool" },
+          {id: "serial", search_id: "s#8xcvxcvcx#", text: "8xcvxcvcx"},
+          {text: "something+cool", search_id: "something+cool"}
         ].as_json
       result = searcher.selectize_items
       expect(result).to eq target
