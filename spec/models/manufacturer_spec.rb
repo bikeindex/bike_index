@@ -107,7 +107,7 @@ RSpec.describe Manufacturer, type: :model do
       Manufacturer.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
       Manufacturer.import(second_import_file)
-      expect(Manufacturer.find_by_slug("surly-bikes")).to be_present
+      expect(Manufacturer.find_by_slug("surly")).to be_present
     end
   end
 

@@ -20,8 +20,8 @@ ignore:
   - app/controllers/api/v3/organizations.rb
   - app/controllers/api/v3/root_v3.rb
   - app/controllers/api/v3/search.rb
-  - app/controllers/bikes_controller.rb
   - app/controllers/bikes/recovery_controller.rb
+  - app/controllers/bikes_controller.rb
   - app/controllers/concerns/controller_helpers.rb
   - app/controllers/oauth/applications_controller.rb
   - app/controllers/org_public/customer_appointments_controller.rb
@@ -32,7 +32,7 @@ ignore:
   - app/models/appointment.rb
   - app/models/appointment_configuration.rb
   - app/models/appointment_update.rb
-  - app/models/concerns/geocodeable.rb # Because of ReturnInVoidContext
+  - app/models/concerns/geocodeable.rb
   - app/models/single_sign_on.rb
   - app/models/twitter_client.rb
   - app/uploaders/alert_image_uploader.rb
