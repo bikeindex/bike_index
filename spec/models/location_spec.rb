@@ -77,4 +77,48 @@ RSpec.describe Location, type: :model do
       expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([location2.id])
     end
   end
+
+  describe "next_line_number" do
+    it "returns nil without virtual line" do
+      location = Location.new
+      expect(location.last_line_number).to be_blank
+      expect(location.next_line_number).to be_blank
+    end
+    context "with virtual line and no appointments" do
+      let(:location) { FactoryBot.create(:location, :with_virtual_line_on) }
+      it "returns 1" do
+        location.reload
+        expect(location.virtual_line_on?).to be_truthy
+        expect(location.last_line_number).to be_blank
+        expect(location.next_line_number).to eq 1
+      end
+      context "with an appointment" do
+        let!(:appointment) { FactoryBot.create(:appointment, location: location, line_number: 42)}
+        it "is the next number" do
+          expect(location.virtual_line_on?).to be_truthy
+          expect(location.last_line_number).to eq 42
+          expect(location.next_line_number).to eq 43
+        end
+        context "appointment resolved" do
+          let!(:appointment_update) { appointment.record_status_update(updator_kind: "queue_worker", new_status: "removed") }
+          it "returns next number" do
+            expect(Appointment.recently_updated.pluck(:id)).to eq([appointment.id])
+            expect(location.virtual_line_on?).to be_truthy
+            expect(location.last_line_number).to eq 42
+            expect(location.next_line_number).to eq 43
+          end
+          context "appointment resolved an hour ago" do
+            before { appointment_update.update_attribute :created_at, Time.current - 1.hour }
+            it "returns 1" do
+              expect(Appointment.recently_updated.pluck(:id)).to eq([])
+              location.reload
+              expect(location.virtual_line_on?).to be_truthy
+              expect(location.last_line_number).to be_blank
+              expect(location.next_line_number).to eq 1
+            end
+          end
+        end
+      end
+    end
+  end
 end

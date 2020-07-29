@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :appointment do
-    organization { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
-    location { organization.locations.first }
+    location { FactoryBot.create(:location, :with_virtual_line_on) }
+    organization { location.organization }
     # if user is present, saving the appointment will assign users email
     sequence(:email) { |n| user.present? ? nil : "bike_owner#{n}@example.com" }
     sequence(:name) { |n| "some name #{n}" }
@@ -10,10 +10,6 @@ FactoryBot.define do
     creator_kind { "no_user" }
     trait :claimed do
       user { FactoryBot.create(:user) }
-    end
-    # This is useful for request specs that require that the organization have things enabled
-    factory :appointment_with_virtual_line_on do
-      location { FactoryBot.create(:location, :with_virtual_line_on) }
     end
   end
 end

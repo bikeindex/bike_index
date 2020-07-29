@@ -65,6 +65,20 @@ class Location < ApplicationRecord
     self.shown = calculated_shown
   end
 
+  def last_recent_appointment_in_line
+    return nil unless virtual_line_on?
+    appointments.in_line.last || appointments.appointment_update_ordered.recently_updated.last
+  end
+
+  def last_line_number
+    last_recent_appointment_in_line&.line_number
+  end
+
+  def next_line_number
+    return nil unless virtual_line_on?
+    (last_line_number || 0) + 1
+  end
+
   def update_associations
     return true if skip_update
     # If this wasn't set by the organization callback (which uses skip_update: true)

@@ -20,11 +20,13 @@ class Appointment < ApplicationRecord
 
   attr_accessor :skip_update
 
-  # Line ordering is first by the priority of the status, then by line_entry_timestamp
-  scope :line_ordered, -> { reorder("status, line_entry_timestamp") }
+  # Line ordering is first by the priority of the status, then by line_number
+  scope :line_ordered, -> { reorder(status: :desc, line_number: :asc) }
+  scope :appointment_update_ordered, -> { includes(:appointment_updates).reorder("appointment_updates.created_at") }
   scope :in_line, -> { where(status: AppointmentUpdate.in_line_statuses).line_ordered }
   scope :paging_or_on_deck, -> { where(status: AppointmentUpdate.paging_or_on_deck_statuses).line_ordered }
   scope :line_not_paging_or_on_deck, -> { where.not(status: AppointmentUpdate.paging_or_on_deck_statuses).in_line }
+  scope :recently_updated, -> { includes(:appointment_updates).where("appointment_updates.created_at > ?", Time.current - 15.minutes) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -62,10 +64,6 @@ class Appointment < ApplicationRecord
 
   def permitted_reasons
     appointment_configuration.reasons
-  end
-
-  def after_failed_to_find_removal_count
-    appointment_configuration&.after_failed_to_find_removal_count || 2
   end
 
   # Deal with deleted locations, etc
@@ -130,13 +128,8 @@ class Appointment < ApplicationRecord
     # We aren't doing anything for the other update_only_statuses, except failed to find, but seems reasonable to skip
     self.status = new_status unless AppointmentUpdate.update_only_statuses.include?(new_status)
     self.skip_update = false # Ensure we run the queue worker
-
-    if new_status == "failed_to_find"
-      update_and_move_for_failed_to_find # This will save the record
-    else
-      # Because things might've changed, and even if they didn't we still want to run the queue updator
-      update(updated_at: Time.current)
-    end
+    # Because things might've changed, and even if they didn't we still want to run the queue updator
+    update(updated_at: Time.current)
     new_update # Return the created update
   end
 
@@ -145,24 +138,6 @@ class Appointment < ApplicationRecord
     appt_update = record_status_update(updator_kind: updator_kind, updator_id: updator_id, new_status: new_status)
     return appt_update if appt_update.present?
     fail "unable to record that appointment update"
-  end
-
-  def move_behind(appt_or_appt_id)
-    other_appt = if appt_or_appt_id.present?
-      appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
-    else
-      other_location_appointments.in_line.last || self # use the last appt in line, fallback to self
-    end
-    update(line_entry_timestamp: other_appt.line_entry_timestamp + 1)
-  end
-
-  def move_ahead(appt_or_appt_id)
-    other_appt = if appt_or_appt_id.present?
-      appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
-    else
-      other_location_appointments.in_line.first || self # use the first appt in line, fallback to self
-    end
-    update(line_entry_timestamp: other_appt.line_entry_timestamp - 1)
   end
 
   def set_calculated_attributes
@@ -174,7 +149,7 @@ class Appointment < ApplicationRecord
     self.user_id ||= User.fuzzy_email_find(email)&.id if email.present?
     # for now, appointment_at is just the created at. This is setup for when appointments can be scheduled
     self.appointment_at ||= created_at || Time.current
-    self.line_entry_timestamp ||= (created_at || Time.current).to_i # Because it's virtual_line
+    self.line_number ||= location&.next_line_number
     # TODO: ensure location matches organization
     # errors.add(:base, "bad location!") unless location&.organization_id == organization_id
   end
@@ -182,23 +157,5 @@ class Appointment < ApplicationRecord
   def update_appointment_queue
     return true if skip_update
     LocationAppointmentsQueueWorker.perform_async(location_id)
-  end
-
-  private
-
-  def update_and_move_for_failed_to_find
-    if failed_to_find_attempts.count <= after_failed_to_find_removal_count
-      self.status = "waiting"
-      # If we have the exact number of failed_to_find_attempts as the removal count, we want to put the person in the back of the line
-      # Otherwise - put them as the next person before the on_deck people
-      if failed_to_find_attempts.count < after_failed_to_find_removal_count
-        new_position = other_location_appointments.line_not_paging_or_on_deck.first
-      end
-    else
-      self.status = "removed"
-    end
-    # Put it as the last record that is around
-    # This will save the record
-    move_behind(new_position)
   end
 end

@@ -9,7 +9,7 @@ RSpec.describe Appointment, type: :model do
       expect(appointment.in_line?).to be_truthy
       expect(appointment.signed_in_user?).to be_falsey
       expect(appointment.virtual_line?).to be_truthy
-      expect(appointment.line_entry_timestamp).to be_within(1).of appointment.created_at.to_i
+      expect(appointment.line_number).to eq 1
       # And it updates the queue
       expect {
         appointment.update(updated_at: Time.current)
@@ -91,105 +91,8 @@ RSpec.describe Appointment, type: :model do
     end
   end
 
-  context "existing appointments" do
-    let(:appt1_status) { "waiting" }
-    let(:appt3_status) { "waiting" }
-    let!(:appt1) { FactoryBot.create(:appointment, status: appt1_status, line_entry_timestamp: (Time.current - 45.minutes).to_i) }
-    let(:organization) { appt1.organization }
-    let(:location) { appt1.location }
-    # Shuffle the order when they're actually created around a little bit
-    let!(:appt4) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 10.minutes).to_i, organization: organization, location: location) }
-    let!(:appt5) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 5.minutes).to_i, organization: organization, location: location) }
-    let!(:appt3) { FactoryBot.create(:appointment, status: appt3_status, line_entry_timestamp: (Time.current - 20.minutes).to_i, organization: organization, location: location) }
-    let!(:appt2) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 30.minutes).to_i, organization: organization, location: location) }
-    let!(:appt6) { FactoryBot.create(:appointment, status: "being_helped", line_entry_timestamp: (Time.current - 1.hour).to_i, organization: organization, location: location) }
-    describe "line_ordered, move_behind, move_to_back" do
-      it "sorts by line_entry_timestamp" do
-        location.reload
-        expect(location.appointments.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
-        # Different than default ordering
-        expect(Appointment.pluck(:id)).to_not eq(Appointment.line_ordered.pluck(:id))
-
-        appt2.move_behind(appt4)
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id, appt6.id])
-
-        # Doing it again doesn't change anything
-        appt2.move_behind(appt4)
-        expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
-        # nil puts in front of line
-        expect(location.appointments.in_line.on_deck.first).to be_blank
-        appt3.move_ahead(location.appointments.in_line.on_deck.first) # this is an example of how we use it
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt3.id, appt1.id, appt4.id, appt2.id, appt5.id, appt6.id])
-
-        # Puts it ahead
-        appt4.move_ahead(appt5)
-        expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id])
-
-        # nil puts in front of in_line
-        appt4.move_ahead(location.appointments.in_line.on_deck.first)
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt4.id, appt3.id, appt1.id, appt2.id, appt5.id, appt6.id])
-      end
-    end
-    describe "update_and_move_for_failed_to_find" do
-      let(:appt1_status) { "on_deck" }
-      let(:appt3_status) { "paging" }
-      it "puts behind the last on deck twice, then to the back of the line, then removes" do
-        # Line ordered first orders by the status priority, than by line_entry_timestamp
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id, appt6.id])
-        expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt4.id, appt5.id])
-        expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt1.id])
-
-        expect(appt6.after_failed_to_find_removal_count).to eq 2
-        # it's possible to failed_to_find something not in line
-        expect {
-          appt6.record_status_update(new_status: "failed_to_find", updator_id: 12, updator_kind: "organization_member")
-        }.to change(AppointmentUpdate, :count).by 1
-        appt6.reload # try to ward off flaky behavior
-        expect(appt6.status).to eq "waiting"
-        appointment_update1 = appt6.appointment_updates.last
-        expect(appointment_update1.creator_kind).to eq "organization_member"
-        expect(appointment_update1.user_id).to eq 12
-        expect(appointment_update1.status).to eq "failed_to_find"
-        expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt6.id, appt4.id, appt5.id])
-        # doing it for another appt puts that appt one back in the waiting queue
-        expect {
-          appt3.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
-        }.to change(AppointmentUpdate, :count).by 1
-        appt3.reload
-        expect(appt3.status).to eq "waiting"
-        appointment_update2 = appt3.appointment_updates.last
-        expect(appointment_update2.creator_kind).to eq "queue_worker"
-        expect(appointment_update2.user_id).to be_blank
-        expect(appointment_update2.status).to eq "failed_to_find"
-        expect(Appointment.line_ordered.pluck(:id)).to eq([appt1.id, appt2.id, appt6.id, appt3.id, appt4.id, appt5.id])
-        # Final warning for 6, puts it in back of the waiting queue
-        expect {
-          appt6.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
-        }.to change(AppointmentUpdate, :count).by 1
-        appt6.reload # try to ward off flaky behavior
-        expect(appt6.status).to eq "waiting"
-        appointment_update4 = appt6.appointment_updates.last
-        expect(appointment_update4.creator_kind).to eq "queue_worker"
-        expect(appointment_update4.user_id).to be_blank
-        expect(appointment_update4.status).to eq "failed_to_find"
-        expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id, appt6.id])
-        # It Removes 6
-        expect {
-          appt6.record_status_update(new_status: "failed_to_find", updator_kind: "organization_member", updator_id: 3333)
-        }.to change(AppointmentUpdate, :count).by 1
-        appt6.reload # try to ward off flaky behavior
-        expect(appt6.status).to eq "removed"
-        appointment_update5 = appt6.appointment_updates.last
-        expect(appointment_update5.creator_kind).to eq "organization_member"
-        expect(appointment_update5.user_id).to eq 3333
-        expect(appointment_update5.status).to eq "failed_to_find"
-        expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id])
-      end
-    end
-  end
-
   describe "record_status_update" do
-    let!(:appointment) { FactoryBot.create(:appointment, status: og_status, line_entry_timestamp: (Time.current - 30.minutes).to_i) }
+    let!(:appointment) { FactoryBot.create(:appointment, status: og_status, line_number: 90) }
     let(:location) { appointment.location }
     let(:og_status) { "waiting" }
     let(:new_status) { "on_deck" }
@@ -276,31 +179,21 @@ RSpec.describe Appointment, type: :model do
           organization: appointment.organization,
           location: appointment.location,
           status: "on_deck",
-          line_entry_timestamp: (Time.current - 1.hour).to_i)
+          line_number: 92)
       end
       context "new_status on_deck" do
-        it "updates and doesn't move to front of the queue" do
+        it "updates, order is changed" do
           appointment.reload
           appointment_on_deck.reload
-          expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
-          expect_update(appointment, og_status, new_status, updator_id, updator_kind)
-          location.reload
+          expect(appointment.line_number).to be < appointment_on_deck.line_number
+          # Test that the way we order by status is correct
+          expect(location.appointments.reorder(status: :desc).pluck(:id)).to eq([appointment_on_deck.id, appointment.id])
+          expect(location.appointments.reorder(line_number: :asc).pluck(:id)).to eq([appointment.id, appointment_on_deck.id])
           expect(location.appointments.in_line.pluck(:id)).to eq([appointment_on_deck.id, appointment.id])
-        end
-      end
-      context "failed_to_find" do
-        let(:new_status) { "failed_to_find" }
-        it "updates and moves to front of the queue" do
-          expect(appointment.after_failed_to_find_removal_count).to eq 2
-          expect(appointment_on_deck.line_entry_timestamp).to be < appointment.line_entry_timestamp
-          # NOTE: Passing appointment_on_deck, not appointment
-          appointment_update = expect_update(appointment_on_deck, og_status, new_status, updator_id, updator_kind, "waiting")
-          # Because we've reordered!
-          appointment.reload
-          appointment_on_deck.reload
-          expect(appointment_on_deck.failed_to_find_attempts.pluck(:id)).to eq([appointment_update.id])
-          expect(appointment_on_deck.line_entry_timestamp).to be > appointment.line_entry_timestamp
+          expect_update(appointment, og_status, new_status, updator_id, updator_kind)
+          expect(appointment.status).to eq "on_deck"
           location.reload
+          expect(location.appointments.pluck(:status).uniq).to eq(["on_deck"])
           expect(location.appointments.in_line.pluck(:id)).to eq([appointment.id, appointment_on_deck.id])
         end
       end
