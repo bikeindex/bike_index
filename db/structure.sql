@@ -247,12 +247,11 @@ CREATE TABLE public.appointments (
     status integer,
     reason character varying,
     description text,
-    line_entry_timestamp integer,
+    line_number integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     appointment_at timestamp without time zone,
-    creation_ip_address inet,
-    line_number integer
+    creation_ip_address inet
 );
 
 
@@ -5257,7 +5256,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620171606'),
 ('20200620172241'),
 ('20200630200556'),
-('20200724222804'),
-('20200727213018');
+('20200727213018'),
+('20200729182853');
 
 

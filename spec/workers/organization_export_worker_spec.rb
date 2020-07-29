@@ -181,7 +181,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "assigning stickers" do
         let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation], bike_code_start: "ff333333"} }
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
-        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "717.742.3423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_falsey
@@ -226,7 +226,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             owner_email: bike.owner_email,
             owner_name: nil,
             organization_affiliation: "community_member",
-            phone: "717.742.3423",
+            phone: "7177423423",
             sticker: "FF 333 333",
             address: "717 Market St",
             city: "San Francisco",
@@ -329,7 +329,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
               owner_email: bike.owner_email,
               owner_name: nil,
               organization_affiliation: "community_member",
-              phone: "717.742.3423",
+              phone: "7177423423",
               sticker: nil,
               address: nil,
               city: nil,
