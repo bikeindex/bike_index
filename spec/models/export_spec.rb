@@ -4,7 +4,7 @@ RSpec.describe Export, type: :model do
   let(:organization) { export.organization }
 
   describe "scope and method for stolen_no_blocklist" do
-    let(:export) { FactoryBot.create(:export, options: { with_blocklist: true, headers: %w[party registered_at] }) }
+    let(:export) { FactoryBot.create(:export, options: {with_blocklist: true, headers: %w[party registered_at]}) }
     it "is with blocklist" do
       expect(export.stolen?).to be_truthy
       expect(export.option?(:with_blocklist)).to be_truthy
@@ -39,13 +39,13 @@ RSpec.describe Export, type: :model do
       expect(Export.new.partial_registrations).to be_falsey
     end
     context "true" do
-      let(:export) { Export.new(options: { partial_registrations: true }.as_json) }
+      let(:export) { Export.new(options: {partial_registrations: true}.as_json) }
       it "returns true if true" do
         expect(export.partial_registrations).to eq true
       end
     end
     context "only" do
-      let(:export) { Export.new(options: { partial_registrations: "only" }.as_json) }
+      let(:export) { Export.new(options: {partial_registrations: "only"}.as_json) }
       it "returns true if true" do
         expect(export.partial_registrations).to eq "only"
       end
@@ -140,7 +140,7 @@ RSpec.describe Export, type: :model do
       allow(export).to receive(:file_url) { "https://files.bikeindex.org/exports/820181214ccc.xlsx" }
       expect(export.avery_export?).to be_falsey
       expect(export.avery_export_url).to be_nil
-      export.options = { avery_export: true }
+      export.options = {avery_export: true}
       expect(export.avery_export?).to be_truthy
       expect(export.avery_export_url).to be_nil
       expect(export.assign_bike_codes?).to be_falsey
@@ -162,7 +162,7 @@ RSpec.describe Export, type: :model do
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
       let!(:b_param) do
         FactoryBot.create(:b_param, created_bike_id: bike.id,
-                                    params: { bike: { address: "102 Washington Pl, State College" } })
+                                    params: {bike: {address: "102 Washington Pl, State College"}})
       end
       let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
       include_context :geocoder_real

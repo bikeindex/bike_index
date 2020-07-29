@@ -11,9 +11,9 @@ RSpec.describe Membership, type: :model do
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           FactoryBot.create(:membership_claimed, organization: org, user: user)
-        end.to change(ProcessMembershipWorker.jobs, :count).by 1
+        }.to change(ProcessMembershipWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)

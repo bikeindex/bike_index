@@ -40,9 +40,9 @@ RSpec.describe Location, type: :model do
       expect(location.destroy_forbidden?).to be_falsey
       organization.reload
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         organization.update(approved: true, skip_update: false)
-      end.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
+      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
       UpdateOrganizationAssociationsWorker.drain
       location.reload
       expect(location.shown).to be_truthy
@@ -59,9 +59,9 @@ RSpec.describe Location, type: :model do
       expect(organization.default_impound_location).to be_blank
       expect(organization.enabled_feature_slugs).to eq(["impound_bikes"])
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         location.update(impound_location: true)
-      end.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
+      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
       UpdateOrganizationAssociationsWorker.drain
       location.reload
       expect(location.default_impound_location).to be_truthy

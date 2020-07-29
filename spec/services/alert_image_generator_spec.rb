@@ -23,7 +23,7 @@ RSpec.describe AlertImageGenerator do
   describe "#stolen_record_location" do
     let(:generator) { described_class.new(stolen_record: stolen_record, bike_image: nil) }
     let(:state) { FactoryBot.create(:state_california) }
-    let(:location_attrs) { { state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368 } }
+    let(:location_attrs) { {state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368} }
     context "stolen record with a location" do
       let(:stolen_record) { StolenRecord.new(location_attrs) }
       it "returns the stolen record location" do
@@ -39,7 +39,7 @@ RSpec.describe AlertImageGenerator do
       end
     end
     context "Edmonton" do
-      let(:location_attrs) { { street: "7935 Gateway Blvd", city: "Edmonton", zipcode: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, state: nil, country: Country.canada } }
+      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", zipcode: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, state: nil, country: Country.canada} }
       let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.merge(skip_geocoding: true)) }
       it "returns edmonton" do
         stolen_record.reload

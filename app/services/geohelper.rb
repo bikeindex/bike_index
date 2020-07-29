@@ -21,10 +21,10 @@ class Geohelper
         # Google returns a box that represents the area, return just one coordinate group from that box
         location = geometry["bounds"]["northeast"]
       elsif result.first&.data&.dig("latitude") # This is probably a test geocoder response...
-        location = { "lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"] }
+        location = {"lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"]}
       end
       return nil unless location
-      { latitude: location["lat"], longitude: location["lng"] }
+      {latitude: location["lat"], longitude: location["lng"]}
     end
 
     # Google isn't a fan of bare zipcodes anymore. But we search using bare zipcodes a lot - so make it work
@@ -54,7 +54,7 @@ class Geohelper
         city: city,
         state: state,
         zipcode: code,
-        country: country&.gsub("USA", "US"),
+        country: country&.gsub("USA", "US")
       }.with_indifferent_access
     end
 
@@ -66,7 +66,7 @@ class Geohelper
         longitude: result.longitude,
         state_id: State.fuzzy_find(result.state_code)&.id,
         country_id: Country.fuzzy_find(result.country_code)&.id,
-        zipcode: result.postal_code,
+        zipcode: result.postal_code
       }
     end
   end

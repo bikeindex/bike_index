@@ -8,7 +8,7 @@ class WheelSize < ApplicationRecord
 
   def self.id_for_bsd(bsd)
     ws = where(iso_bsd: bsd.to_i).first
-    ws && ws.id
+    ws&.id
   end
 
   def select_value

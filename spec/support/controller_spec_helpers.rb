@@ -3,7 +3,7 @@
 module ControllerSpecHelpers
   def set_current_user(user)
     cookies.signed[:auth] =
-      { secure: true, httponly: true, value: [user.id, user.auth_token] }
+      {secure: true, httponly: true, value: [user.id, user.auth_token]}
   end
 
   RSpec.shared_context :logged_in_as_user do

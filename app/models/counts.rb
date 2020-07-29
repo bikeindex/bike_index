@@ -23,11 +23,17 @@ class Counts
       (Time.current - 7.days).end_of_day + 1.minute
     end
 
-    def total_bikes; retrieve_for("total_bikes") end
+    def total_bikes
+      retrieve_for("total_bikes")
+    end
 
-    def stolen_bikes; retrieve_for("stolen_bikes") end
+    def stolen_bikes
+      retrieve_for("stolen_bikes")
+    end
 
-    def organizations; retrieve_for("organizations") end
+    def organizations
+      retrieve_for("organizations")
+    end
 
     def week_creation_chart
       chart_data = redis { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
@@ -35,11 +41,17 @@ class Counts
     end
 
     # And here are the assignments:
-    def assign_stolen_bikes; assign_for("stolen_bikes", Bike.stolen.count) end
+    def assign_stolen_bikes
+      assign_for("stolen_bikes", Bike.stolen.count)
+    end
 
-    def assign_total_bikes; assign_for("total_bikes", Bike.count) end
+    def assign_total_bikes
+      assign_for("total_bikes", Bike.count)
+    end
 
-    def assign_organizations; assign_for("organizations", Organization.count) end
+    def assign_organizations
+      assign_for("organizations", Organization.count)
+    end
 
     def assign_recoveries
       # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
@@ -50,7 +62,9 @@ class Counts
       assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.current).group_by_day(:created_at).count.to_json)
     end
 
-    def recoveries; retrieve_for("recoveries") end
+    def recoveries
+      retrieve_for("recoveries")
+    end
 
     def assign_recoveries_value
       valued = StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
@@ -58,7 +72,9 @@ class Counts
       assign_for("recoveries_value", valued.sum + (recoveries - valued.count) * recovery_average_value)
     end
 
-    def recoveries_value; retrieve_for("recoveries_value") end
+    def recoveries_value
+      retrieve_for("recoveries_value")
+    end
 
     protected
 
@@ -70,9 +86,9 @@ class Counts
     end
 
     def redis_pool
-      @redis ||= ConnectionPool.new(timeout: 1, size: 2) do
+      @redis ||= ConnectionPool.new(timeout: 1, size: 2) {
         Redis.new
-      end
+      }
     end
   end
 end

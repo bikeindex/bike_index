@@ -8,8 +8,8 @@ class Admin::MailSnippetsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @mail_snippets = matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-                        .page(page).per(per_page)
-                        .includes(:organization)
+      .page(page).per(per_page)
+      .includes(:organization)
   end
 
   def show
@@ -69,7 +69,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def permitted_parameters
     params.require(:mail_snippet).permit(:name, :body, :is_enabled, :address,
-                                         :is_location_triggered, :proximity_radius)
+      :is_location_triggered, :proximity_radius)
   end
 
   def find_snippet

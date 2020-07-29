@@ -4,9 +4,11 @@ module MoneyFormattable
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def default_currency; "USD" end
+    def default_currency
+      "USD"
+    end
 
-    def money_formatted(amnt, currency=nil)
+    def money_formatted(amnt, currency = nil)
       Money.new(amnt || 0, currency || default_currency).format
     end
 

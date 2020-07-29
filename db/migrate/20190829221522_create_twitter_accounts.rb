@@ -24,7 +24,7 @@ class CreateTwitterAccounts < ActiveRecord::Migration[4.2]
     end
 
     add_index :twitter_accounts,
-              %i[latitude longitude],
-              name: :index_twitter_accounts_on_latitude_and_longitude
+      %i[latitude longitude],
+      name: :index_twitter_accounts_on_latitude_and_longitude
   end
 end

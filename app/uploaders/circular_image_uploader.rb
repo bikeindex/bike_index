@@ -22,16 +22,16 @@ class CircularImageUploader < ApplicationUploader
     process :round_image
   end
 
-  version :medium, :from_version => :large do
+  version :medium, from_version: :large do
     process resize_to_fill: [400, 400]
   end
 
-  version :thumb, :from_version => :medium do
+  version :thumb, from_version: :medium do
     process resize_to_fill: [100, 100]
   end
 
   def extension_white_list
-    %w(jpg jpeg gif png tiff tif)
+    %w[jpg jpeg gif png tiff tif]
   end
 
   def round_image
@@ -39,13 +39,13 @@ class CircularImageUploader < ApplicationUploader
       path = img.path
       new_tmp_path = File.join(cache_dir, "round_#{File.basename(path)}")
       width, height = img[:dimensions]
-      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(",")
+      radius_point = (width > height ? [width / 2, height] : [width, height / 2]).join(",")
       imagemagick_command = ["convert",
-                             "-size #{width}x#{height}",
-                             "xc:transparent",
-                             "-fill #{path}",
-                             "-draw 'circle #{width / 2},#{height / 2} #{radius_point}'",
-                             "+repage #{new_tmp_path}"].join(" ")
+        "-size #{width}x#{height}",
+        "xc:transparent",
+        "-fill #{path}",
+        "-draw 'circle #{width / 2},#{height / 2} #{radius_point}'",
+        "+repage #{new_tmp_path}"].join(" ")
 
       system(imagemagick_command)
       MiniMagick::Image.open(new_tmp_path)

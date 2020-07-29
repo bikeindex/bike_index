@@ -3,9 +3,13 @@ class BikeStickerBatch < ApplicationRecord
   belongs_to :organization
   has_many :bike_stickers
 
-  def min_code_integer; bike_stickers.minimum(:code_integer) || 0 end
+  def min_code_integer
+    bike_stickers.minimum(:code_integer) || 0
+  end
 
-  def max_code_integer; bike_stickers.maximum(:code_integer) || 0 end
+  def max_code_integer
+    bike_stickers.maximum(:code_integer) || 0
+  end
 
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
@@ -17,7 +21,7 @@ class BikeStickerBatch < ApplicationRecord
       bike_stickers.create!(
         organization: organization,
         kind: kind,
-        code: prefix + code_integer_with_padding,
+        code: prefix + code_integer_with_padding
       )
     end
     touch # Bump
@@ -31,10 +35,10 @@ class BikeStickerBatch < ApplicationRecord
 
   # Shouldn't occur anymore, but included for legacy diagnostic purposes
   def duplicated_integers
-    bike_sticker_integers.map do |int|
+    bike_sticker_integers.map { |int|
       next unless bike_sticker_integers.count(int) > 1
       int
-    end.reject(&:blank?)
+    }.reject(&:blank?)
   end
 
   # Really simple implementation for diagnostic purposes

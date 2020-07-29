@@ -3,13 +3,13 @@ class TheftAlertPlan < ApplicationRecord
   include Localizable
 
   validates :name,
-            :amount_cents,
-            :currency,
-            :views,
-            :duration_days,
-            presence: true
+    :amount_cents,
+    :currency,
+    :views,
+    :duration_days,
+    presence: true
 
-  validates :amount_cents, :duration_days, :views, numericality: { greater_than: 0 }
+  validates :amount_cents, :duration_days, :views, numericality: {greater_than: 0}
 
   has_many :theft_alerts, dependent: :destroy
   has_many :stolen_records, through: :theft_alerts

@@ -8,7 +8,7 @@ class ExternalRegistryBike < ApplicationRecord
     :serial_normalized,
     presence: true
 
-  validates :external_id, uniqueness: { scope: :type }
+  validates :external_id, uniqueness: {scope: :type}
 
   before_validation :normalize_serial_number
 
@@ -40,7 +40,7 @@ class ExternalRegistryBike < ApplicationRecord
     end
 
     def absent?(value)
-      value.presence.blank? || (/geen|onbekend/i).match?(value)
+      value.presence.blank? || /geen|onbekend/i.match?(value)
     end
   end
 
@@ -64,9 +64,14 @@ class ExternalRegistryBike < ApplicationRecord
     raise NotImplementedError
   end
 
-  def image_url; end
-  def thumb_url; end
-  def url; end
+  def image_url
+  end
+
+  def thumb_url
+  end
+
+  def url
+  end
 
   private
 

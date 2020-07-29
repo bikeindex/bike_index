@@ -11,5 +11,5 @@ RSpec.describe MembershipSerializer do
   it { expect(subject.organization_id).to eq(organization.id) }
   it { expect(subject.slug).to eq(organization.slug) }
   it { expect(subject.is_admin).to be_falsey }
-  it { expect(subject.locations).to eq([{ name: organization.name, id: nil }]) }
+  it { expect(subject.locations).to eq([{name: organization.name, id: nil}]) }
 end

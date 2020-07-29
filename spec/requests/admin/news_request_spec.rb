@@ -33,17 +33,17 @@ RSpec.describe Admin::NewsController, type: :request do
       blog_attrs = {
         title: "new title thing stuff",
         body: "<p>html</p>",
-        language: "en",
+        language: "en"
       }
-      put "#{base_url}/#{blog.to_param}", params: { blog: blog_attrs }
+      put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
       blog.reload
       expect(blog.title).to eq blog_attrs[:title]
       expect(blog.body).to eq blog_attrs[:body]
     end
     describe "update info" do
-      let(:blog_attrs) { { is_info: true } }
+      let(:blog_attrs) { {is_info: true} }
       it "switches to be info" do
-        put "#{base_url}/#{blog.to_param}", params: { blog: blog_attrs }
+        put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
         blog.reload
         expect(blog.info?).to be_truthy
       end

@@ -6,7 +6,7 @@ class CustomerContact < ApplicationRecord
   KIND_ENUM = {
     stolen_contact: 0,
     stolen_twitter_alerter: 1,
-    bike_possibly_found: 2,
+    bike_possibly_found: 2
   }.freeze
 
   enum kind: KIND_ENUM
@@ -54,7 +54,7 @@ class CustomerContact < ApplicationRecord
           stolen_record_id: bike&.current_stolen_record&.id.to_s,
           match_type: match.class.to_s,
           match_id: match.id.to_s,
-          match: match.as_json,
+          match: match.as_json
         })
   end
 

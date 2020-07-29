@@ -16,7 +16,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
       context "period of one day" do
         it "renders the period expected" do
-          get base_url, params: { period: "day", timezone: "Pacific Time (US & Canada)" }
+          get base_url, params: {period: "day", timezone: "Pacific Time (US & Canada)"}
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           Time.zone = target_timezone
@@ -27,7 +27,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       context "custom without end_time" do
         let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
         it "renders the period expected" do
-          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: "" }
+          get base_url, params: {period: "custom", start_time: start_time.to_i, end_time: ""}
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(assigns(:period)).to eq "custom"
@@ -40,11 +40,11 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         let(:end_time) { Time.at(1515448980) } # 2018-01-08 14:03:00 -0800
         it "renders the period expected" do
           get base_url, params: {
-              period: "custom",
-              start_time: start_time.to_i,
-              end_time: "2018-01-08T14:03",
-              timezone: "Pacific Time (US & Canada)"
-            }
+            period: "custom",
+            start_time: start_time.to_i,
+            end_time: "2018-01-08T14:03",
+            timezone: "Pacific Time (US & Canada)"
+          }
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(assigns(:period)).to eq "custom"
@@ -71,14 +71,14 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.status).to eq("pending")
 
         patch "/admin/theft_alerts/#{alert.id}",
-              params: {
-                              theft_alert: {
-                        status: "active",
-                        facebook_post_url: "https://facebook.com/example/post/1",
-                        theft_alert_plan_id: alert.theft_alert_plan.id,
-                        notes: "Some notes",
-                      }
-        }
+          params: {
+            theft_alert: {
+              status: "active",
+              facebook_post_url: "https://facebook.com/example/post/1",
+              theft_alert_plan_id: alert.theft_alert_plan.id,
+              notes: "Some notes"
+            }
+          }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:success]).to match(/success/i)
@@ -95,13 +95,13 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.end_at).to eq(nil)
 
         patch "/admin/theft_alerts/#{alert.id}",
-              params: {
-                              theft_alert: {
-                        status: "active",
-                        facebook_post_url: "https://facebook.com/example/post/1",
-                        theft_alert_plan_id: alert.theft_alert_plan.id,
-                      }
-        }
+          params: {
+            theft_alert: {
+              status: "active",
+              facebook_post_url: "https://facebook.com/example/post/1",
+              theft_alert_plan_id: alert.theft_alert_plan.id
+            }
+          }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("active")
@@ -117,14 +117,14 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.end_at).to be_nil
 
         patch "/admin/theft_alerts/#{alert.id}",
-              params: {
-                              theft_alert: {
-                        status: "pending",
-                        facebook_post_url: "https://facebook.com/example/post/1",
-                        theft_alert_plan_id: alert.theft_alert_plan.id,
-                        notes: "updated note",
-                      }
-        }
+          params: {
+            theft_alert: {
+              status: "pending",
+              facebook_post_url: "https://facebook.com/example/post/1",
+              theft_alert_plan_id: alert.theft_alert_plan.id,
+              notes: "updated note"
+            }
+          }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("pending")
@@ -139,15 +139,15 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.status).to eq("active")
 
         patch "/admin/theft_alerts/#{alert.id}",
-              params: {
-                              theft_alert: {
-                        status: "active",
-                        facebook_post_url: "https://facebook.com/example/post/1",
-                        theft_alert_plan_id: alert.theft_alert_plan.id,
-                        begin_at: now,
-                        end_at: now + 1.day,
-                      }
-        }
+          params: {
+            theft_alert: {
+              status: "active",
+              facebook_post_url: "https://facebook.com/example/post/1",
+              theft_alert_plan_id: alert.theft_alert_plan.id,
+              begin_at: now,
+              end_at: now + 1.day
+            }
+          }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("active")
@@ -159,12 +159,12 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         alert = FactoryBot.create(:theft_alert, status: "pending")
 
         patch "/admin/theft_alerts/#{alert.id}",
-              params: {
-                              theft_alert: {
-                        status: nil,
-                        theft_alert_plan_id: alert.theft_alert_plan.id,
-                      }
-        }
+          params: {
+            theft_alert: {
+              status: nil,
+              theft_alert_plan_id: alert.theft_alert_plan.id
+            }
+          }
 
         expect(response.status).to eq(200)
         expect(flash[:success]).to be_blank

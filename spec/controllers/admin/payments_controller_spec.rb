@@ -14,7 +14,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       email: user2.email,
       amount: 222.22,
       payment_method: "stripe",
-      created_at: create_time.strftime("%FT%T%:z"),
+      created_at: create_time.strftime("%FT%T%:z")
     }
   end
 
@@ -28,7 +28,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, params: { id: subject.to_param }
+      get :edit, params: {id: subject.to_param}
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
@@ -49,7 +49,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       it "updates available attributes" do
         expect(subject.invoice).to be_nil
 
-        put :update, params: { id: subject.to_param, payment: params }
+        put :update, params: {id: subject.to_param, payment: params}
 
         subject.reload
         expect(subject.organization).to eq organization
@@ -66,7 +66,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
     context "check payment" do
       let(:subject) { FactoryBot.create(:payment_check, organization: nil, amount_cents: 55_555, user: user) }
       it "updates available attributes" do
-        put :update, params: { id: subject.to_param, payment: params }
+        put :update, params: {id: subject.to_param, payment: params}
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.invoice).to eq invoice
@@ -79,7 +79,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       end
       context "no invoice" do
         it "updates available attributes" do
-          put :update, params: { id: subject.to_param, payment: params.merge(invoice_id: "") }
+          put :update, params: {id: subject.to_param, payment: params.merge(invoice_id: "")}
           subject.reload
           expect(subject.organization).to eq organization
           expect(subject.invoice).to be_nil
@@ -97,7 +97,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         it "Does not update" do
           expect(invoice.organization).to_not eq organization
           expect(subject.organization).to eq organization
-          put :update, params: { id: subject.to_param, payment: params }
+          put :update, params: {id: subject.to_param, payment: params}
           expect(flash[:error]).to match(/#{organization.short_name}/)
           subject.reload
           expect(subject.invoice).to be_nil
@@ -109,19 +109,19 @@ RSpec.describe Admin::PaymentsController, type: :controller do
   describe "create" do
     context "stripe payment" do
       it "does not create" do
-        expect do
-          post :create, params: { payment: params.merge(payment_method: "stripe") }
+        expect {
+          post :create, params: {payment: params.merge(payment_method: "stripe")}
           expect(flash[:error]).to match(/stripe/i)
-        end.to_not change(Payment, :count)
+        }.to_not change(Payment, :count)
       end
     end
     context "check payment" do
       it "creates" do
         payment_attrs = params.merge(payment_method: "check")
 
-        expect do
-          post :create, params: { payment: payment_attrs }
-        end.to change(Payment, :count).by 1
+        expect {
+          post :create, params: {payment: payment_attrs}
+        }.to change(Payment, :count).by 1
 
         payment = Payment.last
         expect(payment.organization).to eq organization
@@ -138,9 +138,9 @@ RSpec.describe Admin::PaymentsController, type: :controller do
             params.merge(payment_method: "check",
                          organization_id: "",
                          invoice_id: "Invoice ##{invoice.id}")
-          expect do
-            post :create, params: { payment: payment_attrs }
-          end.to change(Payment, :count).by 1
+          expect {
+            post :create, params: {payment: payment_attrs}
+          }.to change(Payment, :count).by 1
 
           payment = Payment.last
           expect(payment.organization).to eq organization

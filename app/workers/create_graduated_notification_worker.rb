@@ -18,7 +18,7 @@ class CreateGraduatedNotificationWorker < ScheduledWorker
 
   def organizations
     Organization.where.not(graduated_notification_interval: nil)
-                .with_enabled_feature_slugs("graduated_notifications")
+      .with_enabled_feature_slugs("graduated_notifications")
   end
 
   def enqueue_workers

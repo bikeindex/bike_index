@@ -16,20 +16,20 @@ class ListicleImageUploader < ApplicationUploader
     process resize_to_fit: [726, 10000]
   end
 
-  version :large, :from_version => :at_width do
+  version :large, from_version: :at_width do
     process :crop
   end
 
-  version :medium, :from_version => :large do
+  version :medium, from_version: :large do
     process resize_to_fill: [300, 300]
   end
 
-  version :thumb, :from_version => :medium do
+  version :thumb, from_version: :medium do
     process resize_to_fill: [100, 100]
   end
 
   def extension_white_list
-    %w(jpg jpeg gif png tiff tif)
+    %w[jpg jpeg gif png tiff tif]
   end
 
   def crop

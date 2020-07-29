@@ -76,9 +76,9 @@ class OrganizationExportWorker < ApplicationWorker
   end
 
   def comma_wrapped_string(array)
-    array.map do |val|
-      '"' + val.to_s.tr("\\", "").gsub(/(\\)?\"/, '\"') + '"'
-    end.join(",") + "\n"
+    array.map { |val|
+      '"' + val.to_s.tr("\\", "").gsub(/(\\)?"/, '\"') + '"'
+    }.join(",") + "\n"
   end
 
   # If we have to load the bike record to check if it's a valid export, check conditions here
@@ -101,10 +101,10 @@ class OrganizationExportWorker < ApplicationWorker
       when "registered_at" then b_param.created_at.utc
       when "manufacturer" then b_param.manufacturer&.name
       when "color"
-        %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map do |key|
+        %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map { |key|
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
-        end.compact.join(", ")
+        }.compact.join(", ")
       when "owner_email" then b_param.owner_email
       when "partial_registration" then true
       end

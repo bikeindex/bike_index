@@ -6,7 +6,6 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
     bike = impound_record.bike
     matching_display_ids = ImpoundRecord.where(organization_id: impound_record.organization_id, display_id: impound_record.display_id)
     if matching_display_ids.where.not(id: impound_record.id).any?
-      display_id = impound_record.display_id
       matching_display_ids.reorder(:id).each_with_index do |irecord, index|
         next if index == 0 # don't change the ID of the first one
         irecord.update_attributes(display_id: nil, skip_update: true)

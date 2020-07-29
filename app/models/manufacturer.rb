@@ -24,8 +24,8 @@ class Manufacturer < ApplicationRecord
 
   class << self
     def old_attr_accessible
-      %w(name slug website frame_maker open_year close_year logo remote_logo_url
-         logo_cache logo_source description).map(&:to_sym).freeze
+      %w[name slug website frame_maker open_year close_year logo remote_logo_url
+        logo_cache logo_source description].map(&:to_sym).freeze
     end
 
     def friendly_find(n)
@@ -40,7 +40,7 @@ class Manufacturer < ApplicationRecord
 
     def friendly_id_find(n)
       m = friendly_find(n)
-      m && m.id
+      m&.id
     end
 
     def other
@@ -111,8 +111,8 @@ class Manufacturer < ApplicationRecord
       data: {
         slug: slug,
         priority: autocomplete_hash_priority,
-        search_id: search_id,
-      },
+        search_id: search_id
+      }
     }.as_json
   end
 
@@ -125,6 +125,6 @@ class Manufacturer < ApplicationRecord
   end
 
   def simple_name
-    name.gsub(/\s?\([^\)]*\)/i, "")
+    name.gsub(/\s?\([^)]*\)/i, "")
   end
 end

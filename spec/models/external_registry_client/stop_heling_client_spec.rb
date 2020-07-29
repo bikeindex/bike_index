@@ -60,7 +60,7 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
       "Bron" => "KOH",
       "BronNaam" => "POLITIE BRABANT-NOORD",
       "BronUniekID" => "458171",
-      "MatchType" => "PARTIAL HIT",
+      "MatchType" => "PARTIAL HIT"
     }
   end
 
@@ -83,7 +83,7 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
       "Bron" => "KOH",
       "BronNaam" => "POLITIE KENNEMERLAND",
       "BronUniekID" => "83760",
-      "MatchType" => "PARTIAL HIT",
+      "MatchType" => "PARTIAL HIT"
     }
   end
 

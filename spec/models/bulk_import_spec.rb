@@ -16,7 +16,7 @@ RSpec.describe BulkImport, type: :model do
       end
     end
     context "existing errors - unlikely, but worth just to make sure" do
-      let(:existing_errors) { { line: [2, "Nobody loves you"], file: "Wrong place wrong time", file_lines: [1] } }
+      let(:existing_errors) { {line: [2, "Nobody loves you"], file: "Wrong place wrong time", file_lines: [1]} }
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "ongoing", import_errors: existing_errors) }
       it "adds a new error" do
         expect(bulk_import.starting_line).to eq 2
@@ -34,12 +34,12 @@ RSpec.describe BulkImport, type: :model do
   end
 
   describe "blocking_error?" do
-    let(:bulk_import) { BulkImport.new(import_errors: { line: [2, "dddd"] }.as_json, progress: "finished", created_at: Time.current - 1.month) }
+    let(:bulk_import) { BulkImport.new(import_errors: {line: [2, "dddd"]}.as_json, progress: "finished", created_at: Time.current - 1.month) }
     it "is be_falsey" do
       expect(bulk_import.blocking_error?).to be_falsey
     end
     context "file error" do
-      let(:bulk_import) { BulkImport.new(import_errors: { file: "dddd" }.as_json) }
+      let(:bulk_import) { BulkImport.new(import_errors: {file: "dddd"}.as_json) }
       it "is be_falsey" do
         expect(bulk_import.blocking_error?).to be_truthy
       end
@@ -84,22 +84,22 @@ RSpec.describe BulkImport, type: :model do
     before { Sidekiq::Worker.clear_all }
     it "adds an ascend error, sends email" do
       expect(bulk_import.created_at).to_not be_present # Bulk import is saved
-      expect do
+      expect {
         expect(bulk_import.check_ascend_import_processable!).to be_falsey
-      end.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
+      }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
       expect(bulk_import.created_at).to be_present # Bulk import is saved
       expect(bulk_import.import_errors.to_s).to match(/ascend/)
       expect(bulk_import.import_errors?).to be_truthy
       expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
     end
     context "organization_id already present" do
-      let!(:bulk_import) { FactoryBot.build(:bulk_import_ascend, organization_id: 12, import_errors: { ascend: "unable to associate" }) }
+      let!(:bulk_import) { FactoryBot.build(:bulk_import_ascend, organization_id: 12, import_errors: {ascend: "unable to associate"}) }
       it "returns true" do
         expect(bulk_import.created_at).to_not be_present # Bulk import is saved
         expect(bulk_import.import_errors?).to be_truthy
-        expect do
+        expect {
           expect(bulk_import.check_ascend_import_processable!).to be_truthy
-        end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+        }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
         expect(bulk_import.import_errors?).to be_falsey
         expect(bulk_import.created_at).to_not be_present # Bulk import is not saved
       end
@@ -109,9 +109,9 @@ RSpec.describe BulkImport, type: :model do
       it "sets attributes, removes error, doesn't save (because worker will save)" do
         bulk_import.import_errors["ascend"] = "Unable to find an Organization with ascend_name"
         expect(bulk_import.import_errors?).to be_truthy
-        expect do
+        expect {
           expect(bulk_import.check_ascend_import_processable!).to be_truthy
-        end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+        }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
         expect(bulk_import.organization_id).to eq organization.id
         expect(bulk_import.creator).to eq organization.auto_user
       end

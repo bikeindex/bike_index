@@ -12,7 +12,7 @@ class ExternalRegistryClient
   def self.search_for_bikes_with(query, registries: nil)
     registries ||= [
       StopHelingClient,
-      VerlorenOfGevondenClient,
+      VerlorenOfGevondenClient
     ]
 
     queries = [query, SerialNormalizer.new(serial: query).normalized].compact
@@ -43,14 +43,16 @@ class ExternalRegistryClient
   end
 
   def conn
-    @conn ||= Faraday.new(url: self.base_url) do |conn|
+    @conn ||= Faraday.new(url: base_url) { |conn|
       conn.response :json, content_type: /\bjson$/
-      conn.use Faraday::RequestResponseLogger::Middleware,
-               logger_level: :info,
-               logger: Rails.logger if Rails.env.development?
+      if Rails.env.development?
+        conn.use Faraday::RequestResponseLogger::Middleware,
+          logger_level: :info,
+          logger: Rails.logger
+      end
       conn.adapter Faraday.default_adapter
       conn.options.timeout = TIMEOUT_SECS
-    end
+    }
   end
 
   class ExternalRegistryClientError < StandardError; end

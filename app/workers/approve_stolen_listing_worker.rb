@@ -27,7 +27,7 @@ class ApproveStolenListingWorker < ApplicationWorker
         title: title_string,
         user_email: bike.owner_email,
         creator_email: "bryan@bikeindex.org",
-        info_hash: tweet.details_hash,
+        info_hash: tweet.details_hash
       )
 
     if customer_contact.save
@@ -42,7 +42,7 @@ class ApproveStolenListingWorker < ApplicationWorker
       message: "failed creating alert for stolen listing",
       bike: bike&.id,
       tweet: tweet&.id,
-      errors: errors,
+      errors: errors
     }
   end
 end

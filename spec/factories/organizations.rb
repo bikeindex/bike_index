@@ -36,8 +36,8 @@ FactoryBot.define do
       after(:create) do |organization|
         2.times do |n|
           FactoryBot.create(:location,
-                            name: "location #{n}",
-                            organization: organization)
+            name: "location #{n}",
+            organization: organization)
         end
       end
     end

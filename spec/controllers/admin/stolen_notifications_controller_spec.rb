@@ -20,7 +20,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :controller do
       user = FactoryBot.create(:admin)
       set_current_user(user)
 
-      get :show, params: { id: stolen_notification.id }
+      get :show, params: {id: stolen_notification.id}
 
       expect(response).to be_ok
       expect(response.status).to eq(200)
@@ -36,9 +36,9 @@ RSpec.describe Admin::StolenNotificationsController, type: :controller do
       admin = FactoryBot.create(:admin)
       stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
       set_current_user(admin)
-      expect do
-        get :resend, params: { id: stolen_notification.id }
-      end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+      expect {
+        get :resend, params: {id: stolen_notification.id}
+      }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
 
     it "redirects if the stolen notification has already been sent" do
@@ -48,9 +48,9 @@ RSpec.describe Admin::StolenNotificationsController, type: :controller do
       stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
       stolen_notification.update_attribute :send_dates, [69].to_json
       set_current_user(admin)
-      expect do
-        get :resend, params: { id: stolen_notification.id }
-      end.to change(EmailStolenNotificationWorker.jobs, :size).by(0)
+      expect {
+        get :resend, params: {id: stolen_notification.id}
+      }.to change(EmailStolenNotificationWorker.jobs, :size).by(0)
       expect(response).to redirect_to(:admin_stolen_notification)
     end
 
@@ -61,9 +61,9 @@ RSpec.describe Admin::StolenNotificationsController, type: :controller do
       stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
       stolen_notification.update_attribute :send_dates, [69].to_json
       set_current_user(admin)
-      expect do
-        get :resend, params: { id: stolen_notification.id, pretty_please: true }
-      end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+      expect {
+        get :resend, params: {id: stolen_notification.id, pretty_please: true}
+      }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
   end
 end

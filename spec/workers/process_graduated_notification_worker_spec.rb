@@ -25,12 +25,12 @@ RSpec.describe ProcessGraduatedNotificationWorker, type: :lib do
       expect(graduated_notification_primary.associated_notifications.pluck(:id)).to eq([])
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
-        expect do
+        expect {
           instance.perform
           instance.perform
           instance.perform
           instance.perform
-        end.to change(GraduatedNotification, :count).by 1
+        }.to change(GraduatedNotification, :count).by 1
       end
       expect(ActionMailer::Base.deliveries.count).to eq 1
       # Also, manually test that enqueuing the processable one again doesn't send an email

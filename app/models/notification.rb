@@ -4,7 +4,7 @@
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
-    view_appointment: 10,
+    view_appointment: 10
   }.freeze
 
   belongs_to :user
@@ -16,7 +16,9 @@ class Notification < ApplicationRecord
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
   # Eventually additional logic - like whether to create, because duplicates, etc - will be included here
   def self.create_for(kind, **kwargs)
@@ -26,7 +28,9 @@ class Notification < ApplicationRecord
     notification.save
   end
 
-  def email_success?; delivery_status == "email_success" end
+  def email_success?
+    delivery_status == "email_success"
+  end
 
   def send_notification
     return true if kind == "confirmation_email" # email for this is managed outside of this class, at least for now

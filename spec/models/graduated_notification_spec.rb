@@ -4,8 +4,8 @@ RSpec.describe GraduatedNotification, type: :model do
   let(:graduated_notification_interval) { 2.days.to_i }
   let(:organization) do
     FactoryBot.create(:organization_with_paid_features,
-                      enabled_feature_slugs: ["graduated_notifications"],
-                      graduated_notification_interval: graduated_notification_interval)
+      enabled_feature_slugs: ["graduated_notifications"],
+      graduated_notification_interval: graduated_notification_interval)
   end
   describe "factories" do
     let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
@@ -19,9 +19,9 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.send("calculated_primary_notification").id).to eq graduated_notification.id
       expect(graduated_notification.send_email?).to be_truthy
       expect(graduated_notification.email_success?).to be_falsey
-      expect do
+      expect {
         graduated_notification.process_notification
-      end.to change(BikeOrganization, :count).by(-1)
+      }.to change(BikeOrganization, :count).by(-1)
       expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
       graduated_notification.reload
       expect(graduated_notification.bike_organization.deleted?).to be_truthy
@@ -116,10 +116,10 @@ RSpec.describe GraduatedNotification, type: :model do
     context "with mail_snippet" do
       let!(:mail_snippet) do
         FactoryBot.create(:mail_snippet,
-                          kind: "graduated_notification",
-                          subject: "Another crazy subject",
-                          organization: organization,
-                          is_enabled: true)
+          kind: "graduated_notification",
+          subject: "Another crazy subject",
+          organization: organization,
+          is_enabled: true)
       end
       it "returns the mail_snippet" do
         expect(graduated_notification.mail_snippet).to eq mail_snippet
@@ -403,9 +403,9 @@ RSpec.describe GraduatedNotification, type: :model do
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
       expect(GraduatedNotification.count).to eq 1
-      expect do
+      expect {
         expect(graduated_notification1.process_notification).to be_falsey
-      end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
+      }.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
       graduated_notification1.reload
       expect(graduated_notification1.status).to eq "pending"
       expect(graduated_notification1.processed?).to be_falsey
@@ -427,18 +427,18 @@ RSpec.describe GraduatedNotification, type: :model do
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
-        expect do
+        expect {
           expect(graduated_notification1.process_notification).to be_falsey
-        end.to change(CreateGraduatedNotificationWorker.jobs, :count).by 1
+        }.to change(CreateGraduatedNotificationWorker.jobs, :count).by 1
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(CreateGraduatedNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike2.id])
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(graduated_notification1.send("associated_bike_ids_missing_notifications")).to eq([bike2.id])
 
         expect(GraduatedNotification.count).to eq 1
-        expect do
+        expect {
           CreateGraduatedNotificationWorker.drain
-        end.to change(GraduatedNotification, :count).by 1
+        }.to change(GraduatedNotification, :count).by 1
         expect(ActionMailer::Base.deliveries.count).to eq 0
         graduated_notification2 = GraduatedNotification.reorder(:created_at).last
         expect(graduated_notification2.bike_id).to eq bike2.id

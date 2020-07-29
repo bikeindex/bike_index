@@ -28,9 +28,9 @@ RSpec.describe UserEmail, type: :model do
         expect(user.confirmed).to be_truthy
         expect(user.user_emails.count).to eq 1
         user_email = user.user_emails.first
-        expect do
+        expect {
           expect(UserEmail.create_confirmed_primary_email(user)).to eq user_email
-        end.to change(UserEmail, :count).by 0
+        }.to change(UserEmail, :count).by 0
       end
     end
   end

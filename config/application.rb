@@ -26,7 +26,7 @@ module Bikeindex
     config.load_defaults 5.2
 
     # Use our custom error pages
-    config.exceptions_app = self.routes
+    config.exceptions_app = routes
     require "draper"
     Draper::Railtie.initializers.delete_if { |initializer| initializer.name == "draper.setup_active_model_serializers" }
 
@@ -46,10 +46,10 @@ module Bikeindex
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en nl]
-    config.i18n.fallbacks = { "en-US": :en, "en-GB": :en }
+    config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
     # Throttle stuff
-    config.middleware.use Rack::Throttle::Minute, :max => ENV["MIN_MAX_RATE"].to_i, :cache => Redis.new, :key_prefix => :throttle
+    config.middleware.use Rack::Throttle::Minute, max: ENV["MIN_MAX_RATE"].to_i, cache: Redis.new, key_prefix: :throttle
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware

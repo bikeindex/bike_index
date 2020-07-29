@@ -16,7 +16,8 @@ module Organized
         .includes(:user, :bike, :secondary_notifications)
     end
 
-    def show; end
+    def show
+    end
 
     private
 
@@ -67,7 +68,7 @@ module Organized
       return true if current_organization.deliver_graduated_notifications?
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      return
+      nil
     end
   end
 end

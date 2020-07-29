@@ -4,11 +4,10 @@ class Admin::CustomerContactsController < Admin::BaseController
     if @customer_contact.save
       flash[:success] = "Email sent successfully!"
       EmailAdminContactStolenWorker.perform_async(@customer_contact.id)
-      redirect_to edit_admin_stolen_bike_url(@customer_contact.bike_id)
     else
       flash[:error] = "Email send error!\n#{@customer_contact.errors.full_messages.to_sentence}"
-      redirect_to edit_admin_stolen_bike_url(@customer_contact.bike_id)
     end
+    redirect_to edit_admin_stolen_bike_url(@customer_contact.bike_id)
   end
 
   private

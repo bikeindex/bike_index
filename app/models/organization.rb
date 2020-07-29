@@ -11,7 +11,7 @@ class Organization < ApplicationRecord
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9,
+    bike_depot: 9
   }.freeze
 
   POS_KIND_ENUM = {
@@ -21,7 +21,7 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
-    broken_other_pos: 6,
+    broken_other_pos: 6
   }.freeze
 
   acts_as_paranoid
@@ -102,17 +102,29 @@ class Organization < ApplicationRecord
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
+  def self.pos_kinds
+    POS_KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.broken_pos_kinds; %w[broken_other_pos broken_lightspeed_pos] end
+  def self.broken_pos_kinds
+    %w[broken_other_pos broken_lightspeed_pos]
+  end
 
-  def self.no_pos_kinds; %w[no_pos does_not_need_pos] end
+  def self.no_pos_kinds
+    %w[no_pos does_not_need_pos]
+  end
 
-  def self.admin_required_kinds; %w[ambassador bike_depot].freeze end
+  def self.admin_required_kinds
+    %w[ambassador bike_depot].freeze
+  end
 
-  def self.user_creatable_kinds; kinds - admin_required_kinds end
+  def self.user_creatable_kinds
+    kinds - admin_required_kinds
+  end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -132,10 +144,10 @@ class Organization < ApplicationRecord
     # Only search for paid features if the text is paid features
     return with_enabled_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
-    match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
+    match_cols = %w[organizations.name organizations.short_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
-      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), { str: str })
+      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
   end
 
   def self.with_enabled_feature_slugs(slugs)
@@ -156,64 +168,120 @@ class Organization < ApplicationRecord
   end
 
   # never geocode, use default_location lat/long
-  def should_be_geocoded?; false end
+  def should_be_geocoded?
+    false
+  end
 
-  def to_param; slug end
+  def to_param
+    slug
+  end
 
-  def landing_html?; landing_html.present? end
+  def landing_html?
+    landing_html.present?
+  end
 
-  def restrict_invitations?; !enabled?("passwordless_users") && !passwordless_user_domain.present? end
+  def restrict_invitations?
+    !enabled?("passwordless_users") && !passwordless_user_domain.present?
+  end
 
-  def sent_invitation_count; memberships.count end
+  def sent_invitation_count
+    memberships.count
+  end
 
-  def remaining_invitation_count; available_invitation_count - sent_invitation_count end
+  def remaining_invitation_count
+    available_invitation_count - sent_invitation_count
+  end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; enabled?("show_bulk_import") || ascend_pos? end
+  def show_bulk_import?
+    enabled?("show_bulk_import") || ascend_pos?
+  end
 
-  def show_multi_serial?; enabled?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+  def show_multi_serial?
+    enabled?("show_multi_serial") || %w[law_enforcement].include?(kind)
+  end
 
-  def broken_pos?; self.class.broken_pos_kinds.include?(pos_kind) end
+  def broken_pos?
+    self.class.broken_pos_kinds.include?(pos_kind)
+  end
 
-  def any_pos?; !self.class.no_pos_kinds.include?(pos_kind) end
+  def any_pos?
+    !self.class.no_pos_kinds.include?(pos_kind)
+  end
 
-  def allowed_show?; show_on_map && approved end
+  def allowed_show?
+    show_on_map && approved
+  end
 
-  def paid?; is_paid end
+  def paid?
+    is_paid
+  end
 
-  def display_avatar?; avatar.present? end
+  def display_avatar?
+    avatar.present?
+  end
 
-  def suspended?; is_suspended? end
+  def suspended?
+    is_suspended?
+  end
 
-  def appointment_functionality_enabled?; any_enabled?(PaidFeature::APPOINTMENT_FEATURES) end
+  def appointment_functionality_enabled?
+    any_enabled?(PaidFeature::APPOINTMENT_FEATURES)
+  end
 
-  def hot_sheet_on?; hot_sheet_configuration.present? && hot_sheet_configuration.on? end
+  def hot_sheet_on?
+    hot_sheet_configuration.present? && hot_sheet_configuration.on?
+  end
 
-  def current_invoices; invoices.active end
+  def current_invoices
+    invoices.active
+  end
 
-  def current_parent_invoices; Invoice.where(organization_id: parent_organization_id).active end
+  def current_parent_invoices
+    Invoice.where(organization_id: parent_organization_id).active
+  end
 
-  def parent?; child_ids.present? end
+  def parent?
+    child_ids.present?
+  end
 
-  def child_organizations; Organization.where(id: child_ids) end
+  def child_organizations
+    Organization.where(id: child_ids)
+  end
 
-  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius) end
+  def bounding_box
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
+  end
 
-  def regional_parents; self.class.regional.where("regional_ids @> ?", [id].to_json) end
+  def regional_parents
+    self.class.regional.where("regional_ids @> ?", [id].to_json)
+  end
 
-  def default_impound_location; enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil end
+  def default_impound_location
+    enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
+  end
 
   # Try for publicly_visible, fall back to whatever
-  def default_location; locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first end
+  def default_location
+    locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
+  end
 
-  def search_coordinates; [location_latitude, location_longitude] end
+  def search_coordinates
+    [location_latitude, location_longitude]
+  end
 
-  def search_coordinates_set?; search_coordinates.all?(&:present?) end
+  def search_coordinates_set?
+    search_coordinates.all?(&:present?)
+  end
 
   # Many, many things are triggered off of this, so using a method, since we'll probably change logic later
-  def regional?; enabled?("regional_bike_counts") end
+  def regional?
+    enabled?("regional_bike_counts")
+  end
 
-  def overview_dashboard?; parent? || regional? end
+  def overview_dashboard?
+    parent? || regional?
+  end
 
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
@@ -290,7 +358,9 @@ class Organization < ApplicationRecord
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
 
-  def deliver_graduated_notifications?; enabled?("graduated_notifications") && graduated_notification_interval.present? end
+  def deliver_graduated_notifications?
+    enabled?("graduated_notifications") && graduated_notification_interval.present?
+  end
 
   def graduated_notification_interval_days
     return nil unless graduated_notification_interval.present?
@@ -311,12 +381,14 @@ class Organization < ApplicationRecord
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
     features.all? do |feature|
       enabled_feature_slugs.include?(feature) ||
-      (ambassador? && feature == "unstolen_notifications")
+        (ambassador? && feature == "unstolen_notifications")
     end
   end
 
   # Done multiple places, so consolidating. Might be worth optimizing
-  def any_enabled?(features); features.detect { |f| enabled?(f) }.present? end
+  def any_enabled?(features)
+    features.detect { |f| enabled?(f) }.present?
+  end
 
   def set_calculated_attributes
     return true unless name.present?
@@ -330,7 +402,7 @@ class Organization < ApplicationRecord
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs
-    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
+    new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
@@ -364,14 +436,14 @@ class Organization < ApplicationRecord
   def map_focus_coordinates
     {
       latitude: default_location&.latitude || 37.7870322,
-      longitude: default_location&.longitude || -122.4061122,
+      longitude: default_location&.longitude || -122.4061122
     }
   end
 
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u && u.member_of?(self)
+      self.auto_user_id = u.id if u&.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
         Membership.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id

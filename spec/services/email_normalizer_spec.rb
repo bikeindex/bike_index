@@ -9,7 +9,7 @@ RSpec.describe EmailNormalizer do
     end
     context "nil" do
       it "doesn't break on nil" do
-        expect(EmailNormalizer.normalize()).to be_nil
+        expect(EmailNormalizer.normalize).to be_nil
       end
     end
   end

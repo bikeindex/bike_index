@@ -27,15 +27,15 @@ module Organized
         else
           flash[:success] = "#{@bike_sticker.kind.titleize} #{@bike_sticker.code} - #{@bike_sticker.claimed? ? "claimed" : "unclaimed"}"
           if @bike_sticker.bike.present?
-            redirect_to bike_path(@bike_sticker.bike_id) and return
+            redirect_to(bike_path(@bike_sticker.bike_id)) && return
           end
         end
       end
       redirect_back(
         fallback_location: edit_organization_sticker_path(
           organization_id: current_organization.to_param,
-          id: @bike_sticker.code,
-        ),
+          id: @bike_sticker.code
+        )
       )
     end
 
@@ -55,7 +55,7 @@ module Organized
       @bike_sticker = bike_sticker if bike_sticker.present? && bike_sticker.claimable_by?(current_user)
       return @bike_sticker if @bike_sticker.present?
       flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker_code)
-      redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
+      redirect_to(organization_stickers_path(organization_id: current_organization.to_param)) && return
     end
 
     def searched
@@ -71,7 +71,7 @@ module Organized
     def ensure_access_to_bike_stickers!
       return true if current_organization.enabled?("bike_stickers") || current_user.superuser?
       flash[:error] = translation(:org_does_not_have_access)
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
+      redirect_to(organization_bikes_path(organization_id: current_organization.to_param)) && return
     end
   end
 end

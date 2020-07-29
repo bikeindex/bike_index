@@ -11,7 +11,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: missing_email,
+        owner_email: missing_email
       )
 
       expect(result).to be_nil
@@ -25,7 +25,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: bike.creator.email,
+        owner_email: bike.creator.email
       )
 
       expect(result).to eq(bike)
@@ -39,7 +39,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: bike.creator.email,
+        owner_email: bike.creator.email
       )
 
       expect(result).to eq(bike)
@@ -52,7 +52,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: "  #{bike.owner_email} ",
+        owner_email: "  #{bike.owner_email} "
       )
 
       expect(result).to eq(bike)
@@ -63,7 +63,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: "bad-serial-number",
-        owner_email: bike.creator.email,
+        owner_email: bike.creator.email
       )
 
       expect(result).to be_nil
@@ -77,7 +77,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: serial,
-        owner_email: bike.creator.email,
+        owner_email: bike.creator.email
       )
 
       expect(result).to eq(bike)
@@ -90,7 +90,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: serial,
-        owner_email: bike.creator.email,
+        owner_email: bike.creator.email
       )
 
       expect(result).to eq(bike)

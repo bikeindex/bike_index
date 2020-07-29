@@ -230,8 +230,8 @@ RSpec.describe User, type: :model do
     context "secondary email partial match" do
       let(:user_email) do
         FactoryBot.create(:user_email,
-                          email: "urrg@second.org",
-                          user: FactoryBot.create(:user, name: "FeconDDD"))
+          email: "urrg@second.org",
+          user: FactoryBot.create(:user, name: "FeconDDD"))
       end
       let!(:user) { user_email.user }
       it "finds users, deduping" do
@@ -409,9 +409,9 @@ RSpec.describe User, type: :model do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
       expect(user.password_reset_token).to be_nil
-      expect do
+      expect {
         user.send_password_reset_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
       expect(user.reload.password_reset_token).not_to be_nil
     end
 
@@ -419,10 +419,10 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       user.send_password_reset_email
       current_token = user.password_reset_token
-      expect do
+      expect {
         user.send_password_reset_email
         user.send_password_reset_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
       expect(user.password_reset_token).to eq current_token
     end
@@ -432,9 +432,9 @@ RSpec.describe User, type: :model do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
       expect(user.magic_link_token).to be_nil
-      expect do
+      expect {
         user.send_magic_link_email
-      end.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      }.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -443,9 +443,9 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       token = user.magic_link_token
       user.send_magic_link_email
-      expect do
+      expect {
         user.send_magic_link_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
     end
@@ -474,9 +474,9 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.build(:user) }
       it "raises an informative error" do
         user.password = nil
-        expect do
+        expect {
           user.update_last_login("127.0.0.1")
-        end.to raise_error(/password/i)
+        }.to raise_error(/password/i)
       end
     end
   end
@@ -587,19 +587,19 @@ RSpec.describe User, type: :model do
     end
     context "blank" do
       it "does nothing" do
-        expect do
+        expect {
           user.additional_emails = " "
           user.save
-        end.to change(UserEmail, :count).by 0
+        }.to change(UserEmail, :count).by 0
         expect(UserEmail.where(user_id: user.id).count).to eq 1
       end
     end
     context "a single email" do
       it "adds the email" do
-        expect do
+        expect {
           user.additional_emails = "stuffthings@oooooooooh.com"
           user.save
-        end.to change(UserEmail, :count).by 1
+        }.to change(UserEmail, :count).by 1
         user.reload
         expect(user.user_emails.confirmed.count).to eq 1
         expect(user.user_emails.unconfirmed.count).to eq 1
@@ -617,10 +617,10 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.unconfirmed.count).to eq 1
-        expect do
+        expect {
           user.additional_emails = " andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com"
           user.save
-        end.to change(UserEmail, :count).by 2
+        }.to change(UserEmail, :count).by 2
         user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.where(email: "andanother@cool.com").count).to eq 1

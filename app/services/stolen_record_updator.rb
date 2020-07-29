@@ -59,7 +59,7 @@ class StolenRecordUpdator
         phone_for_everyone: false,
         phone_for_users: false,
         phone_for_shops: false,
-        phone_for_police: false,
+        phone_for_police: false
       }
     end
     stolen_record
@@ -87,8 +87,8 @@ class StolenRecordUpdator
 
   def permitted_params
     %w[phone secondary_phone street city zipcode country_id state_id
-       police_report_number police_report_department estimated_value
-       theft_description locking_description lock_defeat_description
-       proof_of_ownership receive_notifications show_address]
+      police_report_number police_report_department estimated_value
+      theft_description locking_description lock_defeat_description
+      proof_of_ownership receive_notifications show_address]
   end
 end

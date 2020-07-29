@@ -4,6 +4,6 @@ class BulkImportUploader < ExportUploader
   end
 
   def extension_white_list
-    %w(csv tsv)
+    %w[csv tsv]
   end
 end

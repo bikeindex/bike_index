@@ -4,16 +4,16 @@ RSpec.describe BikeBookIntegration do
   describe "get_model" do
     it "returns a hash with the model for Co-motion" do
       manufacturer = FactoryBot.create(:manufacturer, name: "Co-Motion")
-      bike = { manufacturer: manufacturer.name, frame_model: "Americano Rohloff", year: 2014 }
+      bike = {manufacturer: manufacturer.name, frame_model: "Americano Rohloff", year: 2014}
       response = BikeBookIntegration.new.get_model(bike)
       expect(response[:bike][:frame_model]).to eq("Americano Rohloff")
-      fork = { ctype: "fork", description: "Easton EC 90X" }
+      # fork = {ctype: "fork", description: "Easton EC 90X"}
       expect(response[:components].count).to eq(8)
     end
 
     it "returns a hash of the model for Surly" do
       manufacturer = FactoryBot.create(:manufacturer, name: "Surly")
-      bike = { manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2013 }
+      bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2013}
       response = BikeBookIntegration.new.get_model(bike)
       expect(response[:bike][:frame_model]).to eq("Pugsley")
       expect(response[:components].count).to eq(22)
@@ -21,7 +21,7 @@ RSpec.describe BikeBookIntegration do
 
     it "returns nothing if it fails" do
       manufacturer = FactoryBot.create(:manufacturer, name: "Some crazy manufacturer we have nothing on")
-      bike = { manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2014 }
+      bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2014}
       response = BikeBookIntegration.new.get_model(bike)
       expect(response).to be_nil
     end
@@ -32,7 +32,7 @@ RSpec.describe BikeBookIntegration do
       manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
       all_giants = BikeBookIntegration.new.get_model_list(manufacturer: manufacturer.name)
       expect(all_giants.is_a?(Array)).to be_truthy
-      giants_from_2014 = BikeBookIntegration.new.get_model_list({ manufacturer: manufacturer.name, year: 2014 })
+      giants_from_2014 = BikeBookIntegration.new.get_model_list({manufacturer: manufacturer.name, year: 2014})
       expect(giants_from_2014.is_a?(Array)).to be_truthy
       expect(all_giants.count).to be > giants_from_2014.count
     end
@@ -41,7 +41,7 @@ RSpec.describe BikeBookIntegration do
       manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
       all_giants = BikeBookIntegration.new.get_model_list(manufacturer: manufacturer.name)
       expect(all_giants.is_a?(Array)).to be_truthy
-      giants_from_2014 = BikeBookIntegration.new.get_model_list({ manufacturer: manufacturer.name, year: 2014 })
+      giants_from_2014 = BikeBookIntegration.new.get_model_list({manufacturer: manufacturer.name, year: 2014})
       expect(giants_from_2014.is_a?(Array)).to be_truthy
       expect(all_giants.count).to be > giants_from_2014.count
     end

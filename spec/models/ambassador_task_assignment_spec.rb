@@ -74,7 +74,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
         FactoryBot.create(:ambassador_task_assignment, :completed)
 
         result = described_class.completed_assignments(
-          filters: { organization_id: a1.organization.id },
+          filters: {organization_id: a1.organization.id}
         )
 
         expect(result).to match_array([a1])
@@ -85,7 +85,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
         FactoryBot.create(:ambassador_task_assignment, :completed)
 
         result = described_class.completed_assignments(
-          filters: { ambassador_task_id: a1.ambassador_task.id },
+          filters: {ambassador_task_id: a1.ambassador_task.id}
         )
 
         expect(result).to match_array([a1])
@@ -96,7 +96,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
         FactoryBot.create(:ambassador_task_assignment, :completed)
 
         result = described_class.completed_assignments(
-          filters: { ambassador_id: a1.ambassador.id },
+          filters: {ambassador_id: a1.ambassador.id}
         )
 
         expect(result).to match_array([a1])
@@ -105,18 +105,18 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
       it "filters by combinations of filter columns" do
         a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
         a2 = FactoryBot.create(:ambassador_task_assignment, :completed,
-                               organization: a1.organization,
-                               ambassador_task: a1.ambassador_task)
+          organization: a1.organization,
+          ambassador_task: a1.ambassador_task)
         a3 = FactoryBot.create(:ambassador_task_assignment, :completed,
-                               organization: a1.organization,
-                               ambassador_task: a1.ambassador_task)
+          organization: a1.organization,
+          ambassador_task: a1.ambassador_task)
         FactoryBot.create(:ambassador_task_assignment, :completed)
 
         result = described_class.completed_assignments(
           filters: {
             organization_id: a1.organization.id,
-            ambassador_task_id: a3.ambassador_task.id,
-          },
+            ambassador_task_id: a3.ambassador_task.id
+          }
         )
 
         expect(result).to match_array([a1, a2, a3])
@@ -141,7 +141,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:id)
 
-        result = described_class.completed_assignments(sort: { completed_at: :asc })
+        result = described_class.completed_assignments(sort: {completed_at: :asc})
 
         expect(result.map(&:id)).to eq(ordered_assignments)
       end
@@ -152,7 +152,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:id)
 
-        result = described_class.completed_assignments(sort: { completed_at: :desc })
+        result = described_class.completed_assignments(sort: {completed_at: :desc})
 
         expect(result.map(&:id)).to eq(ordered_assignments.reverse)
       end
@@ -171,7 +171,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
         org4 = FactoryBot.create(:organization_ambassador, name: "X Ambassadors")
         FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
-        result = described_class.completed_assignments(sort: { organization_name: :asc })
+        result = described_class.completed_assignments(sort: {organization_name: :asc})
 
         # Tasks should be sorted by name of the ambassador's *current* ambassador org
         names = result.map { |a| a.ambassador.current_ambassador_organization.name }
@@ -190,7 +190,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
         org4 = FactoryBot.create(:organization_ambassador, name: "B Ambassadors")
         FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
-        result = described_class.completed_assignments(sort: { organization_name: :desc })
+        result = described_class.completed_assignments(sort: {organization_name: :desc})
 
         # Tasks should be sorted by name of the ambassador's *current* ambassador org
         names = result.map { |a| a.ambassador.current_ambassador_organization.name }
@@ -207,7 +207,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         result =
           described_class
-            .completed_assignments(sort: { ambassador_name: :asc })
+            .completed_assignments(sort: {ambassador_name: :asc})
 
         expect(result.map(&:ambassador_name)).to eq(ambassador_names)
       end
@@ -220,7 +220,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         result =
           described_class
-            .completed_assignments(sort: { ambassador_name: :desc })
+            .completed_assignments(sort: {ambassador_name: :desc})
 
         expect(result.map(&:ambassador_name)).to eq(ambassador_names.reverse)
       end
@@ -235,7 +235,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         result =
           described_class
-            .completed_assignments(sort: { ambassador_task_title: :asc })
+            .completed_assignments(sort: {ambassador_task_title: :asc})
 
         expect(result.map(&:title)).to eq(task_titles)
       end
@@ -248,7 +248,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         result =
           described_class
-            .completed_assignments(sort: { ambassador_task_title: :desc })
+            .completed_assignments(sort: {ambassador_task_title: :desc})
 
         expect(result.map(&:title)).to eq(task_titles.reverse)
       end

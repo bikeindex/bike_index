@@ -183,14 +183,14 @@ RSpec.describe BikeSticker, type: :model do
     let(:bike_sticker3) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a1113", bike_id: 12) }
     let(:bike_sticker4) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a111") }
     it "finds next unassigned, returns nil if not found" do
-      [bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4]
+      expect([bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4].size).to eq 5
       expect(bike_sticker1.next_unclaimed_code).to eq bike_sticker4
       expect(bike_sticker2.next_unclaimed_code).to be_nil
     end
     context "an unassigned lower code" do
       let!(:earlier_unclaimed) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a1110") }
       it "grabs the next one anyway" do
-        [earlier_unclaimed, bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4]
+        expect([earlier_unclaimed, bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4].size).to eq 6
         expect(earlier_unclaimed.id).to be < bike_sticker4.id
         # expect(BikeSticker.where(organization_id: 12).next_unclaimed_code).to eq bike_sticker4
         expect(BikeSticker.where(organization_id: 11).next_unclaimed_code).to eq bike_sticker2

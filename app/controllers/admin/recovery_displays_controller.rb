@@ -12,7 +12,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     if params[:stolen_record_id].present?
       @recovery_display.from_stolen_record(params[:stolen_record_id])
       @stolen_record = @recovery_display.stolen_record
-      @bike = @recovery_display.bike && @recovery_display.bike.decorate
+      @bike = @recovery_display.bike&.decorate
     end
   end
 
@@ -28,7 +28,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def edit
     @stolen_record = @recovery_display.stolen_record
-    @bike = @recovery_display.bike && @recovery_display.bike.decorate
+    @bike = @recovery_display.bike&.decorate
   end
 
   def update
@@ -62,8 +62,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def permitted_parameters
     params.require(:recovery_display)
-          .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link, :image,
-                  :remote_image_url, :date_input, :remove_image)
+      .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link, :image,
+        :remote_image_url, :date_input, :remove_image)
   end
 
   def clear_index_wrap_cache

@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Admin::ExchangeRatesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
-  def base_url(path=nil)
+  def base_url(path = nil)
     "/admin/exchange_rates/#{path}"
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Admin::ExchangeRatesController, type: :request do
     it "responds with ok" do
       attrs = FactoryBot.attributes_for(:exchange_rate)
 
-      post base_url, params: { exchange_rate: attrs }
+      post base_url, params: {exchange_rate: attrs}
 
       expect(flash[:error]).to be_blank
       expect(response).to redirect_to(admin_exchange_rates_url)
@@ -56,8 +56,8 @@ RSpec.describe Admin::ExchangeRatesController, type: :request do
       expect(xrate.rate).to_not eq(new_rate)
 
       patch base_url(xrate.id), params: {
-              exchange_rate: { rate: new_rate}
-            }
+        exchange_rate: {rate: new_rate}
+      }
 
       expect(flash[:error]).to be_blank
       expect(response).to redirect_to(admin_exchange_rates_url)

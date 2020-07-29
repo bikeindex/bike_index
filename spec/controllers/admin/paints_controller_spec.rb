@@ -13,7 +13,7 @@ RSpec.describe Admin::PaintsController, type: :controller do
   describe "edit" do
     it "renders" do
       paint = FactoryBot.create(:paint)
-      get :edit, params: { id: paint.id }
+      get :edit, params: {id: paint.id}
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end

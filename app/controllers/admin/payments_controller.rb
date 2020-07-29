@@ -8,8 +8,8 @@ class Admin::PaymentsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @payments = matching_payments.includes(:user, :organization, :invoice)
-                                 .order(sort_column + " " + sort_direction)
-                                 .page(page).per(per_page)
+      .order(sort_column + " " + sort_direction)
+      .page(page).per(per_page)
   end
 
   def new
@@ -41,10 +41,10 @@ class Admin::PaymentsController < Admin::BaseController
       flash[:success] = "Payment created"
       redirect_to admin_payments_path
     else
-      if valid_method
-        flash[:error] ||= "Unable to create"
+      flash[:error] ||= if valid_method
+        "Unable to create"
       else
-        flash[:error] ||= "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
+        "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
       end
       render :new
     end
@@ -91,7 +91,7 @@ class Admin::PaymentsController < Admin::BaseController
     if @params_invoice.present?
       iparams[:organization_id] = @params_invoice.organization_id unless iparams[:organization_id].present?
     end
-    @invoice_parameters = { invoice_id: @params_invoice&.id, organization_id: iparams[:organization_id]&.to_i }
+    @invoice_parameters = {invoice_id: @params_invoice&.id, organization_id: iparams[:organization_id]&.to_i}
   end
 
   def permitted_create_parameters

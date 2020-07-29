@@ -20,7 +20,8 @@ class Admin::AmbassadorTasksController < Admin::BaseController
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @ambassador_task.update(ambassador_task_params)
@@ -34,7 +35,7 @@ class Admin::AmbassadorTasksController < Admin::BaseController
   def destroy
     ambassador_task = AmbassadorTask.find_by(id: params[:id])
 
-    if !ambassador_task&.destroy
+    unless ambassador_task&.destroy
       flash[:error] = "Could not delete ambassador task."
     end
 

@@ -33,7 +33,7 @@ module OrganizedHelper
       "web" => "Registered with self registration process",
       "org reg" => "Registered by internal, organization member form",
       "landing page" => "Registration began with incomplete registration, via organization landing page",
-      "bulk reg" => "Registered by spreadsheet import",
+      "bulk reg" => "Registered by spreadsheet import"
     }
     origin_title = "Automatically registered by bike shop point of sale (#{creation_description} POS)" if %w[Lightspeed Ascend].include?(creation_description)
     origin_title ||= extended_description[creation_description] || "Registered via #{creation_description}"
@@ -62,12 +62,12 @@ module OrganizedHelper
       %w[bikes incompletes],
       %w[exports show],
       %w[users new],
-      %w[dashboard index],
+      %w[dashboard index]
     ].include?([controller_name, action_name])
   end
 
   def status_display(status)
-    status_str = status.gsub("_", " ")
+    status_str = status.tr("_", " ")
     case status.downcase
     when "current", "paging", "being_helped"
       content_tag(:span, status_str, class: "text-success")

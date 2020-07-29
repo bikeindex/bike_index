@@ -25,7 +25,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let!(:organization) { FactoryBot.create(:organization) }
     it "creates" do
       expect(organization.memberships.count).to eq 0
-      post base_url, params: { membership: { role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com" } }
+      post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com"}}
       organization.reload
       expect(organization.memberships.count).to eq 1
       membership = Membership.last
@@ -39,9 +39,9 @@ RSpec.describe Admin::MembershipsController, type: :request do
         expect(existing_user.memberships.count).to eq 0
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
-        expect do
-          post base_url, params: { membership: { role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com" } }
-        end.to change(Membership, :count).by 1
+        expect {
+          post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
+        }.to change(Membership, :count).by 1
         expect(organization.memberships.count).to eq 1
         existing_user.reload
         membership = Membership.last

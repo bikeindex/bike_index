@@ -10,7 +10,7 @@ RSpec.describe BulkImportWorker, type: :job do
     [
       %w[manufacturer model year color owner_email serial_number],
       ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", "xyz_test"],
-      ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"],
+      ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"]
     ]
   end
   let(:csv_lines) { sample_csv_lines }
@@ -38,9 +38,9 @@ RSpec.describe BulkImportWorker, type: :job do
         bulk_import.reload
         expect(bulk_import.import_errors?).to be_falsey
         expect(instance).to_not receive(:register_bike)
-        expect do
+        expect {
           instance.perform(bulk_import.id)
-        end.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
+        }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
         bulk_import.reload
         expect(bulk_import.pending?).to be_truthy
         expect(bulk_import.import_errors?).to be_truthy
@@ -67,17 +67,17 @@ RSpec.describe BulkImportWorker, type: :job do
           [
             "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
             '"Blah","Blah","Surly","","","XXXXX","","",""',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"',
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
           ]
         end
         it "registers bike, adds row that is an error" do
           allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-          expect do
+          expect {
             instance.perform(bulk_import.id)
-          end.to change(Bike, :count).by 1
+          }.to change(Bike, :count).by 1
           bulk_import.reload
           expect(bulk_import.line_import_errors).to eq([target_line_error])
-          expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
+          expect(bulk_import.import_errors).to eq({line: [target_line_error]}.as_json)
           expect(bulk_import.bikes.count).to eq 1
           expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
         end
@@ -87,15 +87,15 @@ RSpec.describe BulkImportWorker, type: :job do
           [
             "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
             '"\"","\'","Surly","","","XXXXX","","","","',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"',
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
           ]
         end
         it "stores error line, resumes post errored line successfully" do
           allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
           # It should throw an error and not create a bike
-          expect do
+          expect {
             expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
-          end.to change(Bike, :count).by 0
+          }.to change(Bike, :count).by 0
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.line_import_errors).to be_nil
@@ -103,9 +103,9 @@ RSpec.describe BulkImportWorker, type: :job do
           # Note: we don't have auto-resume built in right now. You have to manually go in through the console
           # and set the progress to be "ongoing", then re-enqueue
           bulk_import.update_attribute :progress, "ongoing"
-          expect do
+          expect {
             instance.perform(bulk_import.id)
-          end.to change(Bike, :count).by 1
+          }.to change(Bike, :count).by 1
           bulk_import.reload
           expect(bulk_import.bikes.count).to eq 1
           bike_matches_target(bulk_import.bikes.first)
@@ -119,9 +119,9 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
       it "marks the import empty" do
         allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-        expect do
+        expect {
           instance.perform(bulk_import.id)
-        end.to_not change(Bike, :count)
+        }.to_not change(Bike, :count)
         bulk_import.reload
         expect(bulk_import.no_bikes?).to be_truthy
         expect(bulk_import.import_errors?).to be_falsey
@@ -137,9 +137,9 @@ RSpec.describe BulkImportWorker, type: :job do
           # Create organization here
           expect(organization).to be_present
           expect(bulk_import.organization).to_not be_present
-          expect do
+          expect {
             instance.perform(bulk_import.id)
-          end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+          }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
           bulk_import.reload
           expect(bulk_import.no_bikes?).to be_truthy
           expect(bulk_import.import_errors?).to be_falsey
@@ -164,10 +164,10 @@ RSpec.describe BulkImportWorker, type: :job do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
         VCR.use_cassette("bulk_import-perform-success") do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { open(file_url) }
-          expect do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { URI.open(file_url) }
+          expect {
             instance.perform(bulk_import.id)
-          end.to change(Bike, :count).by 2
+          }.to change(Bike, :count).by 2
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.bikes.count).to eq 2
@@ -280,7 +280,7 @@ RSpec.describe BulkImportWorker, type: :job do
           extra_registration_number: nil,
           user_name: nil,
           send_email: true,
-          creation_organization_id: nil,
+          creation_organization_id: nil
         }
       end
       describe "row_to_b_param_hash" do
@@ -305,13 +305,13 @@ RSpec.describe BulkImportWorker, type: :job do
       context "valid organization bike" do
         let(:organization) { FactoryBot.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
-        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: "tandem" } }
+        let(:row) { {manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: "tandem"} }
         it "registers a bike" do
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
-          expect do
+          expect {
             instance.register_bike(instance.row_to_b_param_hash(row))
-          end.to change(Bike, :count).by 1
+          }.to change(Bike, :count).by 1
           bike = Bike.last
 
           expect(bike.owner_email).to eq row[:owner_email]
@@ -329,14 +329,14 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
       context "not valid bike" do
-        let(:row) { { manufacturer_id: "\n", serial_number: "na", color: nil } }
+        let(:row) { {manufacturer_id: "\n", serial_number: "na", color: nil} }
         let(:target_errors) { ["Owner email can't be blank"] }
         it "returns the invalid bike with errors" do
-          expect do
+          expect {
             bike = instance.register_bike(instance.row_to_b_param_hash(row))
             expect(bike.id).to_not be_present
             expect(bike.cleaned_error_messages).to eq(target_errors)
-          end.to change(Bike, :count).by 0
+          }.to change(Bike, :count).by 0
         end
       end
     end

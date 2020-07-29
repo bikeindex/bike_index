@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :external_registry_bike,
-          class: "ExternalRegistryBike::VerlorenOfGevondenBike" do
+    class: "ExternalRegistryBike::VerlorenOfGevondenBike" do
     external_id { 10.times.map { rand(10) }.join }
     serial_number { 10.times.map { rand(10) }.join }
     country { Country.netherlands }

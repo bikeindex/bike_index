@@ -12,7 +12,7 @@ RSpec.describe ExternalRegistryBike::StopHelingBike, type: :model do
       license_plate_number: "4883833",
       registration_number: "12334",
       source_name: "HUPD",
-      source_unique_id: "38382",
+      source_unique_id: "38382"
     }
   end
 
@@ -37,7 +37,7 @@ RSpec.describe ExternalRegistryBike::StopHelingBike, type: :model do
 
     context "given a non-bike response object" do
       it "returns nil" do
-        non_bike = { object: "PERSONENAUTO" }
+        non_bike = {object: "PERSONENAUTO"}
         bike = described_class.build_from_api_response(non_bike)
         expect(bike).to eq(nil)
       end

@@ -16,7 +16,7 @@ class ScheduledWorkerRunner < ScheduledWorker
   end
 
   def self.valid_history_records
-    { "last_started" => "s", "last_finished" => "f" }.freeze
+    {"last_started" => "s", "last_finished" => "f"}.freeze
   end
 
   def self.record_key(worker_string, record)
@@ -49,7 +49,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ScheduleSearchForExternalRegistryBikesWorker,
       FetchProject529BikesWorker,
       UpdateExchangeRatesWorker,
-      self,
+      self
     ]
   end
 
