@@ -11,12 +11,18 @@ class AppointmentConfiguration < ApplicationRecord
     ["Bike purchase", "Other purchase", "Service"]
   end
 
-  def virtual_line_on?; virtual_line_on end
+  def virtual_line_on?
+    virtual_line_on
+  end
 
   # Maybe this will be configurable at some point
-  def after_failed_to_find_removal_count; 3 end
+  def after_failed_to_find_removal_count
+    3
+  end
 
-  def reasons_text; reasons.join(", ") end
+  def reasons_text
+    reasons.join(", ")
+  end
 
   def reasons_text=(val)
     self.reasons = val.to_s.split(/,|\n/).map(&:strip).reject(&:blank?)

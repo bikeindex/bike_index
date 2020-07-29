@@ -21,9 +21,9 @@ RSpec.describe AppointmentConfiguration, type: :model do
       # Because this is about access, not whether it's on
       expect(organization.appointment_functionality_enabled?).to be_truthy
       # And it updates the queue
-      expect do
+      expect {
         appointment_configuration.update(updated_at: Time.current)
-      end.to change(LocationAppointmentsQueueWorker.jobs, :count)
+      }.to change(LocationAppointmentsQueueWorker.jobs, :count)
       expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([location.id])
     end
   end

@@ -29,9 +29,6 @@ ignore:
   - app/controllers/organized/appointment_configurations_controller.rb
   - app/controllers/organized/hot_sheets_controller.rb
   - app/controllers/organized/lines_controller.rb
-  - app/models/appointment.rb
-  - app/models/appointment_configuration.rb
-  - app/models/appointment_update.rb
   - app/models/concerns/geocodeable.rb
   - app/models/single_sign_on.rb
   - app/models/twitter_client.rb
@@ -41,8 +38,6 @@ ignore:
   - spec/controllers/api/v1/notifications_controller_spec.rb
   - spec/controllers/api/v1/users_controller_spec.rb
   - spec/controllers/org_public/customer_appointments_controller_spec.rb
-  - spec/models/appointment_configuration_spec.rb
-  - spec/models/appointment_spec.rb
   - spec/requests/api/v1/organizations_request_spec.rb
   - spec/requests/api/v2/bikes_request_spec.rb
   - spec/requests/api/v2/bikes_search_request_spec.rb

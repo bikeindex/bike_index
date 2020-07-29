@@ -1,5 +1,5 @@
 class Appointment < ApplicationRecord
-  KIND_ENUM = { virtual_line: 0 }.freeze # Because that's all there is for now
+  KIND_ENUM = {virtual_line: 0}.freeze # Because that's all there is for now
 
   belongs_to :organization
   belongs_to :location
@@ -25,17 +25,25 @@ class Appointment < ApplicationRecord
   scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).line_ordered }
   scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.statuses; AppointmentUpdate.statuses end
+  def self.statuses
+    AppointmentUpdate.statuses
+  end
 
-  def self.in_line_statuses; %w[waiting on_deck paging] end
+  def self.in_line_statuses
+    %w[waiting on_deck paging]
+  end
 
-  def self.resolved_statuses; %[finished removed being_helped abandoned] end
+  def self.resolved_statuses
+    %(finished removed being_helped abandoned)
+  end
 
   # This will be more sophisticated in the future, when we add phone, etc
   def self.for_user_attrs(user: nil, user_id: nil, email: nil, creation_ip: nil)
-    unless [user, user_id, email].reject(&:blank?).count == 1
+    unless [user, user_id, email].count(&:present?) == 1
       fail "pass exactly one of: user, user_id, email"
     end
     if user_id.present? || user.present?
@@ -55,28 +63,50 @@ class Appointment < ApplicationRecord
     nil
   end
 
-  def creation_ip; creation_ip_address.to_s end
+  def creation_ip
+    creation_ip_address.to_s
+  end
 
-  def appointment_configuration; location.appointment_configuration end
+  def appointment_configuration
+    location.appointment_configuration
+  end
 
-  def permitted_reasons; appointment_configuration.reasons end
+  def permitted_reasons
+    appointment_configuration.reasons
+  end
 
-  def after_failed_to_find_removal_count; appointment_configuration&.after_failed_to_find_removal_count || 2 end
+  def after_failed_to_find_removal_count
+    appointment_configuration&.after_failed_to_find_removal_count || 2
+  end
 
   # Deal with deleted locations, etc
-  def location; Location.unscoped.find_by_id(location_id) end
+  def location
+    Location.unscoped.find_by_id(location_id)
+  end
 
-  def in_line?; self.class.in_line_statuses.include?(status) end
+  def in_line?
+    self.class.in_line_statuses.include?(status)
+  end
 
-  def paging_or_on_deck?; on_deck? || paging? end
+  def paging_or_on_deck?
+    on_deck? || paging?
+  end
 
-  def failed_to_find_attempts; appointment_updates.failed_to_find end
+  def failed_to_find_attempts
+    appointment_updates.failed_to_find
+  end
 
-  def other_location_appointments; location.appointments.where.not(id: id) end
+  def other_location_appointments
+    location.appointments.where.not(id: id)
+  end
 
-  def display_name; name.presence || user&.display_name end
+  def display_name
+    name.presence || user&.display_name
+  end
 
-  def public_display_name; BadWordCleaner.clean(display_name.to_s.split(" ").first) end
+  def public_display_name
+    BadWordCleaner.clean(display_name.to_s.split(" ").first)
+  end
 
   # same parameters as for_user_attrs - args are in passed_args so they don't override model attributes
   def matches_user_attrs?(passed_args = {})
@@ -113,7 +143,7 @@ class Appointment < ApplicationRecord
       update_and_move_for_failed_to_find # This will save the record
     else
       # Because things might've changed, and even if they didn't we still want to run the queue updator
-      self.update(updated_at: Time.current)
+      update(updated_at: Time.current)
     end
     new_update # Return the created update
   end
@@ -126,21 +156,21 @@ class Appointment < ApplicationRecord
   end
 
   def move_behind(appt_or_appt_id)
-    if appt_or_appt_id.present?
-      other_appt = appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
+    other_appt = if appt_or_appt_id.present?
+      appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
     else
-      other_appt = other_location_appointments.in_line.last || self # use the last appt in line, fallback to self
+      other_location_appointments.in_line.last || self # use the last appt in line, fallback to self
     end
-    self.update(line_entry_timestamp: other_appt.line_entry_timestamp + 1)
+    update(line_entry_timestamp: other_appt.line_entry_timestamp + 1)
   end
 
   def move_ahead(appt_or_appt_id)
-    if appt_or_appt_id.present?
-      other_appt = appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
+    other_appt = if appt_or_appt_id.present?
+      appt_or_appt_id.is_a?(Appointment) ? appt_or_appt_id : Appointment.find(appt_or_appt_id)
     else
-      other_appt = other_location_appointments.in_line.first || self # use the first appt in line, fallback to self
+      other_location_appointments.in_line.first || self # use the first appt in line, fallback to self
     end
-    self.update(line_entry_timestamp: other_appt.line_entry_timestamp - 1)
+    update(line_entry_timestamp: other_appt.line_entry_timestamp - 1)
   end
 
   def set_calculated_attributes

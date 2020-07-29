@@ -11,21 +11,21 @@ RSpec.describe Appointment, type: :model do
       expect(appointment.virtual_line?).to be_truthy
       expect(appointment.line_entry_timestamp).to be_within(1).of appointment.created_at.to_i
       # And it updates the queue
-      expect do
+      expect {
         appointment.update(updated_at: Time.current)
-      end.to change(LocationAppointmentsQueueWorker.jobs, :count).by 1
+      }.to change(LocationAppointmentsQueueWorker.jobs, :count).by 1
       expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([appointment.location_id])
     end
   end
 
   describe "for_user_attrs & matches_user_attrs?" do
     it "fails unless passed one arg" do
-      expect do
+      expect {
         Appointment.for_user_attrs(email: "beth@STuff.com", user_id: 12)
-      end.to raise_error(/one/)
-      expect do
+      }.to raise_error(/one/)
+      expect {
         Appointment.for_user_attrs(email: " ")
-      end.to raise_error(/one/)
+      }.to raise_error(/one/)
     end
     context "with appointments" do
       let(:user) { FactoryBot.create(:user_confirmed, email: "beth@stuff.com") }
@@ -141,9 +141,9 @@ RSpec.describe Appointment, type: :model do
 
         expect(appt6.after_failed_to_find_removal_count).to eq 2
         # it's possible to failed_to_find something not in line
-        expect do
+        expect {
           appt6.record_status_update(new_status: "failed_to_find", updator_id: 12, updator_kind: "organization_member")
-        end.to change(AppointmentUpdate, :count).by 1
+        }.to change(AppointmentUpdate, :count).by 1
         appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "waiting"
         appointment_update1 = appt6.appointment_updates.last
@@ -152,9 +152,9 @@ RSpec.describe Appointment, type: :model do
         expect(appointment_update1.status).to eq "failed_to_find"
         expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt1.id, appt2.id, appt6.id, appt4.id, appt5.id])
         # doing it for another appt puts that appt one back in the waiting queue
-        expect do
+        expect {
           appt3.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
-        end.to change(AppointmentUpdate, :count).by 1
+        }.to change(AppointmentUpdate, :count).by 1
         appt3.reload
         expect(appt3.status).to eq "waiting"
         appointment_update2 = appt3.appointment_updates.last
@@ -163,9 +163,9 @@ RSpec.describe Appointment, type: :model do
         expect(appointment_update2.status).to eq "failed_to_find"
         expect(Appointment.line_ordered.pluck(:id)).to eq([appt1.id, appt2.id, appt6.id, appt3.id, appt4.id, appt5.id])
         # Final warning for 6, puts it in back of the waiting queue
-        expect do
+        expect {
           appt6.record_status_update(new_status: "failed_to_find", updator_kind: "queue_worker")
-        end.to change(AppointmentUpdate, :count).by 1
+        }.to change(AppointmentUpdate, :count).by 1
         appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "waiting"
         appointment_update4 = appt6.appointment_updates.last
@@ -174,9 +174,9 @@ RSpec.describe Appointment, type: :model do
         expect(appointment_update4.status).to eq "failed_to_find"
         expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt2.id, appt3.id, appt4.id, appt5.id, appt6.id])
         # It Removes 6
-        expect do
+        expect {
           appt6.record_status_update(new_status: "failed_to_find", updator_kind: "organization_member", updator_id: 3333)
-        end.to change(AppointmentUpdate, :count).by 1
+        }.to change(AppointmentUpdate, :count).by 1
         appt6.reload # try to ward off flaky behavior
         expect(appt6.status).to eq "removed"
         appointment_update5 = appt6.appointment_updates.last
@@ -197,10 +197,10 @@ RSpec.describe Appointment, type: :model do
 
     def expect_no_update(appt, og_status, new_status, updator_id, updator_kind)
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         result = appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_kind: updator_kind)
         expect(result).to be_blank
-      end.to_not change(AppointmentUpdate, :count)
+      }.to_not change(AppointmentUpdate, :count)
       expect(LocationAppointmentsQueueWorker.jobs.count).to eq 0
       appt.reload
       expect(appt.status).to eq(og_status)
@@ -208,9 +208,9 @@ RSpec.describe Appointment, type: :model do
 
     def expect_update(appt, og_status, new_status, updator_id, updator_kind, target_update_status = nil)
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         appt.record_status_update(new_status: new_status, updator_id: updator_id, updator_kind: updator_kind)
-      end.to change(AppointmentUpdate, :count).by 1
+      }.to change(AppointmentUpdate, :count).by 1
       expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
 
       appointment_update = AppointmentUpdate.last
@@ -273,10 +273,10 @@ RSpec.describe Appointment, type: :model do
       let(:updator_id) { 12 } # We aren't verifying that it's an org member in this method
       let(:appointment_on_deck) do
         FactoryBot.create(:appointment,
-                          organization: appointment.organization,
-                          location: appointment.location,
-                          status: "on_deck",
-                          line_entry_timestamp: (Time.current - 1.hour).to_i)
+          organization: appointment.organization,
+          location: appointment.location,
+          status: "on_deck",
+          line_entry_timestamp: (Time.current - 1.hour).to_i)
       end
       context "new_status on_deck" do
         it "updates and doesn't move to front of the queue" do
