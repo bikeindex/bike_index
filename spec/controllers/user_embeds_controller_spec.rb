@@ -5,7 +5,7 @@ RSpec.describe UserEmbedsController, type: :controller do
     it "renders the page if username is found" do
       user = FactoryBot.create(:user, show_bikes: true)
       ownership = FactoryBot.create(:ownership, user_id: user.id, current: true)
-      get :show, params: { id: user.username }
+      get :show, params: {id: user.username}
       expect(response.code).to eq("200")
       expect(assigns(:bikes).first).to eq(ownership.bike)
       expect(assigns(:bikes).count).to eq(1)
@@ -18,7 +18,7 @@ RSpec.describe UserEmbedsController, type: :controller do
       allow_any_instance_of(Bike).to receive(:public_images) { [public_image] }
       bike.save && bike.reload
       expect(bike.thumb_path).to be_present
-      get :show, params: { id: "NOT A USER" }
+      get :show, params: {id: "NOT A USER"}
       expect(response.code).to eq("200")
       expect(assigns(:bikes).count).to eq(1)
       expect(response.headers["X-Frame-Options"]).not_to be_present

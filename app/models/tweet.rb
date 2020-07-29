@@ -7,9 +7,9 @@ class Tweet < ApplicationRecord
 
   belongs_to :original_tweet, class_name: "Tweet"
   has_many :retweets,
-           foreign_key: :original_tweet_id,
-           class_name: "Tweet",
-           dependent: :destroy
+    foreign_key: :original_tweet_id,
+    class_name: "Tweet",
+    dependent: :destroy
 
   mount_uploader :image, ImageUploader
 
@@ -21,15 +21,15 @@ class Tweet < ApplicationRecord
   def self.friendly_find(id)
     return nil if id.blank?
     id = id.to_s
-    query = id.length > 7 ? { twitter_id: id } : { id: id }
+    query = id.length > 7 ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 
   def self.auto_link_text(text)
-    text.gsub /@([^\s])*/ do
+    text.gsub(/@([^\s])*/) {
       username = Regexp.last_match[0]
       "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
-    end.gsub /#([^\s])*/ do
+    }.gsub(/#([^\s])*/) do
       hashtag = Regexp.last_match[0]
       "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
     end
@@ -44,10 +44,10 @@ class Tweet < ApplicationRecord
   end
 
   def ensure_valid_alignment
-    valid_alignments = %w(top-left top-right bottom-left bottom-right)
+    valid_alignments = %w[top-left top-right bottom-left bottom-right]
     self.alignment ||= valid_alignments.first
     return true if valid_alignments.include?(alignment)
-    self.errors[:base] << "#{alignment} is not one of valid alignments: #{valid_alignments}"
+    errors[:base] << "#{alignment} is not one of valid alignments: #{valid_alignments}"
   end
 
   def set_body_from_response

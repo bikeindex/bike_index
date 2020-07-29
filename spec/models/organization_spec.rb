@@ -42,18 +42,18 @@ RSpec.describe Organization, type: :model do
       nonorg_stolen_record.add_recovery_information
 
       expect(nyc_org1.nearby_bikes.pluck(:id))
-        .to(match_array [nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id))
+        .to(match_array([nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id)))
 
       expect(nyc_org1.nearby_recovered_records.pluck(:id))
-        .to(match_array [nonorg_stolen_record.id])
+        .to(match_array([nonorg_stolen_record.id]))
 
       # Make sure we're getting the bike from the org
       expect(Bike.organization(nyc_org1).pluck(:id))
-        .to(match_array [chi_bike1.id])
+        .to(match_array([chi_bike1.id]))
 
       # Make sure we get the bikes from the org or from nearby
       expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
-        .to(match_array [chi_bike1, nyc_bike2, nyc_bike3])
+        .to(match_array([chi_bike1, nyc_bike2, nyc_bike3]))
     end
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Organization, type: :model do
           approved: false,
           website: "http://website.com",
           ascend_name: "ascend-name",
-          parent_organization: FactoryBot.create(:organization),
+          parent_organization: FactoryBot.create(:organization)
         )
 
         org.save
@@ -340,7 +340,7 @@ RSpec.describe Organization, type: :model do
       {
         recovered_description: "recovered it on a special corner",
         index_helped_recovery: true,
-        can_share_recovery: true,
+        can_share_recovery: true
       }
     end
     it "returns recovered bikes" do
@@ -348,8 +348,8 @@ RSpec.describe Organization, type: :model do
       expect(organization.bikes).to eq([bike])
       expect(organization.bikes.stolen).to eq([bike])
       # Check the inverse lookup
-      expect((Bike.organization(organization))).to eq([bike])
-      expect((Bike.organization(organization.id))).to eq([bike])
+      expect(Bike.organization(organization)).to eq([bike])
+      expect(Bike.organization(organization.id)).to eq([bike])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
@@ -589,7 +589,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.include_field_organization_affiliation?).to be_falsey
     end
     context "with paid_features" do
-      let(:labels) { { reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ" }.as_json }
+      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ"}.as_json }
       let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone organization_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do

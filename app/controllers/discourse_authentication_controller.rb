@@ -9,7 +9,7 @@ class DiscourseAuthenticationController < ApplicationController
     sso.admin = current_user.superuser? if current_user.superuser?
     sso.moderator = current_user.ambassador? if current_user.ambassador?
     session[:discourse_redirect] = nil
-    redirect_to sso.to_url(discourse_redirect_url) and return
+    redirect_to(sso.to_url(discourse_redirect_url)) && return
   end
 
   private
@@ -25,7 +25,7 @@ class DiscourseAuthenticationController < ApplicationController
   def authenticate_and_set_redirect
     session[:discourse_redirect] ||= request.query_string
     unless current_user.present?
-      redirect_to new_session_path and return
+      redirect_to(new_session_path) && return
     end
   end
 end

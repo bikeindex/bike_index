@@ -24,7 +24,7 @@ module OrgPublic
       flash[:error] ||= translation(:org_does_not_have_access, org_name: current_organization.short_name,
                                                                scope: [:controllers, :org_public, :base, __method__])
 
-      redirect_to(url_to_redirect_to || user_root_url) and return
+      redirect_to(url_to_redirect_to || user_root_url) && return
     end
 
     def current_appointment

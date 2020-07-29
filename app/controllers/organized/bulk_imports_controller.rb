@@ -18,7 +18,7 @@ module Organized
       @bulk_import = bulk_imports.where(id: params[:id]).first
       unless @bulk_import.present?
         flash[:error] = translation(:unable_to_find_import)
-        redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param) and return
+        redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
       page = params[:page] || 1
       per_page = params[:per_page] || 25
@@ -35,18 +35,16 @@ module Organized
       if @bulk_import.save
         BulkImportWorker.perform_async(@bulk_import.id)
         if @is_api
-          render json: { success: translation(:file_imported) }, status: 201
+          render json: {success: translation(:file_imported)}, status: 201
         else
           flash[:success] = translation(:bulk_import_created)
           redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
         end
+      elsif @is_api
+        render json: {error: @bulk_import.errors.full_messages}
       else
-        if @is_api
-          render json: { error: @bulk_import.errors.full_messages }
-        else
-          flash[:error] = translation(:unable_to_create_bulk_import)
-          render action: :new
-        end
+        flash[:error] = translation(:unable_to_create_bulk_import)
+        render action: :new
       end
     end
 
@@ -71,7 +69,7 @@ module Organized
         @current_user = current_organization.auto_user # Crazy override to make current user work
         return true if request.headers["Authorization"] == current_organization.access_token
       end
-      render json: { error: "Not permitted" }, status: 401 and return
+      render(json: {error: "Not permitted"}, status: 401) && return
     end
 
     def ensure_access_to_bulk_import!
@@ -84,12 +82,12 @@ module Organized
       return true if current_user.superuser? || current_organization.show_bulk_import?
 
       flash[:error] = translation(:org_does_not_have_access)
-      redirect_to organization_root_path and return
+      redirect_to(organization_root_path) && return
     end
 
     def permitted_parameters
       if params[:file].present?
-        { file: params[:file] }
+        {file: params[:file]}
       else
         params.require(:bulk_import).permit([:file])
       end.merge(creator_attributes)
@@ -97,9 +95,9 @@ module Organized
 
     def creator_attributes
       if @ascend_import
-        { is_ascend: true }
+        {is_ascend: true}
       else
-        { user_id: (@current_user || current_user).id, organization_id: current_organization&.id }
+        {user_id: (@current_user || current_user).id, organization_id: current_organization&.id}
       end
     end
   end
