@@ -70,6 +70,8 @@ RSpec.describe NewsController, type: :request do
           FactoryBot.create(:blog, :published)
           get base_url, params: { format: :atom }
           expect(response.status).to eq(200)
+          get "/news.atom"
+          expect(response.status).to eq(200)
         end
       end
     end
