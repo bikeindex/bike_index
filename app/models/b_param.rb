@@ -175,7 +175,7 @@ class BParam < ApplicationRecord
   end
 
   def phone
-    bike["phone"]
+    Phonifyer.phonify(bike["phone"])
   end
 
   def user_name

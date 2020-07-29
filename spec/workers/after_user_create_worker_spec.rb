@@ -108,9 +108,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       instance.associate_appointments(user, email)
       appointment.reload
       expect(appointment.user_id).to eq user.id
-      # Need to ensure that this actually assigns all the appointments for new users
-      # Need to ensure it actually assigns for new secondary emails
-      # Need to ensure it actually assigns for merged users
     end
   end
 

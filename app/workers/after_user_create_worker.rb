@@ -32,6 +32,7 @@ class AfterUserCreateWorker < ApplicationWorker
     associate_membership_invites(user, email, skip_confirm: true)
     associate_ownerships(user, email)
     associate_appointments(user, email)
+    import_user_attributes(user)
   end
 
   def perform_confirmed_jobs(user, email)

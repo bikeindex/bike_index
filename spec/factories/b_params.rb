@@ -3,7 +3,7 @@ FactoryBot.define do
     transient do
       owner_email { "bike_owner@example.com" }
     end
-    creator { FactoryBot.create(:user) }
+    creator { created_bike.present? ? created_bike.creator : FactoryBot.create(:user) }
     params { {bike: {owner_email: owner_email}} }
 
     factory :b_param_stolen do

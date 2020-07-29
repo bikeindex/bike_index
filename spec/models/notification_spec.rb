@@ -8,7 +8,7 @@ RSpec.describe Notification, type: :model do
       }.to_not change(SendNotificationWorker.jobs, :count)
     end
     context "view_appointment" do
-      let(:ticket) { FactoryBot.create(:appointment) }
+      let(:appointment) { FactoryBot.create(:appointment) }
       let(:notification) { FactoryBot.build(:notification, kind: "view_appointment", appointment: appointment, user: nil) }
       it "sends only on creation" do
         Sidekiq::Worker.clear_all

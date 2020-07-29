@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :notifications
+  has_many :appointments
   has_many :memberships, dependent: :destroy
   has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
@@ -87,11 +88,11 @@ class User < ApplicationRecord
     fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
-  def self.username_friendly_find(n)
-    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-      where(id: n).first
+  def self.username_friendly_find(str)
+    if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+      where(id: str).first
     else
-      find_by_username(n)
+      find_by_username(str)
     end
   end
 
@@ -359,8 +360,8 @@ class User < ApplicationRecord
     self.attributes = {auth_token_type => SecurityTokenizer.new_token(time)}
   end
 
-  def access_tokens_for_application(i)
-    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: i)
+  def access_tokens_for_application(app_id)
+    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: app_id)
   end
 
   protected

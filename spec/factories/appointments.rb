@@ -8,6 +8,9 @@ FactoryBot.define do
     reason { AppointmentConfiguration.default_reasons.first }
     status { "waiting" }
     creator_kind { "no_user" }
+    trait :claimed do
+      user { FactoryBot.create(:user) }
+    end
     # This is useful for request specs that require that the organization have things enabled
     factory :appointment_with_virtual_line_on do
       location { FactoryBot.create(:location, :with_virtual_line_on) }

@@ -7,6 +7,7 @@ class Appointment < ApplicationRecord
   belongs_to :bike
 
   has_many :appointment_updates, dependent: :destroy
+  has_many :notifications
 
   validates_presence_of :organization_id, :location_id, :name
 
@@ -21,24 +22,12 @@ class Appointment < ApplicationRecord
 
   # Line ordering is first by the priority of the status, then by line_entry_timestamp
   scope :line_ordered, -> { reorder("status, line_entry_timestamp") }
-  scope :in_line, -> { where(status: in_line_statuses).line_ordered }
-  scope :paging_or_on_deck, -> { where(status: %w[on_deck paging]).line_ordered }
-  scope :line_not_paging_or_on_deck, -> { where.not(status: %w[on_deck paging]).in_line }
+  scope :in_line, -> { where(status: AppointmentUpdate.in_line_statuses).line_ordered }
+  scope :paging_or_on_deck, -> { where(status: AppointmentUpdate.paging_or_on_deck_statuses).line_ordered }
+  scope :line_not_paging_or_on_deck, -> { where.not(status: AppointmentUpdate.paging_or_on_deck_statuses).in_line }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.statuses
-    AppointmentUpdate.statuses
-  end
-
-  def self.in_line_statuses
-    %w[waiting on_deck paging]
-  end
-
-  def self.resolved_statuses
-    %(finished removed being_helped abandoned)
   end
 
   # This will be more sophisticated in the future, when we add phone, etc
@@ -85,7 +74,11 @@ class Appointment < ApplicationRecord
   end
 
   def in_line?
-    self.class.in_line_statuses.include?(status)
+    AppointmentUpdate.in_line_statuses.include?(status)
+  end
+
+  def claimed?
+    user.present?
   end
 
   def paging_or_on_deck?
@@ -126,12 +119,11 @@ class Appointment < ApplicationRecord
   end
 
   def record_status_update(updator_kind: "no_user", updator_id: nil, new_status: nil)
-    return nil unless new_status.present? && self.class.statuses.include?(new_status) && new_status != status
+    return nil unless new_status.present? && AppointmentUpdate.statuses.include?(new_status) && new_status != status
     # customers can't update their appointment unless it's in line and they're updating to a valid status
     if AppointmentUpdate.customer_creator_kind?(updator_kind)
       return nil if status == "on_deck" && new_status == "waiting" # Don't permit customer putting themselves back into waiting
-      customer_update_statuses = %w[waiting being_helped abandoned]
-      return nil unless in_line? && customer_update_statuses.include?(new_status)
+      return nil unless in_line? && AppointmentUpdate.customer_update_statuses.include?(new_status)
     end
     new_update = appointment_updates.create(creator_kind: updator_kind, user_id: updator_id, status: new_status)
 

@@ -31,8 +31,24 @@ class AppointmentUpdate < ApplicationRecord
     STATUS_ENUM.keys.map(&:to_s)
   end
 
+  def self.customer_update_statuses
+    %w[waiting being_helped abandoned].freeze
+  end
+
   def self.update_only_statuses
-    %w[failed_to_find organization_reordered]
+    %w[failed_to_find organization_reordered].freeze
+  end
+
+  def self.in_line_statuses
+    %w[waiting on_deck paging].freeze
+  end
+
+  def self.paging_or_on_deck_statuses
+    %w[on_deck paging].freeze
+  end
+
+  def self.resolved_statuses
+    %(finished removed being_helped abandoned).freeze
   end
 
   def self.creator_kinds
