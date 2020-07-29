@@ -7,7 +7,7 @@ RSpec.describe LocalizationHelper, type: :helper do
         I18n.with_locale(:en) do
           choices = [
             ["English", "en"],
-            ["Nederlands (Dutch)", "nl"],
+            ["Nederlands (Dutch)", "nl"]
           ]
           expect(language_choices).to eq(choices)
         end
@@ -19,7 +19,7 @@ RSpec.describe LocalizationHelper, type: :helper do
         I18n.with_locale(:nl) do
           choices = [
             ["English (Engels)", "en"],
-            ["Nederlands", "nl"],
+            ["Nederlands", "nl"]
           ]
           expect(language_choices).to eq(choices)
         end

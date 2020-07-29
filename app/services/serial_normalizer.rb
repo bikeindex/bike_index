@@ -9,7 +9,7 @@ class SerialNormalizer
   end
 
   def self.looks_like_made_without?(str_downcase)
-    (/custom/).match?(str_downcase)
+    /custom/.match?(str_downcase)
   end
 
   def self.looks_like_unknown?(str_downcase)
@@ -25,7 +25,7 @@ class SerialNormalizer
   end
 
   def initialize(serial: nil, bike_id: nil)
-    @serial = serial && serial.strip.upcase
+    @serial = serial&.strip&.upcase
     @bike_id = bike_id
   end
 
@@ -34,7 +34,7 @@ class SerialNormalizer
     normed = @serial.dup
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
-      normed.gsub!(/[^\w]|[_]/, " ") # turn all non letter/numbers into spaces
+      normed.gsub!(/[^\w]|_/, " ") # turn all non letter/numbers into spaces
     end
     normed.gsub(/^0+/, "").gsub(/\s+/, " ").strip # remove leading zeros and multiple spaces
   end
@@ -61,7 +61,7 @@ class SerialNormalizer
       "O" => "0",
       "S" => "5",
       "Z" => "2",
-      "B" => "8",
+      "B" => "8"
     }
   end
 end

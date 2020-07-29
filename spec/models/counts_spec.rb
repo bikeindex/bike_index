@@ -7,7 +7,7 @@ RSpec.describe Counts, type: :model do
   context "total_bikes" do
     it "saves things to redis" do
       Counts.assign_total_bikes
-      expect(redis.hget Counts::STOREAGE_KEY, "total_bikes").to eq "0"
+      expect(redis.hget(Counts::STOREAGE_KEY, "total_bikes")).to eq "0"
       expect(Counts.total_bikes).to eq 0
     end
   end
@@ -23,7 +23,7 @@ RSpec.describe Counts, type: :model do
         (Date.current - 3.days).to_s => 0,
         (Date.current - 2.days).to_s => 0,
         (Date.current - 1.days).to_s => 0,
-        Date.current.to_s => 1,
+        Date.current.to_s => 1
       }
     end
     it "saves the thing" do

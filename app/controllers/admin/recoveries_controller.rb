@@ -7,7 +7,7 @@ class Admin::RecoveriesController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
-                                     .page(page).per(per_page)
+      .page(page).per(per_page)
   end
 
   def show
@@ -17,7 +17,7 @@ class Admin::RecoveriesController < Admin::BaseController
   def edit
     @recovery ||= StolenRecord.unscoped.find(params[:id])
     bike = Bike.unscoped.find_by_id(@recovery.bike_id)
-    @bike = bike && bike.decorate
+    @bike = bike&.decorate
   end
 
   def update
@@ -32,7 +32,7 @@ class Admin::RecoveriesController < Admin::BaseController
 
     if @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"
-      redirect_to redirect ||= admin_recoveries_url
+      redirect_to redirect || admin_recoveries_url
     else
       @recovery = @stolen_record
       render action: :edit

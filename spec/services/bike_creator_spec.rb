@@ -7,7 +7,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         allow(b_param).to receive(:id).and_return(9)
         allow(b_param).to receive(:creator_id).and_return(6)
-        allow(b_param).to receive(:params).and_return({ bike: { serial_number: "AAAA" } }.as_json)
+        allow(b_param).to receive(:params).and_return({bike: {serial_number: "AAAA"}}.as_json)
         bike = BikeCreator.new(b_param).build_bike
         expect(bike.serial_number).to eq("AAAA")
         expect(bike.updator_id).to eq(6)
@@ -73,9 +73,9 @@ RSpec.describe BikeCreator do
         manufacturer_id: manufacturer.id,
         year: 2014,
         frame_model: "Draft",
-        primary_frame_color_id: color.id,
+        primary_frame_color_id: color.id
       }
-      b_param = FactoryBot.create(:b_param, params: { bike: bike })
+      b_param = FactoryBot.create(:b_param, params: {bike: bike})
       BikeCreator.new(b_param).send(:add_bike_book_data)
 
       b_param.reload
@@ -135,15 +135,15 @@ RSpec.describe BikeCreator do
       let(:new_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: new_email) }
       let!(:ownerships) do
         [FactoryBot.create(:ownership, bike: existing_bike, owner_email: email),
-         FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)]
+          FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)]
       end
       let(:params) do
         {
           bike: {
             serial_number: "some serial number",
             owner_email: new_email,
-            no_duplicate: true,
-          },
+            no_duplicate: true
+          }
         }
       end
       let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
@@ -153,9 +153,9 @@ RSpec.describe BikeCreator do
         it "finds a duplicate" do
           expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
-          expect do
+          expect {
             BikeCreator.new(b_param).send(:validate_record, new_bike)
-          end.to change(Ownership, :count).by(-1)
+          }.to change(Ownership, :count).by(-1)
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
           expect(Bike.where(id: new_bike.id)).to_not be_present
@@ -167,9 +167,9 @@ RSpec.describe BikeCreator do
         it "does not find a non-duplicate" do
           expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
-          expect do
+          expect {
             BikeCreator.new(b_param).send(:validate_record, new_bike)
-          end.to change(Ownership, :count).by 0
+          }.to change(Ownership, :count).by 0
           b_param.reload
           expect(b_param.created_bike_id).to eq new_bike.id
         end
@@ -191,8 +191,8 @@ RSpec.describe BikeCreator do
         expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
-          creation_organization_id: organization.id,
-          propulsion_type: "sail",
+          :creation_organization_id => organization.id,
+          :propulsion_type => "sail",
           "cycle_type" => "stroller",
           "serial_number" => "BIKE TOKENd",
           "manufacturer_id" => manufacturer.id,
@@ -200,11 +200,11 @@ RSpec.describe BikeCreator do
           "rear_wheel_size_id" => wheel_size.id,
           "primary_frame_color_id" => color.id,
           "handlebar_type" => "bmx",
-          "creator" => user,
+          "creator" => user
         )
-        expect do
+        expect {
           creator.send(:save_bike, new_bike)
-        end.to change(Bike, :count).by(1)
+        }.to change(Bike, :count).by(1)
       end
     end
 
@@ -216,9 +216,9 @@ RSpec.describe BikeCreator do
         bike = FactoryBot.create(:bike)
         expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
-        expect do
+        expect {
           creator.send(:save_bike, bike)
-        end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
+        }.to change(AfterBikeSaveWorker.jobs, :size).by(1)
       end
     end
   end
@@ -263,7 +263,7 @@ RSpec.describe BikeCreator do
             creation_organization_id: organization.id,
             serial_number: "",
             primary_frame_color_id: color.id,
-            manufacturer_id: manufacturer.id,
+            manufacturer_id: manufacturer.id
           },
           parking_notification: {
             latitude: "40.7143528",

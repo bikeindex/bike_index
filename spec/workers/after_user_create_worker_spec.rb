@@ -14,9 +14,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       let(:user) { User.new(id: 69, email: "owner@jess.com") }
       it "sends confirmation email" do
         expect(instance).to receive(:associate_membership_invites).and_return(true)
-        expect do
+        expect {
           instance.perform(user.id, "new", user: user)
-        end.to change(AfterUserCreateWorker.jobs, :count).by 1
+        }.to change(AfterUserCreateWorker.jobs, :count).by 1
         expect(EmailConfirmationWorker.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
         expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
@@ -24,9 +24,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       context "confirmed user" do
         it "sends welcome email" do
           allow(user).to receive(:confirmed?) { true }
-          expect do
+          expect {
             instance.perform(user.id, "new", user: user)
-          end.to change(AfterUserCreateWorker.jobs, :count).by 1
+          }.to change(AfterUserCreateWorker.jobs, :count).by 1
           expect(EmailWelcomeWorker.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
           expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
@@ -36,9 +36,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     context "stage: confirmed" do
       it "associates" do
         expect(UserEmail).to receive(:create_confirmed_primary_email).with(user)
-        expect do
+        expect {
           instance.perform(user.id, "confirmed", user: user)
-        end.to change(AfterUserCreateWorker.jobs, :count).by 1
+        }.to change(AfterUserCreateWorker.jobs, :count).by 1
         expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
     end
@@ -47,9 +47,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       it "associates" do
         expect(instance).to receive(:associate_ownerships)
         expect(instance).to receive(:associate_membership_invites)
-        expect do
+        expect {
           instance.perform(user.id, "merged", user: user)
-        end.to_not change(AfterUserCreateWorker.jobs, :count)
+        }.to_not change(AfterUserCreateWorker.jobs, :count)
       end
     end
 
@@ -57,18 +57,18 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       it "calls import" do
         expect(instance).to_not receive(:associate_ownerships)
         expect(instance).to receive(:import_user_attributes)
-        expect do
+        expect {
           instance.perform(user.id, "async")
-        end.to_not change(AfterUserCreateWorker.jobs, :count)
+        }.to_not change(AfterUserCreateWorker.jobs, :count)
       end
       context "confirmed user" do
         let(:user) { FactoryBot.create(:user_confirmed) }
         it "calls import and associate_ownerships" do
           expect(instance).to receive(:associate_ownerships)
           expect(instance).to receive(:import_user_attributes)
-          expect do
+          expect {
             instance.perform(user.id, "async")
-          end.to_not change(AfterUserCreateWorker.jobs, :count)
+          }.to_not change(AfterUserCreateWorker.jobs, :count)
         end
       end
     end
@@ -103,12 +103,12 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     let!(:country) { Country.united_states }
     let!(:b_param) do
       FactoryBot.create(:b_param,
-                        created_bike_id: bike.id,
-                        creator: bike.creator,
-                        params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
+        created_bike_id: bike.id,
+        creator: bike.creator,
+        params: {bike: {address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333"}})
     end
     let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
-    let(:target_address_hash) { { street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348 } }
+    let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348} }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
     it "assigns the extra user attributes" do
@@ -239,9 +239,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           user.reload
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
-          expect do
+          expect {
             Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
-          end.to_not change(Membership, :count)
+          }.to_not change(Membership, :count)
           expect(ActionMailer::Base.deliveries.count).to eq 0
           user.reload
           expect(user.confirmed?).to be_truthy

@@ -4,9 +4,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
   let(:organization) { FactoryBot.create(:organization_with_auto_user) }
   let(:header_mail_snippet) do
     FactoryBot.create(:organization_mail_snippet,
-                      kind: "header",
-                      organization: organization,
-                      body: "<p>HEADERXSNIPPET</p>")
+      kind: "header",
+      organization: organization,
+      body: "<p>HEADERXSNIPPET</p>")
   end
   describe "partial_registration" do
     context "without organization" do
@@ -36,9 +36,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
             FactoryBot.create(:organization_mail_snippet,
-                              kind: "partial",
-                              organization: organization,
-                              body: "<p>PARTIALYXSNIPPET</p>")
+              kind: "partial",
+              organization: organization,
+              body: "<p>PARTIALYXSNIPPET</p>")
           end
           it "includes mail snippet" do
             expect(b_param.owner_email).to be_present
@@ -99,15 +99,15 @@ RSpec.describe OrganizedMailer, type: :mailer do
     context "organized snippets" do
       let(:welcome_mail_snippet) do
         FactoryBot.create(:organization_mail_snippet,
-                          kind: "welcome",
-                          organization: organization,
-                          body: "<p>WELCOMEXSNIPPET</p>")
+          kind: "welcome",
+          organization: organization,
+          body: "<p>WELCOMEXSNIPPET</p>")
       end
       let(:security_mail_snippet) do
         FactoryBot.create(:organization_mail_snippet,
-                          kind: "security",
-                          organization: organization,
-                          body: "<p>SECURITYXSNIPPET</p>")
+          kind: "security",
+          organization: organization,
+          body: "<p>SECURITYXSNIPPET</p>")
       end
       let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
 

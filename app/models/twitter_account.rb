@@ -62,7 +62,7 @@ class TwitterAccount < ApplicationRecord
       consumer_key: ENV["TWITTER_CONSUMER_KEY"],
       consumer_secret: ENV["TWITTER_CONSUMER_SECRET"],
       user_token: info["credentials"]["token"],
-      user_secret: info["credentials"]["secret"],
+      user_secret: info["credentials"]["secret"]
     }
   end
 
@@ -120,7 +120,7 @@ class TwitterAccount < ApplicationRecord
     end
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
-    return
+    nil
   end
 
   def retweet(tweet_id)
@@ -129,7 +129,7 @@ class TwitterAccount < ApplicationRecord
     twitter_client.retweet(tweet_id).first
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
-    return
+    nil
   end
 
   def should_be_reverse_geocoded?
@@ -141,11 +141,11 @@ class TwitterAccount < ApplicationRecord
   private
 
   def twitter_client
-    @twitter_client ||= Twitter::REST::Client.new do |config|
+    @twitter_client ||= Twitter::REST::Client.new { |config|
       config.consumer_key = consumer_key
       config.consumer_secret = consumer_secret
       config.access_token = user_token
       config.access_token_secret = user_secret
-    end
+    }
   end
 end

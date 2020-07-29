@@ -6,8 +6,8 @@ FactoryBot.define do
 
     after(:create) do |ambassador, evaluator|
       FactoryBot.create(:membership_ambassador,
-                        user: ambassador,
-                        organization: evaluator.organization)
+        user: ambassador,
+        organization: evaluator.organization)
     end
   end
 end

@@ -24,9 +24,9 @@ FactoryBot.define do
       organization { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["virtual_line"]) }
       after(:create) do |location, _evaluator|
         FactoryBot.create(:appointment_configuration,
-                          location: location,
-                          organization: location.organization,
-                          virtual_line_on: true)
+          location: location,
+          organization: location.organization,
+          virtual_line_on: true)
       end
     end
 

@@ -164,14 +164,14 @@ FactoryBot.define do
         info_hash = {
           "match_id" => evaluator.match.id.to_s,
           "match_type" => evaluator.match.class.to_s,
-          "stolen_record_id" => cc.bike.current_stolen_record.id.to_s,
+          "stolen_record_id" => cc.bike.current_stolen_record.id.to_s
         }
         cc.update(
           info_hash: info_hash,
           user_email: cc.bike.owner_email,
           creator_email: cc.creator.email,
           title: "We may have found your stolen #{cc.bike.title_string}",
-          body: "Check this matching bike: #{evaluator.match.title_string}",
+          body: "Check this matching bike: #{evaluator.match.title_string}"
         )
       end
     end

@@ -23,16 +23,16 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
       expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
       # With appointment_configuration in place, it makes only 1 be on_deck
       expect(appointment_configuration).to be_present
-      expect do
+      expect {
         instance.perform(location.id)
-      end.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
+      }.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
       expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
       expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
 
       appt1.update(status: "waiting")
-      expect do
+      expect {
         instance.perform(location.id)
-      end.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
+      }.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
       # Because organization has 2 on deck, it doesn't add another
       expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt4.id])
 

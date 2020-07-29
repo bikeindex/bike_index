@@ -7,7 +7,7 @@ class AddConfidentialToApplications < ActiveRecord::Migration[5.0]
       :confidential,
       :boolean,
       null: false,
-      default: false, # Default to false since we're using public clients
+      default: false # Default to false since we're using public clients
     )
   end
 end

@@ -14,7 +14,7 @@ RSpec.describe AdminMailer, type: :mailer do
   end
 
   describe "special_feedback_notification_email" do
-    let(:feedback) { FactoryBot.create(:feedback, feedback_type: feedback_type, feedback_hash: { bike_id: bike.id }) }
+    let(:feedback) { FactoryBot.create(:feedback, feedback_type: feedback_type, feedback_hash: {bike_id: bike.id}) }
     let(:bike) { FactoryBot.create(:bike) }
     context "a recovery email" do
       let(:feedback_type) { "bike_recovery" }
@@ -41,7 +41,7 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.reply_to).to eq([feedback.email])
       end
       context "with a link" do
-        let(:feedback) { FactoryBot.create(:feedback, body: "something <a href='sddddd'>ffffff</a> WHAT UP", feedback_type: feedback_type, feedback_hash: { bike_id: bike.id }) }
+        let(:feedback) { FactoryBot.create(:feedback, body: "something <a href='sddddd'>ffffff</a> WHAT UP", feedback_type: feedback_type, feedback_hash: {bike_id: bike.id}) }
         it "strips the tag and renders read more" do
           mail = AdminMailer.feedback_notification_email(feedback)
           expect(mail.subject).to eq("New Feedback Submitted")
@@ -53,7 +53,7 @@ RSpec.describe AdminMailer, type: :mailer do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user) }
       let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
-      let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: { organization_id: organization.id }) }
+      let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: {organization_id: organization.id}) }
       it "sends a new org email" do
         mail = AdminMailer.feedback_notification_email(feedback)
         expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
@@ -65,7 +65,7 @@ RSpec.describe AdminMailer, type: :mailer do
   context "user_hidden bike" do
     let(:ownership) { FactoryBot.create(:ownership, user_hidden: true) }
     let(:bike) { ownership.bike }
-    let(:feedback) { FactoryBot.create(:feedback, feedback_hash: { bike_id: bike.id }, feedback_type: "bike_delete_request") }
+    let(:feedback) { FactoryBot.create(:feedback, feedback_hash: {bike_id: bike.id}, feedback_type: "bike_delete_request") }
     it "doesn't explode" do
       bike.update_attribute :hidden, true
       bike.reload

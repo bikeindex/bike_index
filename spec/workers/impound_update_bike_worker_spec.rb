@@ -118,12 +118,12 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(bike.ownerships.count).to eq 1
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
-      expect do
+      expect {
         Sidekiq::Testing.inline! do
           impound_record_update.save
           described_class.new.perform(impound_record.id)
         end
-      end.to change(Ownership, :count).by 1
+      }.to change(Ownership, :count).by 1
       expect(ActionMailer::Base.deliveries.count).to eq 1
       ownership.reload
       expect(ownership.current?).to be_falsey

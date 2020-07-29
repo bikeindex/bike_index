@@ -30,7 +30,7 @@ class Admin::NewsController < Admin::BaseController
         @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
       end
 
-      flash[:success] = "#{@blog.info? ? 'Info post' : 'Blog'} saved!"
+      flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"
       redirect_to edit_admin_news_url(@blog)
     else
       render action: :edit
@@ -43,13 +43,13 @@ class Admin::NewsController < Admin::BaseController
       user_id: current_user.id,
       body: "No content yet, write some now!",
       published_at: Time.current,
-      is_listicle: false,
+      is_listicle: false
     })
     if @blog.save
-      flash[:success] = "#{@blog.info? ? 'Info post' : 'Blog'} created!"
+      flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} created!"
       redirect_to edit_admin_news_url(@blog)
     else
-      flash[:error] = "#{@blog.info? ? 'Info post' : 'Blog'} error! #{@blog.errors.full_messages.to_sentence}"
+      flash[:error] = "#{@blog.info? ? "Info post" : "Blog"} error! #{@blog.errors.full_messages.to_sentence}"
       redirect_to new_admin_news_path
     end
   end
@@ -82,13 +82,13 @@ class Admin::NewsController < Admin::BaseController
       :update_title,
       :user_email,
       :user_id,
-      :is_info,
+      :is_info
     )
   end
 
   def set_dignified_name
     @dignified_name = "short form creative non-fiction"
-    @dignified_name = "collection of vignettes" if @blog && @blog.is_listicle
+    @dignified_name = "collection of vignettes" if @blog&.is_listicle
   end
 
   def find_blog

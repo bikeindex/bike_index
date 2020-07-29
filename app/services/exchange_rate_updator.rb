@@ -6,9 +6,9 @@ class ExchangeRateUpdator
     rates = payload.fetch(:rates)
     base_iso = payload.fetch(:base)
 
-    results = rates.map do |target_iso, multiplier|
+    results = rates.map { |target_iso, multiplier|
       ExchangeRate.add_rate(base_iso, target_iso, multiplier)
-    end
+    }
 
     results.none?(&:nil?)
   end

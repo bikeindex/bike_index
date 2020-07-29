@@ -19,9 +19,9 @@ RSpec.describe BikeStickerBatch, type: :model do
       expect(bike_sticker_batch.updated_at).to be < Time.current - 50.minutes
       expect(bike_sticker_batch.code_number_length_or_default).to eq 4
       expect(bike_sticker_batch.bike_stickers.count).to eq 0
-      expect do
+      expect {
         bike_sticker_batch.create_codes(3, initial_code_integer: 9999)
-      end.to change(BikeSticker, :count).by 3
+      }.to change(BikeSticker, :count).by 3
       bike_sticker_batch.reload
       expect(bike_sticker_batch.updated_at).to be_within(1.second).of Time.current
       expect(bike_sticker_batch.bike_stickers.count).to eq 3
@@ -31,30 +31,30 @@ RSpec.describe BikeStickerBatch, type: :model do
       expect(bike_sticker_batch.bike_stickers.pluck(:code_integer)).to match_array([9999, 10_000, 10_001])
       expect(bike_sticker_batch.code_number_length_or_default).to eq 5
 
-      expect do
+      expect {
         bike_sticker_batch.create_codes(1)
-      end.to change(BikeSticker, :count).by 1
+      }.to change(BikeSticker, :count).by 1
       expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array(target_codes + ["XD10002"])
 
       # If passed a code number that already exists, it creates the following one
-      expect do
+      expect {
         bike_sticker_batch.create_codes(1, initial_code_integer: 10_002)
-      end.to change(BikeSticker, :count).by 1
+      }.to change(BikeSticker, :count).by 1
       expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003])
 
       # It can do earlier numbers too. If doing so, it pads accordingly
-      expect do
+      expect {
         bike_sticker_batch.create_codes(1, initial_code_integer: 12)
-      end.to change(BikeSticker, :count).by 1
+      }.to change(BikeSticker, :count).by 1
       expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003 XD00012])
       expect(bike_sticker_batch.non_sequential_integers).to eq([[12, 9999]])
     end
     context "without a prefix" do
       let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, prefix: nil) }
       it "errors" do
-        expect do
+        expect {
           bike_sticker_batch.create_codes(100)
-        end.to raise_error(/prefix/i)
+        }.to raise_error(/prefix/i)
       end
     end
   end

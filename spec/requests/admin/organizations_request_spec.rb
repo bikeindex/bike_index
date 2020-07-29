@@ -14,7 +14,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "search" do
       let!(:organization) { FactoryBot.create(:organization, name: "Cool Bikes") }
       it "renders, finds organization" do
-        get base_url, params: { search_query: "cool" }
+        get base_url, params: {search_query: "cool"}
         expect(response.status).to eq 200
         expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
@@ -56,13 +56,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         lock_show_on_map: true,
         show_on_map: true,
         kind: "shop",
-        approved: true,
+        approved: true
       }
     end
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
-          post base_url, params: { organization: create_attributes.merge(kind: kind) }
+          post base_url, params: {organization: create_attributes.merge(kind: kind)}
           expect(Organization.count).to eq(1)
           organization = Organization.last
           expect(organization.kind).to eq(kind)
@@ -107,7 +107,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
             publicly_visible: false,
             impound_location: true,
             default_impound_location: false,
-            _destroy: 0,
+            _destroy: 0
           },
           Time.current.to_i.to_s => {
             created_at: Time.current.to_f.to_s,
@@ -125,17 +125,17 @@ RSpec.describe Admin::OrganizationsController, type: :request do
             shown: false,
             publicly_visible: true,
             impound_location: true,
-            default_impound_location: true,
-          },
-        },
+            default_impound_location: true
+          }
+        }
       }
     end
     it "updates the organization" do
       expect(location1).to be_present
       Sidekiq::Worker.clear_all
-      expect do
-        put "#{base_url}/#{organization.to_param}", params: { organization_id: organization.to_param, organization: update_attributes }
-      end.to change(Location, :count).by 1
+      expect {
+        put "#{base_url}/#{organization.to_param}", params: {organization_id: organization.to_param, organization: update_attributes}
+      }.to change(Location, :count).by 1
       expect(UpdateOrganizationPosKindWorker.jobs.count).to eq 1
       UpdateOrganizationPosKindWorker.drain # Run the jobs in the queue
       organization.reload
@@ -160,32 +160,32 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
       it "updates the organization" do
-        expect do
-          put "#{base_url}/#{organization.to_param}", params: { organization: { manual_pos_kind: "not_set" } }
-        end.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
+        expect {
+          put "#{base_url}/#{organization.to_param}", params: {organization: {manual_pos_kind: "not_set"}}
+        }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
       end
     end
     context "update passwordless_user_domain" do
       it "updates (only blocking non-developers in frontend because whateves)" do
-        put "#{base_url}/#{organization.to_param}", params: { organization: { passwordless_user_domain: "@bikeindex.org" } }
+        put "#{base_url}/#{organization.to_param}", params: {organization: {passwordless_user_domain: "@bikeindex.org"}}
         organization.reload
         expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
       end
     end
     context "updating graduated notifications" do
       it "updates graduated_notification_interval_days" do
-        put "#{base_url}/#{organization.to_param}", params: { organization: { graduated_notification_interval_days: "365" } }
+        put "#{base_url}/#{organization.to_param}", params: {organization: {graduated_notification_interval_days: "365"}}
         organization.reload
         expect(organization.graduated_notification_interval).to eq 365.days.to_i
       end
     end
     context "not updating manual_pos_kind" do
       it "updates and doesn't enqueue worker" do
-        expect do
-          put "#{base_url}/#{organization.to_param}", params: { organization: { name: "new name", short_name: "something else" } }
-        end.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        expect {
+          put "#{base_url}/#{organization.to_param}", params: {organization: {name: "new name", short_name: "something else"}}
+        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
         organization.reload
         expect(organization.name).to eq "new name"
         expect(organization.short_name).to eq "something else"

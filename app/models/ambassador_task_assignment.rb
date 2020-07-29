@@ -1,14 +1,14 @@
 class AmbassadorTaskAssignment < ApplicationRecord
   belongs_to :ambassador_task
   belongs_to :ambassador,
-             class_name: "Ambassador",
-             foreign_key: :user_id,
-             primary_key: :id
+    class_name: "Ambassador",
+    foreign_key: :user_id,
+    primary_key: :id
 
   validates :ambassador, presence: true
   validates :ambassador_task, presence: true
 
-  validates :ambassador_task, uniqueness: { scope: :ambassador }
+  validates :ambassador_task, uniqueness: {scope: :ambassador}
 
   scope :completed, -> { where.not(completed_at: nil) }
   scope :incomplete, -> { where(completed_at: nil) }
@@ -72,23 +72,23 @@ class AmbassadorTaskAssignment < ApplicationRecord
       filter_to_sql_clause = {
         organization_id: ->(filter_val) { "AND organizations.id = #{filter_val}" },
         ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val}" },
-        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val}" },
+        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val}" }
       }
       sql << filters
         .map { |col, val| filter_to_sql_clause[col]&.call(val) }
         .join("\n")
 
-      case sort_col
+      sql << case sort_col
       when :organization_name
-        sql << "ORDER BY organizations.name #{sort_dir.upcase}\n"
+        "ORDER BY organizations.name #{sort_dir.upcase}\n"
       when :completed_at
-        sql << "ORDER BY ambassador_task_assignments.completed_at #{sort_dir.upcase}\n"
+        "ORDER BY ambassador_task_assignments.completed_at #{sort_dir.upcase}\n"
       when :ambassador_task_title
-        sql << "ORDER BY ambassador_tasks.title #{sort_dir.upcase}\n"
+        "ORDER BY ambassador_tasks.title #{sort_dir.upcase}\n"
       when :ambassador_name
-        sql << "ORDER BY users.name #{sort_dir.upcase}\n"
+        "ORDER BY users.name #{sort_dir.upcase}\n"
       else
-        sql << "ORDER BY ambassador_task_assignments.completed_at DESC\n"
+        "ORDER BY ambassador_task_assignments.completed_at DESC\n"
       end
     end
 

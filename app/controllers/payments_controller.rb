@@ -16,7 +16,7 @@ class PaymentsController < ApplicationController
     elsif user.present?
       customer = Stripe::Customer.create(
         email: email,
-        card: params[:stripe_token],
+        card: params[:stripe_token]
       )
       user.update_attribute :stripe_id, customer.id
     else
@@ -27,7 +27,7 @@ class PaymentsController < ApplicationController
       else
         customer = Stripe::Customer.create(
           email: email,
-          card: params[:stripe_token],
+          card: params[:stripe_token]
         )
       end
     end
@@ -39,7 +39,7 @@ class PaymentsController < ApplicationController
         customer: customer.id,
         amount: amount_cents,
         description: "Bike Index customer",
-        currency: "usd",
+        currency: "usd"
       )
       charge_time = charge.created
     end
@@ -49,7 +49,7 @@ class PaymentsController < ApplicationController
       is_current: true,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount_cents: amount_cents,
+      amount_cents: amount_cents
     )
     @payment.is_recurring = true if subscription
     @payment.kind = "payment" if ParamsNormalizer.boolean(params[:is_payment])
@@ -58,6 +58,6 @@ class PaymentsController < ApplicationController
     end
   rescue Stripe::CardError => e
     flash[:error] = e.message
-    redirect_to new_payment_path and return
+    redirect_to(new_payment_path) && return
   end
 end

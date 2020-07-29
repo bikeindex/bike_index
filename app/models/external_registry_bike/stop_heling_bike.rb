@@ -19,7 +19,7 @@ class ExternalRegistryBike::StopHelingBike < ExternalRegistryBike
       bike = find_or_initialize_by(
         external_id: attrs[:registration_number].presence,
         serial_number: serial_number(attrs),
-        type: to_s,
+        type: to_s
       )
 
       bike.cycle_type = "bike"
@@ -49,7 +49,7 @@ class ExternalRegistryBike::StopHelingBike < ExternalRegistryBike
 
       [
         source_name.sub(/politie/i, "").strip&.titleize,
-        country_iso,
+        country_iso
       ].select(&:present?).join(" - ")
     end
   end

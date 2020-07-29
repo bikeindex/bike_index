@@ -89,7 +89,7 @@ class CustomerMailer < ApplicationMailer
         to: @customer_contact.user_email,
         sender: @customer_contact.creator_email,
         reply_to: @customer_contact.creator_email,
-        subject: @customer_contact.title,
+        subject: @customer_contact.title
       )
     end
   end
@@ -104,7 +104,7 @@ class CustomerMailer < ApplicationMailer
         cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
         reply_to: @stolen_notification.sender.email,
         from: "bryan@bikeindex.org",
-        subject: @stolen_notification.subject || default_i18n_subject,
+        subject: @stolen_notification.subject || default_i18n_subject
       )
     end
 
@@ -133,7 +133,7 @@ class CustomerMailer < ApplicationMailer
       mail(
         to: [@bike.owner_email],
         from: "bryan@bikeindex.org",
-        subject: default_i18n_subject(biketype: @biketype),
+        subject: default_i18n_subject(biketype: @biketype)
       )
     end
   end

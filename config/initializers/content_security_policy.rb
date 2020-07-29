@@ -20,9 +20,9 @@ Rails.application.config.content_security_policy do |policy|
     # This can be done in Rails 5.2+ for development environment in the CSP initializer
     # config/initializers/content_security_policy.rb with a snippet like this:
     policy.connect_src :self,
-                       :https,
-                       "http://localhost:3033",
-                       "ws://localhost:3033"
+      :https,
+      "http://localhost:3033",
+      "ws://localhost:3033"
   end
 end
 

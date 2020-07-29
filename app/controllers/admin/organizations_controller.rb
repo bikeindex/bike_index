@@ -103,7 +103,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :show_on_map,
         :slug,
         :website,
-        [locations_attributes: permitted_locations_params],
+        [locations_attributes: permitted_locations_params]
       ).merge(kind: approved_kind)
   end
 
@@ -115,7 +115,7 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
-    matching_organizations = matching_organizations.where(approved: (sort_direction == "desc" ? true : false)) if sort_column == "approved"
+    matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
     @matching_organizations = matching_organizations
   end
 
@@ -125,17 +125,17 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def pos_kind_for_organizations
     if params[:search_pos] == "with_pos"
-      return Organization.pos_kinds - Organization.no_pos_kinds
+      Organization.pos_kinds - Organization.no_pos_kinds
     elsif params[:search_pos] == "without_pos"
-      return Organization.no_pos_kinds
+      Organization.no_pos_kinds
     else
       params[:search_pos]
     end
   end
 
   def permitted_locations_params
-    %i(name zipcode city state_id _destroy id country_id street phone email publicly_visible
-       impound_location default_impound_location)
+    %i[name zipcode city state_id _destroy id country_id street phone email publicly_visible
+      impound_location default_impound_location]
   end
 
   def find_organization
@@ -146,10 +146,10 @@ class Admin::OrganizationsController < Admin::BaseController
     @organization = Organization.unscoped.friendly_find(params[:id])
     if @organization.present?
       flash[:error] = "This organization is deleted! Things might not work correctly in here"
-      return true
+      true
     else
       flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to admin_organizations_url and return
+      redirect_to(admin_organizations_url) && return
     end
   end
 end

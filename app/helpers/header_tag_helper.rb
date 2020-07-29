@@ -62,7 +62,7 @@ module HeaderTagHelper
       "fb:app_id" => "223376277803071",
       "twitter:card" => (page_image == DEFAULT_IMAGE ? "summary" : "summary_large_image"),
       "twitter:creator" => "@bikeindex",
-      "twitter:site" => "@bikeindex",
+      "twitter:site" => "@bikeindex"
     }
   end
 
@@ -73,20 +73,20 @@ module HeaderTagHelper
   def main_header_tags
     [
       tag(:meta, charset: "utf-8"),
-      tag(:meta, "http-equiv" => "Content-Language", content: "en"),
-      tag(:meta, "http-equiv" => "X-UA-Compatible", content: "IE=edge"),
+      tag(:meta, "http-equiv" => "Content-Language", :content => "en"),
+      tag(:meta, "http-equiv" => "X-UA-Compatible", :content => "IE=edge"),
       tag(:meta, name: "viewport", content: "width=device-width"),
       content_tag(:title, page_title),
       tag(:meta, name: "description", content: page_description),
       tag(:link, rel: "shortcut icon", href: "/fav.ico"),
       tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple_touch_icon.png"),
-      csrf_meta_tags,
+      csrf_meta_tags
     ]
   end
 
   def my_accounts_header_tags
     if action_name == "show"
-      self.page_title = (current_user && current_user.name) ? "#{current_user.name} on Bike Index" : "Your bikes"
+      self.page_title = current_user&.name ? "#{current_user.name} on Bike Index" : "Your bikes"
     end
     default_header_tag_array
   end
@@ -124,7 +124,7 @@ module HeaderTagHelper
       elsif @bike.stock_photo_url.present?
         self.page_image = @bike.stock_photo_url
       end
-      if @bike.owner && @bike.owner.show_twitter && @bike.owner.twitter.present?
+      if @bike.owner&.show_twitter && @bike.owner.twitter.present?
         meta_overrides["twitter:creator"] = "@#{@bike.owner.twitter}"
       end
     end
@@ -133,7 +133,7 @@ module HeaderTagHelper
 
   def landing_pages_header_tags
     if current_organization
-      args = { default: "", organization: current_organization.short_name }
+      args = {default: "", organization: current_organization.short_name}
       self.page_title = translation_title(translation_args: args)
       self.page_description = translation_description(translation_args: args)
     end
@@ -160,7 +160,7 @@ module HeaderTagHelper
     meta_overrides = {
       "og:type" => "article",
       "og:published_time" => @blog.published_at.utc,
-      "og:modified_time" => @blog.updated_at.utc,
+      "og:modified_time" => @blog.updated_at.utc
     }
     meta_overrides["twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
     if @blog.index_image.present?
@@ -179,7 +179,7 @@ module HeaderTagHelper
     meta_overrides = {
       "og:type" => "article",
       "og:published_time" => @blog.created_at.utc,
-      "og:modified_time" => @blog.updated_at.utc,
+      "og:modified_time" => @blog.updated_at.utc
     }
     if @blog.index_image.present?
       self.page_image = @blog.index_image_lg
@@ -191,7 +191,7 @@ module HeaderTagHelper
 
   private
 
-  SPECIAL_CONTROLLERS = %w(bikes welcome my_accounts news users landing_pages).freeze
+  SPECIAL_CONTROLLERS = %w[bikes welcome my_accounts news users landing_pages].freeze
   DEFAULT_IMAGE = "/bike_index.png".freeze
 
   def default_header_tag_array(meta_overrides = {})
@@ -199,8 +199,8 @@ module HeaderTagHelper
   end
 
   def default_translation_args
-    return { default: "" } unless controller_namespace == "organized"
-    { default: "", organization: current_organization.short_name }
+    return {default: ""} unless controller_namespace == "organized"
+    {default: "", organization: current_organization.short_name}
   end
 
   def translation_title(location: nil, translation_args: default_translation_args)
@@ -237,7 +237,7 @@ module HeaderTagHelper
       new: "New",
       edit: "Edit",
       show: "View",
-      create: "Created",
+      create: "Created"
     }.as_json.freeze[action_name]
   end
 

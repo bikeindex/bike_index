@@ -9,7 +9,7 @@ FactoryBot.define do
     factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
       factory :user_bikehub_signup do
-        partner_data { { sign_up: "bikehub" } }
+        partner_data { {sign_up: "bikehub"} }
       end
       factory :admin do
         accepted_vendor_terms_of_service { true }

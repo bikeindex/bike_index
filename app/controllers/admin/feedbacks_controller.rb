@@ -6,7 +6,7 @@ class Admin::FeedbacksController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
-                                   .page(page).per(per_page)
+      .page(page).per(per_page)
   end
 
   def show
@@ -40,7 +40,7 @@ class Admin::FeedbacksController < Admin::BaseController
   end
 
   def available_feedbacks
-    available_feedbacks ||= matching_feedbacks.where(created_at: @time_range)
+    matching_feedbacks.where(created_at: @time_range)
   end
 
   # Override earliest period date, to use 1 week before first feedback created

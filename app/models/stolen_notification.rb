@@ -16,14 +16,15 @@ class StolenNotification < ApplicationRecord
   def permitted_send?
     return false unless bike.contact_owner?(sender)
     return true if sender.send_unstolen_notifications?
-    sender.sent_stolen_notifications.count < 2 or sender.can_send_many_stolen_notifications
+    (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
   end
 
   def unstolen_blocked?
     !bike.stolen? && !bike.contact_owner?(sender)
   end
 
-  def send_dates_parsed # Required for compatibility with rails 3 & 4
+  # Required for compatibility with rails 3 & 4
+  def send_dates_parsed
     return [] unless send_dates
     send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates
   end

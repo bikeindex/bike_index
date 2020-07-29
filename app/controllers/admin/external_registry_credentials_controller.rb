@@ -22,7 +22,8 @@ class Admin::ExternalRegistryCredentialsController < Admin::BaseController
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @external_registry_credential.update(external_registry_credential_params)

@@ -37,9 +37,9 @@ RSpec.describe GetManufacturerLogoWorker, type: :job do
     local_image = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
     manufacturer = FactoryBot.create(:manufacturer, logo: local_image, website: "http://example.com")
     expect(manufacturer.logo).to be_present
-    expect do
+    expect {
       described_class.new.perform
-    end.to change(described_class.jobs, :count).by 1
+    }.to change(described_class.jobs, :count).by 1
     described_class.drain
     manufacturer.reload
     expect(manufacturer.logo).to be_present

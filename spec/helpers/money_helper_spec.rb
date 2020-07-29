@@ -1,4 +1,3 @@
-# coding: utf-8
 require "rails_helper"
 
 RSpec.describe MoneyHelper, type: :helper do
@@ -27,7 +26,7 @@ RSpec.describe MoneyHelper, type: :helper do
 
     context "given the current locale is set to an unavailable locale" do
       it "returns the alphabetic_code for the default locale's currency" do
-        I18n.with_locale(:"unavailable") do
+        I18n.with_locale(:unavailable) do
           expect { default_currency }.to raise_error(I18n::MissingTranslationData)
         end
       end

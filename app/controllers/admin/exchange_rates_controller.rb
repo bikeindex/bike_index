@@ -25,7 +25,8 @@ class Admin::ExchangeRatesController < Admin::BaseController
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @exchange_rate.update(exchange_rate_params)
@@ -39,7 +40,7 @@ class Admin::ExchangeRatesController < Admin::BaseController
   def destroy
     exchange_rate = ExchangeRate.find_by(id: params[:id])
 
-    if !exchange_rate&.destroy
+    unless exchange_rate&.destroy
       flash[:error] = "Could not delete exchange rate."
     end
 

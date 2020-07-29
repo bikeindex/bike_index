@@ -42,7 +42,9 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   # Because we start with alpha ordering
-  def default_direction; "asc" end
+  def default_direction
+    "asc"
+  end
 
   def permitted_update_parameters
     permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)

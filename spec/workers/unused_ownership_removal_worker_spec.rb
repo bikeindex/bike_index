@@ -12,9 +12,9 @@ RSpec.describe UnusedOwnershipRemovalWorker, type: :job do
   it "makes non existent ownerships not current" do
     Sidekiq::Worker.clear_all
     ownership = Ownership.create(owner_email: "something@d.com", creator_id: 69, bike_id: 69, current: true)
-    expect do
+    expect {
       described_class.perform_async
-    end.to change(described_class.jobs, :count).by 1
+    }.to change(described_class.jobs, :count).by 1
     described_class.drain
     ownership.reload
     expect(ownership.current).to be_falsey

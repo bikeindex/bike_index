@@ -18,13 +18,13 @@ def expect_hashes_to_match(hash1, hash2, inside = nil)
   if hash2.is_a?(Hash)
     hash2 = hash2.with_indifferent_access
     matching_errors = hash1.map { |k, v| match_hash_recursively(k, v, hash2[k], inside) }
-                           .flatten.compact
+      .flatten.compact
     # Make sure we've matched all the keys in the target hash
     unless hash2.keys & hash1.keys == hash2.keys
-      matching_errors += [{ inside: inside, key: "key mismatch", value: "expected [#{hash2.keys.sort.join(", ")}],\n     got [#{hash1.keys.sort.join(", ")}]" }]
+      matching_errors += [{inside: inside, key: "key mismatch", value: "expected [#{hash2.keys.sort.join(", ")}],\n     got [#{hash1.keys.sort.join(", ")}]"}]
     end
   else
-    matching_errors = [{ inside: inside, key: "invalid hash", value: "expected a hash, got '#{hash2}'" }]
+    matching_errors = [{inside: inside, key: "invalid hash", value: "expected a hash, got '#{hash2}'"}]
   end
   # Recurse out if still inside things
   return matching_errors unless inside.blank?
@@ -37,10 +37,10 @@ def expect_hashes_to_match(hash1, hash2, inside = nil)
   matching_errors.compact.map { |e| e[:inside] }.uniq.each do |inside_level|
     puts inside_level.present? ? "#{inside_level}:" : "Top level:"
     # Grab the matching insideness errors, turn key and values into a hash to make it better visible
-    msg = matching_errors.map do |merror|
+    msg = matching_errors.map { |merror|
       next unless merror[:inside] == inside_level
       [merror[:key], merror[:value]]
-    end.compact.to_h
+    }.compact.to_h
     pp msg
   end
   # give pretty format for failure if possible >
@@ -68,5 +68,5 @@ def match_hash_recursively(key, value, hash2_value, inside)
       raise "Unable to match array #{key} #{"- inside #{inside}" if inside.present?} - to non-array"
     end
   end
-  value.to_s == hash2_value.to_s ? nil : { inside: inside, key: key, value: value }
+  value.to_s == hash2_value.to_s ? nil : {inside: inside, key: key, value: value}
 end

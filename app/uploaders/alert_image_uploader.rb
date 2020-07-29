@@ -13,7 +13,7 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def extension_white_list
-    %w(jpg jpeg gif png tiff tif)
+    %w[jpg jpeg gif png tiff tif]
   end
 
   process :fix_exif_rotation

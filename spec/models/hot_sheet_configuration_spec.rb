@@ -69,9 +69,9 @@ RSpec.describe HotSheetConfiguration, type: :model do
       let(:send_seconds) { Time.current.in_time_zone(timezone).seconds_since_midnight + 100 }
       let(:hot_sheet_configuration) do
         FactoryBot.create(:hot_sheet_configuration,
-                          send_seconds_past_midnight: send_seconds,
-                          timezone_str: "America/Halifax",
-                          is_on: true)
+          send_seconds_past_midnight: send_seconds,
+          timezone_str: "America/Halifax",
+          is_on: true)
       end
       it "is falsey" do
         expect(hot_sheet_configuration.time_in_zone.to_i).to be_within(1).of Time.current.utc.to_i # OMG Time math is so hard

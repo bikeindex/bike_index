@@ -77,7 +77,7 @@ module Organized
 
     def avery_export_parameters
       params.require(:export).permit(:timezone, :start_at, :end_at, :bike_code_start, :custom_bike_ids)
-            .merge(avery_export: true)
+        .merge(avery_export: true)
     end
 
     def find_export
@@ -100,7 +100,7 @@ module Organized
     def ensure_access_to_exports!
       return true if current_organization.enabled?("csv_exports") || current_user.superuser?
       flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
+      redirect_to(organization_bikes_path(organization_id: current_organization.to_param)) && return
     end
   end
 end

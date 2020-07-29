@@ -58,17 +58,23 @@ module Geocodeable
       city && obj.city,
       [
         state && obj.state&.abbreviation,
-        zipcode && obj.zipcode,
+        zipcode && obj.zipcode
       ].reject(&:blank?).join(" "),
-      country_name,
+      country_name
     ].reject(&:blank?).join(", ")
   end
 
-  def address(**kwargs); Geocodeable.address(self, **kwargs) end
+  def address(**kwargs)
+    Geocodeable.address(self, **kwargs)
+  end
 
-  def without_location?; latitude.blank? end
+  def without_location?
+    latitude.blank?
+  end
 
-  def with_location?; !without_location? end
+  def with_location?
+    !without_location?
+  end
 
   # Should the receiving object be geocoded?
   #
@@ -88,7 +94,9 @@ module Geocodeable
       .any? { |col| public_send("#{col}_changed?") }
   end
 
-  def address_present?; [street, city, zipcode].any?(&:present?) end
+  def address_present?
+    [street, city, zipcode].any?(&:present?)
+  end
 
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_data
@@ -100,19 +108,19 @@ module Geocodeable
 
   def bike_index_geocode
     # Only geocode if there is specific location information
-    if address_present?
-      self.attributes = Geohelper.coordinates_for(address) || {}
+    self.attributes = if address_present?
+      Geohelper.coordinates_for(address) || {}
     else
-      self.attributes = { latitude: nil, longitude: nil }
+      {latitude: nil, longitude: nil}
     end
   end
 
   # default address hash. Probably could be used more often/better
   def address_hash
     attributes.slice("street", "city", "zipcode", "latitude", "longitude")
-              .merge(state: state&.abbreviation, country: country&.iso)
-              .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
-              .with_indifferent_access
+      .merge(state: state&.abbreviation, country: country&.iso)
+      .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
+      .with_indifferent_access
   end
 
   # Override assignment to enable friendly finding state and country
@@ -126,5 +134,7 @@ module Geocodeable
     self.country = Country.fuzzy_find(val)
   end
 
-  def metric_units?; country.blank? || !country.united_states? end
+  def metric_units?
+    country.blank? || !country.united_states?
+  end
 end

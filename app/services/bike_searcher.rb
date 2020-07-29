@@ -30,7 +30,7 @@ class BikeSearcher
     serial_matcher = /s#[^#]*#/i
     query.gsub!(serial_matcher) do |match|
       # Set the serial to the match, with the first part chopped and the last part chopped
-      i_params[:serial] = match.gsub(/\As#/, "").gsub(/#\z/, "")
+      i_params[:serial] = match.delete_prefix("s#").delete_suffix("#")
       "" # remove it from query
     end
     i_params.merge(query: query)
@@ -53,11 +53,11 @@ class BikeSearcher
       @color_ids.each { |c_id| items << Color.find(c_id).autocomplete_result_hash }
     end
     if @params[:serial].present?
-      items << { id: "serial", search_id: "s##{@params[:serial]}#", text: @params[:serial] }.as_json
+      items << {id: "serial", search_id: "s##{@params[:serial]}#", text: @params[:serial]}.as_json
     end
     if @params[:query]
       stripped_query.split(",").reject(&:blank?)
-        .each { |q| items << { search_id: q, text: q }.as_json }
+        .each { |q| items << {search_id: q, text: q}.as_json }
     end
     items
   end
@@ -69,7 +69,7 @@ class BikeSearcher
   end
 
   def is_proximity
-    return false if @params[:non_proximity] && @params[:non_proximity].present?
+    return false if @params[:non_proximity]&.present?
     params[:proximity].present?
   end
 
@@ -81,7 +81,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
-    @bikes = (stolenness == "stolen") ? bikes.stolen : bikes.non_stolen
+    @bikes = stolenness == "stolen" ? bikes.stolen : bikes.non_stolen
   end
 
   def parsed_attributes
@@ -94,7 +94,7 @@ class BikeSearcher
 
   def matching_query(bikes)
     return nil unless @params[:query].present?
-    @bikes = bikes.text_search(stripped_query.gsub(",", " "))
+    @bikes = bikes.text_search(stripped_query.tr(",", " "))
     @bikes
   end
 
@@ -108,13 +108,13 @@ class BikeSearcher
   def matching_manufacturer(bikes)
     if @params[:manufacturer].present?
       manufacturer = Manufacturer.friendly_find(@params[:manufacturer])
-      if manufacturer.present?
-        @params[:manufacturer_id] = manufacturer.id
+      @params[:manufacturer_id] = if manufacturer.present?
+        manufacturer.id
       else
-        @params[:manufacturer_id] = 0
+        0
       end
     end
-    if @params[:query] && @params[:query].match(/(,?m_\d+)/)
+    if @params[:query]&.match(/(,?m_\d+)/)
       @params[:manufacturer_id] = @params[:query].match(/(,?m_\d+)/)[0].gsub(/,?m_/, "")
     end
     @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
@@ -124,8 +124,8 @@ class BikeSearcher
   def matching_colors(bikes)
     if @params[:colors].present?
       @color_ids = @params[:colors].split(",")
-        .collect { |c| Color.friendly_find(c).id if Color.friendly_find(c) }
-    elsif @params[:query] && @params[:query].match(/(,?c_\d+)/)
+        .collect { |c| Color.friendly_find(c)&.id }
+    elsif @params[:query]&.match(/(,?c_\d+)/)
       @color_ids = @params[:query].scan(/(,?c_\d+)/).flatten
         .map { |c| c.gsub(/(,?c_)/, "") }
     end
@@ -205,7 +205,7 @@ class BikeSearcher
     matching_manufacturer(@bikes)
     matching_colors(@bikes)
     matching_query(@bikes)
-    result = { non_stolen: @bikes.non_stolen.count }
+    result = {non_stolen: @bikes.non_stolen.count}
     if @params[:serial].present?
       result[:close_serials] = fuzzy_find_serial.count
     end

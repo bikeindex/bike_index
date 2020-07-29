@@ -11,7 +11,7 @@ RSpec.describe FileCacheMaintainer do
         "filename" => "#{t}_all_stolen_cache.json",
         "daily" => true,
         "updated_at" => t.to_s,
-        "description" => nil,
+        "description" => nil
       }
       expect(FileCacheMaintainer.cached_all_stolen).to eq(target)
     end
@@ -20,7 +20,7 @@ RSpec.describe FileCacheMaintainer do
   describe "blocklist_ids" do
     it "gets and sets the ids" do
       FileCacheMaintainer.reset_blocklist_ids([1, 1, 2, 4, "https://bikeindex.org/admin/bikes/6"])
-      expect(FileCacheMaintainer.blocklist).to eq %w(1 2 4 6)
+      expect(FileCacheMaintainer.blocklist).to eq %w[1 2 4 6]
     end
     it "doesn't break if it's empty" do
       FileCacheMaintainer.reset_blocklist_ids([])
