@@ -12,7 +12,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
       frame_maker: true,
       open_year: 1992,
       close_year: 89898,
-      description: "new description",
+      description: "new description"
     }
   end
 
@@ -26,7 +26,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, params: { id: subject.slug }
+      get :show, params: {id: subject.slug}
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
@@ -35,14 +35,14 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
   describe "edit" do
     context "slug" do
       it "renders" do
-        get :edit, params: { id: subject.slug }
+        get :edit, params: {id: subject.slug}
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
     end
     context "id" do
       it "renders" do
-        get :edit, params: { id: subject.id }
+        get :edit, params: {id: subject.id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -51,7 +51,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "update" do
     it "updates available attributes" do
-      put :update, params: { id: subject.to_param, manufacturer: permitted_attributes }
+      put :update, params: {id: subject.to_param, manufacturer: permitted_attributes}
       subject.reload
       permitted_attributes.each do |attribute, val|
         pp attribute unless subject.send(attribute) == val
@@ -63,9 +63,9 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
   describe "create" do
     it "creates with available attributes" do
       expect(Manufacturer.where(name: "new name and things").count).to eq 0
-      expect do
-        post :create, params: { manufacturer: permitted_attributes }
-      end.to change(Manufacturer, :count).by 1
+      expect {
+        post :create, params: {manufacturer: permitted_attributes}
+      }.to change(Manufacturer, :count).by 1
       target = Manufacturer.where(name: "new name and things").first
       permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
     end

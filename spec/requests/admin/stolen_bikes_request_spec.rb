@@ -71,7 +71,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         ownership = FactoryBot.create(:ownership)
         bike = ownership.bike
-        put "#{base_url}/#{bike.id}", params: { bike: { serial_number: "stuff" } }
+        put "#{base_url}/#{bike.id}", params: {bike: {serial_number: "stuff"}}
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(flash[:success]).to be_present
       end
@@ -80,7 +80,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         describe "regenerate_alert_image" do
           it "regenerates_alert_image" do
             expect(stolen_record.alert_image).to be_blank
-            put "#{base_url}/#{bike.id}", params: { public_image_id: public_image.id, update_action: "regenerate_alert_image"  }
+            put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "regenerate_alert_image"}
             expect(response).to redirect_to(:edit_admin_stolen_bike)
             expect(flash[:success]).to be_present
             stolen_record.reload
@@ -90,7 +90,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         describe "delete image" do
           it "deletes image" do
             expect(bike.public_images.count).to eq 1
-            put "#{base_url}/#{bike.id}", params: { public_image_id: public_image.id, update_action: "delete"  }
+            put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "delete"}
             expect(response).to redirect_to(:edit_admin_stolen_bike)
             expect(flash[:success]).to be_present
             bike.reload

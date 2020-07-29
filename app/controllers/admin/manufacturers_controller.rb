@@ -49,11 +49,10 @@ class Admin::ManufacturersController < Admin::BaseController
     if params[:file]
       Manufacturer.import(params[:file])
       flash[:success] = "Manufacturers imported"
-      redirect_to admin_manufacturers_url
     else
       flash[:notice] = "You gotta choose a file to import!"
-      redirect_to admin_manufacturers_url
     end
+    redirect_to admin_manufacturers_url
   end
 
   protected

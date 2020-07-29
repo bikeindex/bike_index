@@ -8,10 +8,10 @@ RSpec.describe Admin::BikesController, type: :request do
     include_context :request_spec_logged_in_as_superuser
     describe "destroy" do
       it "destroys the bike" do
-        ownership = bike.current_ownership
-        expect do
+        bike.current_ownership
+        expect {
           delete "#{base_url}/#{bike.id}"
-        end.to change(Bike, :count).by(-1)
+        }.to change(Bike, :count).by(-1)
         expect(response).to redirect_to(:admin_bikes)
         expect(flash[:success]).to match(/deleted/i)
         expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
@@ -24,9 +24,9 @@ RSpec.describe Admin::BikesController, type: :request do
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
-          expect do
-            put "#{base_url}/#{bike.id}", params: { bike: { owner_email: "new@example.com", skip_email: "1" } }
-          end.to change(Ownership, :count).by 1
+          expect {
+            put "#{base_url}/#{bike.id}", params: {bike: {owner_email: "new@example.com", skip_email: "1"}}
+          }.to change(Ownership, :count).by 1
         end
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(flash[:success]).to be_present
@@ -45,9 +45,9 @@ RSpec.describe Admin::BikesController, type: :request do
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
-            expect do
-              put "#{base_url}/#{bike.id}", params: { bike: { owner_email: "new@example.com", skip_email: "false" } }
-            end.to change(Ownership, :count).by 1
+            expect {
+              put "#{base_url}/#{bike.id}", params: {bike: {owner_email: "new@example.com", skip_email: "false"}}
+            }.to change(Ownership, :count).by 1
           end
           expect(ActionMailer::Base.deliveries.count).to eq 1
           expect(flash[:success]).to be_present

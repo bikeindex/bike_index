@@ -32,7 +32,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
       let(:timezone) { "America/Los_Angeles" }
       let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
       it "renders, sets timezone from params" do
-        get :index, params: { timezone: timezone }
+        get :index, params: {timezone: timezone}
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
         expect(session[:timezone]).to eq timezone
@@ -54,7 +54,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
       context "passing nonsense timezone" do
         it "doesn't set the timezone" do
           session[:timezone] = timezone
-          get :index, params: { timezone: "party-zone" }
+          get :index, params: {timezone: "party-zone"}
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(session[:timezone]).to be_blank
@@ -87,7 +87,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
         t = Time.current
         FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", t)
         # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
-        blocklist = %w(1010101 2 4 6)
+        blocklist = %w[1010101 2 4 6]
         FileCacheMaintainer.reset_blocklist_ids(blocklist)
         get :tsvs
         expect(response.code).to eq("200")
@@ -99,7 +99,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
     describe "update_tsv_blocklist" do
       it "renders and updates" do
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
-        put :update_tsv_blocklist, params: { blocklist: ids }
+        put :update_tsv_blocklist, params: {blocklist: ids}
         expect(FileCacheMaintainer.blocklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
       end
     end
