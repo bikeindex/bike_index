@@ -9,7 +9,7 @@ RSpec.describe Organized::AppointmentsController, type: :request do
   let(:appointment_configuration) { location.appointment_configuration }
 
   describe "create" do
-    let(:appointment_params) { { name: "Sarah h.", email: "something@stuff.com", reason: "Service", location_id: location.id, status: "on_deck" } }
+    let(:appointment_params) { {name: "Sarah h.", email: "something@stuff.com", reason: "Service", location_id: location.id, status: "on_deck"} }
     it "creates and assigns the appointment" do
       current_organization.reload
       location.reload
@@ -17,16 +17,16 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       expect(location.appointments.count).to eq 0
       expect(appointment_configuration.reasons.include?(appointment_params[:reason])).to be_truthy
       Sidekiq::Worker.clear_all
-      expect do
-        post base_url, params: { organization_id: current_organization.to_param, appointment: appointment_params }
-      end.to change(Appointment, :count).by 1
+      expect {
+        post base_url, params: {organization_id: current_organization.to_param, appointment: appointment_params}
+      }.to change(Appointment, :count).by 1
       expect(LocationAppointmentsQueueWorker.jobs.count).to eq 1
       location.reload
       current_organization.reload
       expect(location.appointments.count).to eq 1
       new_appointment = location.appointments.last
 
-      expect(response).to redirect_to(organization_line_path(location.to_param, organization_id: current_organization.to_param))
+      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
       expect(flash[:success]).to be_present
 
       expect(new_appointment.status).to eq "on_deck"
@@ -41,13 +41,13 @@ RSpec.describe Organized::AppointmentsController, type: :request do
 
       # It also can create an appointment without an email
       # squeezing in this test here because idgaf
-      expect do
+      expect {
         post base_url, params: {
-                         organization_id: current_organization.to_param,
-                         appointment: appointment_params.merge(email: " ", status: ""),
-                       }
-      end.to change(Appointment, :count).by 1
-      expect(response).to redirect_to(organization_line_path(location.to_param, organization_id: current_organization.to_param))
+          organization_id: current_organization.to_param,
+          appointment: appointment_params.merge(email: " ", status: "")
+        }
+      }.to change(Appointment, :count).by 1
+      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
       expect(flash[:success]).to be_present
 
       new_appointment2 = Appointment.last
@@ -58,11 +58,11 @@ RSpec.describe Organized::AppointmentsController, type: :request do
   describe "update" do
     it "updates with a new status" do
       expect(appointment.appointment_updates.count).to eq 0
-      expect do
-        put "#{base_url}/#{appointment.id}", params: { status: "being_helped" }
-      end.to change(AppointmentUpdate, :count).by 1
+      expect {
+        put "#{base_url}/#{appointment.id}", params: {status: "being_helped"}
+      }.to change(AppointmentUpdate, :count).by 1
       expect(flash[:success]).to be_present
-      expect(response).to redirect_to(organization_line_path(location.to_param, organization_id: current_organization.to_param))
+      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
 
       appointment.reload
       expect(appointment.status).to eq "being_helped"

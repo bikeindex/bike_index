@@ -57,6 +57,25 @@ RSpec.describe "organizations routing", type: :routing do
         )
       end
     end
+    describe "operate_lines" do
+      it "routes to operate_lines" do
+        expect(get: "/o/university/operate_lines").to route_to(
+          controller: "organized/operate_lines",
+          action: "index",
+          organization_id: "university"
+        )
+      end
+      context "update" do
+        it "routes to operate_lines" do
+          expect(patch: "/o/university/operate_lines/12").to route_to(
+            controller: "organized/operate_lines",
+            action: "update",
+            organization_id: "university",
+            id: "12"
+          )
+        end
+      end
+    end
   end
 
   context "legacy embed" do
@@ -88,26 +107,18 @@ RSpec.describe "organizations routing", type: :routing do
     end
   end
 
-  describe "org_public module" do # At least for now...
-    it "routes to walkrightup" do
-      expect(get: "/bike_shop/walkrightup").to route_to(
-        controller: "org_public/walkrightup",
+  describe "organization_public module" do # At least for now...
+    it "routes to line" do
+      expect(get: "/bike_shop/line").to route_to(
+        controller: "organization_public/lines",
         action: "show",
         organization_id: "bike_shop"
       )
     end
-    context "capitals" do
-      it "routes to walkrightup" do
-        expect(get: "/bike_shop/WalkRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-        # TODO: ideally, these would work too - but I don't know how :(
-        # expect(get: "/bike_shop/WALKRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-        # expect(get: "/bike_shop/WALK-Right-Up").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-      end
-    end
     describe "appointment" do
       it "routes to appointment" do
         expect(get: "/california-bikes/customer_appointments/12").to route_to(
-          controller: "org_public/customer_appointments",
+          controller: "organization_public/customer_appointments",
           action: "show",
           organization_id: "california-bikes",
           id: "12"

@@ -1,11 +1,11 @@
 module Organized
-  class LinesController < Organized::BaseController
+  class OperateLinesController < Organized::BaseController
     before_action :ensure_access_to_appointments!
     before_action :assign_current_location, except: [:index]
 
     def index
       if current_location.present?
-        redirect_to organization_line_path(current_location.to_param, organization_id: current_organization.to_param) and return
+        redirect_to(organization_operate_line_path(current_location.to_param, organization_id: current_organization.to_param)) && return
       end
     end
 
@@ -29,7 +29,7 @@ module Organized
       else
         flash[:error] = "Unknown update action!"
       end
-      redirect_to organization_line_path(current_location.to_param, organization_id: current_organization.to_param)
+      redirect_to organization_operate_line_path(current_location.to_param, organization_id: current_organization.to_param)
     end
 
     private

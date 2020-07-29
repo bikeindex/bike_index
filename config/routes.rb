@@ -335,7 +335,9 @@ Rails.application.routes.draw do
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
-    resources :lines, only: %i[index show update]
+    resources :operate_lines, only: %i[index show edit update] do
+      member { get :shop_display }
+    end
     resources :appointments, only: %i[create update]
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do
@@ -357,9 +359,8 @@ Rails.application.routes.draw do
   end
 
   # This is the public organizations section
-  resources :organization, only: [], path: "", module: "org_public" do
-    resource :walkrightup, only: %i[show], controller: "walkrightup" # walkrightups is stupid
-    get "WalkRightUp", to: "walkrightup#show"
+  resources :organization, only: [], path: "", module: "organization_public" do
+    resource :line, only: %i[show]
     resources :customer_appointments, only: %i[show update create] do
       collection do
         post :set_current

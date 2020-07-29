@@ -5,7 +5,7 @@
       = current_location.name
     Virtual Line
     %em{ style: "font-size: 50%;" }
-      = link_to "customer view", organization_walkrightup_path(organization_id: current_organization.to_param, location_id: current_location.to_param)
+      = link_to "customer view", organization_line_path(organization_id: current_organization.to_param, location_id: current_location.to_param)
 
 .row.mt-4.mb-4
   .col-xs-6.mb-4
@@ -36,7 +36,7 @@
 
 - valid_update_statuses = [["Being helped", "being_helped"], ["Manually remove from line", "removed"], ["Left without being helped", "abandoned"], ["Page - they're needed", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Unable to find", "failed_to_find"]]
 -# Form needs to wrap the table to get the checked appointment ids
-= form_tag organization_line_path(current_location.to_param, organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :put, action: "update" do
+= form_tag organization_operate_line_path(current_location.to_param, organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :put, action: "update" do
 
   .showOnMultiSelect.collapse
     .row.mt-4

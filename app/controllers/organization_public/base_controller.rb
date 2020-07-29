@@ -1,4 +1,4 @@
-module OrgPublic
+module OrganizationPublic
   class BaseController < ApplicationController
     before_action :ensure_current_organization!
 

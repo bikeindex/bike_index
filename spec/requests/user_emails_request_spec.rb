@@ -53,12 +53,12 @@ RSpec.describe UserEmailsController, type: :request do
           expect(flash[:success]).to be_present
         end
         context "process merge" do
-          let(:state) { FactoryBot.create(:state, name: "Colorado", abbreviation: "CO", country: Country.united_states)}
-          let!(:membership) { FactoryBot.create(:membership, invited_email: "new_email@example.com")}
-          let(:bike) { FactoryBot.create(:bike, street: "123 main street", city: "Denver", state: state, country: Country.united_states)}
-          let!(:ownership) { FactoryBot.create(:ownership, owner_email: "new_email@example.com", bike: bike, creator: bike.creator)}
+          let(:state) { FactoryBot.create(:state, name: "Colorado", abbreviation: "CO", country: Country.united_states) }
+          let!(:membership) { FactoryBot.create(:membership, invited_email: "new_email@example.com") }
+          let(:bike) { FactoryBot.create(:bike, street: "123 main street", city: "Denver", state: state, country: Country.united_states) }
+          let!(:ownership) { FactoryBot.create(:ownership, owner_email: "new_email@example.com", bike: bike, creator: bike.creator) }
           let!(:appointment) { FactoryBot.create(:appointment, email: "new_email@example.com") }
-          let(:b_param) { FactoryBot.create(:b_param, created_bike: bike, params: { bike: { phone: "888.883.3232" }}) }
+          let(:b_param) { FactoryBot.create(:b_param, created_bike: bike, params: {bike: {phone: "888.883.3232"}}) }
           it "assigns the things" do
             expect(b_param.creator.id).to eq bike.creator.id
             expect(user_email.confirmed?).to be_falsey
@@ -72,9 +72,9 @@ RSpec.describe UserEmailsController, type: :request do
             expect(bike.b_params.pluck(:id)).to eq([b_param.id])
             expect(bike.phone).to eq "8888833232"
             Sidekiq::Worker.clear_all
-            Sidekiq::Testing.inline! {
+            Sidekiq::Testing.inline! do
               get "#{base_url}/#{user_email.id}/confirm?confirmation_token=#{user_email.confirmation_token}"
-            }
+            end
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_path
             user_email.reload
@@ -93,8 +93,8 @@ RSpec.describe UserEmailsController, type: :request do
 
           context "with existing user" do
             let(:old_user) { FactoryBot.create(:user_confirmed, email: "new_email@example.com") }
-            let!(:membership) { FactoryBot.create(:membership_claimed, user: old_user)}
-            let!(:ownership) { FactoryBot.create(:ownership_claimed, user: old_user, bike: bike)}
+            let!(:membership) { FactoryBot.create(:membership_claimed, user: old_user) }
+            let!(:ownership) { FactoryBot.create(:ownership_claimed, user: old_user, bike: bike) }
             let!(:appointment) { FactoryBot.create(:appointment, :claimed, user: old_user) }
             it "assigns the things" do
               expect(user_email.confirmed?).to be_falsey
@@ -103,9 +103,9 @@ RSpec.describe UserEmailsController, type: :request do
               expect(appointment.claimed?).to be_truthy
               expect(bike.user).to eq old_user
               Sidekiq::Worker.clear_all
-              Sidekiq::Testing.inline! {
+              Sidekiq::Testing.inline! do
                 get "#{base_url}/#{user_email.id}/confirm?confirmation_token=#{user_email.confirmation_token}"
-              }
+              end
               expect(flash[:success]).to be_present
               expect(response).to redirect_to edit_my_account_path
               user_email.reload

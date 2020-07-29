@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Organized::LinesController, type: :request do
+RSpec.describe Organized::OperateLinesController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
-  let(:base_url) { "/o/#{current_organization.to_param}/lines" }
+  let(:base_url) { "/o/#{current_organization.to_param}/operate_lines" }
   let(:appointment) { FactoryBot.create(:appointment, status: status, location: location, organization: current_organization) }
   let(:location) { FactoryBot.create(:location, :with_virtual_line_on) }
   let(:current_organization) { location.organization }
@@ -14,7 +14,7 @@ RSpec.describe Organized::LinesController, type: :request do
       expect(current_organization.locations.pluck(:id)).to eq([location.id])
       get base_url
       expect(assigns(:current_location)&.id).to eq location.id
-      expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
       expect(flash).to be_blank
     end
     context "with two locations" do
@@ -50,17 +50,17 @@ RSpec.describe Organized::LinesController, type: :request do
   describe "update" do
     let!(:appointment2) { FactoryBot.create(:appointment, status: "on_deck", organization: current_organization, location: location) }
     it "updates multiple appointments" do
-      expect do
+      expect {
         put "#{base_url}/#{location.to_param}", params: {
           status: "being_helped",
           organization: current_organization.to_param,
           ids: {
             appointment.id.to_s => appointment.id.to_s,
-            appointment2.id.to_s => appointment2.id.to_s,
+            appointment2.id.to_s => appointment2.id.to_s
           }
         }
-      end.to change(AppointmentUpdate, :count).by 2
-      expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+      }.to change(AppointmentUpdate, :count).by 2
+      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
       expect(flash[:success]).to be_present
       appointment.reload
       appointment2.reload
@@ -72,13 +72,13 @@ RSpec.describe Organized::LinesController, type: :request do
       expect(appointment.appointment_updates.last.organization_member?).to be_truthy
       expect(appointment2.appointment_updates.last.user_id).to eq current_user.id
       # updating with no ids doesn't break
-      expect do
+      expect {
         put "#{base_url}/#{location.to_param}", params: {
           status: "being_helped",
-          organization: current_organization.to_param,
+          organization: current_organization.to_param
         }
-      end.to_not change(AppointmentUpdate, :count)
-      expect(response).to redirect_to organization_line_path(location.to_param, organization_id: current_organization.to_param)
+      }.to_not change(AppointmentUpdate, :count)
+      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
       expect(flash[:notice]).to be_present
     end
   end

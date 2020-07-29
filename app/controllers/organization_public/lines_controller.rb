@@ -1,8 +1,8 @@
-module OrgPublic
-  class WalkrightupController < OrgPublic::BaseController
+module OrganizationPublic
+  class LinesController < OrganizationPublic::BaseController
     before_action :ensure_access_to_virtual_line!
 
-    layout "walkrightup"
+    layout "lines_public"
 
     def show
       @appointments_in_line = current_location.appointments.in_line

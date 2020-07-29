@@ -19,7 +19,7 @@
       - current_organization.locations.each do |location|
         %tr
           %td
-            = link_to location.name, organization_line_path(location.to_param, organization_id: current_organization)
+            = link_to location.name, organization_operate_line_path(location.to_param, organization_id: current_organization)
           %td
             - if location.virtual_line_on?
               %strong

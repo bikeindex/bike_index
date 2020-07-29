@@ -46,7 +46,7 @@
                     = active_link "#{passive_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
                   %li.divider-nav-item
                 - if passive_organization.appointment_functionality_enabled?
-                  = active_link t(".virtual_line"), organization_lines_path(organization_id: passive_organization.to_param), class: "nav-link", match_controller: true
+                  = active_link t(".virtual_line"), organization_operate_lines_path(organization_id: passive_organization.to_param), class: "nav-link", match_controller: true
                   %li.divider-nav-item
                 - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
                 %li

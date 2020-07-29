@@ -12,7 +12,7 @@ class AppointmentUpdate < ApplicationRecord
     removed: 7,
     abandoned: 8,
     being_helped: 10, # Another blank before, for potential later assignment
-    finished: 11,
+    finished: 11
   }.freeze
 
   CREATOR_KIND_ENUM = {

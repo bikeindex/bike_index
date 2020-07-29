@@ -93,7 +93,7 @@ RSpec.describe Location, type: :model do
         expect(location.next_line_number).to eq 1
       end
       context "with an appointment" do
-        let!(:appointment) { FactoryBot.create(:appointment, location: location, line_number: 42)}
+        let!(:appointment) { FactoryBot.create(:appointment, location: location, line_number: 42) }
         it "is the next number" do
           expect(location.virtual_line_on?).to be_truthy
           expect(location.last_line_number).to eq 42

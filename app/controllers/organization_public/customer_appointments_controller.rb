@@ -1,14 +1,16 @@
-module OrgPublic
-  class CustomerAppointmentsController < OrgPublic::BaseController
+module OrganizationPublic
+  class CustomerAppointmentsController < OrganizationPublic::BaseController
     # If a user has a link to an appointment, permit it - even if the org no longer has the functionality enabled
     before_action :find_appointment_and_redirect, only: [:show, :set_current]
     before_action :find_appointment, only: [:update]
 
     layout "customer_virtual_line"
 
-    def show; end
+    def show
+    end
 
-    def set_current; end
+    def set_current
+    end
 
     def create
       @appointment = Appointment.new(permitted_create_params)
@@ -20,7 +22,7 @@ module OrgPublic
       else
         flash[:error] = @appointment.errors.full_messages.to_sentence
       end
-      redirect_to walkrightup_route and return
+      redirect_to(lines_route) && return
     end
 
     def update
@@ -33,14 +35,14 @@ module OrgPublic
       else
         flash[:error] = "Unable to update because: #{@appointment.errors.full_messages.to_sentence}"
       end
-      redirect_to walkrightup_route
+      redirect_to lines_route
     end
 
     private
 
-    def walkrightup_route
-      organization_walkrightup_path(organization_id: current_organization.to_param,
-                                    location_id: current_appointment&.location&.to_param || current_location&.to_param)
+    def lines_route
+      organization_line_path(organization_id: current_organization.to_param,
+                             location_id: current_appointment&.location&.to_param || current_location&.to_param)
     end
 
     def find_appointment
@@ -57,7 +59,7 @@ module OrgPublic
         flash[:error] = "Unable to find that appointment!"
         current_appointment # Grab it if it's around, because at least something
       end
-      redirect_to walkrightup_route and return
+      redirect_to(lines_route) && return
     end
 
     def permitted_create_params
@@ -79,7 +81,7 @@ module OrgPublic
       {
         new_status: params.dig(:appointment, :status),
         updator_id: current_user&.id,
-        updator_kind: current_user.present? ? "signed_in_user" : "no_user",
+        updator_kind: current_user.present? ? "signed_in_user" : "no_user"
       }
     end
   end

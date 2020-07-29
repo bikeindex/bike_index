@@ -30,7 +30,7 @@ module Organized
     private
 
     def redirect_back_to_organized_line
-      redirect_back(fallback_location: organization_line_path(@appointment.location.to_param, organization_id: current_organization.to_param))
+      redirect_back(fallback_location: organization_operate_line_path(@appointment.location.to_param, organization_id: current_organization.to_param))
     end
 
     def find_appointment

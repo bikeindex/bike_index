@@ -5,8 +5,8 @@ module Organized
 
     def index
       if current_organization.locations.count == 1
-        redirect_to edit_organization_appointment_configuration_path(current_organization.locations.first.to_param,
-                                                                     organization_id: current_organization.to_param) and return
+        redirect_to(edit_organization_appointment_configuration_path(current_organization.locations.first.to_param,
+          organization_id: current_organization.to_param)) && return
       end
     end
 
