@@ -25,13 +25,13 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
     cache_key = ["stopheling.nl", endpoint, req_params]
 
     response_body =
-      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
-        response = conn.get(endpoint) do |req|
+      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) {
+        response = conn.get(endpoint) { |req|
           req.headers["Content-Type"] = "application/json;charset=UTF-8"
           req.params = req_params
-        end
+        }
         response.body
-      end
+      }
 
     results_from(response_body: response_body, request_params: req_params)
   end
@@ -65,7 +65,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         # Typically an HMAC key error message will be returned as a Hash.
         Honeybadger.notify("StopHeling API request failed", {
           error_class: self.class.to_s,
-          context: { request: request_params, response: response_body },
+          context: {request: request_params, response: response_body}
         })
       end
       []
@@ -90,14 +90,14 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
     "Bron" => :source,
     "BronNaam" => :source_name,
     "BronUniekID" => :source_unique_id,
-    "MatchType" => :match_type,
+    "MatchType" => :match_type
   }
 
   def translate_keys(result)
-    translated = result.map do |key, val|
+    translated = result.map { |key, val|
       t_key = KEY_TRANSLATION.fetch(key, key.underscore.tr(" ", "_").to_sym)
       [t_key, val]
-    end
+    }
 
     translated.to_h
   end

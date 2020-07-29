@@ -10,7 +10,7 @@ module FriendlyNameFindable
 
     def friendly_id_find(n)
       m = friendly_find(n)
-      m && m.id
+      m&.id
     end
   end
 end

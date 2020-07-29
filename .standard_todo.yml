@@ -9,8 +9,6 @@ ignore:
   - app/controllers/admin/dashboard_controller.rb
   - app/controllers/admin/exchange_rates_controller.rb
   - app/controllers/admin/exports_controller.rb
-  - app/controllers/admin/external_registry_bikes_controller.rb
-  - app/controllers/admin/external_registry_credentials_controller.rb
   - app/controllers/admin/feedbacks_controller.rb
   - app/controllers/admin/graphs_controller.rb
   - app/controllers/admin/mail_snippets_controller.rb
@@ -94,11 +92,7 @@ ignore:
   - app/models/bulk_import.rb
   - app/models/color.rb
   - app/models/component.rb
-  - app/models/concerns/bike_searchable.rb
-  - app/models/concerns/enumable.rb
-  - app/models/concerns/friendly_name_findable.rb
-  - app/models/concerns/geocodeable.rb
-  - app/models/concerns/money_formattable.rb
+  - app/models/concerns/geocodeable.rb # Because of ReturnInVoidContext
   - app/models/counts.rb
   - app/models/ctype.rb
   - app/models/customer_contact.rb
@@ -138,12 +132,6 @@ ignore:
   - app/models/wheel_size.rb
   - app/uploaders/alert_image_uploader.rb
   - app/uploaders/avatar_uploader.rb
-  - app/uploaders/bulk_import_uploader.rb
-  - app/uploaders/circular_image_uploader.rb
-  - app/uploaders/export_uploader.rb
-  - app/uploaders/image_uploader.rb
-  - app/uploaders/listicle_image_uploader.rb
-  - app/uploaders/partner_uploader.rb
   - spec/controllers/admin/ambassador_tasks_controller_spec.rb
   - spec/controllers/admin/bikes_controller_spec.rb
   - spec/controllers/admin/customer_contacts_controller_spec.rb
@@ -204,9 +192,6 @@ ignore:
   - spec/models/counts_spec.rb
   - spec/models/creation_state_spec.rb
   - spec/models/export_spec.rb
-  - spec/models/external_registry_bike/stop_heling_bike_spec.rb
-  - spec/models/external_registry_bike_spec.rb
-  - spec/models/external_registry_client/stop_heling_client_spec.rb
   - spec/models/graduated_notification_spec.rb
   - spec/models/hot_sheet_configuration_spec.rb
   - spec/models/integration_spec.rb
