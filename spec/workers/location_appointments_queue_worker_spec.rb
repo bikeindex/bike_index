@@ -4,25 +4,17 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do
-    let!(:appt1) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 45.minutes).to_i) }
-    let(:organization) { appt1.organization }
-    let(:location) { appt1.location }
-    let(:appointment_configuration) { FactoryBot.create(:appointment_configuration, organization: organization, location: location, customers_on_deck_count: 2) }
+    let!(:appt1) { FactoryBot.create(:appointment, status: "on_deck", line_number: 12, location: location) }
+    let(:location) { FactoryBot.create(:location, :with_virtual_line_on, customers_on_deck_count: 2) }
+    let(:appointment_configuration) { location.appointment_configuration }
     # Shuffle the order when they're actually created around a little bit
-    let!(:appt4) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 10.minutes).to_i, organization: organization, location: location) }
-    let!(:appt5) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 5.minutes).to_i, organization: organization, location: location) }
-    let!(:appt3) { FactoryBot.create(:appointment, status: "on_deck", line_entry_timestamp: (Time.current - 20.minutes).to_i, organization: organization, location: location) }
-    let!(:appt2) { FactoryBot.create(:appointment, line_entry_timestamp: (Time.current - 30.minutes).to_i, organization: organization, location: location) }
+    let!(:appt4) { FactoryBot.create(:appointment, status: "on_deck", line_number: 20, location: location) }
+    let!(:appt5) { FactoryBot.create(:appointment, line_number: 21, location: location) }
+    let!(:appt3) { FactoryBot.create(:appointment, status: "on_deck", line_number: 17, location: location) }
+    let!(:appt2) { FactoryBot.create(:appointment, line_number: 15, location: location) }
     it "sets the correct number of appointments on deck" do
-      expect(location.appointment_configuration).to be_blank
-      expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
       expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
-      # Doesn't change anything, because there is no appointment_configuration
-      instance.perform(location.id)
-      expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
-      expect(Appointment.in_line.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id, appt2.id, appt5.id])
-      # With appointment_configuration in place, it makes only 1 be on_deck
-      expect(appointment_configuration).to be_present
+      # There are more on deck than are permitted - so nothing changes
       expect {
         instance.perform(location.id)
       }.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
@@ -33,7 +25,7 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
       expect {
         instance.perform(location.id)
       }.to_not change(described_class.jobs, :count) # Ensure we aren't re-enqueueing
-      # Because organization has 2 on deck, it doesn't add another
+      # Because organization still has 2 on deck, it doesn't add another
       expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt4.id])
 
       # Try it with a larger customers on deck count
@@ -42,10 +34,11 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
       # Test the actual process to make sure it works out
       Sidekiq::Testing.inline! do
         expect(appt1.appointment_updates.count).to eq 0
-        # Put appt1 into paging
-        appt1.record_status_update!(new_status: "paging", updator_kind: "queue_worker")
-        expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt1.id, appt3.id, appt4.id])
-        expect(appt1.appointment_updates.count).to eq 1
+        # Put appt3 into paging
+        appt3.record_status_update!(new_status: "paging", updator_kind: "queue_worker")
+        expect(Appointment.paging_or_on_deck.pluck(:id)).to eq([appt3.id, appt1.id, appt4.id])
+        expect(appt3.appointment_updates.count).to eq 1
+        # Put appt1 into being helped
         appt1.record_status_update!(new_status: "being_helped") # customer kind
         expect(appt1.appointment_updates.count).to eq 2
         expect(appt1.being_helped?).to be_truthy
@@ -54,14 +47,14 @@ RSpec.describe LocationAppointmentsQueueWorker, type: :job do
         expect(appointment_update1.user_id).to be_blank
         expect(appointment_update1.creator_kind).to eq "no_user"
         expect(appointment_update1.customer_creator?).to be_truthy
-        expect(Appointment.paging_or_on_deck.line_ordered.pluck(:id)).to eq([appt2.id, appt3.id, appt4.id])
-        expect(Appointment.in_line.pluck(:id)).to eq([appt2.id, appt3.id, appt4.id, appt5.id])
-        # appt was updated because
+        # appt was updated because another appointment put into line
         appt2.reload
         expect(appt2.status).to eq "on_deck"
         expect(appt2.appointment_updates.count).to eq 1
         expect(appt2.appointment_updates.first.on_deck?).to be_truthy
         expect(appt2.appointment_updates.first.queue_worker?).to be_truthy
+        expect(Appointment.paging_or_on_deck.line_ordered.pluck(:id)).to eq([appt3.id, appt2.id, appt4.id])
+        expect(Appointment.in_line.pluck(:id)).to eq([appt3.id, appt2.id, appt4.id, appt5.id])
 
         # Put another one into paging
         appt2.record_status_update!(new_status: "paging", updator_kind: "organization_member", updator_id: 123)
