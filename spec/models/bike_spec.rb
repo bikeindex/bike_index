@@ -1166,7 +1166,7 @@ RSpec.describe Bike, type: :model do
       end
       it "returns the phone" do
         allow(bike).to receive(:first_ownership) { ownership }
-        expect(bike.phone).to eq "888.888.8888"
+        expect(bike.phone).to eq "8888888888"
       end
       context "not first ownerships" do
         it "is the users " do

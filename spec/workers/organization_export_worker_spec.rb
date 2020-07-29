@@ -185,7 +185,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         it "returns the expected values" do
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_falsey
-          expect(bike.phone).to eq "717.742.3423"
+          expect(bike.phone).to eq "7177423423"
           expect(bike.extra_registration_number).to eq "cool extra serial"
           expect(bike.organization_affiliation).to eq "community_member"
           expect(export.assign_bike_codes?).to be_truthy
@@ -243,7 +243,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike_sticker.user).to eq user
             expect(export.assign_bike_codes?).to be_falsey
             expect(export.headers).to eq Export.permitted_headers("include_paid")
-            expect(bike.phone).to eq "717.742.3423"
+            expect(bike.phone).to eq "7177423423"
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address).to eq target_address

@@ -947,7 +947,7 @@ RSpec.describe BikesController, type: :controller do
                   address: default_location[:address],
                   extra_registration_number: "XXXZZZ",
                   organization_affiliation: "employee",
-                  phone: "888.777.6666"
+                  phone: "(888) 777-6666"
                 }
               }
             }.to change(Bike, :count).by(1)
@@ -956,7 +956,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.creator_id).to eq user.id
             b_param.reload
             expect(b_param.created_bike_id).to eq bike.id
-            expect(b_param.phone).to eq "888.777.6666"
+            expect(b_param.phone).to eq "8887776666"
             bike_params.delete(:manufacturer_id)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
@@ -965,7 +965,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.registration_address).to eq target_address.as_json
             expect(bike.extra_registration_number).to eq "XXXZZZ"
             expect(bike.organization_affiliation).to eq "employee"
-            expect(bike.phone).to eq "888.777.6666"
+            expect(bike.phone).to eq "8887776666"
             user.reload
             expect(bike.owner).to eq user # NOTE: not bike user
             expect(user.phone).to be_nil # Because the phone doesn't set for the creator
