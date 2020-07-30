@@ -378,11 +378,13 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.password_reset_token).to be_present
         expect(user.auth_token_time("password_reset_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_expired?("password_reset_token")).to be_falsey
       end
-      it "uses input time" do
+      it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("password_reset_token", (Time.current - 121.minutes).to_i)
         expect(user.reload.auth_token_time("password_reset_token")).to be < (Time.current - 1.hours)
+        expect(user.auth_token_expired?("password_reset_token")).to be_truthy
       end
     end
 
@@ -395,12 +397,14 @@ RSpec.describe User, type: :model do
         user = User.new
         user.generate_auth_token("magic_link_token")
         expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
       it "uses input time, it returns the token" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("magic_link_token", (Time.current - 1.hour).to_i)
         user.reload
         expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+        expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
     end
   end
