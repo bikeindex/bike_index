@@ -199,7 +199,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < (Time.current - 1.hours)
+    auth_token_time(auth_token_type) < (Time.current - 2.hours)
   end
 
   def accepted_vendor_terms_of_service?
