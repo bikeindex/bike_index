@@ -68,10 +68,10 @@ module Organized
 
     def find_impound_record
       # NOTE: Uses display_id, not normal id, unless id starts with pkey-
-      if params[:id].start_with?("pkey-")
-        @impound_record = impound_records.find_by_id(params[:id].gsub("pkey-", ""))
+      @impound_record = if params[:id].start_with?("pkey-")
+        impound_records.find_by_id(params[:id].gsub("pkey-", ""))
       else
-        @impound_record = impound_records.find_by_display_id(params[:id])
+        impound_records.find_by_display_id(params[:id])
       end
       raise ActiveRecord::RecordNotFound unless @impound_record.present?
     end

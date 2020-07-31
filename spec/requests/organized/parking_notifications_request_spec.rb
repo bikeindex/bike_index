@@ -319,12 +319,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           }
         end
         expect(ParkingNotification.count).to eq 1
+        expect(ActionMailer::Base.deliveries.count).to eq 0
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
         expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason" # This should not have been bumped
         expect(parking_notification_initial.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification_initial.retrieved_by).to eq current_user
-        expect(ActionMailer::Base.deliveries.count).to eq 0
 
         expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
         expect(assigns(:notifications_repeated).pluck(:id)).to eq([parking_notification_initial.id])
@@ -334,7 +334,29 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
       end
       context "multiple parking notifications" do
-        it "marks both retrieved"
+        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
+        it "marks both retrieved" do
+          Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Testing.inline! do
+            post base_url, params: {
+              organization_id: current_organization.to_param,
+              kind: "mark_retrieved",
+              ids: "#{parking_notification_initial.id}, #{parking_notification2.id}"
+            }
+          end
+          expect(ParkingNotification.count).to eq 2
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+          parking_notification_initial.reload
+          expect(parking_notification_initial.current?).to be_falsey
+          expect(parking_notification_initial.retrieved_kind).to eq "organization_recovery"
+          expect(parking_notification_initial.retrieved_by).to eq current_user
+
+          parking_notification2.reload
+          expect(parking_notification2.current?).to be_falsey
+          expect(parking_notification2.retrieved_kind).to eq "organization_recovery"
+          expect(parking_notification2.retrieved_by).to eq current_user
+        end
       end
     end
     context "parking notification not active" do

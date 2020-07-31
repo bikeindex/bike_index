@@ -127,7 +127,7 @@ module Organized
         @redirect_location = organization_parking_notification_path(success_ids.first, organization_id: current_organization.to_param)
       end
       session[:notifications_repeated_ids] = @notifications_repeated.pluck(:id)
-      # If the notification was repeated, it can't also be failed (relevant for marking resolved)
+      # If the notification was repeated, it can't also be failed (relevant when marking resolved)
       session[:notifications_failed_resolved_ids] = notifications_failed_resolved_ids - session[:notifications_repeated_ids]
       @notifications_failed_resolved ||= ParkingNotification.where(id: session[:notifications_failed_resolved_ids])
       session[:repeated_kind] = kind
