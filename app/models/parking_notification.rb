@@ -83,6 +83,10 @@ class ParkingNotification < ActiveRecord::Base
     false
   end
 
+  def sent_at
+    email_success? ? created_at : nil
+  end
+
   # Get it unscoped, because unregistered_bike notifications
   def bike
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil

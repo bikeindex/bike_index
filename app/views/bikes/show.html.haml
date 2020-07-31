@@ -14,7 +14,7 @@
 
 
   - if current_user&.superuser
-    - if !@bike.created_by_parking_notification && @bike.user_hidden
+    - if !@bike.unregistered_parking_notification? && @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
         %small.less-strong

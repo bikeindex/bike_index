@@ -85,17 +85,21 @@ class BikeIndex.Init extends BikeIndex
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
 
-  displayLocalDate: (time, preciseTime = false) ->
+  displayLocalDate: (time, preciseTime = false, withPreposition = false) ->
     # Ensure we return if it's a big future day
     if time < window.tomorrow
       if time > window.today
-        return time.format("h:mma")
+        if withPreposition
+          return "at #{time.format("h:mma")}"
+        else
+          return time.format("h:mma")
       else if time > window.yesterday
         return "Yesterday #{time.format('h:mma')}"
     if time.year() == moment().year()
-      if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
+      str = if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
     else
-      if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
+      str = if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
+    "on #{str}"
 
   localizeTimes: ->
     window.localTimezone ||= moment.tz.guess()
@@ -116,7 +120,7 @@ class BikeIndex.Init extends BikeIndex
       return unless text.length > 0
       time = moment(text, moment.ISO_8601)
       return unless time.isValid
-      $this.text(displayLocalDate(time, $this.hasClass("preciseTime")))
+      $this.text(displayLocalDate(time, $this.hasClass("preciseTime"), $this.hasClass("withPreposition")))
 
     # Write timezone
     $(".convertTimezone").each ->

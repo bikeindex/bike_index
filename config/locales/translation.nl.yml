@@ -1727,6 +1727,9 @@ nl:
       you_have_already_marked_remaining: U heeft deze %{bike_type} al gemarkeerd als
         resterend
       you_have_already_marked_resolved: Je hebt deze melding als opgelost gemarkeerd
+      organization_sent_this_message: "%{org_name} heeft deze melding verzonden"
+      please_email_organization_with_questions_html: Stuur een e-mail naar %{email_link}
+        als u vragen heeft
     edit_accessories:
       add_a_component: Voeg een component toe
       other_handlebar_type: Ander type stuur
