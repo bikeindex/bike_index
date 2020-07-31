@@ -52,7 +52,7 @@
             %span.extended-col-info.d-block
               = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike, organization_id: current_organization.id)
           %em.small.extended-col-info.d-block.status-cell
-            #{status_display(parking_notification.status)} status
+            #{status_display(parking_notification.status)}
           - if parking_notification.resolved_at.present?
             %strong.small.extended-col-info.d-block
               - if parking_notification.impounded?

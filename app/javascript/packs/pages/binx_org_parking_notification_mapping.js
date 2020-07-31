@@ -201,9 +201,10 @@ export default class BinxAppOrgParkingNotificationMapping {
       record.user_display_name
     }</td><td class="hidden-sm-cells">${
       record.notification_number > 1 ? record.notification_number : ""
-    }</td><td class="hidden-sm-cells status-cell">${
-      record.status
-    }</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
+    }</td><td class="hidden-sm-cells status-cell">${record.status.replace(
+      /_/,
+      " "
+    )}</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
       record.id
     }]" id="ids_${record.id}" value="${record.id}"></td>

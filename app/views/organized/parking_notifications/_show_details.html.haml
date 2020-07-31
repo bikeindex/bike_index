@@ -79,7 +79,8 @@
                         = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
                 - else
                   %em.text-danger Unable to find retrieved information!
-
+            - else
+              = status_display(@parking_notification.status)
         %tr
           %td= t(".bike")
           %td
@@ -87,7 +88,7 @@
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
               %br
               %small
-                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
+                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id, search_status: "all"), class: "gray-link" do
                   view all notifications for
                   %em
                     = @bike.type

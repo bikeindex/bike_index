@@ -42,7 +42,7 @@ module OrganizedHelper
 
   # Used in two places, so... putting it here. Probably is a better place somewhere else
   def parking_notification_repeat_kinds
-    ParkingNotification.kinds_humanized.map { |k, v| [v, k] } + [["Mark retrieved", "mark_retrieved"]]
+    ParkingNotification.kinds_humanized.map { |k, v| [v, k] } + [["Mark retrieved/resolved", "mark_retrieved"]]
   end
 
   def export_progress_class(export)
@@ -71,8 +71,8 @@ module OrganizedHelper
     case status.downcase
     when "current", "paging", "being_helped"
       content_tag(:span, status_str, class: "text-success")
-    when /retrieved/, "on_deck"
-      content_tag(:span, status_str, class: "text-info")
+    when /retrieved/, "resolved_otherwise", "on_deck"
+      content_tag(:span, status_str.gsub("otherwise", ""), class: "text-info")
     when /removed/, "impounded", "trashed", "failed_to_find"
       content_tag(:span, status_str, class: "text-danger")
     else
