@@ -39,7 +39,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
   end
 
   def impound_record_id
-    object.impound_record&.display_id
+    object.impound_record_id
   end
 
   def bike

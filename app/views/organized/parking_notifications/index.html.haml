@@ -61,13 +61,13 @@
 
   .row.mt-2.mb-4
     .col-md-4.col-xs-6
-      #recordsCount
-        %span.number 0
-        = t(".matches_visible")
-    .col-md-4.col-xs-6
-      #recordsTotalCount.text-right.less-strong
+      #recordsTotalCount.less-strong
         %span.number 0
         total matches
+    .col-md-4.col-xs-6
+      #recordsCount.text-right
+        %span.number 0
+        = t(".matches_visible")
     .col-md-4.col-xs-12
       -# Hide the repeat notification interface because the checks don't display on mobile
       .text-right.hidden-md-down
@@ -109,7 +109,8 @@
                   .col-xs-6.text-center
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
 
-    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status != "all" }
+    -# only hide status on current - because otherwise it displays the time things were resolved
+    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status == "current" }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

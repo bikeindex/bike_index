@@ -66,6 +66,7 @@ module OrganizedHelper
     ].include?([controller_name, action_name])
   end
 
+  # This is duplicated in parking_notifications.js
   def status_display(status)
     status_str = status.tr("_", " ")
     case status.downcase

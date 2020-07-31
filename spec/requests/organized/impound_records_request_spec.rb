@@ -62,6 +62,16 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
     end
+    context "id-" do
+      it "renders" do
+        impound_record.reload
+        expect(impound_record.display_id).to eq 1111
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_record)).to eq impound_record
+      end
+    end
     context "not found" do
       it "raises" do
         expect {

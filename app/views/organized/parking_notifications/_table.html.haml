@@ -82,7 +82,10 @@
           = status_display(parking_notification.status)
         - unless skip_resolved
           %td.hidden-sm-cells
-            - if parking_notification.resolved_at.present?
+            - if parking_notification.impound_record_id.present?
+              %a.convertTime.preciseTime{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) }
+                = l(parking_notification.resolved_at, format: :convert_time)
+            - elsif parking_notification.resolved_at.present?
               %span.convertTime.preciseTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 
