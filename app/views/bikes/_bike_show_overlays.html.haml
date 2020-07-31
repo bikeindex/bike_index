@@ -27,7 +27,7 @@
 
         - if @matching_notification.organization.present?
           .mt-2.small.less-strong
-            #{@matching_notification.organization.name} sent this notification
+            = t(".organization_sent_this_message", org_name: @matching_notification.organization.name)
             - if @matching_notification.sent_at.present?
               %span.convertTime.preciseTime.withPreposition
                 = l @matching_notification.sent_at, format: :convert_time
@@ -35,11 +35,7 @@
           - organization_email = @matching_notification.organization.auto_user&.email
           - if organization_email.present?
             .mt-1
-              -#= t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
-              Please email
-              = link_to(organization_email, "mailto:#{organization_email}")
-              / biking@psu.edu
-              if you have any questions.
+              = t(".please_email_organization_with_questions_html", email_link: link_to(organization_email, "mailto:#{organization_email}"))
 
 - if modal_title.blank? || @bike.stolen && session[:recovery_link_token].present?
   -# Delete token so modal doesn't keep rendering

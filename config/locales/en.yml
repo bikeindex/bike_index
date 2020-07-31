@@ -979,6 +979,9 @@ en:
       nevermind: Nevermind
       no_futher_action_necessary: no further action necessary!
       no_one_can_see_it_but_you: No one can see it but you
+      organization_sent_this_message: "%{org_name} sent this notification"
+      please_email_organization_with_questions_html: Please email %{email_link} if
+        you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
       thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
