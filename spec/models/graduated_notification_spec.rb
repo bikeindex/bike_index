@@ -30,6 +30,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.processed?).to be_truthy
       expect(graduated_notification.user).to be_blank
       expect(graduated_notification.email).to eq bike.owner_email
+      expect(graduated_notification.sent_at).to be_within(1).of graduated_notification.created_at + GraduatedNotification::PENDING_PERIOD
       expect(bike.graduated?(organization)).to be_truthy
     end
     context "organization doesn't have graduated_interval set" do
@@ -267,6 +268,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
         expect(graduated_notification2.in_pending_period?).to be_falsey
+        expect(graduated_notification2.sent_at).to be_blank
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification1.processable?).to be_truthy
         # Processing right now
