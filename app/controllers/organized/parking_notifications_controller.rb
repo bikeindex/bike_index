@@ -109,7 +109,7 @@ module Organized
 
       selected_notifications = parking_notifications.where(id: ids_array)
       # We can't update already resolved notifications - so add them to an ivar for displaying
-      @notifications_failed_resolved = selected_notifications.resolved
+      notifications_failed_resolved_ids = selected_notifications.resolved.pluck(:id)
       success_ids = []
       ids_repeated = []
 
@@ -126,8 +126,10 @@ module Organized
       if ids_array.count == 1 && success_ids.count == 1
         @redirect_location = organization_parking_notification_path(success_ids.first, organization_id: current_organization.to_param)
       end
-      session[:notifications_failed_resolved_ids] = @notifications_failed_resolved.pluck(:id)
       session[:notifications_repeated_ids] = @notifications_repeated.pluck(:id)
+      # If the notification was repeated, it can't also be failed (relevant for marking resolved)
+      session[:notifications_failed_resolved_ids] = notifications_failed_resolved_ids - session[:notifications_repeated_ids]
+      @notifications_failed_resolved ||= ParkingNotification.where(id: session[:notifications_failed_resolved_ids])
       session[:repeated_kind] = kind
       # I don't think there will be a failure without error, retrieve_or_repeat_notification! should throw an error
       # rescuing makes it difficult to diagnose the problem, so we're just going to silently fail. sry

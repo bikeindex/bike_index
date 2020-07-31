@@ -301,6 +301,42 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       bike.reload
       expect(bike.status).to eq "status_with_owner"
     end
+    context "mark_retrieved" do
+      it "marks the parking_notification retrieved" do
+        bike.reload
+        expect(bike.status).to eq "status_with_owner"
+        parking_notification_initial.reload
+        expect(parking_notification_initial.current?).to be_truthy
+        expect(parking_notification_initial.user).to_not eq current_user
+        expect(ParkingNotification.count).to eq 1
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          post base_url, params: {
+            organization_id: current_organization.to_param,
+            kind: "mark_retrieved",
+            ids: parking_notification_initial.id
+          }
+        end
+        expect(ParkingNotification.count).to eq 1
+        parking_notification_initial.reload
+        expect(parking_notification_initial.current?).to be_falsey
+        expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason" # This should not have been bumped
+        expect(parking_notification_initial.retrieved_kind).to eq "organization_recovery"
+        expect(parking_notification_initial.retrieved_by).to eq current_user
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+
+        expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
+        expect(assigns(:notifications_repeated).pluck(:id)).to eq([parking_notification_initial.id])
+        expect(response).to redirect_to organization_parking_notification_path(parking_notification_initial, organization_id: current_organization.to_param)
+
+        bike.reload
+        expect(bike.status).to eq "status_with_owner"
+      end
+      context "multiple parking notifications" do
+        it "marks both retrieved"
+      end
+    end
     context "parking notification not active" do
       let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, :retrieved, bike: bike, organization: current_organization) }
       it "shows an alert" do
