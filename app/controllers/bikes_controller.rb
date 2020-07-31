@@ -367,12 +367,9 @@ class BikesController < ApplicationController
       end
     end
 
-    if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
-      flash[:error] = error
-      redirect_to bike_path(@bike) and return
-    end
-
-    authenticate_user(translation_key: :create_account, flash_type: :info)
+    return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+    flash[:error] = error
+    redirect_to bike_path(@bike) and return
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)

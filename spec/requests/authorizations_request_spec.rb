@@ -12,6 +12,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       expect(response).to redirect_to new_session_url
       expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
       expect(session[:partner]).to be_nil
+      expect(flash).to be_blank
     end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do
@@ -19,6 +20,16 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response).to redirect_to new_session_url
         expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
         expect(session[:partner]).to eq "bikehub"
+        expect(flash).to be_blank
+      end
+      context "passing unauthenticated_redirect" do
+        it "redirects to sign up with the partners parameter" do
+          get "#{authorization_url}&partner=bikehub&unauthenticated_redirect=sign_up"
+          expect(response).to redirect_to new_user_url
+          expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
+          expect(session[:partner]).to eq "bikehub"
+          expect(flash).to be_blank
+        end
       end
     end
   end
