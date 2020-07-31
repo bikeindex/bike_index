@@ -28,7 +28,7 @@
         %small=t(".notification_number")
     %th.status-cell Status
     - unless skip_resolved
-      %th
+      %th.status-cell
         %small=t(".resolved")
     - unless skip_multiselect
       %th.multiselect-cell.table-cell-check.collapse
@@ -81,7 +81,7 @@
         %td.hidden-sm-cells.status-cell
           = status_display(parking_notification.status)
         - unless skip_resolved
-          %td.hidden-sm-cells
+          %td.hidden-sm-cells.status-cell
             - if parking_notification.impound_record_id.present?
               %a.convertTime.preciseTime{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) }
                 = l(parking_notification.resolved_at, format: :convert_time)

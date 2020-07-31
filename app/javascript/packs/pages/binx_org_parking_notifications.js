@@ -128,7 +128,9 @@ export default class BinxAppOrgParkingNotifications {
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${this.statusSpan(
       record.status
-    )}</td><td class="hidden-sm-cells">${this.retrievedAtEl(record)}</td>
+    )}</td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
+      record
+    )}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
       record.id
     }]" id="ids_${record.id}" value="${record.id}"></td>
