@@ -48,7 +48,7 @@ RSpec.describe LocksController, type: :controller do
       end
     end
     context "no user" do
-      let(:user) { nil}
+      let(:user) { nil }
       it "redirects to sign_in" do
         get :edit, params: {id: lock.id}
         expect(flash[:error]).to be_present

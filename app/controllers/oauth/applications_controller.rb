@@ -17,7 +17,7 @@ module Oauth
         Doorkeeper::AccessToken.create!(
           application_id: @application.id,
           resource_owner_id: ENV["V2_ACCESSOR_ID"],
-          expires_in: nil, scopes: "write_bikes",
+          expires_in: nil, scopes: "write_bikes"
         )
 
         redirect_to oauth_application_url(@application)
@@ -31,7 +31,7 @@ module Oauth
     def ensure_app_owner!
       return true if @current_user&.superuser? || @current_user&.id == @application&.owner_id
       flash[:error] = translation(:not_your_application)
-      redirect_to oauth_applications_url and return
+      redirect_to(oauth_applications_url) && return
     end
   end
 end
