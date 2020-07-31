@@ -23,12 +23,13 @@ export default class TimeParser {
   // If we're display time with the hour, we have different formats based on whether we include seconds
   // this manages that functionality
   hourFormat(time, baseTimeFormat, includeSeconds, includePreposition) {
+    const prefix = includePreposition ? " at " : "";
     if (includeSeconds) {
-      return `${time.format(baseTimeFormat)}:<small>${time.format(
+      return `${prefix}${time.format(baseTimeFormat)}:<small>${time.format(
         "ss"
       )}</small> ${time.format("a")}`;
     } else {
-      return time.format(`${baseTimeFormat}a`);
+      return prefix + time.format(`${baseTimeFormat}a`);
     }
   }
 
@@ -42,12 +43,14 @@ export default class TimeParser {
       } else if (time > this.todayEnd) {
         prefix = "Tomorrow ";
       }
-      if (classList.contains("withPreposition")) {
-        prefix += " at ";
-      }
       return (
         prefix +
-        this.hourFormat(time, "h:mm", classList.contains("preciseTimeSeconds"))
+        this.hourFormat(
+          time,
+          "h:mm",
+          classList.contains("preciseTimeSeconds"),
+          classList.contains("withPreposition")
+        )
       );
     }
     if (classList.contains("withPreposition")) {
@@ -59,30 +62,26 @@ export default class TimeParser {
       classList.contains("preciseTime") ||
       classList.contains("preciseTimeSeconds")
     ) {
+      let hourStr = this.hourFormat(
+        time,
+        "h:mm",
+        classList.contains("preciseTimeSeconds"),
+        classList.contains("withPreposition")
+      );
       // Include the year if it isn't the current year
       if (time.year() === moment().year()) {
-        return (
-          prefix +
-          this.hourFormat(
-            time,
-            "MMM Do[,] h:mm",
-            classList.contains("preciseTimeSeconds")
-          )
-        );
+        return prefix + time.format("MMM Do[,]") + hourStr;
       } else {
-        return (
-          prefix +
-          this.hourFormat(
-            time,
-            "YYYY-MM-DD h:mm",
-            classList.contains("preciseTimeSeconds")
-          )
-        );
+        return prefix + time.format("YYYY-MM-DD") + hourStr;
       }
     }
     // Otherwise, format in basic format
     if (time.year() === moment().year()) {
-      return prefix + time.format("MMM Do[,] ha");
+      if (classList.contains("withPreposition")) {
+        return prefix + time.format("MMM Do[,]") + " at " + time.format("ha");
+      } else {
+        return prefix + time.format("MMM Do[,] ha");
+      }
     } else {
       return prefix + time.format("YYYY-MM-DD");
     }
