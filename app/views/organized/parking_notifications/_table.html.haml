@@ -28,7 +28,7 @@
         %small=t(".notification_number")
     %th.status-cell Status
     - unless skip_resolved
-      %th
+      %th.status-cell
         %small=t(".resolved")
     - unless skip_multiselect
       %th.multiselect-cell.table-cell-check.collapse
@@ -52,7 +52,7 @@
             %span.extended-col-info.d-block
               = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike, organization_id: current_organization.id)
           %em.small.extended-col-info.d-block.status-cell
-            #{status_display(parking_notification.status)} status
+            #{status_display(parking_notification.status)}
           - if parking_notification.resolved_at.present?
             %strong.small.extended-col-info.d-block
               - if parking_notification.impounded?
@@ -81,8 +81,11 @@
         %td.hidden-sm-cells.status-cell
           = status_display(parking_notification.status)
         - unless skip_resolved
-          %td.hidden-sm-cells
-            - if parking_notification.resolved_at.present?
+          %td.hidden-sm-cells.status-cell
+            - if parking_notification.impound_record_id.present?
+              %a.convertTime.preciseTime{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) }
+                = l(parking_notification.resolved_at, format: :convert_time)
+            - elsif parking_notification.resolved_at.present?
               %span.convertTime.preciseTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 

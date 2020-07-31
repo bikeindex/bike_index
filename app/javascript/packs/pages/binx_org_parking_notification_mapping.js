@@ -155,61 +155,6 @@ export default class BinxAppOrgParkingNotificationMapping {
     this.addTableMapLinkHandler();
   }
 
-  tableRowForRecord(record) {
-    if (typeof record !== "object" || typeof record.id !== "number") {
-      return "";
-    }
-    const showCellUrl = `${location.pathname}/${record.id}`;
-    const bikeCellUrl = `/bikes/${record.bike.id}`;
-    let bikeLink = `<a href="${bikeCellUrl}">${record.bike.title} ${
-      record.unregistered_bike
-        ? '<em class="text-warning small"> unregistered</em>'
-        : ""
-    }</a>`;
-    const impoundLink =
-      record.impund_record_id !== undefined
-        ? `<a href="${record.impund_record_id}" class="convertTime">${record.resolved_at}</a>`
-        : "";
-    const retrievedAtSpan = record.resolved_at
-      ? `<span class="convertTime preciseTime">${record.resolved_at}</span>`
-      : "";
-    return `<tr class="record-row" data-recordid="${
-      record.id
-    }"><td class="map-cell"><a>↑</a></td><td><a href="${showCellUrl}" class="convertTime">${
-      record.created_at
-    }</a> <span class="extended-col-info small"> - <em>${
-      record.kind_humanized
-    }</em> - by ${record.user_display_name}<strong>${
-      record.notification_number > 1
-        ? "- notification #" + record.notification_number
-        : ""
-    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span>
-    ${
-      impoundLink.length
-        ? "<strong class='small extended-col-info d-block'>Impounded: " +
-          impoundLink +
-          "</strong>"
-        : ""
-    }
-    <strong class='small extended-col-info d-block'>
-      ${record.status === "retrieved" ? "Retrieved" : ""}
-      ${record.status !== "impounded" ? retrievedAtSpan : ""}
-    </strong>
-      </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
-      record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${
-      record.user_display_name
-    }</td><td class="hidden-sm-cells">${
-      record.notification_number > 1 ? record.notification_number : ""
-    }</td><td class="hidden-sm-cells status-cell">${
-      record.status
-    }</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
-    <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
-      record.id
-    }]" id="ids_${record.id}" value="${record.id}"></td>
-    `;
-  }
-
   mapPopup(point) {
     let record = _.find(binxAppOrgParkingNotificationMapping.records, [
       "id",
@@ -220,7 +165,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     tableTop += `<thead class="small-header hidden-md-down">${$(
       ".list-table thead"
     ).html()}</thead>`;
-    return `${tableTop}${binxAppOrgParkingNotificationMapping.tableRowForRecord(
+    return `${tableTop}${binxAppOrgParkingNotifications.tableRowForRecord(
       record
     )}</tbody></table>`;
   }
@@ -228,9 +173,7 @@ export default class BinxAppOrgParkingNotificationMapping {
   renderRecordsTable(records) {
     let body_html = "";
     for (const record of Array.from(records)) {
-      body_html += binxAppOrgParkingNotificationMapping.tableRowForRecord(
-        record
-      );
+      body_html += binxAppOrgParkingNotifications.tableRowForRecord(record);
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records
