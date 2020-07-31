@@ -47,6 +47,21 @@ RSpec.describe LocksController, type: :controller do
         expect(response).to render_template("edit")
       end
     end
+    context "no user" do
+      let(:user) { nil }
+      it "redirects to sign_in" do
+        get :edit, params: {id: lock.id}
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to(new_session_path)
+      end
+      context "unauthenticated_redirect" do
+        it "redirects to sign up" do
+          get :edit, params: {id: lock.id, unauthenticated_redirect: "sign_up"}
+          expect(flash).to be_blank
+          expect(response).to redirect_to(new_user_path)
+        end
+      end
+    end
   end
 
   describe "update" do

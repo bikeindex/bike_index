@@ -163,7 +163,7 @@ group :development, :test do
   gem "rspec", "~> 3.4"
   gem "rspec-rails", "~> 3.8"
   gem "rspec_junit_formatter" # For circle ci
-  gem "standard"
+  gem "standard" # Ruby linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"
