@@ -1,7 +1,7 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
-    DEFAULT_PER_PAGE = 100 # Could also
+    DEFAULT_PER_PAGE = 100
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
     before_action :set_failed_and_repeated_ivars
@@ -15,7 +15,7 @@ module Organized
         per_page: @per_page,
         default_location: @search_bounding_box.blank?,
         map_center_lat: map_center(@search_bounding_box).first,
-        map_center_lng: map_center(@search_bounding_box).last,
+        map_center_lng: map_center(@search_bounding_box).last
       }
 
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
@@ -38,8 +38,8 @@ module Organized
           set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
 
           render json: records,
-                   root: "parking_notifications",
-                   each_serializer: ParkingNotificationSerializer
+                 root: "parking_notifications",
+                 each_serializer: ParkingNotificationSerializer
         end
       end
     end
@@ -197,7 +197,7 @@ module Organized
 
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
     def set_pagination_headers(collection, page, per_page)
-      url   = request.base_url + request.path_info
+      url = request.base_url + request.path_info
       pages = ApiPagination.pages_from(collection)
       links = []
 
