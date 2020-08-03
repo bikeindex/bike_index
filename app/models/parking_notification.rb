@@ -5,6 +5,8 @@ class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
+  MAX_PER_PAGE = 250
+  max_paginates_per 250
 
   belongs_to :bike
   belongs_to :user
@@ -76,6 +78,11 @@ class ParkingNotification < ActiveRecord::Base
   def self.bikes
     Bike.unscoped.includes(:parking_notifications)
       .where(parking_notifications: {id: pluck(:id)})
+  end
+
+  # Passing in an already formed bounding_box - added method to explicitly document required args
+  def self.search_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
+    within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
   end
 
   # geocoding is managed by set_calculated_attributes

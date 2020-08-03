@@ -10,8 +10,23 @@
   .text-right.mb-4
     = link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: current_organization, parking_notification: true), class: "btn btn-sm btn-outline-primary"
 
-  #map
-
+  .map-wrapper
+    #map
+    %a#redo-search-in-map.currently-hidden{ href: "#" }
+      redo search in current location
+  .row.mb-2
+    .col-xs-6
+      .recordsCount
+        %span.number 0
+        = t(".matches_visible")
+    .col-xs-6
+      .recordsTotalCount.less-strong.text-right
+        %span.number 0
+        total matches
+        %em.maxNumberDisplayed.currently-hidden
+          \- first #{@per_page} loaded
+          %small
+            tighten search to view others
 
   = render partial: "/shared/period_select", locals: { skip_submission: true }
 
@@ -61,13 +76,15 @@
 
   .row.mt-2.mb-4
     .col-md-4.col-xs-6
-      #recordsTotalCount.less-strong
-        %span.number 0
-        total matches
-    .col-md-4.col-xs-6
-      #recordsCount.text-right
+      .recordsCount
         %span.number 0
         = t(".matches_visible")
+    .col-md-4.col-xs-6
+      .recordsTotalCount.less-strong.text-right
+        %span.number 0
+        total matches
+        %em.maxNumberDisplayed.currently-hidden
+          \- first #{@per_page} loaded
     .col-md-4.col-xs-12
       -# Hide the repeat notification interface because the checks don't display on mobile
       .text-right.hidden-md-down

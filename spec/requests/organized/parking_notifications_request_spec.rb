@@ -70,20 +70,41 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
     end
     context "with searched bike" do
-      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization) }
-      let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization) }
+      let(:coords1) { [40.79426110344111, -77.86604158369109] }
+      let(:coords2) { [40.69908378081713, -77.76302033475155] }
+      let(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
+      let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
       let(:bike) { parking_notification2.bike }
-      it "renders" do
+      it "renders", vcr: true do
+        expect(parking_notification1.to_coordinates).to eq coords1
+        expect(parking_notification2.to_coordinates).to eq coords2
         expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
-        get base_url, params: {search_bike_id: bike.id}, headers: json_headers
+        get base_url, params: {search_bike_id: bike.id, per_page: 250}, headers: json_headers
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
+        expect(response.header["Per-Page"]).to eq "250"
 
-        get base_url, params: {search_email: bike.owner_email}, headers: json_headers
+        get base_url, params: {search_email: bike.owner_email, per_page: 500}, headers: json_headers
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
+        expect(response.header["Per-Page"]).to eq "100" # Because it's over the max permitted
+
+        # Pagination tests
+        get "#{base_url}?per_page=1&page=2", headers: json_headers
+        expect(response.status).to eq(200)
+        expect(response.header["Total"]).to eq("2")
+        expect(response.header["Per-Page"]).to eq "1"
+        expect(response.header["Link"].match('page=1&per_page=1>; rel=\"prev\"')).to be_present
+        expect(json_result[:parking_notifications].count).to eq 1
+        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id # Because it was created last
+
+        # location tests
+        get "#{base_url}?search_southwest_coords=40.79184719166159,-77.87257982819405&search_northeast_coords=40.80632036997267,-77.85346084130906", headers: json_headers
+        expect(json_result[:parking_notifications].count).to eq 1
+        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id
+        expect(response.header["Per-Page"]).to eq "100" # Default to 100
       end
     end
   end
