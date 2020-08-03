@@ -1,6 +1,7 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
+    DEFAULT_PER_PAGE = 100 # Could also
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
     before_action :set_failed_and_repeated_ivars
@@ -8,11 +9,11 @@ module Organized
     def index
       @search_bounding_box = search_bounding_box
       @per_page = params[:per_page]
-      @per_page = ParkingNotification::MAX_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
-        searching_bounding_box: @search_bounding_box.present?,
+        default_location: @search_bounding_box.present?,
         map_center_lat: map_center(@search_bounding_box).first,
         map_center_lng: map_center(@search_bounding_box).last,
       }
@@ -205,6 +206,7 @@ module Organized
         links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
       end
 
+      headers["Page"] = page
       headers["Link"] = links.join(", ") unless links.empty?
       headers["Per-Page"] = per_page.to_s
       headers["Total"] = collection.total_count.to_s

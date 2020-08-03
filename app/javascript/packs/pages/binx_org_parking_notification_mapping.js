@@ -6,8 +6,11 @@ export default class BinxAppOrgParkingNotificationMapping {
     this.fetchedRecords = false;
     this.mapReady = false;
     this.listRendered = false;
-    this.mapRendered = false;
+    this.defaultLocation;
     this.records = [];
+    this.totalRecords = 0;
+    this.perPage = 0;
+    this.page = 0;
   }
 
   init() {
@@ -27,7 +30,7 @@ export default class BinxAppOrgParkingNotificationMapping {
       fetchRecords();
       return true;
     });
-    $("#redoSearchInMap").on("click", (e) => {
+    $("#redo-search-in-map").on("click", (e) => {
       e.preventDefault();
       fetchRecords();
       return false;
@@ -35,6 +38,7 @@ export default class BinxAppOrgParkingNotificationMapping {
   }
 
   fetchRecords(opts = []) {
+    $("#redo-search-in-map").fadeOut();
     // Use the period selector urlParams - which will use the current period
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
 
@@ -64,6 +68,7 @@ export default class BinxAppOrgParkingNotificationMapping {
       url: url,
       success(data, textStatus, jqXHR) {
         binxAppOrgParkingNotificationMapping.fetchedRecords = true;
+        binxAppOrgParkingNotificationMapping.setPaginationInfo(jqXHR);
         binxAppOrgParkingNotificationMapping.renderOrganizedRecords(
           data.parking_notifications
         );
@@ -73,6 +78,12 @@ export default class BinxAppOrgParkingNotificationMapping {
         log.debug(data);
       },
     });
+  }
+
+  setPaginationInfo(jqXHR) {
+    this.totalRecords = parseInt(jqXHR.getResponseHeader("Total"), 10);
+    this.perPage = parseInt(jqXHR.getResponseHeader("Per-Page"), 10);
+    this.page = parseInt(jqXHR.getResponseHeader("Page"), 10);
   }
 
   // Grabs the visible markers, looks up the records from them and returns that list
@@ -85,7 +96,7 @@ export default class BinxAppOrgParkingNotificationMapping {
   // this loops and calls itself again if we haven't finished rendering the map and the records
   mapOrganizedRecords() {
     // if we have already rendered the mapRendered, then we're done!
-    if (binxAppOrgParkingNotificationMapping.mapRendered) {
+    if (binxMapping.mapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
@@ -146,8 +157,10 @@ export default class BinxAppOrgParkingNotificationMapping {
   }
 
   inititalizeMapMarkers() {
-    binxMapping.addMarkers({ fitMap: true });
-    this.mapRendered = true;
+    binxMapping.addMarkers({
+      fitMap: window.pageInfo.default_location,
+    });
+
     // Add a trigger to the map when the viewport changes (after it has finished moving)
     google.maps.event.addListener(binxMap, "idle", function () {
       // This is grabbing the markers in viewport and logging the ids for them.
@@ -156,6 +169,9 @@ export default class BinxAppOrgParkingNotificationMapping {
       binxAppOrgParkingNotificationMapping.renderRecordsTable(
         binxAppOrgParkingNotificationMapping.visibleRecords()
       );
+      if (binxMapping.mapRendered) {
+        $("#redo-search-in-map").fadeIn();
+      }
     });
     this.addTableMapLinkHandler();
   }
@@ -187,13 +203,23 @@ export default class BinxAppOrgParkingNotificationMapping {
 
     // Render the body - whether it says no records or records
     $("#recordsTable tbody").html(body_html);
+
+    binxAppOrgParkingNotificationMapping.updateTotalCount(records.length);
     // And localize the times since we added times to the table
-    $(".recordsCount .number").text(records.length);
+    window.timeParser.localize();
+  }
+
+  updateTotalCount(renderedCount) {
+    $(".recordsCount .number").text(renderedCount);
     // render the total count too
     $(".recordsTotalCount .number").text(
-      binxAppOrgParkingNotificationMapping.records.length
+      binxAppOrgParkingNotificationMapping.totalRecords
     );
-    window.timeParser.localize();
+    if (renderedCount < binxAppOrgParkingNotificationMapping.totalRecords) {
+      $(".maxNumberDisplayed").slideDown();
+    } else {
+      $(".maxNumberDisplayed").slideUp();
+    }
   }
 
   addMarkerPointsForRecords(records) {

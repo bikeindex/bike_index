@@ -9,6 +9,7 @@ export default class BinxMapping {
     this.searchMarkers = [];
     this.markerPointsToRender = [];
     this.markersRendered = [];
+    this.mapRendered = false;
   }
 
   loadMap(callback) {
@@ -249,5 +250,7 @@ export default class BinxMapping {
     if (renderAddressSearch == true) {
       binxMapping.renderAddressSearch();
     }
+
+    binxMapping.mapRendered = true;
   }
 }
