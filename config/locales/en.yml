@@ -4733,7 +4733,7 @@ en:
       other_amount: Other amount
       pay_bike_index: Pay Bike Index
       payment_to_bike_index: Payment to Bike Index
-      select_an_amount: Select an amount
+      select_an_amount_in_usd: Select an amount (in USD)
   plan_features:
     abandoned_bike_suite: >-
       Abandoned bike suite - contact bike owners and log abandonment and impound bike
