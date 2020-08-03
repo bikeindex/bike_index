@@ -60,8 +60,13 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def matching_theft_alerts
-    return @matching_theft_alerts if defined?(@matching_theft_alerts)
-    @matching_theft_alerts = TheftAlert.where(created_at: @time_range)
+    if params[:search_recovered].present?
+      stolen_record_ids = StolenRecord.recovered.with_theft_alerts
+          .where(theft_alerts: {created_at: @time_range}).pluck(:id)
+      TheftAlert.where(stolen_record_id: stolen_record_ids)
+    else
+      TheftAlert.where(created_at: @time_range)
+    end
   end
 
   def set_alert_timestamps(theft_alert_attrs)
