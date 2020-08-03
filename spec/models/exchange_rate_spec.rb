@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.describe ExchangeRate, type: :model do
   describe "validations" do
+    before { expect(ExchangeRate.count).to eq 0 }
     it "ensures rate is non-negative" do
       rate = FactoryBot.build(:exchange_rate, rate: -1)
       expect(rate).to be_invalid
@@ -36,7 +37,6 @@ RSpec.describe ExchangeRate, type: :model do
       rate0 = FactoryBot.create(:exchange_rate)
       rate1 = FactoryBot.build(:exchange_rate, from: rate0.from, to: rate0.to)
       expect(rate1).to be_invalid
-
       rate1.to = rate1.to.reverse
       expect(rate1).to be_valid
     end
