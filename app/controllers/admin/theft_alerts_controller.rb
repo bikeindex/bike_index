@@ -60,9 +60,10 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def matching_theft_alerts
-    if params[:search_recovered].present?
+    @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
+    if @search_recovered
       stolen_record_ids = StolenRecord.recovered.with_theft_alerts
-          .where(theft_alerts: {created_at: @time_range}).pluck(:id)
+        .where(theft_alerts: {created_at: @time_range}).pluck(:id)
       TheftAlert.where(stolen_record_id: stolen_record_ids)
     else
       TheftAlert.where(created_at: @time_range)

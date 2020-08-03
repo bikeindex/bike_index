@@ -4,6 +4,8 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "recovered", admin_theft_alerts_path(sortable_search_params.merge(search_recovered: !@search_recovered)), class: "nav-link #{@search_recovered ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", admin_theft_alerts_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
 - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
@@ -25,8 +27,9 @@
     end
   .col-12.mt-2
     = column_chart theft_alerts_graph, stacked: true, thousands: ",", defer: true
-  .col-12.mt-2
-    = column_chart alerts_recoveries_graph, stacked: true, thousands: ",", defer: true
+  - unless @search_recovered
+    .col-12.mt-2
+      = column_chart alerts_recoveries_graph, stacked: true, thousands: ",", defer: true
 
 = render partial: "/shared/period_select"
 
