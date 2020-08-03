@@ -39,6 +39,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :email_success, -> { where(delivery_status: "email_success") }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
+  scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
