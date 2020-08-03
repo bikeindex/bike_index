@@ -18,9 +18,7 @@ export default class BinxMapping {
     // Add google maps script
     var js_file = document.createElement("script");
     js_file.type = "text/javascript";
-    js_file.src = `https://maps.googleapis.com/maps/api/js?callback=${callback}&key=${
-      window.pageInfo.google_maps_key
-    }&libraries=places`;
+    js_file.src = `https://maps.googleapis.com/maps/api/js?callback=${callback}&key=${window.pageInfo.google_maps_key}&libraries=places`;
     document.getElementsByTagName("head")[0].appendChild(js_file);
     window.googleMapInjected = true;
   }
@@ -60,11 +58,19 @@ export default class BinxMapping {
     binxMap.fitBounds(bounds);
 
     // Finish rendering map, then check - if too zoomed in (e.g. on one point), zoom out
-    window.setTimeout(function() {
+    window.setTimeout(function () {
       if (binxMap.zoom > 16) {
         binxMap.setZoom(16);
       }
     }, 500);
+  }
+
+  boundingBox() {
+    let bounds = binxMap.getBounds();
+    return [
+      bounds.getSouthWest().toUrlValue(),
+      bounds.getNorthEast().toUrlValue(),
+    ];
   }
 
   renderAddressSearch() {
@@ -83,14 +89,14 @@ export default class BinxMapping {
       binxMapping.searchBox.setBounds(binxMap.getBounds())
     );
 
-    this.searchBox.addListener("places_changed", function() {
+    this.searchBox.addListener("places_changed", function () {
       let places = binxMapping.searchBox.getPlaces();
       if (places.length === 0) {
         log.debug("Unable to find that address");
       }
       // For each place, get the icon, name and location.
       let bounds = new google.maps.LatLngBounds();
-      places.forEach(function(place) {
+      places.forEach(function (place) {
         if (!place.geometry) {
           log.debug("Returned place contains no geometry");
         }
@@ -166,7 +172,7 @@ export default class BinxMapping {
 
   markersInViewport() {
     let bounds = binxMap.getBounds();
-    return _.filter(binxMapping.markersRendered, function(m) {
+    return _.filter(binxMapping.markersRendered, function (m) {
       return bounds.contains(m.getPosition());
     });
   }
@@ -197,7 +203,7 @@ export default class BinxMapping {
     // Make sure we aren't adding duplicate handlers, sometimes we don't catch the close event
     $(window).off("keyup");
     // Add the trigger for the escape closing the window
-    $(window).on("keyup", function(e) {
+    $(window).on("keyup", function (e) {
       if (e.keyCode === 27) {
         window.infoWindow.close();
         // Escape was pressed, infoWindow is closed, so remove the keyup handler
@@ -206,7 +212,7 @@ export default class BinxMapping {
       return true; // allow bubbling up
     });
     // on infowindow close, remove keyup handler - aka clean up after yourself
-    google.maps.event.addListener(window.infoWindow, "closeclick", function() {
+    google.maps.event.addListener(window.infoWindow, "closeclick", function () {
       $(window).off("keyup");
     });
   }
@@ -228,7 +234,7 @@ export default class BinxMapping {
           marker,
           "click",
           ((marker, markerId) =>
-            function() {
+            function () {
               return binxMapping.openInfoWindow(marker, markerId, point);
             })(marker, markerId)
         );

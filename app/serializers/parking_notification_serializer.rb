@@ -14,6 +14,10 @@ class ParkingNotificationSerializer < ApplicationSerializer
     :unregistered_bike,
     :resolved_at
 
+  def perform_caching
+    true
+  end
+
   def created_at
     object.created_at.to_i
   end

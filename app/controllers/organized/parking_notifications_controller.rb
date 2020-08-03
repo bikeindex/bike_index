@@ -1,18 +1,26 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
+    include Rails::Pagination
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
     before_action :set_failed_and_repeated_ivars
 
     def index
+      @search_bounding_box = search_bounding_box
+      @per_page = params[:per_page]
+      @per_page = ParkingNotification::MAX_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
-        map_center_lat: current_organization.map_focus_coordinates[:latitude],
-        map_center_lng: current_organization.map_focus_coordinates[:longitude]
+        per_page: @per_page,
+        searching_bounding_box: @search_bounding_box.present?,
+        map_center_lat: map_center(@search_bounding_box).first,
+        map_center_lng: map_center(@search_bounding_box).last,
       }
 
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+
+      # This is set here because we render it in HTML
       @search_status = if params[:search_status] == "all"
         "all"
       else
@@ -22,12 +30,12 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          page = params[:page] || 1
-          per_page = params[:per_page] || ParkingNotification::MAX_PER_PAGE
+          @page = params[:page] || 1
           # TODO: add sortable here
-          records = matching_parking_notifications.reorder(created_at: :desc)
-            .includes(:user, :bike, :impound_record)
-            .page(page).per(per_page)
+          records = matching_parking_notifications.reorder(created_at: :desc).includes(:user, :bike, :impound_record)
+            .page(@page).per(@per_page)
+          set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
+
           render json: records,
                    root: "parking_notifications",
                    each_serializer: ParkingNotificationSerializer
@@ -82,6 +90,9 @@ module Organized
         bikes = notifications.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
         notifications = notifications.where(bike_id: bikes.pluck(:id))
+      end
+      if @search_bounding_box.present?
+        notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
       @matching_parking_notifications = notifications.where(created_at: @time_range)
     end
@@ -169,6 +180,34 @@ module Organized
       bikes = bikes.search(@interpreted_params)
       bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
       bikes
+    end
+
+    def search_bounding_box
+      return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
+      [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
+    end
+
+    def map_center(bounding_box)
+      return current_organization.map_focus_coordinates.values unless bounding_box.present?
+      lat_dif = bounding_box[0] - bounding_box[2]
+      lng_dif = bounding_box[1] - bounding_box[3]
+      [bounding_box[0] + lat_dif, bounding_box[1] + lng_dif]
+    end
+
+    # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
+    def set_pagination_headers(collection, page, per_page)
+      url   = request.base_url + request.path_info
+      pages = ApiPagination.pages_from(collection)
+      links = []
+
+      pages.each do |k, v|
+        new_params = request.query_parameters.merge(page: v)
+        links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
+      end
+
+      headers["Link"] = links.join(", ") unless links.empty?
+      headers["Per-Page"] = per_page.to_s
+      headers["Total"] = collection.total_count.to_s
     end
   end
 end

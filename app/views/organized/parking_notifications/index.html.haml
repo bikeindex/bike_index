@@ -10,7 +10,18 @@
   .text-right.mb-4
     = link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: current_organization, parking_notification: true), class: "btn btn-sm btn-outline-primary"
 
-  #map
+  #map{style: "margin-bottom: 12px;"}
+  %a#redoSearchInMap{ href: "#" }
+    Redo Search in current location
+  .row.mb-2
+    .col-xs-6
+      .recordsTotalCount.less-strong
+        %span.number 0
+        total matches
+    .col-xs-6
+      .recordsCount.text-right
+        %span.number 0
+        = t(".matches_visible")
 
 
   = render partial: "/shared/period_select", locals: { skip_submission: true }
@@ -61,11 +72,11 @@
 
   .row.mt-2.mb-4
     .col-md-4.col-xs-6
-      #recordsTotalCount.less-strong
+      .recordsTotalCount.less-strong
         %span.number 0
         total matches
     .col-md-4.col-xs-6
-      #recordsCount.text-right
+      .recordsCount.text-right
         %span.number 0
         = t(".matches_visible")
     .col-md-4.col-xs-12

@@ -27,6 +27,11 @@ export default class BinxAppOrgParkingNotificationMapping {
       fetchRecords();
       return true;
     });
+    $("#redoSearchInMap").on("click", (e) => {
+      e.preventDefault();
+      fetchRecords();
+      return false;
+    });
   }
 
   fetchRecords(opts = []) {
@@ -37,8 +42,6 @@ export default class BinxAppOrgParkingNotificationMapping {
       urlParams.delete(param[0]); // remove any matching parameters
       urlParams.append(param[0], param[1]);
     }
-
-    log.debug(urlParams.toString());
 
     // Update the address bar to include the current parameters
     history.replaceState(
@@ -185,12 +188,12 @@ export default class BinxAppOrgParkingNotificationMapping {
     // Render the body - whether it says no records or records
     $("#recordsTable tbody").html(body_html);
     // And localize the times since we added times to the table
-    window.timeParser.localize();
-    $("#recordsCount .number").text(records.length);
+    $(".recordsCount .number").text(records.length);
     // render the total count too
-    $("#recordsTotalCount .number").text(
+    $(".recordsTotalCount .number").text(
       binxAppOrgParkingNotificationMapping.records.length
     );
+    window.timeParser.localize();
   }
 
   addMarkerPointsForRecords(records) {
