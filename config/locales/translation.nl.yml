@@ -5439,9 +5439,9 @@ nl:
       next: volgende>
       other_amount: Ander bedrag
       pay_bike_index: Pay Bike Index
-      select_an_amount: Selecteer een bedrag
       donate_to_bike_index: Doneer aan Bike Index
       payment_to_bike_index: Betaling aan fietsindex
+      select_an_amount_in_usd: Selecteer een bedrag (in USD)
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien
