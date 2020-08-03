@@ -13,7 +13,7 @@ module Organized
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
-        default_location: @search_bounding_box.present?,
+        default_location: @search_bounding_box.blank?,
         map_center_lat: map_center(@search_bounding_box).first,
         map_center_lng: map_center(@search_bounding_box).last,
       }

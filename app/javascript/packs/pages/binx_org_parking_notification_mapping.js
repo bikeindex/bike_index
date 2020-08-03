@@ -39,8 +39,14 @@ export default class BinxAppOrgParkingNotificationMapping {
 
   fetchRecords(opts = []) {
     $("#redo-search-in-map").fadeOut();
-    // Use the period selector urlParams - which will use the current period
+    // Use the period selector urlParams - which will use the current period -
+    // even if the period is default (and not in the url)
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
+
+    // Add the current location, unless we're fetching the default location
+    if (!window.pageInfo.default_location) {
+      opts = opts.concat(binxMapping.boundingBoxParams());
+    }
 
     for (const param of opts) {
       urlParams.delete(param[0]); // remove any matching parameters
@@ -171,6 +177,7 @@ export default class BinxAppOrgParkingNotificationMapping {
       );
       if (binxMapping.mapRendered) {
         $("#redo-search-in-map").fadeIn();
+        window.pageInfo.default_location = false;
       }
     });
     this.addTableMapLinkHandler();
@@ -215,7 +222,10 @@ export default class BinxAppOrgParkingNotificationMapping {
     $(".recordsTotalCount .number").text(
       binxAppOrgParkingNotificationMapping.totalRecords
     );
-    if (renderedCount < binxAppOrgParkingNotificationMapping.totalRecords) {
+    if (
+      binxAppOrgParkingNotificationMapping.totalRecords >=
+      binxAppOrgParkingNotificationMapping.perPage
+    ) {
       $(".maxNumberDisplayed").slideDown();
     } else {
       $(".maxNumberDisplayed").slideUp();

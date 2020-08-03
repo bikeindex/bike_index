@@ -101,15 +101,16 @@
 }
 #redo-search-in-map {
   border-top-right-radius: 4px;
-  background: rgba(black, 0.6);
+  background: rgba(black, 0.7);
   line-height: 1;
-  padding: 0.2rem 0.4rem;
-  box-shadow: 0 0 4px rgba(black, 0.1);
+  padding: 0.3rem 0.4rem 0.3rem;
+  box-shadow: 0 0 2px rgba(black, 0.1);
   color: #fff;
   position: absolute;
   bottom: 0rem;
   left: 0rem;
+  transition-duration: 0.3s;
   &:hover {
-    background: rgba(black, 0.9);
+    background: rgba(black, 0.95);
   }
 }

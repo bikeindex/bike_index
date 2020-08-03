@@ -66,11 +66,14 @@ export default class BinxMapping {
     }, 500);
   }
 
-  boundingBox() {
+  boundingBoxParams() {
+    if (!binxMapping.mapRendered) {
+      return [];
+    }
     let bounds = binxMap.getBounds();
     return [
-      bounds.getSouthWest().toUrlValue(),
-      bounds.getNorthEast().toUrlValue(),
+      ["search_southwest_coords", bounds.getSouthWest().toUrlValue()],
+      ["search_northeast_coords", bounds.getNorthEast().toUrlValue()],
     ];
   }
 
@@ -250,7 +253,12 @@ export default class BinxMapping {
     if (renderAddressSearch == true) {
       binxMapping.renderAddressSearch();
     }
-
-    binxMapping.mapRendered = true;
+    if (binxMapping.mapRendered) {
+      return true;
+    }
+    // If map isn't rendered, give the page a second to catch up
+    window.setTimeout(function () {
+      binxMapping.mapRendered = true;
+    }, 1000);
   }
 }
