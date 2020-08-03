@@ -15,7 +15,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     binxMapping.loadMap(
       "binxAppOrgParkingNotificationMapping.mapOrganizedRecords"
     );
-    this.fetchRecords([["per_page", 100]]);
+    this.fetchRecords();
 
     // On period update, fetch records
     const fetchRecords = this.fetchRecords;
@@ -37,6 +37,8 @@ export default class BinxAppOrgParkingNotificationMapping {
       urlParams.delete(param[0]); // remove any matching parameters
       urlParams.append(param[0], param[1]);
     }
+
+    log.debug(urlParams.toString());
 
     // Update the address bar to include the current parameters
     history.replaceState(

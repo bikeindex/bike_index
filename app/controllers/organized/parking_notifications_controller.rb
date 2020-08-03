@@ -23,12 +23,14 @@ module Organized
         format.html
         format.json do
           page = params[:page] || 1
-          per_page = params[:per_page] || 100
+          per_page = params[:per_page] || ParkingNotification::MAX_PER_PAGE
           # TODO: add sortable here
-          records = matching_parking_notifications.reorder(created_at: :desc).includes(:user, :bike, :impound_record)
-          render json: records.page(page).per(per_page),
-                 root: "parking_notifications",
-                 each_serializer: ParkingNotificationSerializer
+          records = matching_parking_notifications.reorder(created_at: :desc)
+            .includes(:user, :bike, :impound_record)
+            .page(page).per(per_page)
+          render json: records,
+                   root: "parking_notifications",
+                   each_serializer: ParkingNotificationSerializer
         end
       end
     end

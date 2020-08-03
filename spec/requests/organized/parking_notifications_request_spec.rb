@@ -72,7 +72,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "with searched bike" do
       let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization) }
       let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization) }
-      let(:bike) { parking_notification2.bike }
+      let!(:bike) { parking_notification2.bike }
       it "renders" do
         expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
         get base_url, params: {search_bike_id: bike.id}, headers: json_headers
@@ -84,6 +84,15 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
+
+        # Pagination tests
+        get "#{base_url}?per_page=1", headers: json_headers
+        expect(response.status).to eq(200)
+        pp response.headers
+        expect(response.header["Total"]).to eq("2")
+        expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
+        expect(json_result["parking_notifications"].count).to eq 1
+        expect(json_result.dig(:parking_notification, :id)).to eq parking_notification2.id # Because it was created more recently
       end
     end
   end
