@@ -6,9 +6,9 @@ class CreateBikeStickerUpdates < ActiveRecord::Migration[5.2]
       t.references :user
       t.references :organization
 
-      t.boolean :pos_claim, default: false
       t.integer :kind
       t.integer :creator_kind
+      t.integer :organization_kind
 
       t.timestamps
     end
