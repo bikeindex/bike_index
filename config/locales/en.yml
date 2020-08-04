@@ -2407,6 +2407,9 @@ en:
       all_you_have_to_do_is_go_to_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
         Index to access your Lightspeed Account.
+      already_have_a_sophisticated_html: >-
+        Already have a sophisticated email connection with your customers? Bike Index
+        can integrate with your existing flow - email %{link} for setup.
       bicycles_sold_before_you_activated_lights: >-
         Bicycles sold before you activated Lightspeed Retail integration will not
         be registered.

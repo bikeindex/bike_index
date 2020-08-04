@@ -3589,6 +3589,9 @@ nl:
       write_do_not_register: Als een klant niet wil dat een fiets wordt toegevoegd
         aan de fietsindex, schrijft u gewoon "NIET REGISTREREN" in de notities voor
         de verkoop en de fiets wordt niet geregistreerd.
+      already_have_a_sophisticated_html: Heeft u al een geavanceerde e-mailverbinding
+        met uw klanten? Bike Index kan worden geïntegreerd met uw bestaande stroom
+        - e-mail %{link} voor configuratie.
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
