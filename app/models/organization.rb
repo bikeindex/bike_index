@@ -48,7 +48,6 @@ class Organization < ApplicationRecord
   has_many :b_params
   has_many :invoices
   has_many :payments
-  has_many :bike_stickers
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
@@ -285,6 +284,10 @@ class Organization < ApplicationRecord
 
   def overview_dashboard?
     parent? || regional?
+  end
+
+  def bike_stickers
+    BikeSticker.where(organization_id: id).or(BikeSticker.where(secondary_organization_id: id))
   end
 
   def nearby_organizations

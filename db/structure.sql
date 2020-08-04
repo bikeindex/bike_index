@@ -406,6 +406,7 @@ CREATE TABLE public.bike_sticker_updates (
     bike_id bigint,
     user_id bigint,
     organization_id bigint,
+    pos_claim boolean DEFAULT false,
     kind integer,
     creator_kind integer,
     created_at timestamp without time zone NOT NULL,
