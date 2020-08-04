@@ -15,10 +15,24 @@ class BikeStickerUpdate < ApplicationRecord
   before_save :set_calculated_attributes
 
   def set_calculated_attributes
+    self.organization ||= calculated_organization
     self.creator_kind ||= calculated_creator_kind
   end
 
   private
+
+  def calculated_organization
+    return nil unless user.present?
+    if bike_sticker.organization.present?
+      if user.authorized?(bike_sticker.organization)
+        update_organization = bike_sticker.organization
+      elsif bike_sticker.organization.regional?
+        update_organization = user.organizations.where(id: bike_sticker.organization.regional_ids).first
+        update_organization ||= user.organizations.ambassador.first
+      end
+    end
+    update_organization || user.organizations.first
+  end
 
   def calculated_creator_kind
     return "creator_user" unless organization_id.present?
