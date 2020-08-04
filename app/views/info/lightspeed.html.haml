@@ -27,6 +27,7 @@
     %h3= t(".a_few_things_to_note")
 
   %ul.fancy-bullets
+    - email_link = link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"
     %li
       %span.blue-bullet
       %p= t(".write_do_not_register")
@@ -38,9 +39,11 @@
       %span.blue-bullet
       %p= t(".we_know_you_and_your_customers_html", link: link)
     %li
-      - link = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
       %span.blue-bullet
-      %p= t(".were_happy_to_answer_any_questions_html", link: link)
+      %p= t(".already_have_a_sophisticated_html", link: email_link)
+    %li
+      %span.blue-bullet
+      %p= t(".were_happy_to_answer_any_questions_html", link: email_link)
 
   %blockquote
     = t(".i_started_bike_index_because")
