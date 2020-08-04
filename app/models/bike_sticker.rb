@@ -5,8 +5,10 @@ class BikeSticker < ApplicationRecord
   MAX_UNORGANIZED = 10
   belongs_to :bike
   belongs_to :organization
+  belongs_to :secondary_organization, class_name: "Organization"
   belongs_to :user # User who assigns the bike
   belongs_to :bike_sticker_batch
+  has_many :bike_sticker_updates
 
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }

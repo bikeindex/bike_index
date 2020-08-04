@@ -25,7 +25,7 @@
           %td Registered by related organizations
           %td= number_with_delimiter(@bikes_in_child_organizations_count)
       - if current_organization.regional?
-        - if current_organization.nearby_organizations.any?
+        - if current_organization.regional_ids.any?
           %tr
             %td
               Registered by local bike shops or other organizations

@@ -249,8 +249,8 @@ class Organization < ApplicationRecord
     Organization.where(id: child_ids)
   end
 
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
+  def regional_organizations
+    Organization.where(id: regional_ids)
   end
 
   def regional_parents
@@ -259,6 +259,10 @@ class Organization < ApplicationRecord
 
   def default_impound_location
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
+  end
+
+  def bounding_box
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
   end
 
   # Try for publicly_visible, fall back to whatever
