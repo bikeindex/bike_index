@@ -31,11 +31,14 @@
         %li.nav-item
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
             #{@search_status.humanize} notifications
+            - if @search_status == "all"
+              statuses
           .dropdown-menu
             - (["all"] + ParkingNotification.statuses).each do |status|
               - status_active = @search_status == status
               - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
               - status_display = "#{status.humanize} notifications"
+              - status_display += " statuses" if status == "all"
               = link_to status_display, organization_parking_notifications_path(status_link_params), class: "dropdown-item linkWithSortableSearchParams #{status_active ? 'active' : ''}", "data-urlparams" => "search_status,#{status}"
               - if status == "all" # Add a divider after all
                 .dropdown-divider
@@ -102,7 +105,7 @@
       = hidden_field_tag :end_time, params[:end_time]
       = hidden_field_tag :search_status, @search_status
 
-  .row.mt-4
+  .row.mt-4.mb-2
     .col-sm-6
       - if search_params_present?
         = pluralize number_with_delimiter(matching_parking_notifications.count), "parking notification"
@@ -118,6 +121,13 @@
           %em.less-strong
             view notifications
             = link_to "for all bikes", organization_parking_notifications_path(sortable_search_params.merge(search_bike_id: nil)), class: "linkWithSortableSearchParams", "data-urlparams" => "search_bike_id,"
+      - if params[:user_id].present?
+        - user = User.find_by_id(params[:user_id])
+        Only notifications created by
+        %strong
+          = user&.display_name&.truncate(20)
+        %span.less-strong
+          = link_to "(view by all)", organization_parking_notifications_path(sortable_search_params.merge(user_id: nil)), class: "linkWithSortableSearchParams", "data-urlparams" => "user_id,"
 
     .col-md-6.col-xs-12
       -# Hide the repeat notification interface because the checks don't display on mobile

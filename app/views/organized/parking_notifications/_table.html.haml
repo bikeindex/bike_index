@@ -31,9 +31,6 @@
         Kind
     %th
       =t(".by")
-      - if render_sortable && params[:user_id].present?
-        %small.less-strong
-          = link_to "view by all", organization_parking_notifications_path(sortable_search_params.merge(user_id: nil)), class: "linkWithSortableSearchParams", "data-urlparams" => "user_id,"
     - unless skip_repeat
       %th
         %small=t(".notification_number")
