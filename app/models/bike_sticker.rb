@@ -126,32 +126,43 @@ class BikeSticker < ApplicationRecord
     return true if passed_user.superuser?
     if passed_organization.present?
       return false unless passed_user.authorized?(passed_organization)
+      return true if organization_authorized?(passed_organization)
+    elsif passed_user.organizations.detect { |o| organization_authorized?(o) }
+      return true
     end
-    return true if organization_authorized?(passed_organization) || passed_user.organizations.detect { |o| organization_authorized?(o) }
     unauthorized_sticker_ids = passed_user.unauthorized_organization_update_bike_sticker_ids
-    return true if unorganized_sticker_ids.include?(id)
-    unorganized_sticker_ids.count < MAX_UNORGANIZED
+    return true if unauthorized_sticker_ids.include?(id)
+    unauthorized_sticker_ids.count < MAX_UNORGANIZED
   end
 
-  # def authorized?(passed_user)
-  #   return true if passed_user == user || passed_user.superuser?
-  #   return true if organization.present? && passed_user.member_of?(organization)
-  #   passed_user.authorized?(bike) || claimable_by?(passed_user)
-  # end
-
-  # def unclaimable_by?(passed_user)
-  #   return false unless errors.none? && claimed?
-  #   authorized?(passed_user)
-  # end
-
-  # def unclaim!(passed_user, passed_organization = nil)
-  #   self.previous_bike_id = bike_id if bike_id.present?
-
-  #   update(bike_id: nil, user_id: nil, claimed_at: nil)
-  # end
-
   # Passing as hash so that the keywords don't override the methods here
-  # args => user: bike:, bike_string:, organization:
+  # args => user:, bike:, organization:
+  def claim(args = {})
+    claiming_bike = args[:bike].is_a?(Bike) ? args[:bike] : Bike.friendly_find(args[:bike])
+    claiming_organization = args[:organization] ||
+      args[:user]&.organizations&.detect { |o| organization_authorized?(o) }
+    bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id,
+                                                user: args[:user], organization: claiming_organization, bike: claiming_bike)
+    if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
+      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
+      errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")
+      bike_sticker_update.add_failed_claim_error("unable to find bike: #{args[:bike]}")
+    end
+    bike_sticker_update.save
+    return self if bike_sticker_update.failed_claim_errors.present?
+    if claiming_bike.blank?
+      update(bike: nil, claimed_at: nil)
+    else
+      self.secondary_organization = claiming_organization unless claiming_organization == organization
+      update(user: args[:user], bike: claiming_bike, claimed_at: Time.current)
+      if claiming_organization.present?
+        bike.bike_organizations.create(organization_id: claiming_organization.id, can_not_edit_claimed: true)
+      end
+    end
+    self
+  end
+
+  # args => same as #claim
   def claim_if_permitted(args = {})
     return claim(args[:user], args[:bike], args[:organization]) if claimable_by?(passed_user)
     if user.present?
@@ -160,27 +171,6 @@ class BikeSticker < ApplicationRecord
       errors.add(:user, :not_found) unless passed_user.present?
     end
     false
-  end
-
-  # args => user: bike_or_string:, organization:
-  def claim(args = {})
-    claiming_bike = args[:bike_or_string].is_a?(Bike) ? bike_or_string : Bike.friendly_find(args[:bike_or_string])
-
-    # if args[:user].present? # If we've passed a user, we need to ensure that the user can unclaim it
-    #   # Check bike_or_string, not bike_id, because we don't want to allow people adding bikes
-    #   if args[:bike_or_string].blank? && claiming_bike.blank? && unclaimable_by?(passed_user)
-    #   unclaim!
-    # elsif claiming_bike.present?
-    #   self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
-    #   unless errors.any?
-    #     update(bike_id: claiming_bike.id, user_id: passed_user.id, claimed_at: Time.current)
-    #     bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
-    #   end
-    # else
-    #   not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
-    #   errors.add(:bike, "\"#{bike_or_string}\" #{not_found}")
-    # end
-    self
   end
 
   # Bust cache keys TODO: Rails 5 update test this

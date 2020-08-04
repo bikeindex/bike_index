@@ -12,7 +12,7 @@ class BikeStickerUpdate < ApplicationRecord
   enum creator_kind: CREATOR_KIND_ENUM
   enum organization_kind: ORGANIZATION_KIND_ENUM
 
-  scope :successful, -> { where.not(kind: "failed_claim")}
+  scope :successful, -> { where.not(kind: "failed_claim") }
   scope :unauthorized_organization, -> { where(organization_kind: organization_kinds_unauthorized) }
 
   before_save :set_calculated_attributes
@@ -25,13 +25,23 @@ class BikeStickerUpdate < ApplicationRecord
     ORGANIZATION_KIND_ENUM.keys.map(&:to_s) - organization_kinds_unauthorized
   end
 
+  def previous_successful_updates
+    BikeStickerUpdate.where(bike_sticker_id: bike_sticker_id).successful
+      .where("created_at < ?", created_at || Time.current)
+  end
+
   def unauthorized_organization?
-    self.class.organization_kinds_authorized.include?(organization_kind)
+    !self.class.organization_kinds_authorized.include?(organization_kind)
+  end
+
+  def add_failed_claim_error(str)
+    self.failed_claim_errors = [(failed_claim_errors || nil), str].compact.join(", ")
   end
 
   def set_calculated_attributes
     self.creator_kind ||= "creator_user"
     self.organization_kind ||= calculated_organization_kind
+    self.kind ||= calculated_kind
   end
 
   private
@@ -42,8 +52,16 @@ class BikeStickerUpdate < ApplicationRecord
       "primary_organization"
     elsif bike_sticker.organization&.regional? && organization.regional_parents.pluck(:id).include?(bike_sticker.organization_id)
       "regional_organization"
+    elsif organization.paid?
+      "other_paid_organization"
     else
       "other_organization"
     end
+  end
+
+  def calculated_kind
+    return "failed_claim" if failed_claim_errors.present?
+    return "un_claim" if bike_id.blank?
+    previous_successful_updates.any? ? "re_claim" : "initial_claim"
   end
 end
