@@ -22,6 +22,7 @@ class User < ApplicationRecord
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships
+  has_many :bike_sticker_updates
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike
@@ -306,6 +307,10 @@ class User < ApplicationRecord
   # Just check a couple, so we don't move too slowly
   def rough_stolen_bikes
     rough_approx_bikes.stolen.limit(10)
+  end
+
+  def unauthorized_organization_update_bike_sticker_ids
+    bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
   end
 
   def render_donation_request

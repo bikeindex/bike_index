@@ -10,8 +10,8 @@ class BikeStickerUpdateMigrationWorker < ApplicationWorker
     if bike_sticker.previous_bike_id.present?
       earlier_claimed_at = bike_sticker.claimed_at || bike_sticker.updated_at
       earlier_update = bike_sticker.bike_sticker_updates.new(bike_id: bike_sticker.previous_bike_id,
-                                                              created_at: earlier_claimed_at - 1.hour,
-                                                                kind: "initial_claim")
+                                                             created_at: earlier_claimed_at - 1.hour,
+                                                             kind: "initial_claim")
       earlier_update.save!
     end
     return true unless bike_sticker.claimed?
@@ -20,6 +20,16 @@ class BikeStickerUpdateMigrationWorker < ApplicationWorker
                                                                 created_at: bike_sticker.claimed_at,
                                                                 kind: earlier_update.present? ? "re_claim" : "initial_claim",
                                                                 user: user)
+
+    if bike_sticker.organization.present? && user.authorized?(bike_sticker.organization)
+      update_organization = bike_sticker.organization
+    elsif bike_sticker.organization.present? && bike_sticker.organization.regional?
+      update_organization = user.organizations.where(id: bike_sticker.organization.regional_ids).first
+      update_organization ||= user.organizations.ambassador.first
+    end
+    update_organization ||= user.organizations.first
+    bike_sticker_update.organization_id = update_organization&.id
+
     bike_sticker_update.save!
     return true if bike_sticker_update.organization.blank? || bike_sticker.organization == bike_sticker_update.organization
     bike_sticker.update_column :secondary_organization_id, bike_sticker_update.organization_id

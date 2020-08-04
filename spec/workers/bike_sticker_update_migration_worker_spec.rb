@@ -39,7 +39,7 @@ RSpec.describe BikeStickerUpdateMigrationWorker, type: :job do
     end
     context "previous_bike_id" do
       let(:bike1) { FactoryBot.create(:bike) }
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, claimed_at: claimed_at, previous_bike_id: bike1.id)}
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, claimed_at: claimed_at, previous_bike_id: bike1.id) }
       it "creates a second bike_sticker_update" do
         expect { instance.perform(bike_sticker.id) }.to change(BikeStickerUpdate, :count).by 2
         bike_sticker.reload

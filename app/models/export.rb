@@ -113,7 +113,7 @@ class Export < ApplicationRecord
 
   def remove_bike_codes
     (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)&.unclaim!
+      BikeSticker.lookup(code, organization_id: organization_id)&.claim(user: nil, bike_string: nil, organization: organization)
     end
   end
 
