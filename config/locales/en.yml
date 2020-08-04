@@ -2452,7 +2452,7 @@ en:
       were_happy_to_answer_any_questions_html: >-
         We're happy to answer any questions you have about making Bike Index work
         with Lightspeed Retail and we're always looking for ways to improve the integration.
-        Please %{link} with any questions, concerns, comments, or suggestions.
+        Please email %{link} with any questions, concerns, comments, or suggestions.
       write_do_not_register: >-
         If a customer doesn't want a bike to be added to Bike Index, simply write
         "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
