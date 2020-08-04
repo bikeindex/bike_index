@@ -22,7 +22,7 @@ module Organized
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
-      # These are set here because we render it in HTML
+      # These are set here because we render them in HTML
       @search_status = if params[:search_status] == "all"
         "all"
       else
