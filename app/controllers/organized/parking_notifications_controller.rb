@@ -96,6 +96,9 @@ module Organized
       if @search_bounding_box.present?
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
+      if params[:user_id].present?
+        notifications = notifications.where(user_id: params[:user_id])
+      end
       if @search_unregistered == "only_unregistered"
         notifications = notifications.unregistered_bike
       elsif @search_unregistered == "not_unregistered"

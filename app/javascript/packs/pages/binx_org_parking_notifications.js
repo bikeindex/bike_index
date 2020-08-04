@@ -89,14 +89,14 @@ export default class BinxAppOrgParkingNotifications {
     return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="convertTime">${record.resolved_at}</a>`;
   }
 
-  mainTableCell(record) {
+  mainTableCell(record, userLink) {
     const showCellUrl = `${location.pathname}/${record.id}`;
 
     return `<a href="${showCellUrl}" class="convertTime">${
       record.created_at
     }</a> <span class="extended-col-info small"> - <em>${
       record.kind_humanized
-    }</em> - by ${record.user_display_name}<strong>${
+    }</em> - by ${userLink}<strong>${
       record.notification_number > 1
         ? "- notification #" + record.notification_number
         : ""
@@ -114,6 +114,9 @@ export default class BinxAppOrgParkingNotifications {
     if (typeof record !== "object" || typeof record.id !== "number") {
       return "";
     }
+    const userLink = record.user_id
+      ? `<a href="${window.location}&user_id=${record.user_id}">${record.user_display_name}</a>`
+      : "";
 
     return `<tr class="record-row" data-recordid="${
       record.id
@@ -122,9 +125,7 @@ export default class BinxAppOrgParkingNotifications {
       record
     )}</td><td class="hidden-sm-cells"><em>${
       record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${
-      record.user_display_name
-    }</td><td class="hidden-sm-cells">${
+    }</em></td><td class="hidden-sm-cells">${userLink}</td><td class="hidden-sm-cells">${
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${this.statusSpan(
       record.status

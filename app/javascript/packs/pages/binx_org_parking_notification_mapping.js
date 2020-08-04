@@ -28,17 +28,19 @@ export default class BinxAppOrgParkingNotificationMapping {
     });
     $("#timeSelectionBtnGroup .btn").on("click", (e) => {
       fetchRecords();
-      return true;
+      return true; // I don't know why this returns true
     });
     $("#redo-search-in-map").on("click", (e) => {
-      e.preventDefault();
       fetchRecords();
       return false;
     });
+    $("#FitMapTrigger").on("click", (e) => {
+      binxMapping.fitMap();
+      return false; // prevent default action
+    });
   }
 
-  fetchRecords(opts = []) {
-    $("#redo-search-in-map").fadeOut();
+  urlParamsWithOpts(opts = []) {
     // Use the period selector urlParams - which will use the current period -
     // even if the period is default (and not in the url)
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
@@ -52,6 +54,14 @@ export default class BinxAppOrgParkingNotificationMapping {
       urlParams.delete(param[0]); // remove any matching parameters
       urlParams.append(param[0], param[1]);
     }
+    return urlParams;
+  }
+
+  fetchRecords(opts = []) {
+    $("#redo-search-in-map").fadeOut();
+    const urlParams = binxAppOrgParkingNotificationMapping.urlParamsWithOpts(
+      opts
+    );
 
     // Update the address bar to include the current parameters
     history.replaceState(
@@ -222,6 +232,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     $(".recordsTotalCount .number").text(
       binxAppOrgParkingNotificationMapping.totalRecords
     );
+    // If there are more total records, show the maxNumber columns
     if (
       binxAppOrgParkingNotificationMapping.totalRecords >=
       binxAppOrgParkingNotificationMapping.perPage
@@ -229,6 +240,12 @@ export default class BinxAppOrgParkingNotificationMapping {
       $(".maxNumberDisplayed").slideDown();
     } else {
       $(".maxNumberDisplayed").slideUp();
+    }
+    // If there is a missmatch between the records found and the records visible, show fitToMap
+    if (renderedCount !== binxAppOrgParkingNotificationMapping.records.length) {
+      $("#FitMapTrigger").slideDown();
+    } else {
+      $("#FitMapTrigger").slideUp();
     }
   }
 

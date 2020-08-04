@@ -14,7 +14,7 @@
     #map
     %a#redo-search-in-map.currently-hidden{ href: "#" }
       redo search in current location
-  .row.mb-2
+  .row.mt-2.mb-4
     .col-xs-6
       .recordsCount
         %span.number 0
@@ -25,9 +25,41 @@
         total matches
         %em.maxNumberDisplayed.currently-hidden
           \- first #{@per_page} loaded
-          %small
-            tighten search to view others
+          %small.em tighten search to view others
+  .row.mt-2.mb-4
+    .col-sm-12
+      %ul.nav.nav-links
+        %li.nav-item
+          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+            #{@search_status.humanize} notifications
+          .dropdown-menu
+            - (ParkingNotification.statuses + ["all"]).each do |kind|
+              - if kind == "all" # Add a divider before all
+                .dropdown-divider
+              - kind_active = @search_status == kind
+              - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
+              - kind_display = "#{kind.humanize} notifications"
+              = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+        %li.nav-item
+          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+            - if @search_unregistered == "not_unregistered"
+              Registered bikes only
+            - else
+              #{@search_unregistered.humanize} bikes
+          .dropdown-menu
+            - unregistered_all_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: "all")
+            = link_to "All bikes", organization_parking_notifications_path(unregistered_all_link_params), class: "dropdown-item #{@search_unregistered == 'all' ? 'active' : ''}"
+            .dropdown-divider
+            - unregistered_active = @search_unregistered == "only_unregistered"
+            - unregistered_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_active ? nil : "only_unregistered"))
+            = link_to "Only unregistered bikes", organization_parking_notifications_path(unregistered_link_params), class: "dropdown-item #{unregistered_active ? 'active' : ''}"
 
+            - unregistered_not_active = @search_unregistered == "not_unregistered"
+            - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
+            = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item #{unregistered_not_active ? 'active' : ''}"
+        %li.nav-item
+          %a#FitMapTrigger.currently-hidden{href: "#"}
+            Fit map to notifications
   = render partial: "/shared/period_select", locals: { skip_submission: true }
 
   .mt-4
@@ -74,53 +106,11 @@
             view notifications
             = link_to "for all bikes", organization_parking_notifications_path(sortable_search_params.merge(search_bike_id: nil))
 
-  .row.mt-2.mb-4
-    .col-md-4.col-xs-6
-      .recordsCount
-        %span.number 0
-        = t(".matches_visible")
-    .col-md-4.col-xs-6
-      .recordsTotalCount.less-strong.text-right
-        %span.number 0
-        total matches
-        %em.maxNumberDisplayed.currently-hidden
-          \- first #{@per_page} loaded
-    .col-md-4.col-xs-12
+    .col-md-6.col-xs-12
       -# Hide the repeat notification interface because the checks don't display on mobile
       .text-right.hidden-md-down
         %a.gray-link#toggleSendRepeat{ href: "#sendRepeatNotifications", data: { toggle: "collapse", target: "#sendRepeatNotifications" } }
           retrieve/send repeat notification
-  .row.mt-2.mb-4
-    .col-sm-12
-      %ul.nav.justify-content-cente
-        %li.nav-item
-          %a.dropdown-toggle.uncap.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            #{@search_status.humanize} notifications
-          .dropdown-menu
-            - (ParkingNotification.statuses + ["all"]).each do |kind|
-              - if kind == "all" # Add a divider before all
-                .dropdown-divider
-              - kind_active = @search_status == kind
-              - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
-              - kind_display = "#{kind.humanize} notifications"
-              = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
-        %li.nav-item
-          %a.dropdown-toggle.uncap.btn.btn-outline-secondary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            - if @search_unregistered == "not_unregistered"
-              Registered bikes only
-            - else
-              #{@search_unregistered.humanize} bikes
-          .dropdown-menu
-            - unregistered_all_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: "all")
-            = link_to "All bikes", organization_parking_notifications_path(unregistered_all_link_params), class: "dropdown-item #{@search_unregistered == 'all' ? 'active' : ''}"
-            .dropdown-divider
-            - unregistered_active = @search_unregistered == "only_unregistered"
-            - unregistered_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_active ? nil : "only_unregistered"))
-            = link_to "Only unregistered bikes", organization_parking_notifications_path(unregistered_link_params), class: "dropdown-item #{unregistered_active ? 'active' : ''}"
-
-            - unregistered_not_active = @search_unregistered == "not_unregistered"
-            - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
-            = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item #{unregistered_not_active ? 'active' : ''}"
 
 
   - # Form needs to wrap the table too
@@ -147,7 +137,7 @@
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
 
     -# only hide status on current - because otherwise it displays the time things were resolved
-    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status == "current" }
+    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status == "current", render_sortable: true }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

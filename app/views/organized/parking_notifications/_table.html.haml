@@ -22,7 +22,11 @@
     - if render_address
       %th=t(".address")
     %th Kind
-    %th=t(".by")
+    %th
+      =t(".by")
+      - if render_sortable && params[:user_id].present?
+        %small.less-strong
+          = link_to "view by all", organization_parking_notifications_path(sortable_search_params.merge(user_id: nil))
     - unless skip_repeat
       %th
         %small=t(".notification_number")
@@ -73,7 +77,11 @@
           %em
             = parking_notification.kind_humanized
         %td.hidden-sm-cells
-          = parking_notification.user&.display_name&.truncate(20)
+          - if render_sortable && parking_notification.user.present?
+            = link_to parking_notification.user&.display_name&.truncate(20), organization_parking_notifications_path(sortable_search_params.merge(user_id: parking_notification.user_id))
+          - else
+            = parking_notification.user&.display_name&.truncate(20)
+
         - unless skip_repeat
           %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?
