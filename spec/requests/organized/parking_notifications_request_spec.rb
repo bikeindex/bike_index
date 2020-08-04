@@ -89,7 +89,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "100" # Because it's over the max permitted
+        expect(response.header["Per-Page"]).to eq "200" # Because it's over the max permitted
 
         # Pagination tests
         get "#{base_url}?per_page=1&page=2", headers: json_headers
@@ -104,7 +104,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         get "#{base_url}?search_southwest_coords=40.79184719166159,-77.87257982819405&search_northeast_coords=40.80632036997267,-77.85346084130906", headers: json_headers
         expect(json_result[:parking_notifications].count).to eq 1
         expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id
-        expect(response.header["Per-Page"]).to eq "100" # Default to 100
+        expect(response.header["Per-Page"]).to eq "200" # Default to 100
       end
     end
   end

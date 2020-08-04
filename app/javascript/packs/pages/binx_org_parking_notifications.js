@@ -115,7 +115,7 @@ export default class BinxAppOrgParkingNotifications {
       return "";
     }
     const userLink = record.user_id
-      ? `<a href="${window.location}&user_id=${record.user_id}">${record.user_display_name}</a>`
+      ? `<a href="${window.location}&user_id=${record.user_id}" class="linkWithSortableSearchParams" data-urlparams="user_id,${record.user_id}">${record.user_display_name}</a>`
       : "";
 
     return `<tr class="record-row" data-recordid="${

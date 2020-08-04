@@ -1,6 +1,7 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
+    include SortableTable
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
     before_action :set_period, only: [:index]
@@ -33,8 +34,8 @@ module Organized
         format.html
         format.json do
           @page = params[:page] || 1
-          # TODO: add sortable here
-          records = matching_parking_notifications.reorder(created_at: :desc).includes(:user, :bike, :impound_record)
+          records = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+            .includes(:user, :bike, :impound_record)
             .page(@page).per(@per_page)
           set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
 
@@ -72,6 +73,10 @@ module Organized
 
     private
 
+    def sortable_columns
+      %w[created_at updated_at user_id kind]
+    end
+
     def parking_notifications
       current_organization.parking_notifications
     end
@@ -98,6 +103,9 @@ module Organized
       end
       if params[:user_id].present?
         notifications = notifications.where(user_id: params[:user_id])
+      end
+      if ParkingNotification.kinds.include?(params[:search_kind]).present?
+        notifications = notifications.where(kind: params[:search_kind])
       end
       if @search_unregistered == "only_unregistered"
         notifications = notifications.unregistered_bike

@@ -28,49 +28,86 @@ export default class BinxAppOrgParkingNotificationMapping {
     });
     $("#timeSelectionBtnGroup .btn").on("click", (e) => {
       fetchRecords();
-      return true; // I don't know why this returns true
+      return true; // Returns true because of bootstrap button list actions
     });
     $("#redo-search-in-map").on("click", (e) => {
-      fetchRecords();
+      fetchRecordsWithCurrentLocation();
       return false;
     });
     $("#FitMapTrigger").on("click", (e) => {
-      binxMapping.fitMap();
+      e.preventDefault();
+      // If there are no notifications in the window, and we have passed a location, load the page without a location
+      if (binxAppOrgParkingNotificationMapping.zeroVisibleAtLocation()) {
+        window.location = binxAppOrgParkingNotificationMapping.urlForOpts([
+          ["search_southwest_coords", ""],
+          ["search_northeast_coords", ""],
+        ]);
+      } else {
+        binxMapping.fitMap();
+      }
       return false; // prevent default action
     });
+
+    $("#recordsTable, #parking-notification-nav-links").on(
+      "click",
+      ".linkWithSortableSearchParams",
+      (e) => {
+        const $target = $(e.target);
+        if ($target.attr("data-urlparams")) {
+          e.preventDefault();
+          let urlOpts = $target.attr("data-urlparams").split(",");
+          let urlParams = binxAppOrgParkingNotificationMapping.urlParamsForOpts(
+            [urlOpts]
+          );
+          window.location = `${location.pathname}?${urlParams.toString()}`;
+        }
+      }
+    );
   }
 
-  urlParamsWithOpts(opts = []) {
+  urlForOpts(opts = []) {
+    return `${
+      location.pathname
+    }?${binxAppOrgParkingNotificationMapping
+      .urlParamsForOpts(opts)
+      .toString()}`;
+  }
+
+  fetchRecordsWithCurrentLocation(opts = []) {
+    // Add the current location, unless we're fetching the default location - or a location was passed in
+    if (!window.pageInfo.default_location) {
+      // check for the boundary box keys
+      const optsValues = opts.map((param) => param[0]);
+      if (!optsValues.includes("search_southwest_coords")) {
+        opts = opts.concat(binxMapping.boundingBoxParams());
+      }
+    }
+    return fetchRecords(opts);
+  }
+
+  urlParamsForOpts(opts = []) {
     // Use the period selector urlParams - which will use the current period -
     // even if the period is default (and not in the url)
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
 
-    // Add the current location, unless we're fetching the default location
-    if (!window.pageInfo.default_location) {
-      opts = opts.concat(binxMapping.boundingBoxParams());
-    }
-
     for (const param of opts) {
       urlParams.delete(param[0]); // remove any matching parameters
-      urlParams.append(param[0], param[1]);
+      if (param[1] !== null && param[1].length) {
+        urlParams.append(param[0], param[1]);
+      }
     }
     return urlParams;
   }
 
   fetchRecords(opts = []) {
     $("#redo-search-in-map").fadeOut();
-    const urlParams = binxAppOrgParkingNotificationMapping.urlParamsWithOpts(
-      opts
-    );
+
+    const urlParams = binxAppOrgParkingNotificationMapping.urlParamsForOpts();
+    const url = binxAppOrgParkingNotificationMapping.urlForOpts();
 
     // Update the address bar to include the current parameters
-    history.replaceState(
-      {},
-      "",
-      `${location.pathname}?${urlParams.toString()}`
-    );
+    history.replaceState({}, url);
 
-    let url = `${location.pathname}?${urlParams.toString()}`;
     log.debug("fetching notifications: " + url);
 
     // Update the bike search panel to get specific bikes
@@ -107,6 +144,16 @@ export default class BinxAppOrgParkingNotificationMapping {
     return binxMapping.markersInViewport().map((marker) => {
       return this.records.find((record) => marker.binxId == record.id);
     });
+  }
+
+  zeroVisibleAtLocation() {
+    // If there is a stored location and there are no records there at all
+    return (
+      binxAppOrgParkingNotificationMapping.records.length === 0 &&
+      binxAppOrgParkingNotificationMapping
+        .urlParamsForOpts()
+        .getAll("search_southwest_coords")
+    );
   }
 
   // this loops and calls itself again if we haven't finished rendering the map and the records
@@ -174,7 +221,7 @@ export default class BinxAppOrgParkingNotificationMapping {
 
   inititalizeMapMarkers() {
     binxMapping.addMarkers({
-      fitMap: window.pageInfo.default_location,
+      fitMap: window.pageInfo.default_location, // only fitMap if it's the default location
     });
 
     // Add a trigger to the map when the viewport changes (after it has finished moving)
@@ -242,7 +289,10 @@ export default class BinxAppOrgParkingNotificationMapping {
       $(".maxNumberDisplayed").slideUp();
     }
     // If there is a missmatch between the records found and the records visible, show fitToMap
-    if (renderedCount !== binxAppOrgParkingNotificationMapping.records.length) {
+    if (
+      renderedCount !== binxAppOrgParkingNotificationMapping.records.length ||
+      binxAppOrgParkingNotificationMapping.zeroVisibleAtLocation()
+    ) {
       $("#FitMapTrigger").slideDown();
     } else {
       $("#FitMapTrigger").slideUp();
