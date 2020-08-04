@@ -135,12 +135,19 @@ class BikeSticker < ApplicationRecord
     unauthorized_sticker_ids.count < MAX_UNORGANIZED
   end
 
+  def claiming_bike_for_args(args)
+    args[:bike].is_a?(Bike) ? args[:bike] : Bike.friendly_find(args[:bike])
+  end
+
+  def claiming_organization_for_args(args)
+    args[:organization] || args[:user]&.organizations&.detect { |o| organization_authorized?(o) }
+  end
+
   # Passing as hash so that the keywords don't override the methods here
   # args => user:, bike:, organization:
   def claim(args = {})
-    claiming_bike = args[:bike].is_a?(Bike) ? args[:bike] : Bike.friendly_find(args[:bike])
-    claiming_organization = args[:organization] ||
-      args[:user]&.organizations&.detect { |o| organization_authorized?(o) }
+    claiming_bike = claiming_bike_for_args(args)
+    claiming_organization = claiming_organization_for_args(args)
     bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id,
                                                 user: args[:user], organization: claiming_organization, bike: claiming_bike)
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
@@ -164,13 +171,15 @@ class BikeSticker < ApplicationRecord
 
   # args => same as #claim
   def claim_if_permitted(args = {})
-    return claim(args[:user], args[:bike], args[:organization]) if claimable_by?(passed_user)
-    if user.present?
-      errors.add(:user, :unauthorized_to_claim)
-    else
-      errors.add(:user, :not_found) unless passed_user.present?
-    end
-    false
+    args[:organization] = claiming_organization_for_args(args)
+    return claim(args) if claimable_by?(args[:user], args[:organization])
+    errors.add(:user, args[:user].present? ? :unauthorized_to_claim : :not_found)
+    BikeStickerUpdate.create(bike_sticker_id: id,
+                             user: args[:user],
+                             organization: args[:organization],
+                             bike: claiming_bike_for_args(args),
+                             failed_claim_errors: errors.full_messages.join(", "))
+    self
   end
 
   # Bust cache keys TODO: Rails 5 update test this

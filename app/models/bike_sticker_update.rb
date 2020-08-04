@@ -34,8 +34,11 @@ class BikeStickerUpdate < ApplicationRecord
     !self.class.organization_kinds_authorized.include?(organization_kind)
   end
 
-  def add_failed_claim_error(str)
-    self.failed_claim_errors = [(failed_claim_errors || nil), str].compact.join(", ")
+  def add_failed_claim_error(str_or_array)
+    self.failed_claim_errors = [
+      (failed_claim_errors || nil),
+      Array(str_or_array)
+    ].flatten.compact.join(", ")
   end
 
   def set_calculated_attributes

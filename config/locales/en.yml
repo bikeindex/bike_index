@@ -751,7 +751,7 @@ en:
           suspended: suspended and can't be used
         bike_sticker:
           not_found: not found
-          unauthorized_to_claim: do not have permission to claim this
+          unauthorized_to_claim: does not have permission to claim this
         export:
           required: required
         impound_record:
