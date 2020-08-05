@@ -147,6 +147,7 @@ class BikeSticker < ApplicationRecord
 
   # Passing as hash so that the keywords don't override the methods here
   # args => user:, bike:, organization:, creator_kind:, export_id:
+  # NOTE: bike can be a bike or string (for friendly finding)
   def claim(args = {})
     claiming_bike = claiming_bike_for_args(args)
     claiming_organization = claiming_organization_for_args(args)

@@ -248,10 +248,6 @@ class Organization < ApplicationRecord
     Organization.where(id: child_ids)
   end
 
-  def regional_organizations
-    Organization.where(id: regional_ids)
-  end
-
   def regional_parents
     self.class.regional.where("regional_ids @> ?", [id].to_json)
   end
