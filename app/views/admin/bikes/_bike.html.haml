@@ -117,7 +117,11 @@
               Address
             %td
               %small
-                = bike.registration_address || bike.address
+                - address = bike.registration_address || bike.address
+                - if address.present? # Make this a little easier to see, don't use ruby specific hashes
+                  \{
+                  = address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
+                  \}
                 %span.only-dev-visible.ml-2
                   manual:
                   = bike.address_set_manually

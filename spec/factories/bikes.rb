@@ -114,6 +114,7 @@ FactoryBot.define do
         after(:create) do |bike, _evaluator|
           create(:creation_state, creator: bike.creator,
                                   bike: bike,
+                                  created_at: bike.created_at,
                                   is_pos: true,
                                   pos_kind: "lightspeed_pos",
                                   organization: bike.creation_organization)
@@ -127,6 +128,7 @@ FactoryBot.define do
         after(:create) do |bike, evaluator|
           create(:creation_state, creator: bike.creator,
                                   bike: bike,
+                                  created_at: bike.created_at,
                                   is_pos: true,
                                   pos_kind: "ascend_pos",
                                   bulk_import: evaluator.bulk_import,
@@ -141,6 +143,7 @@ FactoryBot.define do
         create(:creation_state, creator: bike.creator,
                                 organization: bike.creation_organization,
                                 bike: bike,
+                                created_at: bike.created_at,
                                 can_edit_claimed: evaluator.can_edit_claimed)
         bike.save
         bike.reload

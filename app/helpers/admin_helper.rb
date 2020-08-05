@@ -31,6 +31,7 @@ module AdminHelper
       {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
       {title: "TSV Exports", path: admin_tsvs_path, match_controller: false},
+      {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
       {title: "Maintenance", path: admin_maintenance_path, match_controller: false},
       {title: "Failed Bikes", path: admin_failed_bikes_path, match_controller: true},
       {title: "Component Types", path: admin_ctypes_path, match_controller: true},
@@ -85,5 +86,11 @@ module AdminHelper
     else
       edit_admin_mail_snippet_path(mail_snippet.id)
     end
+  end
+
+  def credibility_scorer_color(score)
+    return "#dc3545" if score < 31
+    return "#ffc107" if score < 70
+    "#28a745"
   end
 end

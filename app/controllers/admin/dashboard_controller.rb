@@ -21,6 +21,9 @@ class Admin::DashboardController < Admin::BaseController
   def scheduled_jobs
   end
 
+  def crediblity_badges
+  end
+
   def bust_z_cache
     Rails.cache.clear
     flash[:success] = "Z cash WAAAAAS busted!"
