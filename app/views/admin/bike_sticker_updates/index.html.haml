@@ -30,6 +30,23 @@
 - if @render_chart
   = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
 
+  - unless params[:organization_id].present?
+    .row.mt-2
+      .col-md-6.offset-md-3
+        %table.table-list.wide-definition
+          %tbody
+            - matching_sticker_per_org_id = matching_bike_sticker_updates.distinct.pluck(:organization_id).map { |id| [id, matching_bike_sticker_updates.where(organization_id: id).count] }
+            - matching_sticker_per_org_id.sort_by { |id, number| number }.each do |id, number|
+              - organization = Organization.find(id) if id.present?
+              %tr
+                %td
+                  - if organization.present?
+                    = link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id))
+                  - else
+                    = link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: ""
+                %td
+                  = number_with_delimiter(number)
+
 .mt-2
   = render partial: "/shared/period_select"
 
@@ -45,6 +62,13 @@
       %p
         %strong
           Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Sticker updates
+
+    - elsif params[:organization_id].present?
+      %p
+        %strong
+          Viewing Sticker updates
+          %em
+            with no organization
 
   .col-md-6.mt-2.text-right
     = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do

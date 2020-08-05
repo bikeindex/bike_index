@@ -29,7 +29,10 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
   def matching_bike_sticker_updates
     bike_sticker_updates = BikeStickerUpdate.all
     bike_stickers = BikeSticker.all
-    if current_organization.present?
+    if params[:organization_id] == "none"
+      @current_organization = nil
+      bike_sticker_updates = bike_sticker_updates.where(organization_id: current_organization.id)
+    elsif current_organization.present?
       bike_sticker_updates = bike_sticker_updates.where(organization_id: current_organization.id)
       bike_stickers = bike_stickers.where(organization_id: current_organization.id)
     end
