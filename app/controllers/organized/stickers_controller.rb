@@ -55,7 +55,7 @@ module Organized
     end
 
     def searched
-      searched_codes = BikeSticker.where(organization_id: current_organization.id)
+      searched_codes = current_organization.bike_stickers
       if params[:search_bike].present?
         searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:search_bike])&.id)
       elsif params[:search_claimedness] && params[:search_claimedness] != "all"

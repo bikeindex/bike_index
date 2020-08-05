@@ -49,10 +49,9 @@ class BikeSticker < ApplicationRecord
   def self.organization_search(organization_id)
     if organization_id.present?
       org = Organization.friendly_find(organization_id)
-      return where(organization_id: org.id) if org.present?
+      return where(organization_id: org.id).or(where(secondary_organization_id: org.id)) if org.present?
     end
-    # Sorta ugly, but this needs to return an empty active record collection
-    where(organization_id: 0)
+    BikeSticker.none
   end
 
   # organization_id can be any organization identifier (name, slug, id)
