@@ -271,8 +271,8 @@ class Bike < ApplicationRecord
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
-  def credibility_score
-    CredibilityScorer.score(self)
+  def credibility_scorer
+    CredibilityScorer.new(self)
   end
 
   def creation_state

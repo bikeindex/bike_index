@@ -3,33 +3,35 @@ class CredibilityScorer
   MAX_SCORE = 100
 
   BADGES = {
-    override: {
-      pos_registration: 100,
-      banned: -100
+    overrides: {
+      created_by_point_of_sale: 100,
+      user_banned: -200
     },
 
     creation: {
       no_creator: -10,
       creation_organization_trusted: 20,
-      creation_organization_suspicious: -10
+      creation_organization_suspicious: -10,
+      created_this_month: -10,
+      created_1_year_ago: 10,
+      created_2_years_ago: 20,
+      created_3_years_ago: 30,
+      created_5_years_ago: 40
     },
 
     ownership: {
-      current_registration_claimed: 10,
-      multiple_ownerships: 10,
-      registered_this_month: -10,
-      registered_1_year_ago: 10,
-      registered_2_years_ago: 20,
-      registered_3_years_ago: 30,
-      registered_5_years_ago: 40
+      current_ownership_claimed: 10,
+      multiple_ownerships: 10
     },
 
     user: {
-      ambassador: 50,
-      longtime_user: 10
+      user_ambassador: 50,
+      user_veteran: 10
     },
 
-    misc: {
+    bike: {
+      serial_missing: -10,
+      serial_duplicated: -20,
       has_bike_sticker: 10,
       has_photos: 10
     }
@@ -39,8 +41,93 @@ class CredibilityScorer
     BADGES.values.inject(&:merge)
   end
 
+  def self.permitted_badges_array(badges_array)
+    badges_array = Array(badges_array)
+    if (badges_array & %i[user_ambassador creation_organization_trusted]).count == 2
+      badges_array -= [:creation_organization_trusted]
+    end
+    badges_array
+  end
+
+  def self.permitted_badges_hash(badges_array)
+    all_badges.slice(*permitted_badges_array(badges_array)).sort_by { |_badge, value| value }.to_h
+  end
+
   def self.badge_value(badges_array)
-    Array(badges_array).uniq.map { |key| all_badges[key] }.sum
+    permitted_badges_hash(badges_array).map { |badge, value| value }.sum
+  end
+
+  def self.creation_badges(creation_state = nil)
+    return [] unless creation_state.present?
+    return [:created_by_point_of_sale] if creation_state.is_pos
+    c_badges = [creation_age_badge(creation_state)].compact
+    c_badges << :no_creator if creation_state.creator.blank?
+    if creation_state.organization_id.present?
+      c_badges << :creation_organization_suspicious if organization_suspicious?(creation_state.organization)
+      c_badges << :creation_organization_trusted if organization_trusted?(creation_state.organization)
+    end
+    c_badges
+  end
+
+  def self.ownership_badges(bike)
+    return [] unless bike.current_ownership.present?
+    [
+      bike.ownerships.count > 1 ? :multiple_ownerships : nil,
+      bike.claimed? ? :current_ownership_claimed : nil
+    ].compact
+  end
+
+  def self.bike_user_badges(bike)
+    users = bike.ownerships.map { |o| [o.creator, o.user] }.flatten.reject(&:blank?).uniq
+    badges = users.map { |u| user_badges(u) }.flatten.uniq
+    return [:user_banned] if badges.include?(:user_banned)
+    return [:user_ambassador] if badges.include?(:user_ambassador)
+    badges
+  end
+
+  def self.bike_badges(bike)
+    [
+      bike.serial_unknown? ? :serial_missing : nil,
+      bike.duplicate_bikes.any? ? :serial_duplicated : nil,
+      bike.public_images.any? ? :has_photos : nil,
+      bike.bike_stickers.any? ? :has_bike_sticker : nil
+    ].compact
+  end
+
+  def self.user_badges(user)
+    return [] unless user.present?
+    return [:user_banned] if user.banned
+    return [:user_ambassador] if user.ambassador?
+    user.created_at < Time.current - 2.years ? [:user_veteran] : []
+  end
+
+  #
+  # Individual methods for badges below here. Maybe should be private?
+  # TODO: Figure out a better structure for this
+  #
+
+  def self.creation_age_badge(obj)
+    if obj.created_at > Time.current - 1.year
+      obj.created_at > Time.current - 1.month ? :created_this_month : nil
+    elsif obj.created_at > Time.current - 2.years
+      :created_1_year_ago
+    elsif obj.created_at > Time.current - 3.years
+      :created_2_years_ago
+    elsif obj.created_at > Time.current - 5.years
+      :created_3_years_ago
+    else
+      :created_5_years_ago
+    end
+  end
+
+  def self.organization_suspicious?(organization)
+    return true if organization.blank?
+    !organization.approved
+  end
+
+  def self.organization_trusted?(organization)
+    return false unless organization.present?
+    organization.paid? || organization.bike_shop? && organization.does_not_need_pos?
   end
 
   def initialize(bike)
@@ -48,6 +135,7 @@ class CredibilityScorer
   end
 
   def badges
+    self.class.permitted_badges_array(calculated_badges)
   end
 
   def score
@@ -56,49 +144,12 @@ class CredibilityScorer
     badge_value > MAX_SCORE ? MAX_SCORE : badge_value
   end
 
-  # def self.banned_user?(bike)
-  #   bike.ownerships.any? { |o| o.creator&.banned? || o.user&.banned? }
-  # end
+  private
 
-  # def self.score_methods(bike)
-  #   [
-  #     bike.creation_organization.present? ? :creation_organization_score : nil,
-  #     bike.ownerships.count > 1 ? bike.ownerships
-  #   ].compact
-  #   creation_organization_score(bike) +
-  #   ownerships_score(bike) +
-  #     user_score(bike.creator, bike.creator_id) +
-  #     current_owner_score(bike.user)
-  # end
-
-  # def self.creation_organization_score(bike)
-  #   organization_score(bike.creation_organization, bike.creation_organization_id)
-  # end
-
-  # def self.organization_score(organization = nil, organization_id = nil)
-  #   organization_id ||= organization&.id
-  #   return 0 if organization_id.blank?
-  #   organization ||= Organization.unscoped.find(organization_id)
-  #   return 50 if organization.ambassador?
-  #   return -10 if organization.deleted?
-  #   organization.approved? ? 10 : -10
-  # end
-
-  # def self.ownerships_score(bike)
-  #   0
-  # end
-
-  # def self.current_owner_score(user)
-  #   return 0 if user.blank?
-  #   uscore = user_score(user)
-  #   uscore < 0 ? uscore : uscore + 10
-  # end
-
-  # def self.user_score(user = nil, user_id = nil)
-  #   user_id ||= user&.id
-  #   return 0 if user_id.blank?
-  #   return -10 if user.blank? # Because user is deleted
-  #   return 50 if user.ambassador?
-  #   user.organizations.map { |o| organization_score(o) }.max || 0
-  # end
+  def calculated_badges
+    self.class.creation_badges(@bike.creation_state) +
+      self.class.ownership_badges(@bike) +
+      self.class.bike_user_badges(@bike) +
+      self.class.bike_badges(@bike)
+  end
 end

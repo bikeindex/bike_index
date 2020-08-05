@@ -23,42 +23,24 @@
             = l @bike.deleted_at, format: :convert_time
   .col-4.col-md-2
     .text-right
-      - score = @bike.credibility_score
-      .credibility-score{ style: "background: #{credibility_scorer_color(score)};" }
+      - scorer = @bike.credibility_scorer
+      .credibility-score{ style: "background: #{credibility_scorer_color(scorer.score)};" }
         .main-crediblity-score-box
           %a.credibility-title{ href: ".score-details", data: { toggle: "collapse" } }
             Credibility Score
           %span.score-number
-            = score
+            = scorer.score
         .score-details.collapse.text-left
           %span.details-title
             Factors in the score:
           %table.table-list
             %tbody
-              %tr
-                %td
-                  Creator
-                %td
-                  = CredibilityScorer.user_score(@bike.creator, @bike.creator_id)
-              - if @bike.creation_organization.present?
+              - CredibilityScorer.permitted_badges_hash(scorer.badges).each do |badge, value|
                 %tr
-                  %td Creating org
                   %td
-                    = CredibilityScorer.creation_organization_score(@bike)
-              - unless @bike.user == @bike.creator
-                %tr
-                  %td Owner
+                    = badge.to_s.humanize
                   %td
-                    - if @bike.user.present?
-                      = CredibilityScorer.current_owner_score(@bike.user)
-                    - else
-                      Bike not claimed!
-              - if @bike.ownerships.count > 1
-                %tr
-                  %td Previous Ownerships
-                  %td
-                    = CredibilityScorer.ownerships_score(@bike)
-
+                    = value
 
 
 - if @bike.user_hidden

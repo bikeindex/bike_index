@@ -2,8 +2,8 @@
 FactoryBot.define do
   factory :duplicate_bike_group do
     transient do
-      serial_number { "duplicateserialnumber" }
-      bike1 { FactoryBot.create(:bike, serial_number: serial_number) }
+      serial_number { bike1.serial_number }
+      bike1 { FactoryBot.create(:bike, serial_number: "duplicateserialnumber") }
       bike2 { FactoryBot.create(:bike, serial_number: serial_number) }
       normalized_serial_segments1 do
         bike1.create_normalized_serial_segments
