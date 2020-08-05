@@ -17,12 +17,16 @@ class BikeStickerUpdate < ApplicationRecord
 
   before_save :set_calculated_attributes
 
+  def self.kind
+    ORGANIZATION_KIND_ENUM.keys.map(&:to_s)
+  end
+
   def self.organization_kinds_unauthorized
     %w[no_organization other_organization]
   end
 
   def self.organization_kinds_authorized
-    ORGANIZATION_KIND_ENUM.keys.map(&:to_s) - organization_kinds_unauthorized
+    kinds - organization_kinds_unauthorized
   end
 
   def previous_successful_updates

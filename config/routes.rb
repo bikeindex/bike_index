@@ -185,7 +185,7 @@ Rails.application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :memberships, :bulk_imports, :exports, :bike_stickers,
+    resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
       :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications
 
