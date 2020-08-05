@@ -159,6 +159,7 @@ class BikeSticker < ApplicationRecord
     end
     bike_sticker_update.save
     return self if bike_sticker_update.failed_claim_errors.present?
+    self.previous_bike_id = bike_id unless bike_id.blank? || bike_id == claiming_bike&.id
     if claiming_bike.blank?
       update(bike: nil, claimed_at: nil)
     else
@@ -189,10 +190,6 @@ class BikeSticker < ApplicationRecord
     if bike_id.present?
       found_b = Bike.where(id: bike_id).first
       found_b&.update_attributes(updated_at: Time.current)
-    end
-    if previous_bike_id.present?
-      found_previous_b = Bike.where(id: previous_bike_id).first
-      found_previous_b&.update_attributes(updated_at: Time.current)
     end
   end
 

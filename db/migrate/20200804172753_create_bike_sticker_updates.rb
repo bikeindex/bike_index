@@ -10,6 +10,7 @@ class CreateBikeStickerUpdates < ActiveRecord::Migration[5.2]
       t.integer :creator_kind
       t.integer :organization_kind
 
+      t.integer :update_number
       t.text :failed_claim_errors
 
       t.timestamps

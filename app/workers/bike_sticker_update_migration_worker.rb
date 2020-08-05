@@ -1,6 +1,6 @@
 # NOTE: process them in claimed order, so we get IDs roughly in line with claim history
 # BikeSticker.claimed.reorder(:claimed_at).pluck(:id)
-# ... and after migration, remove this worker and BikeSticker#previous_bike_id
+# ... and after migration, remove this worker
 class BikeStickerUpdateMigrationWorker < ApplicationWorker
   sidekiq_options queue: "low_priority"
 
@@ -21,13 +21,13 @@ class BikeStickerUpdateMigrationWorker < ApplicationWorker
                                                                 kind: earlier_update.present? ? "re_claim" : "initial_claim",
                                                                 user: user)
 
-    if bike_sticker.organization.present? && user.authorized?(bike_sticker.organization)
+    if bike_sticker.organization.present? && user&.authorized?(bike_sticker.organization)
       update_organization = bike_sticker.organization
     elsif bike_sticker.organization.present? && bike_sticker.organization.regional?
-      update_organization = user.organizations.where(id: bike_sticker.organization.regional_ids).first
-      update_organization ||= user.organizations.ambassador.first
+      update_organization = user&.organizations.where(id: bike_sticker.organization.regional_ids).first
+      update_organization ||= user&.organizations.ambassador.first
     end
-    update_organization ||= user.organizations.first
+    update_organization ||= user&.organizations.first
     bike_sticker_update.organization_id = update_organization&.id
 
     bike_sticker_update.save!

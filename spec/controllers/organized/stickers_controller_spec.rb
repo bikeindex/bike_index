@@ -99,6 +99,7 @@ RSpec.describe Organized::StickersController, type: :controller do
           expect(response).to redirect_to bike_path(bike2)
           bike_sticker.reload
           expect(bike_sticker.bike_id).to eq bike2.id
+          expect(bike_sticker.previous_bike_id).to eq(bike.id)
           bike2.reload
           expect(bike2.organizations.pluck(:id)).to eq([organization.id])
         end
@@ -113,6 +114,7 @@ RSpec.describe Organized::StickersController, type: :controller do
             expect(response).to redirect_to bike_path(bike2)
             bike_sticker.reload
             expect(bike_sticker.bike_id).to eq bike2.id
+            expect(bike_sticker.previous_bike_id).to eq bike1.id
           end
           context "code blank" do
             it "redirects back" do
@@ -156,6 +158,7 @@ RSpec.describe Organized::StickersController, type: :controller do
         end
         context "nil bike_id" do
           it "updates and removes the assignment" do
+            og_user_id = bike_sticker.user_id
             expect {
               put :update, params: {id: bike_sticker.code, bike_id: nil, organization_id: organization.id}
             }.to change(BikeStickerUpdate, :count).by 1
@@ -164,8 +167,8 @@ RSpec.describe Organized::StickersController, type: :controller do
             bike_sticker.reload
             expect(bike_sticker.claimed_at).to be_nil
             expect(bike_sticker.bike_id).to be_nil
-            expect(bike_sticker.user_id).to be_nil
-            expect(bike_sticker.previous_bike_id).to eq bike.id
+            expect(bike_sticker.user_id).to eq og_user_id
+            expect(bike_sticker.previous_bike_id).to eq(bike.id)
           end
         end
       end

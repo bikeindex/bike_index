@@ -409,6 +409,7 @@ CREATE TABLE public.bike_sticker_updates (
     kind integer,
     creator_kind integer,
     organization_kind integer,
+    update_number integer,
     failed_claim_errors text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL

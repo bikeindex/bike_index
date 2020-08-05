@@ -54,6 +54,7 @@ class BikeStickerUpdate < ApplicationRecord
     self.creator_kind ||= "creator_user"
     self.organization_kind ||= calculated_organization_kind
     self.kind ||= calculated_kind
+    self.update_number ||= previous_successful_updates.count + 1
   end
 
   private

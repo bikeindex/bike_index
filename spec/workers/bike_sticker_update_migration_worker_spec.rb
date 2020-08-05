@@ -53,6 +53,7 @@ RSpec.describe BikeStickerUpdateMigrationWorker, type: :job do
         expect(bike_sticker_update1.kind).to eq "initial_claim"
         expect(bike_sticker_update1.creator_kind).to eq "creator_user"
         expect(bike_sticker_update1.organization_kind).to eq "no_organization"
+        expect(bike_sticker_update1.update_number).to eq 1
 
         bike_sticker_update2 = bike_sticker.bike_sticker_updates.reorder(:created_at).last
         expect(bike_sticker_update2.created_at).to be_within(1).of claimed_at
@@ -62,6 +63,7 @@ RSpec.describe BikeStickerUpdateMigrationWorker, type: :job do
         expect(bike_sticker_update2.kind).to eq "re_claim"
         expect(bike_sticker_update2.creator_kind).to eq "creator_user"
         expect(bike_sticker_update2.organization_kind).to eq "no_organization"
+        expect(bike_sticker_update2.update_number).to eq 2
       end
     end
   end
