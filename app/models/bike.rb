@@ -271,6 +271,10 @@ class Bike < ApplicationRecord
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
+  def credibility_score
+    CredibilityScorer.score(self)
+  end
+
   def creation_state
     creation_states.first
   end
@@ -288,7 +292,7 @@ class Bike < ApplicationRecord
   end
 
   def pos?
-    pos_kind != "no_pos"
+    pos_kind.present? && pos_kind != "no_pos"
   end
 
   def current_ownership
