@@ -45,11 +45,12 @@ RSpec.describe Organized::StickersController, type: :controller do
 
     context "logged in as organization member" do
       describe "index" do
+        let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, secondary_organization: organization) }
         it "renders" do
           get :index, params: {organization_id: organization.to_param}
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
-          expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
+          expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker.id, bike_sticker2.id])
         end
         context "with query search" do
           let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
