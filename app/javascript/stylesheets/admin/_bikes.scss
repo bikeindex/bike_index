@@ -31,6 +31,37 @@
   }
 }
 
+.credibility-score {
+  border: 2px solid rgba(black, 0.25);
+  .main-crediblity-score-box {
+    text-align: center;
+    padding: 1rem 0;
+    .credibility-title {
+      display: block;
+      color: #fff;
+      text-decoration: underline;
+    }
+    .score-number {
+      margin-top: 0.5rem;
+      display: block;
+      font-size: 125%;
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+  .score-details {
+    background: #fff;
+    padding: 0.2rem 0 0;
+    .details-title {
+      padding: 0.5rem 0.1rem;
+      display: block;
+    }
+    .table-list {
+      margin-bottom: 0;
+    }
+  }
+}
+
 // Admin bike table specials
 .admin-bike-table-serial-cell {
   display: none;

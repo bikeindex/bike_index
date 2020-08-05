@@ -63,6 +63,14 @@ RSpec.describe Admin::DashboardController, type: :controller do
       end
     end
 
+    describe "credibility_badges" do
+      it "renders" do
+        get :credibility_badges
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:credibility_badges)
+      end
+    end
+
     describe "scheduled_jobs" do
       it "renders" do
         get :scheduled_jobs
