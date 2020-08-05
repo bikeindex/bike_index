@@ -13,7 +13,7 @@
   = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
 .admin-subnav.midpage-subnav
-  .col-8.col-md-10
+  .col-8.col-lg-10
     %h1
       Edit Bike
       - if @bike.deleted?
@@ -21,7 +21,7 @@
           Deleted at:
           %span.convertTime.preciseTime
             = l @bike.deleted_at, format: :convert_time
-  .col-4.col-md-2
+  .col-4.col-lg-2
     .text-right
       - scorer = @bike.credibility_scorer
       .credibility-score{ style: "background: #{credibility_scorer_color(scorer.score)};" }
