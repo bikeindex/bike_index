@@ -465,7 +465,7 @@ class Organization < ApplicationRecord
     return "other_pos" if recent_bikes.any_pos.count > 0
     if bike_shop? && recent_bikes.count > 2
       return "does_not_need_pos" if created_at < Time.current - 1.week ||
-        bikes.where("created > ?", Time.current - 1.year).count > 100
+        bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
     end
     return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
     bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
