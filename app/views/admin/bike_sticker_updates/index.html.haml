@@ -44,9 +44,7 @@
     - if current_organization.present?
       %p
         %strong
-          Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Stickers
-          %small
-            = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
+          Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Sticker updates
 
   .col-md-6.mt-2.text-right
     = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
