@@ -237,9 +237,9 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "bike sticker, photo and duplicate serial" do
-      let(:bike) { FactoryBot.create(:bike, serial_number: "XXX222-xvbpererfa")}
-      let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike)}
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike)}
+      let(:bike) { FactoryBot.create(:bike, serial_number: "XXX222-xvbpererfa") }
+      let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike) }
       let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
       it "returns" do
         bike.reload
