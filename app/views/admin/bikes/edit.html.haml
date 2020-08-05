@@ -31,18 +31,18 @@
           %span.score-number
             = scorer.score
         .score-details.collapse.text-left
-          %span.details-title
+          %small.details-title
             Factors in score:
           %table.table-list
             %tbody
               - CredibilityScorer.permitted_badges_hash(scorer.badges).each do |badge, value|
                 %tr
                   %td
-                    %strong
+                    %strong{ class: (value < 0 ? "text-danger" : "") }
                       = value
                   %td
                     %small
-                    = badge.to_s.humanize
+                      = badge.to_s.humanize
 
 
 - if @bike.user_hidden
