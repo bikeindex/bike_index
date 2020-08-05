@@ -41,6 +41,11 @@ class BikeStickerUpdate < ApplicationRecord
     ].flatten.compact.join(", ")
   end
 
+  def safe_assign_creator_kind=(val)
+    return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
+    self.creator_kind = val
+  end
+
   def set_calculated_attributes
     self.creator_kind ||= "creator_user"
     self.organization_kind ||= calculated_organization_kind

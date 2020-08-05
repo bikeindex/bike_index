@@ -144,12 +144,13 @@ class BikeSticker < ApplicationRecord
   end
 
   # Passing as hash so that the keywords don't override the methods here
-  # args => user:, bike:, organization:
+  # args => user:, bike:, organization:, source:
   def claim(args = {})
     claiming_bike = claiming_bike_for_args(args)
     claiming_organization = claiming_organization_for_args(args)
-    bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id,
-                                                user: args[:user], organization: claiming_organization, bike: claiming_bike)
+    bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id, user: args[:user],
+                                                organization: claiming_organization, bike: claiming_bike,
+                                                safe_assign_creator_kind: args[:creator_kind])
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
       not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")

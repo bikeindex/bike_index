@@ -359,10 +359,11 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update3.organization_kind).to eq "other_paid_organization"
         expect(bike_sticker_update3.unauthorized_organization?).to be_falsey
         expect(bike_sticker_update3.kind).to eq "un_claim"
+        expect(bike_sticker_update3.creator_kind).to eq "creator_user" # Default
         bike1.reload
         expect(bike1.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         # claiming with organization_paid
-        expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization_paid) }.to change(BikeStickerUpdate, :count).by 1
+        expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization_paid, creator_kind: "whatever69") }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker2.reload
         expect(bike_sticker2.claimed?).to be_truthy
         expect(bike_sticker2.user).to eq user
@@ -374,10 +375,11 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update4.organization_kind).to eq "other_paid_organization"
         expect(bike_sticker_update4.unauthorized_organization?).to be_falsey
         expect(bike_sticker_update4.kind).to eq "re_claim"
+        expect(bike_sticker_update4.creator_kind).to eq "creator_user" # Because unknown value passed
         bike1.reload
         expect(bike1.bike_organizations.pluck(:organization_id)).to match_array([organization.id, organization_paid.id])
         # claiming with primary organization
-        expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization) }.to change(BikeStickerUpdate, :count).by 1
+        expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization, creator_kind: "creator_pos") }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker2.reload
         expect(bike_sticker2.claimed?).to be_truthy
         expect(bike_sticker2.user).to eq user
@@ -388,6 +390,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update5.bike).to eq bike1
         expect(bike_sticker_update5.organization_kind).to eq "primary_organization"
         expect(bike_sticker_update5.unauthorized_organization?).to be_falsey
+        expect(bike_sticker_update5.creator_kind).to eq "creator_pos" # Because it was passed
         expect(bike1.bike_organizations.pluck(:organization_id)).to match_array([organization.id, organization_paid.id])
       end
     end

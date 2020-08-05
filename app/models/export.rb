@@ -105,15 +105,16 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_codes_and_record!
+  def remove_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
-    remove_bike_codes
+    remove_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
-  def remove_bike_codes
+  def remove_bike_stickers(passed_user = nil)
     (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)&.claim(user: nil, bike_string: nil, organization: organization)
+      BikeSticker.lookup(code, organization_id: organization_id)
+        &.claim(user: passed_user, bike_string: nil, organization: organization, creator_kind: "creator_export")
     end
   end
 
