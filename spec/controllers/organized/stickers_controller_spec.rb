@@ -45,7 +45,7 @@ RSpec.describe Organized::StickersController, type: :controller do
 
     context "logged in as organization member" do
       describe "index" do
-        let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, secondary_organization: organization)}
+        let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, secondary_organization: organization) }
         it "renders" do
           get :index, params: {organization_id: organization.to_param}
           expect(response).to render_template(:index)
