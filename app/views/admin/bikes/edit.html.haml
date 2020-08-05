@@ -32,15 +32,17 @@
             = scorer.score
         .score-details.collapse.text-left
           %span.details-title
-            Factors in the score:
+            Factors in score:
           %table.table-list
             %tbody
               - CredibilityScorer.permitted_badges_hash(scorer.badges).each do |badge, value|
                 %tr
                   %td
-                    = badge.to_s.humanize
+                    %strong
+                      = value
                   %td
-                    = value
+                    %small
+                    = badge.to_s.humanize
 
 
 - if @bike.user_hidden
