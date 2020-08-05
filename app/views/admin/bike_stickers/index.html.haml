@@ -108,7 +108,7 @@
             %li.small
               %code
                 = int
-      Non-sequential codes:
+      Non-sequential stickers:
       %ul
         - @bike_sticker_batch.non_sequential_integers.each do |arr|
           %li.small
@@ -127,7 +127,7 @@
         = check_box_tag :search_claimed, true, sortable_search_params[:search_claimed].present?, class: "form-check-input"
         = label_tag :search_claimed, "Claimed only"
       .form-group.ml-2
-        = text_field_tag :search_query, params[:search_query], placeholder: "search code", class: "form-control"
+        = text_field_tag :search_query, params[:search_query], placeholder: "search sticker", class: "form-control"
 
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 

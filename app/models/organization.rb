@@ -48,7 +48,6 @@ class Organization < ApplicationRecord
   has_many :b_params
   has_many :invoices
   has_many :payments
-  has_many :bike_stickers
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
@@ -249,16 +248,16 @@ class Organization < ApplicationRecord
     Organization.where(id: child_ids)
   end
 
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
-  end
-
   def regional_parents
     self.class.regional.where("regional_ids @> ?", [id].to_json)
   end
 
   def default_impound_location
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
+  end
+
+  def bounding_box
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
   end
 
   # Try for publicly_visible, fall back to whatever
@@ -281,6 +280,10 @@ class Organization < ApplicationRecord
 
   def overview_dashboard?
     parent? || regional?
+  end
+
+  def bike_stickers
+    BikeSticker.where(organization_id: id).or(BikeSticker.where(secondary_organization_id: id))
   end
 
   def nearby_organizations

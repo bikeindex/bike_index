@@ -63,6 +63,10 @@ class Export < ApplicationRecord
     bike.owner_name.present? && bike.valid_registration_address_present?
   end
 
+  def self.with_bike_sticker_code(bike_sticker_code)
+    where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+  end
+
   def finished_processing?
     %w[finished errored].include?(progress)
   end
@@ -105,15 +109,16 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_codes_and_record!
+  def remove_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
-    remove_bike_codes
+    remove_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
-  def remove_bike_codes
+  def remove_bike_stickers(passed_user = nil)
     (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)&.unclaim!
+      BikeSticker.lookup(code, organization_id: organization_id)
+        &.claim(user: passed_user, bike_string: nil, organization: organization, creator_kind: "creator_export")
     end
   end
 

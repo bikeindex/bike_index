@@ -199,6 +199,7 @@ RSpec.describe BikesController, type: :controller do
       let(:organization) { FactoryBot.create(:organization) }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED09999") }
       it "renders with the sticker assigned" do
+        expect(bike_sticker.claimable_by?(user)).to be_truthy
         expect(user.authorized?(bike_sticker)).to be_truthy
         get :show, params: {id: bike.id, scanned_id: "ED009999", organization_id: organization.id}
         expect(response.status).to eq(200)
@@ -1366,7 +1367,10 @@ RSpec.describe BikesController, type: :controller do
             let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker_claimed, bike: bike, user: user) }
             it "assigns another bike code, doesn't remove existing" do
               expect(bike.bike_stickers.count).to eq 1
-              put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+              expect {
+                put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+              }.to change(BikeStickerUpdate, :count).by 1
+              expect(BikeStickerUpdate.last.kind).to eq "initial_claim"
               expect(flash[:success]).to match(bike_sticker.pretty_code)
               bike.reload
               expect(bike.description).to eq "42"
@@ -1381,8 +1385,20 @@ RSpec.describe BikesController, type: :controller do
             context "not allowed to assign another code" do
               before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
               it "renders errors" do
-                expect(bike.bike_stickers.count).to eq 1
-                put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+                FactoryBot.create(:bike_sticker_update, user: user)
+                expect(bike_sticker.claimable_by?(user)).to be_falsey
+                expect {
+                  put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+                }.to change(BikeStickerUpdate, :count).by 1
+                bike_sticker_update = BikeStickerUpdate.last
+                expect(bike_sticker_update.kind).to eq "failed_claim"
+                expect(bike_sticker_update.organization_kind).to eq "no_organization"
+                expect(bike_sticker_update.user_id).to eq user.id
+                expect(bike_sticker_update.bike_id).to eq bike.id
+                expect(bike_sticker_update.bike_sticker_id).to eq bike_sticker.id
+                bike_sticker.reload
+                expect(bike_sticker.claimed?).to be_falsey
+
                 expect(flash[:error]).to be_present
                 bike.reload
                 expect(bike.description).to eq "42"

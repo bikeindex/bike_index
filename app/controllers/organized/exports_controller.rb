@@ -41,8 +41,8 @@ module Organized
     end
 
     def update
-      if params[:remove_bike_codes] && @export.assign_bike_codes?
-        @export.remove_bike_codes_and_record!
+      if params[:remove_bike_stickers] && @export.assign_bike_codes?
+        @export.remove_bike_stickers_and_record!(current_user)
         flash[:success] = translation(:bike_stickers_removed)
       else
         flash[:error] = translation(:unknown_update_action)
@@ -51,7 +51,7 @@ module Organized
     end
 
     def destroy
-      @export.remove_bike_codes
+      @export.remove_bike_stickers(current_user)
       @export.destroy
       flash[:success] = translation(:export_deleted)
       redirect_to organization_exports_path(organization_id: current_organization.to_param)

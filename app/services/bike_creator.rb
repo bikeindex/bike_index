@@ -119,7 +119,7 @@ class BikeCreator
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
-        bike_sticker&.claim(@bike.creator, @bike.id)
+        bike_sticker&.claim(user: @bike.creator, bike: @bike.id, organization: @bike.creation_organization)
       end
       if @b_param.unregistered_parking_notification?
         # We skipped setting address, with default_parking_notification_attrs, notification will update it

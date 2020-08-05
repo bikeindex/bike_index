@@ -397,6 +397,46 @@ ALTER SEQUENCE public.bike_sticker_batches_id_seq OWNED BY public.bike_sticker_b
 
 
 --
+-- Name: bike_sticker_updates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_sticker_updates (
+    id bigint NOT NULL,
+    bike_sticker_id bigint,
+    bike_id bigint,
+    user_id bigint,
+    organization_id bigint,
+    export_id bigint,
+    kind integer,
+    creator_kind integer,
+    organization_kind integer,
+    update_number integer,
+    failed_claim_errors text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_sticker_updates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_sticker_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_sticker_updates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_sticker_updates_id_seq OWNED BY public.bike_sticker_updates.id;
+
+
+--
 -- Name: bike_stickers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -413,7 +453,8 @@ CREATE TABLE public.bike_stickers (
     previous_bike_id integer,
     bike_sticker_batch_id integer,
     code_integer bigint,
-    code_prefix character varying
+    code_prefix character varying,
+    secondary_organization_id bigint
 );
 
 
@@ -2893,6 +2934,13 @@ ALTER TABLE ONLY public.bike_sticker_batches ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: bike_sticker_updates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_sticker_updates ALTER COLUMN id SET DEFAULT nextval('public.bike_sticker_updates_id_seq'::regclass);
+
+
+--
 -- Name: bike_stickers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3398,6 +3446,14 @@ ALTER TABLE ONLY public.bike_organizations
 
 ALTER TABLE ONLY public.bike_sticker_batches
     ADD CONSTRAINT bike_sticker_batches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_sticker_updates bike_sticker_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_sticker_updates
+    ADD CONSTRAINT bike_sticker_updates_pkey PRIMARY KEY (id);
 
 
 --
@@ -4007,6 +4063,41 @@ CREATE INDEX index_bike_sticker_batches_on_user_id ON public.bike_sticker_batche
 
 
 --
+-- Name: index_bike_sticker_updates_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bike_id ON public.bike_sticker_updates USING btree (bike_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_bike_sticker_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticker_updates USING btree (bike_sticker_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_export_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_export_id ON public.bike_sticker_updates USING btree (export_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_organization_id ON public.bike_sticker_updates USING btree (organization_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_user_id ON public.bike_sticker_updates USING btree (user_id);
+
+
+--
 -- Name: index_bike_stickers_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4018,6 +4109,13 @@ CREATE INDEX index_bike_stickers_on_bike_id ON public.bike_stickers USING btree 
 --
 
 CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_stickers USING btree (bike_sticker_batch_id);
+
+
+--
+-- Name: index_bike_stickers_on_secondary_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_stickers USING btree (secondary_organization_id);
 
 
 --
@@ -5246,6 +5344,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620171606'),
 ('20200620172241'),
 ('20200630200556'),
-('20200727213018');
+('20200727213018'),
+('20200804172753'),
+('20200804180457');
 
 
