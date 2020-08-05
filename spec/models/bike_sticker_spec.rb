@@ -213,6 +213,20 @@ RSpec.describe BikeSticker, type: :model do
   end
 
   describe "claimable_by?" do
+    context "already claimed sticker for unorganized user" do
+      let(:user) { FactoryBot.create(:user) }
+      let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+      let(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed) }
+      it "does not permit claiming already claimed stickers" do
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user)).to be_falsey
+        # It's still claimable by the user after it has been claimed
+        bike_sticker1.claim(user: user, bike: bike_sticker2.bike)
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        # But is not claimable by a different unorganized user
+        expect(bike_sticker1.claimable_by?(bike_sticker2.user)).to be_falsey
+      end
+    end
     before { stub_const("BikeSticker::MAX_UNORGANIZED", 2) }
     context "user" do
       let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
