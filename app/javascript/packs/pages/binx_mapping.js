@@ -226,12 +226,14 @@ export default class BinxMapping {
     while (binxMapping.markerPointsToRender.length > 0) {
       let point = binxMapping.markerPointsToRender.shift();
       let markerId = point.id;
+      let markerOpacity = binxMapping.kind == "parking_notifications" ? 0.6 : 1;
       // Only render if the point isn't already rendered
       if (!_.find(binxMapping.markersRendered, ["binxId", point.id])) {
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(point.lat, point.lng),
           map: window.binxMap,
           binxId: markerId,
+          opacity: markerOpacity,
         });
 
         google.maps.event.addListener(
