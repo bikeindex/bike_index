@@ -187,7 +187,7 @@ class User < ApplicationRecord
     return true if superuser?
     return obj.authorized?(self) if obj.is_a?(Bike)
     return member_of?(obj) if obj.is_a?(Organization)
-    return obj.authorized?(self) if obj.is_a?(BikeSticker)
+    return obj.claimable_by?(self) if obj.is_a?(BikeSticker)
     false
   end
 

@@ -17,7 +17,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   before_save :set_calculated_attributes
 
-  def self.kind
+  def self.kinds
     ORGANIZATION_KIND_ENUM.keys.map(&:to_s)
   end
 

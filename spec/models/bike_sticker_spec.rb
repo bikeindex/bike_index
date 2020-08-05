@@ -217,14 +217,19 @@ RSpec.describe BikeSticker, type: :model do
       let(:user) { FactoryBot.create(:user) }
       let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed) }
+      let(:bike) { bike_sticker2.bike }
       it "does not permit claiming already claimed stickers" do
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
         expect(bike_sticker2.claimable_by?(user)).to be_falsey
         # It's still claimable by the user after it has been claimed
-        bike_sticker1.claim(user: user, bike: bike_sticker2.bike)
+        bike_sticker1.claim(user: user, bike: bike)
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
         # But is not claimable by a different unorganized user
         expect(bike_sticker1.claimable_by?(bike_sticker2.user)).to be_falsey
+        # If we make the user the owner of that bike, they have permission
+        FactoryBot.create(:ownership_claimed, bike: bike, user: user)
+        bike_sticker2.reload
+        expect(bike_sticker2.claimable_by?(user)).to be_truthy
       end
     end
     before { stub_const("BikeSticker::MAX_UNORGANIZED", 2) }

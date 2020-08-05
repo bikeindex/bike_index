@@ -132,7 +132,7 @@ class BikeSticker < ApplicationRecord
     end
     unauthorized_sticker_ids = passed_user.unauthorized_organization_update_bike_sticker_ids
     return true if unauthorized_sticker_ids.include?(id)
-    return false if claimed? # Sticker is claimed by a different user
+    return bike.authorized?(passed_user) if claimed? # if user is authorized, they can edit
     unauthorized_sticker_ids.count < MAX_UNORGANIZED
   end
 

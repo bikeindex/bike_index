@@ -184,10 +184,10 @@ RSpec.describe User, type: :model do
         expect(organization_member.authorized?(bike)).to be_truthy
         expect(admin.authorized?(bike)).to be_truthy
         # Check bike code authorization
-        expect(bike_sticker.authorized?(user)).to be_falsey
-        expect(bike_sticker.authorized?(owner)).to be_truthy
-        expect(bike_sticker.authorized?(organization_member)).to be_truthy
-        expect(bike_sticker.authorized?(admin)).to be_truthy
+        expect(user.authorized?(bike_sticker)).to be_falsey
+        expect(owner.authorized?(bike_sticker)).to be_truthy
+        expect(organization_member.authorized?(bike_sticker)).to be_truthy
+        expect(admin.authorized?(bike_sticker)).to be_truthy
       end
     end
   end
