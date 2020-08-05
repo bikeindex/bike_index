@@ -22,6 +22,10 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
     %w[created_at kind creator_kind update_number organization_kind bike_id bike_sticker_id organization_id user_id]
   end
 
+  def earliest_period_date
+    BikeStickerUpdate.minimum(:created_at)
+  end
+
   def matching_bike_sticker_updates
     bike_sticker_updates = BikeStickerUpdate.all
     bike_stickers = BikeSticker.all
@@ -34,6 +38,12 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
       bike_sticker_updates = bike_sticker_updates.where(kind: @search_kind)
     else
       @search_kind = "all"
+    end
+    if params[:search_creator_kind].present? && BikeStickerUpdate.creator_kinds.include?(params[:search_creator_kind])
+      @search_creator_kind = params[:search_creator_kind]
+      bike_sticker_updates = bike_sticker_updates.where(creator_kind: @search_creator_kind)
+    else
+      @search_creator_kind = "all"
     end
 
     if params[:search_bike_sticker_id].present?

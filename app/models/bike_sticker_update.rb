@@ -30,6 +30,10 @@ class BikeStickerUpdate < ApplicationRecord
     kinds - organization_kinds_unauthorized
   end
 
+  def self.creator_kinds
+    CREATOR_KIND_ENUM.keys.map(&:to_s)
+  end
+
   def previous_successful_updates
     BikeStickerUpdate.where(bike_sticker_id: bike_sticker_id).successful
       .where("created_at < ?", created_at || Time.current)

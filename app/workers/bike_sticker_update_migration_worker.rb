@@ -24,7 +24,8 @@ class BikeStickerUpdateMigrationWorker < ApplicationWorker
     if bike_sticker.organization.present? && user&.authorized?(bike_sticker.organization)
       update_organization = bike_sticker.organization
       if update_organization.enabled?("avery_export")
-        bike_sticker_update.export = update_organization.exports.with_bike_sticker_code(bike_sticker.code).first
+        bike_sticker_update.export = Export.where(organization: update_organization.id)
+          .with_bike_sticker_code(bike_sticker.code).first
       end
     elsif bike_sticker.organization.present? && bike_sticker.organization.regional? && user.present?
       update_organization = user.organizations.where(id: bike_sticker.organization.regional_ids).first
