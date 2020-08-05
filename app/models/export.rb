@@ -63,6 +63,10 @@ class Export < ApplicationRecord
     bike.owner_name.present? && bike.valid_registration_address_present?
   end
 
+  def self.with_bike_sticker_code(bike_sticker_code)
+    where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+  end
+
   def finished_processing?
     %w[finished errored].include?(progress)
   end

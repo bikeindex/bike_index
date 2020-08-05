@@ -406,6 +406,7 @@ CREATE TABLE public.bike_sticker_updates (
     bike_id bigint,
     user_id bigint,
     organization_id bigint,
+    export_id bigint,
     kind integer,
     creator_kind integer,
     organization_kind integer,
@@ -4073,6 +4074,13 @@ CREATE INDEX index_bike_sticker_updates_on_bike_id ON public.bike_sticker_update
 --
 
 CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticker_updates USING btree (bike_sticker_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_export_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_export_id ON public.bike_sticker_updates USING btree (export_id);
 
 
 --

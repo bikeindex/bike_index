@@ -7,6 +7,7 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
+  belongs_to :export
 
   enum kind: KIND_ENUM
   enum creator_kind: CREATOR_KIND_ENUM
@@ -51,7 +52,7 @@ class BikeStickerUpdate < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.creator_kind ||= "creator_user"
+    self.creator_kind ||= export_id.present? ? "creator_export" : "creator_user"
     self.organization_kind ||= calculated_organization_kind
     self.kind ||= calculated_kind
     self.update_number ||= previous_successful_updates.count + 1

@@ -322,7 +322,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       let(:organization_paid) { FactoryBot.create(:organization_with_paid_features) }
       let(:user) { FactoryBot.create(:user) }
-      let(:bike2) { FactoryBot.create(:bike)}
+      let(:bike2) { FactoryBot.create(:bike) }
       it "claims anyway" do
         expect(user.authorized?(organization)).to be_falsey
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1)

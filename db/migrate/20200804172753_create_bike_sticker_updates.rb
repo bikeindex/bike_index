@@ -5,6 +5,7 @@ class CreateBikeStickerUpdates < ActiveRecord::Migration[5.2]
       t.references :bike
       t.references :user
       t.references :organization
+      t.references :export
 
       t.integer :kind
       t.integer :creator_kind

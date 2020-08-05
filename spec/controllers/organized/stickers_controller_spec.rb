@@ -114,7 +114,7 @@ RSpec.describe Organized::StickersController, type: :controller do
             expect(response).to redirect_to bike_path(bike2)
             bike_sticker.reload
             expect(bike_sticker.bike_id).to eq bike2.id
-            expect(bike_sticker.previous_bike_id).to eq bike1.id
+            expect(bike_sticker.previous_bike_id).to eq bike.id
           end
           context "code blank" do
             it "redirects back" do
