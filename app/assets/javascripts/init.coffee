@@ -80,10 +80,11 @@ class BikeIndex.Init extends BikeIndex
       # specify an additional manual offset if you'd like
       offset = $target.attr('data-offset')
       if offset? then offset = parseInt(offset, 10)
-      offset ||= -20
+      offset ||= -80
       $('body, html').animate(
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
+      history.replaceState({}, "", "#{location.pathname}#{$target.attr('href')}")
 
   displayLocalDate: (time, preciseTime = false, withPreposition = false) ->
     # Ensure we return if it's a big future day

@@ -18,6 +18,7 @@
       %li.nav-item
         = link_to "graph", admin_parking_notifications_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Parking notifications" }
 
 .row.mt-4.mb-4
   .col-sm-6
@@ -32,6 +33,22 @@
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_parking_notifications), stacked: true, thousands: ",", defer: true
+  - unless params[:organization_id].present?
+    .row.mt-2
+      .col-md-6.offset-md-3
+        %table.table-list.wide-definition
+          %tbody
+            - matching_parking_notification_per_org_id = matching_parking_notifications.distinct.pluck(:organization_id).map { |id| [id, matching_parking_notifications.where(organization_id: id).count] }
+            - matching_parking_notification_per_org_id.sort_by { |id, number| number }.each do |id, number|
+              - organization = Organization.unscoped.find_by_id(id) if id.present?
+              %tr
+                %td
+                  - if organization.present?
+                    = link_to organization.short_name, admin_parking_notifications_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
+                  - else
+                    = link_to "no organization", admin_parking_notifications_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
+                %td
+                  = number_with_delimiter(number)
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"
