@@ -35,6 +35,7 @@
           = link_to "Subscription started in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Invoices" }
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ",", defer: true

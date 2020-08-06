@@ -51,6 +51,10 @@ class Admin::InvoicesController < Admin::BaseController
       invoices = @search_endless == "endless_only" ? invoices.endless : invoices.not_endless
     end
 
+    if current_organization.present?
+      invoices = invoices.where(organization_id: current_organization.id)
+    end
+
     invoices.where(@time_range_column => @time_range)
   end
 end

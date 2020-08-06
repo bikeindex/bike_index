@@ -56,7 +56,7 @@
           - if display_organization
             %td
               - if organization.present?
-                = link_to organization.short_name, admin_organization_path(organization.to_param)
+                = link_to organization.short_name, admin_invoices_path(organization_id: organization.to_param)
                 - unless invoice.organization.present?
                   %small.text-danger
                     organization is deleted!
