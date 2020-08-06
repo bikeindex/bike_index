@@ -538,7 +538,7 @@ class Bike < ApplicationRecord
 
   def render_paint_description?
     return false unless pos? && primary_frame_color == Color.black
-    secondary_frame_color_id.blank?
+    secondary_frame_color_id.blank? && paint.present?
   end
 
   def bike_organization_ids
