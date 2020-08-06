@@ -11,7 +11,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration
-    render_finished_registration(Bike.unscoped)
+    render_finished_registration(Bike.find)
   end
 
   def finished_registration_organization
@@ -40,8 +40,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
 
   private
 
-  def render_finished_registration(bikes)
-    bike = Organization.friendly_find("psu").created_bikes.order(:created_at).last
+  def render_finished_registration(bikes, bike = nil)
     bike ||= bikes.order(:created_at).last
     OrganizedMailer.finished_registration(bike.current_ownership)
   end

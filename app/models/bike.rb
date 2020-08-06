@@ -536,6 +536,11 @@ class Bike < ApplicationRecord
     end
   end
 
+  def render_paint_description?
+    return false unless pos? && primary_frame_color == Color.black
+    secondary_frame_color_id.blank? && paint.present?
+  end
+
   def bike_organization_ids
     bike_organizations.pluck(:organization_id)
   end

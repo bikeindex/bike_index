@@ -1411,6 +1411,7 @@ en:
       other: Other
       other_serial: Other serial/registration/sticker
       owners_phone_number: 'Owner''s phone number:'
+      paint_description: Color description
       police_report: 'Police report #'
       primary_colors: Primary colors
       rear: Rear
@@ -4889,7 +4890,7 @@ en:
       stolen: stolen
       view_bike: View %{bike_type}
     email_bike_box:
-      color: color
+      color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
       found: 'Found:'
       make: 'Make:'

@@ -2152,6 +2152,7 @@ nl:
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
       not_registered: Niet echt geregistreerd!
+      paint_description: Kleurbeschrijving
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
