@@ -1184,6 +1184,41 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "render_paint_description?" do
+    let(:black) { Color.black }
+    it "returns false" do
+      expect(Bike.new.render_paint_description?).to be_falsey
+    end
+    context "with paint" do
+      let(:stickers) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+      let(:paint) { FactoryBot.create(:paint, name: "812348123") }
+      let(:bike) { FactoryBot.create(:bike, paint: paint, primary_frame_color: black) }
+      it "returns false" do
+        expect(bike.render_paint_description?).to be_falsey
+      end
+      context "bike pos" do
+        it "returns true" do
+          allow(bike).to receive(:pos?) { true }
+          expect(bike.render_paint_description?).to be_truthy
+          # If the primary frame color isn't black, don't render
+          bike.primary_frame_color = stickers
+          expect(bike.render_paint_description?).to be_falsey
+          bike.primary_frame_color = black # reset to black
+          expect(bike.render_paint_description?).to be_truthy
+          # And with a secondary frame color it fails
+          bike.secondary_frame_color = stickers
+          expect(bike.render_paint_description?).to be_falsey
+        end
+      end
+    end
+    context "pos registration without paint" do
+      let(:bike) { FactoryBot.create(:bike_lightspeed_pos, primary_frame_color: black, paint: nil) }
+      it "returns false" do
+        expect(bike.render_paint_description?).to be_falsey
+      end
+    end
+  end
+
   describe "set_paints" do
     it "returns true if paint is a color" do
       FactoryBot.create(:color, name: "Bluety")

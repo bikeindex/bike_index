@@ -24,8 +24,11 @@
 
           %li
             %strong
-              = pluralize(@bike.frame_colors.count, t(".color"))
-            = @bike.frame_colors.to_sentence
+              #{t(".color").pluralize(@bike.frame_colors.count)}:
+            - if @bike.render_paint_description?
+              = @bike.paint_description
+            - else
+              = @bike.frame_colors.to_sentence
 
           - if @bike.stolen && @bike.current_stolen_record.present?
             - stolen_record = @bike.current_stolen_record

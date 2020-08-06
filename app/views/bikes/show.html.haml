@@ -138,7 +138,19 @@
           = @bike.attr_list_item(@bike.name, t(".name"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_model, t(".model"), with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, t(".year"), with_colon: true)
-          = @bike.attr_list_item(@bike.frame_colors.to_sentence, t(".primary_colors"), with_colon: true)
+          %li.color-attrs
+            %span.attr-title
+              #{t(".primary_colors")}:
+            = @bike.frame_colors.to_sentence
+            - if @bike.render_paint_description?
+              .paint-description
+                %span.attr-title
+                  #{t(".paint_description")}:
+                = @bike.paint_description
+
+          -# = @bike.attr_list_item(@bike.frame_colors.to_sentence, t(".primary_colors"), with_colon: true)
+
+          -# @bike.attr_list_item(@bike.paint_description, t(".paint_description"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_size&.upcase, t(".frame_size"), with_colon: true)
 
           - if @bike.front_wheel_size_id.present?

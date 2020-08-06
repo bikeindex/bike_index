@@ -34,6 +34,9 @@
                 Colors
               %td
                 = bike.frame_colors.to_sentence
+                - if bike.paint.present?
+                  %small.less-strong
+                    = bike.paint_description
             %tr
               %td
                 Created
