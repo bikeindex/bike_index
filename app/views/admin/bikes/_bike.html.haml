@@ -34,9 +34,10 @@
                 Colors
               %td
                 = bike.frame_colors.to_sentence
-                - if bike.paint.present?
-                  %small.less-strong
-                    = bike.paint_description
+                - if bike.render_paint_description?
+                  %small.less-strong= bike.paint_description
+                - elsif bike.paint.present? && current_user.developer
+                  %small.only-dev-visible= bike.paint_description
             %tr
               %td
                 Created
@@ -125,9 +126,10 @@
                   \{
                   = address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                   \}
-                %span.only-dev-visible.ml-2
-                  manual:
-                  = bike.address_set_manually
+                - if current_user.developer?
+                  %span.only-dev-visible.ml-2
+                    manual:
+                    = bike.address_set_manually
 
           -# Only show phone if no stolen record
           - if stolen_record.blank? && bike.phone.present?
