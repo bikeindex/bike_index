@@ -148,9 +148,6 @@
                   #{t(".paint_description")}:
                 = @bike.paint_description
 
-          -# = @bike.attr_list_item(@bike.frame_colors.to_sentence, t(".primary_colors"), with_colon: true)
-
-          -# @bike.attr_list_item(@bike.paint_description, t(".paint_description"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_size&.upcase, t(".frame_size"), with_colon: true)
 
           - if @bike.front_wheel_size_id.present?
