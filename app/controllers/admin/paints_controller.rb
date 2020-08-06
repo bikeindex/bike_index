@@ -19,7 +19,7 @@ class Admin::PaintsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 20
     @bikes = Bike.where(paint_id: @paint.id).includes(:paint)
-                  .page(page).per(per_page)
+      .page(page).per(per_page)
   end
 
   def update
@@ -67,7 +67,7 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:paint).permit(:name, :color_id, :manufacturer_id, :secondary_color_id, :tertiary_color_id, :bikes_count)
+    params.require(:paint).permit(:color_id, :manufacturer_id, :secondary_color_id, :tertiary_color_id, :bikes_count)
   end
 
   def find_paint

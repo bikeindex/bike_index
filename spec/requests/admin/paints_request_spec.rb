@@ -16,14 +16,14 @@ RSpec.describe Admin::PaintsController, type: :request do
 
   describe "edit" do
     it "renders" do
-      get "#{paint.id}"
+      get "#{base_url}/#{paint.id}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
   end
 
   describe "update" do
-    let(:paint) { FactoryBot.create(:paint, "avacado sunset anthracite") }
+    let(:paint) { FactoryBot.create(:paint, name: "avacado sunset anthracite") }
     let!(:bike) { FactoryBot.create(:bike, paint: paint, primary_frame_color: black) }
     let(:black) { Color.black }
     let!(:green) { FactoryBot.create(:color, name: "Green") }
@@ -41,7 +41,7 @@ RSpec.describe Admin::PaintsController, type: :request do
     it "updates the bikes" do
       expect(bike.paint).to eq paint
       expect(bike.primary_frame_color).to eq black
-      expect(paint.color).to eq black
+      expect(paint.color).to be_blank
       expect(paint.secondary_color).to be_blank
       expect(paint.tertiary_color).to be_blank
       put "#{base_url}/#{paint.to_param}", params: {paint: paint_attributes}
