@@ -166,7 +166,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           let(:primary_organization) { FactoryBot.create(:organization) }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CAL09999", organization: primary_organization) }
           let(:post_hash) do
-            bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 000 999 99")
+            bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 00 09 99 9")
             bike_hash.merge(organization_slug: organization.id, bike: bike_hash_nested)
           end
           it "creates and adds sticker" do
@@ -186,8 +186,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             expect_matching_created_bike(bike)
 
             bike_sticker.reload
-            expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.bike_id).to eq bike.id
+            expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.organization_id).to eq primary_organization.id
             expect(bike_sticker.secondary_organization_id).to eq organization.id
             expect(bike_sticker.bike_sticker_updates.count).to eq 1

@@ -83,28 +83,45 @@ RSpec.describe BikeSticker, type: :model do
 
   describe "lookup_with_fallback" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
-    let(:organization_no_match) { FactoryBot.create(:organization) }
-    let!(:bike_sticker_initial) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization) }
-    let(:bike_sticker_duplicate) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization_duplicate) }
-    let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
-    it "looks up, falling back to the orgs for the user, falling back to any org" do
-      expect(bike_sticker_duplicate).to be_present # Ensure it's created after initial
-      # It finds the first record in the database
-      expect(BikeSticker.lookup_with_fallback("a0010")).to eq bike_sticker_initial
-      expect(BikeSticker.lookup_with_fallback("0010")).to eq bike_sticker_initial
-      # If there is an organization passed, it finds matching that organization
-      expect(BikeSticker.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_sticker_duplicate
-      expect(BikeSticker.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_sticker_duplicate
-      # It finds the bike_sticker that exists, even if it doesn't match the organization passed
-      expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_sticker_initial
-      # It finds the bike_sticker from the user's organization
-      expect(BikeSticker.lookup_with_fallback("a0010", user: user)).to eq bike_sticker_duplicate
-      # It finds bike_sticker that matches the passed organization - overriding the user organization
-      expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_sticker_initial
-      # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
-      expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_sticker_duplicate
-      expect(BikeSticker.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
+    describe "duplicate org issues" do
+      let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
+      let(:organization_no_match) { FactoryBot.create(:organization) }
+      let!(:bike_sticker_initial) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization) }
+      let(:bike_sticker_duplicate) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization_duplicate) }
+      let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
+      it "looks up, falling back to the orgs for the user, falling back to any org" do
+        expect(bike_sticker_duplicate).to be_present # Ensure it's created after initial
+        # It finds the first record in the database
+        expect(BikeSticker.lookup_with_fallback("a0010")).to eq bike_sticker_initial
+        expect(BikeSticker.lookup_with_fallback("0010")).to eq bike_sticker_initial
+        # If there is an organization passed, it finds matching that organization
+        expect(BikeSticker.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_sticker_duplicate
+        expect(BikeSticker.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_sticker_duplicate
+        # It finds the bike_sticker that exists, even if it doesn't match the organization passed
+        expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_sticker_initial
+        # It finds the bike_sticker from the user's organization
+        expect(BikeSticker.lookup_with_fallback("a0010", user: user)).to eq bike_sticker_duplicate
+        # It finds bike_sticker that matches the passed organization - overriding the user organization
+        expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_sticker_initial
+        # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
+        expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_sticker_duplicate
+        expect(BikeSticker.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
+      end
+    end
+    context "3 letter prefix" do
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CAL09999", organization: organization) }
+      let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "CAL09998", organization: organization) }
+      let!(:organization2) { FactoryBot.create(:organization) }
+      it "finds the sticker" do
+        expect(BikeSticker.lookup("CAL09999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL9999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL09999", organization_id: organization2.id)).to eq bike_sticker
+        expect(BikeSticker.lookup_with_fallback("CAL09999", organization_id: organization2.id)).to eq bike_sticker
+        expect(BikeSticker.lookup_with_fallback("CAL 00 099 98", organization_id: organization2.id)).to eq bike_sticker2
+        expect(BikeSticker.lookup_with_fallback("CAL 99 9 8", organization_id: organization2.id)).to eq bike_sticker2
+      end
     end
   end
 

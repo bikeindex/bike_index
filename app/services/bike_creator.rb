@@ -111,14 +111,14 @@ class BikeCreator
     bike.save
     @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
-
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
+
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
-        bike_sticker = BikeSticker.lookup(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
+        bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
         bike_sticker&.claim(user: @bike.creator, bike: @bike.id, organization: @bike.creation_organization)
       end
       if @b_param.unregistered_parking_notification?
