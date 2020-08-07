@@ -41,6 +41,12 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
     else
       @search_kind = "all"
     end
+    if params[:search_organization_kind].present? && BikeStickerUpdate.organization_kinds.include?(params[:search_kind])
+      @search_organization_kind = params[:search_organization_kind]
+      bike_sticker_updates = bike_sticker_updates.where(kind: @search_organization_kind)
+    else
+      @search_organization_kind = "all"
+    end
     if params[:search_creator_kind].present? && BikeStickerUpdate.creator_kinds.include?(params[:search_creator_kind])
       @search_creator_kind = params[:search_creator_kind]
       bike_sticker_updates = bike_sticker_updates.where(creator_kind: @search_creator_kind)
