@@ -31,7 +31,7 @@ class BikeStickerUpdate < ApplicationRecord
   end
 
   def self.organization_kinds_authorized
-    kinds - organization_kinds_unauthorized
+    organization_kinds - organization_kinds_unauthorized
   end
 
   def self.creator_kinds
