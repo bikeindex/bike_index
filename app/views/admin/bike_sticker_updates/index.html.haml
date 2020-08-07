@@ -7,13 +7,23 @@
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind != "all" ? "active" : "") }
           - if @search_kind == "all"
-            Organization kinds
+            All Kinds
           - else
             = @search_kind.humanize
         .dropdown-menu
           - BikeStickerUpdate.kinds.each do |kind|
             - kind_active = @search_kind == kind
             = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind != "all" ? "active" : "") }
+          - if @search_organization_kind == "all"
+            Organization Kinds
+          - else
+            = @search_organization_kind.humanize
+        .dropdown-menu
+          - BikeStickerUpdate.organization_kinds.each do |kind|
+            - kind_active = @search_organization_kind == kind
+            = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_creator_kind != "all" ? "active" : "") }
           - if @search_creator_kind == "all"
@@ -30,7 +40,12 @@
   = render partial: "/shared/admin_current_header", locals: { viewing: "Sticker updates" }
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
+  - if @search_kind == "all"
+    - counts_by_kind = counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
+    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true
+  - else
+    = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
+
 
   - unless params[:organization_id].present?
     .row.mt-2

@@ -162,6 +162,39 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             expect(ActionMailer::Base.deliveries.count).to eq 0
           end
         end
+        context "with bike_sticker" do
+          let(:primary_organization) { FactoryBot.create(:organization) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CAL09999", organization: primary_organization) }
+          let(:post_hash) do
+            bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 00 09 99 9")
+            bike_hash.merge(organization_slug: organization.id, bike: bike_hash_nested)
+          end
+          it "creates and adds sticker" do
+            expect(bike_sticker.bike_sticker_updates.count).to eq 0
+            Sidekiq::Testing.inline! do
+              expect do
+                post :create, params: post_hash.as_json
+              end.to change(Ownership, :count).by(1)
+            end
+
+            Sidekiq::Worker.drain_all
+            expect(ActionMailer::Base.deliveries.count).to eq 1
+            expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
+
+            expect(response.code).to eq("200")
+            bike = Bike.where(serial_number: "SSOMESERIAL").first
+            expect_matching_created_bike(bike)
+
+            bike_sticker.reload
+            expect(bike_sticker.bike_id).to eq bike.id
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.organization_id).to eq primary_organization.id
+            expect(bike_sticker.secondary_organization_id).to eq organization.id
+            expect(bike_sticker.bike_sticker_updates.count).to eq 1
+            bike_sticker_update = bike_sticker.bike_sticker_updates.first
+            expect(bike_sticker_update.organization_id).to eq organization.id
+          end
+        end
       end
     end
 
