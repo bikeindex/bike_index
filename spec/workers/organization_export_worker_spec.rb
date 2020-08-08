@@ -193,11 +193,11 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "assigning stickers" do
         let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation], bike_code_start: "ff333333"} }
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
-        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "717.742.3423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_falsey
-          expect(bike.phone).to eq "717.742.3423"
+          expect(bike.phone).to eq "7177423423"
           expect(bike.extra_registration_number).to eq "cool extra serial"
           expect(bike.organization_affiliation).to eq "community_member"
           expect(export.assign_bike_codes?).to be_truthy
@@ -238,7 +238,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             owner_email: bike.owner_email,
             owner_name: nil,
             organization_affiliation: "community_member",
-            phone: "717.742.3423",
+            phone: "7177423423",
             sticker: "FF 333 333",
             address: "717 Market St",
             city: "San Francisco",
@@ -255,7 +255,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike_sticker.user).to eq user
             expect(export.assign_bike_codes?).to be_falsey
             expect(export.headers).to eq Export.permitted_headers("include_paid")
-            expect(bike.phone).to eq "717.742.3423"
+            expect(bike.phone).to eq "7177423423"
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address).to eq target_address
@@ -341,7 +341,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
               owner_email: bike.owner_email,
               owner_name: nil,
               organization_affiliation: "community_member",
-              phone: "717.742.3423",
+              phone: "7177423423",
               sticker: nil,
               address: nil,
               city: nil,

@@ -276,12 +276,12 @@ RSpec.describe Organization, type: :model do
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
       let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
+        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts bike_stickers])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
