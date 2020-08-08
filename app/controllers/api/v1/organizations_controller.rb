@@ -49,8 +49,9 @@ module Api
           name: organization.name,
           slug: organization.slug,
           can_add_bikes: organization.auto_user_id.present?,
-          pos_kind: organization.pos_kind,
-          manual_pos_kind: organization.manual_pos_kind
+          manual_pos_kind: organization.manual_pos_kind,
+          lightspeed_register_with_phone: organization.lightspeed_register_with_phone,
+          has_bike_stickers: organization.enabled?("bike_stickers")
         }
       end
     end
