@@ -83,6 +83,7 @@ class Admin::OrganizationsController < Admin::BaseController
       .permit(
         :access_token,
         :api_access_approved,
+        :lightspeed_register_with_phone,
         :approved,
         :ascend_name,
         :auto_user_id,
