@@ -37,7 +37,7 @@ RSpec.describe BParam, type: :model do
         expect(b_param.params["bike"]["cool"]).to eq("lol")
         expect(b_param.params["bike"]["owner_email"]).to eq("foo@example.com")
         expect(b_param.params["stolen_record"]["something"]).to eq(42)
-        expect(b_param.params["stolen_record"]["phone"]).to eq("171-829-2625")
+        expect(b_param.phone).to eq("1718292625")
       end
     end
 
