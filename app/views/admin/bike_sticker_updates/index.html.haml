@@ -43,7 +43,7 @@
   - if @search_kind == "all"
     - counts_by_kind = counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
     -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
-    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310" ]
+    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
     = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
 
