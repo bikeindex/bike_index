@@ -2027,7 +2027,8 @@ CREATE TABLE public.organizations (
     regional_ids jsonb,
     manual_pos_kind integer,
     passwordless_user_domain character varying,
-    graduated_notification_interval bigint
+    graduated_notification_interval bigint,
+    lightspeed_register_with_phone boolean DEFAULT false
 );
 
 
@@ -5346,6 +5347,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200630200556'),
 ('20200727213018'),
 ('20200804172753'),
-('20200804180457');
+('20200804180457'),
+('20200808175756');
 
 

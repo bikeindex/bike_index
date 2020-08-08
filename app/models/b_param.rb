@@ -175,7 +175,7 @@ class BParam < ApplicationRecord
   end
 
   def phone
-    bike["phone"]
+    Phonifyer.phonify(params.dig("stolen_record", "phone") || bike["phone"])
   end
 
   def user_name

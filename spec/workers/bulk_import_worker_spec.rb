@@ -186,7 +186,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.frame_size).to eq "29in"
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
-          expect(bike1.phone).to eq("(888) 777-6666")
+          expect(bike1.phone).to eq("8887776666")
           expect(bike1.registration_address).to eq default_location_registration_address
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil

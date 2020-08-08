@@ -90,6 +90,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         previous_slug: "partied-on",
         manual_pos_kind: "lightspeed_pos",
         graduated_notification_interval_days: " ",
+        lightspeed_register_with_phone: "true",
         locations_attributes: {
           "0" => {
             id: location1.id,
@@ -146,6 +147,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
       expect(organization.pos_kind).to eq "lightspeed_pos"
       expect(organization.graduated_notification_interval).to be_blank
+      expect(organization.lightspeed_register_with_phone).to be_truthy
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
@@ -158,13 +160,14 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect_attrs_to_match_hash(location2, location2_update_attributes.except(:latitude, :longitude, :organization_id, :created_at))
     end
     context "setting to not_set" do
-      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do
         expect {
-          put "#{base_url}/#{organization.to_param}", params: {organization: {manual_pos_kind: "not_set"}}
+          put "#{base_url}/#{organization.to_param}", params: {organization: {manual_pos_kind: "not_set", lightspeed_register_with_phone: "0"}}
         }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
+        expect(organization.lightspeed_register_with_phone).to be_falsey
       end
     end
     context "update passwordless_user_domain" do

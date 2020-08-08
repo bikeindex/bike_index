@@ -17,19 +17,19 @@ module Api
                                                    info_hash: params[:notification_hash])
             if customer_contact.save
               EmailStolenBikeAlertWorker.perform_async(customer_contact.id)
-              render json: { success: true } and return
+              render(json: {success: true}) && return
             else
               msg = customer_contact.errors.full_messages.to_sentence
-              render json: { error: msg }, status: :unprocessable_entity and return
+              render(json: {error: msg}, status: :unprocessable_entity) && return
             end
           end
         end
-        render json: { error: "Unable to send that email, srys" }, status: :unprocessable_entity and return
+        render(json: {error: "Unable to send that email, srys"}, status: :unprocessable_entity) && return
       end
 
       def authenticate_notification_permission
         unless params[:access_token] == ENV["NOTIFICATIONS_API_KEY"]
-          render json: "Not authorized", status: :unauthorized and return
+          render(json: "Not authorized", status: :unauthorized) && return
         end
       end
 

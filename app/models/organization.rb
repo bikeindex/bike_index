@@ -99,7 +99,7 @@ class Organization < ApplicationRecord
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
+  attr_accessor :embedable_user_email, :skip_update
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -297,9 +297,9 @@ class Organization < ApplicationRecord
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
-  def mail_snippet_body(kind)
-    return nil unless MailSnippet.organization_snippet_kinds.include?(kind)
-    snippet = mail_snippets.enabled.where(kind: kind).first
+  def mail_snippet_body(snippet_kind)
+    return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
+    snippet = mail_snippets.enabled.where(kind: snippet_kind).first
     snippet&.body
   end
 
@@ -484,9 +484,9 @@ class Organization < ApplicationRecord
 
   def calculated_enabled_feature_slugs
     fslugs = current_invoices.feature_slugs
-    # If part of a region with regional_stickers, the organization receives the stickers paid feature
+    # If part of a region with bike_stickers, the organization receives the stickers paid feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("regional_stickers") }
+      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
     end
     # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
     if fslugs.include?("impound_bikes") && locations.impound_locations.any?

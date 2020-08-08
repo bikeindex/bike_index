@@ -83,6 +83,7 @@ class Admin::OrganizationsController < Admin::BaseController
       .permit(
         :access_token,
         :api_access_approved,
+        :lightspeed_register_with_phone,
         :approved,
         :ascend_name,
         :auto_user_id,
@@ -91,7 +92,6 @@ class Admin::OrganizationsController < Admin::BaseController
         :avatar_cache,
         :embedable_user_email,
         :is_suspended,
-        :lightspeed_cloud_api_key,
         :passwordless_user_domain,
         :graduated_notification_interval_days,
         :lock_show_on_map,

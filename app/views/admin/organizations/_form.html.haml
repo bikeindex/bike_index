@@ -60,6 +60,12 @@
             .form-check
               = f.radio_button "kind", kind, class: "form-check-input"
               = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
+      - if @organization.bike_shop?
+        .form-group.mt-2
+          = f.check_box :lightspeed_register_with_phone
+          = f.label :lightspeed_register_with_phone do
+            Lightspeed POS registrations include phone
+            %small.less-strong originally for Edmonton
 
     %hr
     .form-group

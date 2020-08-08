@@ -1141,20 +1141,14 @@ RSpec.describe Bike, type: :model do
 
   describe "phone" do
     let(:bike) { Bike.new }
-    let(:user) { User.new(phone: "888.888.8888") }
-    context "assigned phone" do
-      it "returns phone" do
-        bike.phone = user.phone
-        expect(bike.phone).to eq "888.888.8888"
-      end
-    end
+    let(:user) { FactoryBot.create(:user, phone: "765.987.1234") }
     context "user" do
       let(:ownership) { Ownership.new(user: user) }
       it "returns users phone" do
         allow(bike).to receive(:current_ownership) { ownership }
         expect(ownership.first?).to be_truthy
-        expect(user.phone).to eq "888.888.8888"
-        expect(bike.phone).to eq "888.888.8888"
+        expect(user.phone).to eq "7659871234"
+        expect(bike.phone).to eq "7659871234"
       end
     end
     context "b_param" do
@@ -1166,7 +1160,7 @@ RSpec.describe Bike, type: :model do
       end
       it "returns the phone" do
         allow(bike).to receive(:first_ownership) { ownership }
-        expect(bike.phone).to eq "888.888.8888"
+        expect(bike.phone).to eq "8888888888"
       end
       context "not first ownerships" do
         it "is the users " do
