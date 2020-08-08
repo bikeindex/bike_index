@@ -33,8 +33,10 @@ function BinxAdminBikesEdit() {
         e.preventDefault();
         if ($this.prop("checked")) {
           $("#adminRecoveryFields").collapse("hide");
+          $("#mark_recovered_reason").attr("required", false);
         } else {
           $("#adminRecoveryFields").collapse("show");
+          $("#mark_recovered_reason").attr("required", true);
         }
       });
     },
