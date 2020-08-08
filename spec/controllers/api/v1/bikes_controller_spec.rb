@@ -166,7 +166,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           let(:primary_organization) { FactoryBot.create(:organization) }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CAL09999", organization: primary_organization) }
           let(:post_hash) do
-            bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 00 09 99 9", phone: "1 (888) 777 - 6666")
+            bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 00 09 99 9", phone: "CELL888 777 - 6666")
             bike_hash.merge(organization_slug: organization.id, bike: bike_hash_nested)
           end
           it "creates and adds sticker" do
@@ -180,7 +180,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             expect(Bike.where(serial_number: "SSOMESERIAL").count).to eq 1
             bike = Bike.where(serial_number: "SSOMESERIAL").first
             expect_matching_created_bike(bike)
-            expect(bike.phone).to eq "18887776666"
+            expect(bike.phone).to eq "CELL8887776666"
 
             Sidekiq::Worker.drain_all
             expect(ActionMailer::Base.deliveries.count).to eq 1

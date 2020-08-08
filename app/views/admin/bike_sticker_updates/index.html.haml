@@ -42,27 +42,57 @@
 - if @render_chart
   - if @search_kind == "all"
     - counts_by_kind = counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
-    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true
+    -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
+    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
     = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
 
 
   - unless params[:organization_id].present?
-    .row.mt-2
-      .col-md-6.offset-md-3
-        %table.table-list.wide-definition
-          %tbody
-            - matching_sticker_per_org_id = matching_bike_sticker_updates.distinct.pluck(:organization_id).map { |id| [id, matching_bike_sticker_updates.where(organization_id: id).count] }
-            - matching_sticker_per_org_id.sort_by { |id, number| number }.each do |id, number|
-              - organization = Organization.unscoped.find_by_id(id) if id.present?
-              %tr
+    - update_kinds = BikeStickerUpdate.kinds # Just to ensure consistency
+    .full-screen-table.mt-2
+      %table.table.table-striped.table-bordered.table-sm
+        %thead.small-header
+          %th Organization
+          - if @search_kind == "all"
+            - update_kinds.each do |kind|
+              %th.small= kind.humanize
+          %th Total
+
+        %tbody
+          - matching_org_ids = matching_bike_sticker_updates.distinct.pluck(:organization_id)
+          - if @search_kinds == "all"
+            - matching_sticker_per_org_id = matching_org_ids.map { |id| [id, {total:  matching_bike_sticker_updates.where(organization_id: id).count }] }
+          - else
+            -# Do some crazy ruby inline shit
+            :ruby
+              matching_sticker_per_org_id = matching_org_ids.map do |id|
+                values = update_kinds.map { |kind| [kind, matching_bike_sticker_updates.where(organization_id: id, kind: kind).count] }.to_h
+                [id, values.merge(total: values.values.sum)]
+              end
+          - matching_sticker_per_org_id.sort_by { |id, values| values[:total] }.each do |id, values|
+            - organization = Organization.unscoped.find_by_id(id) if id.present?
+            %tr
+              %td.small
+                - if organization.present?
+                  = link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
+                - else
+                  = link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
+              - if @search_kind == "all"
+                - update_kinds.each do |kind|
+                  %td
+                    %small= number_with_delimiter(values[kind])
+              %td
+                = number_with_delimiter(values[:total])
+          %tr
+            %td Total
+            - if @search_kind == "all"
+              - update_kinds.each do |kind|
                 %td
-                  - if organization.present?
-                    = link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
-                  - else
-                    = link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
-                %td
-                  = number_with_delimiter(number)
+                  %small
+                    = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
+            %td
+              = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
 
 .mt-2
   = render partial: "/shared/period_select"

@@ -68,7 +68,7 @@ RSpec.describe Admin::BikesController, type: :request do
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{bike.id}", params: {
               mark_recovered_reason: "some reason", mark_recovered_we_helped: "true", can_share_recovery: "1",
-              bike: { owner_email: bike.owner_email }
+              bike: {owner_email: bike.owner_email}
             }
           end
           bike.reload
