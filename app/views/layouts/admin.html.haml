@@ -7,8 +7,7 @@
     = javascript_pack_tag "application_standalone"
     = stylesheet_pack_tag "application_css"
     - if params[:hide_dev].present?
-      :css
-        .only-dev-visible { display: none; }
+      <style>.only-dev-visible { display: none; }</style>
 
   / manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
