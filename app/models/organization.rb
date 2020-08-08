@@ -99,7 +99,7 @@ class Organization < ApplicationRecord
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
+  attr_accessor :embedable_user_email, :skip_update
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)

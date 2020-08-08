@@ -145,6 +145,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             show_on_map: true,
             short_name: "Something cool",
             kind: "ambassador",
+            lightspeed_register_with_phone: true,
             locations_attributes: {
               "0" => {
                 id: location1.id,
@@ -199,6 +200,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             current_organization.reload
             expect(current_organization.show_on_map).to be_truthy
             expect(current_organization.kind).to_not eq "ambassador"
+            expect(current_organization.lightspeed_register_with_phone).to be_truthy
             # Existing location is updated
             location1.reload
             expect(location1.organization).to eq current_organization
