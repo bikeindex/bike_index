@@ -132,8 +132,8 @@ RSpec.describe GraduatedNotification, type: :model do
   describe "bikes_to_notify" do
     let(:graduated_notification_interval) { 2.years }
     let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - 5.years) }
-    let(:bike2) { FactoryBot.create(:bike_organized, :stolen, :with_ownership, organization: organization, created_at: Time.current - 3.years) }
-    let!(:bike3) { FactoryBot.create(:bike_organized, :stolen, :with_ownership, created_at: Time.current - 5.years) }
+    let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership, organization: organization, created_at: Time.current - 3.years) }
+    let!(:bike3) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership, created_at: Time.current - 5.years) }
     let!(:bike_organization1) { bike1.bike_organizations.where(organization_id: organization.id).first }
     let!(:bike_organization2) { bike2.bike_organizations.where(organization_id: organization.id).first }
     let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
@@ -166,7 +166,7 @@ RSpec.describe GraduatedNotification, type: :model do
     context "user" do
       let(:user) { FactoryBot.create(:user) }
       let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization, user: user) }
-      let(:bike2) { FactoryBot.create(:bike_organized, :stolen, :with_ownership_claimed, organization: organization, user: user) }
+      let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership_claimed, organization: organization, user: user) }
       it "finds the first bike" do
         _bike3 = FactoryBot.create(:bike_organized, :with_ownership, organization: organization) # Test to ensure that we aren't grabbing bikes that aren't due notification
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike1.id, bike2.id])
