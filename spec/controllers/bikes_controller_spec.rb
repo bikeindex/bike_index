@@ -891,6 +891,7 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.current_stolen_record.phone).to eq "3123799513"
               expect(bike_user.phone).to eq "3123799513"
               expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
+              expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
               stolen_record = bike.current_stolen_record
               chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
               expect(stolen_record.show_address).to be_truthy

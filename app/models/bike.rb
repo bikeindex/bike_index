@@ -513,8 +513,12 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
+  def frame_model_truncated
+    frame_model&.truncate(40)
+  end
+
   def title_string
-    t = [year, mnfg_name, frame_model].join(" ")
+    t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
     Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
   end
