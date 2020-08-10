@@ -106,7 +106,7 @@
         = humanized_time_range(@time_range)
 
   .col-md-6.text-right
-    = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
+    = form_tag admin_bike_sticker_updates_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :render_chart, @render_chart
@@ -121,9 +121,13 @@
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
 - if @searched_bike_stickers.present?
-  - if @searched_bike_stickers.count > 100
-    %h3 More than 100 matching stickers, just showing the first ones
-  = render partial: "table", locals: { bike_stickers: @bike_stickers.limit(100) }
+  .row.matching-bike-stickers.mt-4.mb-4{ style: "background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;" }
+    .col-12.pt-4.pb-2
+      %h2
+        Matching bike stickers
+      - if @searched_bike_stickers.count > 100
+        %h3 More than 100 matching stickers, just showing the first ones
+      = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @searched_bike_stickers.limit(100) }
 
 .row
   .col-sm-6.offset-sm-6
@@ -158,7 +162,7 @@
         - bike_sticker = bike_sticker_update.bike_sticker
         %tr
           %td
-            %span.convertTime
+            %a.convertTime{ href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" }
               = l bike_sticker_update.created_at, format: :convert_time
           %td
             - if bike_sticker_update.user_id.present?
@@ -166,7 +170,7 @@
               = link_to user_name, admin_bike_sticker_updates_path(sortable_search_params.merge(user_id: bike_sticker_update.user_id))
           %td
             %strong
-              = link_to bike_sticker.pretty_code, "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}"
+              = link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code))
             - unless bike_sticker.sticker?
               %em.small.text-warning
                 = bike_sticker.kind
