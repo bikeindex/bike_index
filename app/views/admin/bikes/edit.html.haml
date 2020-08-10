@@ -44,12 +44,18 @@
                     %small
                       = badge.to_s.humanize
 
-
 - if @bike.user_hidden
-  %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
-    Marked HIDDEN by the user
-    %small
-      no one but the user (and bike index admins) can see it
+  - if @bike.unregistered_parking_notification?
+    %h2.text-warning.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+      Bike Created by parking notification:
+      %em
+        - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
+        = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-warning text-underline"
+  - else
+    %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+      Marked HIDDEN by the user
+      %small
+        no one but the user (and bike index admins) can see it
 
 = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
   - if @bike.errors.any?
