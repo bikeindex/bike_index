@@ -849,6 +849,7 @@ RSpec.describe BikesController, type: :controller do
 
       context "no existing b_param and stolen" do
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
+        let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
         let(:bike_params) do
           {
             b_param_id_token: "",
@@ -856,7 +857,7 @@ RSpec.describe BikesController, type: :controller do
             serial_number: "example serial",
             manufacturer_other: "",
             year: "2016",
-            frame_model: "Cool frame model",
+            frame_model: extra_long_string,
             primary_frame_color_id: color.id.to_s,
             secondary_frame_color_id: "",
             tertiary_frame_color_id: "",
@@ -889,6 +890,7 @@ RSpec.describe BikesController, type: :controller do
               bike_user.reload
               expect(bike.current_stolen_record.phone).to eq "3123799513"
               expect(bike_user.phone).to eq "3123799513"
+              expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
               stolen_record = bike.current_stolen_record
               chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
               expect(stolen_record.show_address).to be_truthy
