@@ -60,7 +60,7 @@
                 = bike.mnfg_name
             %td.d-none.d-lg-table-cell
               .less-strong-hold
-                = [bike.year, bike.frame_model].join(' ')
+                = [bike.year, bike.frame_model_truncated].join(' ')
                 = "(#{bike.type})" unless bike.type == 'bike'
                 - if bike.stolen_recovery?
                   %small

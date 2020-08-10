@@ -9,7 +9,7 @@ module OrganizedHelper
       concat(content_tag(:strong, bike.mnfg_name))
       if bike.frame_model.present?
         concat(" ")
-        concat(content_tag(:em, bike.frame_model))
+        concat(content_tag(:em, bike.frame_model_truncated))
       end
       unless bike.cycle_type == "bike"
         concat(content_tag(:small, " #{bike.type}"))
