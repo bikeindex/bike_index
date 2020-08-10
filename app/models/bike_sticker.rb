@@ -2,7 +2,7 @@
 
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
-  MAX_UNORGANIZED = 10
+  MAX_UNORGANIZED = 20
   belongs_to :bike
   belongs_to :organization
   belongs_to :secondary_organization, class_name: "Organization" # assigning organization
