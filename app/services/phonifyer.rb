@@ -13,6 +13,7 @@ class Phonifyer
   end
 
   def self.strip_ignored_parts(number)
+    return nil unless number.present?
     # Formatting bits that we don't care about
     number.gsub(/\s|\.|-|\(|\)|\//, "")
   end
@@ -32,6 +33,7 @@ class Phonifyer
   def self.split_with_extension(number)
     return [number] unless number.match?(/x/i)
     number, extension = number.split(/e?x[a-z]*/i)
+    return [number, nil] unless extension.present?
     # Remove things we don't care about
     extension = extension.strip.gsub(/\A(-|\.|:)/, "")
     [number.strip, "x#{extension.strip}"]
