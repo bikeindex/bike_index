@@ -58,11 +58,6 @@ class Export < ApplicationRecord
     (PERMITTED_HEADERS + additional_headers).uniq
   end
 
-  # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
-  def self.avery_export_bike?(bike)
-    bike.owner_name.present? && bike.valid_registration_address_present?
-  end
-
   def self.with_bike_sticker_code(bike_sticker_code)
     where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
   end

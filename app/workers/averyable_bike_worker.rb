@@ -4,7 +4,7 @@
 class AveryableBikeWorker < ApplicationWorker
   def perform(filename, bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
-    return true if Export.avery_export_bike?(bike)
+    return true if bike.avery_exportable?(bike)
     File.open(filename, "a+") { |f| f << "\n#{bike.id}" }
   end
 end

@@ -987,6 +987,34 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "avery_exportable?" do
+    context "unclaimed bike, with owner email" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let!(:b_param) do
+        FactoryBot.create(:b_param, created_bike_id: bike.id,
+                                    params: {bike: {address: "102 Washington Pl, State College"}})
+      end
+      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      include_context :geocoder_real
+      it "is exportable" do
+        # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
+        VCR.use_cassette("organization_export_worker-avery") do
+          ownership.reload
+          expect(bike.owner_name).to eq "some name"
+          # expect(bike.latitude).to be_blank
+          # expect(bike.longitude).to be_blank
+          expect(bike.registration_address["street"]).to eq "102 Washington Pl"
+          expect(bike.avery_exportable?(bike)).to be_truthy
+          bike.reload
+          # expect(bike.latitude).to be_present
+          # expect(bike.longitude).to be_present
+        end
+      end
+    end
+  end
+
   describe "registration_address" do
     let(:bike) { Bike.new }
     let(:b_param) { BParam.new }
