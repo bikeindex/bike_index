@@ -283,7 +283,7 @@ RSpec.describe Organized::UsersController, type: :request do
           let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: current_organization) }
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
-            # and the organization needs to have the paid feature after the first membership is created
+            # and the organization needs to have the organization feature after the first membership is created
             Sidekiq::Testing.inline! do
               invoice.update_attributes(organization_feature_ids: [organization_feature.id])
               expect(current_organization.reload.enabled_feature_slugs).to eq(["passwordless_users"])

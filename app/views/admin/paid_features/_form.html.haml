@@ -2,7 +2,7 @@
   .row
     .col-xs-12
       - if @organization_feature.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @organization_feature }
+        = render partial: "/shared/errors", locals: { name: "Organization feature", obj: @organization_feature }
   .row
     .col-md-6.col-xs-12
       .form-group
@@ -17,7 +17,7 @@
       .col-md-6
         .form-group
           = f.label :feature_slugs_string do
-            Paid Feature Slugs <small>comma delineated</small>
+            Organization Feature Slugs <small>comma delineated</small>
           = f.text_area :feature_slugs_string, class: "form-control"
       .col-md-6{ style: "background: #fff;" }
         %small.less-strong.p-1

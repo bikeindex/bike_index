@@ -112,8 +112,8 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(bike.stolen).to be_truthy
       end
     end
-    context "with all the paid features possible" do
-      # Because we render different fields for some of the paid features, make sure they all work
+    context "with all the organization features possible" do
+      # Because we render different fields for some of the organization features, make sure they all work
       let(:organization) { FactoryBot.create(:organization_with_auto_user, :organization_features, enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS) }
       it "renders embed without xframe block" do
         get :embed, params: {id: organization.slug, stolen: 1}

@@ -51,7 +51,7 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
     if current_user.developer?
       permitted_parameters.merge(params.require(:organization_feature).permit(:feature_slugs_string))
     elsif @organization_feature&.id&.present? && @organization_feature.locked?
-      flash[:error] = "Can't update locked paid feature! Please ask Seth"
+      flash[:error] = "Can't update locked organization feature! Please ask Seth"
       {}
     else
       permitted_parameters

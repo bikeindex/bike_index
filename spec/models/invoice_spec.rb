@@ -105,9 +105,9 @@ RSpec.describe Invoice, type: :model do
       invoice.update_attributes(child_enabled_feature_slugs_string: ["passwordless_users"])
       expect(invoice.child_enabled_feature_slugs).to eq([])
     end
-    context "with paid features" do
+    context "with organization features" do
       let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: %w[passwordless_users reg_phone reg_address]) }
-      it "permits matching paid feature slugs" do
+      it "permits matching organization feature slugs" do
         invoice.organization_feature_ids = [organization_feature.id]
         invoice.reload
         expect(invoice.feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
@@ -126,7 +126,7 @@ RSpec.describe Invoice, type: :model do
     let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 100_000) }
     let(:organization_feature2) { FactoryBot.create(:organization_feature) }
     let(:organization_feature_one_time) { FactoryBot.create(:organization_feature_one_time, name: "one Time Feature") }
-    it "adds the paid feature ids and updates amount_due_cents" do
+    it "adds the organization feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
 
       invoice.update_attributes(organization_feature_ids: organization_feature.id, amount_due_cents: 0)
@@ -151,7 +151,7 @@ RSpec.describe Invoice, type: :model do
     let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
     let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.day, organization: organization) }
-    it "adds the paid features" do
+    it "adds the organization features" do
       invoice1.update_attributes(organization_feature_ids: [organization_feature1.id])
       organization.save
       expect(organization.enabled_feature_slugs).to eq(["bike_search"])

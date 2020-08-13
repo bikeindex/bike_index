@@ -56,7 +56,7 @@
       = hidden_field_tag :search_kind, params[:search_kind]
       = hidden_field_tag :search_pos, params[:search_pos]
       .form-group.ml-auto.align-self-end.mt-4
-        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Paid features' : '' }", class: "form-control", style: "min-width: 300px;"
+        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Organization features' : '' }", class: "form-control", style: "min-width: 300px;"
       .form-group.mt-4
         = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
 

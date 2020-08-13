@@ -5,7 +5,7 @@ function BinxAdminInvoices() {
       $(".inputTriggerRecalculation").on("change paste keyup", (e) =>
         this.updateInvoiceCalculations()
       );
-      $("#invoiceForm .paidFeatureCheck input").on("change", (e) =>
+      $("#invoiceForm .organizationFeatureCheck input").on("change", (e) =>
         this.updateInvoiceCalculations()
       );
       $("#invoice_is_endless").on("change", (e) => {
@@ -16,7 +16,7 @@ function BinxAdminInvoices() {
 
     updateInvoiceCalculations() {
       let oneTimeCost, recurringCost;
-      const recurring = $(".paidFeatureCheck input.recurring:checked")
+      const recurring = $(".organizationFeatureCheck input.recurring:checked")
         .get()
         .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (recurring.length > 0) {
@@ -24,7 +24,7 @@ function BinxAdminInvoices() {
       } else {
         recurringCost = 0;
       }
-      const oneTime = $(".paidFeatureCheck input.oneTime:checked")
+      const oneTime = $(".organizationFeatureCheck input.oneTime:checked")
         .get()
         .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (oneTime.length > 0) {
@@ -40,7 +40,7 @@ function BinxAdminInvoices() {
       const due = parseInt($("#invoice_amount_due").val(), 10);
       $("#discountCost").text(`${-1 * (recurringCost + oneTimeCost - due)}.00`);
 
-      const checked_ids = $(".paidFeatureCheck input:checked")
+      const checked_ids = $(".organizationFeatureCheck input:checked")
         .get()
         .map((i) => $(i).attr("data-id"));
       $("#invoice_organization_feature_ids").val(checked_ids);

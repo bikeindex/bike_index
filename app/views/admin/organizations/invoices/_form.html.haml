@@ -18,7 +18,7 @@
           - organization_feature_ids = @invoice.organization_feature_ids
           - @organization_features.each do |organization_feature|
             %tr
-              %td.paidFeatureCheck
+              %td.organizationFeatureCheck
                 / I know there is a way to make rails do this, but I'm having trouble making it happen, so whatever
                 = check_box_tag "organization_feature_ids_#{organization_feature.id}", organization_feature.id, organization_feature_ids.include?(organization_feature.id), { class: (organization_feature.one_time? ? "oneTime" : "recurring"), "data-amount" => organization_feature.amount, "data-id" => organization_feature.id }
 

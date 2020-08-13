@@ -343,11 +343,11 @@ en:
         amount_paid_cents: Amount paid cents
         first_invoice: :activerecord.models.first_invoice
         force_active: Force active
-        invoice_organization_features: Invoice paid features
+        invoice_organization_features: Invoice organization features
         is_active: Is active
         notes: Notes
         organization: :activerecord.models.organization
-        organization_features: Paid features
+        organization_features: Organization features
         payments: Payments
         subscription_end_at: Subscription end at
         subscription_start_at: Subscription start at
@@ -493,7 +493,7 @@ en:
         description: Description
         details_link: Details link
         feature_slugs: Feature slugs
-        invoice_organization_features: Invoice paid features
+        invoice_organization_features: Invoice organization features
         invoices: Invoices
         kind: Kind
         name: Name
@@ -804,7 +804,7 @@ en:
       front_gear_type: Front gear type
       integration: Integration
       invoice: Invoice
-      invoice_organization_feature: Invoice paid feature
+      invoice_organization_feature: Invoice organization feature
       listicle: Listicle
       location: Location
       lock: Lock
@@ -817,7 +817,7 @@ en:
       organization_message: Organization message
       other_listing: Other listing
       ownership: Ownership
-      organization_feature: Paid feature
+      organization_feature: Organization feature
       paint: Paint
       payment: Payment
       public_image: Public image
