@@ -987,6 +987,36 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "avery_exportable?" do
+    context "unclaimed bike, with owner email" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let(:b_param) do
+        FactoryBot.create(:b_param, created_bike_id: bike.id,
+                                    params: {bike: {address: "102 Washington Pl, State College"}})
+      end
+      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      include_context :geocoder_real
+      it "is exportable" do
+        # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
+        VCR.use_cassette("organization_export_worker-avery") do
+          expect(b_param).to be_present
+          ownership.reload
+          bike.save
+          bike.reload
+          # We test that the bike has a location saved
+          expect(bike.latitude).to be_present
+          expect(bike.longitude).to be_present
+          expect(bike.owner_name).to eq "some name"
+          expect(bike.registration_address["street"]).to eq "102 Washington Pl"
+          expect(bike.avery_exportable?).to be_truthy
+          bike.reload
+        end
+      end
+    end
+  end
+
   describe "registration_address" do
     let(:bike) { Bike.new }
     let(:b_param) { BParam.new }
@@ -1063,6 +1093,16 @@ RSpec.describe Bike, type: :model do
           bike.reload
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           expect(bike.registration_address).to eq target.as_json
+        end
+        context "with address_set_manually" do
+          let(:target) { {street: "1313 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "66666", country: "US", latitude: 43.9, longitude: -88.7} }
+          it "returns address set" do
+            FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)
+            bike.update(target.merge(address_set_manually: true))
+            bike.reload
+            expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
+            expect(bike.registration_address).to eq target.as_json
+          end
         end
       end
     end

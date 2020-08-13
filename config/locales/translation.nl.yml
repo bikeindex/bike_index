@@ -1788,6 +1788,8 @@ nl:
       zipcode: Postcode
       choose_country: Kies land
       city: City
+      state: Staat
+      street: Straat
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
@@ -4447,8 +4449,6 @@ nl:
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
         model: Model
         only_no_sticker_html: Alleen <strong>geen</strong> sticker
-        only_not: alleen niet
-        only_with: alleen met
         only_with_stickers_html: Alleen <strong>met</strong> stickers
         owner_name: Eigenaar naam
         registered: Geregistreerd
@@ -4468,6 +4468,10 @@ nl:
         visible_columns: Zichtbare kolommen
         email_hidden: email verborgen
         impounded: In beslag genomen bij
+        address: 'Adres:'
+        avery: Avery?
+        only_no_address_html: Alleen <strong>geen</strong> adres
+        only_with_address_html: Alleen <strong>met</strong> adres
     bulk_imports:
       index:
         added: Toegevoegd

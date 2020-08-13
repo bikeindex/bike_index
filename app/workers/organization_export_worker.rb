@@ -88,7 +88,8 @@ class OrganizationExportWorker < ApplicationWorker
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    Export.avery_export_bike?(bike_or_b_param)
+    return false unless bike_or_b_param.is_a?(Bike)
+    bike_or_b_param.avery_exportable?
   end
 
   def bike_to_row(bike)

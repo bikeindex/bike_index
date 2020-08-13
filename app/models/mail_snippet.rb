@@ -90,7 +90,6 @@ class MailSnippet < ApplicationRecord
   def should_be_geocoded?
     return false if skip_geocoding?
     return true if is_location_triggered?
-    return false if address.blank?
     address_changed?
   end
 end

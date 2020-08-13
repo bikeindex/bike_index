@@ -136,12 +136,17 @@ module Organized
       else
         bikes = Bike.search(@interpreted_params)
       end
-      @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
         bikes = @search_stickers == "none" ? bikes.no_bike_sticker : bikes.bike_sticker
       else
         @search_stickers = false
+      end
+      if params[:search_address].present?
+        @search_address = params[:search_address] == "none" ? "none" : "with"
+        bikes = @search_address == "none" ? bikes.without_location : bikes.with_location
+      else
+        @search_address = false
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
       @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)

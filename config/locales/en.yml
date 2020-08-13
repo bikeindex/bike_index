@@ -1052,6 +1052,8 @@ en:
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
       seat_tube_length: Seat tube length
+      state: State
+      street: Street
       submit_manufacturer_correction: Submit Manufacturer Correction
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
@@ -4305,7 +4307,9 @@ en:
         render_chart: Show chart
         show_only_organization_recoveries: Show only %{org_short_name} bikes
       search:
+        address: 'Address:'
         all: All
+        avery: Avery?
         bike: bike
         color: Color
         email_hidden: email hidden
@@ -4315,9 +4319,9 @@ en:
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
+        only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
-        only_not: only not
-        only_with: only with
+        only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name
         registered: Registered
