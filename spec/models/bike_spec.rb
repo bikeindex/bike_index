@@ -1094,6 +1094,15 @@ RSpec.describe Bike, type: :model do
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           expect(bike.registration_address).to eq target.as_json
         end
+        context "with address_set_manually" do
+          let(:target) { {street: "1313 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "66666", country: "US", latitude: 43.9, longitude: -88.7} }
+          it "returns address set" do
+            bike.update(target.merge(address_set_manually: true))
+            bike.reload
+            expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
+            expect(bike.registration_address).to eq target.as_json
+          end
+        end
       end
     end
   end

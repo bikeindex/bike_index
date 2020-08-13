@@ -1693,7 +1693,6 @@ CREATE TABLE public.mail_snippets (
     is_enabled boolean DEFAULT false NOT NULL,
     is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
-    address character varying(255),
     latitude double precision,
     longitude double precision,
     proximity_radius integer,
@@ -5350,6 +5349,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200804180457'),
 ('20200808175756'),
 ('20200810163704'),
-('20200813154458');
+('20200813154458'),
+('20200813221439');
 
 
