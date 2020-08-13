@@ -10,7 +10,7 @@ RSpec.describe HotSheetConfiguration, type: :model do
   end
 
   describe "validates bounding_box" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
     it "ensures there is a search location" do
       expect(hot_sheet_configuration.valid?).to be_truthy

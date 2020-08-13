@@ -212,7 +212,7 @@ RSpec.describe Organized::UsersController, type: :request do
         end
       end
       context "restrict_invitations? is false" do
-        let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
         it "just creates the user" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
@@ -260,7 +260,7 @@ RSpec.describe Organized::UsersController, type: :request do
             end
           end
           context "restrict_invitations? is false" do
-            let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
             it "creates memberships" do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []
@@ -279,13 +279,13 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "auto_passwordless_users" do
-          let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 0, feature_slugs: ["passwordless_users"]) }
+          let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 0, feature_slugs: ["passwordless_users"]) }
           let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: current_organization) }
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
             # and the organization needs to have the paid feature after the first membership is created
             Sidekiq::Testing.inline! do
-              invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+              invoice.update_attributes(organization_feature_ids: [organization_feature.id])
               expect(current_organization.reload.enabled_feature_slugs).to eq(["passwordless_users"])
 
               ActionMailer::Base.deliveries = []

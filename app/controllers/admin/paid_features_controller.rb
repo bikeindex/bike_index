@@ -1,34 +1,34 @@
 class Admin::OrganizationFeaturesController < Admin::BaseController
   include SortableTable
-  before_action :find_paid_feature, only: %i[edit update]
+  before_action :find_organization_feature, only: %i[edit update]
 
   def index
-    @paid_features = OrganizationFeature.order(sort_column + " " + sort_direction)
+    @organization_features = OrganizationFeature.order(sort_column + " " + sort_direction)
   end
 
   def new
-    @paid_feature ||= OrganizationFeature.new
+    @organization_feature ||= OrganizationFeature.new
   end
 
   def show
-    redirect_to edit_admin_paid_feature_path
+    redirect_to edit_admin_organization_feature_path
   end
 
   def edit
-    @invoices = @paid_feature.invoices.includes(:organization, :payments)
+    @invoices = @organization_feature.invoices.includes(:organization, :payments)
   end
 
   def update
-    @paid_feature.update_attributes(permitted_update_parameters)
+    @organization_feature.update_attributes(permitted_update_parameters)
     flash[:success] = "Feature updated" unless flash[:error].present?
-    redirect_to admin_paid_features_path
+    redirect_to admin_organization_features_path
   end
 
   def create
-    @paid_feature = OrganizationFeature.new(permitted_update_parameters)
-    if @paid_feature.save
+    @organization_feature = OrganizationFeature.new(permitted_update_parameters)
+    if @organization_feature.save
       flash[:success] = "Feature created"
-      redirect_to admin_paid_features_path
+      redirect_to admin_organization_features_path
     else
       flash[:error] = "Unable to create"
       render :new
@@ -47,10 +47,10 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)
+    permitted_parameters = params.require(:organization_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)
     if current_user.developer?
-      permitted_parameters.merge(params.require(:paid_feature).permit(:feature_slugs_string))
-    elsif @paid_feature&.id&.present? && @paid_feature.locked?
+      permitted_parameters.merge(params.require(:organization_feature).permit(:feature_slugs_string))
+    elsif @organization_feature&.id&.present? && @organization_feature.locked?
       flash[:error] = "Can't update locked paid feature! Please ask Seth"
       {}
     else
@@ -58,7 +58,7 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
     end
   end
 
-  def find_paid_feature
-    @paid_feature = OrganizationFeature.find(params[:id])
+  def find_organization_feature
+    @organization_feature = OrganizationFeature.find(params[:id])
   end
 end

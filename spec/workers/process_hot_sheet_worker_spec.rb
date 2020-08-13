@@ -13,7 +13,7 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
   describe "perform" do
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
     let!(:organization1) { hot_sheet_configuration.organization }
-    let!(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["hot_sheet"]) }
+    let!(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
 
     before do
       Sidekiq::Worker.clear_all

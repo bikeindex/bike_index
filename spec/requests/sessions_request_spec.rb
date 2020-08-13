@@ -29,7 +29,7 @@ RSpec.describe SessionsController, type: :request do
       end
     end
     context "passwordless email" do
-      let!(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu", available_invitation_count: 1) }
+      let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu", available_invitation_count: 1) }
       it "autogenerates" do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all

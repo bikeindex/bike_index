@@ -4,7 +4,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/graduated_notifications" }
   include_context :request_spec_logged_in_as_organization_member
 
-  let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i) }
+  let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i) }
   let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: Time.current - 2.years) }
 
   describe "index" do

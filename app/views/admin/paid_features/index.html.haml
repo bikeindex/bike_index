@@ -2,12 +2,12 @@
   .col-lg-10.col-sm-12
     %h1 Paid Features
   .col-lg-2.col-sm-12
-    = link_to "New Feature", new_admin_paid_feature_url, class: "btn btn-success float-right"
+    = link_to "New Feature", new_admin_organization_feature_url, class: "btn btn-success float-right"
 
 
 
 %h4
-  #{@paid_features.count} total
+  #{@organization_features.count} total
 
 .full-screen-table
   %table.table.table-striped.table-bordered
@@ -21,30 +21,30 @@
       %th
         = sortable "amount_cents", "Amount"
     %tbody
-      - @paid_features.each do |paid_feature|
+      - @organization_features.each do |organization_feature|
         %tr
           %td
             %small.convertTime
-              = l paid_feature.created_at, format: :convert_time
+              = l organization_feature.created_at, format: :convert_time
           %td
-            = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
-            - if paid_feature.description.present?
+            = link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature)
+            - if organization_feature.description.present?
               %br
-              %small= paid_feature.description
-            - if paid_feature.details_link.present?
+              %small= organization_feature.description
+            - if organization_feature.details_link.present?
               %br
-              %small= link_to paid_feature.details_link, paid_feature.details_link
+              %small= link_to organization_feature.details_link, organization_feature.details_link
 
-            - if paid_feature.feature_slugs_string.present?
+            - if organization_feature.feature_slugs_string.present?
               %br
               %small.less-strong
                 %span
                   Feature slugs:
                   %span{style: "color: purple;"}
-                    = paid_feature.feature_slugs_string
+                    = organization_feature.feature_slugs_string
 
           %td
             %small
-              = paid_feature.kind.humanize
+              = organization_feature.kind.humanize
           %td
-            = paid_feature.amount_formatted
+            = organization_feature.amount_formatted

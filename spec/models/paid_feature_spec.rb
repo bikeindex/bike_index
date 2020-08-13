@@ -4,19 +4,19 @@ RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
 
   describe "feature_slugs_string" do
-    let(:paid_feature) { OrganizationFeature.new }
+    let(:organization_feature) { OrganizationFeature.new }
     it "updates only including the expected ones" do
-      paid_feature.feature_slugs_string = "REG_Phone,, PARKING_NOTIFICATIONs, Stuff"
-      expect(paid_feature.feature_slugs).to eq(%w[reg_phone parking_notifications])
-      paid_feature.feature_slugs_string = " \n"
-      expect(paid_feature.feature_slugs).to eq([])
+      organization_feature.feature_slugs_string = "REG_Phone,, PARKING_NOTIFICATIONs, Stuff"
+      expect(organization_feature.feature_slugs).to eq(%w[reg_phone parking_notifications])
+      organization_feature.feature_slugs_string = " \n"
+      expect(organization_feature.feature_slugs).to eq([])
     end
   end
 
   describe "child organization" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, kind: "law_enforcement", enabled_feature_slugs: %w[child_organizations bike_stickers]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement", enabled_feature_slugs: %w[child_organizations bike_stickers]) }
     let(:invoice) { organization.current_invoices.first }
-    let(:organization_child) { FactoryBot.create(:organization_with_paid_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
+    let(:organization_child) { FactoryBot.create(:organization_with_organization_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
     context "without child_enabled_feature_slugs" do
       it "does not inherit from the parent" do
         Sidekiq::Testing.inline! do

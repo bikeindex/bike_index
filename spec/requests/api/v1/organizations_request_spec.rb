@@ -36,7 +36,7 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
 
     context "numeric id, has_bike_stickers" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, :in_chicago, kind: "bike_shop") }
-      let!(:organization_regional_parent) { FactoryBot.create(:organization_with_paid_features, :in_chicago, regional_ids: [organization.id], enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
+      let!(:organization_regional_parent) { FactoryBot.create(:organization_with_organization_features, :in_chicago, regional_ids: [organization.id], enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
       let(:target) do
         {
           id: organization.id,

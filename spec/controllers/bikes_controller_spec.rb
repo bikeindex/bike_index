@@ -169,7 +169,7 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to redirect_to(new_session_path)
       end
       context "organization present" do
-        let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"]) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
         it "redirects to magic link, because organization sign in" do
           get :show, params: {id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param}
           expect(session[:return_to]).to eq bike_path(bike.to_param)

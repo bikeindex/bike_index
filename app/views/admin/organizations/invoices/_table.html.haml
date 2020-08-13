@@ -87,11 +87,11 @@
               = invoice.discount_formatted
           %td
             %ul{ style: "font-size: 80%;" }
-              - invoice.paid_features.each do |paid_feature|
+              - invoice.organization_features.each do |organization_feature|
                 %li
-                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  = link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature)
                   %em{ style: "font-size: 70%;" }
-                    = paid_feature.kind
+                    = organization_feature.kind
 
             %small
               = safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")

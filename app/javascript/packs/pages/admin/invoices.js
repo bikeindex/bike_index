@@ -43,7 +43,7 @@ function BinxAdminInvoices() {
       const checked_ids = $(".paidFeatureCheck input:checked")
         .get()
         .map((i) => $(i).attr("data-id"));
-      $("#invoice_paid_feature_ids").val(checked_ids);
+      $("#invoice_organization_feature_ids").val(checked_ids);
     },
   };
 }

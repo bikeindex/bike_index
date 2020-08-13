@@ -2,5 +2,5 @@
 
 class InvoiceOrganizationFeature < ActiveRecord::Base
   belongs_to :invoice
-  belongs_to :paid_feature
+  belongs_to :organization_feature
 end

@@ -24,7 +24,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
-    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
 
     describe "show" do
       it "renders" do
@@ -59,7 +59,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
 
     describe "show" do
       it "renders" do

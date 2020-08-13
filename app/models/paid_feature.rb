@@ -41,8 +41,8 @@ class OrganizationFeature < ApplicationRecord
     skip_ownership_email
   ] + APPOINTMENT_FEATURES + BIKE_ACTIONS + REG_FIELDS).freeze
 
-  has_many :invoice_paid_features
-  has_many :invoices, through: :invoice_paid_features
+  has_many :invoice_organization_features
+  has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
   validates :currency, presence: true

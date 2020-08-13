@@ -482,10 +482,10 @@ nl:
         amount_due_cents: Verschuldigde centen
         amount_paid_cents: Bedrag betaald cent
         force_active: Forceer actief
-        invoice_paid_features: Factuur betaalde functies
+        invoice_organization_features: Factuur betaalde functies
         is_active: Is actief
         notes: Notes
-        paid_features: Betaalde functies
+        organization_features: Betaalde functies
         payments: Betalingen
         subscription_end_at: Abonnement eindigt om
         subscription_start_at: Abonnement start om
@@ -604,12 +604,12 @@ nl:
         owner_email: E-mailadres eigenaar
         send_email: Stuur e-mail
         user_hidden: Gebruiker verborgen
-      paid_feature:
+      organization_feature:
         amount_cents: Bedrag centen
         description: Beschrijving
         details_link: Details link
         feature_slugs: Naaktslakken
-        invoice_paid_features: Factuur betaalde functies
+        invoice_organization_features: Factuur betaalde functies
         invoices: Facturen
         kind: Soort
         name: Naam
@@ -865,7 +865,7 @@ nl:
       front_gear_type: Type versnelling voor
       integration: integratie
       invoice: factuur
-      invoice_paid_feature: Factuur betaald functie
+      invoice_organization_feature: Factuur betaald functie
       listicle: Listicle
       location: Plaats
       lock: Slot
@@ -878,7 +878,7 @@ nl:
       organization_message: Organisatie bericht
       other_listing: Andere lijst
       ownership: eigendom
-      paid_feature: Betaalde functie
+      organization_feature: Betaalde functie
       paint: Verf
       payment: Betaling
       public_image: Publiek imago

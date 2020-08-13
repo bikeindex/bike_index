@@ -337,7 +337,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:organization_paid) { FactoryBot.create(:organization_with_paid_features) }
+      let(:organization_paid) { FactoryBot.create(:organization_with_organization_features) }
       let(:user) { FactoryBot.create(:user) }
       let(:bike2) { FactoryBot.create(:bike) }
       it "claims anyway" do

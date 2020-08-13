@@ -42,7 +42,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
   context "organization with csv_exports" do
     let(:enabled_feature_slugs) { ["csv_exports"] }
-    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
 
     describe "index" do

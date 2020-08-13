@@ -1,7 +1,7 @@
 class Admin::Organizations::InvoicesController < Admin::BaseController
   before_action :find_organization
   before_action :find_invoice, only: %i[edit update]
-  before_action :find_paid_features, only: %i[new edit]
+  before_action :find_organization_features, only: %i[new edit]
 
   def index
     @invoices = @organization.invoices.reorder(id: :desc)
@@ -20,10 +20,10 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def create
-    @invoice = @organization.invoices.build(permitted_parameters.except(:paid_feature_ids, :child_enabled_feature_slugs))
+    @invoice = @organization.invoices.build(permitted_parameters.except(:organization_feature_ids, :child_enabled_feature_slugs))
     if @invoice.save
-      # Invoice has to be created before it can get paid_feature_ids
-      @invoice.paid_feature_ids = permitted_parameters[:paid_feature_ids]
+      # Invoice has to be created before it can get organization_feature_ids
+      @invoice.organization_feature_ids = permitted_parameters[:organization_feature_ids]
       @invoice.update_attributes(child_enabled_feature_slugs_string: permitted_parameters[:child_enabled_feature_slugs_string])
       flash[:success] = "Invoice created! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
@@ -51,12 +51,12 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   protected
 
-  def find_paid_features
-    @paid_features = OrganizationFeature.order(:name)
+  def find_organization_features
+    @organization_features = OrganizationFeature.order(:name)
   end
 
   def permitted_parameters
-    params.require(:invoice).permit(:paid_feature_ids, :amount_due, :notes, :timezone, :start_at, :end_at,
+    params.require(:invoice).permit(:organization_feature_ids, :amount_due, :notes, :timezone, :start_at, :end_at,
       :child_enabled_feature_slugs_string, :is_endless)
   end
 

@@ -1,8 +1,8 @@
-= form_for [:admin, @paid_feature] do |f|
+= form_for [:admin, @organization_feature] do |f|
   .row
     .col-xs-12
-      - if @paid_feature.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @paid_feature }
+      - if @organization_feature.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @organization_feature }
   .row
     .col-md-6.col-xs-12
       .form-group
@@ -41,4 +41,4 @@
         = f.label :description
         = f.text_area :description, style: "width: 100%;", class: "form-control"
 
-  = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'
+  = f.submit (@organization_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'

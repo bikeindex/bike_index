@@ -52,7 +52,7 @@ RSpec.describe Location, type: :model do
   end
 
   describe "impound_location, default_impound_location, organization setting" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["impound_bikes"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"]) }
     let!(:location) { FactoryBot.create(:location, organization: organization) }
     let!(:location2) { FactoryBot.create(:location, organization: organization) }
     it "sets the impound_bikes_locations on organization setting" do

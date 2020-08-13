@@ -403,7 +403,7 @@ class Organization < ApplicationRecord
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
-    # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
+    # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug

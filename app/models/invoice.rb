@@ -6,8 +6,8 @@ class Invoice < ApplicationRecord
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
-  has_many :invoice_paid_features, dependent: :destroy
-  has_many :paid_features, through: :invoice_paid_features
+  has_many :invoice_organization_features, dependent: :destroy
+  has_many :organization_features, through: :invoice_organization_features
   has_many :payments
 
   validates :organization, :currency, presence: true
@@ -35,7 +35,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.feature_slugs
-    includes(:paid_features).pluck(:feature_slugs).flatten.uniq
+    includes(:organization_features).pluck(:feature_slugs).flatten.uniq
   end
 
   # Static, at least for now
@@ -105,30 +105,30 @@ class Invoice < ApplicationRecord
     "Invoice ##{id}"
   end
 
-  def paid_feature_ids
-    invoice_paid_features.pluck(:paid_feature_id)
+  def organization_feature_ids
+    invoice_organization_features.pluck(:organization_feature_id)
   end
 
   # There can be multiple features of the same id. View the spec for additional info
-  def paid_feature_ids=(val)
+  def organization_feature_ids=(val)
     # This isn't super efficient, but whateves
     val = val.to_s.split(",") unless val.is_a?(Array)
     new_features = val.map { |v| OrganizationFeature.where(id: v).first }.compact
     new_feature_ids = new_features.map(&:id)
-    existing_feature_ids = invoice_paid_features.pluck(:paid_feature_id)
+    existing_feature_ids = invoice_organization_features.pluck(:organization_feature_id)
     (existing_feature_ids - new_feature_ids).uniq.each do |absent_id| # ids absent from new features
-      invoice_paid_features.where(paid_feature_id: absent_id).delete_all
+      invoice_organization_features.where(organization_feature_id: absent_id).delete_all
     end
     new_feature_ids.uniq.each do |feature_id|
       new_matching_ids = new_feature_ids.select { |i| i == feature_id }
       existing_matching_ids = existing_feature_ids.select { |i| i == feature_id }
       if new_matching_ids.count > existing_matching_ids.count
         (new_matching_ids.count - existing_matching_ids.count).times do
-          invoice_paid_features.create(paid_feature_id: feature_id)
+          invoice_organization_features.create(organization_feature_id: feature_id)
         end
       elsif new_matching_ids.count < existing_matching_ids.count
         (existing_matching_ids.count - new_matching_ids.count).times do
-          invoice_paid_features.where(paid_feature_id: feature_id).first.delete
+          invoice_organization_features.where(organization_feature_id: feature_id).first.delete
         end
       end
     end
@@ -195,11 +195,11 @@ class Invoice < ApplicationRecord
   end
 
   def feature_cost_cents
-    paid_features.sum(:amount_cents)
+    organization_features.sum(:amount_cents)
   end
 
   def feature_slugs
-    paid_features.pluck(:feature_slugs).flatten.uniq
+    organization_features.pluck(:feature_slugs).flatten.uniq
   end
 
   def create_following_invoice
@@ -207,7 +207,7 @@ class Invoice < ApplicationRecord
     return following_invoice if following_invoice.present?
     new_invoice = organization.invoices.create(start_at: subscription_end_at,
                                                first_invoice_id: subscription_first_invoice_id)
-    new_invoice.paid_feature_ids = paid_features.recurring.pluck(:id)
+    new_invoice.organization_feature_ids = organization_features.recurring.pluck(:id)
     new_invoice.reload
     new_invoice.update_attributes(child_enabled_feature_slugs: child_enabled_feature_slugs)
     new_invoice

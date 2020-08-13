@@ -179,7 +179,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
     end
     context "special headers" do
       let(:enabled_feature_slugs) { ["csv_exports"] }
-      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }

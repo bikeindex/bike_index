@@ -108,7 +108,7 @@ RSpec.describe Ownership, type: :model do
       end
     end
     context "organization with paid feature of skip_ownership_email" do
-      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["skip_ownership_email"]) }
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
       let!(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
       let(:bike) { ownership.bike }
       it "returns false" do
