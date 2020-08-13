@@ -1452,23 +1452,23 @@ ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
 
 
 --
--- Name: invoice_paid_features; Type: TABLE; Schema: public; Owner: -
+-- Name: invoice_organization_features; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.invoice_paid_features (
+CREATE TABLE public.invoice_organization_features (
     id integer NOT NULL,
     invoice_id integer,
-    paid_feature_id integer,
+    organization_feature_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 
 --
--- Name: invoice_paid_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: invoice_organization_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.invoice_paid_features_id_seq
+CREATE SEQUENCE public.invoice_organization_features_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1477,10 +1477,10 @@ CREATE SEQUENCE public.invoice_paid_features_id_seq
 
 
 --
--- Name: invoice_paid_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: invoice_organization_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.invoice_paid_features_id_seq OWNED BY public.invoice_paid_features.id;
+ALTER SEQUENCE public.invoice_organization_features_id_seq OWNED BY public.invoice_organization_features.id;
 
 
 --
@@ -3124,10 +3124,10 @@ ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: invoice_paid_features id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: invoice_organization_features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.invoice_paid_features ALTER COLUMN id SET DEFAULT nextval('public.invoice_paid_features_id_seq'::regclass);
+ALTER TABLE ONLY public.invoice_organization_features ALTER COLUMN id SET DEFAULT nextval('public.invoice_organization_features_id_seq'::regclass);
 
 
 --
@@ -3666,11 +3666,11 @@ ALTER TABLE ONLY public.integrations
 
 
 --
--- Name: invoice_paid_features invoice_paid_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: invoice_organization_features invoice_organization_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.invoice_paid_features
-    ADD CONSTRAINT invoice_paid_features_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.invoice_organization_features
+    ADD CONSTRAINT invoice_organization_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -4428,17 +4428,17 @@ CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (u
 
 
 --
--- Name: index_invoice_paid_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_invoice_organization_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_invoice_paid_features_on_invoice_id ON public.invoice_paid_features USING btree (invoice_id);
+CREATE INDEX index_invoice_organization_features_on_invoice_id ON public.invoice_organization_features USING btree (invoice_id);
 
 
 --
--- Name: index_invoice_paid_features_on_paid_feature_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_invoice_organization_features_on_organization_feature_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_invoice_paid_features_on_paid_feature_id ON public.invoice_paid_features USING btree (paid_feature_id);
+CREATE INDEX index_invoice_organization_features_on_organization_feature_id ON public.invoice_organization_features USING btree (organization_feature_id);
 
 
 --
