@@ -52,7 +52,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   protected
 
   def find_paid_features
-    @paid_features = PaidFeature.order(:name)
+    @paid_features = OrganizationFeature.order(:name)
   end
 
   def permitted_parameters

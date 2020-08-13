@@ -141,7 +141,7 @@ class Organization < ApplicationRecord
   def self.admin_text_search(n)
     return nil unless n.present?
     # Only search for paid features if the text is paid features
-    return with_enabled_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
+    return with_enabled_feature_slugs(n) if OrganizationFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -150,7 +150,7 @@ class Organization < ApplicationRecord
   end
 
   def self.with_enabled_feature_slugs(slugs)
-    matching_slugs = PaidFeature.matching_slugs(slugs)
+    matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
@@ -225,7 +225,7 @@ class Organization < ApplicationRecord
   end
 
   def appointment_functionality_enabled?
-    any_enabled?(PaidFeature::APPOINTMENT_FEATURES)
+    any_enabled?(OrganizationFeature::APPOINTMENT_FEATURES)
   end
 
   def hot_sheet_on?
@@ -304,7 +304,7 @@ class Organization < ApplicationRecord
   end
 
   def additional_registration_fields
-    PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
+    OrganizationFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
   def include_field_organization_affiliation?(user = nil)
@@ -337,7 +337,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    any_enabled?(PaidFeature::BIKE_ACTIONS)
+    any_enabled?(OrganizationFeature::BIKE_ACTIONS)
   end
 
   def law_enforcement_missing_verified_features?

@@ -1,13 +1,13 @@
-class Admin::PaidFeaturesController < Admin::BaseController
+class Admin::OrganizationFeaturesController < Admin::BaseController
   include SortableTable
   before_action :find_paid_feature, only: %i[edit update]
 
   def index
-    @paid_features = PaidFeature.order(sort_column + " " + sort_direction)
+    @paid_features = OrganizationFeature.order(sort_column + " " + sort_direction)
   end
 
   def new
-    @paid_feature ||= PaidFeature.new
+    @paid_feature ||= OrganizationFeature.new
   end
 
   def show
@@ -25,7 +25,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def create
-    @paid_feature = PaidFeature.new(permitted_update_parameters)
+    @paid_feature = OrganizationFeature.new(permitted_update_parameters)
     if @paid_feature.save
       flash[:success] = "Feature created"
       redirect_to admin_paid_features_path
@@ -59,6 +59,6 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def find_paid_feature
-    @paid_feature = PaidFeature.find(params[:id])
+    @paid_feature = OrganizationFeature.find(params[:id])
   end
 end

@@ -221,7 +221,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         end
       end
       context "including every available field + stickers" do
-        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + ["bike_stickers"] }
+        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + ["bike_stickers"] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
         let(:target_row) do
           {
@@ -272,7 +272,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         end
       end
       context "with partial registrations, every available field without sticker" do
-        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
+        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
         let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
         let(:partial_reg_attrs) do
           {

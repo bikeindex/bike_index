@@ -94,7 +94,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
       context "organization has all feature slugs" do
-        let(:enabled_feature_slugs) { ["csv_exports"] + PaidFeature::REG_FIELDS }
+        let(:enabled_feature_slugs) { ["csv_exports"] + OrganizationFeature::REG_FIELDS }
         it "renders still" do
           get :new, params: {organization_id: organization.to_param}
           expect(response.code).to eq("200")

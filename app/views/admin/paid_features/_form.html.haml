@@ -7,7 +7,7 @@
     .col-md-6.col-xs-12
       .form-group
         = f.label :kind
-        = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
+        = f.select :kind, OrganizationFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
     .col-md-6.col-xs-12
       .form-group
         = f.label :name
@@ -22,7 +22,7 @@
       .col-md-6{ style: "background: #fff;" }
         %small.less-strong.p-1
           Permitted slugs:
-          = safe_join(PaidFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
+          = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2
     .col-md-6.col-xs-12
       .form-group

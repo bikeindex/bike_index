@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::PaidFeaturesController, type: :controller do
+RSpec.describe Admin::OrganizationFeaturesController, type: :controller do
   let(:subject) { FactoryBot.create(:paid_feature) }
   include_context :logged_in_as_super_admin
   let(:passed_params) { {amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff"} }
@@ -57,7 +57,7 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       end
     end
     context "locked" do
-      before { allow_any_instance_of(PaidFeature).to receive(:locked?) { true } }
+      before { allow_any_instance_of(OrganizationFeature).to receive(:locked?) { true } }
       it "does not update" do
         put :update, params: {id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports")}
         expect(flash[:error]).to be_present
@@ -80,8 +80,8 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
     it "succeeds" do
       expect {
         post :create, params: {paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}
-      }.to change(PaidFeature, :count).by 1
-      paid_feature = PaidFeature.last
+      }.to change(OrganizationFeature, :count).by 1
+      paid_feature = OrganizationFeature.last
       passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
       expect(paid_feature.feature_slugs).to eq([])
     end
@@ -90,8 +90,8 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       it "succeeds" do
         expect {
           post :create, params: {paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}
-        }.to change(PaidFeature, :count).by 1
-        paid_feature = PaidFeature.last
+        }.to change(OrganizationFeature, :count).by 1
+        paid_feature = OrganizationFeature.last
         passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
         expect(paid_feature.feature_slugs).to eq %w[csv_exports show_bulk_import]
       end

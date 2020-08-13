@@ -193,7 +193,7 @@
             - current_organization.additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
-                - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
+                - bike_attr = OrganizationFeature.reg_field_bike_attrs[reg_field.to_sym]
                 - if bike_attr == "registration_address"
                   - if bike.registration_address.present?
                     %small

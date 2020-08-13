@@ -1,4 +1,4 @@
 require "rails_helper"
 
-RSpec.describe InvoicePaidFeature, type: :model do
+RSpec.describe InvoiceOrganizationFeature, type: :model do
 end
