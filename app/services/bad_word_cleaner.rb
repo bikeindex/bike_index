@@ -3,7 +3,8 @@ class BadWordCleaner
 
   def self.clean(str)
     return nil unless str.present?
-    BAD_WORDS.each { |w| str.gsub!(/#{w}/i, "*" * w.length) }
-    str
+    duped_str = str.dup
+    BAD_WORDS.each { |w| duped_str.gsub!(/#{w}/i, "*" * w.length) }
+    duped_str
   end
 end
