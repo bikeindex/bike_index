@@ -14,6 +14,10 @@ class ParkingNotificationSerializer < ApplicationSerializer
     :unregistered_bike,
     :resolved_at
 
+  def perform_caching
+    true
+  end
+
   def created_at
     object.created_at.to_i
   end
@@ -39,7 +43,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
   end
 
   def impound_record_id
-    object.impound_record&.display_id
+    object.impound_record_id
   end
 
   def bike

@@ -24,7 +24,7 @@ FactoryBot.define do
       transient do
         customers_on_deck_count { 0 }
       end
-      organization { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["virtual_line"]) }
+      organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["virtual_line"]) }
       after(:create) do |location, evaluator|
         FactoryBot.create(:appointment_configuration,
           location: location,

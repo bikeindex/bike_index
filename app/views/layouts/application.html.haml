@@ -15,6 +15,8 @@
     -# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method
     = yield :header
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+    - if params[:hide_dev].present?
+      <style>.only-dev-visible { display: none; }</style>
   %body{ id: page_id, class:  body_class }
     %nav.primary-header-nav
       .container
@@ -48,7 +50,7 @@
                 - if passive_organization.appointment_functionality_enabled?
                   = active_link t(".virtual_line"), organization_operate_lines_path(organization_id: passive_organization.to_param), class: "nav-link", match_controller: true
                   %li.divider-nav-item
-                - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
+                - on_bikes_path = controller_name == "bikes" && action_name == "index" && params[:organization_id].present? # Because we want to ignore queries and stuff
                 %li
                   = link_to t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}"
                 - if passive_organization.enabled?("impound_bikes")

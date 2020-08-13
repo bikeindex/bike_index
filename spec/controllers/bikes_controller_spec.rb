@@ -169,7 +169,7 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to redirect_to(new_session_path)
       end
       context "organization present" do
-        let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"]) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
         it "redirects to magic link, because organization sign in" do
           get :show, params: {id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param}
           expect(session[:return_to]).to eq bike_path(bike.to_param)
@@ -199,6 +199,7 @@ RSpec.describe BikesController, type: :controller do
       let(:organization) { FactoryBot.create(:organization) }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED09999") }
       it "renders with the sticker assigned" do
+        expect(bike_sticker.claimable_by?(user)).to be_truthy
         expect(user.authorized?(bike_sticker)).to be_truthy
         get :show, params: {id: bike.id, scanned_id: "ED009999", organization_id: organization.id}
         expect(response.status).to eq(200)
@@ -848,6 +849,7 @@ RSpec.describe BikesController, type: :controller do
 
       context "no existing b_param and stolen" do
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
+        let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
         let(:bike_params) do
           {
             b_param_id_token: "",
@@ -855,7 +857,7 @@ RSpec.describe BikesController, type: :controller do
             serial_number: "example serial",
             manufacturer_other: "",
             year: "2016",
-            frame_model: "Cool frame model",
+            frame_model: extra_long_string,
             primary_frame_color_id: color.id.to_s,
             secondary_frame_color_id: "",
             tertiary_frame_color_id: "",
@@ -888,6 +890,8 @@ RSpec.describe BikesController, type: :controller do
               bike_user.reload
               expect(bike.current_stolen_record.phone).to eq "3123799513"
               expect(bike_user.phone).to eq "3123799513"
+              expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
+              expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
               stolen_record = bike.current_stolen_record
               chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
               expect(stolen_record.show_address).to be_truthy
@@ -1366,7 +1370,10 @@ RSpec.describe BikesController, type: :controller do
             let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker_claimed, bike: bike, user: user) }
             it "assigns another bike code, doesn't remove existing" do
               expect(bike.bike_stickers.count).to eq 1
-              put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+              expect {
+                put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+              }.to change(BikeStickerUpdate, :count).by 1
+              expect(BikeStickerUpdate.last.kind).to eq "initial_claim"
               expect(flash[:success]).to match(bike_sticker.pretty_code)
               bike.reload
               expect(bike.description).to eq "42"
@@ -1381,8 +1388,20 @@ RSpec.describe BikesController, type: :controller do
             context "not allowed to assign another code" do
               before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
               it "renders errors" do
-                expect(bike.bike_stickers.count).to eq 1
-                put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+                FactoryBot.create(:bike_sticker_update, user: user)
+                expect(bike_sticker.claimable_by?(user)).to be_falsey
+                expect {
+                  put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 100"}
+                }.to change(BikeStickerUpdate, :count).by 1
+                bike_sticker_update = BikeStickerUpdate.last
+                expect(bike_sticker_update.kind).to eq "failed_claim"
+                expect(bike_sticker_update.organization_kind).to eq "no_organization"
+                expect(bike_sticker_update.user_id).to eq user.id
+                expect(bike_sticker_update.bike_id).to eq bike.id
+                expect(bike_sticker_update.bike_sticker_id).to eq bike_sticker.id
+                bike_sticker.reload
+                expect(bike_sticker.claimed?).to be_falsey
+
                 expect(flash[:error]).to be_present
                 bike.reload
                 expect(bike.description).to eq "42"

@@ -83,6 +83,10 @@ class GraduatedNotification < ApplicationRecord
       bikes_to_notify_expired_notifications(organization).pluck(:id)
   end
 
+  def message
+    nil # for parity with parking_notifications
+  end
+
   # Get it unscoped, because we really want it
   def bike
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
@@ -142,6 +146,11 @@ class GraduatedNotification < ApplicationRecord
     return Bike.none unless user.present? || bike.present?
     # We want to order the bikes by when the ownership was created, so perform that on either result
     (processed? ? bikes_from_associated_notifications : user_or_email_bikes).reorder("ownerships.created_at DESC")
+  end
+
+  def sent_at
+    return nil unless email_success?
+    created_at + PENDING_PERIOD
   end
 
   def send_email?

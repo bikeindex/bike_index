@@ -22,7 +22,7 @@ module AdminHelper
       {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
       {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
-      {title: "Paid Features", path: admin_paid_features_path, match_controller: true},
+      {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
       {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
       {title: "Impound Records", path: admin_impound_records_path, match_controller: true},
       {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},
@@ -31,15 +31,17 @@ module AdminHelper
       {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
       {title: "TSV Exports", path: admin_tsvs_path, match_controller: false},
+      {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
       {title: "Maintenance", path: admin_maintenance_path, match_controller: false},
       {title: "Failed Bikes", path: admin_failed_bikes_path, match_controller: true},
       {title: "Component Types", path: admin_ctypes_path, match_controller: true},
       {title: "Graphs", path: admin_graphs_path, match_controller: true},
-      {title: "Edit Paints", path: admin_paints_path, match_controller: true},
+      {title: "Paints", path: admin_paints_path, match_controller: true},
       {title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true},
       {title: "Twitter Accounts", path: admin_twitter_accounts_path, match_controller: true},
       {title: "Tweets", path: admin_tweets_path, match_controller: true},
       {title: "Stickers", path: admin_bike_stickers_path, match_controller: true},
+      {title: "Sticker Updates", path: admin_bike_sticker_updates_path, match_controller: true},
       {title: "Exports", path: admin_exports_path, match_controller: true},
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Partial Bikes", path: admin_partial_bikes_path, match_controller: true},
@@ -84,5 +86,11 @@ module AdminHelper
     else
       edit_admin_mail_snippet_path(mail_snippet.id)
     end
+  end
+
+  def credibility_scorer_color(score)
+    return "#dc3545" if score < 31
+    return "#ffc107" if score < 70
+    "#28a745"
   end
 end

@@ -31,6 +31,15 @@ RSpec.describe Paint, type: :model do
       expect(paint.tertiary_color.name.downcase).to eq("black")
     end
 
+    it "associates mint" do
+      expect(Color.friendly_find("green")).to be_present
+      paint = Paint.new(name: "mint")
+      paint.associate_colors
+      expect(paint.color.name.downcase).to eq("green")
+      expect(paint.secondary_color_id).to be_blank
+      expect(paint.tertiary_color_id).to be_blank
+    end
+
     it "associates only as many colors as it finds" do
       paint = Paint.new(name: "wood with leaf details")
       paint.associate_colors

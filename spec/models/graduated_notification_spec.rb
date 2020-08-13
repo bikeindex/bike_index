@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe GraduatedNotification, type: :model do
   let(:graduated_notification_interval) { 2.days.to_i }
   let(:organization) do
-    FactoryBot.create(:organization_with_paid_features,
+    FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: ["graduated_notifications"],
       graduated_notification_interval: graduated_notification_interval)
   end
@@ -30,6 +30,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.processed?).to be_truthy
       expect(graduated_notification.user).to be_blank
       expect(graduated_notification.email).to eq bike.owner_email
+      expect(graduated_notification.sent_at).to be_within(1).of graduated_notification.created_at + GraduatedNotification::PENDING_PERIOD
       expect(bike.graduated?(organization)).to be_truthy
     end
     context "organization doesn't have graduated_interval set" do
@@ -131,8 +132,8 @@ RSpec.describe GraduatedNotification, type: :model do
   describe "bikes_to_notify" do
     let(:graduated_notification_interval) { 2.years }
     let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - 5.years) }
-    let(:bike2) { FactoryBot.create(:bike_organized, :stolen, :with_ownership, organization: organization, created_at: Time.current - 3.years) }
-    let!(:bike3) { FactoryBot.create(:bike_organized, :stolen, :with_ownership, created_at: Time.current - 5.years) }
+    let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership, organization: organization, created_at: Time.current - 3.years) }
+    let!(:bike3) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership, created_at: Time.current - 5.years) }
     let!(:bike_organization1) { bike1.bike_organizations.where(organization_id: organization.id).first }
     let!(:bike_organization2) { bike2.bike_organizations.where(organization_id: organization.id).first }
     let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
@@ -165,7 +166,7 @@ RSpec.describe GraduatedNotification, type: :model do
     context "user" do
       let(:user) { FactoryBot.create(:user) }
       let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization, user: user) }
-      let(:bike2) { FactoryBot.create(:bike_organized, :stolen, :with_ownership_claimed, organization: organization, user: user) }
+      let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership_claimed, organization: organization, user: user) }
       it "finds the first bike" do
         _bike3 = FactoryBot.create(:bike_organized, :with_ownership, organization: organization) # Test to ensure that we aren't grabbing bikes that aren't due notification
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike1.id, bike2.id])
@@ -267,6 +268,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
         expect(graduated_notification2.in_pending_period?).to be_falsey
+        expect(graduated_notification2.sent_at).to be_blank
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification1.processable?).to be_truthy
         # Processing right now

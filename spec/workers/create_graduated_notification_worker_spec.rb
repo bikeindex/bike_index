@@ -12,7 +12,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
 
   describe "perform" do
     let(:graduated_notification_interval) { 1.year.to_i }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
     let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - (3 * graduated_notification_interval)) }
 
     describe "enqueue notifications" do

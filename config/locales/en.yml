@@ -343,17 +343,17 @@ en:
         amount_paid_cents: Amount paid cents
         first_invoice: :activerecord.models.first_invoice
         force_active: Force active
-        invoice_paid_features: Invoice paid features
+        invoice_organization_features: Invoice organization features
         is_active: Is active
         notes: Notes
         organization: :activerecord.models.organization
-        paid_features: Paid features
+        organization_features: Organization features
         payments: Payments
         subscription_end_at: Subscription end at
         subscription_start_at: Subscription start at
-      invoice_paid_feature:
+      invoice_organization_feature:
         invoice: :activerecord.models.invoice
-        paid_feature: :activerecord.models.paid_feature
+        organization_feature: :activerecord.models.organization_feature
       listicle:
         blog: :activerecord.models.blog
         body: Body
@@ -474,6 +474,15 @@ en:
         slug: Slug
         users: Users
         website: Website
+      organization_feature:
+        amount_cents: Amount cents
+        description: Description
+        details_link: Details link
+        feature_slugs: Feature slugs
+        invoice_organization_features: Invoice organization features
+        invoices: Invoices
+        kind: Kind
+        name: Name
       other_listing:
         bike: :activerecord.models.bike
         listing_type: Listing type
@@ -488,15 +497,6 @@ en:
         send_email: Send email
         user: :activerecord.models.user
         user_hidden: User hidden
-      paid_feature:
-        amount_cents: Amount cents
-        description: Description
-        details_link: Details link
-        feature_slugs: Feature slugs
-        invoice_paid_features: Invoice paid features
-        invoices: Invoices
-        kind: Kind
-        name: Name
       paint:
         bikes: Bikes
         color: :activerecord.models.color
@@ -751,7 +751,7 @@ en:
           suspended: suspended and can't be used
         bike_sticker:
           not_found: not found
-          unauthorized_to_claim: do not have permission to claim this
+          unauthorized_to_claim: does not have permission to claim this
         export:
           required: required
         impound_record:
@@ -804,7 +804,7 @@ en:
       front_gear_type: Front gear type
       integration: Integration
       invoice: Invoice
-      invoice_paid_feature: Invoice paid feature
+      invoice_organization_feature: Invoice organization feature
       listicle: Listicle
       location: Location
       lock: Lock
@@ -814,10 +814,10 @@ en:
       membership: Membership
       normalized_serial_segment: Normalized serial segment
       organization: Organization
+      organization_feature: Organization feature
       organization_message: Organization message
       other_listing: Other listing
       ownership: Ownership
-      paid_feature: Paid feature
       paint: Paint
       payment: Payment
       public_image: Public image
@@ -979,6 +979,9 @@ en:
       nevermind: Nevermind
       no_futher_action_necessary: no further action necessary!
       no_one_can_see_it_but_you: No one can see it but you
+      organization_sent_this_message: "%{org_name} sent this notification"
+      please_email_organization_with_questions_html: Please email %{email_link} if
+        you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
       thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
@@ -1368,7 +1371,6 @@ en:
     show:
       abandoned: Abandoned
       at: at
-      bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
@@ -1408,6 +1410,7 @@ en:
       other: Other
       other_serial: Other serial/registration/sticker
       owners_phone_number: 'Owner''s phone number:'
+      paint_description: Color description
       police_report: 'Police report #'
       primary_colors: Primary colors
       rear: Rear
@@ -2404,6 +2407,9 @@ en:
       all_you_have_to_do_is_go_to_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
         Index to access your Lightspeed Account.
+      already_have_a_sophisticated_html: >-
+        Already have a sophisticated email connection with your customers? Bike Index
+        can integrate with your existing flow - email %{link} for setup.
       bicycles_sold_before_you_activated_lights: >-
         Bicycles sold before you activated Lightspeed Retail integration will not
         be registered.
@@ -2446,7 +2452,7 @@ en:
       were_happy_to_answer_any_questions_html: >-
         We're happy to answer any questions you have about making Bike Index work
         with Lightspeed Retail and we're always looking for ways to improve the integration.
-        Please %{link} with any questions, concerns, comments, or suggestions.
+        Please email %{link} with any questions, concerns, comments, or suggestions.
       write_do_not_register: >-
         If a customer doesn't want a bike to be added to Bike Index, simply write
         "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
@@ -3677,6 +3683,7 @@ en:
       how_it_works: How it works
       keep_campus_bikes_in_order: Keep campus bikes in order
       make_bike_registration_better: Make bike registration better
+      must_read: Must read -
       protecting_bikes_on_campus_can_be: Protecting bikes on campus can be a full-time
         job. Let us help.
       read_about_our_html: >-
@@ -3684,6 +3691,8 @@ en:
         Bike Index's partners, visit our partners page, and for information on partnering
         with Bike Index, please contact us.
       related_articles: 'Related articles:'
+      six_best_features_for_schools: Bike Index’s six best features for campus bike
+        management
       trusted_by_top_universities: Trusted by top universities
       universities_should_use_bike_index_as_the: Universities should use Bike Index
         as their registration system of choice
@@ -4730,7 +4739,7 @@ en:
       other_amount: Other amount
       pay_bike_index: Pay Bike Index
       payment_to_bike_index: Payment to Bike Index
-      select_an_amount: Select an amount
+      select_an_amount_in_usd: Select an amount (in USD)
   plan_features:
     abandoned_bike_suite: >-
       Abandoned bike suite - contact bike owners and log abandonment and impound bike
@@ -4880,7 +4889,7 @@ en:
       stolen: stolen
       view_bike: View %{bike_type}
     email_bike_box:
-      color: color
+      color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
       found: 'Found:'
       make: 'Make:'

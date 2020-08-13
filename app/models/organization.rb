@@ -48,10 +48,9 @@ class Organization < ApplicationRecord
   has_many :b_params
   has_many :invoices
   has_many :payments
-  has_many :bike_stickers
   has_many :graduated_notifications
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
-  has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
+  has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_many :appointment_configurations, through: :locations
   has_many :appointments
   has_one :hot_sheet_configuration
@@ -77,7 +76,7 @@ class Organization < ApplicationRecord
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
-  # Regional orgs have to have the paid feature slug AND the search location set
+  # Regional orgs have to have the organization feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
   before_validation :set_calculated_attributes
@@ -100,7 +99,7 @@ class Organization < ApplicationRecord
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
+  attr_accessor :embedable_user_email, :skip_update
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -141,8 +140,8 @@ class Organization < ApplicationRecord
 
   def self.admin_text_search(n)
     return nil unless n.present?
-    # Only search for paid features if the text is paid features
-    return with_enabled_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
+    # Only search for organization features if the text is organization features
+    return with_enabled_feature_slugs(n) if OrganizationFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -151,7 +150,7 @@ class Organization < ApplicationRecord
   end
 
   def self.with_enabled_feature_slugs(slugs)
-    matching_slugs = PaidFeature.matching_slugs(slugs)
+    matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
@@ -226,7 +225,7 @@ class Organization < ApplicationRecord
   end
 
   def appointment_functionality_enabled?
-    any_enabled?(PaidFeature::APPOINTMENT_FEATURES)
+    any_enabled?(OrganizationFeature::APPOINTMENT_FEATURES)
   end
 
   def hot_sheet_on?
@@ -249,16 +248,16 @@ class Organization < ApplicationRecord
     Organization.where(id: child_ids)
   end
 
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
-  end
-
   def regional_parents
     self.class.regional.where("regional_ids @> ?", [id].to_json)
   end
 
   def default_impound_location
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
+  end
+
+  def bounding_box
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
   end
 
   # Try for publicly_visible, fall back to whatever
@@ -283,6 +282,10 @@ class Organization < ApplicationRecord
     parent? || regional?
   end
 
+  def bike_stickers
+    BikeSticker.where(organization_id: id).or(BikeSticker.where(secondary_organization_id: id))
+  end
+
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
     @nearby_organizations ||= self.class.within_bounding_box(bounding_box)
@@ -294,14 +297,14 @@ class Organization < ApplicationRecord
     [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
-  def mail_snippet_body(kind)
-    return nil unless MailSnippet.organization_snippet_kinds.include?(kind)
-    snippet = mail_snippets.enabled.where(kind: kind).first
+  def mail_snippet_body(snippet_kind)
+    return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
+    snippet = mail_snippets.enabled.where(kind: snippet_kind).first
     snippet&.body
   end
 
   def additional_registration_fields
-    PaidFeature::REG_FIELDS.select { |f| enabled?(f) }
+    OrganizationFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
   def include_field_organization_affiliation?(user = nil)
@@ -334,7 +337,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    any_enabled?(PaidFeature::BIKE_ACTIONS)
+    any_enabled?(OrganizationFeature::BIKE_ACTIONS)
   end
 
   def law_enforcement_missing_verified_features?
@@ -400,8 +403,8 @@ class Organization < ApplicationRecord
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
-    # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.enabled_feature_slugs = calculated_enabled_feature_slugs
+    # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
+    self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -460,8 +463,9 @@ class Organization < ApplicationRecord
     return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
-    if bike_shop? && created_at < Time.current - 1.week
-      return "does_not_need_pos" if recent_bikes.count > 2
+    if bike_shop? && recent_bikes.count > 2
+      return "does_not_need_pos" if created_at < Time.current - 1.week ||
+        bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
     end
     return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
     bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
@@ -480,9 +484,9 @@ class Organization < ApplicationRecord
 
   def calculated_enabled_feature_slugs
     fslugs = current_invoices.feature_slugs
-    # If part of a region with regional_stickers, the organization receives the stickers paid feature
+    # If part of a region with bike_stickers, the organization receives the stickers organization feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("regional_stickers") }
+      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
     end
     # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
     if fslugs.include?("impound_bikes") && locations.impound_locations.any?

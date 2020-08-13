@@ -68,7 +68,7 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "initial/repeat_record" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
     let(:parking_notification) { FactoryBot.build(:parking_notification, is_repeat: true, bike: bike, organization: organization, kind: "parked_incorrectly_notification") }
     it "repeat_record is false (also, test that abandoned updates bike status)" do
       bike.reload

@@ -7,7 +7,7 @@ class Admin::InvoicesController < Admin::BaseController
     per_page = params[:per_page] || 50
     @invoices =
       matching_invoices
-        .includes(:organization, :payments, :paid_features, :first_invoice)
+        .includes(:organization, :payments, :organization_features, :first_invoice)
         .reorder(sort_column + " " + sort_direction)
         .page(page)
         .per(per_page)
@@ -49,6 +49,10 @@ class Admin::InvoicesController < Admin::BaseController
     if %w[endless_only not_endless].include?(params[:search_endless])
       @search_endless ||= params[:search_endless]
       invoices = @search_endless == "endless_only" ? invoices.endless : invoices.not_endless
+    end
+
+    if current_organization.present?
+      invoices = invoices.where(organization_id: current_organization.id)
     end
 
     invoices.where(@time_range_column => @time_range)

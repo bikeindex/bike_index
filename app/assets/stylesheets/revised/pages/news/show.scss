@@ -122,7 +122,11 @@
       float: right;
     }
   }
+}
 
+// News show, also page-content (e.g. /lightspeed)
+#news_show,
+.page-content {
   blockquote {
     background: $gray-lighter;
     border-left: 10px solid #ccc;

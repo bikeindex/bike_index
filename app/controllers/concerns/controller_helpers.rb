@@ -41,13 +41,16 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
     else
-      flash[flash_type] = translation(
-        translation_key,
-        **translation_args,
-        scope: [:controllers, :concerns, :controller_helpers, __method__],
-      )
+      force_sign_up = params[:unauthenticated_redirect] == "sign_up"
+      unless force_sign_up # Force signup doesn't show a flash message
+        flash[flash_type] = translation(
+          translation_key,
+          **translation_args,
+          scope: [:controllers, :concerns, :controller_helpers, __method__],
+        )
+      end
 
-      if translation_key.to_s.match?(/create.+account/)
+      if force_sign_up || translation_key.to_s.match?(/create.+account/)
         redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
         redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return

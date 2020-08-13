@@ -21,9 +21,15 @@
               %span.text-danger
                 Stolen
             = bike.title_string
-          = link_to "non-admin view", bike_path(bike.to_param), class: "text-muted float-right"
+          = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
         %table.table-list.mb-0
           %tbody
+            - if current_user.developer?
+              %tr.small
+                %td.only-dev-visible ID
+                %td.only-dev-visible
+                  %code= bike.id
+
             %tr
               %td
                 Serial number
@@ -34,6 +40,10 @@
                 Colors
               %td
                 = bike.frame_colors.to_sentence
+                - if bike.render_paint_description?
+                  %small.less-strong= bike.paint_description
+                - elsif bike.paint.present? && current_user.developer
+                  %small.only-dev-visible= bike.paint_description
             %tr
               %td
                 Created
@@ -117,10 +127,15 @@
               Address
             %td
               %small
-                = bike.registration_address || bike.address
-                %span.only-dev-visible.ml-2
-                  manual:
-                  = bike.address_set_manually
+                - address = bike.registration_address || bike.address
+                - if address.present? # Make this a little easier to see, don't use ruby specific hashes
+                  \{
+                  = address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
+                  \}
+                - if current_user.developer?
+                  %span.only-dev-visible.ml-2
+                    manual:
+                    = bike.address_set_manually
 
           -# Only show phone if no stolen record
           - if stolen_record.blank? && bike.phone.present?
@@ -145,6 +160,11 @@
       .col-md-6
         %table.table-list
           %tbody
+            - if current_user.developer?
+              %tr.small
+                %td.only-dev-visible ID
+                %td.only-dev-visible
+                  %code= stolen_record.id
             %tr
               %td
                 Theft description

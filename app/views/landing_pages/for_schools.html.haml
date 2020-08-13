@@ -23,6 +23,10 @@
       .landing-why-col
         %h3= t(".make_bike_registration_better")
         %p= t(".weve_designed_a_platform")
+        %p.text-center
+          %em=t(".must_read")
+          %strong
+            = link_to t(".six_best_features_for_schools"), "https://bikeindex.org/info/university-bike-management-with-bike-index"
         %p= t(".your_students_can_register_their_bikes")
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 

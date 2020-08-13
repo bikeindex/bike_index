@@ -3,12 +3,6 @@
 ---
 ignore:
   - app/controllers/api/base.rb
-  - app/controllers/api/v1/api_v1_controller.rb
-  - app/controllers/api/v1/bikes_controller.rb
-  - app/controllers/api/v1/notifications_controller.rb
-  - app/controllers/api/v1/organizations_controller.rb
-  - app/controllers/api/v1/stolen_locking_response_suggestions_controller.rb
-  - app/controllers/api/v1/users_controller.rb
   - app/controllers/api/v2/bikes.rb
   - app/controllers/api/v2/bikes_search.rb
   - app/controllers/api/v2/manufacturers.rb
@@ -23,7 +17,6 @@ ignore:
   - app/controllers/bikes/recovery_controller.rb
   - app/controllers/bikes_controller.rb
   - app/controllers/concerns/controller_helpers.rb
-  - app/controllers/oauth/applications_controller.rb
   - app/controllers/organized/ambassador_dashboards_controller.rb
   - app/controllers/organized/hot_sheets_controller.rb
   - app/models/concerns/geocodeable.rb

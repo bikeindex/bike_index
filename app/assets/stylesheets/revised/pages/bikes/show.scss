@@ -26,9 +26,8 @@
     background: rgba($blue, 0.92);
   }
 
-  h1 {
+  .bike-title {
     margin-bottom: 0;
-
     .stolen {
       display: block;
       color: $red;
@@ -105,6 +104,16 @@
     margin-top: 3 * $vertical-height;
   }
 
+  .color-attrs {
+    line-height: 1.5;
+    .paint-description {
+      font-size: 85%;
+      .attr-title {
+        opacity: 90%;
+      }
+    }
+  }
+
   #map_canvas {
     width: 100%;
     height: 400px;
@@ -166,6 +175,17 @@
       @extend .uncap;
     }
   }
+
+  // This is the first title, that only shows up if you're a paid organization or superuser
+  .secondary-bike-title {
+    @extend .uncap;
+    margin: 0;
+    color: $gray-light;
+  }
+  .superuser-bike-button {
+    @extend .uncap;
+    float: right;
+  }
 }
 
 // On small screens, use the tabbed interface for components
@@ -195,6 +215,16 @@
       .unstolen-notification-box {
         border-left: 0 none;
       }
+    }
+    .secondary-bike-title {
+      font-size: 100%;
+    }
+    .superuser-bike-button {
+      margin-top: -0.75rem;
+    }
+    .credibility-score {
+      margin-top: $vertical-height;
+      margin-right: auto;
     }
   }
 }
@@ -250,6 +280,60 @@
     // more space for ad
     .ad300x600 {
       margin-top: 4 * $vertical-height;
+    }
+  }
+}
+
+// Duplicates admin/bikes.scss
+.credibility-score {
+  border: 2px solid rgba(black, 0.25);
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 500px;
+  margin-left: auto;
+  .main-crediblity-score-box {
+    position: relative;
+    width: 100%;
+    flex: 0 0 40%;
+    max-width: 40%;
+    text-align: center;
+    padding: 1rem 0;
+    .credibility-title {
+      display: block;
+      color: #fff;
+      &a {
+        text-decoration: underline;
+      }
+    }
+    .score-number {
+      margin-top: 0.5rem;
+      display: block;
+      font-size: 125%;
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+  .score-details {
+    position: relative;
+    width: 100%;
+    flex: 0 0 60%;
+    max-width: 60%;
+    background: #fff;
+    padding: 0;
+    .details-title {
+      padding: 0.25rem 0.1rem 0.1rem;
+      display: block;
+    }
+    .table {
+      margin-bottom: 0;
+      tr td {
+        line-height: 1.5;
+        border: 1px solid #eceeef;
+        padding: 4px 4px 4px 4px;
+        &:last-child {
+          width: 15%; // This is effectively min-width for tables
+        }
+      }
     }
   }
 }

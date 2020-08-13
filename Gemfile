@@ -50,7 +50,8 @@ gem "honeybadger"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
-gem "kramdown", "1.11.1" # Markdown
+gem "kramdown", "2.3.0" # Markdown
+gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails", "~> 1.11"
 gem "nokogiri", ">= 1.10.4"
@@ -63,7 +64,6 @@ gem "paranoia"
 gem "pg_search"
 gem "puma", "~> 3.12"
 gem "rack-contrib"
-gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
 gem "rqrcode", "0.10.1"
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3"
@@ -163,7 +163,7 @@ group :development, :test do
   gem "rspec", "~> 3.4"
   gem "rspec-rails", "~> 3.8"
   gem "rspec_junit_formatter" # For circle ci
-  gem "standard"
+  gem "standard" # Ruby linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

@@ -76,6 +76,8 @@ RSpec.describe Phonifyer do
         expect(Phonifyer.phonify("(800)478-2111 ext. 1111")).to eq "8004782111 x1111"
         expect(Phonifyer.phonify("8004782111 EXT.1111")).to eq "8004782111 x1111"
         expect(Phonifyer.phonify("800478.2111 extension: 1111")).to eq "8004782111 x1111"
+        # With just a BS number it doesn't crash
+        expect(Phonifyer.phonify("xxxxxxxxxx")).to be_blank
       end
     end
 

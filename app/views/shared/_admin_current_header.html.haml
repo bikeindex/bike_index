@@ -1,0 +1,32 @@
+- viewing ||= controller_name.humanize
+
+
+- header_present = params[:user_id].present? || params[:organization_id].present?
+
+- if header_present
+  .col-12.mt-4
+    - if params[:user_id].present?
+      - user_subject = User.find_by_id(params[:user_id])
+      %p
+        - if user_subject.present?
+          #{viewing} for
+          = link_to user_subject.display_name, admin_user_path(user_subject)
+        - else
+          %span.text-danger
+            User ##{params[:user_id]}
+            %em missing
+    - if params[:organization_id].present?
+      %p
+        #{viewing} for
+        - if current_organization.present?
+          %em
+            = link_to current_organization.short_name, admin_organization_path(current_organization)
+          - if current_organization.deleted?
+            %small.less-strong
+              (#{current_organization.short_name} is <em class="text-danger">deleted</em>)
+        - else
+          %strong no organization
+        %small.less-strong
+          \- #{viewing} for
+          = link_to "all organizations", url_for(sortable_search_params.merge(organization_id: nil))
+

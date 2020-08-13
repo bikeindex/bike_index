@@ -247,11 +247,9 @@ CREATE TABLE public.appointments (
     status integer,
     reason character varying,
     description text,
-    line_number integer,
+    line_entry_timestamp integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    appointment_at timestamp without time zone,
-    creation_ip_address inet
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -399,6 +397,46 @@ ALTER SEQUENCE public.bike_sticker_batches_id_seq OWNED BY public.bike_sticker_b
 
 
 --
+-- Name: bike_sticker_updates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_sticker_updates (
+    id bigint NOT NULL,
+    bike_sticker_id bigint,
+    bike_id bigint,
+    user_id bigint,
+    organization_id bigint,
+    export_id bigint,
+    kind integer,
+    creator_kind integer,
+    organization_kind integer,
+    update_number integer,
+    failed_claim_errors text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_sticker_updates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_sticker_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_sticker_updates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_sticker_updates_id_seq OWNED BY public.bike_sticker_updates.id;
+
+
+--
 -- Name: bike_stickers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -415,7 +453,8 @@ CREATE TABLE public.bike_stickers (
     previous_bike_id integer,
     bike_sticker_batch_id integer,
     code_integer bigint,
-    code_prefix character varying
+    code_prefix character varying,
+    secondary_organization_id bigint
 );
 
 
@@ -446,7 +485,7 @@ CREATE TABLE public.bikes (
     id integer NOT NULL,
     name character varying(255),
     serial_number character varying(255) NOT NULL,
-    frame_model character varying(255),
+    frame_model text,
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
     number_of_seats integer,
@@ -1413,23 +1452,23 @@ ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
 
 
 --
--- Name: invoice_paid_features; Type: TABLE; Schema: public; Owner: -
+-- Name: invoice_organization_features; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.invoice_paid_features (
+CREATE TABLE public.invoice_organization_features (
     id integer NOT NULL,
     invoice_id integer,
-    paid_feature_id integer,
+    organization_feature_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 
 --
--- Name: invoice_paid_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: invoice_organization_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.invoice_paid_features_id_seq
+CREATE SEQUENCE public.invoice_organization_features_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1438,10 +1477,10 @@ CREATE SEQUENCE public.invoice_paid_features_id_seq
 
 
 --
--- Name: invoice_paid_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: invoice_organization_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.invoice_paid_features_id_seq OWNED BY public.invoice_paid_features.id;
+ALTER SEQUENCE public.invoice_organization_features_id_seq OWNED BY public.invoice_organization_features.id;
 
 
 --
@@ -1815,8 +1854,7 @@ CREATE TABLE public.notifications (
     kind integer,
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    appointment_id bigint
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1952,6 +1990,43 @@ ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applicatio
 
 
 --
+-- Name: organization_features; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_features (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    amount_cents integer,
+    name character varying,
+    description text,
+    details_link character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    feature_slugs text[] DEFAULT '{}'::text[],
+    currency character varying DEFAULT 'USD'::character varying NOT NULL
+);
+
+
+--
+-- Name: organization_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_features_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_features_id_seq OWNED BY public.organization_features.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1989,7 +2064,8 @@ CREATE TABLE public.organizations (
     regional_ids jsonb,
     manual_pos_kind integer,
     passwordless_user_domain character varying,
-    graduated_notification_interval bigint
+    graduated_notification_interval bigint,
+    lightspeed_register_with_phone boolean DEFAULT false
 );
 
 
@@ -2083,43 +2159,6 @@ CREATE SEQUENCE public.ownerships_id_seq
 --
 
 ALTER SEQUENCE public.ownerships_id_seq OWNED BY public.ownerships.id;
-
-
---
--- Name: paid_features; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.paid_features (
-    id integer NOT NULL,
-    kind integer DEFAULT 0,
-    amount_cents integer,
-    name character varying,
-    description text,
-    details_link character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
-);
-
-
---
--- Name: paid_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.paid_features_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: paid_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.paid_features_id_seq OWNED BY public.paid_features.id;
 
 
 --
@@ -2896,6 +2935,13 @@ ALTER TABLE ONLY public.bike_sticker_batches ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: bike_sticker_updates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_sticker_updates ALTER COLUMN id SET DEFAULT nextval('public.bike_sticker_updates_id_seq'::regclass);
+
+
+--
 -- Name: bike_stickers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3078,10 +3124,10 @@ ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: invoice_paid_features id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: invoice_organization_features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.invoice_paid_features ALTER COLUMN id SET DEFAULT nextval('public.invoice_paid_features_id_seq'::regclass);
+ALTER TABLE ONLY public.invoice_organization_features ALTER COLUMN id SET DEFAULT nextval('public.invoice_organization_features_id_seq'::regclass);
 
 
 --
@@ -3176,6 +3222,13 @@ ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: organization_features id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_features ALTER COLUMN id SET DEFAULT nextval('public.organization_features_id_seq'::regclass);
+
+
+--
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3194,13 +3247,6 @@ ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 ALTER TABLE ONLY public.ownerships ALTER COLUMN id SET DEFAULT nextval('public.ownerships_id_seq'::regclass);
-
-
---
--- Name: paid_features id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.paid_features ALTER COLUMN id SET DEFAULT nextval('public.paid_features_id_seq'::regclass);
 
 
 --
@@ -3401,6 +3447,14 @@ ALTER TABLE ONLY public.bike_organizations
 
 ALTER TABLE ONLY public.bike_sticker_batches
     ADD CONSTRAINT bike_sticker_batches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_sticker_updates bike_sticker_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_sticker_updates
+    ADD CONSTRAINT bike_sticker_updates_pkey PRIMARY KEY (id);
 
 
 --
@@ -3612,11 +3666,11 @@ ALTER TABLE ONLY public.integrations
 
 
 --
--- Name: invoice_paid_features invoice_paid_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: invoice_organization_features invoice_organization_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.invoice_paid_features
-    ADD CONSTRAINT invoice_paid_features_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.invoice_organization_features
+    ADD CONSTRAINT invoice_organization_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -3724,6 +3778,14 @@ ALTER TABLE ONLY public.oauth_applications
 
 
 --
+-- Name: organization_features organization_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_features
+    ADD CONSTRAINT organization_features_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3745,14 +3807,6 @@ ALTER TABLE ONLY public.other_listings
 
 ALTER TABLE ONLY public.ownerships
     ADD CONSTRAINT ownerships_pkey PRIMARY KEY (id);
-
-
---
--- Name: paid_features paid_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.paid_features
-    ADD CONSTRAINT paid_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -4010,6 +4064,41 @@ CREATE INDEX index_bike_sticker_batches_on_user_id ON public.bike_sticker_batche
 
 
 --
+-- Name: index_bike_sticker_updates_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bike_id ON public.bike_sticker_updates USING btree (bike_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_bike_sticker_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticker_updates USING btree (bike_sticker_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_export_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_export_id ON public.bike_sticker_updates USING btree (export_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_organization_id ON public.bike_sticker_updates USING btree (organization_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_user_id ON public.bike_sticker_updates USING btree (user_id);
+
+
+--
 -- Name: index_bike_stickers_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4021,6 +4110,13 @@ CREATE INDEX index_bike_stickers_on_bike_id ON public.bike_stickers USING btree 
 --
 
 CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_stickers USING btree (bike_sticker_batch_id);
+
+
+--
+-- Name: index_bike_stickers_on_secondary_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_stickers USING btree (secondary_organization_id);
 
 
 --
@@ -4332,17 +4428,17 @@ CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (u
 
 
 --
--- Name: index_invoice_paid_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_invoice_organization_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_invoice_paid_features_on_invoice_id ON public.invoice_paid_features USING btree (invoice_id);
+CREATE INDEX index_invoice_organization_features_on_invoice_id ON public.invoice_organization_features USING btree (invoice_id);
 
 
 --
--- Name: index_invoice_paid_features_on_paid_feature_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_invoice_organization_features_on_organization_feature_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_invoice_paid_features_on_paid_feature_id ON public.invoice_paid_features USING btree (paid_feature_id);
+CREATE INDEX index_invoice_organization_features_on_organization_feature_id ON public.invoice_organization_features USING btree (organization_feature_id);
 
 
 --
@@ -4420,13 +4516,6 @@ CREATE INDEX index_normalized_serial_segments_on_bike_id ON public.normalized_se
 --
 
 CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON public.normalized_serial_segments USING btree (duplicate_bike_group_id);
-
-
---
--- Name: index_notifications_on_appointment_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_notifications_on_appointment_id ON public.notifications USING btree (appointment_id);
 
 
 --
@@ -5257,6 +5346,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200620172241'),
 ('20200630200556'),
 ('20200727213018'),
-('20200729182853');
+('20200804172753'),
+('20200804180457'),
+('20200808175756'),
+('20200810163704'),
+('20200813154458');
 
 

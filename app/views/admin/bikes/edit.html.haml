@@ -13,22 +13,29 @@
   = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
 .admin-subnav.midpage-subnav
-  .col-12
+  .col-4.col-md-6
     %h1
       Edit Bike
       - if @bike.deleted?
-        %span.text-danger
+        %small.text-danger
           Deleted at:
           %span.convertTime.preciseTime
             = l @bike.deleted_at, format: :convert_time
-
-
+  .col-8.col-md-6.text-right
+    = render partial: "/bikes/credibility_score", locals: { bike: @bike }
 
 - if @bike.user_hidden
-  %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
-    Marked HIDDEN by the user
-    %small
-      no one but the user (and bike index admins) can see it
+  - if @bike.unregistered_parking_notification?
+    %h2.text-warning.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+      Bike Created by parking notification:
+      %em
+        - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
+        = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-warning text-underline"
+  - else
+    %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+      Marked HIDDEN by the user
+      %small
+        no one but the user (and bike index admins) can see it
 
 = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
   - if @bike.errors.any?
@@ -166,7 +173,7 @@
           .col-md-6
             .form-group
               = label :mark_recovered_reason, "How was it recovered"
-              = text_area_tag :mark_recovered_reason, nil, rows: 3, class: "form-control"
+              = text_area_tag :mark_recovered_reason, nil, rows: 3, placeholder: "You HAVE to put something in here", class: "form-control"
           .col-md-6
             .form-group
               = label_tag :mark_recovered_we_helped do
@@ -199,14 +206,16 @@
           %td
             %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
               = l ownership.created_at, format: :convert_time
-            %small.less-strong.only-dev-visible
-              = ownership.id
+            - if current_user.developer?
+              %small.less-strong.only-dev-visible
+                = ownership.id
           %td
             - creator = ownership.creator
             - if creator.blank?
               %em.text-warning user deleted
-              %span.only-dev-visible
-                \##{ownership.creator_id}
+              - if current_user.developer
+                %span.only-dev-visible
+                  \##{ownership.creator_id}
             - elsif creator.name.present?
               = creator.name
             - else

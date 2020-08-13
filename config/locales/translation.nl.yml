@@ -482,13 +482,13 @@ nl:
         amount_due_cents: Verschuldigde centen
         amount_paid_cents: Bedrag betaald cent
         force_active: Forceer actief
-        invoice_paid_features: Factuur betaalde functies
         is_active: Is actief
         notes: Notes
-        paid_features: Betaalde functies
         payments: Betalingen
         subscription_end_at: Abonnement eindigt om
         subscription_start_at: Abonnement start om
+        invoice_organization_features: Factuurorganisatiefuncties
+        organization_features: Organisatiefuncties
       listicle:
         body: Lichaam
         body_html: Body html
@@ -604,15 +604,6 @@ nl:
         owner_email: E-mailadres eigenaar
         send_email: Stuur e-mail
         user_hidden: Gebruiker verborgen
-      paid_feature:
-        amount_cents: Bedrag centen
-        description: Beschrijving
-        details_link: Details link
-        feature_slugs: Naaktslakken
-        invoice_paid_features: Factuur betaalde functies
-        invoices: Facturen
-        kind: Soort
-        name: Naam
       paint:
         bikes: Bikes
         name: Naam
@@ -794,6 +785,15 @@ nl:
         bike_stickers: Fietscodes
         code_number_length: Codenummer lengte
         notes: Notes
+      organization_feature:
+        amount_cents: Bedrag centen
+        description: Beschrijving
+        details_link: Details link
+        feature_slugs: Naaktslakken
+        invoice_organization_features: Factuurorganisatiefuncties
+        invoices: Facturen
+        kind: Soort
+        name: Naam
     enums:
       cycle_type:
         bike: Fiets
@@ -865,7 +865,6 @@ nl:
       front_gear_type: Type versnelling voor
       integration: integratie
       invoice: factuur
-      invoice_paid_feature: Factuur betaald functie
       listicle: Listicle
       location: Plaats
       lock: Slot
@@ -878,7 +877,6 @@ nl:
       organization_message: Organisatie bericht
       other_listing: Andere lijst
       ownership: eigendom
-      paid_feature: Betaalde functie
       paint: Verf
       payment: Betaling
       public_image: Publiek imago
@@ -895,6 +893,8 @@ nl:
       wheel_size: Wielgrootte
       bike_sticker: Fiets sticker
       bike_sticker_batch: Fietssticker batch
+      invoice_organization_feature: Factuur organisatiefunctie
+      organization_feature: Organisatiefunctie
     select_options:
       color:
         black: Zwart
@@ -1727,6 +1727,9 @@ nl:
       you_have_already_marked_remaining: U heeft deze %{bike_type} al gemarkeerd als
         resterend
       you_have_already_marked_resolved: Je hebt deze melding als opgelost gemarkeerd
+      organization_sent_this_message: "%{org_name} heeft deze melding verzonden"
+      please_email_organization_with_questions_html: Stuur een e-mail naar %{email_link}
+        als u vragen heeft
     edit_accessories:
       add_a_component: Voeg een component toe
       other_handlebar_type: Ander type stuur
@@ -2149,6 +2152,7 @@ nl:
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
       not_registered: Niet echt geregistreerd!
+      paint_description: Kleurbeschrijving
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -3586,6 +3590,9 @@ nl:
       write_do_not_register: Als een klant niet wil dat een fiets wordt toegevoegd
         aan de fietsindex, schrijft u gewoon "NIET REGISTREREN" in de notities voor
         de verkoop en de fiets wordt niet geregistreerd.
+      already_have_a_sophisticated_html: Heeft u al een geavanceerde e-mailverbinding
+        met uw klanten? Bike Index kan worden geïntegreerd met uw bestaande stroom
+        - e-mail %{link} voor configuratie.
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -4122,6 +4129,9 @@ nl:
         van overal. Het enige dat ze nodig hebben is elke smartphone of laptop. Je
         hebt toegang tot de gegevens erachter om te begrijpen hoe je fietsen op je
         campus het beste kunt beschermen.
+      must_read: Moet lezen -
+      six_best_features_for_schools: De zes beste functies van Bike Index voor fietsbeheer
+        op de campus
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -5436,9 +5446,9 @@ nl:
       next: volgende>
       other_amount: Ander bedrag
       pay_bike_index: Pay Bike Index
-      select_an_amount: Selecteer een bedrag
       donate_to_bike_index: Doneer aan Bike Index
       payment_to_bike_index: Betaling aan fietsindex
+      select_an_amount_in_usd: Selecteer een bedrag (in USD)
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien

@@ -19,7 +19,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response).to render_template(:new)
       end
       context "with feature" do
-        let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["parking_notifications"]) }
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["parking_notifications"]) }
         it "renders with unregistered_parking_notification" do
           get "#{base_url}/new", params: {parking_notification: 1}
           expect(response.status).to eq(200)
@@ -57,7 +57,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
 
     context "with parking_notification" do
-      let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
 
       let(:parking_notification) do

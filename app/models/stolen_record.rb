@@ -46,6 +46,7 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
+  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
   scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
   scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity

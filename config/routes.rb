@@ -179,14 +179,15 @@ Rails.application.routes.draw do
       member { get :get_destroy }
     end
     resources :partial_bikes, only: [:index]
+    get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
     put "update_tsv_blocklist", to: "dashboard#update_tsv_blocklist"
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :memberships, :bulk_imports, :exports, :bike_stickers,
-      :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
+    resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
+      :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications
 
     resources :invoices, only: [:index]

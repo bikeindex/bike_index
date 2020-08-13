@@ -141,5 +141,8 @@
     = yield
 
 - if organized_include_javascript_pack?
+  :javascript
+    window.passiveOrganizationId = "#{passive_organization&.slug}";
   -# Important that this is below yield, sometimes important page data is added to the dom in there
   = javascript_pack_tag "application"
+

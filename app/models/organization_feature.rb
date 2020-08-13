@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # In reality, this should be something like OrganizationFeatures. Initially all features were paid though
-class PaidFeature < ApplicationRecord
+class OrganizationFeature < ApplicationRecord
   include Amountable
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
@@ -34,7 +34,7 @@ class PaidFeature < ApplicationRecord
     impound_bikes_locations
     passwordless_users
     regional_bike_counts
-    regional_stickers
+    credibility_badges
     show_bulk_import
     show_multi_serial
     show_partial_registrations
@@ -42,8 +42,8 @@ class PaidFeature < ApplicationRecord
     skip_ownership_email
   ] + APPOINTMENT_FEATURES + BIKE_ACTIONS + REG_FIELDS).freeze
 
-  has_many :invoice_paid_features
-  has_many :invoices, through: :invoice_paid_features
+  has_many :invoice_organization_features
+  has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
   validates :currency, presence: true

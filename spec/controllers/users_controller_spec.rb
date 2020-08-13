@@ -207,7 +207,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       context "with auto passwordless users" do
-        let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
         it "Does not create a membership or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
@@ -319,7 +319,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       context "with auto_passwordless organization" do
-        let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
 
@@ -457,7 +457,8 @@ RSpec.describe UsersController, type: :controller do
 
       context "token expired" do
         it "redirects to request password reset" do
-          user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
+          user.update_auth_token("password_reset_token", (Time.current - 121.minutes).to_i)
+          expect(user.auth_token_expired?("password_reset_token")).to be_truthy
           post :password_reset, params: {token: user.password_reset_token}
           expect(flash[:error]).to be_present
           expect(cookies.signed[:auth]).to_not be_present
@@ -628,8 +629,8 @@ RSpec.describe UsersController, type: :controller do
       expect(user.password_reset_token).to eq(reset)
     end
 
-    it "Doesn't update user if reset_pass token is more than an hour old" do
-      user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
+    it "Doesn't update user if reset_pass token is more than expiration" do
+      user.update_auth_token("password_reset_token", (Time.current - 1.day).to_i)
       auth = user.auth_token
       set_current_user(user)
       expect(cookies[:auth]).to be_present
@@ -757,7 +758,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     context "organization with hotsheet" do
-      let(:organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:membership) { user.memberships.first }

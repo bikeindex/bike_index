@@ -51,4 +51,16 @@ RSpec.describe AdminHelper, type: :helper do
       expect(edit_mail_snippet_path_for(mail_snippet)).to eq edit_admin_mail_snippet_path(2)
     end
   end
+
+  describe "credibility_scorer_color" do
+    it "returns yellow for 50" do
+      expect(credibility_scorer_color(50)).to eq "#ffc107"
+    end
+    it "returns red for 25" do
+      expect(credibility_scorer_color(25)).to eq "#dc3545"
+    end
+    it "returns green for 80" do
+      expect(credibility_scorer_color(80)).to eq "#28a745"
+    end
+  end
 end

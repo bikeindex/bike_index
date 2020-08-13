@@ -42,7 +42,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
   context "organization with csv_exports" do
     let(:enabled_feature_slugs) { ["csv_exports"] }
-    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
 
     describe "index" do
@@ -94,7 +94,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
       context "organization has all feature slugs" do
-        let(:enabled_feature_slugs) { ["csv_exports"] + PaidFeature::REG_FIELDS }
+        let(:enabled_feature_slugs) { ["csv_exports"] + OrganizationFeature::REG_FIELDS }
         it "renders still" do
           get :new, params: {organization_id: organization.to_param}
           expect(response.code).to eq("200")
@@ -132,7 +132,11 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(response).to redirect_to exports_root_path
           expect(flash[:success]).to be_present
           bike_sticker.reload
-          expect([bike_sticker.user_id, bike_sticker.claimed_at, bike_sticker.bike_id].count(&:present?)).to eq 0
+          expect([bike_sticker.claimed_at, bike_sticker.bike_id].count(&:present?)).to eq 0
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker_update.creator_kind).to eq "creator_export"
+          expect(bike_sticker_update.kind).to eq "un_claim"
         end
       end
     end
@@ -321,7 +325,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "z") }
       it "removes the bike codes" do
         export.options = export.options.merge(bike_codes_assigned: ["Z"])
-        bike_sticker.claim(user, bike)
+        bike_sticker.claim(user: user, bike: bike)
         export.save
         export.reload
         bike_sticker.reload
@@ -330,7 +334,9 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export.bike_codes_removed?).to be_falsey
         expect(bike_sticker.claimed?).to be_truthy
         expect(bike_sticker.bike).to eq bike
-        put :update, params: {organization_id: organization.to_param, id: export.id, remove_bike_codes: true}
+        expect {
+          put :update, params: {organization_id: organization.to_param, id: export.id, remove_bike_stickers: true}
+        }.to change(BikeStickerUpdate, :count).by 1
         export.reload
         bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy
@@ -338,6 +344,15 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export.bike_codes_removed?).to be_truthy
         expect(bike_sticker.claimed?).to be_falsey
         expect(bike_sticker.bike).to be_nil
+        expect(bike_sticker.bike_sticker_updates.count).to eq 2
+
+        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update.kind).to eq "un_claim"
+        expect(bike_sticker_update.creator_kind).to eq "creator_export"
+        expect(bike_sticker_update.organization_kind).to eq "primary_organization"
+        expect(bike_sticker_update.user).to eq user
+        expect(bike_sticker_update.bike).to be_blank
+        expect(bike_sticker_update.organization_id).to eq organization.id
       end
     end
   end

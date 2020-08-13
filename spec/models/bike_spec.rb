@@ -1141,20 +1141,14 @@ RSpec.describe Bike, type: :model do
 
   describe "phone" do
     let(:bike) { Bike.new }
-    let(:user) { User.new(phone: "888.888.8888") }
-    context "assigned phone" do
-      it "returns phone" do
-        bike.phone = user.phone
-        expect(bike.phone).to eq "888.888.8888"
-      end
-    end
+    let(:user) { FactoryBot.create(:user, phone: "765.987.1234") }
     context "user" do
       let(:ownership) { Ownership.new(user: user) }
       it "returns users phone" do
         allow(bike).to receive(:current_ownership) { ownership }
         expect(ownership.first?).to be_truthy
-        expect(user.phone).to eq "888.888.8888"
-        expect(bike.phone).to eq "888.888.8888"
+        expect(user.phone).to eq "7659871234"
+        expect(bike.phone).to eq "7659871234"
       end
     end
     context "b_param" do
@@ -1180,6 +1174,41 @@ RSpec.describe Bike, type: :model do
       it "returns nil" do
         allow(bike).to receive(:current_ownership) { ownership }
         expect(bike.phone).to be_nil
+      end
+    end
+  end
+
+  describe "render_paint_description?" do
+    let(:black) { Color.black }
+    it "returns false" do
+      expect(Bike.new.render_paint_description?).to be_falsey
+    end
+    context "with paint" do
+      let(:stickers) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+      let(:paint) { FactoryBot.create(:paint, name: "812348123") }
+      let(:bike) { FactoryBot.create(:bike, paint: paint, primary_frame_color: black) }
+      it "returns false" do
+        expect(bike.render_paint_description?).to be_falsey
+      end
+      context "bike pos" do
+        it "returns true" do
+          allow(bike).to receive(:pos?) { true }
+          expect(bike.render_paint_description?).to be_truthy
+          # If the primary frame color isn't black, don't render
+          bike.primary_frame_color = stickers
+          expect(bike.render_paint_description?).to be_falsey
+          bike.primary_frame_color = black # reset to black
+          expect(bike.render_paint_description?).to be_truthy
+          # And with a secondary frame color it fails
+          bike.secondary_frame_color = stickers
+          expect(bike.render_paint_description?).to be_falsey
+        end
+      end
+    end
+    context "pos registration without paint" do
+      let(:bike) { FactoryBot.create(:bike_lightspeed_pos, primary_frame_color: black, paint: nil) }
+      it "returns false" do
+        expect(bike.render_paint_description?).to be_falsey
       end
     end
   end

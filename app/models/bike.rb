@@ -271,6 +271,10 @@ class Bike < ApplicationRecord
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
+  def credibility_scorer
+    CredibilityScorer.new(self)
+  end
+
   def creation_state
     creation_states.first
   end
@@ -288,7 +292,7 @@ class Bike < ApplicationRecord
   end
 
   def pos?
-    pos_kind != "no_pos"
+    pos_kind.present? && pos_kind != "no_pos"
   end
 
   def current_ownership
@@ -509,8 +513,12 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
+  def frame_model_truncated
+    frame_model&.truncate(40)
+  end
+
   def title_string
-    t = [year, mnfg_name, frame_model].join(" ")
+    t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
     Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
   end
@@ -530,6 +538,11 @@ class Bike < ApplicationRecord
       src = code.xpath("//iframe/@src")
       src[0]&.value
     end
+  end
+
+  def render_paint_description?
+    return false unless pos? && primary_frame_color == Color.black
+    secondary_frame_color_id.blank? && paint.present?
   end
 
   def bike_organization_ids

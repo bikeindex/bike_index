@@ -8,7 +8,7 @@ FactoryBot.define do
     created_at { bike.created_at + graduated_notification_interval } # use the actual bike created_at, in case bike was passed in
 
     organization do
-      FactoryBot.create(:organization_with_paid_features,
+      FactoryBot.create(:organization_with_organization_features,
         enabled_feature_slugs: ["graduated_notifications"],
         graduated_notification_interval: 1.year)
     end

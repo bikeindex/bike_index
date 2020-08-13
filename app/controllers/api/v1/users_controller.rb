@@ -5,7 +5,7 @@ module Api
 
       def default_serializer_options
         {
-          root: false,
+          root: false
         }
       end
 
@@ -24,9 +24,9 @@ module Api
         if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
           bike = Bike.find(bike_id)
           if bike.authorized?(current_user)
-            feedback = Feedback.new(email: current_user.email, body: reason, title: "#{feedback_type.titleize}", feedback_type: feedback_type)
+            feedback = Feedback.new(email: current_user.email, body: reason, title: feedback_type.titleize.to_s, feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || "no name"
-            feedback.feedback_hash = { bike_id: bike_id }
+            feedback.feedback_hash = {bike_id: bike_id}
             if params[:serial_update_serial].present?
               bike.current_stolen_record.update_attribute :tsved_at, nil if bike.current_stolen_record.present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
@@ -45,23 +45,23 @@ module Api
                 bike.save
                 feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
               end
-            elsif feedback_type.match("bike_recovery")
+            elsif feedback_type.match?("bike_recovery")
               recover_bike(bike, feedback)
             end
             feedback.user_id = current_user&.id
             feedback.save
-            success = { success: "submitted request" }
-            render json: success and return
+            success = {success: "submitted request"}
+            render(json: success) && return
           end
         end
-        message = { errors: { not_allowed: "You are not authorized for that bike" } }
+        message = {errors: {not_allowed: "You are not authorized for that bike"}}
         render json: message, status: 403
       end
 
       def bust_cache!
         response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
         response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "#{1.year.ago}"
+        response.headers["Expires"] = 1.year.ago.to_s
       end
 
       private

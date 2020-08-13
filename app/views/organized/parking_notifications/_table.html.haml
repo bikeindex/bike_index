@@ -5,6 +5,7 @@
 - skip_multiselect ||= false
 - hide_status ||= false
 - skip_resolved ||= false
+- render_sortable ||= false
 
 - # TODO: add translations
 :css
@@ -15,20 +16,28 @@
     - unless skip_map_cell
       %th.map-cell
     %th
-      = t(".created")
+      - if render_sortable
+        = sortable "created_at"
+      - else
+        = t(".created")
       %small.convertTimezone
     - unless skip_bike
       %th=t(".bike")
     - if render_address
       %th=t(".address")
-    %th Kind
-    %th=t(".by")
+    %th
+      - if render_sortable
+        = sortable "kind"
+      - else
+        Kind
+    %th
+      =t(".by")
     - unless skip_repeat
       %th
         %small=t(".notification_number")
     %th.status-cell Status
     - unless skip_resolved
-      %th
+      %th.status-cell
         %small=t(".resolved")
     - unless skip_multiselect
       %th.multiselect-cell.table-cell-check.collapse
@@ -52,7 +61,7 @@
             %span.extended-col-info.d-block
               = link_to organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike, organization_id: current_organization.id)
           %em.small.extended-col-info.d-block.status-cell
-            #{status_display(parking_notification.status)} status
+            #{status_display(parking_notification.status)}
           - if parking_notification.resolved_at.present?
             %strong.small.extended-col-info.d-block
               - if parking_notification.impounded?
@@ -73,7 +82,11 @@
           %em
             = parking_notification.kind_humanized
         %td.hidden-sm-cells
-          = parking_notification.user&.display_name&.truncate(20)
+          - if render_sortable && parking_notification.user.present?
+            = link_to parking_notification.user&.display_name&.truncate(20), organization_parking_notifications_path(sortable_search_params.merge(user_id: parking_notification.user_id)), class: "linkWithSortableSearchParams", "data-urlparams" => "user_id,#{parking_notification.user_id}"
+          - else
+            = parking_notification.user&.display_name&.truncate(20)
+
         - unless skip_repeat
           %td.small.hidden-sm-cells
             - if parking_notification.repeat_record?
@@ -81,8 +94,11 @@
         %td.hidden-sm-cells.status-cell
           = status_display(parking_notification.status)
         - unless skip_resolved
-          %td.hidden-sm-cells
-            - if parking_notification.resolved_at.present?
+          %td.hidden-sm-cells.status-cell
+            - if parking_notification.impound_record_id.present?
+              %a.convertTime.preciseTime{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) }
+                = l(parking_notification.resolved_at, format: :convert_time)
+            - elsif parking_notification.resolved_at.present?
               %span.convertTime.preciseTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 

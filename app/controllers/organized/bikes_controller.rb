@@ -40,7 +40,6 @@ module Organized
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
       @b_params_total = b_params.where(created_at: @time_range)
       @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
     end

@@ -155,7 +155,10 @@ class OrganizationExportWorker < ApplicationWorker
     return "" unless @bike_sticker.present?
     code = @bike_sticker.code
     pretty_code = @bike_sticker.pretty_code
-    @bike_sticker.claim(@export.user, bike)
+    @bike_sticker.claim(user: @export.user,
+                        bike: bike,
+                        organization: @export.organization,
+                        export_id: @export.id)
     @bike_stickers << code
     @bike_sticker = @bike_sticker.next_unclaimed_code
     pretty_code
@@ -173,6 +176,6 @@ class OrganizationExportWorker < ApplicationWorker
     # And because this might have processed some bike_stickers after the export was deleted, remove them here
     return true unless @export.assign_bike_codes?
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers)
-    @export.remove_bike_codes
+    @export.remove_bike_stickers
   end
 end

@@ -74,6 +74,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(bike_sticker.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
+          expect(Export.with_bike_sticker_code(bike_sticker).pluck(:id)).to eq([])
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
@@ -89,11 +90,22 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.written_headers).to eq(%w[owner_name address city state zipcode assigned_sticker])
           expect(export.bike_stickers_assigned).to eq(["A1111"])
           expect(export.bike_codes_removed?).to be_falsey
+          expect(Export.with_bike_sticker_code(bike_sticker.code).pluck(:id)).to eq([export.id])
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_truthy
           expect(bike_sticker.bike).to eq bike_for_avery
           expect(bike_sticker.user).to eq export.user
           expect(bike_sticker.claimed_at).to be_within(1.second).of Time.current
+
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker_update.kind).to eq "initial_claim"
+          expect(bike_sticker_update.creator_kind).to eq "creator_export"
+          expect(bike_sticker_update.organization_kind).to eq "primary_organization"
+          expect(bike_sticker_update.user).to eq user
+          expect(bike_sticker_update.bike).to eq bike_for_avery
+          expect(bike_sticker_update.organization_id).to eq organization.id
+          expect(bike_sticker_update.export_id).to eq export.id
         end
       end
     end
@@ -167,7 +179,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
     end
     context "special headers" do
       let(:enabled_feature_slugs) { ["csv_exports"] }
-      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: enabled_feature_slugs) }
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
@@ -209,7 +221,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         end
       end
       context "including every available field + stickers" do
-        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + ["bike_stickers"] }
+        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + ["bike_stickers"] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
         let(:target_row) do
           {
@@ -236,7 +248,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         end
         it "returns the expected values" do
           VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
-            bike_sticker.claim(user, bike)
+            bike_sticker.claim(user: user, bike: bike)
             bike_sticker.reload
             expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.bike).to eq bike
@@ -260,7 +272,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         end
       end
       context "with partial registrations, every available field without sticker" do
-        let(:enabled_feature_slugs) { PaidFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
+        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
         let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
         let(:partial_reg_attrs) do
           {

@@ -36,6 +36,18 @@
               = f.radio_button :kind, kind
               = kind.humanize
 
+  - if @organization.bike_shop? && @organization.lightspeed_pos?
+    .form-group.row
+      %label.org-form-label
+        Lightspeed POS
+      .col-sm-4
+        .checkbox
+          %label{ style: "line-height: 1.5em;" }
+            = f.check_box :lightspeed_register_with_phone
+            Add phone to registrations
+            %small.less-strong
+              if checked, bikes from Lightspeed POS will be registered with their phone number (if one is available)
+
   .form-group.row
     = f.label :website, class: 'org-form-label'
     .col-sm-4
