@@ -354,14 +354,12 @@ RSpec.describe OrganizationExportWorker, type: :job do
             instance.perform(export.id)
             export.reload
             expect(instance.export_headers).to eq export.written_headers
-            pp export.written_headers
             expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
             expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
             expect(export.progress).to eq "finished"
             generated_csv_string = export.file.read
             expect(generated_csv_string.split("\n").count).to eq 3
             bike_line = generated_csv_string.split("\n")[1]
-            pp bike_line
             expect(bike_line.split(",").count).to eq target_full_row.keys.count
             expect(bike_line).to eq instance.comma_wrapped_string(target_full_row.values).strip
 

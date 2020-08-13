@@ -884,7 +884,11 @@ class Bike < ApplicationRecord
   end
 
   def b_params_address
-    b_params.find { |b_param| b_param.fetch_formatted_address }
-      &.fetch_formatted_address
+    bp_address = {}
+    b_params.each do |b_param|
+      bp_address = b_param.fetch_formatted_address
+      break if bp_address.present?
+    end
+    bp_address
   end
 end
