@@ -1006,7 +1006,7 @@ RSpec.describe Bike, type: :model do
           # expect(bike.latitude).to be_blank
           # expect(bike.longitude).to be_blank
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
-          expect(bike.avery_exportable?(bike)).to be_truthy
+          expect(bike.avery_exportable?).to be_truthy
           bike.reload
           # expect(bike.latitude).to be_present
           # expect(bike.longitude).to be_present

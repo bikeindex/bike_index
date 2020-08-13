@@ -330,7 +330,7 @@ class Bike < ApplicationRecord
     current_impound_record.present?
   end
 
-  def avery_exportable?(bike)
+  def avery_exportable?
     owner_name.present? && valid_registration_address_present?
   end
 
