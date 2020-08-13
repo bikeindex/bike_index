@@ -482,13 +482,13 @@ nl:
         amount_due_cents: Verschuldigde centen
         amount_paid_cents: Bedrag betaald cent
         force_active: Forceer actief
-        invoice_organization_features: Factuur betaalde functies
         is_active: Is actief
         notes: Notes
-        organization_features: Betaalde functies
         payments: Betalingen
         subscription_end_at: Abonnement eindigt om
         subscription_start_at: Abonnement start om
+        invoice_organization_features: Factuurorganisatiefuncties
+        organization_features: Organisatiefuncties
       listicle:
         body: Lichaam
         body_html: Body html
@@ -604,15 +604,6 @@ nl:
         owner_email: E-mailadres eigenaar
         send_email: Stuur e-mail
         user_hidden: Gebruiker verborgen
-      organization_feature:
-        amount_cents: Bedrag centen
-        description: Beschrijving
-        details_link: Details link
-        feature_slugs: Naaktslakken
-        invoice_organization_features: Factuur betaalde functies
-        invoices: Facturen
-        kind: Soort
-        name: Naam
       paint:
         bikes: Bikes
         name: Naam
@@ -794,6 +785,15 @@ nl:
         bike_stickers: Fietscodes
         code_number_length: Codenummer lengte
         notes: Notes
+      organization_feature:
+        amount_cents: Bedrag centen
+        description: Beschrijving
+        details_link: Details link
+        feature_slugs: Naaktslakken
+        invoice_organization_features: Factuurorganisatiefuncties
+        invoices: Facturen
+        kind: Soort
+        name: Naam
     enums:
       cycle_type:
         bike: Fiets
@@ -865,7 +865,6 @@ nl:
       front_gear_type: Type versnelling voor
       integration: integratie
       invoice: factuur
-      invoice_organization_feature: Factuur betaald functie
       listicle: Listicle
       location: Plaats
       lock: Slot
@@ -878,7 +877,6 @@ nl:
       organization_message: Organisatie bericht
       other_listing: Andere lijst
       ownership: eigendom
-      organization_feature: Betaalde functie
       paint: Verf
       payment: Betaling
       public_image: Publiek imago
@@ -895,6 +893,8 @@ nl:
       wheel_size: Wielgrootte
       bike_sticker: Fiets sticker
       bike_sticker_batch: Fietssticker batch
+      invoice_organization_feature: Factuur organisatiefunctie
+      organization_feature: Organisatiefunctie
     select_options:
       color:
         black: Zwart

@@ -474,6 +474,15 @@ en:
         slug: Slug
         users: Users
         website: Website
+      organization_feature:
+        amount_cents: Amount cents
+        description: Description
+        details_link: Details link
+        feature_slugs: Feature slugs
+        invoice_organization_features: Invoice organization features
+        invoices: Invoices
+        kind: Kind
+        name: Name
       other_listing:
         bike: :activerecord.models.bike
         listing_type: Listing type
@@ -488,15 +497,6 @@ en:
         send_email: Send email
         user: :activerecord.models.user
         user_hidden: User hidden
-      organization_feature:
-        amount_cents: Amount cents
-        description: Description
-        details_link: Details link
-        feature_slugs: Feature slugs
-        invoice_organization_features: Invoice organization features
-        invoices: Invoices
-        kind: Kind
-        name: Name
       paint:
         bikes: Bikes
         color: :activerecord.models.color
@@ -814,10 +814,10 @@ en:
       membership: Membership
       normalized_serial_segment: Normalized serial segment
       organization: Organization
+      organization_feature: Organization feature
       organization_message: Organization message
       other_listing: Other listing
       ownership: Ownership
-      organization_feature: Organization feature
       paint: Paint
       payment: Payment
       public_image: Public image
@@ -2126,7 +2126,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2152,7 +2152,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
