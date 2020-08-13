@@ -509,12 +509,12 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.create(:organization_member) }
       let(:organization) { user.organizations.first }
       let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
-      let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
-      it "is true if the organization has that paid feature" do
+      let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
+      it "is true if the organization has that organization feature" do
         expect(user.render_donation_request).to be_nil
         expect(user.send_unstolen_notifications?).to be_falsey
 
-        invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+        invoice.update_attributes(organization_feature_ids: [organization_feature.id])
         organization.save
 
         expect(organization.bike_actions?).to be_truthy

@@ -196,7 +196,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   context "organization with auto passwordless users" do
-    let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "city.gov", available_invitation_count: 1) }
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "city.gov", available_invitation_count: 1) }
     let(:user) { FactoryBot.create(:user, email: email) }
     let(:email) { "example@somethingcity.gov" }
     it "does not become member for non-matching domain" do

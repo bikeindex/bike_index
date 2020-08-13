@@ -89,7 +89,7 @@ RSpec.describe CredibilityScorer do
         end
       end
       context "paid organization" do
-        let(:organization) { FactoryBot.create(:organization_with_paid_features) }
+        let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         it "returns with trusted organization" do
           expect(organization.is_paid).to be_truthy
           expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_trusted, :created_this_month])

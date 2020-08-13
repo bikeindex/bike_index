@@ -1,13 +1,13 @@
-= form_for [:admin, @paid_feature] do |f|
+= form_for [:admin, @organization_feature] do |f|
   .row
     .col-xs-12
-      - if @paid_feature.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @paid_feature }
+      - if @organization_feature.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Organization feature", obj: @organization_feature }
   .row
     .col-md-6.col-xs-12
       .form-group
         = f.label :kind
-        = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
+        = f.select :kind, OrganizationFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
     .col-md-6.col-xs-12
       .form-group
         = f.label :name
@@ -17,12 +17,12 @@
       .col-md-6
         .form-group
           = f.label :feature_slugs_string do
-            Paid Feature Slugs <small>comma delineated</small>
+            Organization Feature Slugs <small>comma delineated</small>
           = f.text_area :feature_slugs_string, class: "form-control"
       .col-md-6{ style: "background: #fff;" }
         %small.less-strong.p-1
           Permitted slugs:
-          = safe_join(PaidFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
+          = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2
     .col-md-6.col-xs-12
       .form-group
@@ -41,4 +41,4 @@
         = f.label :description
         = f.text_area :description, style: "width: 100%;", class: "form-control"
 
-  = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'
+  = f.submit (@organization_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'

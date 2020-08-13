@@ -187,7 +187,7 @@ Rails.application.routes.draw do
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
-      :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
+      :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications
 
     resources :invoices, only: [:index]

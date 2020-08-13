@@ -107,8 +107,8 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.calculated_send_email).to be_falsey
       end
     end
-    context "organization with paid feature of skip_ownership_email" do
-      let!(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["skip_ownership_email"]) }
+    context "organization with organization feature of skip_ownership_email" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
       let!(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
       let(:bike) { ownership.bike }
       it "returns false" do

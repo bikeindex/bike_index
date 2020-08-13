@@ -343,17 +343,17 @@ en:
         amount_paid_cents: Amount paid cents
         first_invoice: :activerecord.models.first_invoice
         force_active: Force active
-        invoice_paid_features: Invoice paid features
+        invoice_organization_features: Invoice organization features
         is_active: Is active
         notes: Notes
         organization: :activerecord.models.organization
-        paid_features: Paid features
+        organization_features: Organization features
         payments: Payments
         subscription_end_at: Subscription end at
         subscription_start_at: Subscription start at
-      invoice_paid_feature:
+      invoice_organization_feature:
         invoice: :activerecord.models.invoice
-        paid_feature: :activerecord.models.paid_feature
+        organization_feature: :activerecord.models.organization_feature
       listicle:
         blog: :activerecord.models.blog
         body: Body
@@ -474,6 +474,15 @@ en:
         slug: Slug
         users: Users
         website: Website
+      organization_feature:
+        amount_cents: Amount cents
+        description: Description
+        details_link: Details link
+        feature_slugs: Feature slugs
+        invoice_organization_features: Invoice organization features
+        invoices: Invoices
+        kind: Kind
+        name: Name
       other_listing:
         bike: :activerecord.models.bike
         listing_type: Listing type
@@ -488,15 +497,6 @@ en:
         send_email: Send email
         user: :activerecord.models.user
         user_hidden: User hidden
-      paid_feature:
-        amount_cents: Amount cents
-        description: Description
-        details_link: Details link
-        feature_slugs: Feature slugs
-        invoice_paid_features: Invoice paid features
-        invoices: Invoices
-        kind: Kind
-        name: Name
       paint:
         bikes: Bikes
         color: :activerecord.models.color
@@ -804,7 +804,7 @@ en:
       front_gear_type: Front gear type
       integration: Integration
       invoice: Invoice
-      invoice_paid_feature: Invoice paid feature
+      invoice_organization_feature: Invoice organization feature
       listicle: Listicle
       location: Location
       lock: Lock
@@ -814,10 +814,10 @@ en:
       membership: Membership
       normalized_serial_segment: Normalized serial segment
       organization: Organization
+      organization_feature: Organization feature
       organization_message: Organization message
       other_listing: Other listing
       ownership: Ownership
-      paid_feature: Paid feature
       paint: Paint
       payment: Payment
       public_image: Public image

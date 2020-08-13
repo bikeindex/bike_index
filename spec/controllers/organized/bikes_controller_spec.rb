@@ -74,7 +74,7 @@ RSpec.describe Organized::BikesController, type: :controller do
     include_context :logged_in_as_organization_member
     context "paid organization" do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having paid feature
+      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having organization feature
       describe "index" do
         context "with params" do
           let(:query_params) do
@@ -178,7 +178,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
           it "renders" do
             organization.save
-            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue paid feature stubbing
+            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue organization feature stubbing
             expect(partial_registration.organization).to eq organization_child
 
             get :incompletes, params: {organization_id: organization.to_param}

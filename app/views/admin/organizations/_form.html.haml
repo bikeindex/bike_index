@@ -122,7 +122,7 @@
     - if @organization.any_enabled?(enabled_features_with_admin_forms)
       .card
         .card-body
-          %h4.mb-4 Settings for paid features
+          %h4.mb-4 Settings for organization features
           - if @organization.enabled?("graduated_notifications")
             .form-group
               = f.label :graduated_notification_interval_days do

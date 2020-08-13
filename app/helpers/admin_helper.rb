@@ -22,7 +22,7 @@ module AdminHelper
       {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
       {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
-      {title: "Paid Features", path: admin_paid_features_path, match_controller: true},
+      {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
       {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
       {title: "Impound Records", path: admin_impound_records_path, match_controller: true},
       {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},

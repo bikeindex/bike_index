@@ -7,7 +7,7 @@ class Admin::InvoicesController < Admin::BaseController
     per_page = params[:per_page] || 50
     @invoices =
       matching_invoices
-        .includes(:organization, :payments, :paid_features, :first_invoice)
+        .includes(:organization, :payments, :organization_features, :first_invoice)
         .reorder(sort_column + " " + sort_direction)
         .page(page)
         .per(per_page)
