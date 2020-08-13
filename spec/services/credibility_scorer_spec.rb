@@ -46,6 +46,14 @@ RSpec.describe CredibilityScorer do
         expect(subject.badge_value(badge_array)).to eq(50)
       end
     end
+    context "with user_trusted_organization_member and creation_organization_trusted" do
+      let(:badge_array) { %i[user_trusted_organization_member creation_organization_trusted] }
+      it "it returns just creation_organization_trusted" do
+        expect(subject.permitted_badges_array(badge_array)).to eq([:creation_organization_trusted])
+        expect(subject.permitted_badges_hash(badge_array)).to eq({creation_organization_trusted: 20})
+        expect(subject.badge_value(badge_array)).to eq(20)
+      end
+    end
   end
 
   describe "bike badges and score" do
@@ -213,6 +221,14 @@ RSpec.describe CredibilityScorer do
       let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
       it "returns user_name_suspicious" do
         expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
+      end
+      context "user is member of trusted organization" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+        it "returns just user_trusted_organization_member" do
+          expect(user.organizations.pluck(:id)).to eq([organization.id])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_trusted_organization_member])
+        end
       end
       context "user_handle_suspicious, user_veteran & strava" do
         let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
