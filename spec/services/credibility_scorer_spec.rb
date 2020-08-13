@@ -195,7 +195,7 @@ RSpec.describe CredibilityScorer do
         expect(instance.score).to eq(0)
       end
     end
-    context "veteran user" do
+    describe "user_veteran" do
       let(:user) { FactoryBot.create(:user, created_at: Time.current - 3.years) }
       it "returns veteran" do
         expect(subject.bike_user_badges(bike)).to eq([:user_veteran])
@@ -207,6 +207,17 @@ RSpec.describe CredibilityScorer do
         it "returns ambassador" do
           expect(subject.bike_user_badges(bike)).to eq([:user_ambassador])
         end
+      end
+    end
+    describe "user_name_suspicious" do
+      it "returns user_name_suspicious"
+      context "user_handle_suspicious, user_veteran & strava" do
+        let(:user) { FactoryBot.create(:user, name: "") }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
+        it "returns all"
+      end
+      context "ambassador" do
+        it "returns ambassador"
       end
     end
   end

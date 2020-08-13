@@ -33,6 +33,16 @@
 
 .credibility-score {
   border: 2px solid rgba(black, 0.25);
+  display: flex;
+  flex-wrap: wrap;
+
+  .main-crediblity-score-box,
+  .score-details {
+    position: relative;
+    width: 100%;
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
   .main-crediblity-score-box {
     text-align: center;
     padding: 1rem 0;

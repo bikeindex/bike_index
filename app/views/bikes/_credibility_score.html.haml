@@ -1,0 +1,20 @@
+- scorer = bike.credibility_scorer
+.credibility-score{ style: "background: #{credibility_scorer_color(scorer.score)};" }
+  .main-crediblity-score-box
+    %a.credibility-title{ href: ".score-details", data: { toggle: "collapse" } }
+      Credibility Score
+    %span.score-number
+      = scorer.score
+  .score-details.text-left
+    %small.details-title
+      Factors in score:
+    %table.table-list
+      %tbody
+        - CredibilityScorer.permitted_badges_hash(scorer.badges).each do |badge, value|
+          %tr
+            %td
+              %strong{ class: (value < 0 ? "text-danger" : "") }
+                = value
+            %td
+              %small
+                = badge.to_s.humanize

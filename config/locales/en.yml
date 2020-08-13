@@ -1371,7 +1371,6 @@ en:
     show:
       abandoned: Abandoned
       at: at
-      bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!

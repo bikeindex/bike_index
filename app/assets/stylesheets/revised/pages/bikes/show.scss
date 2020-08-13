@@ -26,14 +26,20 @@
     background: rgba($blue, 0.92);
   }
 
-  h1 {
+  .bike-title {
     margin-bottom: 0;
-
     .stolen {
       display: block;
       color: $red;
       font-size: 26px;
     }
+  }
+
+  // This is the first title, that only shows up if you're a paid organization or superuser
+  .secondary-bike-title {
+    @extend .uncap;
+    margin: 0;
+    color: $gray-light;
   }
 
   .social-share-bike {
