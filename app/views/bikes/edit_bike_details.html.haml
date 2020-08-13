@@ -107,7 +107,7 @@
                   .form-well-input
                     = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
 
-              - if @bike.street.present? || @bike.creation_organization.enabled?("reg_address")
+              - if @bike.street.present? || @bike.creation_organization&.enabled?("reg_address")
                 .form-group.row
                   = f.label :street, class: 'form-well-label'
                   .form-well-input
