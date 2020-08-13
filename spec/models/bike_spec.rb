@@ -992,7 +992,7 @@ RSpec.describe Bike, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
-      let!(:b_param) do
+      let(:b_param) do
         FactoryBot.create(:b_param, created_bike_id: bike.id,
                                     params: {bike: {address: "102 Washington Pl, State College"}})
       end
@@ -1001,15 +1001,17 @@ RSpec.describe Bike, type: :model do
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
         VCR.use_cassette("organization_export_worker-avery") do
+          expect(b_param).to be_present
           ownership.reload
+          bike.save
+          bike.reload
+          # We test that the bike has a location saved
+          expect(bike.latitude).to be_present
+          expect(bike.longitude).to be_present
           expect(bike.owner_name).to eq "some name"
-          # expect(bike.latitude).to be_blank
-          # expect(bike.longitude).to be_blank
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
           bike.reload
-          # expect(bike.latitude).to be_present
-          # expect(bike.longitude).to be_present
         end
       end
     end
