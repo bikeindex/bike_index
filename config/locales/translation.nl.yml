@@ -2088,7 +2088,6 @@ nl:
       link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
       at: bij
-      bike_in_admin: "%{bike_type} in Admin"
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
       componentcmodel_name: "%{componentcmodel_name}"
