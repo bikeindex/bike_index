@@ -13,7 +13,7 @@
   = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
 .admin-subnav.midpage-subnav
-  .col-6
+  .col-4.col-md-6
     %h1
       Edit Bike
       - if @bike.deleted?
@@ -21,7 +21,7 @@
           Deleted at:
           %span.convertTime.preciseTime
             = l @bike.deleted_at, format: :convert_time
-  .col-6.text-right
+  .col-8.col-md-6.text-right
     = render partial: "/bikes/credibility_score", locals: { bike: @bike }
 
 - if @bike.user_hidden

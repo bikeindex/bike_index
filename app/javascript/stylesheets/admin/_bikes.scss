@@ -31,25 +31,26 @@
   }
 }
 
+// Duplicates revised bikes/show.scss
 .credibility-score {
   border: 2px solid rgba(black, 0.25);
   display: flex;
   flex-wrap: wrap;
-
-  .main-crediblity-score-box,
-  .score-details {
+  max-width: 500px;
+  margin-left: auto;
+  .main-crediblity-score-box {
     position: relative;
     width: 100%;
-    flex: 0 0 50%;
-    max-width: 50%;
-  }
-  .main-crediblity-score-box {
+    flex: 0 0 40%;
+    max-width: 40%;
     text-align: center;
     padding: 1rem 0;
     .credibility-title {
       display: block;
       color: #fff;
-      text-decoration: underline;
+      &a {
+        text-decoration: underline;
+      }
     }
     .score-number {
       margin-top: 0.5rem;
@@ -60,14 +61,26 @@
     }
   }
   .score-details {
+    position: relative;
+    width: 100%;
+    flex: 0 0 60%;
+    max-width: 60%;
     background: #fff;
-    padding: 0.2rem 0 0;
+    padding: 0;
     .details-title {
-      padding: 0.5rem 0.1rem 0.25rem;
+      padding: 0.25rem 0.1rem 0.1rem;
       display: block;
     }
-    .table-list {
+    .table {
       margin-bottom: 0;
+      tr td {
+        line-height: 1.5;
+        border: 1px solid #eceeef;
+        padding: 4px 4px 4px 4px;
+        &:last-child {
+          width: 15%; // This is effectively min-width for tables
+        }
+      }
     }
   }
 }

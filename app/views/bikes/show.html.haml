@@ -8,10 +8,11 @@
         .col-md-6
           - if passive_organization.present?
             %h3.secondary-bike-title= @bike.title_u
+          - if current_user.superuser
+            = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong mt-2"
         .col-md-6.text-right
           = render partial: "/bikes/credibility_score", locals: { bike: @bike }
-          - if current_user.superuser
-            = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong"
+
 
 
   - if current_user&.superuser
