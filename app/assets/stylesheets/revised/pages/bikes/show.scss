@@ -35,13 +35,6 @@
     }
   }
 
-  // This is the first title, that only shows up if you're a paid organization or superuser
-  .secondary-bike-title {
-    @extend .uncap;
-    margin: 0;
-    color: $gray-light;
-  }
-
   .social-share-bike {
     @include clearfix;
 
@@ -182,6 +175,17 @@
       @extend .uncap;
     }
   }
+
+  // This is the first title, that only shows up if you're a paid organization or superuser
+  .secondary-bike-title {
+    @extend .uncap;
+    margin: 0;
+    color: $gray-light;
+  }
+  .superuser-bike-button {
+    @extend .uncap;
+    float: right;
+  }
 }
 
 // On small screens, use the tabbed interface for components
@@ -211,6 +215,16 @@
       .unstolen-notification-box {
         border-left: 0 none;
       }
+    }
+    .secondary-bike-title {
+      font-size: 100%;
+    }
+    .superuser-bike-button {
+      margin-top: -0.75rem;
+    }
+    .credibility-score {
+      margin-top: $vertical-height;
+      margin-right: auto;
     }
   }
 }
