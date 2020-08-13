@@ -210,14 +210,53 @@ RSpec.describe CredibilityScorer do
       end
     end
     describe "user_name_suspicious" do
-      it "returns user_name_suspicious"
-      context "user_handle_suspicious, user_veteran & strava" do
-        let(:user) { FactoryBot.create(:user, name: "") }
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
-        it "returns all"
+      let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
+      it "returns user_name_suspicious" do
+        expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
       end
-      context "ambassador" do
-        it "returns ambassador"
+      context "user_handle_suspicious, user_veteran & strava" do
+        let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
+        let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
+        let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
+        let(:info) { JSON.parse(strava_file) }
+        let!(:integration) { FactoryBot.create(:integration, information: info) }
+        it "returns all" do
+          expect(user.integrations.pluck(:id)).to eq([integration.id])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :user_veteran, :user_connected_to_strava])
+        end
+        context "ambassador" do
+          let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
+          it "returns ambassador" do
+            expect(subject.bike_user_badges(bike)).to eq([:user_ambassador])
+          end
+        end
+      end
+    end
+  end
+
+  describe "suspiscious_handle?" do
+    ["shady-p@yahoo.com", "bike thief", "hoogivzzafudge5150@hotmail.co", "mj", "fuckyou@stuff.com", "cunt-edu"].each do |str|
+      it "is truthy for #{str}" do
+        expect(subject.suspiscious_handle?(str)).to be_truthy
+      end
+    end
+    # Things that might trip us up
+    ["Baller**", "696969 party"].each do |str|
+      it "is falsey for #{str}" do
+        expect(subject.suspiscious_handle?(str)).to be_falsey
+      end
+    end
+    context ".edu email address" do
+      let(:edu_email1) { "ncp5150@ccc7.edu" }
+      let(:edu_email2) { "shady@ccc7.edu" }
+      let(:edu_email3) { "asshole@ccc7.edu" }
+      let(:edu_email4) { "thief@ccc7.edu" }
+      it "ignores .edu email addresses" do
+        expect(subject.suspiscious_handle?(edu_email1)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email2)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email3)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email4)).to be_truthy
       end
     end
   end

@@ -100,7 +100,11 @@ class CredibilityScorer
     return [] unless user.present?
     return [:user_banned] if user.banned
     return [:user_ambassador] if user.ambassador?
-    user.created_at < Time.current - 2.years ? [:user_veteran] : []
+    badges = []
+    badges += [:user_veteran] if user.created_at < Time.current - 2.years
+    badges += [:user_connected_to_strava] if user.integrations.strava.any?
+    badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }
+    badges
   end
 
   #
@@ -130,6 +134,16 @@ class CredibilityScorer
   def self.organization_trusted?(organization)
     return false unless organization.present?
     organization.paid? || organization.bike_shop? && organization.does_not_need_pos?
+  end
+
+  def self.suspiscious_handle?(str)
+    return false unless str.present?
+    str = str.downcase.strip
+    return true if str.match?("thief")
+    return false if str.match?(/@.*\.edu/)
+    return true if str.match?("5150") || str.match?("shady")
+    return true if BadWordCleaner.clean(str).count("*") > str.count("*")
+    str.length < 4
   end
 
   def initialize(bike)
