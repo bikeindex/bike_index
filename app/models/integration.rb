@@ -11,6 +11,8 @@ class Integration < ApplicationRecord
 
   before_create :associate_with_user
 
+  scope :strava, -> { where(provider_name: "strava") }
+
   def self.email_from_globalid_pii(auth_hash)
     decrypted_pii = auth_hash.dig("info", "decrypted_pii")&.first
     decrypted_pii && decrypted_pii["value"]
