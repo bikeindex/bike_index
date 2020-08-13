@@ -268,7 +268,7 @@ RSpec.describe CredibilityScorer do
       let(:edu_email2) { "shady@ccc7.edu" }
       let(:edu_email3) { "asshole@ccc7.edu" }
       let(:edu_email4) { "thief@ccc7.edu" }
-      it "ignores .edu email addresses" do
+      it "ignores .edu email addresses, except thief" do
         expect(subject.suspiscious_handle?(edu_email1)).to be_falsey
         expect(subject.suspiscious_handle?(edu_email2)).to be_falsey
         expect(subject.suspiscious_handle?(edu_email3)).to be_falsey
