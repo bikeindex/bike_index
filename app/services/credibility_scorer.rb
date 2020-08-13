@@ -26,7 +26,9 @@ class CredibilityScorer
 
     user: {
       user_ambassador: 50,
-      user_veteran: 10
+      user_veteran: 10,
+      user_connected_to_strava: 10,
+      user_handle_suspicious: -20
     },
 
     bike: {

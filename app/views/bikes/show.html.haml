@@ -5,12 +5,16 @@
   - if current_user.present?
     - if passive_organization.present? && current_user.authorized?(passive_organization) || current_user.superuser
       .row
-        .col-md-8
+        - col_classes = passive_organization&.enabled?("credibility_badges") ? "col-lg-8 col-md-6" : "col-xs-12"
+        .clearfix{ class: col_classes }
+          - if current_user.superuser
+            = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
           - if passive_organization.present?
-            %h1= @bike.title_u
-        - if current_user.superuser
-          .col-md-4
-            = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
+            %h3.secondary-bike-title.mb-2= @bike.title_u
+        - if passive_organization&.enabled?("credibility_badges")
+          .col-lg-4.col-md-6.text-right
+            = render partial: "/bikes/credibility_score", locals: { bike: @bike }
+
 
 
   - if current_user&.superuser
@@ -54,7 +58,7 @@
 
   .row
     .col-md-8
-      %h1
+      %h1.bike-title
         - if @bike.stolen
           %strong.stolen
             = t(".abandoned") if @bike.abandoned
