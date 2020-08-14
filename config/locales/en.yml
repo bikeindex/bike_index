@@ -2577,7 +2577,8 @@ en:
         Tug on whatever you're about to lock to make sure it can't be easily removed.
         Signposts in particular can be easily removed by unbolting them and some are
         already unattached.
-      use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40.
+      use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40
+      checkout_out_bestbikelock_html: "- check out %{link} for recommendations on the best locks."
     resources:
       api_documentation: API documentation
       bike_index_resources: Bike Index Resources
@@ -5029,6 +5030,7 @@ en:
       api_documentation: API documentation
       bike_index: Bike Index
       bike_manufacturer_list: Bike Manufacturer List
+      protect_your_bike: Protect your bike
       bike_shops: Bike Shops
       blog: Blog
       change_preferred_language: change preferred language
