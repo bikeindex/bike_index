@@ -3641,6 +3641,8 @@ nl:
         wegwijzers kunnen gemakkelijk worden verwijderd door ze los te maken en sommige
         zijn al niet bevestigd.
       use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens € 40 kost.
+      checkout_out_bestbikelock_html: "- ga naar %{link} voor aanbevelingen over de
+        beste sloten."
     resources:
       api_documentation: API-documentatie
       bike_index_resources: Bike Index middelen
@@ -5061,6 +5063,7 @@ nl:
       who_we_serve: Wie we dienen
       change_preferred_language: voorkeurstaal wijzigen
       security: veiligheid
+      protect_your_bike: Bescherm je fiets
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
