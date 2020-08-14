@@ -2549,6 +2549,8 @@ en:
         as a primary means of locking a bike in a city.
       cheaper_and_older_ulocks_can_often_be_broken: Cheaper and older U-locks can
         often be broken without any tools.
+      checkout_out_bestbikelock_html: "- check out %{link} for recommendations on
+        the best locks."
       correctly_locking_a_bike: Correctly locking a bike
       dont_rely_on_foot_traffic_to_keep_your_bi: >-
         Don't rely on foot traffic to keep your bike safe; years of reports have taught
@@ -2578,7 +2580,6 @@ en:
         Signposts in particular can be easily removed by unbolting them and some are
         already unattached.
       use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40
-      checkout_out_bestbikelock_html: "- check out %{link} for recommendations on the best locks."
     resources:
       api_documentation: API documentation
       bike_index_resources: Bike Index Resources
@@ -5030,7 +5031,6 @@ en:
       api_documentation: API documentation
       bike_index: Bike Index
       bike_manufacturer_list: Bike Manufacturer List
-      protect_your_bike: Protect your bike
       bike_shops: Bike Shops
       blog: Blog
       change_preferred_language: change preferred language
@@ -5046,6 +5046,7 @@ en:
       language: Language
       law_enforcement: Law Enforcement
       privacy_policy: Privacy policy
+      protect_your_bike: Protect your bike
       resources: Resources
       schools_and_universities: Schools and Universities
       security: Security
