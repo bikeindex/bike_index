@@ -31,12 +31,14 @@ $sign-in-up-form-bg: $gray-lighter;
   }
 
   .sign-in-up-main-form-header {
-    padding: (1.5 * $vertical-height) 0 $vertical-height;
+    padding: 0 0 $vertical-height;
 
     small {
       @extend .body-font;
-
+      line-height: 1;
       float: right;
+      display: block;
+      font-style: italic;
     }
   }
 
@@ -167,10 +169,16 @@ $sign-in-up-form-bg: $gray-lighter;
     border-radius: $border-radius;
     padding: (2 * $vertical-height) 0.9375rem;
   }
+  .main-form .sign-in-up-main-form-header {
+    font-size: 18px;
+  }
 
   .oauth-providers,
   .main-form {
     @include make-col(12);
+  }
+  .oauth-providers a:last-of-type {
+    margin-bottom: 2.5 * $vertical-height;
   }
 }
 
@@ -231,6 +239,24 @@ $sign-in-up-form-bg: $gray-lighter;
 }
 
 //
+// XS screens where link to switch between login/signup breaks line
+@media (max-width: 450px) {
+  .sign-in-up {
+    .main-form .sign-in-up-main-form-header {
+      small {
+        margin: -12px 0 6px;
+        font-size: 13px;
+        float: none;
+        text-align: right;
+      }
+    }
+    .oauth-providers .oauth-text-block {
+      padding-left: $vertical-height;
+    }
+  }
+}
+
+//
 // Small screens and larger
 @media (max-width: $grid-breakpoint-md - 1px) {
   .sign-in-up.not-partner {
@@ -248,10 +274,8 @@ $sign-in-up-form-bg: $gray-lighter;
 
 // Small awkward point where we need less padding to fit the buttons
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
-  .sign-in-up.not-partner .oauth-providers {
-    .oauth-text-block {
-      padding-left: $vertical-height;
-    }
+  .sign-in-up.not-partner .oauth-providers .oauth-text-block {
+    padding-left: $vertical-height;
   }
 }
 

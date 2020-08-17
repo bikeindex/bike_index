@@ -56,23 +56,12 @@
     background-color: #ffffff;
     height: 84px;
 
-    .logo-plus {
-      background: #ffffff;
-      color: $gray-darker;
-      font-size: 40px;
-      float: left;
-      line-height: 1;
-      margin: 17px 12px 0;
-    }
-
     .partner-header-logo {
       float: left;
       margin-top: 21px;
-
       // Margin calculated above is 6px
       margin-right: 0;
       height: 45px;
-
       // This is also manually set in HTML attrs because of outlook
     }
   }
