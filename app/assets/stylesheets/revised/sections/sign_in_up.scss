@@ -278,6 +278,7 @@ $sign-in-up-form-bg: $gray-lighter;
     padding-left: $vertical-height;
   }
 }
+
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-xl - 1px) {
   .sign-in-up.not-partner {
     .main-form {
