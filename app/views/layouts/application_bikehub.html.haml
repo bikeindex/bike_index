@@ -46,39 +46,25 @@
                 %a.nav-link{ href:  new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
                   = t(".login")
 
-      / .bikehub-signup-landing-page.bikehub-signup-page.landing-page
-      /   %header.bikehub-banner-header
-      /     .row.teamed-up-with-bike-index.text-center
-      /       .col-lg-4.team-title-box
-      /         %h1
-      /           = t(".teamed_up")
-      /         %span.high-five-wrapper
-      /           = image_tag "bikehub/high-five.svg", alt: "High Five"
-      .bikehub-top-info
-        %h1
-          %span.high-five-wrapper
-            = image_tag "bikehub/high-five.svg", alt: "High Five"
-          %strong We teamed up:
-          BikeHub accounts are powered by Bike Index.
-
-        / %h2
-        /   = t(".accounts_powered_by_bike_index")
-        /   %br
-        /   - if signup_page
-        /     = t(".sign_up_message")
-        /   - else
-        /     = t(".log_in_message")
-
+      .bikehub-signup-landing-page.bikehub-signup-page.landing-page
+        %header.bikehub-banner-header
+          .teamed-up-with-bike-index
+            = image_tag "bikehub/high-five.svg", alt: "Bikehub and Bike Index together", class: "bikehub-high-five"
+            %h1
+              %strong We teamed up:
+              BikeHub accounts are powered by Bike Index
+            %p
+              = t(".non_profit")
 
       = render "layouts/revised_messages"
+      .mt-4
       = yield
       .container-fluid
         .row
           .col-lg-8.offset-lg-2.bikehub-bottom-info
             %p
-              = t(".non_profit")
-            %p
-              = t(".partnership")
+              %em
+                = t(".partnership")
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
