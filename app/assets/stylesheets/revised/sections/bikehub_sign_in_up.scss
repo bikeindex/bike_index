@@ -212,27 +212,6 @@ $bikehub-text-color: #212529;
     }
   }
 
-  .bikehub-top-info {
-    @extend .clearfix;
-    margin: 2 * $vertical-height 0;
-
-    h1 {
-      @extend .uncap;
-      font-size: 18px;
-      font-weight: bold;
-      color: $bikehub-green;
-      text-align: center;
-      font-weight: normal;
-    }
-    .high-five-wrapper {
-      display: inline-block;
-      max-width: 5rem;
-      height: auto;
-      margin: 0 1rem 0 0;
-      // float: left;
-    }
-  }
-
   .bikehub-bottom-info {
     margin-top: 40px;
   }
