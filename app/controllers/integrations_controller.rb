@@ -12,6 +12,8 @@ class IntegrationsController < ApplicationController
       @user.reload
       sign_in_and_redirect(@user)
     else
+      pp @integration, @integration.errors.full_messages
+      flash[:error] = @integration.errors.full_messages.to_sentence
       integrations_controller_creation_error
     end
   end
@@ -20,7 +22,7 @@ class IntegrationsController < ApplicationController
     provider_name = request.env["omniauth.auth"] && request.env["omniauth.auth"]["provider"]
     provider_name ||= params[:strategy]
 
-    flash[:error] = translation(:problem_authenticating_with_provider,
+    flash[:error] ||= translation(:problem_authenticating_with_provider,
       provider_name: provider_name)
     redirect_to(new_session_path) && return
   end

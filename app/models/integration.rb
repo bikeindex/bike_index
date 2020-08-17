@@ -21,6 +21,7 @@ class Integration < ApplicationRecord
   def associate_with_user
     self.provider_name ||= information["provider"]
     if provider_name == "facebook" || provider_name == "strava"
+      pp information
       update_or_create_user(email: information["info"]["email"], name: information["info"]["name"])
     elsif provider_name == "globalid"
       update_or_create_user(email: self.class.email_from_globalid_pii(information),

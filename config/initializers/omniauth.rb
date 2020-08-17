@@ -1,6 +1,6 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :facebook, ENV["FACEBOOK_KEY"], ENV["FACEBOOK_SECRET"], scope: "email"
-  provider :strava, ENV["STRAVA_KEY"], ENV["STRAVA_SECRET"], scope: "public"
+  provider :strava, ENV["STRAVA_KEY"], ENV["STRAVA_SECRET"], scope: "read_all"
   provider :twitter, ENV["TWITTER_CONSUMER_KEY"], ENV["TWITTER_CONSUMER_SECRET"],
     authorize_params: {force_login: true}
   provider :globalid, ENV["GLOBALID_CLIENT_ID"], ENV["GLOBALID_CLIENT_SECRET"],
