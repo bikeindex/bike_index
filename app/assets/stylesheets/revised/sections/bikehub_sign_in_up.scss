@@ -176,60 +176,76 @@ $bikehub-text-color: #212529;
 }
 
 .bikehub {
-  .bikehub-banner-header {
-    background-image: image-url("landing_pages/header_bg_bike_hub.jpg");
-    background-size: auto 100%;
-    background-position: right center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    padding: 30px 0;
-    border-bottom: 0px;
-  }
+  // .bikehub-banner-header {
+  //   background-image: image-url("landing_pages/header_bg_bike_hub.jpg");
+  //   background-size: auto 100%;
+  //   background-position: right center;
+  //   background-repeat: no-repeat;
+  //   background-size: cover;
+  //   padding: 30px 0;
+  //   border-bottom: 0px;
+  // }
 
-  .teamed-up-with-bike-index {
-    background: white;
-    max-width: 675px;
-    margin: 0 auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
+  // .teamed-up-with-bike-index {
+  //   background: white;
+  //   max-width: 675px;
+  //   margin: 0 auto;
+  //   padding-top: 15px;
+  //   padding-bottom: 15px;
+  //   h1 {
+  //     font-size: 18px;
+  //     font-weight: bold;
+  //     color: $bikehub-green;
+  //     text-align: center;
+  //   }
+  //   img {
+  //     max-width: 100px;
+  //     height: auto;
+  //   }
+  //   p {
+  //     font-size: 12px;
+  //     &:last-of-type {
+  //       margin-bottom: 0;
+  //     }
+  //   }
+  //   .team-title-box {
+  //     @include media-breakpoint-down(md) {
+  //       display: flex;
+  //       padding-bottom: 20px;
+  //       h1,
+  //       .high-five-wrapper {
+  //         flex: 0 0 50%;
+  //       }
+  //       h1 {
+  //         padding-top: 36px;
+  //       }
+  //     }
+  //   }
+  // }
+
+  .bikehub-top-info {
+    @extend .clearfix;
+    margin: 2 * $vertical-height 0;
+
     h1 {
+      @extend .uncap;
       font-size: 18px;
       font-weight: bold;
       color: $bikehub-green;
       text-align: center;
+      font-weight: normal;
     }
-    img {
-      max-width: 100px;
+    .high-five-wrapper {
+      display: inline-block;
+      max-width: 5rem;
       height: auto;
-    }
-    p {
-      font-size: 12px;
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-    }
-    .team-title-box {
-      @include media-breakpoint-down(md) {
-        display: flex;
-        padding-bottom: 20px;
-        h1,
-        .high-five-wrapper {
-          flex: 0 0 50%;
-        }
-        h1 {
-          padding-top: 36px;
-        }
-      }
+      margin: 0 1rem 0 0;
+      // float: left;
     }
   }
 
-  .bike-hub-login {
-    h2 {
-      color: $bikehub-green;
-      font-size: 22px;
-      text-align: center;
-      line-height: 34px;
-    }
+  .bikehub-bottom-info {
+    margin-top: 40px;
   }
 
   .sign-in-up-main-form-header {
