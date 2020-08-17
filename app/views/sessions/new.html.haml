@@ -7,13 +7,12 @@
     .sign-in-up-wrap
       .row
         .oauth-providers
-          / %a.facebook-login{ href: '/auth/facebook' }
-          /   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-          /   %span.oauth-text-block= t(".sign_in_using_facebook")
-
-          / %a.strava-login{ href: '/auth/strava' }
-          /   %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
-          /   %span.oauth-text-block= t(".sign_in_using_strava")
+          -# %a.facebook-login{ href: '/auth/facebook' }
+          -#   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
+          -#   %span.oauth-text-block= t(".sign_in_using_facebook")
+          -# %a.strava-login{ href: '/auth/strava' }
+          -#   %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
+          -#   %span.oauth-text-block= t(".sign_in_using_strava")
 
           %a.globalid-login{ href: '/auth/globalid' }
             %span.oauth-logo-block= image_tag 'revised/globalid_logo.svg'
@@ -27,13 +26,13 @@
           %h3= t(".or")
         .main-form
           %h3.sign-in-up-main-form-header
-            = t(".log_in")
             %small
               - if sign_in_partner.present?
                 = t(".no_bike_index_account")
               - else
                 = t(".dont_have_an_account")
               = link_to t(".sign_up"), new_user_path(partner: sign_in_partner, email: params[:email])
+            = t(".log_in")
 
           = form_for :session, url: session_url(params.permit(:return_to)) do |f|
             - if sign_in_partner

@@ -52,19 +52,21 @@
             = image_tag "bikehub/high-five.svg", alt: "Bikehub and Bike Index together", class: "bikehub-high-five"
             %h1
               %strong We teamed up:
-              BikeHub accounts are powered by Bike Index
-            %p
-              = t(".non_profit")
+              = t(".accounts_powered_by_bike_index")
+
 
       = render "layouts/revised_messages"
       .mt-4
       = yield
       .container-fluid
         .row
-          .col-lg-8.offset-lg-2.bikehub-bottom-info
+          .col-xl-8.offset-xl-2.col-md-10.offset-md-1.bikehub-bottom-info
             %p
               %em
                 = t(".partnership")
+            %p
+              %em
+                = t(".non_profit")
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

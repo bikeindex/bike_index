@@ -197,18 +197,14 @@ $bikehub-text-color: #212529;
       font-size: 18px;
       font-weight: normal;
       color: $bikehub-green;
-      margin: 0.5rem 0 1rem;
+      margin: 0.5rem 0 0;
+      line-height: 1.5;
     }
     .bikehub-high-five {
       max-width: 100px;
       height: auto;
       float: right;
-    }
-    p {
-      font-size: 12px;
-      &:last-of-type {
-        margin-bottom: 0;
-      }
+      margin-left: 1rem;
     }
   }
 
@@ -237,5 +233,15 @@ $bikehub-text-color: #212529;
     &:focus {
       color: $bikehub-green-secondary;
     }
+  }
+}
+@media (min-width: $grid-breakpoint-lg) {
+  .bikehub .teamed-up-with-bike-index strong {
+    display: block;
+  }
+}
+@media (max-width: 450px) {
+  .bikehub .teamed-up-with-bike-index .bikehub-high-five {
+    max-width: 50px;
   }
 }
