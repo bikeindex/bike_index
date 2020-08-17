@@ -46,12 +46,12 @@
                 %a.nav-link{ href:  new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
                   = t(".login")
 
-      .bikehub-signup-landing-page.bikehub-signup-page.landing-page
+      .landing-page
         %header.bikehub-banner-header
           .teamed-up-with-bike-index
             = image_tag "bikehub/high-five.svg", alt: "Bikehub and Bike Index together", class: "bikehub-high-five"
-            %h1
-              %strong We teamed up:
+            %h1= t(".teamed_up")
+            %p
               = t(".accounts_powered_by_bike_index")
 
 
@@ -63,10 +63,10 @@
           .col-xl-8.offset-xl-2.col-md-10.offset-md-1.bikehub-bottom-info
             %p
               %em
-                = t(".partnership")
+                = t(".non_profit")
             %p
               %em
-                = t(".non_profit")
+                = t(".partnership")
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
