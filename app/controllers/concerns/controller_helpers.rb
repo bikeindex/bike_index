@@ -302,9 +302,6 @@ module ControllerHelpers
   end
 
   def require_index_admin!
-    type = "full"
-    content_accessible = ["news"]
-    type = "content" if content_accessible.include?(controller_name)
     return true if current_user.present? && current_user.superuser?
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(user_root_url) && return
