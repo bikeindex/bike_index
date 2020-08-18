@@ -301,6 +301,16 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
+  # Mainly a testing method, because we were getting notifications that should have been resolved but weren't
+  # Can be removed when there are no longer resolved notifications without resolved_at
+  # see also parking_notifications.js#retrievedAtEl
+  def calculated_resolved_at
+    return resolved_at if resolved_at.present?
+    resolved_notification = associated_notifications_including_self.resolved.first
+    return nil unless resolved_notification.present?
+    resolved_notification.resolved_at.present? ? resolved_notification.resolved_at : resolved_notification.created_at
+  end
+
   private
 
   def calculated_unregistered_parking_notification
