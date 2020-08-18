@@ -4510,6 +4510,7 @@ en:
         internal_notes: Internal notes
         message: Message
         notification_number: Notification#
+        resolved: Resolved
       table:
         address: Address
         bike: Bike

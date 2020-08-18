@@ -108,6 +108,10 @@ class ParkingNotification < ActiveRecord::Base
     !active?
   end
 
+  def resolved_without_impounding?
+    resolved? && !impounded?
+  end
+
   def email_success?
     delivery_status == "email_success"
   end
@@ -299,6 +303,16 @@ class ParkingNotification < ActiveRecord::Base
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
     end
+  end
+
+  # Mainly a testing method, because we were getting notifications that should have been resolved but weren't
+  # Can be removed when there are no longer resolved notifications without resolved_at
+  # see also parking_notifications.js#retrievedAtEl
+  def calculated_resolved_at
+    return resolved_at if resolved_at.present?
+    resolved_notification = associated_notifications_including_self.resolved.first
+    return nil unless resolved_notification.present?
+    resolved_notification.resolved_at.present? ? resolved_notification.resolved_at : resolved_notification.created_at
   end
 
   private
