@@ -63,7 +63,7 @@ RSpec.describe CredibilityScorer do
         expect(instance.score).to eq 0
       end
       it "returns max score if above" do
-        allow(instance).to receive(:badges) { %i[user_ambassador created_5_years_ago] }
+        allow(instance).to receive(:badges) { %i[user_ambassador long_time_registration] }
         expect(instance.score).to eq 100
       end
     end
@@ -186,7 +186,7 @@ RSpec.describe CredibilityScorer do
         # It ignores that there is an ambassador in there
         expect(subject.bike_user_badges(bike)).to eq([:user_banned])
         # Also, just test for the full thing, because curiosity
-        expect(instance.badges).to eq([:created_5_years_ago, :multiple_ownerships, :current_ownership_claimed, :user_banned])
+        expect(instance.badges).to eq([:long_time_registration, :multiple_ownerships, :current_ownership_claimed, :user_banned])
         expect(instance.score).to eq(0)
       end
     end
@@ -195,7 +195,7 @@ RSpec.describe CredibilityScorer do
       it "returns veteran" do
         expect(subject.bike_user_badges(bike)).to eq([:long_time_user])
         # Also, just test for the full thing, because curiosity
-        expect(instance.badges).to eq([:created_5_years_ago, :current_ownership_claimed, :long_time_user])
+        expect(instance.badges).to eq([:long_time_registration, :current_ownership_claimed, :long_time_user])
       end
       context "veteran also ambassador" do
         let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
