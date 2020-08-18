@@ -66,8 +66,10 @@
             %strong.small.extended-col-info.d-block
               - if parking_notification.impounded?
                 Impounded:
-              - if parking_notification.retrieved?
+              - elsif parking_notification.retrieved?
                 Retrieved:
+              - else
+                Resolved
               %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 

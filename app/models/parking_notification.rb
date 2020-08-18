@@ -108,6 +108,10 @@ class ParkingNotification < ActiveRecord::Base
     !active?
   end
 
+  def resolved_without_impounding?
+    resolved? && !impounded?
+  end
+
   def email_success?
     delivery_status == "email_success"
   end

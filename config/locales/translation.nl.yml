@@ -4688,6 +4688,7 @@ nl:
         internal_notes: Interne notities
         message: Bericht
         notification_number: Kennisgeving#
+        resolved: Vastbesloten
     manages:
       location_fields:
         address: Adres

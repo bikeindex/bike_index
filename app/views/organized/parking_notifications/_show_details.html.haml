@@ -129,6 +129,20 @@
                   - else
                     = @parking_notification.initial_record_id
         %tr
+          %td= t(".resolved")
+          %td
+            - if @parking_notification.resolved?
+              %span.less-strong
+                - if @parking_notification.impounded?
+                  Impounded
+                - elsif @parking_notification.retrieved?
+                  Retrieved
+                - else
+                  Resolved
+              - if @parking_notification.resolved_at.present?
+                %span.convertTime
+                  = l(@parking_notification.resolved_at, format: :convert_time)
+        %tr
           %td= t(".message")
           %td= @parking_notification.message
         %tr
