@@ -3787,8 +3787,6 @@ nl:
     ambassadors_how_to:
       9_steps_for_getting_your_stolen_bike_back: 9 stappen om je gestolen fiets terug
         te krijgen
-      a_basic_package_of_materials_including_a_: Een basispakket met materialen, waaronder
-        een Bike Index-fietsmuts en stickers
       access_to_ambassadors_slack_channel_for_s: Toegang tot het slappe kanaal van
         ambassadeurs voor het delen van ideeën, tips en succesverhalen onder het Bike
         Index-team en andere ambassadeurs in het hele land en de wereld
@@ -4218,8 +4216,6 @@ nl:
         advocaten om herstelfietsen met hun eigenaars te verbinden.
       accounts_powered_by_bike_index: BikeHub-accounts worden mogelijk gemaakt door
         Bike Index - het belangrijkste fietsregister.
-      log_in_message: Als u hier inlogt, logt u in op BikeHub
-      sign_up_message: Als u zich hier aanmeldt, logt u in op BikeHub
   meta_descriptions:
     bikes_index: Zoeken naar fietsen die zijn geregistreerd op Bike Index
     bikes_new: Registreer een fiets snel, eenvoudig en gratis op Bike Index. Maak
@@ -5289,7 +5285,6 @@ nl:
       get_bike_indexs_newsletter: Ontvang Bike Index's nieuwsbrief
       get_on_bike_index: Ga op Bike Index
       log_in: Log in
-      or: of
       sign_up: Registreren
       sign_up_using_facebook: Meld je aan met Facebook
       sign_up_using_strava: Meld je aan met Strava
