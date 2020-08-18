@@ -133,7 +133,7 @@ module ApplicationHelper
       html_options[:class] += " active"
       span_content = direction == "asc" ? "\u2193" : "\u2191"
     end
-    link_to(sortable_search_params.merge(sort: column, direction: direction, query: params[:query]), html_options) do
+    link_to(sortable_search_params.merge(sort: column, direction: direction), html_options) do
       concat(title.html_safe)
       concat(content_tag(:span, span_content, class: "sortable-direction"))
     end
