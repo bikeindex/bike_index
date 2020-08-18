@@ -69,7 +69,7 @@
               - elsif parking_notification.retrieved?
                 Retrieved:
               - else
-                Resolved
+                Resolved:
               %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 

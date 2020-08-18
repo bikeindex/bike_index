@@ -16,7 +16,6 @@ ignore:
   - app/controllers/api/v3/search.rb
   - app/controllers/bikes/recovery_controller.rb
   - app/controllers/bikes_controller.rb
-  - app/controllers/concerns/controller_helpers.rb
   - app/controllers/org_public/customer_appointments_controller.rb
   - app/controllers/organized/ambassador_dashboards_controller.rb
   - app/controllers/organized/appointment_configurations_controller.rb
