@@ -1,6 +1,5 @@
 class Admin::ParkingNotificationsController < Admin::BaseController
   include SortableTable
-
   before_action :set_period, only: [:index]
 
   def index
@@ -26,6 +25,9 @@ class Admin::ParkingNotificationsController < Admin::BaseController
     if ParkingNotification.statuses.include?(params[:search_status])
       @search_status = params[:search_status]
       parking_notifications = parking_notifications.where(status: @search_status)
+    elsif %w[active resolved].include?(params[:search_status])
+      @search_status = params[:search_status]
+      parking_notifications = @search_status == "active" ? parking_notifications.active : parking_notifications.resolved
     else
       @search_status = "all"
     end

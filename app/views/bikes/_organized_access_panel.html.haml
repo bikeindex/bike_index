@@ -142,7 +142,7 @@
                   %tr
                     %td= t(".avery_exportable")
                     %td
-                      - if Export.avery_export_bike?(@bike)
+                      - if @bike.avery_exportable?
                         %span.text-success
                           = t(".is_true")
                       - else

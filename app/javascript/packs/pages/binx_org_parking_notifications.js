@@ -59,7 +59,7 @@ export default class BinxAppOrgParkingNotifications {
       .trim();
     const statusClass =
       status === "current"
-        ? "text-success"
+        ? ["current", "paging", "being_helped"].includes(status)
         : ["retrieved", "resolved_otherwise"].includes(status)
         ? "text-info"
         : ["removed", "impounded"].includes(status)
@@ -83,10 +83,14 @@ export default class BinxAppOrgParkingNotifications {
   retrievedAtEl(record) {
     if (record.impound_record_id === null) {
       return record.resolved_at
-        ? `<span class="convertTime preciseTime">${record.resolved_at}</span>`
+        ? `<small class="convertTime">${record.resolved_at}</small>`
         : "";
     }
-    return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="convertTime">${record.resolved_at}</a>`;
+    // TODO: remove this once there are no longer notifications missing resolved_at (see also parking_notification.rb#calculated_resolved_at)
+    if (record.resolved_at === null) {
+      return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="small">impounded</a>`;
+    }
+    return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="convertTime small">${record.resolved_at}</a>`;
   }
 
   mainTableCell(record, userLink) {

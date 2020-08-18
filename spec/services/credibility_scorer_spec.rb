@@ -46,6 +46,14 @@ RSpec.describe CredibilityScorer do
         expect(subject.badge_value(badge_array)).to eq(50)
       end
     end
+    context "with user_trusted_organization_member and creation_organization_trusted" do
+      let(:badge_array) { %i[user_trusted_organization_member creation_organization_trusted] }
+      it "it returns just creation_organization_trusted" do
+        expect(subject.permitted_badges_array(badge_array)).to eq([:creation_organization_trusted])
+        expect(subject.permitted_badges_hash(badge_array)).to eq({creation_organization_trusted: 20})
+        expect(subject.badge_value(badge_array)).to eq(20)
+      end
+    end
   end
 
   describe "bike badges and score" do
@@ -55,7 +63,7 @@ RSpec.describe CredibilityScorer do
         expect(instance.score).to eq 0
       end
       it "returns max score if above" do
-        allow(instance).to receive(:badges) { %i[user_ambassador created_5_years_ago] }
+        allow(instance).to receive(:badges) { %i[user_ambassador long_time_registration] }
         expect(instance.score).to eq 100
       end
     end
@@ -100,11 +108,11 @@ RSpec.describe CredibilityScorer do
           expect(instance.score).to eq 100
         end
       end
-      context "deleted organization, created_1_year_ago" do
+      context "deleted organization, long_time_registration" do
         let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: Time.current - 366.days) }
         let(:organization) { FactoryBot.create(:organization, approved: false) } # Organizations are verified by default
         it "returns with creation_organization_suspiscious" do
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :created_1_year_ago])
+          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
     end
@@ -117,23 +125,10 @@ RSpec.describe CredibilityScorer do
     end
     context "registered 2 years ago" do
       let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 1.day - 2.years, bike: bike) }
-      it "returns created_2_years_ago" do
-        expect(subject.creation_age_badge(creation_state)).to eq :created_2_years_ago
-        expect(subject.creation_badges(creation_state)).to eq([:created_2_years_ago])
-        expect(instance.score).to eq(70)
-      end
-    end
-    context "registered 4 years ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 4.years, bike: bike) }
-      it "returns created_3_years_ago" do
-        expect(subject.creation_badges(creation_state)).to eq([:created_3_years_ago])
-      end
-    end
-    context "registered 7 years ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 5.years, bike: bike) }
-      it "returns created_5_years_ago" do
-        expect(subject.creation_badges(creation_state)).to eq([:created_5_years_ago])
-        expect(instance.score).to eq(90)
+      it "returns long_time_registration" do
+        expect(subject.creation_age_badge(creation_state)).to eq :long_time_registration
+        expect(subject.creation_badges(creation_state)).to eq([:long_time_registration])
+        expect(instance.score).to eq(60)
       end
     end
   end
@@ -144,8 +139,8 @@ RSpec.describe CredibilityScorer do
     it "returns claimed" do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
-      # Also, general badges returns created_1_year_ago
-      expect(instance.badges).to match_array(%i[created_1_year_ago current_ownership_claimed])
+      # Also, general badges returns long_time_registration
+      expect(instance.badges).to match_array(%i[long_time_registration current_ownership_claimed])
     end
     context "multiple ownerships" do
       let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
@@ -156,8 +151,8 @@ RSpec.describe CredibilityScorer do
         expect(bike.current_ownership).to eq ownership2
         expect(ownership1.current?).to be_falsey
         expect(subject.ownership_badges(bike)).to eq([:multiple_ownerships])
-        # Also, general badges returns created_1_year_ago
-        expect(instance.badges).to match_array(%i[created_1_year_ago multiple_ownerships])
+        # Also, general badges returns long_time_registration
+        expect(instance.badges).to match_array(%i[long_time_registration multiple_ownerships])
       end
     end
   end
@@ -191,16 +186,16 @@ RSpec.describe CredibilityScorer do
         # It ignores that there is an ambassador in there
         expect(subject.bike_user_badges(bike)).to eq([:user_banned])
         # Also, just test for the full thing, because curiosity
-        expect(instance.badges).to eq([:created_5_years_ago, :multiple_ownerships, :current_ownership_claimed, :user_banned])
+        expect(instance.badges).to eq([:long_time_registration, :multiple_ownerships, :current_ownership_claimed, :user_banned])
         expect(instance.score).to eq(0)
       end
     end
-    describe "user_veteran" do
+    describe "long_time_user" do
       let(:user) { FactoryBot.create(:user, created_at: Time.current - 3.years) }
       it "returns veteran" do
-        expect(subject.bike_user_badges(bike)).to eq([:user_veteran])
+        expect(subject.bike_user_badges(bike)).to eq([:long_time_user])
         # Also, just test for the full thing, because curiosity
-        expect(instance.badges).to eq([:created_5_years_ago, :current_ownership_claimed, :user_veteran])
+        expect(instance.badges).to eq([:long_time_registration, :current_ownership_claimed, :long_time_user])
       end
       context "veteran also ambassador" do
         let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
@@ -210,14 +205,61 @@ RSpec.describe CredibilityScorer do
       end
     end
     describe "user_name_suspicious" do
-      it "returns user_name_suspicious"
-      context "user_handle_suspicious, user_veteran & strava" do
-        let(:user) { FactoryBot.create(:user, name: "") }
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
-        it "returns all"
+      let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
+      it "returns user_name_suspicious" do
+        expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
       end
-      context "ambassador" do
-        it "returns ambassador"
+      context "user is member of trusted organization" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+        it "returns just user_trusted_organization_member" do
+          expect(user.organizations.pluck(:id)).to eq([organization.id])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_trusted_organization_member])
+        end
+      end
+      context "user_handle_suspicious, long_time_user & strava" do
+        let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
+        let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
+        let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
+        let(:info) { JSON.parse(strava_file) }
+        let!(:integration) { FactoryBot.create(:integration, information: info) }
+        it "returns all" do
+          expect(user.integrations.pluck(:id)).to eq([integration.id])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :long_time_user, :user_connected_to_strava])
+        end
+        context "ambassador" do
+          let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
+          it "returns ambassador" do
+            expect(subject.bike_user_badges(bike)).to eq([:user_ambassador])
+          end
+        end
+      end
+    end
+  end
+
+  describe "suspiscious_handle?" do
+    ["shady-p@yahoo.com", "bike thief", "hoogivzzafudge5150@hotmail.co", "mj", "fuckyou@stuff.com", "cunt-edu"].each do |str|
+      it "is truthy for #{str}" do
+        expect(subject.suspiscious_handle?(str)).to be_truthy
+      end
+    end
+    # Things that might trip us up
+    ["Baller**", "696969 party"].each do |str|
+      it "is falsey for #{str}" do
+        expect(subject.suspiscious_handle?(str)).to be_falsey
+      end
+    end
+    context ".edu email address" do
+      let(:edu_email1) { "ncp5150@ccc7.edu" }
+      let(:edu_email2) { "shady@ccc7.edu" }
+      let(:edu_email3) { "asshole@ccc7.edu" }
+      let(:edu_email4) { "thief@ccc7.edu" }
+      it "ignores .edu email addresses, except thief" do
+        expect(subject.suspiscious_handle?(edu_email1)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email2)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email3)).to be_falsey
+        expect(subject.suspiscious_handle?(edu_email4)).to be_truthy
       end
     end
   end

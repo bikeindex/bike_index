@@ -153,19 +153,30 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.hidden).to be_truthy
       expect(bike.user_hidden).to be_truthy
       expect(parking_notification1.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_blank
+      expect(parking_notification1.calculated_resolved_at).to be_blank
       Sidekiq::Worker.clear_all
       parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
       expect(parking_notification2.unregistered_bike?).to be_truthy
+      expect(parking_notification2.resolved_at).to be_blank
+      expect(parking_notification2.calculated_resolved_at).to be_within(1).of parking_notification2.created_at
+      expect(parking_notification1.calculated_resolved_at).to be_within(1).of parking_notification2.created_at
       Sidekiq::Testing.inline! do
         parking_notification2.process_notification
       end
       bike.reload
       parking_notification2.reload
       expect(parking_notification2.impound_record).to be_present
+      expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
       expect(bike.status).to eq "status_impounded"
       expect(parking_notification2.unregistered_bike?).to be_truthy
       expect(bike.hidden).to be_falsey
       expect(bike.user_hidden).to be_falsey
+
+      parking_notification1.reload
+      expect(parking_notification1.resolved_at).to be_present
+      expect(parking_notification1.calculated_resolved_at).to eq parking_notification1.resolved_at
+      expect(parking_notification1.resolved_without_impounding?).to be_falsey
     end
   end
 
@@ -336,6 +347,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.resolved_at).to be_within(1.second).of Time.current
         expect(parking_notification.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification.retrieved_by).to eq user
+        expect(parking_notification.resolved_without_impounding?).to be_truthy
         expect(parking_notification.retrieval_link_token).to eq og_token # Why not leave it around
       end
       context "impounded" do

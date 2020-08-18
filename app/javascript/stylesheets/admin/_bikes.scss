@@ -33,10 +33,11 @@
 
 // Duplicates revised bikes/show.scss
 .credibility-score {
-  border: 2px solid rgba(black, 0.25);
+  border: 2px solid rgba(black, 0.15);
+  border-radius: 2px;
   display: flex;
   flex-wrap: wrap;
-  max-width: 500px;
+  max-width: 546px; // width of the org access panel in bikes/show
   margin-left: auto;
   .main-crediblity-score-box {
     position: relative;
@@ -67,6 +68,8 @@
     max-width: 60%;
     background: #fff;
     padding: 0;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
     .details-title {
       padding: 0.25rem 0.1rem 0.1rem;
       display: block;
@@ -76,7 +79,7 @@
       tr td {
         line-height: 1.5;
         border: 1px solid #eceeef;
-        padding: 4px 4px 4px 4px;
+        padding: 4px;
         &:last-child {
           width: 15%; // This is effectively min-width for tables
         }

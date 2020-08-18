@@ -123,11 +123,25 @@
                 = @parking_notification.notification_number
               %em.small.less-strong.ml-1
                 first notification sent
-                %a.convertTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
+                %a.convertTime.preciseTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
                   - if @parking_notification.initial_record.present?
                     = l(@parking_notification.initial_record.created_at, format: :convert_time)
                   - else
                     = @parking_notification.initial_record_id
+        %tr
+          %td= t(".resolved")
+          %td
+            - if @parking_notification.resolved?
+              %span.less-strong
+                - if @parking_notification.impounded?
+                  Impounded
+                - elsif @parking_notification.retrieved?
+                  Retrieved
+                - else
+                  Resolved
+              - if @parking_notification.resolved_at.present?
+                %span.convertTime
+                  = l(@parking_notification.resolved_at, format: :convert_time)
         %tr
           %td= t(".message")
           %td= @parking_notification.message

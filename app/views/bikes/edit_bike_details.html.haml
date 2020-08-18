@@ -90,7 +90,7 @@
           -# Only show the bike location fields if the bike isn't stolen
           - unless @bike.current_stolen_record.present?
             .related-fields.no-divider-row
-              .form-group.row.fancy-select-placeholder.unfancy
+              .form-group.row.fancy-select-placeholder.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
                 = f.label :country_id, class: 'form-well-label'
                 .form-well-input
                   = f.select :country_id, Country.select_options,
@@ -100,6 +100,18 @@
                 = f.label :city, class: 'form-well-label'
                 .form-well-input
                   = f.text_field :city, class: 'form-control', required: true, placeholder: t(".city")
+
+              - if @bike.state.present?
+                .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
+                  = f.label :state_id, class: 'form-well-label'
+                  .form-well-input
+                    = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
+
+              - if @bike.street.present? || @bike.creation_organization&.enabled?("reg_address")
+                .form-group.row
+                  = f.label :street, class: 'form-well-label'
+                  .form-well-input
+                    = f.text_field :street, class: 'form-control', required: true, placeholder: t(".street")
 
               .form-group.row
                 = f.label :zipcode, class: 'form-well-label'

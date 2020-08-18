@@ -177,59 +177,36 @@ $bikehub-text-color: #212529;
 
 .bikehub {
   .bikehub-banner-header {
-    background-image: image-url("landing_pages/header_bg_bike_hub.jpg");
-    background-size: auto 100%;
-    background-position: right center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    padding: 30px 0;
     border-bottom: 0px;
   }
 
   .teamed-up-with-bike-index {
+    @extend .clearfix;
     background: white;
     max-width: 675px;
     margin: 0 auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding: 15px;
     h1 {
-      font-size: 18px;
-      font-weight: bold;
+      @extend .uncap;
+      font-weight: normal;
       color: $bikehub-green;
-      text-align: center;
+      margin: 0.5rem 0 0.5rem;
+      line-height: 1.5;
+      font-size: 30px;
     }
-    img {
+    .bikehub-high-five {
       max-width: 100px;
       height: auto;
+      float: right;
+      margin-left: 1rem;
     }
     p {
-      font-size: 12px;
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-    }
-    .team-title-box {
-      @include media-breakpoint-down(md) {
-        display: flex;
-        padding-bottom: 20px;
-        h1,
-        .high-five-wrapper {
-          flex: 0 0 50%;
-        }
-        h1 {
-          padding-top: 36px;
-        }
-      }
+      margin-bottom: 0;
     }
   }
 
-  .bike-hub-login {
-    h2 {
-      color: $bikehub-green;
-      font-size: 22px;
-      text-align: center;
-      line-height: 34px;
-    }
+  .bikehub-bottom-info {
+    margin-top: 40px;
   }
 
   .sign-in-up-main-form-header {
@@ -252,6 +229,37 @@ $bikehub-text-color: #212529;
     &:active,
     &:focus {
       color: $bikehub-green-secondary;
+    }
+  }
+}
+
+@media (max-width: $grid-breakpoint-md) {
+  .bikehub .teamed-up-with-bike-index h1 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 501px) {
+  .bikehub .teamed-up-with-bike-index {
+    padding-bottom: 0;
+    .bikehub-high-five {
+      max-width: 50px;
+    }
+    p {
+      clear: both;
+    }
+  }
+}
+
+@media (min-width: 500px) {
+  .bikehub {
+    .bikehub-banner-header {
+      background-image: image-url("landing_pages/header_bg_bike_hub.jpg");
+      background-size: auto 100%;
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      padding: 30px 0;
     }
   }
 }

@@ -6,12 +6,12 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-                  :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert
+      :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
+      :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert
     before_action :enable_rack_profiler
 
     before_action do
-      if current_user.present?
+      if Rails.env.production? && current_user.present?
         Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
       end
     end
@@ -37,23 +37,23 @@ module ControllerHelpers
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
-      redirect_to accept_terms_url(subdomain: false) and return
+      redirect_to(accept_terms_url(subdomain: false)) && return
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
-      redirect_to please_confirm_email_users_path and return
+      redirect_to(please_confirm_email_users_path) && return
     else
       force_sign_up = params[:unauthenticated_redirect] == "sign_up"
       unless force_sign_up # Force signup doesn't show a flash message
         flash[flash_type] = translation(
           translation_key,
           **translation_args,
-          scope: [:controllers, :concerns, :controller_helpers, __method__],
+          scope: [:controllers, :concerns, :controller_helpers, __method__]
         )
       end
 
       if force_sign_up || translation_key.to_s.match?(/create.+account/)
-        redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
+        redirect_to(new_user_url(subdomain: false, partner: sign_in_partner)) && return
       else
-        redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return
+        redirect_to(new_session_url(subdomain: false, partner: sign_in_partner)) && return
       end
     end
   end
@@ -89,10 +89,10 @@ module ControllerHelpers
     return @show_general_alert = false if @skip_general_alert
     return @show_general_alert = false unless current_user.present? && current_user.general_alerts.any?
 
-    if %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
-      @show_general_alert = false
+    @show_general_alert = if %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
+      false
     else
-      @show_general_alert = true
+      true
     end
   end
 
@@ -122,15 +122,15 @@ module ControllerHelpers
       when "password_reset"
         flash[:success] =
           translation(:reset_your_password,
-                      scope: [:controllers, :concerns, :controller_helpers, __method__])
-        render action: :update_password and return true
+            scope: [:controllers, :concerns, :controller_helpers, __method__])
+        render(action: :update_password) && (return true)
       when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-        redirect_to(target) and return true
+        redirect_to(target) && (return true)
       when "https://facebook.com/bikeindex"
-        redirect_to(target) and return true
+        redirect_to(target) && (return true)
       end
     elsif session[:discourse_redirect]
-      redirect_to discourse_authentication_url and return true
+      redirect_to(discourse_authentication_url) && (return true)
     end
   end
 
@@ -218,8 +218,8 @@ module ControllerHelpers
     return ensure_member_of!(current_organization) if params[:organization_id].present?
     store_return_to
     flash[:notice] = translation(:please_sign_in,
-                                 scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to new_session_path and return
+      scope: [:controllers, :concerns, :controller_helpers, __method__])
+    redirect_to(new_session_path) && return
   end
 
   protected
@@ -292,42 +292,39 @@ module ControllerHelpers
   def require_member!
     return true if current_user.member_of?(current_organization)
     flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to my_account_url(subdomain: false) and return
+    redirect_to(my_account_url(subdomain: false)) && return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
     flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to my_account_url and return
+    redirect_to(my_account_url) && return
   end
 
   def require_index_admin!
-    type = "full"
-    content_accessible = ["news"]
-    type = "content" if content_accessible.include?(controller_name)
     return true if current_user.present? && current_user.superuser?
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to user_root_url and return
+    redirect_to(user_root_url) && return
   end
 
   def ensure_member_of!(passed_organization)
-    if current_user && current_user.member_of?(passed_organization)
+    if current_user&.member_of?(passed_organization)
       return true if current_user.accepted_vendor_terms_of_service?
       flash[:success] = translation(:accept_tos_for_orgs,
-                                    scope: [:controllers, :concerns, :controller_helpers, __method__])
-      redirect_to accept_vendor_terms_path and return
+        scope: [:controllers, :concerns, :controller_helpers, __method__])
+      redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,
-                                   scope: [:controllers, :concerns, :controller_helpers, __method__])
+        scope: [:controllers, :concerns, :controller_helpers, __method__])
       store_return_to
       set_passive_organization(passed_organization)
       sign_in_path = passed_organization.enabled?("passwordless_users") ? magic_link_session_path : new_session_path
-      redirect_to sign_in_path and return
+      redirect_to(sign_in_path) && return
     end
     set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
     flash[:error] = translation(:not_a_member_of_that_org,
-                                scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to user_root_url and return
+      scope: [:controllers, :concerns, :controller_helpers, __method__])
+    redirect_to(user_root_url) && return
   end
 
   def invalid_return_to?(target)
@@ -339,7 +336,7 @@ module ControllerHelpers
   def bikehub_url(path)
     [
       ENV["BIKEHUB_URL"].presence || "https://parkit.bikehub.com",
-      path,
+      path
     ].join("/")
   end
 
@@ -368,7 +365,8 @@ module ControllerHelpers
     @end_time ||= latest_period_date
   end
 
-  def default_period # Separate method so it can be overridden on per controller basis
+  # Separate method so it can be overridden on per controller basis
+  def default_period
     "all"
   end
 
@@ -377,7 +375,8 @@ module ControllerHelpers
     Time.current
   end
 
-  def earliest_period_date # Separate method so it can be overridden on per controller basis
+  # Separate method so it can be overridden on per controller basis
+  def earliest_period_date
     if current_organization.present?
       @start_time = current_organization.created_at
       @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)

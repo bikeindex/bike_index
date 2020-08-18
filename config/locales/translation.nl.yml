@@ -1788,6 +1788,8 @@ nl:
       zipcode: Postcode
       choose_country: Kies land
       city: City
+      state: Staat
+      street: Straat
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
@@ -2088,7 +2090,6 @@ nl:
       link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
       at: bij
-      bike_in_admin: "%{bike_type} in Admin"
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
       componentcmodel_name: "%{componentcmodel_name}"
@@ -3640,6 +3641,8 @@ nl:
         wegwijzers kunnen gemakkelijk worden verwijderd door ze los te maken en sommige
         zijn al niet bevestigd.
       use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens € 40 kost.
+      checkout_out_bestbikelock_html: "- ga naar %{link} voor aanbevelingen over de
+        beste sloten."
     resources:
       api_documentation: API-documentatie
       bike_index_resources: Bike Index middelen
@@ -3784,8 +3787,6 @@ nl:
     ambassadors_how_to:
       9_steps_for_getting_your_stolen_bike_back: 9 stappen om je gestolen fiets terug
         te krijgen
-      a_basic_package_of_materials_including_a_: Een basispakket met materialen, waaronder
-        een Bike Index-fietsmuts en stickers
       access_to_ambassadors_slack_channel_for_s: Toegang tot het slappe kanaal van
         ambassadeurs voor het delen van ideeën, tips en succesverhalen onder het Bike
         Index-team en andere ambassadeurs in het hele land en de wereld
@@ -4215,8 +4216,6 @@ nl:
         advocaten om herstelfietsen met hun eigenaars te verbinden.
       accounts_powered_by_bike_index: BikeHub-accounts worden mogelijk gemaakt door
         Bike Index - het belangrijkste fietsregister.
-      log_in_message: Als u hier inlogt, logt u in op BikeHub
-      sign_up_message: Als u zich hier aanmeldt, logt u in op BikeHub
   meta_descriptions:
     bikes_index: Zoeken naar fietsen die zijn geregistreerd op Bike Index
     bikes_new: Registreer een fiets snel, eenvoudig en gratis op Bike Index. Maak
@@ -4448,8 +4447,6 @@ nl:
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
         model: Model
         only_no_sticker_html: Alleen <strong>geen</strong> sticker
-        only_not: alleen niet
-        only_with: alleen met
         only_with_stickers_html: Alleen <strong>met</strong> stickers
         owner_name: Eigenaar naam
         registered: Geregistreerd
@@ -4469,6 +4466,10 @@ nl:
         visible_columns: Zichtbare kolommen
         email_hidden: email verborgen
         impounded: In beslag genomen bij
+        address: 'Adres:'
+        avery: Avery?
+        only_no_address_html: Alleen <strong>geen</strong> adres
+        only_with_address_html: Alleen <strong>met</strong> adres
     bulk_imports:
       index:
         added: Toegevoegd
@@ -4687,6 +4688,7 @@ nl:
         internal_notes: Interne notities
         message: Bericht
         notification_number: Kennisgeving#
+        resolved: Vastbesloten
     manages:
       location_fields:
         address: Adres
@@ -5058,6 +5060,7 @@ nl:
       who_we_serve: Wie we dienen
       change_preferred_language: voorkeurstaal wijzigen
       security: veiligheid
+      protect_your_bike: Bescherm je fiets
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -5283,7 +5286,6 @@ nl:
       get_bike_indexs_newsletter: Ontvang Bike Index's nieuwsbrief
       get_on_bike_index: Ga op Bike Index
       log_in: Log in
-      or: of
       sign_up: Registreren
       sign_up_using_facebook: Meld je aan met Facebook
       sign_up_using_strava: Meld je aan met Strava

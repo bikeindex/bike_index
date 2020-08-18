@@ -66,9 +66,11 @@
             %strong.small.extended-col-info.d-block
               - if parking_notification.impounded?
                 Impounded:
-              - if parking_notification.retrieved?
+              - elsif parking_notification.retrieved?
                 Retrieved:
-              %small.convertTime.preciseTime
+              - else
+                Resolved:
+              %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 
         - if render_address
@@ -96,10 +98,14 @@
         - unless skip_resolved
           %td.hidden-sm-cells.status-cell
             - if parking_notification.impound_record_id.present?
-              %a.convertTime.preciseTime{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) }
-                = l(parking_notification.resolved_at, format: :convert_time)
+              - resolved_at = parking_notification.calculated_resolved_at
+              %a.small{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id), class: (resolved_at.present? ? "convertTime" : "") }
+                - if resolved_at.present?
+                  = l(resolved_at, format: :convert_time)
+                - else
+                  impounded
             - elsif parking_notification.resolved_at.present?
-              %span.convertTime.preciseTime
+              %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
 
         - unless skip_multiselect
