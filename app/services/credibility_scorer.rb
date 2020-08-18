@@ -13,10 +13,7 @@ class CredibilityScorer
       creation_organization_trusted: 20,
       creation_organization_suspicious: -10,
       created_this_month: -10,
-      created_1_year_ago: 10,
-      created_2_years_ago: 20,
-      created_3_years_ago: 30,
-      created_5_years_ago: 40
+      long_time_registration: 10
     },
 
     ownership: {
@@ -27,7 +24,7 @@ class CredibilityScorer
     user: {
       user_ambassador: 50,
       user_trusted_organization_member: 20,
-      user_veteran: 10,
+      long_time_user: 10,
       user_connected_to_strava: 10,
       user_handle_suspicious: -20
     },
@@ -106,7 +103,7 @@ class CredibilityScorer
     return [:user_ambassador] if user.ambassador?
     return [:user_trusted_organization_member] if user.organizations.any? { |o| organization_trusted?(o) }
     badges = []
-    badges += [:user_veteran] if user.created_at < Time.current - 2.years
+    badges += [:long_time_user] if user.created_at < Time.current - 2.years
     badges += [:user_connected_to_strava] if user.integrations.strava.any?
     badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }
     badges
@@ -118,17 +115,8 @@ class CredibilityScorer
   #
 
   def self.creation_age_badge(obj)
-    if obj.created_at > Time.current - 1.year
-      obj.created_at > Time.current - 1.month ? :created_this_month : nil
-    elsif obj.created_at > Time.current - 2.years
-      :created_1_year_ago
-    elsif obj.created_at > Time.current - 3.years
-      :created_2_years_ago
-    elsif obj.created_at > Time.current - 5.years
-      :created_3_years_ago
-    else
-      :created_5_years_ago
-    end
+    return :long_time_registration if obj.created_at < Time.current - 1.year
+    obj.created_at > Time.current - 1.month ? :created_this_month : nil
   end
 
   def self.organization_suspicious?(organization)

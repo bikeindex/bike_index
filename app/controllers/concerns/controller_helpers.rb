@@ -11,7 +11,7 @@ module ControllerHelpers
     before_action :enable_rack_profiler
 
     before_action do
-      if current_user.present?
+      if Rails.env.production? && current_user.present?
         Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
       end
     end

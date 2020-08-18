@@ -108,11 +108,11 @@ RSpec.describe CredibilityScorer do
           expect(instance.score).to eq 100
         end
       end
-      context "deleted organization, created_1_year_ago" do
+      context "deleted organization, long_time_registration" do
         let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: Time.current - 366.days) }
         let(:organization) { FactoryBot.create(:organization, approved: false) } # Organizations are verified by default
         it "returns with creation_organization_suspiscious" do
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :created_1_year_ago])
+          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
     end
@@ -125,23 +125,10 @@ RSpec.describe CredibilityScorer do
     end
     context "registered 2 years ago" do
       let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 1.day - 2.years, bike: bike) }
-      it "returns created_2_years_ago" do
-        expect(subject.creation_age_badge(creation_state)).to eq :created_2_years_ago
-        expect(subject.creation_badges(creation_state)).to eq([:created_2_years_ago])
-        expect(instance.score).to eq(70)
-      end
-    end
-    context "registered 4 years ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 4.years, bike: bike) }
-      it "returns created_3_years_ago" do
-        expect(subject.creation_badges(creation_state)).to eq([:created_3_years_ago])
-      end
-    end
-    context "registered 7 years ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 5.years, bike: bike) }
-      it "returns created_5_years_ago" do
-        expect(subject.creation_badges(creation_state)).to eq([:created_5_years_ago])
-        expect(instance.score).to eq(90)
+      it "returns long_time_registration" do
+        expect(subject.creation_age_badge(creation_state)).to eq :long_time_registration
+        expect(subject.creation_badges(creation_state)).to eq([:long_time_registration])
+        expect(instance.score).to eq(60)
       end
     end
   end
@@ -152,8 +139,8 @@ RSpec.describe CredibilityScorer do
     it "returns claimed" do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
-      # Also, general badges returns created_1_year_ago
-      expect(instance.badges).to match_array(%i[created_1_year_ago current_ownership_claimed])
+      # Also, general badges returns long_time_registration
+      expect(instance.badges).to match_array(%i[long_time_registration current_ownership_claimed])
     end
     context "multiple ownerships" do
       let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
@@ -164,8 +151,8 @@ RSpec.describe CredibilityScorer do
         expect(bike.current_ownership).to eq ownership2
         expect(ownership1.current?).to be_falsey
         expect(subject.ownership_badges(bike)).to eq([:multiple_ownerships])
-        # Also, general badges returns created_1_year_ago
-        expect(instance.badges).to match_array(%i[created_1_year_ago multiple_ownerships])
+        # Also, general badges returns long_time_registration
+        expect(instance.badges).to match_array(%i[long_time_registration multiple_ownerships])
       end
     end
   end
@@ -203,12 +190,12 @@ RSpec.describe CredibilityScorer do
         expect(instance.score).to eq(0)
       end
     end
-    describe "user_veteran" do
+    describe "long_time_user" do
       let(:user) { FactoryBot.create(:user, created_at: Time.current - 3.years) }
       it "returns veteran" do
-        expect(subject.bike_user_badges(bike)).to eq([:user_veteran])
+        expect(subject.bike_user_badges(bike)).to eq([:long_time_user])
         # Also, just test for the full thing, because curiosity
-        expect(instance.badges).to eq([:created_5_years_ago, :current_ownership_claimed, :user_veteran])
+        expect(instance.badges).to eq([:created_5_years_ago, :current_ownership_claimed, :long_time_user])
       end
       context "veteran also ambassador" do
         let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
@@ -230,7 +217,7 @@ RSpec.describe CredibilityScorer do
           expect(subject.bike_user_badges(bike)).to match_array([:user_trusted_organization_member])
         end
       end
-      context "user_handle_suspicious, user_veteran & strava" do
+      context "user_handle_suspicious, long_time_user & strava" do
         let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
         let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
         let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
@@ -239,7 +226,7 @@ RSpec.describe CredibilityScorer do
         let!(:integration) { FactoryBot.create(:integration, information: info) }
         it "returns all" do
           expect(user.integrations.pluck(:id)).to eq([integration.id])
-          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :user_veteran, :user_connected_to_strava])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :long_time_user, :user_connected_to_strava])
         end
         context "ambassador" do
           let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
