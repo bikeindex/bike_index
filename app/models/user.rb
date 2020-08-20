@@ -52,13 +52,13 @@ class User < ApplicationRecord
 
   validates :password,
     presence: true,
-    length: {within: 6..100},
+    length: {within: 12..100},
     on: :create
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
 
   validates :password,
     confirmation: true,
-    length: {within: 6..100},
+    length: {within: 12..100},
     allow_blank: true,
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
