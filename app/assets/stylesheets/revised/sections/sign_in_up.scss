@@ -2,6 +2,17 @@ $facebook-login-color: #3c5a99;
 $strava-login-color: #fc4c02;
 $sign-in-up-form-bg: $gray-lighter;
 
+// Used by everywhere that does password reset
+.password-help-text {
+  @extend .below-input-help;
+  a {
+    text-decoration: underline;
+    // Necessary to override the styles from the sign up form
+    font-weight: normal !important;
+    color: $gray-light !important;
+  }
+}
+
 @mixin oauth-login-bar(
   $oauth-login-bg,
   $oauth-login-bg-hover: darken($oauth-login-bg, 7%)

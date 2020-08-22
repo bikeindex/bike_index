@@ -5219,6 +5219,9 @@ nl:
       new_password: Nieuw wachtwoord
       new_password_confirmation: Bevestiging van nieuwe wachtwoord
       reset_password: Reset wachtwoord
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
     edit_root:
       add_additional_email: Voeg extra e-mail toe
       additional_email: Extra E-mail
@@ -5291,6 +5294,9 @@ nl:
       sign_up_using_strava: Meld je aan met Strava
       terms_and_conditions: Termen en voorwaarden
       sign_up_using_globalid: Meld u aan met globaliD
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
     password_reset:
       follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
         in te stellen!
@@ -5327,6 +5333,9 @@ nl:
       password_confirmation: Wachtwoord bevestigen
       update_password: password-update
       update_your_password: Update uw wachtwoord
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
   welcome:
     choose_registration:
       add_a_bike_through: Voeg een fiets toe door

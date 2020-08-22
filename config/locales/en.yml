@@ -5261,9 +5261,12 @@ en:
       save_changes: Save changes
       you_are_editing: You are editing
     edit_password:
+      better_password: better
       for_password_update: For password update
       new_password: New Password
       new_password_confirmation: New Password confirmation
+      password_helper_text_html: Password must be at least 12 characters. Longer is
+        %{better_password_link}.
       reset_password: Reset password
     edit_root:
       add_additional_email: Add additional email
@@ -5329,9 +5332,12 @@ en:
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
       already_have_a_bike_index_account: Already have a Bike Index account?
       already_have_an_account: already have an account?
+      better_password: better
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index
       log_in: log in
+      password_helper_text_html: Password must be at least 12 characters. Longer is
+        %{better_password_link}.
       sign_up: Sign up
       sign_up_using_facebook: Sign up using Facebook
       sign_up_using_globalid: Sign up using globaliD
@@ -5370,9 +5376,12 @@ en:
       this_users_bikes: This user's bikes
     update_password:
       and_try_not_to_forget_it: and try not to forget it...
+      better_password: better
       choose_a_new_password: Choose a new password!
       password: Password
       password_confirmation: Password confirmation
+      password_helper_text_html: Password must be at least 12 characters. Longer is
+        %{better_password_link}.
       update_password: Update password
       update_your_password: Update your password
   views:
