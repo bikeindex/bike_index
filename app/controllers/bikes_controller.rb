@@ -5,6 +5,7 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:create]
   before_action :sign_in_if_not!, only: [:show]
   before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
@@ -112,7 +113,7 @@ class BikesController < ApplicationController
 
   def create
     find_or_new_b_param
-    if params[:bike][:embeded]
+    if params[:bike][:embeded] # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -139,7 +140,7 @@ class BikesController < ApplicationController
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
-    else
+    elsif verified_request?
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
@@ -152,6 +153,9 @@ class BikesController < ApplicationController
         flash[:success] = translation(:bike_was_added)
         redirect_to edit_bike_url(@bike)
       end
+    else
+      flash[:error] = "Unable to verify request, please sign in again"
+      redirect_back(fallback_location: user_root_url)
     end
   end
 
