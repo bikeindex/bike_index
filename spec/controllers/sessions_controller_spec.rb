@@ -229,6 +229,24 @@ RSpec.describe SessionsController, type: :controller do
             expect(user.last_login_ip).to eq "66.66.66.66"
           end
         end
+        context "password that's too short" do
+          # Prior to #1738 password requirement was 8 characters.
+          # Ensure users who had valid passwords for the previous requirements can still log in
+          it "still logs in" do
+            user.update_attribute :password, "old_pass"
+            expect(user.reload.authenticate("old_pass")).to be_truthy
+            expect(user).to receive(:authenticate).and_return(true)
+            request.env["HTTP_CF_CONNECTING_IP"] = "192.168.1.644"
+            post :create, params: {session: {password: "would be correct"}}
+            expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+            expect(User.from_auth(cookies.signed[:auth])).to eq user
+            expect(response).to redirect_to my_account_url
+            expect(session[:partner]).to be_nil
+            user.reload
+            expect(user.last_login_at).to be_within(1.second).of Time.current
+            expect(user.last_login_ip).to eq "192.168.1.644"
+          end
+        end
 
         context "admin" do
           let(:user) { FactoryBot.create(:admin) }
