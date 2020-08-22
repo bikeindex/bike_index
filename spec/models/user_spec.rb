@@ -62,7 +62,7 @@ RSpec.describe User, type: :model do
         subject.password = "hi"
         subject.password_confirmation = "hi"
         expect(subject.valid?).to be_falsey
-        expect(subject.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
+        expect(subject.errors.messages[:password].include?("is too short (minimum is 12 characters)")).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
@@ -135,10 +135,10 @@ RSpec.describe User, type: :model do
       end
 
       it "requires at least 8 characters for the password" do
-        @user.password = "hi"
-        @user.password_confirmation = "hi"
+        @user.password = "please12"
+        @user.password_confirmation = "please12"
         expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
+        expect(@user.errors.messages[:password].include?("is too short (minimum is 12 characters)")).to be_truthy
       end
 
       it "makes sure there is at least one letter" do

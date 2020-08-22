@@ -138,7 +138,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:organization) { membership.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
-        let(:user_attributes) { {email: email, name: "SAMPLE", password: "please12", terms_of_service: "1", notification_newsletters: "0"} }
+        let(:user_attributes) { {email: email, name: "SAMPLE", password: "pleaseplease12", terms_of_service: "1", notification_newsletters: "0"} }
 
         it "creates a confirmed user, logs in, and send welcome even with an example bike" do
           expect(session[:passive_organization_id]).to be_blank
@@ -545,7 +545,7 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe "update" do
-    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
+    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_password", password_confirmation: "old_password", username: "something") }
     context "nil username" do
       it "doesn't update username" do
         user.reload
@@ -563,11 +563,11 @@ RSpec.describe UsersController, type: :controller do
       post :update, params: {
         id: user.username,
         user: {
-          password: "new_pass",
-          password_confirmation: "new_pass"
+          password: "new_password",
+          password_confirmation: "new_password"
         }
       }
-      expect(user.reload.authenticate("new_pass")).to be_falsey
+      expect(user.reload.authenticate("new_password")).to be_falsey
     end
 
     it "doesn't update user if password doesn't match" do
@@ -575,13 +575,13 @@ RSpec.describe UsersController, type: :controller do
       post :update, params: {
         id: user.username,
         user: {
-          current_password: "old_pass",
-          password: "new_pass",
+          current_password: "old_password",
+          password: "new_password",
           name: "Mr. Slick",
-          password_confirmation: "new_passd"
+          password_confirmation: "new_passwordd"
         }
       }
-      expect(user.reload.authenticate("new_pass")).to be_falsey
+      expect(user.reload.authenticate("new_password")).to be_falsey
       expect(user.name).not_to eq("Mr. Slick")
     end
 
@@ -596,11 +596,11 @@ RSpec.describe UsersController, type: :controller do
         user: {
           email: "cool_new_email@something.com",
           password_reset_token: user.password_reset_token,
-          password: "new_pass",
-          password_confirmation: "new_pass"
+          password: "new_password",
+          password_confirmation: "new_password"
         }
       }
-      expect(user.reload.authenticate("new_pass")).to be_truthy
+      expect(user.reload.authenticate("new_password")).to be_truthy
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq("stuff")
       expect(user.auth_token).not_to eq(auth)
@@ -619,13 +619,13 @@ RSpec.describe UsersController, type: :controller do
         id: user.username,
         user: {
           password_reset_token: "something_else",
-          password: "new_pass",
-          password_confirmation: "new_pass"
+          password: "new_password",
+          password_confirmation: "new_password"
         }
       }
       expect(response).to_not redirect_to(edit_my_account_url)
       expect(flash[:error]).to be_present
-      expect(user.reload.authenticate("new_pass")).to be_falsey
+      expect(user.reload.authenticate("new_password")).to be_falsey
       expect(user.password_reset_token).to eq(reset)
     end
 
@@ -639,21 +639,21 @@ RSpec.describe UsersController, type: :controller do
         id: user.username,
         user: {
           password_reset_token: user.password_reset_token,
-          password: "new_pass",
-          password_confirmation: "new_pass"
+          password: "new_password",
+          password_confirmation: "new_password"
         }
       }
 
       expect(response).to_not redirect_to(edit_my_account_url)
       expect(flash[:error]).to be_present
-      expect(user.authenticate("new_pass")).not_to be_truthy
+      expect(user.authenticate("new_password")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq("stuff")
       expect(response.cookies[:auth]).to eq(nil)
     end
 
     it "resets users auth if password changed, updates current session" do
-      user = FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", password_reset_token: "stuff")
+      user = FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_password", password_confirmation: "old_password", password_reset_token: "stuff")
       auth = user.auth_token
       email = user.email
       set_current_user(user)
@@ -661,15 +661,15 @@ RSpec.describe UsersController, type: :controller do
         id: user.username,
         user: {
           email: "cool_new_email@something.com",
-          current_password: "old_pass",
-          password: "new_pass",
+          current_password: "old_password",
+          password: "new_password",
           name: "Mr. Slick",
-          password_confirmation: "new_pass"
+          password_confirmation: "new_password"
         }
       }
       expect(response).to redirect_to(edit_my_account_url)
       expect(flash[:error]).to_not be_present
-      expect(user.reload.authenticate("new_pass")).to be_truthy
+      expect(user.reload.authenticate("new_password")).to be_truthy
       expect(user.auth_token).not_to eq(auth)
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq("stuff")

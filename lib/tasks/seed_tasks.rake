@@ -4,11 +4,11 @@
 desc "Seed test users & 50 text bikes for user@example on first organization"
 task seed_test_users_and_bikes: :environment do
   user_attrs = {
-    admin: {name: "admin", email: "admin@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true, superuser: true},
-    member: {name: "member", email: "member@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true},
-    user: {name: "user", email: "user@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true},
-    api_accessor: {name: "Api Accessor", email: "api@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true},
-    example_user: {name: "Example user", email: "example_user@bikeindex.org", password: "please12", password_confirmation: "please12", terms_of_service: true}
+    admin: {name: "admin", email: "admin@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, superuser: true},
+    member: {name: "member", email: "member@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    user: {name: "user", email: "user@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    api_accessor: {name: "Api Accessor", email: "api@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    example_user: {name: "Example user", email: "example_user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true}
   }
 
   user_attrs.values.each do |attributes|

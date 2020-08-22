@@ -39,7 +39,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 This explanation assumes you're familiar with developing Ruby on Rails applications.
 
 - `bin/setup` sets up the application and seeds:
-  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
+  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
 - `./start` start the server.
@@ -64,7 +64,7 @@ For running you need to have [docker](https://docs.docker.com/engine/install/) a
   - Starts all servers (you need to setup the application on the first time, see bellow)
 
 - `docker-compose run app bin/setup` sets up the application and seeds:
-  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
+  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
 - Add `docker-compose run app` before any other rails command, f.e.:
