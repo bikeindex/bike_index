@@ -3,7 +3,7 @@
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
 
-- unless current_user.developer?
+- unless current_user.developer? && params[:hide_dev].blank?
   <style>.bikeTable .only-dev-visible { display: none !important; }</style>
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
@@ -45,17 +45,16 @@
                       = bike.id
                   - else
                     = bike.id
+              - if bike.deleted?
+                .small.text-danger
+                  Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
             %td.d-none.d-md-table-cell
-              %span{ class: (bike.deleted? ? "less-strong-hold small" : "") }
-                = bike.owner_email
-                - if bike.user?
-                  - if bike.owner.donor?
-                    <span class="donor-icon">D</span>
-                  - elsif bike.owner.paid_org?
-                    <span class="paid-org-icon">O</span>
-                - if bike.deleted?
-                  %span.text-warning.less-strong-right
-                    deleted
+              = bike.owner_email
+              - if bike.user?
+                - if bike.owner.donor?
+                  <span class="donor-icon">D</span>
+                - elsif bike.owner.paid_org?
+                  <span class="paid-org-icon">O</span>
             %td
               - if bike.manufacturer_other.present?
                 %span.text-warning
