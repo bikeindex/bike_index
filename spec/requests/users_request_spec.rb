@@ -85,6 +85,7 @@ RSpec.describe UsersController, type: :request do
   end
 
   describe "update password" do
+    include_context :request_spec_logged_in_as_user
     context "previous password was too short" do
       # Prior to #1738 password requirement was 8 characters.
       # Ensure users who had valid passwords for the previous requirements can update their password
@@ -102,7 +103,7 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to edit_my_account_path
         expect(flash[:success]).to be_present
         current_user.reload
-        expect(user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
+        expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
       end
     end
   end
