@@ -6,7 +6,7 @@ RSpec.describe RegistrationsController, type: :controller do
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do
     expect(response.status).to eq(200)
-    expect(response.headers["X-Frame-Options"]).to eq "None"
+    expect(response.headers["X-Frame-Options"]).to eq "SameSite=None"
     expect(flash).to_not be_present
   end
   describe "new" do

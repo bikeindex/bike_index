@@ -76,7 +76,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new_iframe
         expect(assigns(:current_organization)).to eq organization
-        expect(response.headers["X-Frame-Options"]).to eq "None"
+        expect(response.headers["X-Frame-Options"]).to eq "SameSite=None"
       end
     end
 
@@ -102,7 +102,7 @@ RSpec.describe Organized::BikesController, type: :controller do
             post :create, params: {bike: attrs, organization_id: organization.to_param}
           }.to change(Bike, :count).by 1
         end
-        expect(response.headers["X-Frame-Options"]).to eq "None"
+        expect(response.headers["X-Frame-Options"]).to eq "SameSite=None"
 
         b_param = BParam.reorder(:created_at).last
         expect(b_param.owner_email).to eq attrs[:owner_email]
