@@ -76,7 +76,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new_iframe
         expect(assigns(:current_organization)).to eq organization
-        expect(response.headers["X-Frame-Options"]).to eq "None"
+        expect(response.headers["X-Frame-Options"]).to eq "SameSite=None"
       end
     end
 
@@ -102,7 +102,7 @@ RSpec.describe Organized::BikesController, type: :controller do
             post :create, params: {bike: attrs, organization_id: organization.to_param}
           }.to change(Bike, :count).by 1
         end
-        expect(response.headers["X-Frame-Options"]).to eq "None"
+        expect(response.headers["X-Frame-Options"]).to eq "SameSite=None"
 
         b_param = BParam.reorder(:created_at).last
         expect(b_param.owner_email).to eq attrs[:owner_email]
@@ -167,10 +167,10 @@ RSpec.describe Organized::BikesController, type: :controller do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_sticker?).to be_truthy
-            get :index, params: {organization_id: organization.to_param, search_stickers: "none"}
+            get :index, params: {organization_id: organization.to_param, search_stickers: "SameSite=None"}
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_stickers)).to eq "none"
+            expect(assigns(:search_stickers)).to eq "SameSite=None"
             expect(assigns(:bikes).pluck(:id)).to eq([])
             expect(session[:passive_organization_id]).to eq organization.id
           end

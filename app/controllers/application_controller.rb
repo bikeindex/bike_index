@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permit_cross_site_iframe!
-    headers["X-Frame-Options"] = "None" # Quick hack, see if this works
+    headers["X-Frame-Options"] = "SameSite=None" # Quick hack, see if this works
   end
 
   # If this is a preflight OPTIONS request, then short-circuit the
