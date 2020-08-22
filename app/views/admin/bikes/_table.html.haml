@@ -46,12 +46,16 @@
                   - else
                     = bike.id
             %td.d-none.d-md-table-cell
-              = bike.owner_email
-              - if bike.user?
-                - if bike.owner.donor?
-                  <span class="donor-icon">D</span>
-                - elsif bike.owner.paid_org?
-                  <span class="paid-org-icon">O</span>
+              %span{ class: (bike.deleted? ? "less-strong-hold small" : "") }
+                = bike.owner_email
+                - if bike.user?
+                  - if bike.owner.donor?
+                    <span class="donor-icon">D</span>
+                  - elsif bike.owner.paid_org?
+                    <span class="paid-org-icon">O</span>
+                - if bike.deleted?
+                  %span.text-warning.less-strong-right
+                    deleted
             %td
               - if bike.manufacturer_other.present?
                 %span.text-warning
