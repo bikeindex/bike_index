@@ -1,6 +1,7 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+    before_action :permit_cross_site_iframe!, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
@@ -67,7 +68,7 @@ module Organized
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
-        if params[:bike][:image].present? # Have to do in the controller, before assigning
+        if params.dig(:bike, :image).present? # Have to do in the controller, before assigning
           @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
         end
         # we handle filtering & coercion in BParam, just create it with whatever here
@@ -101,7 +102,7 @@ module Organized
       phash = params.as_json
       {
         origin: "organization_form",
-        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id))
+        params: phash.merge("bike" => phash["bike"].merge("creation_organization_id" => current_organization.id))
       }
     end
 

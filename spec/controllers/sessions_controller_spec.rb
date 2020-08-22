@@ -208,6 +208,7 @@ RSpec.describe SessionsController, type: :controller do
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           user.reload
+          expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
           expect(user.last_login_at).to be_within(1.second).of Time.current
           expect(user.last_login_ip).to eq "66.66.66.66"
         end

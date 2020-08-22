@@ -9,7 +9,7 @@ RSpec.describe UserEmbedsController, type: :controller do
       expect(response.code).to eq("200")
       expect(assigns(:bikes).first).to eq(ownership.bike)
       expect(assigns(:bikes).count).to eq(1)
-      expect(response.headers["X-Frame-Options"]).not_to be_present
+      expect(response.headers["X-Frame-Options"]).to eq "None"
     end
 
     it "renders the most recent bikes with images if it doesn't find the user" do
@@ -21,7 +21,7 @@ RSpec.describe UserEmbedsController, type: :controller do
       get :show, params: {id: "NOT A USER"}
       expect(response.code).to eq("200")
       expect(assigns(:bikes).count).to eq(1)
-      expect(response.headers["X-Frame-Options"]).not_to be_present
+      expect(response.headers["X-Frame-Options"]).to eq "None"
     end
   end
 end
