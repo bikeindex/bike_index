@@ -155,7 +155,7 @@ class BikesController < ApplicationController
       end
     else
       flash[:error] = "Unable to verify request, please sign in again"
-      redirect to user_root_url && return
+      redirect_back(fallback_location: user_root_url)
     end
   end
 
