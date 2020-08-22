@@ -554,11 +554,11 @@ RSpec.describe BikesController, type: :controller do
           expect {
             post :create, params: {bike: bike_params}
           }.to change(Ownership, :count).by 1
-          bike = Bike.last
+          bike = Bike.reorder(:created_at).last
           expect(bike.country.name).to eq("United States")
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
-          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.creation_state.creator).to eq organization.auto_user
         end
       end
       context "non-stolen" do
@@ -794,7 +794,7 @@ RSpec.describe BikesController, type: :controller do
             expect {
               post :create, params: {bike: bike_params}
             }.to_not change(Ownership, :count)
-            expect(flash[:error]).to match(/csrf/i)
+            expect(flash[:error]).to match(/verify/i)
           end
         end
         context "made_without_serial" do
