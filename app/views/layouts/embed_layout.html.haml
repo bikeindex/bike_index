@@ -11,7 +11,7 @@
     = csrf_meta_tags
 
 
-  %body#bi_embed
+  %body#bi_embed{ "data-host" => request.host }
     #alert-block
       - flash.each do |name, msg|
         %div{class: "alert-#{name}"}
