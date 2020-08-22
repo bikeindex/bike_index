@@ -1,6 +1,7 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+    before_action :permit_cross_site_iframe!, only: [:new, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index

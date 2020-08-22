@@ -66,6 +66,49 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(assigns(:current_organization)).to eq organization
+        expect(response.headers["X-Frame-Options"]).to eq "None"
+      end
+    end
+
+    describe "create" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:color) { FactoryBot.create(:color) }
+      let(:attrs) do
+        {
+            manufacturer_id: manufacturer.id,
+            owner_email: "something@sss.com",
+            creator_id: 21,
+            primary_frame_color_id: color.id,
+            secondary_frame_color_id: 12,
+            tertiary_frame_color_id: 222,
+            creation_organization_id: 9292
+          }
+        end
+      it "creates" do
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          expect {
+            post :create, params: {b_param: attrs, organization_id: organization.to_param}
+          }.to change(Bike, :count).by 1
+        end
+        expect(response.headers["X-Frame-Options"]).to eq "None"
+
+        bike = Bike.last
+        expect(bike.status).to eq "with_owner"
+        expect(bike.creator_id).to eq user.id
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.manufacturer).to eq manufacturer.id
+        expect(bike.creation_state.origin).to eq "embed_partial"
+        expect(bike.primary_frame_color_id).to eq color.id
+        expect(bike.secondary_frame_color_id).to be_blank
+        expect(bike.tertiary_frame_color_id).to be_blank
+
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        message = ActionMailer::Base.deliveries.last
+        expect(message.to).to eq attrs[:owner_email]
+        expect(message.subject).to eq "new bike!"
       end
     end
   end

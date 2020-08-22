@@ -1,5 +1,5 @@
 class UserEmbedsController < ApplicationController
-  skip_before_action :set_x_frame_options_header
+  skip_before_action :permit_cross_site_iframe!
   layout "embed_user_layout"
 
   def show
