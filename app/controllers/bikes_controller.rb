@@ -5,6 +5,7 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:create] # We're managing this manually here
   before_action :sign_in_if_not!, only: [:show]
   before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
@@ -112,7 +113,7 @@ class BikesController < ApplicationController
 
   def create
     find_or_new_b_param
-    if params[:bike][:embeded]
+    if params[:bike][:embeded] # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -140,6 +141,7 @@ class BikesController < ApplicationController
         end
       end
     else
+      verify_authenticity_token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end

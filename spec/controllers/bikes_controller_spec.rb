@@ -549,15 +549,20 @@ RSpec.describe BikesController, type: :controller do
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
       context "unverified authenticity token" do
         include_context :test_csrf_token
-        it "fails" do
+        it "permits" do
           expect(user).to be_present
           expect {
             post :create, params: {bike: bike_params}
-          }.to_not change(Ownership, :count)
-          expect(flash[:error]).to match(/csrf/i)
+          }.to change(Ownership, :count).by 1
+          bike = Bike.last
+          expect(bike.country.name).to eq("United States")
+          expect(bike.creation_state.origin).to eq "embed"
+          expect(bike.creation_state.organization).to eq organization
+          expect(bike.creation_state.creator).to eq bike.creator
         end
       end
       context "non-stolen" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
         it "creates a new ownership and bike from an organization" do
           expect(user).to be_present
           expect {
@@ -567,6 +572,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.country.name).to eq("United States")
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
+          expect(bike.creator_id).to eq organization.auto_user_id
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.cycle_type).to eq "tricycle"
           testable_bike_params.each do |k, v|
@@ -709,10 +715,11 @@ RSpec.describe BikesController, type: :controller do
           end
         end
       end
-      context "with persisted email and non-member and parent organization" do
+      context "csrf tested with persisted email and non-member and parent organization" do
         let(:organization_parent) { FactoryBot.create(:organization) }
         let(:organization) { FactoryBot.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
         let!(:user2) { FactoryBot.create(:user_confirmed) }
+        include_context :test_csrf_token
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, params: {bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true}
@@ -779,6 +786,16 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.serial_number).to eq "unknown"
           expect(bike.normalized_serial_segments).to eq([])
+        end
+        context "unverified authenticity token" do
+          include_context :test_csrf_token
+          it "fails" do
+            expect(user).to be_present
+            expect {
+              post :create, params: {bike: bike_params}
+            }.to_not change(Ownership, :count)
+            expect(flash[:error]).to match(/csrf/i)
+          end
         end
         context "made_without_serial" do
           it "creates, is made_without_serial" do
