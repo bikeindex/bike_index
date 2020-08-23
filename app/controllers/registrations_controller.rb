@@ -1,5 +1,5 @@
 class RegistrationsController < ApplicationController
-  before_action :permit_cross_site_iframe!, except: [:new]
+  skip_before_action :set_x_frame_options_header, except: [:new]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :simple_header
   layout "reg_embed"

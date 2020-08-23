@@ -26,10 +26,6 @@ class ApplicationController < ActionController::Base
     headers["Access-Control-Max-Age"] = "1728000"
   end
 
-  def permit_cross_site_iframe!
-    headers["X-Frame-Options"] = nil
-  end
-
   # If this is a preflight OPTIONS request, then short-circuit the
   # request, return only the necessary headers and return an empty
   # text/plain.
