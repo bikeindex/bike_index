@@ -19,6 +19,7 @@ class window.BikeIndex
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
   constructor: ->
+    console.log($.fn.tooltip.Constructor.VERSION)
     new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()

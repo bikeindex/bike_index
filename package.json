@@ -19,7 +19,7 @@
     "@uppy/progress-bar": "^1.1.0",
     "@uppy/tus": "^1.2.0",
     "@uppy/xhr-upload": "^1.1.0",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "~>4.5.2",
     "chart.js": "^2.8.0",
     "chartkick": "^3.0.2",
     "core-js": "^3.6.3",
