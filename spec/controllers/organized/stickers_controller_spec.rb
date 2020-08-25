@@ -102,7 +102,7 @@ RSpec.describe Organized::StickersController, type: :controller do
           expect(bike_sticker.bike_id).to eq bike2.id
           expect(bike_sticker.previous_bike_id).to eq(bike.id)
           bike2.reload
-          expect(bike2.organizations.pluck(:id)).to eq([organization.id])
+          expect(bike2.organizations.pluck(:id)).to eq([])
         end
         context "passed code rather than id" do
           it "updates" do
