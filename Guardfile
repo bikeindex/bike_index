@@ -1,4 +1,4 @@
-directories %w[app spec lib config]
+directories %w[app spec config]
 
 group :red_green_refactor, halt_on_fail: true do
   rspec_options = {
@@ -37,8 +37,6 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^app/(.+)\.rb$})
     watch(%r{^spec/(.+)\.rb$})
     watch(%r{^config/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rb$})
-    watch(%r{^lib/(.+)\.rake$})
     watch(%r{^db/(.+)\.rb$})
     watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
   end
