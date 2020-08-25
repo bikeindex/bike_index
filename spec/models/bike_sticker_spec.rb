@@ -569,14 +569,15 @@ RSpec.describe BikeSticker, type: :model do
           bike_organization = bike.bike_organizations.first
           expect(bike_organization.can_not_edit_claimed).to be_truthy
           bike_organization.update(can_not_edit_claimed: false)
-          og_updated_at = bike_organization.updated_at
+          og_id = bike_organization.id
           bike.reload
           expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
           expect { bike_sticker2.claim_if_permitted(user: user, bike: bike) }.to change(BikeStickerUpdate, :count).by 1
           bike.reload
           expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
           bike_organization.reload
-          expect(bike_organization.updated_at).to eq og_updated_at
+          expect(bike_organization.id).to eq og_id
+          expect(bike_organization.can_not_edit_claimed).to be_falsey
           expect(bike_sticker2.claimed?).to be_truthy
           expect(bike_sticker2.bike_id).to eq bike.id
           expect(bike_sticker2.user_id).to eq user.id
