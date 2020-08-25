@@ -164,7 +164,10 @@ class BikeSticker < ApplicationRecord
     if claiming_bike.blank?
       update(bike: nil, claimed_at: nil)
     else
-      self.secondary_organization = claiming_organization unless claiming_organization == organization
+      unless claiming_organization == organization
+        self.secondary_organization = claiming_organization
+        bike.bike_organizations.create(organization_id: organization.id, can_not_edit_claimed: true)
+      end
       update(user: args[:user], bike: claiming_bike, claimed_at: Time.current)
       if claiming_organization.present?
         bike.bike_organizations.create(organization_id: claiming_organization.id, can_not_edit_claimed: true)
