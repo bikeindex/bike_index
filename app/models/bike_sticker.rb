@@ -164,14 +164,9 @@ class BikeSticker < ApplicationRecord
     if claiming_bike.blank?
       update(bike: nil, claimed_at: nil)
     else
-      unless claiming_organization == organization
-        self.secondary_organization = claiming_organization
-        bike.bike_organizations.create(organization_id: organization.id, can_not_edit_claimed: true)
-      end
+      self.secondary_organization = claiming_organization if claiming_organization != organization
       update(user: args[:user], bike: claiming_bike, claimed_at: Time.current)
-      if claiming_organization.present?
-        bike.bike_organizations.create(organization_id: claiming_organization.id, can_not_edit_claimed: true)
-      end
+      add_bike_organizations_if_authorized(args[:user], claiming_bike, claiming_organization)
     end
     self
   end
@@ -209,5 +204,17 @@ class BikeSticker < ApplicationRecord
     str = code_integer.to_s
     return str unless bike_sticker_batch&.code_number_length.present?
     str.rjust(bike_sticker_batch.code_number_length, "0")
+  end
+
+  # NOTE: Only add organization to bike if user is authorized for the bike
+  # ... otherwise, organizations could see any bike owner email by linking a sticker
+  #  - also, if a regional organization is adding a sticker, don't add the primary organization
+  def add_bike_organizations_if_authorized(claiming_user, claiming_bike, claiming_organization)
+    return false unless user.present? && claiming_bike.present? && user.authorized?(claiming_bike)
+    if claiming_organization.present?
+      claiming_bike.bike_organizations.create(organization_id: claiming_organization.id, can_not_edit_claimed: true)
+    elsif organization.present?
+      claiming_bike.bike_organizations.create(organization_id: organization.id, can_not_edit_claimed: true)
+    end
   end
 end

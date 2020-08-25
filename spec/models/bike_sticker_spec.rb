@@ -339,9 +339,12 @@ RSpec.describe BikeSticker, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       let(:organization_paid) { FactoryBot.create(:organization_with_organization_features) }
       let(:user) { FactoryBot.create(:user) }
-      let(:bike2) { FactoryBot.create(:bike) }
+      let(:bike1) { FactoryBot.create(:bike, :with_ownership, creator: user) }
+      let(:bike2) { FactoryBot.create(:bike, :with_ownership, creator: user) }
       it "claims anyway" do
         expect(user.authorized?(organization)).to be_falsey
+        expect(user.authorized?(bike1)).to be_truthy
+        expect(user.authorized?(bike2)).to be_truthy
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1)
         # Not passing in organization
         expect(bike_sticker2.claimable_by?(user)).to be_falsey
@@ -359,7 +362,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update1.unauthorized_organization?).to be_truthy
         expect(bike_sticker_update1.kind).to eq "initial_claim"
         bike1.reload
-        expect(bike1.bike_organizations.pluck(:organization_id)).to eq([])
+        expect(bike1.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         # Manually passing unauthorized organization in
         expect(bike_sticker1.claimed?).to be_falsey
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
@@ -515,43 +518,85 @@ RSpec.describe BikeSticker, type: :model do
       end
     end
     describe "assigning organization tests" do
-      let(:organization) { FactoryBot.create(:organization) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
-      let(:bike) { FactoryBot.create(:bike) }
+      let(:bike) { FactoryBot.create(:bike, creator: user) }
       let(:user) { FactoryBot.create(:user) }
-      it "adds bike_organization if organization isn't present" do
-        expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
-        expect { bike_sticker1.claim_if_permitted(user: user, bike: bike1) }.to change(BikeStickerUpdate, :count).by 1
-        bike.reload
-        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
-        expect(bike_sticker1.claimed?).to be_truthy
+      context "user not authorized for bike" do
+        let(:bike) { FactoryBot.create(:bike) }
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user2) { FactoryBot.create(:organization_member, organization: organization_regional) }
+        it "does not add bike" do
+          expect(user.authorized?(bike)).to be_falsey
+          expect { bike_sticker1.claim_if_permitted(user: user, bike: bike, organization: organization) }.to change(BikeStickerUpdate, :count).by 1
+          bike.reload
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          bike_sticker1.reload
+          expect(bike_sticker1.claimed?).to be_truthy
+          expect(bike_sticker1.bike).to eq bike
           expect(bike_sticker1.user).to eq user
           expect(bike_sticker1.organization_id).to eq organization.id
-          expect(bike_sticker1.secondary_organization_id).to eq organization_regional.id
-        expect(bike.editable_organizations.pluck(:ids)).to eq([])
-        bike_organization = bike.bike_organizations.first
-        expect(bike_organization.can_not_edit_claimed).to be_truthy
-        bike_organization.update(can_not_edit_claimed: false)
-        og_updated_at = bike_organization.updated_at
-        bike.reload
-        expect(bike.editable_organizations.pluck(:ids)).to eq([organization.id])
-        expect { bike_sticker2.claim_if_permitted(user: user, bike: bike1) }.to change(BikeStickerUpdate, :count).by 1
-        bike.reload
-        expect(bike.editable_organizations.pluck(:ids)).to eq([organization.id])
-        bike_organization.reload
-        expect(bike_organization.updated_at).to eq og_updated_at
-      end
-      context "with secondary organziation" do
-        let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
-        let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
-        it "adds both organizations" do
-          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
-          expect {
-            bike_sticker1.claim_if_permitted(user: user, bike: bike1, organization: organization_regional) }.to change(BikeStickerUpdate, :count).by 1
+          expect(bike_sticker1.secondary_organization_id).to be_blank
+          # Also test that regional org behaves the same
+          expect { bike_sticker2.claim_if_permitted(user: user2, bike: bike, organization: organization_regional) }.to change(BikeStickerUpdate, :count).by 1
           bike.reload
-          expect(bike.bike_organizations.pluck(:organization_id)).to match_array([organization.id, organization_regional.id])
-          expect(bike.editable_organizations.pluck(:ids)).to eq([])
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          bike_sticker2.reload
+          expect(bike_sticker2.claimed?).to be_truthy
+          expect(bike_sticker2.bike_id).to eq bike.id
+          expect(bike_sticker2.user_id).to eq user2.id
+          expect(bike_sticker2.organization_id).to eq organization.id
+          expect(bike_sticker2.secondary_organization_id).to eq organization_regional.id
+        end
+      end
+      context "user bike owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+        it "adds bike_organization if organization isn't present" do
+          expect(user.authorized?(bike)).to be_truthy
+          expect(user.authorized?(organization)).to be_falsey
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          expect { bike_sticker1.claim_if_permitted(user: user, bike: bike) }.to change(BikeStickerUpdate, :count).by 1
+          bike.reload
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike_sticker1.claimed?).to be_truthy
+          expect(bike_sticker1.bike_id).to eq bike.id
+          expect(bike_sticker1.user_id).to eq user.id
+          expect(bike_sticker1.organization_id).to eq organization.id
+          expect(bike_sticker1.secondary_organization_id).to be_blank
+          expect(bike.editable_organizations.map(&:id)).to eq([])
+          bike_organization = bike.bike_organizations.first
+          expect(bike_organization.can_not_edit_claimed).to be_truthy
+          bike_organization.update(can_not_edit_claimed: false)
+          og_updated_at = bike_organization.updated_at
+          bike.reload
+          expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
+          expect { bike_sticker2.claim_if_permitted(user: user, bike: bike) }.to change(BikeStickerUpdate, :count).by 1
+          bike.reload
+          expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
+          bike_organization.reload
+          expect(bike_organization.updated_at).to eq og_updated_at
+          expect(bike_sticker2.claimed?).to be_truthy
+          expect(bike_sticker2.bike_id).to eq bike.id
+          expect(bike_sticker2.user_id).to eq user.id
+          expect(bike_sticker2.organization_id).to eq organization.id
+          expect(bike_sticker2.secondary_organization_id).to be_blank
+        end
+      end
+      context "with secondary organization authorized" do
+        let(:user) { FactoryBot.create(:organization_member, organization: organization_regional) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
+        it "adds only the organization_regional" do
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          expect(bike.editable_organizations.map(&:id)).to eq([])
+          expect(user.authorized?(bike)).to be_truthy
+          expect(user.authorized?(organization_regional)).to be_truthy
+          expect(user.authorized?(organization)).to be_falsey
+          expect { bike_sticker1.claim_if_permitted(user: user, bike: bike, organization: organization_regional) }.to change(BikeStickerUpdate, :count).by 1
+          bike.reload
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization_regional.id])
+          expect(bike.bike_organizations.map(&:can_not_edit_claimed).uniq).to eq([true])
           bike_sticker1.reload
           expect(bike_sticker1.claimed?).to be_truthy
           expect(bike_sticker1.user).to eq user
