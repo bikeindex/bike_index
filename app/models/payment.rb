@@ -1,7 +1,7 @@
 class Payment < ApplicationRecord
   include Amountable
-  PAYMENT_METHOD_ENUM = { stripe: 0, check: 1 }.freeze
-  KIND_ENUM = { donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3 }
+  PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
+  KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
 
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
@@ -23,11 +23,17 @@ class Payment < ApplicationRecord
   after_create :send_invoice_email
   after_commit :update_invoice
 
-  def self.payment_methods; PAYMENT_METHOD_ENUM.keys.map(&:to_s) end
+  def self.payment_methods
+    PAYMENT_METHOD_ENUM.keys.map(&:to_s)
+  end
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.admin_creatable_payment_methods; ["check"] end
+  def self.admin_creatable_payment_methods
+    ["check"]
+  end
 
   def self.display_kind(kind)
     return "NO KIND!" unless kind.present?
@@ -35,9 +41,13 @@ class Payment < ApplicationRecord
     kind.humanize
   end
 
-  def non_donation?; !donation? end
+  def non_donation?
+    !donation?
+  end
 
-  def display_kind; self.class.display_kind(kind) end
+  def display_kind
+    self.class.display_kind(kind)
+  end
 
   def set_calculated_attributes
     self.kind = calculated_kind

@@ -482,13 +482,13 @@ nl:
         amount_due_cents: Verschuldigde centen
         amount_paid_cents: Bedrag betaald cent
         force_active: Forceer actief
-        invoice_paid_features: Factuur betaalde functies
         is_active: Is actief
         notes: Notes
-        paid_features: Betaalde functies
         payments: Betalingen
         subscription_end_at: Abonnement eindigt om
         subscription_start_at: Abonnement start om
+        invoice_organization_features: Factuurorganisatiefuncties
+        organization_features: Organisatiefuncties
       listicle:
         body: Lichaam
         body_html: Body html
@@ -604,15 +604,6 @@ nl:
         owner_email: E-mailadres eigenaar
         send_email: Stuur e-mail
         user_hidden: Gebruiker verborgen
-      paid_feature:
-        amount_cents: Bedrag centen
-        description: Beschrijving
-        details_link: Details link
-        feature_slugs: Naaktslakken
-        invoice_paid_features: Factuur betaalde functies
-        invoices: Facturen
-        kind: Soort
-        name: Naam
       paint:
         bikes: Bikes
         name: Naam
@@ -794,6 +785,15 @@ nl:
         bike_stickers: Fietscodes
         code_number_length: Codenummer lengte
         notes: Notes
+      organization_feature:
+        amount_cents: Bedrag centen
+        description: Beschrijving
+        details_link: Details link
+        feature_slugs: Naaktslakken
+        invoice_organization_features: Factuurorganisatiefuncties
+        invoices: Facturen
+        kind: Soort
+        name: Naam
     enums:
       cycle_type:
         bike: Fiets
@@ -865,7 +865,6 @@ nl:
       front_gear_type: Type versnelling voor
       integration: integratie
       invoice: factuur
-      invoice_paid_feature: Factuur betaald functie
       listicle: Listicle
       location: Plaats
       lock: Slot
@@ -878,7 +877,6 @@ nl:
       organization_message: Organisatie bericht
       other_listing: Andere lijst
       ownership: eigendom
-      paid_feature: Betaalde functie
       paint: Verf
       payment: Betaling
       public_image: Publiek imago
@@ -895,6 +893,8 @@ nl:
       wheel_size: Wielgrootte
       bike_sticker: Fiets sticker
       bike_sticker_batch: Fietssticker batch
+      invoice_organization_feature: Factuur organisatiefunctie
+      organization_feature: Organisatiefunctie
     select_options:
       color:
         black: Zwart
@@ -1727,6 +1727,9 @@ nl:
       you_have_already_marked_remaining: U heeft deze %{bike_type} al gemarkeerd als
         resterend
       you_have_already_marked_resolved: Je hebt deze melding als opgelost gemarkeerd
+      organization_sent_this_message: "%{org_name} heeft deze melding verzonden"
+      please_email_organization_with_questions_html: Stuur een e-mail naar %{email_link}
+        als u vragen heeft
     edit_accessories:
       add_a_component: Voeg een component toe
       other_handlebar_type: Ander type stuur
@@ -1785,6 +1788,8 @@ nl:
       zipcode: Postcode
       choose_country: Kies land
       city: City
+      state: Staat
+      street: Straat
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
@@ -2085,7 +2090,6 @@ nl:
       link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
       at: bij
-      bike_in_admin: "%{bike_type} in Admin"
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
       componentcmodel_name: "%{componentcmodel_name}"
@@ -2149,6 +2153,7 @@ nl:
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
       not_registered: Niet echt geregistreerd!
+      paint_description: Kleurbeschrijving
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -2214,6 +2219,8 @@ nl:
           het jouw %{bike_type} is, meld je dan aan en je kunt het bewerken!
         you_dont_own_that: Oh nee! Het lijkt erop dat je dat niet bezit %{bike_type}.
         you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
+        bike_impounded: "%{org_name} heeft dat %{bike_type} in beslag genomen. Praat
+          met hen om toegang te krijgen tot deze %{bike_type}."
       index:
         we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
           een andere locatie om gestolen fietsen in de buurt te zoeken.
@@ -3584,6 +3591,9 @@ nl:
       write_do_not_register: Als een klant niet wil dat een fiets wordt toegevoegd
         aan de fietsindex, schrijft u gewoon "NIET REGISTREREN" in de notities voor
         de verkoop en de fiets wordt niet geregistreerd.
+      already_have_a_sophisticated_html: Heeft u al een geavanceerde e-mailverbinding
+        met uw klanten? Bike Index kan worden geïntegreerd met uw bestaande stroom
+        - e-mail %{link} voor configuratie.
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -3631,6 +3641,8 @@ nl:
         wegwijzers kunnen gemakkelijk worden verwijderd door ze los te maken en sommige
         zijn al niet bevestigd.
       use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens € 40 kost.
+      checkout_out_bestbikelock_html: "- ga naar %{link} voor aanbevelingen over de
+        beste sloten."
     resources:
       api_documentation: API-documentatie
       bike_index_resources: Bike Index middelen
@@ -3775,8 +3787,6 @@ nl:
     ambassadors_how_to:
       9_steps_for_getting_your_stolen_bike_back: 9 stappen om je gestolen fiets terug
         te krijgen
-      a_basic_package_of_materials_including_a_: Een basispakket met materialen, waaronder
-        een Bike Index-fietsmuts en stickers
       access_to_ambassadors_slack_channel_for_s: Toegang tot het slappe kanaal van
         ambassadeurs voor het delen van ideeën, tips en succesverhalen onder het Bike
         Index-team en andere ambassadeurs in het hele land en de wereld
@@ -4120,6 +4130,9 @@ nl:
         van overal. Het enige dat ze nodig hebben is elke smartphone of laptop. Je
         hebt toegang tot de gegevens erachter om te begrijpen hoe je fietsen op je
         campus het beste kunt beschermen.
+      must_read: Moet lezen -
+      six_best_features_for_schools: De zes beste functies van Bike Index voor fietsbeheer
+        op de campus
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -4203,8 +4216,6 @@ nl:
         advocaten om herstelfietsen met hun eigenaars te verbinden.
       accounts_powered_by_bike_index: BikeHub-accounts worden mogelijk gemaakt door
         Bike Index - het belangrijkste fietsregister.
-      log_in_message: Als u hier inlogt, logt u in op BikeHub
-      sign_up_message: Als u zich hier aanmeldt, logt u in op BikeHub
   meta_descriptions:
     bikes_index: Zoeken naar fietsen die zijn geregistreerd op Bike Index
     bikes_new: Registreer een fiets snel, eenvoudig en gratis op Bike Index. Maak
@@ -4436,8 +4447,6 @@ nl:
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
         model: Model
         only_no_sticker_html: Alleen <strong>geen</strong> sticker
-        only_not: alleen niet
-        only_with: alleen met
         only_with_stickers_html: Alleen <strong>met</strong> stickers
         owner_name: Eigenaar naam
         registered: Geregistreerd
@@ -4457,6 +4466,10 @@ nl:
         visible_columns: Zichtbare kolommen
         email_hidden: email verborgen
         impounded: In beslag genomen bij
+        address: 'Adres:'
+        avery: Avery?
+        only_no_address_html: Alleen <strong>geen</strong> adres
+        only_with_address_html: Alleen <strong>met</strong> adres
     bulk_imports:
       index:
         added: Toegevoegd
@@ -4514,7 +4527,6 @@ nl:
         your_headers_must_match_html: Uw kopteksten moeten <em>exact</em> overeenkomen
           met onze kopteksten - als u bijvoorbeeld 'serienummer' als koptekst hebt,
           werkt de import niet.
-        example_csv_url_main: https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv
       show:
         ascend_import: Ascending importeren
         bikes: Bikes
@@ -4665,10 +4677,9 @@ nl:
         bike: Fiets
         by: Door
         created: Gemaakt
-        impounded: In beslag genomen bij
         address: Adres
         notification_number: Kennisgeving#
-        retrieved: Opgehaald
+        resolved: Vastbesloten
       show_details:
         address: Adres
         bike: Fiets
@@ -4677,6 +4688,7 @@ nl:
         internal_notes: Interne notities
         message: Bericht
         notification_number: Kennisgeving#
+        resolved: Vastbesloten
     manages:
       location_fields:
         address: Adres
@@ -5047,6 +5059,8 @@ nl:
       where_we_are: Waar we zijn
       who_we_serve: Wie we dienen
       change_preferred_language: voorkeurstaal wijzigen
+      security: veiligheid
+      protect_your_bike: Bescherm je fiets
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -5070,6 +5084,7 @@ nl:
       from: uit
       to: Naar
       update: Bijwerken
+      next: Volgende
     edit_bike_skeleton:
       abandoned: Verlaten
       edit: Bewerken
@@ -5204,6 +5219,9 @@ nl:
       new_password: Nieuw wachtwoord
       new_password_confirmation: Bevestiging van nieuwe wachtwoord
       reset_password: Reset wachtwoord
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
     edit_root:
       add_additional_email: Voeg extra e-mail toe
       additional_email: Extra E-mail
@@ -5271,12 +5289,14 @@ nl:
       get_bike_indexs_newsletter: Ontvang Bike Index's nieuwsbrief
       get_on_bike_index: Ga op Bike Index
       log_in: Log in
-      or: of
       sign_up: Registreren
       sign_up_using_facebook: Meld je aan met Facebook
       sign_up_using_strava: Meld je aan met Strava
       terms_and_conditions: Termen en voorwaarden
       sign_up_using_globalid: Meld u aan met globaliD
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
     password_reset:
       follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
         in te stellen!
@@ -5313,6 +5333,9 @@ nl:
       password_confirmation: Wachtwoord bevestigen
       update_password: password-update
       update_your_password: Update uw wachtwoord
+      better_password: beter
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
   welcome:
     choose_registration:
       add_a_bike_through: Voeg een fiets toe door
@@ -5434,9 +5457,9 @@ nl:
       next: volgende>
       other_amount: Ander bedrag
       pay_bike_index: Pay Bike Index
-      select_an_amount: Selecteer een bedrag
       donate_to_bike_index: Doneer aan Bike Index
       payment_to_bike_index: Betaling aan fietsindex
+      select_an_amount_in_usd: Selecteer een bedrag (in USD)
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien

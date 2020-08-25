@@ -41,7 +41,6 @@ RSpec.describe StolenRecord, type: :model do
     context "if not being marked as recovered" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "does not removes alert_image" do
-
         expect(stolen_record.alert_image).to be_present
 
         stolen_record.run_callbacks(:commit)
@@ -245,7 +244,7 @@ RSpec.describe StolenRecord, type: :model do
     context "stolen record is recovered, sharable but no bike photo" do
       it "is not displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          can_share_recovery: true)
+          can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
       end
     end
@@ -253,8 +252,8 @@ RSpec.describe StolenRecord, type: :model do
       it "is displayed" do
         recovery_display = FactoryBot.create(:recovery_display)
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          can_share_recovery: true,
-                                          recovery_display: recovery_display)
+          can_share_recovery: true,
+          recovery_display: recovery_display)
 
         expect(stolen_record.recovery_display_status).to eq "displayed"
       end
@@ -262,8 +261,8 @@ RSpec.describe StolenRecord, type: :model do
     context "stolen_record is not_displayed" do
       it "is not_displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          recovery_display_status: "not_displayed",
-                                          can_share_recovery: true)
+          recovery_display_status: "not_displayed",
+          can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
       end
     end
@@ -357,15 +356,15 @@ RSpec.describe StolenRecord, type: :model do
     context "recovery is eligible for display but has no photo" do
       it "returns displayable_no_photo" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          can_share_recovery: true)
+          can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
       end
     end
     context "recovery is eligible for display" do
       it "returns waiting_on_decision" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          :with_bike_image,
-                                          can_share_recovery: true)
+          :with_bike_image,
+          can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
       end
     end
@@ -373,16 +372,16 @@ RSpec.describe StolenRecord, type: :model do
       it "returns displayed" do
         recovery_display = FactoryBot.create(:recovery_display)
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          can_share_recovery: true,
-                                          recovery_display: recovery_display)
+          can_share_recovery: true,
+          recovery_display: recovery_display)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
       end
     end
     context "recovery has been marked as not eligible for display" do
       it "returns not_displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          can_share_recovery: true,
-                                          recovery_display_status: "not_displayed")
+          can_share_recovery: true,
+          recovery_display_status: "not_displayed")
         expect(stolen_record.calculated_recovery_display_status).to eq "not_displayed"
       end
     end
@@ -400,7 +399,7 @@ RSpec.describe StolenRecord, type: :model do
         recovered_description: "Some reason",
         index_helped_recovery: "true",
         can_share_recovery: "false",
-        recovering_user_id: user_id,
+        recovering_user_id: user_id
       }
     end
     before do
@@ -556,7 +555,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record = FactoryBot.create(
           :stolen_record,
           :in_los_angeles,
-          skip_geocoding: false,
+          skip_geocoding: false
         )
         expect(stolen_record.should_be_geocoded?).to eq(false)
 

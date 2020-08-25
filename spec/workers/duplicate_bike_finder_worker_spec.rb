@@ -6,14 +6,14 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
     bike1.create_normalized_serial_segments
     bike2 = FactoryBot.create(:bike, serial_number: "applejacks Funtimes cross")
     bike2.create_normalized_serial_segments
-    expect do
+    expect {
       described_class.new.perform(bike1.id)
-    end.to change(DuplicateBikeGroup, :count).by 1
+    }.to change(DuplicateBikeGroup, :count).by 1
 
-    expect do
+    expect {
       duplicate_group = bike1.normalized_serial_segments.first.duplicate_bike_group
       expect(bike2.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
-    end.to_not change(DuplicateBikeGroup, :count)
+    }.to_not change(DuplicateBikeGroup, :count)
   end
   context "only one match" do
     it "doesn't create a duplicate" do
@@ -46,9 +46,9 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
 
   context "bike gone" do
     it "doesn't explode" do
-      expect do
+      expect {
         described_class.new.perform(12121212)
-      end.to_not raise_error
+      }.to_not raise_error
     end
   end
 end

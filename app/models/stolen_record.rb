@@ -7,19 +7,19 @@ class StolenRecord < ApplicationRecord
     waiting_on_decision: 1,
     displayable_no_photo: 2,
     displayed: 3,
-    not_displayed: 4,
+    not_displayed: 4
   }.freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
   def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
-    %w(police_report_number police_report_department locking_description lock_defeat_description
-       timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
-       longitude theft_description current phone secondary_phone phone_for_everyone
-       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
-       approved recovered_at recovered_description index_helped_recovery can_share_recovery
-       recovery_posted show_address tsved_at estimated_value).map(&:to_sym).freeze
+    %w[police_report_number police_report_department locking_description lock_defeat_description
+      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+      longitude theft_description current phone secondary_phone phone_for_everyone
+      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+      approved recovered_at recovered_description index_helped_recovery can_share_recovery
+      recovery_posted show_address tsved_at estimated_value].map(&:to_sym).freeze
   end
 
   belongs_to :bike
@@ -46,6 +46,7 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
+  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
   scope :displayable, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
   scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity
@@ -66,37 +67,52 @@ class StolenRecord < ApplicationRecord
   def twitter_accounts_in_proximity
     [
       TwitterAccount.default_account_for_country(country),
-      TwitterAccount.active.near(self, 50),
+      TwitterAccount.active.near(self, 50)
     ].flatten.compact.uniq
   end
 
-  def self.recovery_display_statuses; RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s) end
+  def self.recovery_display_statuses
+    RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
+  end
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
   end
 
-  def self.recovering_user_recording_start; Time.at(1558821440) end # Rough time that PR#790 was merged
+  # Rough time that PR#790 was merged
+  def self.recovering_user_recording_start
+    Time.at(1558821440)
+  end
 
-  def recovered?; !current? end
+  def recovered?
+    !current?
+  end
 
   # TODO: check based on the ownership of the bike at the time of recovery
-  def recovering_user_owner?; recovering_user.present? && bike&.owner == recovering_user end
+  def recovering_user_owner?
+    recovering_user.present? && bike&.owner == recovering_user
+  end
 
-  def pre_recovering_user?; recovered_at.present? && recovered_at < self.class.recovering_user_recording_start end
+  def pre_recovering_user?
+    recovered_at.present? && recovered_at < self.class.recovering_user_recording_start
+  end
 
   # Only display if they have put in an address - so that we don't show on initial creation
-  def display_checklist?; address.present? end
+  def display_checklist?
+    address.present?
+  end
 
   # Overrides geocodeable without_location, we need more specificity
-  def without_location?; street.blank? end
+  def without_location?
+    street.blank?
+  end
 
   def address(skip_default_country: false, force_show_address: false)
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: [(:skip_default if skip_default_country)],
+      country: [(:skip_default if skip_default_country)]
     ).presence
   end
 
@@ -124,7 +140,7 @@ class StolenRecord < ApplicationRecord
     "Cable lock",
     "Heavy duty bicycle security chain",
     "Not locked",
-    "Other",
+    "Other"
   ].freeze
 
   def self.locking_description
@@ -133,7 +149,7 @@ class StolenRecord < ApplicationRecord
 
   def self.locking_description_select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, self.name.underscore]
+    translation_scope = [:activerecord, :select_options, name.underscore]
 
     locking_description.map do |name|
       localized_name = I18n.t(normalize.call(name), scope: translation_scope)
@@ -147,7 +163,7 @@ class StolenRecord < ApplicationRecord
     "Lock is missing, along with the bike",
     "Object that bike was locked to was broken, removed, or otherwise compromised",
     "Other situation, please describe below",
-    "Bike was not locked",
+    "Bike was not locked"
   ].freeze
 
   def self.locking_defeat_description
@@ -156,7 +172,7 @@ class StolenRecord < ApplicationRecord
 
   def self.locking_defeat_description_select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, self.name.underscore]
+    translation_scope = [:activerecord, :select_options, name.underscore]
 
     locking_defeat_description.map do |name|
       localized_name = I18n.t(normalize.call(name), scope: translation_scope)
@@ -185,7 +201,7 @@ class StolenRecord < ApplicationRecord
   def tsv_col(i)
     return "" unless i.present?
     i.gsub(/\\?(\t|\\t)+/i, " ").gsub(/\\?(\r|\\r)+/i, " ")
-     .gsub(/\\?(\n|\\n)+/i, " ").gsub(/\\?\\?('|")+/, " ")
+      .gsub(/\\?(\n|\\n)+/i, " ").gsub(/\\?\\?('|")+/, " ")
   end
 
   def tsv_row(with_article = true, with_stolen_locations: false)
@@ -237,7 +253,7 @@ class StolenRecord < ApplicationRecord
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
       index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
-      can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery]),
+      can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery])
     )
     Bike.unscoped.find_by_id(bike_id)&.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
     notify_of_promoted_alert_recovery
@@ -251,12 +267,18 @@ class StolenRecord < ApplicationRecord
   end
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
-  def theft_alert_missing_photo?; current_alert_image.blank? && theft_alerts.any? end
+  def theft_alert_missing_photo?
+    current_alert_image.blank? && theft_alerts.any?
+  end
 
   # The associated bike's first public image, if available. Else nil.
-  def bike_main_image; bike&.public_images&.order(:id)&.first end
+  def bike_main_image
+    bike&.public_images&.order(:id)&.first
+  end
 
-  def current_alert_image; alert_image || generate_alert_image end
+  def current_alert_image
+    alert_image || generate_alert_image
+  end
 
   # Generate the "promoted alert image"
   # (One of the stolen bike's public images, placed on a branded template)
@@ -265,7 +287,7 @@ class StolenRecord < ApplicationRecord
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
     alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
-    return if (bike_image&.image).blank? && (bike&.stock_photo_url).blank?
+    return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
 
     new_image = AlertImage.new(stolen_record: self)
     if bike_image&.image.blank?

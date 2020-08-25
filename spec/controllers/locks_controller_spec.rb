@@ -20,7 +20,7 @@ RSpec.describe LocksController, type: :controller do
       has_key: true,
       has_combination: false,
       key_serial: "321",
-      combination: "",
+      combination: ""
     }
   end
 
@@ -35,16 +35,31 @@ RSpec.describe LocksController, type: :controller do
   describe "edit" do
     context "not lock owner" do
       it "redirects to my_account" do
-        get :edit, params: { id: lock.id }
+        get :edit, params: {id: lock.id}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:my_account)
       end
     end
     context "lock owner" do
       it "renders" do
-        get :edit, params: { id: owner_lock.id }
+        get :edit, params: {id: owner_lock.id}
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
+      end
+    end
+    context "no user" do
+      let(:user) { nil }
+      it "redirects to sign_in" do
+        get :edit, params: {id: lock.id}
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to(new_session_path)
+      end
+      context "unauthenticated_redirect" do
+        it "redirects to sign up" do
+          get :edit, params: {id: lock.id, unauthenticated_redirect: "sign_up"}
+          expect(flash).to be_blank
+          expect(response).to redirect_to(new_user_path)
+        end
       end
     end
   end
@@ -52,7 +67,7 @@ RSpec.describe LocksController, type: :controller do
   describe "update" do
     context "not lock owner" do
       it "redirects to my_account" do
-        put :update, params: { id: lock.id, combination: "123" }
+        put :update, params: {id: lock.id, combination: "123"}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:my_account)
         expect(lock.combination).to_not eq("123")
@@ -60,7 +75,7 @@ RSpec.describe LocksController, type: :controller do
     end
     context "lock owner" do
       it "renders" do
-        put :update, params: { id: owner_lock.id, lock: valid_attributes }
+        put :update, params: {id: owner_lock.id, lock: valid_attributes}
         owner_lock.reload
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
@@ -75,7 +90,7 @@ RSpec.describe LocksController, type: :controller do
   describe "create" do
     context "success" do
       it "redirects you to my_account locks table" do
-        post :create, params: { lock: valid_attributes }
+        post :create, params: {lock: valid_attributes}
         user.reload
         lock = user.locks.first
         expect(response).to redirect_to my_account_path(active_tab: "locks")
@@ -91,7 +106,7 @@ RSpec.describe LocksController, type: :controller do
     context "not lock owner" do
       it "redirects to my_account" do
         expect(lock).to be_present
-        delete :destroy, params: { id: lock.id }
+        delete :destroy, params: {id: lock.id}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:my_account)
         expect(lock.reload).to be_truthy
@@ -100,9 +115,9 @@ RSpec.describe LocksController, type: :controller do
     context "lock owner" do
       it "renders" do
         expect(owner_lock).to be_present
-        expect do
-          delete :destroy, params: { id: owner_lock.id }
-        end.to change(Lock, :count).by(-1)
+        expect {
+          delete :destroy, params: {id: owner_lock.id}
+        }.to change(Lock, :count).by(-1)
         expect(response).to redirect_to my_account_path(active_tab: "locks")
       end
     end

@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikeSticker, type: :model do
+  let(:bike1) { FactoryBot.create(:bike) }
+
   describe "normalize_code" do
     let(:url) { "https://bikeindex.org/bikes/scanned/000012?organization_id=palo-party" }
     let(:url2) { "bikeindex.org/bikes/000012/scanned?organization_id=bikeindex" }
@@ -17,12 +19,11 @@ RSpec.describe BikeSticker, type: :model do
   end
 
   describe "basic stuff" do
-    let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
-    let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: 12, bike: bike) }
+    let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: 12, bike: bike1) }
     let!(:sticker) { FactoryBot.create(:bike_sticker, code: 12, organization_id: organization.id) }
     let!(:sticker_dupe) { FactoryBot.build(:bike_sticker, code: "00012", organization_id: organization.id) }
-    let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike) }
+    let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
     it "calls the things we expect and finds the things we expect" do
       expect(BikeSticker.claimed.count).to eq 2
@@ -82,28 +83,45 @@ RSpec.describe BikeSticker, type: :model do
 
   describe "lookup_with_fallback" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
-    let(:organization_no_match) { FactoryBot.create(:organization) }
-    let!(:bike_sticker_initial) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization) }
-    let(:bike_sticker_duplicate) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization_duplicate) }
-    let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
-    it "looks up, falling back to the orgs for the user, falling back to any org" do
-      expect(bike_sticker_duplicate).to be_present # Ensure it's created after initial
-      # It finds the first record in the database
-      expect(BikeSticker.lookup_with_fallback("a0010")).to eq bike_sticker_initial
-      expect(BikeSticker.lookup_with_fallback("0010")).to eq bike_sticker_initial
-      # If there is an organization passed, it finds matching that organization
-      expect(BikeSticker.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_sticker_duplicate
-      expect(BikeSticker.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_sticker_duplicate
-      # It finds the bike_sticker that exists, even if it doesn't match the organization passed
-      expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_sticker_initial
-      # It finds the bike_sticker from the user's organization
-      expect(BikeSticker.lookup_with_fallback("a0010", user: user)).to eq bike_sticker_duplicate
-      # It finds bike_sticker that matches the passed organization - overriding the user organization
-      expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_sticker_initial
-      # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
-      expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_sticker_duplicate
-      expect(BikeSticker.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
+    describe "duplicate org issues" do
+      let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
+      let(:organization_no_match) { FactoryBot.create(:organization) }
+      let!(:bike_sticker_initial) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization) }
+      let(:bike_sticker_duplicate) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization_duplicate) }
+      let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
+      it "looks up, falling back to the orgs for the user, falling back to any org" do
+        expect(bike_sticker_duplicate).to be_present # Ensure it's created after initial
+        # It finds the first record in the database
+        expect(BikeSticker.lookup_with_fallback("a0010")).to eq bike_sticker_initial
+        expect(BikeSticker.lookup_with_fallback("0010")).to eq bike_sticker_initial
+        # If there is an organization passed, it finds matching that organization
+        expect(BikeSticker.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_sticker_duplicate
+        expect(BikeSticker.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_sticker_duplicate
+        # It finds the bike_sticker that exists, even if it doesn't match the organization passed
+        expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_sticker_initial
+        # It finds the bike_sticker from the user's organization
+        expect(BikeSticker.lookup_with_fallback("a0010", user: user)).to eq bike_sticker_duplicate
+        # It finds bike_sticker that matches the passed organization - overriding the user organization
+        expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_sticker_initial
+        # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
+        expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_sticker_duplicate
+        expect(BikeSticker.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
+      end
+    end
+    context "3 letter prefix" do
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CAL09999", organization: organization) }
+      let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "CAL09998", organization: organization) }
+      let!(:organization2) { FactoryBot.create(:organization) }
+      it "finds the sticker" do
+        expect(BikeSticker.lookup("CAL09999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL9999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL09999", organization_id: organization2.id)).to eq bike_sticker
+        expect(BikeSticker.lookup_with_fallback("CAL09999", organization_id: organization2.id)).to eq bike_sticker
+        expect(BikeSticker.lookup_with_fallback("CAL 00 099 98", organization_id: organization2.id)).to eq bike_sticker2
+        expect(BikeSticker.lookup_with_fallback("CAL 99 9 8", organization_id: organization2.id)).to eq bike_sticker2
+      end
     end
   end
 
@@ -132,50 +150,6 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
-  describe "claimable_by?" do
-    let(:user) { FactoryBot.create(:user) }
-    let(:organization) { FactoryBot.create(:organization) }
-    let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
-    let(:bike) { FactoryBot.create(:bike) }
-    before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
-    it "is truthy" do
-      expect(BikeSticker.new.claimable_by?(user)).to be_truthy
-      # Already claimed bikes can't be linked
-      expect(BikeSticker.new(bike_id: bike.id).claimable_by?(user)).to be_falsey
-    end
-    context "user has too many bike_stickers" do
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, user_id: user.id, bike: bike) }
-      it "has expected values" do
-        expect(BikeSticker.new.claimable_by?(user)).to be_falsey
-        expect(membership).to be_present
-        user.reload
-        expect(BikeSticker.new.claimable_by?(user)).to be_falsey # Only has ability to link organized bike_stickers
-        expect(BikeSticker.new(organization_id: organization.id).claimable_by?(user)).to be_truthy
-        # Claimed can still be linked by a member of the org
-        expect(BikeSticker.new(organization_id: organization.id, bike_id: 1243).claimable_by?(user)).to be_truthy
-        # Can't link other organization ones
-        expect(BikeSticker.new(organization_id: organization.id + 100).claimable_by?(user)).to be_falsey
-        expect(BikeSticker.new(bike_id: 1243).claimable_by?(user)).to be_falsey
-      end
-      context "user is superuser" do
-        it "is always true" do
-          user.superuser = true
-          expect(BikeSticker.new.claimable_by?(user)).to be_truthy
-          expect(BikeSticker.new(bike_id: 12).claimable_by?(user)).to be_truthy
-        end
-      end
-    end
-    context "user has too many organized bike_sticker" do
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, user_id: user.id, organization_id: organization.id) }
-      it "has expected values" do
-        expect(BikeSticker.new.claimable_by?(user)).to be_falsey
-        expect(membership).to be_present # Once user is part of the organization, they're permitted to link
-        user.reload
-        expect(BikeSticker.new.claimable_by?(user)).to be_truthy
-      end
-    end
-  end
-
   describe "next_unassigned" do
     let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "zzzz") }
     let(:bike_sticker1) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a1111") }
@@ -183,14 +157,14 @@ RSpec.describe BikeSticker, type: :model do
     let(:bike_sticker3) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a1113", bike_id: 12) }
     let(:bike_sticker4) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a111") }
     it "finds next unassigned, returns nil if not found" do
-      [bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4]
+      expect([bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4].size).to eq 5
       expect(bike_sticker1.next_unclaimed_code).to eq bike_sticker4
       expect(bike_sticker2.next_unclaimed_code).to be_nil
     end
     context "an unassigned lower code" do
       let!(:earlier_unclaimed) { FactoryBot.create(:bike_sticker, organization_id: 12, code: "a1110") }
       it "grabs the next one anyway" do
-        [earlier_unclaimed, bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4]
+        expect([earlier_unclaimed, bike_sticker, bike_sticker1, bike_sticker2, bike_sticker3, bike_sticker4].size).to eq 6
         expect(earlier_unclaimed.id).to be < bike_sticker4.id
         # expect(BikeSticker.where(organization_id: 12).next_unclaimed_code).to eq bike_sticker4
         expect(BikeSticker.where(organization_id: 11).next_unclaimed_code).to eq bike_sticker2
@@ -198,150 +172,346 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
-  describe "authorized?" do
-    context "organization" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:ownership) { FactoryBot.create(:ownership) }
-      let(:bike) { ownership.bike }
-      let(:owner) { ownership.creator }
-      let(:bike_sticker_user) { FactoryBot.create(:user_confirmed) }
-      let(:admin) { User.new(superuser: true) }
-      let(:rando) { FactoryBot.create(:user_confirmed) }
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization, user: bike_sticker_user) }
-      it "is truthy for admins and org members and code claimer" do
-        # Sanity Check organization authorizations
-        expect(bike_sticker_user.authorized?(organization)).to be_falsey
-        expect(owner.authorized?(organization)).to be_falsey
-        expect(organization_member.authorized?(organization)).to be_truthy
-        expect(admin.authorized?(organization)).to be_truthy
-        expect(rando.authorized?(organization)).to be_falsey
-        # Sanity check bike authorizations
-        expect(bike.authorized?(bike_sticker_user)).to be_falsey
-        expect(bike.authorized?(owner)).to be_truthy
-        expect(bike.authorized?(organization_member)).to be_falsey
-        expect(bike.authorized?(admin)).to be_falsey
-        expect(bike.authorized?(rando)).to be_falsey
-        # Check authorizations on the code itself
-        expect(bike_sticker.authorized?(bike_sticker_user)).to be_truthy
-        expect(bike_sticker.authorized?(owner)).to be_truthy
-        expect(bike_sticker.authorized?(organization_member)).to be_truthy
-        expect(bike_sticker.authorized?(admin)).to be_truthy
-        expect(bike_sticker.authorized?(rando)).to be_falsey
-        expect(bike_sticker.authorized?(User.new)).to be_falsey
+  describe "organization_authorized?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
+    it "returns false for no organization passed, true for the same organization" do
+      expect(bike_sticker.organization_authorized?).to be_falsey
+      expect(bike_sticker.organization_authorized?(organization)).to be_truthy
+    end
+    context "organization varieties" do
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
+      let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
+      let(:organization_other) { FactoryBot.create(:organization) }
+      let(:organization_ambassador) { FactoryBot.create(:organization_ambassador) }
+      let!(:bike_sticker_child) { FactoryBot.create(:bike_sticker, organization: organization_child) }
+      let!(:bike_sticker_regional) { FactoryBot.create(:bike_sticker, organization: organization_regional) }
+      let(:bike_sticker_other) { FactoryBot.create(:bike_sticker, organization: organization_other) }
+      let(:bike_sticker_no_organization) { FactoryBot.create(:bike_sticker, organization: nil) }
+      it "returns true for regional organization" do
+        expect(organization.paid?).to be_truthy
+        expect(organization_child.paid?).to be_truthy
+        expect(organization_regional.paid?).to be_falsey
+        expect(organization_other.paid?).to be_falsey
+        # bike sticker for Main organization
+        expect(bike_sticker.organization_authorized?(organization)).to be_truthy
+        expect(bike_sticker.organization_authorized?(organization_child)).to be_truthy
+        expect(bike_sticker.organization_authorized?(organization_regional)).to be_truthy
+        expect(bike_sticker.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker.organization_authorized?(organization_ambassador)).to be_truthy
+        # child sticker
+        expect(bike_sticker_child.organization_authorized?(organization)).to be_truthy
+        expect(bike_sticker_child.organization_authorized?(organization_child)).to be_truthy
+        expect(bike_sticker_child.organization_authorized?(organization_regional)).to be_falsey
+        expect(bike_sticker_child.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker_child.organization_authorized?(organization_ambassador)).to be_truthy
+        # regional org sticker
+        expect(bike_sticker_regional.organization_authorized?(organization)).to be_truthy
+        expect(bike_sticker_regional.organization_authorized?(organization_child)).to be_truthy
+        expect(bike_sticker_regional.organization_authorized?(organization_regional)).to be_truthy
+        expect(bike_sticker_regional.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker_regional.organization_authorized?(organization_ambassador)).to be_truthy
+        # other organization sticker
+        expect(bike_sticker_other.organization_authorized?(organization)).to be_truthy
+        expect(bike_sticker_other.organization_authorized?(organization_child)).to be_truthy
+        expect(bike_sticker_other.organization_authorized?(organization_regional)).to be_falsey
+        expect(bike_sticker_other.organization_authorized?(organization_other)).to be_truthy
+        expect(bike_sticker_other.organization_authorized?(organization_ambassador)).to be_truthy
+        # no organization sticker
+        expect(bike_sticker_no_organization.organization_authorized?(organization)).to be_truthy
+        expect(bike_sticker_no_organization.organization_authorized?(organization_child)).to be_truthy
+        expect(bike_sticker_no_organization.organization_authorized?(organization_regional)).to be_falsey
+        expect(bike_sticker_no_organization.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker_no_organization.organization_authorized?(organization_ambassador)).to be_truthy
       end
     end
-    context "unclaimed bike_sticker" do
-      let(:bike) { FactoryBot.create(:bike) }
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
-      let(:user) { FactoryBot.create(:user_confirmed) }
-      it "permits user to authorize" do
-        expect(bike_sticker.claimable_by?(user)).to be_truthy
-        expect(bike_sticker.authorized?(user)).to be_truthy
-        expect(user.authorized?(bike_sticker)).to be_truthy
-        expect(User.new.authorized?(bike_sticker)).to be_truthy
-        # User has claimed max claimable bike codes
-        BikeSticker::MAX_UNORGANIZED.times { FactoryBot.create(:bike_sticker_claimed, bike: bike, user: user) }
-        expect(bike_sticker.claimable_by?(user)).to be_falsey
-        expect(bike_sticker.authorized?(user)).to be_falsey
-        expect(user.authorized?(bike_sticker)).to be_falsey
-        expect(User.new.authorized?(bike_sticker)).to be_truthy
+  end
+
+  describe "claimable_by?" do
+    context "already claimed sticker for unorganized user" do
+      let(:user) { FactoryBot.create(:user) }
+      let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+      let(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed) }
+      let(:bike) { bike_sticker2.bike }
+      it "does not permit claiming already claimed stickers" do
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user)).to be_falsey
+        # It's still claimable by the user after it has been claimed
+        bike_sticker1.claim(user: user, bike: bike)
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        # But is not claimable by a different unorganized user
+        expect(bike_sticker1.claimable_by?(bike_sticker2.user)).to be_falsey
+        # If we make the user the owner of that bike, they have permission
+        FactoryBot.create(:ownership_claimed, bike: bike, user: user)
+        bike_sticker2.reload
+        expect(bike_sticker2.claimable_by?(user)).to be_truthy
+      end
+    end
+    before { stub_const("BikeSticker::MAX_UNORGANIZED", 2) }
+    context "user" do
+      let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+      let(:bike_sticker2) { FactoryBot.create(:bike_sticker) }
+      let(:bike_sticker3) { FactoryBot.create(:bike_sticker) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      it "is truthy if fewer than MAX_UNORGANIZED bike_sticker_updates" do
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker1.claimable_by?(user, organization)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy
+        expect(bike_sticker3.claimable_by?(user)).to be_truthy
+        expect(bike_sticker3.claimable_by?(user, organization)).to be_truthy
+        expect(bike_sticker1.organization_authorized?(organization)).to be_falsey
+        expect(bike_sticker2.organization_authorized?(organization)).to be_falsey
+        expect(bike_sticker3.organization_authorized?(organization)).to be_falsey
+        update1 = FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1)
+        update2 = FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, organization: organization)
+        expect(update1.organization_kind).to eq "no_organization"
+        expect(update2.organization_kind).to eq "other_organization"
+        user.reload
+        expect(user.unauthorized_organization_update_bike_sticker_ids).to match_array([bike_sticker1.id, bike_sticker2.id])
+        bike_sticker1.reload
+        bike_sticker2.reload
+        bike_sticker3.reload
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker1.claimable_by?(user, organization)).to be_truthy # Not authorized by organization tho
+        expect(bike_sticker2.claimable_by?(user)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy # Not authorized by organization tho
+        expect(bike_sticker3.claimable_by?(user)).to be_falsey
+        # If user is superuser, it's claimable
+        user.update(superuser: true)
+        expect(bike_sticker3.claimable_by?(user)).to be_truthy
+        expect(bike_sticker3.claimable_by?(user, organization)).to be_truthy
+      end
+    end
+    context "bike sticker is for a regional org" do
+      let(:bike_sticker1) { FactoryBot.create(:bike_sticker, organization: organization) }
+      let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
+      let(:bike_sticker3) { FactoryBot.create(:bike_sticker, organization: organization) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
+      let(:organization_other) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization_regional) }
+      before { FactoryBot.create(:membership_claimed, user: user, organization: organization_other) }
+      it "is truthy for regional org" do
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1, kind: "failed_claim") # Ignored, because failed
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, kind: "failed_claim") # Ignored, because failed
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, kind: "failed_claim") # Ignored, because failed
+        expect(user.authorized?(organization_regional)).to be_truthy
+        expect(user.authorized?(organization_other)).to be_truthy
+        expect(user.authorized?(organization)).to be_falsey
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker1.claimable_by?(user, organization_other)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user, organization_regional)).to be_truthy
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_falsey # user not authorized on organization
+        expect(bike_sticker3.claimable_by?(user, organization_other)).to be_truthy
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1, organization: organization_regional)
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, organization: organization_regional)
+        expect(user.unauthorized_organization_update_bike_sticker_ids.count).to eq 0
+        expect(bike_sticker1.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker1.claimable_by?(user, organization_other)).to be_truthy
+        expect(bike_sticker2.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker2.claimable_by?(user, organization_other)).to be_truthy
+        expect(bike_sticker3.claimable_by?(user, organization_other)).to be_truthy
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1)
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, organization: organization_other)
+        user.reload
+        expect(user.unauthorized_organization_update_bike_sticker_ids).to match_array([bike_sticker1.id, bike_sticker2.id])
+        expect(bike_sticker1.claimable_by?(user, organization_other)).to be_truthy # user already claimed bike_sticker already edited
+        expect(bike_sticker2.claimable_by?(user, organization_other)).to be_truthy # user already claimed bike_sticker already edited
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_falsey # user isn't authorized on the organization
+        expect(bike_sticker3.claimable_by?(user)).to be_truthy # authorized by the regional organization
+        expect(bike_sticker3.claimable_by?(user, organization_regional)).to be_truthy
+        expect(bike_sticker3.organization_authorized?(organization_other)).to be_falsey
+        expect(bike_sticker3.claimable_by?(user, organization_other)).to be_falsey
+        expect(bike_sticker3.claimable_by?(user, organization)).to be_falsey # user isn't authorized on the organization
       end
     end
   end
 
   describe "claim" do
-    let(:ownership) { FactoryBot.create(:ownership) }
-    let(:bike) { ownership.bike }
-    let(:user) { FactoryBot.create(:user) }
-    let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
-    it "claims, doesn't update when unable to parse" do
-      bike_sticker.reload
-      expect(bike_sticker.authorized?(user)).to be_truthy
-      bike_sticker.claim(user, bike.id)
-      expect(bike_sticker.authorized?(user)).to be_truthy
-      expect(bike_sticker.previous_bike_id).to be_nil
-      expect(bike_sticker.user).to eq user
-      expect(bike_sticker.bike).to eq bike
-      bike_sticker.claim(user, "https://bikeindex.org/bikes/9#{bike.id}")
-      expect(bike_sticker.previous_bike_id).to be_nil
-      expect(bike_sticker.errors.full_messages).to be_present
-      expect(bike_sticker.bike).to eq bike
-      bike_sticker.claim(user, "https://bikeindex.org/bikes?per_page=200")
-      expect(bike_sticker.errors.full_messages).to be_present
-      expect(bike_sticker.bike).to eq bike
-      expect(bike_sticker.claimed_at).to be_within(1.second).of Time.current
-      expect(bike_sticker.previous_bike_id).to be_nil
-      reloaded_code = BikeSticker.find bike_sticker.id # Hard reload, it wasn't resetting errors
-      expect(reloaded_code.authorized?(user)).to be_truthy
-      expect(reloaded_code.unclaimable_by?(user)).to be_truthy
-      expect(ownership.creator.authorized?(bike)).to be_truthy
-      expect(reloaded_code.unclaimable_by?(ownership.creator)).to be_truthy
-      reloaded_code.claim(ownership.creator, "")
-      expect(reloaded_code.bike_id).to be_nil
-      expect(reloaded_code.previous_bike_id).to eq bike.id
-    end
-    context "with weird strings" do
-      it "updates" do
-        bike_sticker.claim(user, "\nwww.bikeindex.org/bikes/#{bike.id}/edit")
-        expect(bike_sticker.errors.full_messages).to_not be_present
-        expect(bike_sticker.bike).to eq bike
-        bike_sticker.claim(user, "\nwww.bikeindex.org/bikes/#{bike.id} ")
-        expect(bike_sticker.errors.full_messages).to_not be_present
-        expect(bike_sticker.bike).to eq bike
-        expect(bike_sticker.previous_bike_id).to eq bike.id
-      end
-    end
-    context "organized" do
+    describe "not claimable_by? tests" do
+      before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
+      let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+      let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
-      it "permits unclaiming of organized bikes if already claimed" do
-        expect(bike.organizations).to eq([])
-        bike_sticker.claim(user, bike)
-        bike.reload
+      let(:organization_paid) { FactoryBot.create(:organization_with_organization_features) }
+      let(:user) { FactoryBot.create(:user) }
+      let(:bike2) { FactoryBot.create(:bike) }
+      it "claims anyway" do
+        expect(user.authorized?(organization)).to be_falsey
+        FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1)
+        # Not passing in organization
+        expect(bike_sticker2.claimable_by?(user)).to be_falsey
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_falsey
+        expect { bike_sticker2.claim(user: user, bike: bike1) }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker2.reload
+        expect(bike_sticker2.claimed?).to be_truthy
+        expect(bike_sticker2.user).to eq user
+        expect(bike_sticker2.secondary_organization).to be_blank
+        bike_sticker_update1 = bike_sticker2.bike_sticker_updates.last
+        expect(bike_sticker_update1.user).to eq user
+        expect(bike_sticker_update1.organization).to be_blank
+        expect(bike_sticker_update1.bike).to eq bike1
+        expect(bike_sticker_update1.organization_kind).to eq "no_organization"
+        expect(bike_sticker_update1.unauthorized_organization?).to be_truthy
+        expect(bike_sticker_update1.kind).to eq "initial_claim"
+        bike1.reload
+        expect(bike1.bike_organizations.pluck(:organization_id)).to eq([])
+        # Manually passing unauthorized organization in
+        expect(bike_sticker1.claimed?).to be_falsey
+        expect(bike_sticker1.claimable_by?(user)).to be_truthy
+        expect(bike_sticker1.claimable_by?(user, organization)).to be_falsey # Because user isn't authorized on that org
+        expect(bike_sticker1.organization_authorized?(organization)).to be_falsey
+        expect { bike_sticker1.claim(user: user, bike: bike1, organization: organization) }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker1.reload
+        expect(bike_sticker1.claimed?).to be_truthy
+        expect(bike_sticker1.user).to eq user
+        expect(bike_sticker1.organization).to be_blank
+        expect(bike_sticker1.secondary_organization).to eq organization
+        bike_sticker_update2 = bike_sticker1.bike_sticker_updates.last
+        expect(bike_sticker_update2.user).to eq user
+        expect(bike_sticker_update2.organization).to eq organization
+        expect(bike_sticker_update2.bike).to eq bike1
+        expect(bike_sticker_update2.organization_kind).to eq "other_organization"
+        expect(bike_sticker_update2.unauthorized_organization?).to be_truthy
+        expect(bike_sticker_update2.kind).to eq "re_claim" # Because factory created update
+        bike1.reload
+        expect(bike1.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        # blank bike, manually passing in organization that is authorized
+        expect(bike_sticker2.claimed?).to be_truthy
+        expect(bike_sticker2.claimable_by?(user)).to be_truthy # This bike_sticker is already claimed by the user
+        expect(bike_sticker2.organization_authorized?(organization_paid)).to be_truthy
+        expect { bike_sticker2.claim(user: user, organization: organization_paid) }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker2.reload
+        expect(bike_sticker2.claimed?).to be_falsey
+        expect(bike_sticker2.user).to eq user
+        expect(bike_sticker2.secondary_organization).to be_blank # Because the sticker is now unclaimed
+        expect(bike_sticker2.previous_bike_id).to eq bike1.id
+        bike_sticker_update3 = bike_sticker2.bike_sticker_updates.last
+        expect(bike_sticker_update3.user).to eq user
+        expect(bike_sticker_update3.organization).to eq organization_paid
+        expect(bike_sticker_update3.bike).to be_blank
+        expect(bike_sticker_update3.organization_kind).to eq "other_paid_organization"
+        expect(bike_sticker_update3.unauthorized_organization?).to be_falsey
+        expect(bike_sticker_update3.kind).to eq "un_claim"
+        expect(bike_sticker_update3.creator_kind).to eq "creator_user" # Default
+        bike1.reload
+        expect(bike1.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        # claiming with organization_paid
+        expect { bike_sticker2.claim(user: user, bike: bike2, organization: organization_paid, creator_kind: "whatever69") }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker2.reload
+        expect(bike_sticker2.claimed?).to be_truthy
+        expect(bike_sticker2.user).to eq user
+        expect(bike_sticker2.secondary_organization).to eq organization_paid
+        expect(bike_sticker2.previous_bike_id).to eq bike1.id
+        bike_sticker_update4 = bike_sticker2.bike_sticker_updates.last
+        expect(bike_sticker_update4.user).to eq user
+        expect(bike_sticker_update4.organization).to eq organization_paid
+        expect(bike_sticker_update4.bike).to eq bike2
+        expect(bike_sticker_update4.organization_kind).to eq "other_paid_organization"
+        expect(bike_sticker_update4.unauthorized_organization?).to be_falsey
+        expect(bike_sticker_update4.kind).to eq "re_claim"
+        expect(bike_sticker_update4.creator_kind).to eq "creator_user" # Because unknown value passed
+        bike2.reload
+        expect(bike2.bike_organizations.pluck(:organization_id)).to match_array([organization_paid.id])
+        # claiming with primary organization
+        expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization, creator_kind: "creator_pos") }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker2.reload
+        expect(bike_sticker2.claimed?).to be_truthy
+        expect(bike_sticker2.user).to eq user
+        expect(bike_sticker2.secondary_organization).to eq organization_paid
+        expect(bike_sticker2.previous_bike_id).to eq bike2.id
+        bike_sticker_update5 = bike_sticker2.bike_sticker_updates.reorder(:id).last
+        expect(bike_sticker_update5.user).to eq user
+        expect(bike_sticker_update5.organization).to eq organization
+        expect(bike_sticker_update5.bike).to eq bike1
+        expect(bike_sticker_update5.organization_kind).to eq "primary_organization"
+        expect(bike_sticker_update5.unauthorized_organization?).to be_falsey
+        expect(bike_sticker_update5.creator_kind).to eq "creator_pos" # Because it was passed
+        expect(bike1.bike_organizations.pluck(:organization_id)).to match_array([organization.id])
+      end
+    end
+    describe "parsing bike string" do
+      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:bike) { ownership.bike }
+      let(:user) { FactoryBot.create(:user) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
+      it "claims, doesn't update when unable to parse" do
         bike_sticker.reload
-        expect(bike.organizations.pluck(:id)).to eq([organization.id])
-        expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([])
-        expect(bike_sticker.claimed?).to be_truthy
-        expect(bike_sticker.errors.full_messages).to_not be_present
-        bike_sticker.claim(user, "\n ")
-        expect(bike_sticker.errors.full_messages).to_not be_present
-        expect(bike_sticker.bike_id).to be_nil
-        expect(bike_sticker.claimed_at).to be_nil
-        expect(bike_sticker.user_id).to be_nil
-        # Since no bike is assigned, it isn't unclaimable again
-        bike_sticker.claim(user, "\n ")
+        expect(bike_sticker.claimable_by?(user)).to be_truthy
+        bike_sticker.claim(user: user, bike: bike.id)
+        expect(bike_sticker.claimable_by?(user)).to be_truthy
+        expect(bike_sticker.user).to eq user
+        expect(bike_sticker.bike).to eq bike
+        expect(bike_sticker.bike_sticker_updates.count).to eq 1
+        bike_sticker.claim(user: user, bike: "https://bikeindex.org/bikes/9#{bike.id}")
         expect(bike_sticker.errors.full_messages).to be_present
-        # And it sets previous_bike_id correctly
-        bike_sticker.reload
-        bike_sticker.claim(user, "")
-        bike_sticker.reload
-        expect(bike_sticker.previous_bike_id).to eq bike.id
-        bike_sticker.reload
-        bike_sticker.claim(user, "")
-        bike_sticker.reload
-        expect(bike_sticker.previous_bike_id).to eq bike.id
+        expect(bike_sticker.bike).to eq bike
+        expect(bike_sticker.bike_sticker_updates.count).to eq 2
+        bike_sticker_update2 = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update2.kind).to eq "failed_claim"
+        expect(bike_sticker_update2.failed_claim_errors).to match("unable to find")
+        bike_sticker.claim(user: user, bike: "https://bikeindex.org/bikes?per_page=200")
+        expect(bike_sticker.errors.full_messages).to be_present
+        expect(bike_sticker.bike).to eq bike
+        expect(bike_sticker.claimed_at).to be_within(1.second).of Time.current
+        expect(bike_sticker.bike_sticker_updates.count).to eq 3
+        bike_sticker_update3 = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update3.kind).to eq "failed_claim"
+        expect(bike_sticker_update3.failed_claim_errors).to match(/bikeindex.org.bikes.per_page=200/)
       end
-      context "unclaiming with bikeindex.org url" do
-        let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization) }
-        it "adds an error" do
+      context "with weird strings" do
+        it "updates" do
+          bike_sticker.claim(user: user, bike: "\nwww.bikeindex.org/bikes/#{bike.id}/edit")
+          expect(bike_sticker.errors.full_messages).to_not be_present
           expect(bike_sticker.bike).to eq bike
-          # Doesn't permit unclaiming by a bikeindex.org/ url, because that's probably a mistake
-          bike_sticker.claim(user, "www.bikeindex.org/bikes/ ")
-          expect(bike_sticker.errors.full_messages).to be_present
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          expect(bike_sticker.bike_sticker_updates.last.kind).to eq "initial_claim"
+          bike_sticker.claim(user: user, bike: "\nwww.bikeindex.org/bikes/#{bike.id} ")
+          expect(bike_sticker.errors.full_messages).to_not be_present
           expect(bike_sticker.bike).to eq bike
+          expect(bike_sticker.bike_sticker_updates.count).to eq 2
+          expect(bike_sticker.bike_sticker_updates.last.kind).to eq "re_claim"
+          expect(bike_sticker.bike_sticker_updates.last.bike_id).to eq bike.id
         end
       end
+    end
+  end
 
-      context "unorganized" do
-        let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: FactoryBot.create(:organization)) }
-        it "can't unclaim other orgs bikes" do
-          bike_sticker.claim(user, nil)
-          expect(bike_sticker.errors.full_messages).to be_present
-          expect(bike_sticker.claimed?).to be_truthy
-          expect(bike_sticker.bike).to eq bike
-        end
+  describe "claim_if_permitted" do
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
+    let(:user) { FactoryBot.create(:user) }
+    it "claims" do
+      expect { bike_sticker.claim_if_permitted(user: user, bike: bike1) }.to change(BikeStickerUpdate, :count).by 1
+      bike_sticker.reload
+      expect(bike_sticker.claimed?).to be_truthy
+      bike_sticker_update = bike_sticker.bike_sticker_updates.last
+      expect(bike_sticker_update.kind).to eq "initial_claim"
+    end
+    context "too many claims" do
+      before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
+      it "does not claim" do
+        FactoryBot.create(:bike_sticker_update, user: user)
+        expect(bike_sticker.claimable_by?(user)).to be_falsey
+        expect {
+          bike_sticker.claim_if_permitted(user: user, bike: bike1)
+        }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update.kind).to eq "failed_claim"
+        expect(bike_sticker_update.failed_claim_errors).to match("permission")
+      end
+    end
+    context "unable to parse bike" do
+      it "does not claim" do
+        expect {
+          bike_sticker.claim_if_permitted(user: user, bike: "afs8fxc77xc")
+        }.to change(BikeStickerUpdate, :count).by 1
+        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update.kind).to eq "failed_claim"
+        expect(bike_sticker_update.failed_claim_errors).to match("find")
       end
     end
   end

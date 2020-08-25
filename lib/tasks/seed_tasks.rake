@@ -4,11 +4,11 @@
 desc "Seed test users & 50 text bikes for user@example on first organization"
 task seed_test_users_and_bikes: :environment do
   user_attrs = {
-    admin: { name: "admin", email: "admin@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true, superuser: true },
-    member: { name: "member", email: "member@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true },
-    user: { name: "user", email: "user@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true },
-    api_accessor: { name: "Api Accessor", email: "api@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true },
-    example_user: { name: "Example user", email: "example_user@bikeindex.org", password: "please12", password_confirmation: "please12", terms_of_service: true },
+    admin: {name: "admin", email: "admin@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, superuser: true},
+    member: {name: "member", email: "member@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    user: {name: "user", email: "user@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    api_accessor: {name: "Api Accessor", email: "api@example.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
+    example_user: {name: "Example user", email: "example_user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true}
   }
 
   user_attrs.values.each do |attributes|
@@ -41,9 +41,9 @@ task seed_test_users_and_bikes: :environment do
       front_wheel_size_id: (rand(WheelSize.count) - 1),
       primary_frame_color_id: (rand(Color.count) - 1),
       creator: @user,
-      owner_email: @user.email,
+      owner_email: @user.email
     )
-    bike.serial_number = (0...10).map { (65 + rand(26)).chr }.join
+    bike.serial_number = (0...10).map { rand(65..90).chr }.join
     bike.creation_organization_id = @org.id
     if bike.save
       ownership = Ownership.new(bike_id: bike.id, creator_id: @member.id, user_id: @user.id, owner_email: @user.email, current: true)
@@ -65,7 +65,7 @@ task seed_dup_bikes: :environment do
   @member = User.find_by_email("member@example.com")
   @org = Organization.first
   @cycle_type = CycleType.new(:bike)
-  @serial_number = (0...10).map { (65 + rand(26)).chr }.join
+  @serial_number = (0...10).map { rand(65..90).chr }.join
   @manufacturer_id = (rand(Manufacturer.frame_makers.count) + 1)
   500.times do
     bike = Bike.new(
@@ -79,7 +79,7 @@ task seed_dup_bikes: :environment do
       creator: @user,
       owner_email: @user.email,
       serial_number: @serial_number,
-      creation_organization_id: @org.id,
+      creation_organization_id: @org.id
     )
     if bike.save
       ownership = Ownership.new(bike_id: bike.id, creator_id: @member.id, user_id: @user.id, owner_email: @user.email, current: true)
@@ -112,8 +112,8 @@ namespace :dev do
         "2019-06-24": 228,
         "2019-06-25": 226,
         "2019-06-26": 259,
-        "2019-06-27": 127,
-      }.to_json,
+        "2019-06-27": 127
+      }.to_json
     }
 
     printf "Assigning Counts values... "

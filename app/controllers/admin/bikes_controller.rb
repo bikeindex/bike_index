@@ -7,8 +7,8 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = available_bikes.includes(:creation_organization, :creation_states, :paint)
-                            .reorder("bikes.#{sort_column} #{sort_direction}")
-                            .page(@page).per(per_page)
+      .reorder("bikes.#{sort_column} #{sort_direction}")
+      .page(@page).per(per_page)
   end
 
   def missing_manufacturer
@@ -29,17 +29,17 @@ class Admin::BikesController < Admin::BaseController
         Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
       flash[:success] = "Success. Bikes updated"
-      redirect_back(fallback_location: root_url) and return
+      redirect_back(fallback_location: root_url) && return
     end
     flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     redirect_back(fallback_location: root_url)
   end
 
   def duplicates
-    if params[:show_ignored]
-      duplicate_groups = DuplicateBikeGroup.order("created_at desc")
+    duplicate_groups = if params[:show_ignored]
+      DuplicateBikeGroup.order("created_at desc")
     else
-      duplicate_groups = DuplicateBikeGroup.unignored.order("created_at desc")
+      DuplicateBikeGroup.unignored.order("created_at desc")
     end
     @page = params[:page] || 1
     per_page = params[:per_page] || 25
@@ -73,7 +73,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }.as_json)
+    updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}.as_json)
     updator.update_ownership
     updator.update_stolen_record
     @bike = @bike.decorate
@@ -82,13 +82,14 @@ class Admin::BikesController < Admin::BaseController
         recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery],
+        recovering_user_id: current_user.id
       )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
-      redirect_to edit_admin_bike_url(@bike) and return
+      redirect_to(edit_admin_bike_url(@bike)) && return
     else
       render action: "edit"
     end
@@ -139,10 +140,10 @@ class Admin::BikesController < Admin::BaseController
   def matching_bikes
     if params[:search_user_id].present?
       @user = User.username_friendly_find(params[:search_user_id])
-      if @user.rough_approx_bikes.count > 25
-        bikes = @user.rough_approx_bikes
+      bikes = if @user.rough_approx_bikes.count > 25
+        @user.rough_approx_bikes
       else
-        bikes = @user.bikes
+        @user.bikes
       end
     else
       bikes = Bike.unscoped
@@ -155,10 +156,10 @@ class Admin::BikesController < Admin::BaseController
     end
     bikes = bikes.non_example if params[:search_example] == "non_example_only"
     if current_organization.present?
-      if params[:search_only_creation_organization].present?
-        bikes = bikes.includes(:creation_states).where(creation_states: { organization_id: current_organization.id })
+      bikes = if params[:search_only_creation_organization].present?
+        bikes.includes(:creation_states).where(creation_states: {organization_id: current_organization.id})
       else
-        bikes = bikes.organization(current_organization)
+        bikes.organization(current_organization)
       end
     end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
@@ -169,7 +170,7 @@ class Admin::BikesController < Admin::BaseController
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = CreationState.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
-    bikes = bikes.includes(:creation_states).where(creation_states: { origin: @origin_search_type }) if @origin_search_type.present?
+    bikes = bikes.includes(:creation_states).where(creation_states: {origin: @origin_search_type}) if @origin_search_type.present?
     bikes
   end
 

@@ -42,7 +42,7 @@
         Features
     %tbody
       - invoices.each do |invoice|
-        - organization = invoice.organization
+        - organization = Organization.unscoped.find(invoice.organization_id)
         %tr
           %td
             - if organization.present?
@@ -53,18 +53,21 @@
             - if invoice.previous_invoice.present?
               %small.less-strong{ style: "display: block; margin-top: 1rem;" }
                 Follows ##{invoice.previous_invoice.id}
-          - if display_organization && organization.present?
+          - if display_organization
             %td
-              = link_to organization.short_name, admin_organization_path(organization.to_param)
-              - unless invoice.organization.present?
-                %small.text-danger
-                  organization is deleted!
+              - if organization.present?
+                = link_to organization.short_name, admin_invoices_path(organization_id: organization.to_param)
+                - unless invoice.organization.present?
+                  %small.text-danger
+                    organization is deleted!
           %td
             - if invoice.subscription_start_at.present?
               %span.convertTime
                 = l invoice.subscription_start_at, format: :convert_time
           %td
-            - if invoice.subscription_end_at.present?
+            - if invoice.endless?
+              %small.less-strong endless
+            - elsif invoice.subscription_end_at.present?
               %span.convertTime{ class: invoice.subscription_end_at < Time.current ? "text-danger" : "" }
                 = l invoice.subscription_end_at, format: :convert_time
           %td
@@ -84,11 +87,11 @@
               = invoice.discount_formatted
           %td
             %ul{ style: "font-size: 80%;" }
-              - invoice.paid_features.each do |paid_feature|
+              - invoice.organization_features.each do |organization_feature|
                 %li
-                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  = link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature)
                   %em{ style: "font-size: 70%;" }
-                    = paid_feature.kind
+                    = organization_feature.kind
 
             %small
               = safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")

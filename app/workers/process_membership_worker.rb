@@ -31,14 +31,14 @@ class ProcessMembershipWorker < ApplicationWorker
 
   def remove_duplicated_membership!(membership)
     return false unless membership.user.present? &&
-                        membership.user.memberships.where.not(id: membership.id)
-                                  .where(organization_id: membership.organization_id).any?
+      membership.user.memberships.where.not(id: membership.id)
+        .where(organization_id: membership.organization_id).any?
     membership.destroy
   end
 
   def auto_generate_user_for_organization(membership)
     return false unless membership.organization.enabled?("passwordless_users") &&
-                        membership.user.blank?
+      membership.user.blank?
     password = SecurityTokenizer.new_password_token
     user = User.new(skip_update: true,
                     email: membership.invited_email,
@@ -57,7 +57,7 @@ class ProcessMembershipWorker < ApplicationWorker
     already_assigned_task_ids =
       AmbassadorTask
         .includes(ambassador_task_assignments: :ambassador)
-        .where(ambassador_task_assignments: { user_id: ambassador.id })
+        .where(ambassador_task_assignments: {user_id: ambassador.id})
         .select(:id)
 
     new_assignments =

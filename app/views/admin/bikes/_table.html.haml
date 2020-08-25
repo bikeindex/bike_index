@@ -3,8 +3,10 @@
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
 
+- unless current_user.developer? && params[:hide_dev].blank?
+  <style>.bikeTable .only-dev-visible { display: none !important; }</style>
 .full-screen-table
-  %table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
+  %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header
       %thead.thead-light.sortable
         %th
@@ -37,12 +39,15 @@
               .less-strong-hold
                 %a.small.convertTime{ href: edit_admin_bike_url(bike) }
                   = l bike.created_at, format: :convert_time
-                %span.less-strong-right.d-none.d-md-block
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
                   - if bike.example
                     %span.text-danger
                       = bike.id
                   - else
                     = bike.id
+              - if bike.deleted?
+                .small.text-danger
+                  Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
             %td.d-none.d-md-table-cell
               = bike.owner_email
               - if bike.user?
@@ -58,7 +63,7 @@
                 = bike.mnfg_name
             %td.d-none.d-lg-table-cell
               .less-strong-hold
-                = [bike.year, bike.frame_model].join(' ')
+                = [bike.year, bike.frame_model_truncated].join(' ')
                 = "(#{bike.type})" unless bike.type == 'bike'
                 - if bike.stolen_recovery?
                   %small
@@ -68,7 +73,7 @@
                     = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
                     = bike.frame_colors.to_sentence
                 - if bike.stolen
-                  %span.less-strong-right
+                  %span.text-danger.less-strong-right
                     stolen
             %td.admin-bike-table-serial-cell
               %small.less-strong

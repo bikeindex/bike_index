@@ -36,28 +36,28 @@ FactoryBot.define do
       after(:create) do |organization|
         2.times do |n|
           FactoryBot.create(:location,
-                            name: "location #{n}",
-                            organization: organization)
+            name: "location #{n}",
+            organization: organization)
         end
       end
     end
 
-    trait :paid_features do
+    trait :organization_features do
       transient do
         enabled_feature_slugs { ["csv_export"] }
-        paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(enabled_feature_slugs)) }
+        organization_feature { FactoryBot.create(:organization_feature, amount_cents: 10_000, feature_slugs: Array(enabled_feature_slugs)) }
       end
 
       after(:create) do |organization, evaluator|
         Sidekiq::Testing.inline! do
           invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id])
+          invoice.update_attributes(organization_feature_ids: [evaluator.organization_feature.id])
           organization.reload
         end
       end
     end
 
-    factory :organization_with_paid_features, traits: [:paid_features] do
+    factory :organization_with_organization_features, traits: [:organization_features] do
       factory :organization_with_regional_bike_counts do
         enabled_feature_slugs { ["regional_bike_counts"] }
       end

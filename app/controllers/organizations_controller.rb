@@ -9,8 +9,8 @@ class OrganizationsController < ApplicationController
   end
 
   def lightspeed_interface
-    if current_user && current_user.organizations.any?
-      redirect_to "https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}" and return
+    if current_user&.organizations&.any?
+      redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}") && return
     end
 
     session[:return_to] = lightspeed_interface_path
@@ -19,7 +19,7 @@ class OrganizationsController < ApplicationController
       redirect_to new_organization_path
     else
       flash[:info] = translation(:must_create_an_account_first)
-      redirect_to new_user_path and return
+      redirect_to(new_user_path) && return
     end
   end
 
@@ -33,7 +33,7 @@ class OrganizationsController < ApplicationController
         redirect_to organization_manage_path(organization_id: @organization.to_param)
       end
     else
-      render action: :new and return
+      render(action: :new) && return
     end
   end
 
@@ -70,7 +70,7 @@ class OrganizationsController < ApplicationController
     return true unless find_organization.present?
     unless find_organization.auto_user.present?
       flash[:error] = translation(:no_user)
-      redirect_to root_url and return
+      redirect_to(root_url) && return
     end
     if params[:b_param_id_token].present?
       @b_param = BParam.find_or_new_from_token(params[:b_param_id_token])
@@ -78,17 +78,17 @@ class OrganizationsController < ApplicationController
       hash = {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: { stolen: params[:stolen] },
+        bike: {stolen: params[:stolen]}
       }
       @b_param = BParam.create(creator_id: @organization.auto_user.id, params: hash)
     end
   end
 
   def built_stolen_record
-    if @b_param.params && @b_param.params["stolen_record"].present?
-      stolen_attrs = @b_param.params["stolen_record"].except("phone_no_show")
+    stolen_attrs = if @b_param.params && @b_param.params["stolen_record"].present?
+      @b_param.params["stolen_record"].except("phone_no_show")
     else
-      stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.current }
+      {country_id: Country.united_states.id, date_stolen: Time.current}
     end
     @bike.stolen_records.build(stolen_attrs)
   end
@@ -103,15 +103,15 @@ class OrganizationsController < ApplicationController
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
-          .permit(:name, :website)
-          .merge(auto_user_id: current_user.id, kind: approved_kind)
+      .permit(:name, :website)
+      .merge(auto_user_id: current_user.id, kind: approved_kind)
   end
 
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
     flash[:error] = translation(:not_found)
-    redirect_to root_url and return
+    redirect_to(root_url) && return
   end
 
   def notify_admins(type)

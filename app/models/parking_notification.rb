@@ -2,9 +2,11 @@
 
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
-  KIND_ENUM = { appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2 }.freeze
-  STATUS_ENUM = { current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4 }.freeze
-  RETRIEVED_KIND_ENUM = { organization_recovery: 0, link_token_recovery: 1, user_recovery: 2 }.freeze
+  KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
+  STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4}.freeze
+  RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
+  MAX_PER_PAGE = 250
+  max_paginates_per 250
 
   belongs_to :bike
   belongs_to :user
@@ -37,20 +39,29 @@ class ParkingNotification < ActiveRecord::Base
   scope :email_success, -> { where(delivery_status: "email_success") }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
+  scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.statuses; STATUS_ENUM.keys.map(&:to_s) end
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
 
-  def self.active_statuses; %w[current replaced] end
+  def self.active_statuses
+    %w[current replaced]
+  end
 
-  def self.resolved_statuses; statuses - active_statuses end
+  def self.resolved_statuses
+    statuses - active_statuses
+  end
 
   def self.kinds_humanized
     {
       appears_abandoned_notification: "Appears abandoned",
       parked_incorrectly_notification: "Parked incorrectly",
-      impound_notification: "Impounded",
+      impound_notification: "Impounded"
     }
   end
 
@@ -67,49 +78,100 @@ class ParkingNotification < ActiveRecord::Base
 
   def self.bikes
     Bike.unscoped.includes(:parking_notifications)
-        .where(parking_notifications: { id: pluck(:id) })
+      .where(parking_notifications: {id: pluck(:id)})
+  end
+
+  # Passing in an already formed bounding_box - added method to explicitly document required args
+  def self.search_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
+    within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
   end
 
   # geocoding is managed by set_calculated_attributes
-  def should_be_geocoded?; false end
+  def should_be_geocoded?
+    false
+  end
+
+  def sent_at
+    email_success? ? created_at : nil
+  end
 
   # Get it unscoped, because unregistered_bike notifications
-  def bike; @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil end
+  def bike
+    @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
 
-  def active?; self.class.active_statuses.include?(status) end
+  def active?
+    self.class.active_statuses.include?(status)
+  end
 
-  def resolved?; !active? end
+  def resolved?
+    !active?
+  end
 
-  def email_success?; delivery_status == "email_success" end
+  def resolved_without_impounding?
+    resolved? && !impounded?
+  end
 
-  def initial_record?; initial_record_id.blank? end
+  def email_success?
+    delivery_status == "email_success"
+  end
 
-  def repeat_record?; initial_record_id.present? end
+  def initial_record?
+    initial_record_id.blank?
+  end
 
-  def owner_known?; !unregistered_bike? && (bike&.owner_email).present? end
+  def repeat_record?
+    initial_record_id.present?
+  end
 
-  def send_email?; owner_known? end
+  def owner_known?
+    !unregistered_bike? && bike&.owner_email.present?
+  end
 
-  def show_address; !hide_address end
+  def send_email?
+    owner_known?
+  end
 
-  def kind_humanized; self.class.kinds_humanized[kind.to_sym] end
+  def show_address
+    !hide_address
+  end
 
-  def can_be_repeat?; potential_initial_record.present? end
+  def kind_humanized
+    self.class.kinds_humanized[kind.to_sym]
+  end
 
-  def email; bike.owner_email end
+  def can_be_repeat?
+    potential_initial_record.present?
+  end
 
-  def reply_to_email; organization&.auto_user&.email || user&.email end
+  def email
+    bike.owner_email
+  end
 
-  def bike_notifications; ParkingNotification.where(organization_id: organization_id, bike_id: bike_id) end
+  def reply_to_email
+    organization&.auto_user&.email || user&.email
+  end
 
-  def current_associated_notification; current? ? self : associated_notifications_including_self.order(:id).last end
+  def bike_notifications
+    ParkingNotification.where(organization_id: organization_id, bike_id: bike_id)
+  end
 
-  def mail_snippet; organization.blank? ? nil : MailSnippet.where(kind: kind, organization_id: organization_id).first end
+  def current_associated_notification
+    current? ? self : associated_notifications_including_self.order(:id).last
+  end
+
+  def mail_snippet
+    organization.blank? ? nil : MailSnippet.where(kind: kind, organization_id: organization_id).first
+  end
 
   # Only initial_record and repeated records - does not include any resolved parking notifications
-  def associated_notifications; self.class.associated_notifications(id, initial_record_id) end
+  def associated_notifications
+    self.class.associated_notifications(id, initial_record_id)
+  end
 
-  def associated_notifications_including_self; self.class.associated_notifications_including_self(id, initial_record_id) end
+  def associated_notifications_including_self
+    self.class.associated_notifications_including_self(id, initial_record_id)
+  end
 
   def associated_retrieved_notification
     return nil unless resolved_at.present? # Used by calculated_state, so we can't use the status
@@ -122,7 +184,7 @@ class ParkingNotification < ActiveRecord::Base
     period_end = (resolved_at || Time.current) + 1.minute
     notifications = bike_notifications.where("created_at < ?", period_end)
     period_start = bike_notifications.resolved.where("resolved_at < ?", (resolved_at || Time.current) - 1.minute)
-                                     .reorder(:resolved_at).last&.resolved_at
+      .reorder(:resolved_at).last&.resolved_at
     period_start.present? ? notifications.where("created_at > ?", period_start) : notifications
   end
 
@@ -146,20 +208,21 @@ class ParkingNotification < ActiveRecord::Base
   def repeat_number
     return 0 unless repeat_record?
     ParkingNotification.where(initial_record_id: initial_record_id)
-                       .where("id < ?", id).count + 1
+      .where("id < ?", id).count + 1
   end
 
-  def notification_number; repeat_number + 1 end
+  def notification_number
+    repeat_number + 1
+  end
 
   # Doesn't require a user because email recovery doesn't require a user
-  def mark_retrieved!(retrieved_kind:, retrieved_by_id: nil, resolved_at: nil)
+  # args are (retrieved_kind:, retrieved_by_id: nil, resolved_at: nil) - using passed args to avoid overriding methods
+  def mark_retrieved!(passed_args = {})
     return self if retrieved?
-    # Doesn't seem like binding.local_variable_get does anything here, but I still think it's a good practice
-    resolved_at = binding.local_variable_get(:resolved_at) || Time.current
     # Assign here because of calculated_state
-    self.retrieved_kind = binding.local_variable_get(:retrieved_kind)
-    update_attributes!(retrieved_by_id: binding.local_variable_get(:retrieved_by_id),
-                       resolved_at: resolved_at)
+    self.retrieved_kind = passed_args[:retrieved_kind]
+    update_attributes!(retrieved_by_id: passed_args[:retrieved_by_id],
+                       resolved_at: passed_args[:resolved_at] || Time.current)
     process_notification
     self
   end
@@ -169,7 +232,7 @@ class ParkingNotification < ActiveRecord::Base
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: %i[skip_default optional],
+      country: %i[skip_default optional]
     ).presence
   end
 
@@ -207,11 +270,11 @@ class ParkingNotification < ActiveRecord::Base
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present
     return true if latitude.present? && longitude.present? || address.present?
-    self.errors.add(:address, :address_required)
+    errors.add(:address, :address_required)
   end
 
   def subject
-    return mail_snippet.subject if (mail_snippet&.subject).present?
+    return mail_snippet.subject if mail_snippet&.subject.present?
     if appears_abandoned_notification?
       "Your #{bike&.type || "Bike"} appears to be abandoned"
     elsif parked_incorrectly_notification?
@@ -235,17 +298,27 @@ class ParkingNotification < ActiveRecord::Base
     else
       return self unless active?
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-                                "location_from_address", "retrieval_link_token", "delivery_status")
-                        .merge(new_attrs)
+        "location_from_address", "retrieval_link_token", "delivery_status")
+        .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
     end
   end
 
+  # Mainly a testing method, because we were getting notifications that should have been resolved but weren't
+  # Can be removed when there are no longer resolved notifications without resolved_at
+  # see also parking_notifications.js#retrievedAtEl
+  def calculated_resolved_at
+    return resolved_at if resolved_at.present?
+    resolved_notification = associated_notifications_including_self.resolved.first
+    return nil unless resolved_notification.present?
+    resolved_notification.resolved_at.present? ? resolved_notification.resolved_at : resolved_notification.created_at
+  end
+
   private
 
   def calculated_unregistered_parking_notification
-    bike&.unregistered_parking_notification?
+    bike&.unregistered_parking_notification? || initial_record&.unregistered_bike? || false
   end
 
   def calculated_status

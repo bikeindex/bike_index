@@ -1,6 +1,7 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+    skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
@@ -17,7 +18,7 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_root_path and return unless current_organization.enabled?("show_recoveries")
+      redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -34,13 +35,12 @@ module Organized
     end
 
     def incompletes
-      redirect_to current_root_path and return unless current_organization.enabled?("show_partial_registrations")
+      redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @render_chart = ParamsNormalizer.boolean(params[:render_chart])
       @b_params_total = b_params.where(created_at: @time_range)
       @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
     end
@@ -59,15 +59,16 @@ module Organized
       render layout: "embed_layout"
     end
 
-    def multi_serial_search; end
+    def multi_serial_search
+    end
 
     def create
       @b_param = find_or_new_b_param
-      iframe_redirect_params = { organization_id: current_organization.to_param }
+      iframe_redirect_params = {organization_id: current_organization.to_param}
       if @b_param.created_bike.present?
         flash[:success] = "#{@bike.created_bike.type} Created"
       else
-        if params[:bike][:image].present? # Have to do in the controller, before assigning
+        if params.dig(:bike, :image).present? # Have to do in the controller, before assigning
           @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
         end
         # we handle filtering & coercion in BParam, just create it with whatever here
@@ -91,7 +92,7 @@ module Organized
     def find_or_new_b_param
       token = params[:b_param_token]
       token ||= params[:bike] && params[:bike][:b_param_id_token]
-      b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id, organization_id: current_organization.id)
+      b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id, organization_id: current_organization.id)
       b_param.origin = "organization_form"
       b_param
     end
@@ -101,7 +102,7 @@ module Organized
       phash = params.as_json
       {
         origin: "organization_form",
-        params: phash.merge("bike" => phash["bike"].merge(creation_organization_id: current_organization.id)),
+        params: phash.merge("bike" => phash["bike"].merge("creation_organization_id" => current_organization.id))
       }
     end
 
@@ -136,12 +137,17 @@ module Organized
       else
         bikes = Bike.search(@interpreted_params)
       end
-      @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
         bikes = @search_stickers == "none" ? bikes.no_bike_sticker : bikes.bike_sticker
       else
         @search_stickers = false
+      end
+      if params[:search_address].present?
+        @search_address = params[:search_address] == "none" ? "none" : "with"
+        bikes = @search_address == "none" ? bikes.without_location : bikes.with_location
+      else
+        @search_address = false
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
       @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)

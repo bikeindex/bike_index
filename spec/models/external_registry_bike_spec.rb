@@ -45,9 +45,9 @@ RSpec.describe ExternalRegistryBike, type: :model do
         allow(ExternalRegistryClient)
           .to(receive(:search_for_bikes_with)
             .with(exact_match_serial) {
-            FactoryBot.create(:external_registry_bike, serial_number: exact_match_serial)
-            ExternalRegistryBike.where(serial_normalized: exact_match_serial)
-          })
+                FactoryBot.create(:external_registry_bike, serial_number: exact_match_serial)
+                ExternalRegistryBike.where(serial_normalized: exact_match_serial)
+              })
 
         results = described_class.find_or_search_registry_for(serial_number: exact_match_serial)
 

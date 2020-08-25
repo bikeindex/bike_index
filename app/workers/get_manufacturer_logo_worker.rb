@@ -26,7 +26,7 @@ class GetManufacturerLogoWorker < ScheduledWorker
     clearbit_url = "http://logo.clearbit.com/#{manufacturer.website.gsub(/\Ahttps?:\/\//i, "")}?size=400"
 
     status_response = Net::HTTP.get_response(URI(clearbit_url))
-    return true unless status_response.kind_of? Net::HTTPSuccess
+    return true unless status_response.is_a? Net::HTTPSuccess
 
     manufacturer.remote_logo_url = clearbit_url
     manufacturer.logo_source = "Clearbit"

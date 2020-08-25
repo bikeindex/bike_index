@@ -21,13 +21,13 @@ RSpec.describe Admin::OwnershipsController, type: :request do
         {
           user_email: new_user.email,
           creator_email: current_user.email,
-          user_hidden: true,
+          user_hidden: true
         }
       end
       it "updates ownership" do
         expect(og_creator).to_not eq current_user
         expect(new_user.confirmed?).to be_truthy
-        put "#{base_url}/#{ownership.id}", params: { ownership: update_params }
+        put "#{base_url}/#{ownership.id}", params: {ownership: update_params}
         expect(response).to redirect_to(edit_admin_ownership_path(ownership))
         expect(flash[:success]).to be_present
         ownership.reload
@@ -40,7 +40,7 @@ RSpec.describe Admin::OwnershipsController, type: :request do
         it "doesn't update" do
           expect(og_creator).to_not eq current_user
           expect(new_user.confirmed?).to be_falsey
-          put "#{base_url}/#{ownership.id}", params: { ownership: update_params }
+          put "#{base_url}/#{ownership.id}", params: {ownership: update_params}
           expect(flash[:error]).to be_present
           ownership.reload
           expect(ownership.user).to be_blank

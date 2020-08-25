@@ -13,13 +13,13 @@ RSpec.describe Organized::StickersController, type: :controller do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
-          get :index, params: { organization_id: organization.to_param }
+          get :index, params: {organization_id: organization.to_param}
           expect(response).to redirect_to root_path
         end
       end
       describe "edit" do
         it "redirects" do
-          get :edit, params: { id: bike_sticker.code, organization_id: organization.to_param }
+          get :edit, params: {id: bike_sticker.code, organization_id: organization.to_param}
           expect(flash[:error]).to be_present
           expect(response).to redirect_to root_path
         end
@@ -30,7 +30,7 @@ RSpec.describe Organized::StickersController, type: :controller do
       let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
-          get :index, params: { organization_id: organization.to_param }
+          get :index, params: {organization_id: organization.to_param}
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
         end
@@ -45,18 +45,19 @@ RSpec.describe Organized::StickersController, type: :controller do
 
     context "logged in as organization member" do
       describe "index" do
+        let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, secondary_organization: organization) }
         it "renders" do
-          get :index, params: { organization_id: organization.to_param }
+          get :index, params: {organization_id: organization.to_param}
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
-          expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
+          expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker.id, bike_sticker2.id])
         end
         context "with query search" do
           let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
           let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
-          before { bike_sticker_claimed.claim(user, FactoryBot.create(:bike).id) }
+          before { bike_sticker_claimed.claim(user: user, bike: FactoryBot.create(:bike).id) }
           it "renders" do
-            get :index, params: { organization_id: organization.to_param, search_claimedness: "unclaimed", query: "part" }
+            get :index, params: {organization_id: organization.to_param, search_claimedness: "unclaimed", query: "part"}
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
@@ -65,7 +66,7 @@ RSpec.describe Organized::StickersController, type: :controller do
         context "with bike_query" do
           let!(:bike) { FactoryBot.create(:bike) }
           let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
-          before { bike_sticker_claimed.claim(user, bike.id) }
+          before { bike_sticker_claimed.claim(user: user, bike: bike.id) }
           it "renders" do
             expect(BikeSticker.where(bike_id: bike.id).pluck(:id)).to eq([bike_sticker_claimed.id])
             get :index, params: {organization_id: organization.to_param, search_bike: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"}
@@ -78,7 +79,7 @@ RSpec.describe Organized::StickersController, type: :controller do
 
       describe "edit" do
         it "renders" do
-          get :edit, params: { id: bike_sticker.code, organization_id: organization.to_param }
+          get :edit, params: {id: bike_sticker.code, organization_id: organization.to_param}
           expect(response).to render_template(:edit)
           expect(assigns(:current_organization)).to eq organization
         end
@@ -91,20 +92,24 @@ RSpec.describe Organized::StickersController, type: :controller do
         it "updates" do
           bike2.reload
           expect(bike2.organizations.pluck(:id)).to eq([])
-          put :update, params: {id: bike_sticker.code, organization_id: organization.id, bike_sticker: { bike_id: "https://bikeindex.org/bikes/#{bike2.id} " }}
+          expect {
+            put :update, params: {id: bike_sticker.code, organization_id: organization.id, bike_sticker: {bike_id: "https://bikeindex.org/bikes/#{bike2.id} "}}
+          }.to change(BikeStickerUpdate, :count).by 1
           expect(assigns(:current_organization)).to eq organization
           expect(flash[:success]).to be_present
           expect(response).to redirect_to bike_path(bike2)
           bike_sticker.reload
           expect(bike_sticker.bike_id).to eq bike2.id
-          expect(bike_sticker.previous_bike_id).to eq bike.id
+          expect(bike_sticker.previous_bike_id).to eq(bike.id)
           bike2.reload
           expect(bike2.organizations.pluck(:id)).to eq([organization.id])
         end
         context "passed code rather than id" do
           it "updates" do
             request.env["HTTP_REFERER"] = bike_path(bike2)
-            put :update, params: { id: "code", organization_id: organization.id, bike_sticker: { bike_id: bike2.id, code: bike_sticker.code } }
+            expect {
+              put :update, params: {id: "code", organization_id: organization.id, bike_sticker: {bike_id: bike2.id, code: bike_sticker.code}}
+            }.to change(BikeStickerUpdate, :count).by 1
             expect(assigns(:current_organization)).to eq organization
             expect(flash[:success]).to be_present
             expect(response).to redirect_to bike_path(bike2)
@@ -115,7 +120,9 @@ RSpec.describe Organized::StickersController, type: :controller do
           context "code blank" do
             it "redirects back" do
               request.env["HTTP_REFERER"] = bike_path(bike2)
-              put :update, params: { id: "code", organization_id: organization.id, bike_sticker: { bike_id: bike2.id, code: "" } }
+              expect {
+                put :update, params: {id: "code", organization_id: organization.id, bike_sticker: {bike_id: bike2.id, code: ""}}
+              }.to_not change(BikeStickerUpdate, :count)
               expect(assigns(:current_organization)).to eq organization
               expect(flash[:error]).to be_present
               bike_sticker.reload
@@ -126,36 +133,43 @@ RSpec.describe Organized::StickersController, type: :controller do
             let(:bike_sticker) { FactoryBot.create(:bike_sticker, bike_id: bike.id, organization_id: organization.id, code: "AA0000151515") }
             it "updates" do
               request.env["HTTP_REFERER"] = bike_path(bike2)
-              put :update, params: { id: "code", organization_id: organization.id, bike_sticker: { bike_id: bike2.id, code: "151515" } }
+              expect {
+                put :update, params: {id: "code", organization_id: organization.id, bike_sticker: {bike_id: bike2.id, code: "151515"}}
+              }.to change(BikeStickerUpdate, :count).by 1
               expect(assigns(:current_organization)).to eq organization
               expect(flash[:success]).to be_present
               expect(response).to redirect_to bike_path(bike2)
               bike_sticker.reload
               expect(bike_sticker.bike_id).to eq bike2.id
-              expect(bike_sticker.previous_bike_id).to eq bike.id
             end
           end
         end
         context "other organization bike_sticker" do
           let(:bike_sticker) { FactoryBot.create(:bike_sticker, bike_id: bike.id) }
           it "responds with flash error" do
-            put :update, params: { id: bike_sticker.code, bike_id: bike2.id, organization_id: organization.id }
+            expect {
+              put :update, params: {id: bike_sticker.code, bike_id: bike2.id, organization_id: organization.id}
+            }.to change(BikeStickerUpdate, :count).by 1
             expect(flash[:error]).to be_present
-            expect(response).to redirect_to stickers_root_path
+            expect(response).to redirect_to edit_organization_sticker_path(organization_id: organization.to_param, id: bike_sticker.code)
             bike_sticker.reload
             expect(bike_sticker.bike.id).to eq bike.id
+            expect(bike_sticker.bike_sticker_updates.last.kind).to eq "failed_claim"
           end
         end
         context "nil bike_id" do
           it "updates and removes the assignment" do
-            put :update, params: { id: bike_sticker.code, bike_id: nil, organization_id: organization.id }
+            og_user_id = bike_sticker.user_id
+            expect {
+              put :update, params: {id: bike_sticker.code, bike_id: nil, organization_id: organization.id}
+            }.to change(BikeStickerUpdate, :count).by 1
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_organization_sticker_path(organization_id: organization.to_param, id: bike_sticker.code)
             bike_sticker.reload
             expect(bike_sticker.claimed_at).to be_nil
             expect(bike_sticker.bike_id).to be_nil
-            expect(bike_sticker.user_id).to be_nil
-            expect(bike_sticker.previous_bike_id).to eq bike.id
+            expect(bike_sticker.user_id).to eq og_user_id
+            expect(bike_sticker.previous_bike_id).to eq(bike.id)
           end
         end
       end

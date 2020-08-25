@@ -18,7 +18,7 @@ RSpec.describe StolenController, type: :controller do
 
   describe "faq" do
     it "redirects other pages to index" do
-      get :show, params: { id: "faq" }
+      get :show, params: {id: "faq"}
       expect(response).to redirect_to stolen_index_url
     end
   end

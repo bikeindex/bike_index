@@ -118,7 +118,7 @@
                   %em.text-danger= t(".stickers_have_been_unassigned")
                 - else
                   = link_to(t(".unassign_stickers"),
-                    organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true),
+                    organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
                     method: :put,
                     class: "btn btn-warning float-right")
               - else

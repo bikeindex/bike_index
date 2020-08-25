@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe Admin::PaidFeaturesController, type: :controller do
-  let(:subject) { FactoryBot.create(:paid_feature) }
+RSpec.describe Admin::OrganizationFeaturesController, type: :controller do
+  let(:subject) { FactoryBot.create(:organization_feature) }
   include_context :logged_in_as_super_admin
-  let(:passed_params) { { amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff" } }
+  let(:passed_params) { {amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff"} }
 
   describe "index" do
     it "renders" do
@@ -15,7 +15,7 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, params: { id: subject.to_param }
+      get :edit, params: {id: subject.to_param}
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
@@ -33,15 +33,15 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
     let!(:original_name) { subject.name }
     let!(:original_kind) { subject.kind }
     it "updates available attributes" do
-      put :update, params: { id: subject.to_param, paid_feature: passed_params }
+      put :update, params: {id: subject.to_param, organization_feature: passed_params}
       expect(flash[:success]).to be_present
       subject.reload
       passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
     end
     context "feature_slugs" do
-      let(:subject) { FactoryBot.create(:paid_feature) }
+      let(:subject) { FactoryBot.create(:organization_feature) }
       it "does not update feature_slugs" do
-        put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports") }
+        put :update, params: {id: subject.to_param, organization_feature: passed_params.merge(feature_slugs_string: "csv_exports")}
         subject.reload
         passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
         expect(subject.feature_slugs).to eq([])
@@ -49,7 +49,7 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       context "developer" do
         let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
-          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, ,pARKinG_notifications, blarg") }
+          put :update, params: {id: subject.to_param, organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, ,pARKinG_notifications, blarg")}
           subject.reload
           passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
           expect(subject.feature_slugs).to eq(%w[csv_exports parking_notifications])
@@ -57,9 +57,9 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       end
     end
     context "locked" do
-      before { allow_any_instance_of(PaidFeature).to receive(:locked?) { true } }
+      before { allow_any_instance_of(OrganizationFeature).to receive(:locked?) { true } }
       it "does not update" do
-        put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports") }
+        put :update, params: {id: subject.to_param, organization_feature: passed_params.merge(feature_slugs_string: "csv_exports")}
         expect(flash[:error]).to be_present
         subject.reload
         passed_params.each { |k, v| expect(subject.send(k)).to_not eq(v) }
@@ -67,7 +67,7 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
       context "developer" do
         let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
-          put :update, params: { id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, parkiNG_NOTifications, blarg") }
+          put :update, params: {id: subject.to_param, organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, parkiNG_NOTifications, blarg")}
           subject.reload
           passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
           expect(subject.feature_slugs).to eq(%w[csv_exports parking_notifications])
@@ -78,22 +78,22 @@ RSpec.describe Admin::PaidFeaturesController, type: :controller do
 
   describe "create" do
     it "succeeds" do
-      expect do
-        post :create, params: { paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import") }
-      end.to change(PaidFeature, :count).by 1
-      paid_feature = PaidFeature.last
-      passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
-      expect(paid_feature.feature_slugs).to eq([])
+      expect {
+        post :create, params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}
+      }.to change(OrganizationFeature, :count).by 1
+      organization_feature = OrganizationFeature.last
+      passed_params.each { |k, v| expect(organization_feature.send(k)).to eq(v) }
+      expect(organization_feature.feature_slugs).to eq([])
     end
     context "developer" do
       let(:user) { FactoryBot.create(:admin_developer) }
       it "succeeds" do
-        expect do
-          post :create, params: { paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import") }
-        end.to change(PaidFeature, :count).by 1
-        paid_feature = PaidFeature.last
-        passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
-        expect(paid_feature.feature_slugs).to eq %w[csv_exports show_bulk_import]
+        expect {
+          post :create, params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}
+        }.to change(OrganizationFeature, :count).by 1
+        organization_feature = OrganizationFeature.last
+        passed_params.each { |k, v| expect(organization_feature.send(k)).to eq(v) }
+        expect(organization_feature.feature_slugs).to eq %w[csv_exports show_bulk_import]
       end
     end
   end

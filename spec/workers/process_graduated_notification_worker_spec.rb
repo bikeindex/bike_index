@@ -12,7 +12,7 @@ RSpec.describe ProcessGraduatedNotificationWorker, type: :lib do
 
   describe "perform" do
     let(:graduated_notification_interval) { 2.years.to_i }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
     let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - (2 * graduated_notification_interval)) }
     let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "notify@bike.com", created_at: Time.current - 1.week) }
     let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: organization) }
@@ -25,12 +25,12 @@ RSpec.describe ProcessGraduatedNotificationWorker, type: :lib do
       expect(graduated_notification_primary.associated_notifications.pluck(:id)).to eq([])
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
-        expect do
+        expect {
           instance.perform
           instance.perform
           instance.perform
           instance.perform
-        end.to change(GraduatedNotification, :count).by 1
+        }.to change(GraduatedNotification, :count).by 1
       end
       expect(ActionMailer::Base.deliveries.count).to eq 1
       # Also, manually test that enqueuing the processable one again doesn't send an email

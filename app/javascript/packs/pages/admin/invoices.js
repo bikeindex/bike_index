@@ -2,27 +2,31 @@ function BinxAdminInvoices() {
   return {
     init() {
       this.updateInvoiceCalculations();
-      $(".inputTriggerRecalculation").on("change paste keyup", e =>
+      $(".inputTriggerRecalculation").on("change paste keyup", (e) =>
         this.updateInvoiceCalculations()
       );
-      $("#invoiceForm .paidFeatureCheck input").on("change", e =>
+      $("#invoiceForm .organizationFeatureCheck input").on("change", (e) =>
         this.updateInvoiceCalculations()
       );
+      $("#invoice_is_endless").on("change", (e) => {
+        const checked = $("#invoice_is_endless").prop("checked");
+        $("#subscriptionEndsAt").collapse(checked ? "hide" : "show");
+      });
     },
 
     updateInvoiceCalculations() {
       let oneTimeCost, recurringCost;
-      const recurring = $(".paidFeatureCheck input.recurring:checked")
+      const recurring = $(".organizationFeatureCheck input.recurring:checked")
         .get()
-        .map(i => parseInt($(i).attr("data-amount"), 10));
+        .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (recurring.length > 0) {
         recurringCost = recurring.reduce((x, y) => x + y);
       } else {
         recurringCost = 0;
       }
-      const oneTime = $(".paidFeatureCheck input.oneTime:checked")
+      const oneTime = $(".organizationFeatureCheck input.oneTime:checked")
         .get()
-        .map(i => parseInt($(i).attr("data-amount"), 10));
+        .map((i) => parseInt($(i).attr("data-amount"), 10));
       if (oneTime.length > 0) {
         oneTimeCost = oneTime.reduce((x, y) => x + y);
       } else {
@@ -36,11 +40,11 @@ function BinxAdminInvoices() {
       const due = parseInt($("#invoice_amount_due").val(), 10);
       $("#discountCost").text(`${-1 * (recurringCost + oneTimeCost - due)}.00`);
 
-      const checked_ids = $(".paidFeatureCheck input:checked")
+      const checked_ids = $(".organizationFeatureCheck input:checked")
         .get()
-        .map(i => $(i).attr("data-id"));
-      $("#invoice_paid_feature_ids").val(checked_ids);
-    }
+        .map((i) => $(i).attr("data-id"));
+      $("#invoice_organization_feature_ids").val(checked_ids);
+    },
   };
 }
 

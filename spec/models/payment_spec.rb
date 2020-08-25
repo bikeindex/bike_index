@@ -7,9 +7,9 @@ RSpec.describe Payment, type: :model do
       let(:user) { FactoryBot.create(:user) }
       let(:payment) { FactoryBot.create(:payment, user: nil, email: user.email) }
       it "enqueues an email job, associates the user" do
-        expect do
+        expect {
           payment
-        end.to change(EmailInvoiceWorker.jobs, :size).by(1)
+        }.to change(EmailInvoiceWorker.jobs, :size).by(1)
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
@@ -19,9 +19,9 @@ RSpec.describe Payment, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       let(:payment) { FactoryBot.create(:payment_check, user: nil, email: nil, organization: organization) }
       it "does not enqueue an email" do
-        expect do
+        expect {
           payment # it is created here
-        end.to_not change(EmailInvoiceWorker.jobs, :size)
+        }.to_not change(EmailInvoiceWorker.jobs, :size)
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present

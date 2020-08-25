@@ -32,28 +32,27 @@
                 This parking notification has been replaced by
                 = link_to "notification ##{@parking_notification.current_associated_notification.notification_number}", organization_parking_notification_path(@parking_notification.current_associated_notification, organization_id: current_organization.to_param)
             - elsif @parking_notification.impounded?
-              %strong.text-danger
+              %span.text-danger
                 This #{@bike.type} was impounded
               - unless viewing_impound_record
-                %ul
+                %br
+                %strong
                   - if !@parking_notification.impound_notification?
                     - impound_notification = @parking_notification.associated_notifications.impound_notification.last
-                    %li
-                      View the
-                      = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
-                      %small
-                        %em
-                          created
-                          %span.convertTime.preciseTime
-                            = l(impound_notification.created_at, format: :convert_time)
-                        by #{impound_notification.user.display_name}
-                  %li
-                    - if @parking_notification.impound_record_id.present?
-                      View the
-                      = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: current_organization.to_param)
-                    - else
-                      %small.less-strong
-                        Impound record not found. Try reloading the page?
+                    View the
+                    = link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: current_organization.to_param)
+                    %small
+                      %em
+                        created
+                        %span.convertTime.preciseTime
+                          = l(impound_notification.created_at, format: :convert_time)
+                      by #{impound_notification.user.display_name}
+                  - if @parking_notification.impound_record_id.present?
+                    View the
+                    = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: current_organization.to_param)
+                  - else
+                    %small.less-strong
+                      Impound record not found. Try reloading the page?
             - elsif @parking_notification.retrieved?
               %span.text-warning
                 This #{@bike.type} has been retrieved!
@@ -79,7 +78,8 @@
                         = link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: current_organization.to_param)
                 - else
                   %em.text-danger Unable to find retrieved information!
-
+            - else
+              = status_display(@parking_notification.status)
         %tr
           %td= t(".bike")
           %td
@@ -87,7 +87,7 @@
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
               %br
               %small
-                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id), class: "gray-link" do
+                = link_to organization_parking_notifications_path(organization_id: current_organization.to_param, search_bike_id: @bike.id, search_status: "all"), class: "gray-link" do
                   view all notifications for
                   %em
                     = @bike.type
@@ -123,11 +123,25 @@
                 = @parking_notification.notification_number
               %em.small.less-strong.ml-1
                 first notification sent
-                %a.convertTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
+                %a.convertTime.preciseTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
                   - if @parking_notification.initial_record.present?
                     = l(@parking_notification.initial_record.created_at, format: :convert_time)
                   - else
                     = @parking_notification.initial_record_id
+        %tr
+          %td= t(".resolved")
+          %td
+            - if @parking_notification.resolved?
+              %span.less-strong
+                - if @parking_notification.impounded?
+                  Impounded
+                - elsif @parking_notification.retrieved?
+                  Retrieved
+                - else
+                  Resolved
+              - if @parking_notification.resolved_at.present?
+                %span.convertTime
+                  = l(@parking_notification.resolved_at, format: :convert_time)
         %tr
           %td= t(".message")
           %td= @parking_notification.message

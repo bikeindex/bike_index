@@ -7,8 +7,8 @@ class DuplicateBikeGroup < ApplicationRecord
   before_save :update_added_bike_at
 
   def self.matching_segment(segment)
-    includes(:normalized_serial_segments).
-        where(normalized_serial_segments: { segment: segment }).first
+    includes(:normalized_serial_segments)
+      .where(normalized_serial_segments: {segment: segment}).first
   end
 
   def update_added_bike_at
@@ -16,7 +16,7 @@ class DuplicateBikeGroup < ApplicationRecord
   end
 
   def segment
-    normalized_serial_segments && normalized_serial_segments.first &&
+    normalized_serial_segments&.first &&
       normalized_serial_segments.first.segment || ""
   end
 end

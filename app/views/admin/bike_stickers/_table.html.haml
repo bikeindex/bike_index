@@ -48,7 +48,7 @@
             %a.convertTime{ href: bike_sticker_url }
               = l bike_sticker.created_at, format: :convert_time
           %td
-            %small.convertTime
+            %a.small.convertTime{ href: admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) }
               = l bike_sticker.updated_at, format: :convert_time
           %td
             - if bike_sticker.organization.present?

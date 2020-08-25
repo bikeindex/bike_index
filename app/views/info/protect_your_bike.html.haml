@@ -17,6 +17,9 @@
         %strong= t(".cable_locks_should_never_be_used_as_primary")
         = t(".cheaper_and_older_ulocks_can_often_be_broken")
         %strong= t(".use_a_ulock_that_costs_at_least_40")
+        - bestbikelock_link = link_to "thebestbikelock.com", "http://thebestbikelock.com/"
+        = t(".checkout_out_bestbikelock_html", link: bestbikelock_link)
+
     %li
       %p= t(".aim_to_have_the_hardest_bike_to_steal_on_")
     %li

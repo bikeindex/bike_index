@@ -4,7 +4,7 @@ function BinxAdminBikesEdit() {
   return {
     init() {
       window.originalSerialNumber = $("#bike_serial_number").val();
-      $(".serial-check input").on("change", e => {
+      $(".serial-check input").on("change", (e) => {
         this.updateSerialDisplay();
       });
       this.bikesEditRecoverySlide();
@@ -28,16 +28,18 @@ function BinxAdminBikesEdit() {
     },
 
     bikesEditRecoverySlide() {
-      const $this = $("#stolenCheckBox input");
-      $this.on("change", e => {
+      const $this = $("#bike_stolen");
+      $this.on("change", (e) => {
         e.preventDefault();
         if ($this.prop("checked")) {
           $("#adminRecoveryFields").collapse("hide");
+          $("#mark_recovered_reason").attr("required", false);
         } else {
           $("#adminRecoveryFields").collapse("show");
+          $("#mark_recovered_reason").attr("required", true);
         }
       });
-    }
+    },
   };
 }
 export default BinxAdminBikesEdit;

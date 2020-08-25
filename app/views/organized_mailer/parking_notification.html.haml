@@ -22,19 +22,28 @@
       %em
       = impound_record.location.address
 
+- if @parking_notification.message.present?
+  %div{ style: "padding: 0.5rem 1rem; border: 1px solid #ccc; margin: 1rem 0 2rem;" }
+    %strong
+      - if @parking_notification.repeat_record?
+        Original
+      - else
+        Individual
+      message:
+    %br
+    = @parking_notification.message
+
 %p
-  Your #{@bike.title_string}
-  - if @parking_notification.impound_notification?
-    was located at:
-  - else
-    is located at:
-  %br
+  %strong.less-strong
+    Your
+    %em= @bike.title_string
+    - if @parking_notification.impound_notification?
+      was located at:
+    - else
+      is located at:
   %em
     = @parking_notification.address
 
-- if @parking_notification.message.present?
-  %p
-    %strong= @parking_notification.message
 
 <img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@parking_notification.latitude},#{@parking_notification.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@parking_notification.latitude},#{@parking_notification.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
 

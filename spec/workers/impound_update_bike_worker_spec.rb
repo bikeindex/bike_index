@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ImpoundUpdateBikeWorker, type: :job do
-  let(:instance) { subject.new }
+  let(:instance) { described_class.new }
 
   let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
   let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
@@ -24,6 +24,26 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     bike.reload
     expect(bike.status_impounded?).to be_truthy
     expect(bike.updated_at).to be_within(1).of Time.current
+  end
+
+  context "unregistered_parking_notification" do
+    let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
+    let!(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, kind: "impound_notification", bike: bike) }
+    it "marks the bike not hidden" do
+      impound_record.update(parking_notification: parking_notification)
+      impound_record.reload
+      bike.reload
+      expect(bike.hidden).to be_truthy
+      expect(bike.user_hidden).to be_truthy
+      expect(parking_notification.unregistered_bike?).to be_truthy
+      expect(impound_record.unregistered_bike?).to be_truthy
+      instance.perform(impound_record.id)
+      impound_record.reload
+      bike.reload
+      expect(bike.hidden).to be_falsey
+      expect(bike.marked_user_hidden).to be_falsey
+      expect(impound_record.unregistered_bike?).to be_truthy
+    end
   end
 
   context "id collision" do
@@ -98,12 +118,12 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(bike.ownerships.count).to eq 1
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
-      expect do
+      expect {
         Sidekiq::Testing.inline! do
           impound_record_update.save
           described_class.new.perform(impound_record.id)
         end
-      end.to change(Ownership, :count).by 1
+      }.to change(Ownership, :count).by 1
       expect(ActionMailer::Base.deliveries.count).to eq 1
       ownership.reload
       expect(ownership.current?).to be_falsey

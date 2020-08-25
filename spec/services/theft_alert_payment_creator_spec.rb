@@ -15,7 +15,7 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
           stripe_email: user.email,
           stripe_token: stripe_token.id,
           stripe_amount: 900,
-          stripe_currency: "usd",
+          stripe_currency: "usd"
         )
 
         expect(Payment.count).to eq(1)
@@ -33,7 +33,7 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
             stripe_email: user.email,
             stripe_token: stripe_token.id,
             stripe_amount: -99,
-            stripe_currency: "usd",
+            stripe_currency: "usd"
           )
         end
 
@@ -50,7 +50,7 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
             stripe_email: user.email,
             stripe_token: stripe_token_declined.id,
             stripe_amount: 100,
-            stripe_currency: "usd",
+            stripe_currency: "usd"
           )
         end
 

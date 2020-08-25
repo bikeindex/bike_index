@@ -56,21 +56,21 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
     cache_key = ["verlorenofgevonden.nl", query, req_params]
 
     response_json =
-      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
-        response = conn.post("ez.php") do |req|
+      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) {
+        response = conn.post("ez.php") { |req|
           req.params = req_params
           req.params["timestamp"] = Time.current.to_i
-        end
+        }
         response.body
-      end
+      }
 
     if response_json.is_a?(String)
       Rails.cache.delete(cache_key)
       self.backoff += 1
-      wait_time = [self.backoff * self.backoff_factor, self.backoff_max].min
+      wait_time = [self.backoff * backoff_factor, backoff_max].min
       sleep(wait_time)
       Rails.logger.info("Enqueued page #{page} for retry. Waiting #{wait_time}s...")
-      self.retry_pages << page
+      retry_pages << page
     elsif response_json.is_a?(Hash)
       self.backoff = 0
       set_total(response_json)
@@ -103,6 +103,6 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
     return unless response.present?
 
     matches = response.dig("hits", "hits").presence || []
-    self.result_pages[page] = matches.map { |hit| hit["_source"] }
+    result_pages[page] = matches.map { |hit| hit["_source"] }
   end
 end

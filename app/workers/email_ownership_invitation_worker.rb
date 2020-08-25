@@ -8,11 +8,8 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
     ownership.reload
     if ownership.calculated_send_email
       OrganizedMailer.finished_registration(ownership).deliver_now
-    else
-      # Update the ownership to have send email set
-      if ownership.send_email
-        ownership.update_attribute :send_email, ownership.calculated_send_email
-      end
+    elsif ownership.send_email # Update the ownership to have send email set
+      ownership.update_attribute :send_email, ownership.calculated_send_email
     end
   end
 end

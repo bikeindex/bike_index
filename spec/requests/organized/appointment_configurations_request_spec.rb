@@ -15,7 +15,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
-    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
 
     describe "index" do
       it "renders" do
@@ -28,7 +28,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    let(:current_organization) { FactoryBot.create(:organization_with_paid_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["virtual_line"]) }
     let(:location) { current_organization.locations.first }
 
     describe "index" do
@@ -37,7 +37,7 @@ RSpec.describe Organized::AppointmentConfigurationsController, type: :request do
         expect(response).to redirect_to(edit_organization_appointment_configuration_path(location.to_param, organization_id: current_organization.to_param))
       end
       context "no location" do
-        let(:current_organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["virtual_line"]) }
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["virtual_line"]) }
         it "renders" do
           get base_url
           expect(response.status).to eq(200)

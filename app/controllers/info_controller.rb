@@ -3,10 +3,11 @@ class InfoController < ApplicationController
     @blog = Blog.friendly_find(params[:id])
     if @blog.blank?
       flash[:error] = "unable to find that page"
-      redirect_to news_path and return
+      redirect_to(news_path) && return
     elsif @blog.blog?
-      redirect_to news_path(@blog.to_param) and return
+      redirect_to(news_path(@blog.to_param)) && return
     end
+    @page_id = "news_show" # Override to make styles same as news
     @blogger = @blog.user
   end
 
@@ -32,6 +33,9 @@ class InfoController < ApplicationController
   end
 
   def terms
+  end
+
+  def security
   end
 
   def vendor_terms

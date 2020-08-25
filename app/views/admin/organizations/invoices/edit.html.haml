@@ -38,8 +38,8 @@
           %ul
             - @invoice.payments.each do |payment|
               %li
-                = link_to "#{payment.amount_formatted} on", admin_payment_path(payment)
-                %span.convertTime
+                = link_to "#{payment.amount_formatted}", admin_payment_path(payment)
+                %span.convertTime.withPreposition
                   = l payment.created_at, format: :convert_time
   .col-sm-6
     %table.table-list
@@ -63,8 +63,11 @@
           - else
             Expires:
         %td
-          - if @invoice.subscription_end_at.present?
-            %span.convertTime
+          - if @invoice.endless?
+            %span.text-warning Endless
+            (invoice never ends)
+          - elsif @invoice.subscription_end_at.present?
+            %span.convertTime.preciseTimeSeconds
               = l @invoice.subscription_end_at, format: :convert_time
 
 

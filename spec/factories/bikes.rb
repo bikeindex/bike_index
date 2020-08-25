@@ -20,15 +20,6 @@ FactoryBot.define do
       end
     end
 
-    trait :stolen do
-      transient do
-        # default to NYC coordinates
-        latitude { 40.7143528 }
-        longitude { -74.0059731 }
-      end
-      stolen { true }
-    end
-
     trait :with_ownership do
       transient do
         user { nil }
@@ -52,12 +43,26 @@ FactoryBot.define do
       end
     end
 
-    factory :stolen_bike, traits: [:stolen] do
+    # THIS FACTORY SHOULD NEVER BE USED, except in other factories - there needs to be a stolen record created in addition to this.
+    # use with_stolen_record instead
+    trait :stolen_trait do
+      transient do
+        # default to NYC coordinates
+        latitude { 40.7143528 }
+        longitude { -74.0059731 }
+      end
+      stolen { true }
+    end
+
+    trait :with_stolen_record do
+      stolen_trait
       after(:create) do |bike, evaluator|
         create(:stolen_record, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
         bike.reload
       end
+    end
 
+    factory :stolen_bike, traits: [:with_stolen_record] do
       factory :abandoned_bike do
         abandoned { true }
       end
@@ -68,25 +73,25 @@ FactoryBot.define do
     end
 
     # These factories are separate from the stolen bike factory because we only want to call after create once
-    factory :stolen_bike_in_amsterdam, traits: [:stolen] do
+    factory :stolen_bike_in_amsterdam, traits: [:stolen_trait] do
       after(:create) do |bike|
         create(:stolen_record, :in_amsterdam, bike: bike)
         bike.reload
       end
     end
-    factory :stolen_bike_in_los_angeles, traits: [:stolen] do
+    factory :stolen_bike_in_los_angeles, traits: [:stolen_trait] do
       after(:create) do |bike|
         create(:stolen_record, :in_los_angeles, bike: bike)
         bike.reload
       end
     end
-    factory :stolen_bike_in_nyc, traits: [:stolen] do
+    factory :stolen_bike_in_nyc, traits: [:stolen_trait] do
       after(:create) do |bike|
         create(:stolen_record, :in_nyc, bike: bike)
         bike.reload
       end
     end
-    factory :stolen_bike_in_chicago, traits: [:stolen] do
+    factory :stolen_bike_in_chicago, traits: [:stolen_trait] do
       after(:create) do |bike|
         create(:stolen_record, :in_chicago, bike: bike)
         bike.reload
@@ -114,6 +119,7 @@ FactoryBot.define do
         after(:create) do |bike, _evaluator|
           create(:creation_state, creator: bike.creator,
                                   bike: bike,
+                                  created_at: bike.created_at,
                                   is_pos: true,
                                   pos_kind: "lightspeed_pos",
                                   organization: bike.creation_organization)
@@ -127,6 +133,7 @@ FactoryBot.define do
         after(:create) do |bike, evaluator|
           create(:creation_state, creator: bike.creator,
                                   bike: bike,
+                                  created_at: bike.created_at,
                                   is_pos: true,
                                   pos_kind: "ascend_pos",
                                   bulk_import: evaluator.bulk_import,
@@ -141,6 +148,7 @@ FactoryBot.define do
         create(:creation_state, creator: bike.creator,
                                 organization: bike.creation_organization,
                                 bike: bike,
+                                created_at: bike.created_at,
                                 can_edit_claimed: evaluator.can_edit_claimed)
         bike.save
         bike.reload

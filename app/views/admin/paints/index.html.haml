@@ -1,34 +1,59 @@
+.admin-subnav
+  .col-md-5
+    %h1 Manage Paints
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "graph", admin_paints_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-%h1
-  Manage Paints
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_paints), stacked: true, thousands: ",", defer: true
 
-%h4
-  = Paint.count
-  indexed,
-  %em
-    (#{Paint.where("created_at >= ?", Time.current.beginning_of_day).count} today)
-  = Paint.where('color_id IS NULL').count
-  are unlinked
+.mt-2
+  = render partial: "/shared/period_select"
 
-.row.form-group
+.row.mt-4
   .col-sm-7
+    %p
+      = number_with_delimiter(matching_paints.count)
+      matching paints
+      %em
+        = humanized_time_range(@time_range)
+      %em
+        (#{matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count} today)
+
+      - unless sortable_search_params?
+        %strong
+          = Paint.where('color_id IS NULL').count
+
+          are unlinked
+
   .col-sm-4
     = form_tag admin_paints_path, method: :get do
-      = text_field_tag :name, params[:name], placeholder: "Search paints by name", class: "form-control"
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :render_chart, @render_chart
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :end_time, params[:end_time]
+      = hidden_field_tag :start_time, params[:start_time]
+      = text_field_tag :search_name, params[:name], placeholder: "Search paints by name", class: "form-control"
   .col-sm-1
     = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
   = paginate @paints, views_prefix: "admin"
-  .full-screen-table
-    %table.table.table-striped.table-bordered
+
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th
-          Date created
+          = sortable "created_at"
+        %th.small
+          = sortable "updated_at"
         %th
-          manufacturer
+          = sortable "manufacturer"
         %th
-          Bikes
+          = sortable "bikes_count", "Bikes"
         %th
           Description
         %th
@@ -38,22 +63,31 @@
         - @paints.each do |paint|
           %tr
             %td
-              %a.convertTime.preciseTime{ href: admin_paint_url(paint) }
+              %a.convertTime{ href: admin_paint_url(paint) }
                 = l paint.created_at, format: :convert_time
+
+            %td
+              %small.convertTime
+                = l paint.updated_at, format: :convert_time
+
             %td
               - if paint.manufacturer_id.present?
                 = paint.manufacturer.name
             %td
-              = paint.bikes.count
+              = paint.bikes_count
             %td
               = paint.name
             %td
-              - if paint.color_id.present?
-                = paint.color && paint.color.name
-              - if paint.secondary_color_id.present?
-                = "- #{paint.secondary_color.name}"
-              - if paint.tertiary_color_id.present?
-                = "- #{paint.tertiary_color.name}"
+              %ul.small
+                - if paint.color_id.present?
+                  %li
+                    = paint.color.name
+                - if paint.secondary_color_id.present?
+                  %li
+                    = paint.secondary_color.name
+                - if paint.tertiary_color_id.present?
+                  %li
+                    = paint.tertiary_color.name
 
   = paginate @paints, views_prefix: "admin"
 

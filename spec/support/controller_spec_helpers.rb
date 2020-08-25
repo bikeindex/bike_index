@@ -2,8 +2,9 @@
 # via Rspec.configure (rails_helper)
 module ControllerSpecHelpers
   def set_current_user(user)
+    return unless user.present?
     cookies.signed[:auth] =
-      { secure: true, httponly: true, value: [user.id, user.auth_token] }
+      {secure: true, httponly: true, value: [user.id, user.auth_token]}
   end
 
   RSpec.shared_context :logged_in_as_user do

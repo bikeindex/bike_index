@@ -34,7 +34,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec", "support", "**", "*.rb")].each { |f| require f }
+Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
@@ -61,7 +61,7 @@ VCR.configure do |config|
 
   config.default_cassette_options = {
     record: :new_episodes,
-    match_requests_on: [:method, :host, :path],
+    match_requests_on: [:method, :host, :path]
   }
 
   config.before_record do |i|

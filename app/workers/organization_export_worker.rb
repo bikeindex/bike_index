@@ -76,9 +76,9 @@ class OrganizationExportWorker < ApplicationWorker
   end
 
   def comma_wrapped_string(array)
-    array.map do |val|
-      '"' + val.to_s.tr("\\", "").gsub(/(\\)?\"/, '\"') + '"'
-    end.join(",") + "\n"
+    array.map { |val|
+      '"' + val.to_s.tr("\\", "").gsub(/(\\)?"/, '\"') + '"'
+    }.join(",") + "\n"
   end
 
   # If we have to load the bike record to check if it's a valid export, check conditions here
@@ -88,7 +88,8 @@ class OrganizationExportWorker < ApplicationWorker
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    Export.avery_export_bike?(bike_or_b_param)
+    return false unless bike_or_b_param.is_a?(Bike)
+    bike_or_b_param.avery_exportable?
   end
 
   def bike_to_row(bike)
@@ -101,10 +102,10 @@ class OrganizationExportWorker < ApplicationWorker
       when "registered_at" then b_param.created_at.utc
       when "manufacturer" then b_param.manufacturer&.name
       when "color"
-        %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map do |key|
+        %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map { |key|
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
-        end.compact.join(", ")
+        }.compact.join(", ")
       when "owner_email" then b_param.owner_email
       when "partial_registration" then true
       end
@@ -155,7 +156,10 @@ class OrganizationExportWorker < ApplicationWorker
     return "" unless @bike_sticker.present?
     code = @bike_sticker.code
     pretty_code = @bike_sticker.pretty_code
-    @bike_sticker.claim(@export.user, bike)
+    @bike_sticker.claim(user: @export.user,
+                        bike: bike,
+                        organization: @export.organization,
+                        export_id: @export.id)
     @bike_stickers << code
     @bike_sticker = @bike_sticker.next_unclaimed_code
     pretty_code
@@ -173,6 +177,6 @@ class OrganizationExportWorker < ApplicationWorker
     # And because this might have processed some bike_stickers after the export was deleted, remove them here
     return true unless @export.assign_bike_codes?
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers)
-    @export.remove_bike_codes
+    @export.remove_bike_stickers
   end
 end

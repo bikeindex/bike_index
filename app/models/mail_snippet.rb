@@ -12,9 +12,8 @@ class MailSnippet < ApplicationRecord
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
     impound_notification: 9,
-    graduated_notification: 10,
+    graduated_notification: 10
   }.freeze
-
 
   belongs_to :state
   belongs_to :country
@@ -42,21 +41,33 @@ class MailSnippet < ApplicationRecord
       welcome: "Below header",
       footer: "Above <3 <3 <3 <3 Bike Index Team",
       partial: "Above \"Finish it\" button, in email \"Partial registration\"",
-      security: "How to keep your bike safe, in email \"Finished registration\"",
+      security: "How to keep your bike safe, in email \"Finished registration\""
     }.as_json
   end
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
-  def self.organization_snippet_kinds; organization_snippets.keys end
+  def self.organization_snippet_kinds
+    organization_snippets.keys
+  end
 
-  def self.organization_message_kinds; ParkingNotification.kinds + ["graduated_notification"] end
+  def self.organization_message_kinds
+    ParkingNotification.kinds + ["graduated_notification"]
+  end
 
-  def self.finished_registration_kinds; %w[welcome footer security] end
+  def self.finished_registration_kinds
+    %w[welcome footer security]
+  end
 
-  def organization_snippet?; self.class.organization_snippet_kinds.include?(kind) end
+  def organization_snippet?
+    self.class.organization_snippet_kinds.include?(kind)
+  end
 
-  def organization_message?; self.class.organization_message_kinds.include?(kind) end
+  def organization_message?
+    self.class.organization_message_kinds.include?(kind)
+  end
 
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
@@ -79,7 +90,6 @@ class MailSnippet < ApplicationRecord
   def should_be_geocoded?
     return false if skip_geocoding?
     return true if is_location_triggered?
-    return false if address.blank?
     address_changed?
   end
 end

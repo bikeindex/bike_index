@@ -18,7 +18,7 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    redirect_to logout_url and return if current_user_or_unconfirmed_user.present?
+    redirect_to(logout_url) && return if current_user_or_unconfirmed_user.present?
   end
 
   def choose_registration
@@ -35,7 +35,9 @@ class WelcomeController < ApplicationController
   end
 
   # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9
-  def user_root_url_redirect; redirect_to user_root_url and return end
+  def user_root_url_redirect
+    redirect_to(user_root_url) && return
+  end
 
   private
 

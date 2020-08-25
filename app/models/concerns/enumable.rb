@@ -5,7 +5,7 @@ module Enumable
     def slug_translation(slug)
       I18n.t(
         slug.to_s.underscore,
-        scope: [:activerecord, :enums, self.name.underscore],
+        scope: [:activerecord, :enums, name.underscore]
       )
     end
 
@@ -14,7 +14,7 @@ module Enumable
     end
 
     def legacy_selections
-      slugs.map { |slug| { slug: slug, name: slug_translation(slug) } }
+      slugs.map { |slug| {slug: slug, name: slug_translation(slug)} }
     end
 
     def slugs

@@ -15,7 +15,7 @@ RSpec.describe Color, type: :model do
     it "returns what we want" do
       color = FactoryBot.create(:color, name: "blue", display: "#386ed2")
       result = color.autocomplete_hash
-      expect(result.keys).to eq(%w(id text category priority data))
+      expect(result.keys).to eq(%w[id text category priority data])
       expect(result["data"]["display"]).to eq color.display
       expect(result["data"]["search_id"]).to eq("c_#{color.id}")
     end

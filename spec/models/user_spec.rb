@@ -62,7 +62,7 @@ RSpec.describe User, type: :model do
         subject.password = "hi"
         subject.password_confirmation = "hi"
         expect(subject.valid?).to be_falsey
-        expect(subject.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
+        expect(subject.errors.messages[:password].include?("is too short (minimum is 12 characters)")).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
@@ -135,10 +135,10 @@ RSpec.describe User, type: :model do
       end
 
       it "requires at least 8 characters for the password" do
-        @user.password = "hi"
-        @user.password_confirmation = "hi"
+        @user.password = "please12"
+        @user.password_confirmation = "please12"
         expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
+        expect(@user.errors.messages[:password].include?("is too short (minimum is 12 characters)")).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
@@ -184,10 +184,10 @@ RSpec.describe User, type: :model do
         expect(organization_member.authorized?(bike)).to be_truthy
         expect(admin.authorized?(bike)).to be_truthy
         # Check bike code authorization
-        expect(bike_sticker.authorized?(user)).to be_falsey
-        expect(bike_sticker.authorized?(owner)).to be_truthy
-        expect(bike_sticker.authorized?(organization_member)).to be_truthy
-        expect(bike_sticker.authorized?(admin)).to be_truthy
+        expect(user.authorized?(bike_sticker)).to be_falsey
+        expect(owner.authorized?(bike_sticker)).to be_truthy
+        expect(organization_member.authorized?(bike_sticker)).to be_truthy
+        expect(admin.authorized?(bike_sticker)).to be_truthy
       end
     end
   end
@@ -230,8 +230,8 @@ RSpec.describe User, type: :model do
     context "secondary email partial match" do
       let(:user_email) do
         FactoryBot.create(:user_email,
-                          email: "urrg@second.org",
-                          user: FactoryBot.create(:user, name: "FeconDDD"))
+          email: "urrg@second.org",
+          user: FactoryBot.create(:user, name: "FeconDDD"))
       end
       let!(:user) { user_email.user }
       it "finds users, deduping" do
@@ -378,11 +378,13 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.password_reset_token).to be_present
         expect(user.auth_token_time("password_reset_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_expired?("password_reset_token")).to be_falsey
       end
-      it "uses input time" do
+      it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("password_reset_token", (Time.current - 121.minutes).to_i)
         expect(user.reload.auth_token_time("password_reset_token")).to be < (Time.current - 1.hours)
+        expect(user.auth_token_expired?("password_reset_token")).to be_truthy
       end
     end
 
@@ -395,12 +397,14 @@ RSpec.describe User, type: :model do
         user = User.new
         user.generate_auth_token("magic_link_token")
         expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
       it "uses input time, it returns the token" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("magic_link_token", (Time.current - 1.hour).to_i)
         user.reload
         expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+        expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
     end
   end
@@ -409,9 +413,9 @@ RSpec.describe User, type: :model do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
       expect(user.password_reset_token).to be_nil
-      expect do
+      expect {
         user.send_password_reset_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
       expect(user.reload.password_reset_token).not_to be_nil
     end
 
@@ -419,10 +423,10 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       user.send_password_reset_email
       current_token = user.password_reset_token
-      expect do
+      expect {
         user.send_password_reset_email
         user.send_password_reset_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
       expect(user.password_reset_token).to eq current_token
     end
@@ -432,9 +436,9 @@ RSpec.describe User, type: :model do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
       expect(user.magic_link_token).to be_nil
-      expect do
+      expect {
         user.send_magic_link_email
-      end.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      }.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -443,9 +447,9 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       token = user.magic_link_token
       user.send_magic_link_email
-      expect do
+      expect {
         user.send_magic_link_email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
     end
@@ -474,9 +478,9 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.build(:user) }
       it "raises an informative error" do
         user.password = nil
-        expect do
+        expect {
           user.update_last_login("127.0.0.1")
-        end.to raise_error(/password/i)
+        }.to raise_error(/password/i)
       end
     end
   end
@@ -505,12 +509,12 @@ RSpec.describe User, type: :model do
       let(:user) { FactoryBot.create(:organization_member) }
       let(:organization) { user.organizations.first }
       let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
-      let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
-      it "is true if the organization has that paid feature" do
+      let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
+      it "is true if the organization has that organization feature" do
         expect(user.render_donation_request).to be_nil
         expect(user.send_unstolen_notifications?).to be_falsey
 
-        invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+        invoice.update_attributes(organization_feature_ids: [organization_feature.id])
         organization.save
 
         expect(organization.bike_actions?).to be_truthy
@@ -587,19 +591,19 @@ RSpec.describe User, type: :model do
     end
     context "blank" do
       it "does nothing" do
-        expect do
+        expect {
           user.additional_emails = " "
           user.save
-        end.to change(UserEmail, :count).by 0
+        }.to change(UserEmail, :count).by 0
         expect(UserEmail.where(user_id: user.id).count).to eq 1
       end
     end
     context "a single email" do
       it "adds the email" do
-        expect do
+        expect {
           user.additional_emails = "stuffthings@oooooooooh.com"
           user.save
-        end.to change(UserEmail, :count).by 1
+        }.to change(UserEmail, :count).by 1
         user.reload
         expect(user.user_emails.confirmed.count).to eq 1
         expect(user.user_emails.unconfirmed.count).to eq 1
@@ -617,10 +621,10 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.unconfirmed.count).to eq 1
-        expect do
+        expect {
           user.additional_emails = " andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com"
           user.save
-        end.to change(UserEmail, :count).by 2
+        }.to change(UserEmail, :count).by 2
         user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.where(email: "andanother@cool.com").count).to eq 1

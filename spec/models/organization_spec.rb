@@ -42,18 +42,18 @@ RSpec.describe Organization, type: :model do
       nonorg_stolen_record.add_recovery_information
 
       expect(nyc_org1.nearby_bikes.pluck(:id))
-        .to(match_array [nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id))
+        .to(match_array([nyc_bike1, nyc_bike2, nyc_bike3, *nonorg_bikes].map(&:id)))
 
       expect(nyc_org1.nearby_recovered_records.pluck(:id))
-        .to(match_array [nonorg_stolen_record.id])
+        .to(match_array([nonorg_stolen_record.id]))
 
       # Make sure we're getting the bike from the org
       expect(Bike.organization(nyc_org1).pluck(:id))
-        .to(match_array [chi_bike1.id])
+        .to(match_array([chi_bike1.id]))
 
       # Make sure we get the bikes from the org or from nearby
       expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
-        .to(match_array [chi_bike1, nyc_bike2, nyc_bike3])
+        .to(match_array([chi_bike1, nyc_bike2, nyc_bike3]))
     end
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Organization, type: :model do
           approved: false,
           website: "http://website.com",
           ascend_name: "ascend-name",
-          parent_organization: FactoryBot.create(:organization),
+          parent_organization: FactoryBot.create(:organization)
         )
 
         org.save
@@ -246,13 +246,13 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "is_paid and enabled? calculations" do
-    let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
+    let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
     it "uses associations to determine is_paid" do
       expect(organization.enabled?("csv_exports")).to be_falsey
-      invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+      invoice.update_attributes(organization_feature_ids: [organization_feature.id])
       invoice.update_attributes(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
@@ -276,12 +276,12 @@ RSpec.describe Organization, type: :model do
     end
     context "regional_bike_codes" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts regional_stickers]) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
       let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
+        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts bike_stickers])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
@@ -316,7 +316,7 @@ RSpec.describe Organization, type: :model do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
     context "passwordless_users with passwordless_user_domain" do
-      let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
         expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])
@@ -340,7 +340,7 @@ RSpec.describe Organization, type: :model do
       {
         recovered_description: "recovered it on a special corner",
         index_helped_recovery: true,
-        can_share_recovery: true,
+        can_share_recovery: true
       }
     end
     it "returns recovered bikes" do
@@ -348,8 +348,8 @@ RSpec.describe Organization, type: :model do
       expect(organization.bikes).to eq([bike])
       expect(organization.bikes.stolen).to eq([bike])
       # Check the inverse lookup
-      expect((Bike.organization(organization))).to eq([bike])
-      expect((Bike.organization(organization.id))).to eq([bike])
+      expect(Bike.organization(organization)).to eq([bike])
+      expect(Bike.organization(organization.id)).to eq([bike])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
@@ -588,8 +588,8 @@ RSpec.describe Organization, type: :model do
       expect(organization.include_field_extra_registration_number?).to be_falsey
       expect(organization.include_field_organization_affiliation?).to be_falsey
     end
-    context "with paid_features" do
-      let(:labels) { { reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ" }.as_json }
+    context "with organization_features" do
+      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ"}.as_json }
       let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone organization_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do

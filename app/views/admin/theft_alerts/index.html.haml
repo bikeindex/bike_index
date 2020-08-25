@@ -4,20 +4,32 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "recovered", admin_theft_alerts_path(sortable_search_params.merge(search_recovered: !@search_recovered)), class: "nav-link #{@search_recovered ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", admin_theft_alerts_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-:ruby
-  theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
-  theft_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
-    {
-      name: theft_alert_plan.name,
-      data: time_range_counts(collection: matching_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id))
-    }
-  end
+- theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
+- stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {created_at: @time_range})
 
 - if @render_chart
+  :ruby
+    theft_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
+      {
+        name: theft_alert_plan.name,
+        data: time_range_counts(collection: matching_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id))
+      }
+    end
+    alerts_recoveries_graph = theft_alert_plans.map do |theft_alert_plan|
+      {
+        name: "#{theft_alert_plan.name} recoveries",
+        data: time_range_counts(collection: stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}), column: "theft_alerts.created_at")
+      }
+    end
   .col-12.mt-2
     = column_chart theft_alerts_graph, stacked: true, thousands: ",", defer: true
+  - unless @search_recovered
+    .col-12.mt-2
+      = column_chart alerts_recoveries_graph, stacked: true, thousands: ",", defer: true
 
 = render partial: "/shared/period_select"
 
@@ -48,6 +60,11 @@
               - theft_alert_plans.each do |theft_alert_plan|
                 %td
                   = number_with_delimiter(matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).count)
+                  %small
+                    %em.text-success
+                      recovered
+                    %span.less-strong
+                      = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count
 
 = render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
 

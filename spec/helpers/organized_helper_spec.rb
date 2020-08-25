@@ -56,6 +56,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "is blue" do
         expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
         expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
+        expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved </span>"
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do

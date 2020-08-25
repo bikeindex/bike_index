@@ -1,0 +1,33 @@
+.admin-subnav
+  .col-12
+    %h1
+      Credibility Badges
+
+%p
+  Bikes start out with a score of
+  %strong
+    = CredibilityScorer::BASE_SCORE
+%p
+  Badges add or subtract value from that score (max of #{CredibilityScorer::MAX_SCORE}, min of 0)
+
+.row
+  .col-md-8.offset-md-2
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
+        %th.small
+          Category
+        %th
+          Name
+        %th
+          Value
+      %tbody
+        - CredibilityScorer::BADGES.each do |category, badges|
+          - CredibilityScorer::BADGES[category].each do |key, value|
+            %tr
+              %td
+                %small.less-strong
+                  = category.to_s.humanize
+              %td
+                = key.to_s.humanize
+              %td
+                = value

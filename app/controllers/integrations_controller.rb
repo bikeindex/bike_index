@@ -21,7 +21,7 @@ class IntegrationsController < ApplicationController
     provider_name ||= params[:strategy]
 
     flash[:error] = translation(:problem_authenticating_with_provider,
-                                provider_name: provider_name)
-    redirect_to new_session_path and return
+      provider_name: provider_name)
+    redirect_to(new_session_path) && return
   end
 end

@@ -1,6 +1,6 @@
 class Membership < ApplicationRecord
-  MEMBERSHIP_TYPES = %w(admin member).freeze
-  HOT_SHEET_NOTIFICATION_ENUM = { notification_never: 0, notification_daily: 1 }.freeze
+  MEMBERSHIP_TYPES = %w[admin member].freeze
+  HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
 
   acts_as_paranoid
 
@@ -28,7 +28,7 @@ class Membership < ApplicationRecord
   end
 
   def self.create_passwordless(**create_attrs)
-    new_passwordless_attrs = { skip_processing: true, role: "member" }
+    new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
       # We need to check for existing memberships because the AfterUserCreateWorker calls this
       existing_membership = Membership.find_by_invited_email(create_attrs[:invited_email])
@@ -44,12 +44,14 @@ class Membership < ApplicationRecord
 
   def self.admin_text_search(str)
     q = "%#{str.to_s.strip}%"
-      left_joins(:user)
-        .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
-        .references(:users)
+    left_joins(:user)
+      .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
+      .references(:users)
   end
 
-  def invited_display_name; user.present? ? user.display_name : invited_email end
+  def invited_display_name
+    user.present? ? user.display_name : invited_email
+  end
 
   def send_invitation_email?
     return false if created_by_magic_link # Don't send an email if they're already being emailed
@@ -57,11 +59,17 @@ class Membership < ApplicationRecord
     invited_email.present?
   end
 
-  def admin?; role == "admin" end
+  def admin?
+    role == "admin"
+  end
 
-  def claimed?; claimed_at.present? end
+  def claimed?
+    claimed_at.present?
+  end
 
-  def ambassador?; organization.ambassador? end
+  def ambassador?
+    organization.ambassador?
+  end
 
   def enqueue_processing_worker
     return true if skip_processing
@@ -69,10 +77,10 @@ class Membership < ApplicationRecord
   end
 
   def set_calculated_attributes
-    if invited_email.present?
-      self.invited_email = EmailNormalizer.normalize(invited_email)
+    self.invited_email = if invited_email.present?
+      EmailNormalizer.normalize(invited_email)
     else
-      self.invited_email = user&.email # Basically, just for auto_user in orgs
+      user&.email # Basically, just for auto_user in orgs
     end
     self.claimed_at ||= Time.current if user_id.present?
   end

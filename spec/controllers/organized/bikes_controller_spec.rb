@@ -4,14 +4,14 @@ RSpec.describe Organized::BikesController, type: :controller do
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
     it "redirects to the organization root path" do
-      expect(get(:index, params: { organization_id: organization })).to redirect_to(organization_root_path)
-      expect(get(:recoveries, params: { organization_id: organization })).to redirect_to(organization_root_path)
-      expect(get(:incompletes, params: { organization_id: organization })).to redirect_to(organization_root_path)
-      expect(get(:new, params: { organization_id: organization })).to redirect_to(organization_root_path)
+      expect(get(:index, params: {organization_id: organization})).to redirect_to(organization_root_path)
+      expect(get(:recoveries, params: {organization_id: organization})).to redirect_to(organization_root_path)
+      expect(get(:incompletes, params: {organization_id: organization})).to redirect_to(organization_root_path)
+      expect(get(:new, params: {organization_id: organization})).to redirect_to(organization_root_path)
     end
     describe "multi_serial_search" do
       it "renders" do
-        get :multi_serial_search, params: { organization_id: organization.to_param }
+        get :multi_serial_search, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :multi_serial_search
       end
@@ -28,7 +28,7 @@ RSpec.describe Organized::BikesController, type: :controller do
     let!(:organization) { FactoryBot.create(:organization) }
     it "redirects the user, reassigns passive_organization_id" do
       session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization
-      get :index, params: { organization_id: organization.to_param }
+      get :index, params: {organization_id: organization.to_param}
       expect(response.location).to eq my_account_url
       expect(flash[:error]).to be_present
       expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
@@ -37,7 +37,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       let(:user) { FactoryBot.create(:admin) }
       it "renders, doesn't reassign passive_organization_id" do
         session[:passive_organization_id] = organization.to_param # Admin, so user has access
-        get :index, params: { organization_id: organization.to_param }
+        get :index, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq organization
@@ -52,7 +52,7 @@ RSpec.describe Organized::BikesController, type: :controller do
     include_context :logged_in_as_organization_admin
     describe "index" do
       it "renders" do
-        get :index, params: { organization_id: organization.to_param }
+        get :index, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq organization
@@ -62,10 +62,72 @@ RSpec.describe Organized::BikesController, type: :controller do
 
     describe "new" do
       it "renders" do
-        get :new, params: { organization_id: organization.to_param }
+        get :new, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(assigns(:current_organization)).to eq organization
+        expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
+      end
+    end
+
+    describe "new_iframe" do
+      it "renders" do
+        get :new_iframe, params: {organization_id: organization.to_param}
+        expect(response.status).to eq(200)
+        expect(response).to render_template :new_iframe
+        expect(assigns(:current_organization)).to eq organization
+        expect(response.headers["X-Frame-Options"]).to be_blank
+      end
+    end
+
+    describe "create" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:color) { FactoryBot.create(:color) }
+      let(:attrs) do
+        {
+          manufacturer_id: manufacturer.id,
+          owner_email: "something@sss.com",
+          creator_id: 21,
+          primary_frame_color_id: color.id,
+          creation_organization_id: 9292,
+          serial_number: "xcxcxcxcc7xcx"
+        }
+      end
+      it "creates" do
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(organization.auto_user_id).to_not eq user.id
+        Sidekiq::Testing.inline! do
+          expect {
+            post :create, params: {bike: attrs, organization_id: organization.to_param}
+          }.to change(Bike, :count).by 1
+        end
+        expect(response.headers["X-Frame-Options"]).to be_blank
+
+        b_param = BParam.reorder(:created_at).last
+        expect(b_param.owner_email).to eq attrs[:owner_email]
+        expect(b_param.owner_email).to eq attrs[:owner_email]
+        expect(b_param.creation_organization_id).to eq organization.id
+        expect(b_param.bike["serial_number"]).to eq attrs[:serial_number]
+
+        bike = b_param.created_bike
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.serial_number).to eq attrs[:serial_number]
+        expect(bike.id).to eq b_param.created_bike_id
+        expect(bike.creator_id).to eq user.id
+        expect(bike.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.manufacturer_id).to eq manufacturer.id
+        expect(bike.creation_state.origin).to eq "organization_form"
+        expect(bike.primary_frame_color_id).to eq color.id
+        expect(bike.secondary_frame_color_id).to be_blank
+        expect(bike.tertiary_frame_color_id).to be_blank
+
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        message = ActionMailer::Base.deliveries.last
+        expect(message.to).to eq([attrs[:owner_email]])
+        expect(message.subject).to match(/confirm.*registration/i)
       end
     end
   end
@@ -74,19 +136,19 @@ RSpec.describe Organized::BikesController, type: :controller do
     include_context :logged_in_as_organization_member
     context "paid organization" do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having paid feature
+      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having organization feature
       describe "index" do
         context "with params" do
           let(:query_params) do
             {
               query: "1",
               manufacturer: "2",
-              colors: %w(3 4),
+              colors: %w[3 4],
               location: "5",
               distance: "6",
               serial: "9",
-              query_items: %w(7 8),
-              stolenness: "stolen",
+              query_items: %w[7 8],
+              stolenness: "stolen"
             }.as_json
           end
           let(:organization_bikes) { organization.bikes }
@@ -105,7 +167,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_sticker?).to be_truthy
-            get :index, params: { organization_id: organization.to_param, search_stickers: "none" }
+            get :index, params: {organization_id: organization.to_param, search_stickers: "none"}
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_stickers)).to eq "none"
@@ -115,7 +177,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         end
         context "without params" do
           it "renders, assigns search_query_present and stolenness all" do
-            get :index, params: { organization_id: organization.to_param }
+            get :index, params: {organization_id: organization.to_param}
             expect(response.status).to eq(200)
             expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
             expect(assigns(:current_organization)).to eq organization
@@ -137,7 +199,7 @@ RSpec.describe Organized::BikesController, type: :controller do
             recovered_description: "recovered it on a special corner",
             index_helped_recovery: true,
             can_share_recovery: true,
-            recovered_at: "2016-01-10 13:59:59",
+            recovered_at: "2016-01-10 13:59:59"
           }
         end
         before do
@@ -149,7 +211,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           get :recoveries, params: {
             organization_id: organization.to_param,
             period: "custom",
-            start_time: Time.parse("2016-01-01").to_i,
+            start_time: Time.parse("2016-01-01").to_i
           }
           expect(response.status).to eq(200)
           expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
@@ -162,26 +224,26 @@ RSpec.describe Organized::BikesController, type: :controller do
             manufacturer_id: Manufacturer.other.id,
             primary_frame_color_id: Color.black.id,
             owner_email: "something@stuff.com",
-            creation_organization_id: organization.id,
+            creation_organization_id: organization.id
           }
         end
-        let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs }, origin: "embed_partial") }
+        let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
         it "renders" do
           expect(partial_registration.organization).to eq organization
-          get :incompletes, params: { organization_id: organization.to_param }
+          get :incompletes, params: {organization_id: organization.to_param}
           expect(response.status).to eq(200)
           expect(response).to render_template :incompletes
           expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
         end
         context "suborganization incomplete" do
           let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
-          let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id) }, origin: "embed_partial") }
+          let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
           it "renders" do
             organization.save
-            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue paid feature stubbing
+            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue organization feature stubbing
             expect(partial_registration.organization).to eq organization_child
 
-            get :incompletes, params: { organization_id: organization.to_param }
+            get :incompletes, params: {organization_id: organization.to_param}
 
             expect(response.status).to eq(200)
             expect(response).to render_template :incompletes
@@ -191,7 +253,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       end
       describe "multi_serial_search" do
         it "renders" do
-          get :multi_serial_search, params: { organization_id: organization.to_param }
+          get :multi_serial_search, params: {organization_id: organization.to_param}
           expect(response.status).to eq(200)
           expect(response).to render_template :multi_serial_search
         end
@@ -204,7 +266,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       describe "index" do
         it "renders without search" do
           expect(Bike).to_not receive(:search)
-          get :index, params: { organization_id: organization.to_param }
+          get :index, params: {organization_id: organization.to_param}
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq organization
@@ -213,13 +275,13 @@ RSpec.describe Organized::BikesController, type: :controller do
       end
       describe "recoveries" do
         it "redirects recoveries" do
-          get :recoveries, params: { organization_id: organization.to_param }
+          get :recoveries, params: {organization_id: organization.to_param}
           expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
         end
       end
       describe "incompletes" do
         it "redirects incompletes" do
-          get :incompletes, params: { organization_id: organization.to_param }
+          get :incompletes, params: {organization_id: organization.to_param}
           expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
         end
       end
@@ -227,7 +289,7 @@ RSpec.describe Organized::BikesController, type: :controller do
 
     describe "new" do
       it "renders" do
-        get :new, params: { organization_id: organization.to_param }
+        get :new, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(assigns(:current_organization)).to eq organization

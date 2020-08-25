@@ -13,28 +13,28 @@ class Admin::GraphsController < Admin::BaseController
 
     if @kind == "users"
       chart_data = User.where(created_at: @start_at..@end_at)
-                       .group_by_period(@group_period, :created_at, time_zone: @timezone)
-                       .count
+        .group_by_period(@group_period, :created_at, time_zone: @timezone)
+        .count
     elsif @kind == "payments"
       chart_data = [
         {
           name: "All",
           data: Payment.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count,
+            .count
         },
         {
           name: "Payments",
           data: Payment.where(created_at: @start_at..@end_at).payment
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count,
+            .count
         },
         {
           name: "Donations",
           data: Payment.where(created_at: @start_at..@end_at).donation
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count,
-        },
+            .count
+        }
       ]
     elsif @kind == "bikes"
       bikes = Bike.unscoped
@@ -43,14 +43,14 @@ class Admin::GraphsController < Admin::BaseController
           name: "Registered",
           data: bikes.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count,
+            .count
         },
         {
           name: "Stolen bikes",
           data: StolenRecord.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count,
-        },
+            .count
+        }
       ]
     elsif @kind == "recoveries"
       recoveries = StolenRecord.unscoped
@@ -61,7 +61,7 @@ class Admin::GraphsController < Admin::BaseController
     if chart_data.present?
       render json: chart_data.chart_json
     else
-      render json: { error: "unable to parse chart" }
+      render json: {error: "unable to parse chart"}
     end
   end
 
@@ -83,8 +83,8 @@ class Admin::GraphsController < Admin::BaseController
       range ||= bike_index_start..Time.current
     end
     bgraph = [
-      { name: "Registrations", data: bikes.group_by_month(:created_at, range: range).count },
-      { name: "Stolen", data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count },
+      {name: "Registrations", data: bikes.group_by_month(:created_at, range: range).count},
+      {name: "Stolen", data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count}
     ]
     render json: bgraph.chart_json
   end
@@ -104,7 +104,7 @@ class Admin::GraphsController < Admin::BaseController
 
   def review
     start_day = (1.week.ago - 1.day).to_date
-    end_day = (1.day.ago).to_date
+    end_day = 1.day.ago.to_date
     xaxis = []
     days_from_this_week = (start_day..end_day).map
 
@@ -149,7 +149,7 @@ class Admin::GraphsController < Admin::BaseController
     date_from = Date.parse(start_date)
     date_to = Date.today
     date_range = date_from..date_to
-    date_months = date_range.map { |d| Date.new(d.year, d.month, 1) }.uniq
+    date_range.map { |d| Date.new(d.year, d.month, 1) }.uniq
   end
 
   def month_list(range)
@@ -159,7 +159,7 @@ class Admin::GraphsController < Admin::BaseController
   def range_values(range, type)
     values = []
     range.each do |date|
-      values << self.send(type, date)
+      values << send(type, date)
     end
     values
   end

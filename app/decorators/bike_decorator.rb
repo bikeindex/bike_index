@@ -19,7 +19,7 @@ class BikeDecorator < ApplicationDecorator
     t = ""
     t += "#{object.year} " if object.year.present?
     t += h.content_tag(:strong, object.mnfg_name)
-    t += Rack::Utils.escape_html(" #{object.frame_model}") if object.frame_model.present?
+    t += Rack::Utils.escape_html(" #{object.frame_model_truncated}") if object.frame_model.present?
     t.html_safe
   end
 

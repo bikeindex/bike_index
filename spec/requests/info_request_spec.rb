@@ -16,6 +16,7 @@ RSpec.describe InfoController, type: :request do
       expect(html_response).to match(/<title>Cool info about bike things</)
       # This is pulled from the translations file
       expect(html_response).to match(/<meta.*Special info desc/)
+      expect(assigns(:page_id)).to eq "news_show"
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
@@ -27,8 +28,8 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "static pages" do
-    pages = %w(about protect_your_bike where serials image_resources resources
-               dev_and_design support_bike_index terms vendor_terms privacy lightspeed)
+    pages = %w[about protect_your_bike where serials image_resources resources security
+      dev_and_design support_bike_index terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do

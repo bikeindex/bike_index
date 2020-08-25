@@ -1,0 +1,205 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage Stickers Updates
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind != "all" ? "active" : "") }
+          - if @search_kind == "all"
+            All Kinds
+          - else
+            = @search_kind.humanize
+        .dropdown-menu
+          - BikeStickerUpdate.kinds.each do |kind|
+            - kind_active = @search_kind == kind
+            = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind != "all" ? "active" : "") }
+          - if @search_organization_kind == "all"
+            Organization Kinds
+          - else
+            = @search_organization_kind.humanize
+        .dropdown-menu
+          - BikeStickerUpdate.organization_kinds.each do |kind|
+            - kind_active = @search_organization_kind == kind
+            = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_creator_kind != "all" ? "active" : "") }
+          - if @search_creator_kind == "all"
+            All creators
+          - else
+            = @search_creator_kind.gsub("creator_", "").humanize
+        .dropdown-menu
+          - BikeStickerUpdate.creator_kinds.each do |creator_kind|
+            - kind_active = @search_creator_kind == creator_kind
+            = link_to creator_kind.gsub("creator_", "").humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: kind_active ? nil : creator_kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", admin_bike_sticker_updates_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Sticker updates" }
+
+- if @render_chart
+  - if @search_kind == "all"
+    - counts_by_kind = counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
+    -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
+    = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
+  - else
+    = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ",", defer: true
+
+
+  - unless params[:organization_id].present?
+    - update_kinds = BikeStickerUpdate.kinds # Just to ensure consistency
+    .full-screen-table.mt-2
+      %table.table.table-striped.table-bordered.table-sm
+        %thead.small-header
+          %th Organization
+          - if @search_kind == "all"
+            - update_kinds.each do |kind|
+              %th.small= kind.humanize
+          %th Total
+
+        %tbody
+          - matching_org_ids = matching_bike_sticker_updates.distinct.pluck(:organization_id)
+          - if @search_kinds == "all"
+            - matching_sticker_per_org_id = matching_org_ids.map { |id| [id, {total:  matching_bike_sticker_updates.where(organization_id: id).count }] }
+          - else
+            -# Do some crazy ruby inline shit
+            :ruby
+              matching_sticker_per_org_id = matching_org_ids.map do |id|
+                values = update_kinds.map { |kind| [kind, matching_bike_sticker_updates.where(organization_id: id, kind: kind).count] }.to_h
+                [id, values.merge(total: values.values.sum)]
+              end
+          - matching_sticker_per_org_id.sort_by { |id, values| values[:total] }.each do |id, values|
+            - organization = Organization.unscoped.find_by_id(id) if id.present?
+            %tr
+              %td.small
+                - if organization.present?
+                  = link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
+                - else
+                  = link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
+              - if @search_kind == "all"
+                - update_kinds.each do |kind|
+                  %td
+                    %small= number_with_delimiter(values[kind])
+              %td
+                = number_with_delimiter(values[:total])
+          %tr
+            %td Total
+            - if @search_kind == "all"
+              - update_kinds.each do |kind|
+                %td
+                  %small
+                    = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
+            %td
+              = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+.row.mt-4.mb-2
+  .col-md-6
+    %p
+      = number_with_delimiter(@bike_sticker_updates.total_count)
+      matching sticker updates
+      %em
+        = humanized_time_range(@time_range)
+
+  .col-md-6.text-right
+    = form_tag admin_bike_sticker_updates_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :render_chart, @render_chart
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :end_time, params[:end_time]
+      = hidden_field_tag :start_time, params[:start_time]
+      = hidden_field_tag :organization_id, params[:organization_id]
+      = hidden_field_tag :search_kind, params[:search_kind]
+      .form-group.ml-2
+        = text_field_tag :search_query, params[:search_query], placeholder: "search for bike sticker", class: "form-control"
+
+      = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
+
+- if @searched_bike_stickers.present?
+  .row.matching-bike-stickers.mt-4.mb-4{ style: "background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;" }
+    .col-12.pt-4.pb-2
+      %h2
+        Matching bike stickers
+      - if @searched_bike_stickers.count > 100
+        %h3 More than 100 matching stickers, just showing the first ones
+      = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @searched_bike_stickers.limit(100) }
+
+.row
+  .col-sm-6.offset-sm-6
+    = paginate @bike_sticker_updates, views_prefix: "admin"
+
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th
+        = sortable "created_at"
+      %th
+        = sortable "user_id"
+      %th
+        = sortable "bike_sticker_id", "Sticker"
+      %th.small
+        sticker&nbsp;org
+      %th.small
+        = sortable "update_number", "repeat#"
+      %th
+        = sortable "bike_id"
+      %th
+        = sortable "organization_id", "Update&nbsp;org"
+      %th.small
+        = sortable "organization_kind", "org&nbsp;kind"
+      %th
+        = sortable "kind"
+      %th
+        = sortable "creator_kind"
+    %tbody
+      - @bike_sticker_updates.each do |bike_sticker_update|
+        - bike_sticker = bike_sticker_update.bike_sticker
+        %tr
+          %td
+            %a.convertTime{ href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" }
+              = l bike_sticker_update.created_at, format: :convert_time
+          %td
+            - if bike_sticker_update.user_id.present?
+              - user_name = bike_sticker_update.user&.name || bike_sticker_update.user_id
+              = link_to user_name, admin_bike_sticker_updates_path(sortable_search_params.merge(user_id: bike_sticker_update.user_id))
+          %td
+            %strong
+              = link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code))
+            - unless bike_sticker.sticker?
+              %em.small.text-warning
+                = bike_sticker.kind
+          %td
+            - if bike_sticker.organization.present?
+              %small= bike_sticker.organization.short_name
+          %td
+            - unless bike_sticker_update.update_number == 1
+              %small= bike_sticker_update.update_number
+          %td
+            - if bike_sticker_update.bike.present?
+              %small
+                = link_to organized_bike_text(bike_sticker_update.bike), edit_admin_bike_path(bike_sticker_update.bike_id)
+          %td
+            - if bike_sticker_update.organization.present?
+              = link_to bike_sticker_update.organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: bike_sticker_update.organization_id))
+          %td
+            - unless bike_sticker_update.no_organization?
+              %small
+                = bike_sticker_update.organization_kind.gsub("_organization", "").humanize
+          %td
+            %small
+              = bike_sticker_update.kind.gsub("_claim", "").humanize
+          %td
+            - unless bike_sticker_update.creator_user?
+              %small
+                - if bike_sticker_update.creator_export?
+                  = link_to "export", organization_export_path(bike_sticker_update.export_id, organization_id: bike_sticker_update.organization_id)
+                - else
+                  = bike_sticker_update.creator_kind.gsub("creator_", "").humanize
+
+

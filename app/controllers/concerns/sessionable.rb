@@ -5,12 +5,12 @@ module Sessionable
     store_return_to
     # Make absolutely sure we don't have an unconfirmed user
     if unconfirmed_current_user.present? || current_user&.unconfirmed?
-      redirect_to please_confirm_email_users_path and return
+      redirect_to(please_confirm_email_users_path) && return
     end
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
       flash[:success] = translation(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
-      redirect_to user_root_url and return
+      redirect_to(user_root_url) && return
     end
   end
 
@@ -27,12 +27,12 @@ module Sessionable
 
     if sign_in_partner.present?
       session.delete(:partner) # Only removing once signed in, PR#1435
-      redirect_to bikehub_url("account?reauthenticate_bike_index=true") and return # Only partner rn is bikehub, hardcode it
+      redirect_to(bikehub_url("account?reauthenticate_bike_index=true")) && return # Only partner rn is bikehub, hardcode it
     elsif user.unconfirmed?
-      render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) and return
+      render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
     elsif !return_to_if_present
       flash[:success] = translation(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
-      redirect_to user_root_url and return
+      redirect_to(user_root_url) && return
     end
   end
 
@@ -45,7 +45,7 @@ module Sessionable
   def cookie_options(user)
     c = {
       httponly: true,
-      value: [user.id, user.auth_token],
+      value: [user.id, user.auth_token]
     }
     # In development, secure: true breaks the cookie storage. Only add if production
     Rails.env.production? ? c.merge(secure: true) : c

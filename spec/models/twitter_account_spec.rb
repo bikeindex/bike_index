@@ -19,7 +19,7 @@ RSpec.describe TwitterAccount, type: :model do
         :twitter_account,
         :in_chicago,
         skip_geocoding: false,
-        state: nil,
+        state: nil
       )
       twitter_account.address = "1 New Address"
       expect(twitter_account).to be_should_be_geocoded
@@ -46,7 +46,7 @@ RSpec.describe TwitterAccount, type: :model do
 
     it "sets the account info from fetch_account_info on save" do
       twitter_account = FactoryBot.build(:twitter_account, twitter_account_info: {})
-      expect(twitter_account).to receive(:twitter_user).and_return({ screen_name: "foo", created_at: "Sun Jun 22 20:46:35 +0000 2014" })
+      expect(twitter_account).to receive(:twitter_user).and_return({screen_name: "foo", created_at: "Sun Jun 22 20:46:35 +0000 2014"})
 
       twitter_account.save
       twitter_account.reload
@@ -55,8 +55,8 @@ RSpec.describe TwitterAccount, type: :model do
     end
 
     it "does nothing if account info is present" do
-      twitter_account = FactoryBot.build(:twitter_account, twitter_account_info: { screen_name: "BikeIndex" })
-      allow(twitter_account).to receive(:twitter_user).and_return({ screen_name: "foo" })
+      twitter_account = FactoryBot.build(:twitter_account, twitter_account_info: {screen_name: "BikeIndex"})
+      allow(twitter_account).to receive(:twitter_user).and_return({screen_name: "foo"})
 
       twitter_account.fetch_account_info
 

@@ -1,32 +1,43 @@
-- if @token.present?
-  .container
-    .card
-      .card-body{ style: "padding: 2rem; background: #eceeef" }
-        - if @matching_notification.present?
-          %h3.uncap
-            = @matching_notification.subject
-          - organization_message_snippet = @matching_notification.organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first
-          - if organization_message_snippet.present?
-            = organization_message_snippet.body.html_safe
+- if @token.present? && @matching_notification.present?
+  - modal_title = @matching_notification.subject
+  - modal_body = capture_haml do
+    .modal-body
+      - if @matching_notification.message.present?
+        %p
+          = @matching_notification.message
+      - organization_message_snippet = @matching_notification.organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first
+      - if organization_message_snippet.present?
+        = organization_message_snippet.body.html_safe
 
-        .text-center.mt-4
-          - if @matching_notification&.resolved?
-            %strong.text-info{ style: "font-size: 125%;" }
-              - if @token_type == "graduated_notification"
-                = t(".you_have_already_marked_remaining", bike_type: @bike.type)
-              - else
-                = t(".you_have_already_marked_resolved")
+      .text-center.mt-4
+        - if @matching_notification&.resolved?
+          %strong.text-info{ style: "font-size: 125%;" }
+            - if @token_type == "graduated_notification"
+              = t(".you_have_already_marked_remaining", bike_type: @bike.type)
+            - else
+              = t(".you_have_already_marked_resolved")
+          .mt-1
+            %em.small.less-strong=t(".no_futher_action_necessary")
+        - else
+          = form_tag resolve_token_bike_path(@bike), method: "PUT" do
+            = hidden_field_tag :token, @token
+            = hidden_field_tag :token_type, @token_type
+            - button_value = @token_type == "graduated_notification" ? t(".mark_graduated_resolved", bike_type: @bike.type) : t(".mark_parking_resolved", bike_type: @bike.type)
+            %input{ type: "submit", value: button_value, class: 'btn btn-success btn-lg' }
+
+        - if @matching_notification.organization.present?
+          .mt-2.small.less-strong
+            = t(".organization_sent_this_message", org_name: @matching_notification.organization.name)
+            - if @matching_notification.sent_at.present?
+              %span.convertTime.preciseTime.withPreposition
+                = l @matching_notification.sent_at, format: :convert_time
+
+          - organization_email = @matching_notification.organization.auto_user&.email
+          - if organization_email.present?
             .mt-1
-              %em.small.less-strong=t(".no_futher_action_necessary")
-          - else
+              = t(".please_email_organization_with_questions_html", email_link: link_to(organization_email, "mailto:#{organization_email}"))
 
-            = form_tag resolve_token_bike_path(@bike), method: "PUT" do
-              = hidden_field_tag :token, @token
-              = hidden_field_tag :token_type, @token_type
-              - button_value = @token_type == "graduated_notification" ? t(".mark_graduated_resolved", bike_type: @bike.type) : t(".mark_parking_resolved", bike_type: @bike.type)
-              %input{ type: "submit", value: button_value, class: 'btn btn-success btn-lg' }
-
-- if @bike.stolen && session[:recovery_link_token].present?
+- if modal_title.blank? || @bike.stolen && session[:recovery_link_token].present?
   -# Delete token so modal doesn't keep rendering
   - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token))
 
@@ -67,7 +78,7 @@
                 %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
                   = t(".nevermind")
 
-- unless @bike.created_by_parking_notification # We don't want to show claiming info for parking notification unregistered bikes
+- unless modal_title.present? || @bike.created_by_parking_notification # We don't want to show claiming info for parking notification unregistered bikes
   - if current_user.present?
     - if @bike.claimable_by?(current_user)
       - modal_title = t(".your_bike", bike_type: @bike.type)

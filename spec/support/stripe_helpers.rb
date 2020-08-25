@@ -4,7 +4,7 @@
 module StripeHelpers
   TEST_CARD_NUMBERS = {
     visa: "4242424242424242",
-    declined: "4000000000000002",
+    declined: "4000000000000002"
   }.freeze
 
   def stripe_card(kind = :visa, card_attrs = {})
@@ -12,7 +12,7 @@ module StripeHelpers
       number: TEST_CARD_NUMBERS.fetch(kind),
       exp_month: 12,
       exp_year: 2025,
-      cvc: "314",
+      cvc: "314"
     }.merge(card_attrs)
   end
 

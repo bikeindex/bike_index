@@ -6,6 +6,8 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_pack_tag "application_standalone"
     = stylesheet_pack_tag "application_css"
+    - if params[:hide_dev].present?
+      <style>.only-dev-visible { display: none; }</style>
 
   / manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"

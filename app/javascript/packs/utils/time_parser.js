@@ -14,33 +14,30 @@ export default class TimeParser {
     }
     this.localTimezone = window.localTimezone;
     moment.tz.setDefault(this.localTimezone);
-    this.yesterdayStart = moment()
-      .subtract(1, "day")
-      .startOf("day");
+    this.yesterdayStart = moment().subtract(1, "day").startOf("day");
     this.todayStart = moment().startOf("day");
     this.todayEnd = moment().endOf("day");
-    this.tomorrowEnd = moment()
-      .add(1, "day")
-      .endOf("day");
+    this.tomorrowEnd = moment().add(1, "day").endOf("day");
   }
 
   // If we're display time with the hour, we have different formats based on whether we include seconds
   // this manages that functionality
-  hourFormat(time, baseTimeFormat, includeSeconds) {
+  hourFormat(time, baseTimeFormat, includeSeconds, includePreposition) {
+    const prefix = includePreposition ? " at " : "";
     if (includeSeconds) {
-      return `${time.format(baseTimeFormat)}:<small>${time.format(
+      return `${prefix}${time.format(baseTimeFormat)}:<small>${time.format(
         "ss"
       )}</small> ${time.format("a")}`;
     } else {
-      return time.format(`${baseTimeFormat}a`);
+      return prefix + time.format(`${baseTimeFormat}a`);
     }
   }
 
   localizedDateText(time, classList) {
+    let prefix = "";
     // If we're dealing with yesterday or today (not the future)
     if (time < this.tomorrowEnd && time > this.yesterdayStart) {
       // If we're dealing with yesterday or tomorrow, we prepend that
-      let prefix = "";
       if (time < this.todayStart) {
         prefix = "Yesterday ";
       } else if (time > this.todayEnd) {
@@ -48,8 +45,16 @@ export default class TimeParser {
       }
       return (
         prefix +
-        this.hourFormat(time, "h:mm", classList.contains("preciseTimeSeconds"))
+        this.hourFormat(
+          time,
+          "h:mm",
+          classList.contains("preciseTimeSeconds"),
+          classList.contains("withPreposition")
+        )
       );
+    }
+    if (classList.contains("withPreposition")) {
+      prefix = "on ";
     }
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
@@ -57,26 +62,28 @@ export default class TimeParser {
       classList.contains("preciseTime") ||
       classList.contains("preciseTimeSeconds")
     ) {
+      let hourStr = this.hourFormat(
+        time,
+        "h:mm",
+        classList.contains("preciseTimeSeconds"),
+        classList.contains("withPreposition")
+      );
       // Include the year if it isn't the current year
       if (time.year() === moment().year()) {
-        return this.hourFormat(
-          time,
-          "MMM Do[,] h:mm",
-          classList.contains("preciseTimeSeconds")
-        );
+        return prefix + time.format("MMM Do[,]") + hourStr;
       } else {
-        return this.hourFormat(
-          time,
-          "YYYY-MM-DD h:mm",
-          classList.contains("preciseTimeSeconds")
-        );
+        return prefix + time.format("YYYY-MM-DD") + hourStr;
       }
     }
     // Otherwise, format in basic format
     if (time.year() === moment().year()) {
-      return time.format("MMM Do[,] ha");
+      if (classList.contains("withPreposition")) {
+        return prefix + time.format("MMM Do[,]") + " at " + time.format("ha");
+      } else {
+        return prefix + time.format("MMM Do[,] ha");
+      }
     } else {
-      return time.format("YYYY-MM-DD");
+      return prefix + time.format("YYYY-MM-DD");
     }
   }
 
@@ -121,18 +128,18 @@ export default class TimeParser {
 
   localize() {
     // Write times
-    Array.from(document.getElementsByClassName("convertTime")).forEach(el =>
+    Array.from(document.getElementsByClassName("convertTime")).forEach((el) =>
       this.writeUpdatedTimeText(el)
     );
 
     // Write timezones
-    Array.from(document.getElementsByClassName("convertTimezone")).forEach(el =>
-      this.writeTimezone(el)
-    );
+    Array.from(
+      document.getElementsByClassName("convertTimezone")
+    ).forEach((el) => this.writeTimezone(el));
 
     // Write hidden timezone fields - so if we're submitting a form, it includes the current timezone
-    Array.from(document.getElementsByClassName("hiddenFieldTimezone")).forEach(
-      el => this.setHiddenTimezoneFields(el)
-    );
+    Array.from(
+      document.getElementsByClassName("hiddenFieldTimezone")
+    ).forEach((el) => this.setHiddenTimezoneFields(el));
   }
 }

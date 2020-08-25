@@ -21,7 +21,8 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
     object.date_stolen&.to_i
   end
 
-  def year; end
+  def year
+  end
 
   def thumb
     object.thumb_url

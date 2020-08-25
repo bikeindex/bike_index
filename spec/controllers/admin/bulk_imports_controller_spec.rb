@@ -19,7 +19,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
   describe "show" do
     let!(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "renders" do
-      get :show, params: { id: bulk_import.id }
+      get :show, params: {id: bulk_import.id}
       expect(response).to be_ok
       expect(response).to render_template(:show)
       expect(flash).to_not be_present
@@ -39,7 +39,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
     context "passed params" do
       let(:organization) { FactoryBot.create(:organization) }
       it "includes them" do
-        get :new, params: { organization_id: organization.slug, no_notify: 1 }
+        get :new, params: {organization_id: organization.slug, no_notify: 1}
         expect(response).to be_ok
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
@@ -54,11 +54,11 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
     context "valid create" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
-      let(:valid_attrs) { { file: file, organization_id: organization.id, no_notify: "1" } }
+      let(:valid_attrs) { {file: file, organization_id: organization.id, no_notify: "1"} }
       it "creates" do
-        expect do
-          post :create, params: { bulk_import: valid_attrs }
-        end.to change(BulkImport, :count).by 1
+        expect {
+          post :create, params: {bulk_import: valid_attrs}
+        }.to change(BulkImport, :count).by 1
 
         bulk_import = BulkImport.last
         expect(bulk_import.user).to eq user
@@ -75,9 +75,9 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
     let(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "reenqueues" do
       Sidekiq::Worker.clear_all
-      expect do
-        put :update, params: { id: bulk_import.id, reprocess: true }
-      end.to change(BulkImportWorker.jobs, :count).by 1
+      expect {
+        put :update, params: {id: bulk_import.id, reprocess: true}
+      }.to change(BulkImportWorker.jobs, :count).by 1
       expect(flash[:success]).to be_present
       expect(BulkImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
     end

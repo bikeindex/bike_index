@@ -4,7 +4,7 @@ RSpec.describe OwnershipsController, type: :controller do
   describe "show" do
     it "sets the flash with absent user for create account" do
       ownership = FactoryBot.create(:ownership)
-      put :show, params: { id: ownership.id }
+      put :show, params: {id: ownership.id}
       expect(response).to redirect_to(:new_user)
       expect(flash[:error].match("to claim")).to be_present
       expect(flash[:error].match(/create an account/i)).to be_present
@@ -13,7 +13,7 @@ RSpec.describe OwnershipsController, type: :controller do
     it "sets the flash with sign in for owner exists" do
       user = FactoryBot.create(:user)
       ownership = FactoryBot.create(:ownership, user: user)
-      put :show, params: { id: ownership.id }
+      put :show, params: {id: ownership.id}
       expect(response).to redirect_to(:new_session)
       expect(flash[:error].match("to claim")).to be_present
       expect(flash[:error].match(/sign in/i)).to be_present
@@ -27,7 +27,7 @@ RSpec.describe OwnershipsController, type: :controller do
       end
 
       it "redirects and not change the ownership" do
-        put :show, params: { id: @ownership.id }
+        put :show, params: {id: @ownership.id}
         expect(response.code).to eq("302")
         expect(flash).to be_present
         expect(@ownership.reload.claimed).to be_falsey
@@ -35,7 +35,7 @@ RSpec.describe OwnershipsController, type: :controller do
 
       it "redirects and not change the ownership if it isn't current" do
         @ownership.update_attributes(owner_email: @user.email, current: false)
-        put :show, params: { id: @ownership.id }
+        put :show, params: {id: @ownership.id}
         expect(response.code).to eq("302")
         expect(flash).to be_present
         expect(@ownership.reload.claimed).to be_falsey
@@ -43,7 +43,7 @@ RSpec.describe OwnershipsController, type: :controller do
 
       it "redirects and mark current based on fuzzy find" do
         @ownership.update_attributes(owner_email: @user.email.upcase)
-        put :show, params: { id: @ownership.id }
+        put :show, params: {id: @ownership.id}
         expect(response.code).to eq("302")
         expect(response).to redirect_to edit_bike_url(@ownership.bike)
         expect(flash).to be_present

@@ -1,15 +1,17 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
   before_action :find_twitter_account, only: %i[show edit update destroy check_credentials]
-  skip_before_action :require_index_admin!, only: %[create]
+  skip_before_action :require_index_admin!, only: %(create)
 
   def index
     @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
   end
 
-  def show; end
+  def show
+  end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @twitter_account.update_attributes(permitted_parameters)
@@ -77,7 +79,7 @@ class Admin::TwitterAccountsController < Admin::BaseController
       :screen_name,
       :state,
       :user_secret,
-      :user_token,
+      :user_token
     )
   end
 

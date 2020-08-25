@@ -5,6 +5,7 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:create]
   before_action :sign_in_if_not!, only: [:show]
   before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
   before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
@@ -112,7 +113,7 @@ class BikesController < ApplicationController
 
   def create
     find_or_new_b_param
-    if params[:bike][:embeded]
+    if params[:bike][:embeded] # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -139,7 +140,7 @@ class BikesController < ApplicationController
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
-    else
+    elsif verified_request?
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
@@ -152,6 +153,9 @@ class BikesController < ApplicationController
         flash[:success] = translation(:bike_was_added)
         redirect_to edit_bike_url(@bike)
       end
+    else
+      flash[:error] = "Unable to verify request, please sign in again"
+      redirect_back(fallback_location: user_root_url)
     end
   end
 
@@ -354,7 +358,9 @@ class BikesController < ApplicationController
 
     return true if @bike.authorize_and_claim_for_user(current_user)
 
-    if current_user.present?
+    if @bike.current_impound_record.present?
+      error = translation(:bike_impounded, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+    elsif current_user.present?
       error = translation(:you_dont_own_that, bike_type: type)
     else
       store_return_to
@@ -365,12 +371,9 @@ class BikesController < ApplicationController
       end
     end
 
-    if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
-      flash[:error] = error
-      redirect_to bike_path(@bike) and return
-    end
-
-    authenticate_user(translation_key: :create_account, flash_type: :info)
+    return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+    flash[:error] = error
+    redirect_to bike_path(@bike) and return
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)
@@ -383,10 +386,11 @@ class BikesController < ApplicationController
   def assign_bike_stickers(bike_sticker)
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
     return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker) unless bike_sticker.present?
-    if bike_sticker.claim_if_permitted(current_user, @bike)
-      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
-    else
+    bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
+    if bike_sticker.errors.any?
       flash[:error] = bike_sticker.errors.full_messages
+    else
+      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
     end
   end
 

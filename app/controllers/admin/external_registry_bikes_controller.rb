@@ -11,7 +11,8 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
         .per(params[:per_page] || 100)
   end
 
-  def show; end
+  def show
+  end
 
   private
 

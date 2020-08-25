@@ -22,6 +22,7 @@ class User < ApplicationRecord
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships
+  has_many :bike_sticker_updates
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike
@@ -51,13 +52,13 @@ class User < ApplicationRecord
 
   validates :password,
     presence: true,
-    length: { within: 6..100 },
+    length: {within: 12..100},
     on: :create
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
 
   validates :password,
     confirmation: true,
-    length: { within: 6..100 },
+    length: {within: 12..100},
     allow_blank: true,
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
@@ -70,7 +71,7 @@ class User < ApplicationRecord
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_update }
+  after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
   attr_accessor :skip_update
@@ -96,7 +97,7 @@ class User < ApplicationRecord
   end
 
   def self.friendly_find(str)
-    self.fuzzy_email_find(str) || username_friendly_find(str)
+    fuzzy_email_find(str) || username_friendly_find(str)
   end
 
   def self.friendly_id_find(str)
@@ -129,40 +130,64 @@ class User < ApplicationRecord
     errors.add(:email, :email_already_exists)
   end
 
-  def confirmed?; confirmed end
+  def confirmed?
+    confirmed
+  end
 
-  def unconfirmed?; !confirmed? end
+  def unconfirmed?
+    !confirmed?
+  end
 
   # Performed inline
-  def perform_create_jobs; AfterUserCreateWorker.new.perform(id, "new", user: self) end
+  def perform_create_jobs
+    AfterUserCreateWorker.new.perform(id, "new", user: self)
+  end
 
-  def perform_user_update_jobs; AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update end
+  def perform_user_update_jobs
+    AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update
+  end
 
-  def superuser?; superuser end
+  def superuser?
+    superuser
+  end
 
-  def developer?; developer end
+  def developer?
+    developer
+  end
 
   def ambassador?
     memberships.ambassador_organizations.any?
   end
 
-  def to_param; username end
+  def to_param
+    username
+  end
 
-  def display_name; name.present? ? name : email end
+  def display_name
+    name.present? ? name : email
+  end
 
-  def first_display_name; display_name.split(" ")&.first end
+  def first_display_name
+    display_name.split(" ")&.first
+  end
 
-  def donations; payments.sum(:amount_cents) end
+  def donations
+    payments.sum(:amount_cents)
+  end
 
-  def donor?; donations > 900 end
+  def donor?
+    donations > 900
+  end
 
-  def paid_org?; organizations.paid.any? end
+  def paid_org?
+    organizations.paid.any?
+  end
 
   def authorized?(obj)
     return true if superuser?
     return obj.authorized?(self) if obj.is_a?(Bike)
     return member_of?(obj) if obj.is_a?(Organization)
-    return obj.authorized?(self) if obj.is_a?(BikeSticker)
+    return obj.claimable_by?(self) if obj.is_a?(BikeSticker)
     false
   end
 
@@ -175,7 +200,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < (Time.current - 1.hours)
+    auth_token_time(auth_token_type) < (Time.current - 2.hours)
   end
 
   def accepted_vendor_terms_of_service?
@@ -183,11 +208,9 @@ class User < ApplicationRecord
   end
 
   def accepted_vendor_terms_of_service=(val)
-    if ParamsNormalizer.boolean(val)
-      self.vendor_terms_of_service = true
-      self.when_vendor_terms_of_service = Time.current
-    end
-    true
+    return unless ParamsNormalizer.boolean(val)
+    self.vendor_terms_of_service = true
+    self.when_vendor_terms_of_service = Time.current
   end
 
   def send_password_reset_email
@@ -215,7 +238,7 @@ class User < ApplicationRecord
     if token == confirmation_token
       self.confirmation_token = nil
       self.confirmed = true
-      self.save
+      save
       reload
       AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
       true
@@ -224,7 +247,7 @@ class User < ApplicationRecord
 
   def role(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
-    m && m.role
+    m&.role
   end
 
   def member_of?(organization, no_superuser_override: false)
@@ -266,22 +289,29 @@ class User < ApplicationRecord
       .where(id: bike_ids(user_hidden)).reorder(:created_at)
   end
 
-  def rough_approx_bikes # Rough fix for users with large numbers of bikes
-    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id }).reorder(:created_at)
+  # Rough fix for users with large numbers of bikes
+  def rough_approx_bikes
+    Bike.includes(:ownerships).where(ownerships: {current: true, user_id: id}).reorder(:created_at)
   end
 
   def bike_ids(user_hidden = true)
     ows = ownerships.includes(:bike).where(example: false, current: true)
-    if user_hidden
-      ows = ows.map { |o| o.bike_id if o.user_hidden || o.bike }
+    ows = if user_hidden
+      ows.map { |o| o.bike_id if o.user_hidden || o.bike }
     else
-      ows = ows.map { |o| o.bike_id if o.bike }
+      ows.map { |o| o.bike_id if o.bike }
     end
     ows.reject(&:blank?)
   end
 
   # Just check a couple, so we don't move too slowly
-  def rough_stolen_bikes; rough_approx_bikes.stolen.limit(10) end
+  def rough_stolen_bikes
+    rough_approx_bikes.stolen.limit(10)
+  end
+
+  def unauthorized_organization_update_bike_sticker_ids
+    bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
+  end
 
   def render_donation_request
     return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
@@ -327,7 +357,7 @@ class User < ApplicationRecord
   end
 
   def generate_auth_token(auth_token_type, time = nil)
-    self.attributes = { auth_token_type => SecurityTokenizer.new_token(time) }
+    self.attributes = {auth_token_type => SecurityTokenizer.new_token(time)}
   end
 
   def access_tokens_for_application(i)
@@ -342,7 +372,7 @@ class User < ApplicationRecord
       usrname = SecureRandom.urlsafe_base64
     end
     self.username = usrname
-    self.generate_auth_token("confirmation_token") if !confirmed
+    generate_auth_token("confirmation_token") unless confirmed
     generate_auth_token("auth_token")
     true
   end

@@ -13,7 +13,7 @@ class SecurityTokenizer
 
   def self.token_time(str)
     t = str.to_s.split("-")[0]
-    t = (t.present? && t.to_i > EARLIEST_TOKEN_TIME) ? t.to_i : EARLIEST_TOKEN_TIME
+    t = t.present? && t.to_i > EARLIEST_TOKEN_TIME ? t.to_i : EARLIEST_TOKEN_TIME
     Time.at(t)
   end
 end

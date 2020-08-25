@@ -18,6 +18,8 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       @requestManufacturerUpdate()
     $('.frame-sizes .btn').click (e) =>
       @updateFrameSize(e)
+    united_states_id = $('#us_id_data').data('usid')
+    new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   updateYear: ->
     if $('#bike_year').val().length == 0

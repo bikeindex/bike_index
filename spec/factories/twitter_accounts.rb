@@ -14,7 +14,7 @@ FactoryBot.define do
       consumer_secret { ENV.fetch("STOLEN_ALERT_TWITTER_1_CONSUMER_SECRET") }
       user_token { ENV.fetch("STOLEN_ALERT_TWITTER_1_ACCESS_TOKEN") }
       user_secret { ENV.fetch("STOLEN_ALERT_TWITTER_1_ACCESS_SECRET") }
-      twitter_account_info { { name: "name", profile_image_url_https: "https://example.com/image.jpg" } }
+      twitter_account_info { {name: "name", profile_image_url_https: "https://example.com/image.jpg"} }
     end
 
     factory :twitter_account_2 do
@@ -23,7 +23,7 @@ FactoryBot.define do
       consumer_secret { ENV.fetch("STOLEN_ALERT_TWITTER_2_CONSUMER_SECRET") }
       user_token { ENV.fetch("STOLEN_ALERT_TWITTER_2_ACCESS_TOKEN") }
       user_secret { ENV.fetch("STOLEN_ALERT_TWITTER_2_ACCESS_SECRET") }
-      twitter_account_info { { name: "name", profile_image_url_https: "https://example.com/image.jpg" } }
+      twitter_account_info { {name: "name", profile_image_url_https: "https://example.com/image.jpg"} }
     end
 
     trait :active do

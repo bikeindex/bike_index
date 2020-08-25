@@ -8,26 +8,26 @@ FactoryBot.define do
     created_at { bike.created_at + graduated_notification_interval } # use the actual bike created_at, in case bike was passed in
 
     organization do
-      FactoryBot.create(:organization_with_paid_features,
-                        enabled_feature_slugs: ["graduated_notifications"],
-                        graduated_notification_interval: 1.year)
+      FactoryBot.create(:organization_with_organization_features,
+        enabled_feature_slugs: ["graduated_notifications"],
+        graduated_notification_interval: 1.year)
     end
 
     bike do
       FactoryBot.create(:bike_organized,
-                        :with_ownership, # Or else we can't send email
-                        organization: organization,
-                        created_at: bike_created_at)
+        :with_ownership, # Or else we can't send email
+        organization: organization,
+        created_at: bike_created_at)
     end
 
     trait :with_user do
       user { FactoryBot.create(:user) }
       bike do
         FactoryBot.create(:bike_organized,
-                          :with_ownership_claimed,
-                          organization: organization,
-                          created_at: bike_created_at,
-                          user: user)
+          :with_ownership_claimed,
+          organization: organization,
+          created_at: bike_created_at,
+          user: user)
       end
     end
 

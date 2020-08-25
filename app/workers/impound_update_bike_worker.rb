@@ -6,7 +6,6 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
     bike = impound_record.bike
     matching_display_ids = ImpoundRecord.where(organization_id: impound_record.organization_id, display_id: impound_record.display_id)
     if matching_display_ids.where.not(id: impound_record.id).any?
-      display_id = impound_record.display_id
       matching_display_ids.reorder(:id).each_with_index do |irecord, index|
         next if index == 0 # don't change the ID of the first one
         irecord.update_attributes(display_id: nil, skip_update: true)
@@ -31,6 +30,11 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
       impound_record_update.update(resolved: true, skip_update: true)
     end
     impound_record.update_attributes(skip_update: true)
+    # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
+    impound_record.reload
+    if impound_record.unregistered_bike?
+      impound_record.bike.marked_user_unhidden = true
+    end
     impound_record.bike&.update(updated_at: Time.current)
     impound_record.bike&.reload
   end

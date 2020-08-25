@@ -3,12 +3,12 @@ require "rails_helper"
 RSpec.describe BParam, type: :model do
   describe "bike" do
     it "returns the bike attribs" do
-      b_param = BParam.new(params: { bike: { serial_number: "XXX" } })
+      b_param = BParam.new(params: {bike: {serial_number: "XXX"}})
       expect(b_param.bike["serial_number"]).to eq("XXX")
     end
     it "does not fail if there isn't a bike" do
       user = FactoryBot.create(:user)
-      b_param = BParam.new(creator_id: user.id, params: { stolen: true })
+      b_param = BParam.new(creator_id: user.id, params: {stolen: true})
       expect(b_param.save).to be_truthy
     end
   end
@@ -18,26 +18,26 @@ RSpec.describe BParam, type: :model do
         b_param = BParam.new
         expect(b_param).to receive(:set_foreign_keys)
         expect(b_param).to receive(:massage_if_v2)
-        b_param.clean_params(bike: { cool: "lol" }.as_json)
+        b_param.clean_params(bike: {cool: "lol"}.as_json)
         expect(b_param.params["bike"]["cool"]).to eq("lol") # indifferent access
       end
     end
     context "not passed params" do
       it "makes indifferent" do
-        b_param = BParam.new(params: { bike: { cool: "lol" } }.as_json)
+        b_param = BParam.new(params: {bike: {cool: "lol"}}.as_json)
         b_param.clean_params
         expect(b_param.params["bike"]["cool"]).to eq("lol")
       end
     end
     context "existing and passed params" do
       it "makes indifferent" do
-        b_param = BParam.new(params: { bike: { cool: "lol" }, stolen_record: { something: 42 } }.as_json)
-        merge_params = { bike: { owner_email: "foo@example.com" }, stolen_record: { phone: "171-829-2625" } }.as_json
+        b_param = BParam.new(params: {bike: {cool: "lol"}, stolen_record: {something: 42}}.as_json)
+        merge_params = {bike: {owner_email: "foo@example.com"}, stolen_record: {phone: "171-829-2625"}}.as_json
         b_param.clean_params(merge_params)
         expect(b_param.params["bike"]["cool"]).to eq("lol")
         expect(b_param.params["bike"]["owner_email"]).to eq("foo@example.com")
         expect(b_param.params["stolen_record"]["something"]).to eq(42)
-        expect(b_param.params["stolen_record"]["phone"]).to eq("171-829-2625")
+        expect(b_param.phone).to eq("1718292625")
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe BParam, type: :model do
         "frame_material" => "steel",
         "is_bulk" => nil,
         "is_pos" => nil,
-        "is_new" => nil,
+        "is_new" => nil
       }
       b_param = BParam.new(params: params, origin: "api_v2")
 
@@ -85,14 +85,14 @@ RSpec.describe BParam, type: :model do
         test: true,
         stolen_record: {
           date_stolen: "",
-          phone: nil,
-        },
+          phone: nil
+        }
       }.as_json
       b_param = BParam.new(params: p, origin: "api_v2")
       b_param.massage_if_v2
       new_params = b_param.bike
-      expect(new_params.keys.include?("serial_number")).to be_truthy
-      expect(new_params.keys.include?("manufacturer")).to be_truthy
+      expect(new_params.key?("serial_number")).to be_truthy
+      expect(new_params.key?("manufacturer")).to be_truthy
       expect(new_params.keys.length).to eq(3)
       expect(b_param.params["test"]).to be_truthy
       expect(b_param.params["stolen"]).to be_falsey
@@ -100,7 +100,7 @@ RSpec.describe BParam, type: :model do
     end
     it "gets the organization id" do
       org = FactoryBot.create(:organization, name: "Something")
-      p = { organization_slug: org.slug }
+      p = {organization_slug: org.slug}
       b_param = BParam.new(params: p, origin: "api_v2")
       b_param.massage_if_v2
       expect(b_param.bike["creation_organization_id"]).to eq(org.id)
@@ -122,9 +122,9 @@ RSpec.describe BParam, type: :model do
         handlebar_type_slug: "else",
         cycle_type_slug: "entirely",
         rear_gear_type_slug: "gears awesome",
-        front_gear_type_slug: "cool gears",
+        front_gear_type_slug: "cool gears"
       }.as_json
-      b_param = BParam.new(params: { bike: bike })
+      b_param = BParam.new(params: {bike: bike})
       expect(b_param).to receive(:set_manufacturer_key).and_return(true)
       expect(b_param).to receive(:set_color_keys).and_return(true)
       expect(b_param).to receive(:set_wheel_size_key).and_return(true)
@@ -139,13 +139,13 @@ RSpec.describe BParam, type: :model do
   describe "manufacturer_name" do
     context "manufacturer_id" do
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
-      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: manufacturer.id } }) }
+      let(:b_param) { BParam.new(params: {bike: {manufacturer_id: manufacturer.id}}) }
       it "is the manufacturers name" do
         expect(b_param.mnfg_name).to eq manufacturer.name
       end
     end
     context "other" do
-      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: Manufacturer.other.id, manufacturer_other: '<a href="bad_site.js">stuff</a>' } }) }
+      let(:b_param) { BParam.new(params: {bike: {manufacturer_id: Manufacturer.other.id, manufacturer_other: '<a href="bad_site.js">stuff</a>'}}) }
       it "is a sanitized version" do
         expect(b_param.mnfg_name).to eq("stuff")
       end
@@ -155,8 +155,8 @@ RSpec.describe BParam, type: :model do
   describe "set_wheel_size_key" do
     it "sets rear_wheel_size_id to the bsd submitted" do
       ws = FactoryBot.create(:wheel_size, iso_bsd: "Bike")
-      bike = { rear_wheel_bsd: ws.iso_bsd }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {rear_wheel_bsd: ws.iso_bsd}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_wheel_size_key
       expect(b_param.bike["rear_wheel_size_id"]).to eq(ws.id)
     end
@@ -164,8 +164,8 @@ RSpec.describe BParam, type: :model do
 
   describe "set_cycle_type_key" do
     it "sets cycle_type to the cycle type from name submitted" do
-      bike = { serial_number: "gobble gobble", cycle_type_slug: " strolLeR " }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {serial_number: "gobble gobble", cycle_type_slug: " strolLeR "}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_cycle_type_key
       expect(b_param.bike["cycle_type"]).to eq(:stroller)
       expect(b_param.bike["cycle_type_slug"].present?).to be_falsey
@@ -174,8 +174,8 @@ RSpec.describe BParam, type: :model do
 
   describe "set_handlebar_type_key" do
     it "sets handlebar_type to the handlebar type from name submitted" do
-      bike = { serial_number: "gobble gobble", handlebar_type_slug: " bmx " }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {serial_number: "gobble gobble", handlebar_type_slug: " bmx "}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_handlebar_type_key
       expect(b_param.bike["handlebar_type_slug"].present?).to be_falsey
       expect(b_param.bike["handlebar_type"]).to eq(:bmx)
@@ -186,8 +186,8 @@ RSpec.describe BParam, type: :model do
     context "attr set on manufacturer_id" do
       context "other" do
         it "adds other manufacturer name and set the set the foreign keys" do
-          bike = { manufacturer_id: "lololol" }
-          b_param = BParam.new(params: { bike: bike })
+          bike = {manufacturer_id: "lololol"}
+          b_param = BParam.new(params: {bike: bike})
           b_param.set_manufacturer_key
           expect(b_param.bike["manufacturer"]).not_to be_present
           expect(b_param.bike["manufacturer_id"]).to eq(Manufacturer.other.id)
@@ -198,16 +198,16 @@ RSpec.describe BParam, type: :model do
         let(:manufacturer) { FactoryBot.create(:manufacturer) }
         context "manufacturer name" do
           it "uses manufacturer" do
-            bike = { manufacturer_id: manufacturer.id }
-            b_param = BParam.new(params: { bike: bike })
+            bike = {manufacturer_id: manufacturer.id}
+            b_param = BParam.new(params: {bike: bike})
             b_param.set_manufacturer_key
             expect(b_param.bike["manufacturer_id"]).to eq(manufacturer.id)
           end
         end
         context "manufacturer id" do
           it "sets the manufacturer" do
-            bike = { manufacturer_id: manufacturer.id }
-            b_param = BParam.new(params: { bike: bike })
+            bike = {manufacturer_id: manufacturer.id}
+            b_param = BParam.new(params: {bike: bike})
             b_param.set_manufacturer_key
             expect(b_param.bike["manufacturer_id"]).to eq(manufacturer.id)
           end
@@ -215,8 +215,8 @@ RSpec.describe BParam, type: :model do
       end
       context "no manufacturer or manufacturer_id" do
         it "does not set anything" do
-          bike = { manufacturer_id: " " }
-          b_param = BParam.new(params: { bike: bike })
+          bike = {manufacturer_id: " "}
+          b_param = BParam.new(params: {bike: bike})
           b_param.set_manufacturer_key
           expect(b_param.bike["manufacturer_id"]).to be_nil
         end
@@ -225,8 +225,8 @@ RSpec.describe BParam, type: :model do
     context "attr set on manufacturer" do
       context "other manufacturer" do
         it "adds other manufacturer name and set the set the foreign keys" do
-          bike = { manufacturer: "gobble gobble" }
-          b_param = BParam.new(params: { bike: bike })
+          bike = {manufacturer: "gobble gobble"}
+          b_param = BParam.new(params: {bike: bike})
           b_param.set_manufacturer_key
           expect(b_param.bike["manufacturer"]).not_to be_present
           expect(b_param.bike["manufacturer_id"]).to eq(Manufacturer.other.id)
@@ -236,8 +236,8 @@ RSpec.describe BParam, type: :model do
       context "existing manufacturer" do
         it "looks through book slug" do
           manufacturer = FactoryBot.create(:manufacturer, name: "Something Cycles")
-          bike = { manufacturer: "something" }
-          b_param = BParam.new(params: { bike: bike })
+          bike = {manufacturer: "something"}
+          b_param = BParam.new(params: {bike: bike})
           b_param.set_manufacturer_key
           expect(b_param.bike["manufacturer"]).not_to be_present
           expect(b_param.bike["manufacturer_id"]).to eq(manufacturer.id)
@@ -247,9 +247,9 @@ RSpec.describe BParam, type: :model do
   end
 
   describe "additional_registration_fields" do
-    let(:params_hash) { { bike: bike_params }.as_json }
+    let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
-    let(:target_address) { { street: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
+    let(:target_address) { {street: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA"}.as_json }
     let(:bike) { Bike.new }
     let(:bike_params) do
       {
@@ -261,7 +261,7 @@ RSpec.describe BParam, type: :model do
         street: "123 Main St",
         city: "Nevernever Land",
         zipcode: "11111",
-        state: "CA",
+        state: "CA"
       }
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
@@ -291,7 +291,7 @@ RSpec.describe BParam, type: :model do
           address: "123 Main St",
           address_city: "Nevernever Land",
           address_zipcode: "11111",
-          address_state: "CA",
+          address_state: "CA"
         }
       end
       it "has the expected fields" do
@@ -314,7 +314,7 @@ RSpec.describe BParam, type: :model do
           serial_number: "zzz",
           organization_affiliation: "employee",
           handlebar_type: nil,
-          address: "0229 HAMMOND BLDG",
+          address: "0229 HAMMOND BLDG"
         }
       end
       include_context :geocoder_real
@@ -336,16 +336,16 @@ RSpec.describe BParam, type: :model do
   describe "gear_slugs" do
     it "sets the rear gear slug" do
       gear = FactoryBot.create(:rear_gear_type)
-      bike = { rear_gear_type_slug: gear.slug }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {rear_gear_type_slug: gear.slug}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_rear_gear_type_slug
       expect(b_param.params["bike"]["rear_gear_type_slug"]).not_to be_present
       expect(b_param.params["bike"]["rear_gear_type_id"]).to eq(gear.id)
     end
     it "sets the front gear slug" do
       gear = FactoryBot.create(:front_gear_type)
-      bike = { front_gear_type_slug: gear.slug }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {front_gear_type_slug: gear.slug}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_front_gear_type_slug
       expect(b_param.params["bike"]["front_gear_type_slug"]).not_to be_present
       expect(b_param.params["bike"]["front_gear_type_id"]).to eq(gear.id)
@@ -355,15 +355,15 @@ RSpec.describe BParam, type: :model do
   describe "set_color_key" do
     it "sets the color if it's a color and remove the color attr" do
       color = FactoryBot.create(:color)
-      bike = { color: color.name }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {color: color.name}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_color_key("primary_frame_color")
       expect(b_param.params["bike"]["color"]).not_to be_present
       expect(b_param.params["bike"]["primary_frame_color_id"]).to eq(color.id)
     end
     it "set_paint_keys if it isn't a color" do
-      bike = { color: "Goop" }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {color: "Goop"}
+      b_param = BParam.new(params: {bike: bike})
       expect(b_param).to receive(:set_paint_key).and_return(true)
       b_param.set_color_key
     end
@@ -374,7 +374,7 @@ RSpec.describe BParam, type: :model do
       FactoryBot.create(:color, name: "Black")
       color = FactoryBot.create(:color, name: "Yellow")
       paint = FactoryBot.create(:paint, name: "pinkly butter", color_id: color.id)
-      b_param = BParam.new(params: { bike: { color: paint.name } })
+      b_param = BParam.new(params: {bike: {color: paint.name}})
       b_param.set_paint_key(paint.name)
       expect(b_param.bike["paint_id"]).to eq(paint.id)
       expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
@@ -382,10 +382,10 @@ RSpec.describe BParam, type: :model do
 
     it "creates a paint and set the color to black if we don't know the color" do
       black = FactoryBot.create(:color, name: "Black")
-      b_param = BParam.new(params: { bike: {} })
-      expect do
+      b_param = BParam.new(params: {bike: {}})
+      expect {
         b_param.set_paint_key("Paint 69")
-      end.to change(Paint, :count).by(1)
+      }.to change(Paint, :count).by(1)
       expect(b_param.bike["paint_id"]).to eq(Paint.find_by_name("paint 69").id)
       expect(b_param.bike["primary_frame_color_id"]).to eq(black.id)
     end
@@ -393,8 +393,8 @@ RSpec.describe BParam, type: :model do
     it "associates the manufacturer with the paint if it's a new bike" do
       FactoryBot.create(:color, name: "Black")
       m = FactoryBot.create(:manufacturer)
-      bike = { is_pos: true, manufacturer_id: m.id }
-      b_param = BParam.new(params: { bike: bike })
+      bike = {is_pos: true, manufacturer_id: m.id}
+      b_param = BParam.new(params: {bike: bike})
       b_param.set_paint_key("paint 69")
       p = Paint.find_by_name("paint 69")
       expect(p.manufacturer_id).to eq(m.id)
@@ -546,9 +546,9 @@ RSpec.describe BParam, type: :model do
           cycle_type_slug: "cargo",
           b_param_id: 79999,
           creation_organization_id: 888,
-          something_else_cool: "party",
+          something_else_cool: "party"
         }
-        b_param = BParam.new(params: { bike: bike_attrs }, creator_id: 777)
+        b_param = BParam.new(params: {bike: bike_attrs}, creator_id: 777)
         b_param.id = 122
         target = {
           manufacturer_id: 12,
@@ -557,7 +557,7 @@ RSpec.describe BParam, type: :model do
           stolen: true,
           creator_id: 777,
           b_param_id: 122,
-          creation_organization_id: 888,
+          creation_organization_id: 888
         }.with_indifferent_access
         expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
       end
@@ -567,21 +567,21 @@ RSpec.describe BParam, type: :model do
   describe "display_email?" do
     context "owner_email present" do
       it "is false" do
-        b_param = BParam.new(params: { bike: { owner_email: "something@stuff.com" }.with_indifferent_access })
+        b_param = BParam.new(params: {bike: {owner_email: "something@stuff.com"}.with_indifferent_access})
         expect(b_param.display_email?).to be_falsey
       end
     end
     context "owner_email not present" do
       it "is true" do
-        b_param = BParam.new(params: { bike: { owner_email: "" }.with_indifferent_access })
+        b_param = BParam.new(params: {bike: {owner_email: ""}.with_indifferent_access})
         expect(b_param.display_email?).to be_truthy
       end
     end
     context "Bike has errors" do
       it "is true" do
         b_param = BParam.new(params: {
-                               bike: { owner_email: "something@stuff.com" }.with_indifferent_access,
-                             }, bike_errors: ["Some error"])
+          bike: {owner_email: "something@stuff.com"}.with_indifferent_access
+        }, bike_errors: ["Some error"])
         expect(b_param.display_email?).to be_truthy
       end
     end

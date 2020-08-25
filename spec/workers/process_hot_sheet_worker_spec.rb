@@ -13,24 +13,24 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
   describe "perform" do
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
     let!(:organization1) { hot_sheet_configuration.organization }
-    let!(:organization2) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["hot_sheet"]) }
+    let!(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
 
     before do
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
       expect(instance.organizations.pluck(:id)).to eq([organization1.id])
-      expect do
+      expect {
         expect(instance.perform)
-      end.to change(ProcessHotSheetWorker.jobs, :count).by 1
+      }.to change(ProcessHotSheetWorker.jobs, :count).by 1
       expect(HotSheet.count).to eq 0
       expect(ProcessHotSheetWorker.jobs.count).to eq 1
       expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization1.id])
     end
 
     it "does not send an email" do
-      expect do
+      expect {
         ProcessHotSheetWorker.drain
-      end.to change(HotSheet, :count).by 1
+      }.to change(HotSheet, :count).by 1
       hot_sheet = HotSheet.last
       expect(hot_sheet.sheet_date).to eq Time.current.to_date
       expect(hot_sheet.organization_id).to eq organization1.id
@@ -44,9 +44,9 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
       let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
       let!(:membership_unclaimed) { FactoryBot.create(:membership, organization: organization1, hot_sheet_notification: "notification_daily") }
       it "delivers the email" do
-        expect do
+        expect {
           ProcessHotSheetWorker.drain
-        end.to change(HotSheet, :count).by 1
+        }.to change(HotSheet, :count).by 1
         hot_sheet = HotSheet.last
         expect(hot_sheet.sheet_date).to eq Time.current.to_date
         expect(hot_sheet.organization_id).to eq organization1.id

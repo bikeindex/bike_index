@@ -11,7 +11,7 @@
           = t(".donate_today")
     .select-amount
       - unless @is_payment
-        %p= t(".select_an_amount")
+        %p= t(".select_an_amount_in_usd")
       %form#bikeindex-stripe-initial-form
         %ul.row.amount-list
           - if @is_payment # If payment, have one non-arbitrary button
@@ -19,7 +19,7 @@
               %a.btn.btn-secondary.active{ data: { amount: @initial_amount * 100 } }
                 #{ @initial_amount }$
           - else
-            - numbers = [10, 25, 50, 100, 200, 300, 500]
+            - numbers = [15, 25, 50, 100, 200, 300, 500]
             - numbers.each do |amount|
               %li.col-xs-4
                 %a.btn.btn-secondary{ data: { amount: amount * 100 } }

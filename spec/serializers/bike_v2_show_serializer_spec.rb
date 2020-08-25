@@ -14,7 +14,7 @@ RSpec.describe BikeV2ShowSerializer do
         large: public_image.image_url(:large),
         medium: public_image.image_url(:medium),
         thumb: public_image.image_url(:small),
-        id: public_image.id,
+        id: public_image.id
       }
     end
     let(:component_target) do
@@ -28,7 +28,7 @@ RSpec.describe BikeV2ShowSerializer do
         front: component.front,
         manufacturer_name: component.manufacturer_name,
         model_name: component.cmodel_name,
-        year: component.year,
+        year: component.year
       }
     end
 
@@ -74,7 +74,7 @@ RSpec.describe BikeV2ShowSerializer do
         external_id: nil,
         registry_name: nil,
         registry_url: nil,
-        status: nil,
+        status: nil
       }
     end
 

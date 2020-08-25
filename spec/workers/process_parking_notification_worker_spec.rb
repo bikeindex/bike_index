@@ -27,16 +27,16 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification2.delivery_status).to eq "email_success"
         expect(parking_notification2.organization_id).to be_present
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           parking_notification3.save
           parking_notification3.reload
           expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([initial.id, parking_notification2.id])
-        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
+        }.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
         expect(parking_notification3.delivery_status).to be_blank
         # Ensure we don't accidentally reloop things
-        expect do
+        expect {
           subject.drain
-        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(-1)
+        }.to change(ProcessParkingNotificationWorker.jobs, :size).by(-1)
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
         parking_notification3.reload
         expect(parking_notification3.email_success?).to be_truthy
@@ -76,9 +76,9 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification2.status).to eq "current"
         expect(initial.associated_retrieved_notification).to be_nil
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           initial.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "link_token_recovery")
-        end.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
+        }.to change(ProcessParkingNotificationWorker.jobs, :size).by(1)
         ProcessParkingNotificationWorker.drain
         initial.reload
         parking_notification2.reload

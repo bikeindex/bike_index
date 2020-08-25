@@ -13,12 +13,13 @@ class Phonifyer
   end
 
   def self.strip_ignored_parts(number)
+    return nil unless number.present?
     # Formatting bits that we don't care about
-    number.gsub(/\s|\.|\-|\(|\)|\//, "")
+    number.gsub(/\s|\.|-|\(|\)|\//, "")
   end
 
   def self.split_with_country_code(number)
-    return [number] unless number.match?(/\A\+/) # skip if it doesn't look like it has a country code!
+    return [number] unless number.start_with?(/\+/) # skip if it doesn't look like it has a country code!
     # grab the country_code
     country_code = number[/\A\+\d*/]
     if country_code.length > 10 # Looks like the whole number is in country code
@@ -32,8 +33,9 @@ class Phonifyer
   def self.split_with_extension(number)
     return [number] unless number.match?(/x/i)
     number, extension = number.split(/e?x[a-z]*/i)
+    return [number, nil] unless extension.present?
     # Remove things we don't care about
-    extension = extension.strip.gsub(/\A(\-|\.|\:)/, "")
+    extension = extension.strip.gsub(/\A(-|\.|:)/, "")
     [number.strip, "x#{extension.strip}"]
   end
 
@@ -43,9 +45,9 @@ class Phonifyer
     number, country_code = split_with_country_code(number)
     number, extension = split_with_extension(number)
 
-    { number: strip_ignored_parts(number) }.tap do |h|
-      h[:country_code] = country_code.gsub(/\A\+/, "") if country_code.present?
-      h[:extension] = extension.gsub(/\Ax/, "") if extension.present?
+    {number: strip_ignored_parts(number)}.tap do |h|
+      h[:country_code] = country_code.delete_prefix("+") if country_code.present?
+      h[:extension] = extension.delete_prefix("x") if extension.present?
     end
   end
 end

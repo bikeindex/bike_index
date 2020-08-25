@@ -1,7 +1,7 @@
 class AdminNotifier
   def for_organization(organization:, user:, type:)
     feedback = Feedback.new(email: user.email,
-                            feedback_hash: { organization_id: organization.id })
+                            feedback_hash: {organization_id: organization.id})
     if type == "organization_created"
       feedback.body = "#{organization.name} created an account"
       feedback.title = "New Organization created"

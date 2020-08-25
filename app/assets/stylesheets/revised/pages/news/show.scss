@@ -1,12 +1,16 @@
 #news_show {
-  .blog-header {
-    h1,
+  h1 {
+    @extend .uncap;
+  }
+  .primary-content-block {
     h2,
     h3,
     h4 {
       @extend .uncap;
+      color: #000;
     }
   }
+
   .post-image {
     max-width: 100%;
     max-height: 75%;
@@ -120,11 +124,13 @@
   }
 }
 
+// News show, also page-content (e.g. /lightspeed)
+#news_show,
 .page-content {
   blockquote {
     background: $gray-lighter;
     border-left: 10px solid #ccc;
-    margin: 1.5em 10px 0;
+    margin: 1.5em 20px 0;
     padding: 0.5em 10px;
     quotes: "“" "”" "‘" "’";
 
@@ -154,7 +160,7 @@
 
   .blockquote-cite {
     text-align: right;
-    padding: 0 10px 1em 0;
+    padding: 0 20px 1em 0;
     line-height: 2em;
     color: $gray;
     font-style: italic;

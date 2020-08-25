@@ -23,13 +23,13 @@ class TimeParser
     Time.zone = parse_timezone(timezone_str)
 
     time_str =
-      %i(year month day)
+      %i[year month day]
         .map { |component| ie11_formatted[component] }
         .join("-")
 
     time = Time.zone.parse(time_str)
-               .in_time_zone(parse_timezone(timezone_str))
-               .beginning_of_day
+      .in_time_zone(parse_timezone(timezone_str))
+      .beginning_of_day
 
     Time.zone = DEFAULT_TIMEZONE
     time
@@ -39,7 +39,7 @@ class TimeParser
     return DEFAULT_TIMEZONE unless timezone_str.present?
     return timezone_str if timezone_str.is_a?(ActiveSupport::TimeZone) # in case we were given a timezone obj
     # tzinfo requires non-whitespaced strings, so try that if the normal lookup fails
-    ActiveSupport::TimeZone[timezone_str] || ActiveSupport::TimeZone[timezone_str.strip.gsub("\s", "_")]
+    ActiveSupport::TimeZone[timezone_str] || ActiveSupport::TimeZone[timezone_str.strip.tr("\s", "_")]
   end
 
   # Accepts a time object, rounds to minutes

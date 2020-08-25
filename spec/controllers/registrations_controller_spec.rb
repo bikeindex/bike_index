@@ -6,16 +6,16 @@ RSpec.describe RegistrationsController, type: :controller do
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do
     expect(response.status).to eq(200)
-    expect(response.headers["X-Frame-Options"]).not_to be_present
+    expect(response.headers["X-Frame-Options"]).to be_blank
     expect(flash).to_not be_present
   end
   describe "new" do
     it "renders with the embeded form, no xframing" do
       set_current_user(user)
-      get :new, params: { organization_id: organization.id, stolen: true }
+      get :new, params: {organization_id: organization.id, stolen: true}
       expect(response).to render_template(:new)
       expect(response.status).to eq(200)
-      expect(response.headers["X-Frame-Options"]).to be_present
+      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       expect(flash).to_not be_present
     end
   end
@@ -27,7 +27,7 @@ RSpec.describe RegistrationsController, type: :controller do
     context "no organization" do
       context "no user" do
         it "renders" do
-          get :embed, params: { stolen: true }
+          get :embed, params: {stolen: true}
           expect_it_to_render_correctly
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:creator)).to be_nil
@@ -48,7 +48,7 @@ RSpec.describe RegistrationsController, type: :controller do
     context "with organization" do
       context "no user" do
         it "renders" do
-          get :embed, params: { organization_id: organization.to_param, simple_header: true, select_child_organization: true }
+          get :embed, params: {organization_id: organization.to_param, simple_header: true, select_child_organization: true}
           expect_it_to_render_correctly
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:organization)).to eq organization
@@ -59,7 +59,7 @@ RSpec.describe RegistrationsController, type: :controller do
           body = response.body
           # creation_organization
           creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
-          creator_organization_value = creator_organization_input.gsub(/value=./, "").match(/\A[^\"]*/)[0]
+          creator_organization_value = creator_organization_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
           expect(creator_organization_value).to eq organization.id.to_s
         end
       end
@@ -69,14 +69,14 @@ RSpec.describe RegistrationsController, type: :controller do
           set_current_user(user)
           expect(organization.save).to eq(true)
 
-          get :embed, params: { organization_id: organization.id, stolen: true, select_child_organization: true }
+          get :embed, params: {organization_id: organization.id, stolen: true, select_child_organization: true}
 
           expect_it_to_render_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
           owner_email_input = body[/value=.*id..b_param_owner_email*/i]
-          email_value = owner_email_input.gsub(/value=./, "").match(/\A[^\"]*/)[0]
+          email_value = owner_email_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
           expect(email_value).to eq user.email
 
           expect(assigns(:simple_header)).to be_falsey
@@ -103,11 +103,11 @@ RSpec.describe RegistrationsController, type: :controller do
             primary_frame_color_id: color.id,
             secondary_frame_color_id: 12,
             tertiary_frame_color_id: 222,
-            creation_organization_id: 9292,
+            creation_organization_id: 9292
           }
-          expect do
-            post :create, params: { simple_header: true, b_param: attrs }
-          end.to change(BParam, :count).by 0
+          expect {
+            post :create, params: {simple_header: true, b_param: attrs}
+          }.to change(BParam, :count).by 0
           renders_embed_without_xframe
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
@@ -128,7 +128,7 @@ RSpec.describe RegistrationsController, type: :controller do
       context "nothing except email set - unverified authenticity token" do
         include_context :test_csrf_token
         it "creates a new bparam and renders" do
-          post :create, params: { b_param: { owner_email: "something@stuff.com" }, simple_header: true }
+          post :create, params: {b_param: {owner_email: "something@stuff.com"}, simple_header: true}
           expect_it_to_render_correctly
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
@@ -146,9 +146,9 @@ RSpec.describe RegistrationsController, type: :controller do
             secondary_frame_color_id: color.id,
             tertiary_frame_color_id: 222,
             owner_email: "ks78xxxxxx@stuff.com",
-            creation_organization_id: 21,
+            creation_organization_id: 21
           }
-          post :create, params: { b_param: attrs }
+          post :create, params: {b_param: attrs}
           expect_it_to_render_correctly
           b_param = BParam.last
           attrs.each do |key, value|

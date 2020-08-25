@@ -16,7 +16,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
     end
     context "with search_query" do
       it "renders" do
-        get base_url, params: { search_query: "XXXXX" }
+        get base_url, params: {search_query: "XXXXX"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(assigns(:bike_stickers)).to eq([])

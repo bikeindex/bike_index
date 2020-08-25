@@ -40,9 +40,9 @@ RSpec.describe Location, type: :model do
       expect(location.destroy_forbidden?).to be_falsey
       organization.reload
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         organization.update(approved: true, skip_update: false)
-      end.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
+      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
       UpdateOrganizationAssociationsWorker.drain
       location.reload
       expect(location.shown).to be_truthy
@@ -52,16 +52,16 @@ RSpec.describe Location, type: :model do
   end
 
   describe "impound_location, default_impound_location, organization setting" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["impound_bikes"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"]) }
     let!(:location) { FactoryBot.create(:location, organization: organization) }
     let!(:location2) { FactoryBot.create(:location, organization: organization) }
     it "sets the impound_bikes_locations on organization setting" do
       expect(organization.default_impound_location).to be_blank
       expect(organization.enabled_feature_slugs).to eq(["impound_bikes"])
       Sidekiq::Worker.clear_all
-      expect do
+      expect {
         location.update(impound_location: true)
-      end.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
+      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
       UpdateOrganizationAssociationsWorker.drain
       location.reload
       expect(location.default_impound_location).to be_truthy

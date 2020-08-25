@@ -6,8 +6,11 @@ export default class BinxAppOrgParkingNotificationMapping {
     this.fetchedRecords = false;
     this.mapReady = false;
     this.listRendered = false;
-    this.mapRendered = false;
+    this.defaultLocation;
     this.records = [];
+    this.totalRecords = 0;
+    this.perPage = 0;
+    this.page = 0;
   }
 
   init() {
@@ -15,7 +18,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     binxMapping.loadMap(
       "binxAppOrgParkingNotificationMapping.mapOrganizedRecords"
     );
-    this.fetchRecords([["per_page", 100]]);
+    this.fetchRecords();
 
     // On period update, fetch records
     const fetchRecords = this.fetchRecords;
@@ -25,27 +28,88 @@ export default class BinxAppOrgParkingNotificationMapping {
     });
     $("#timeSelectionBtnGroup .btn").on("click", (e) => {
       fetchRecords();
-      return true;
+      return true; // Returns true because of bootstrap button list actions
     });
+    $("#redo-search-in-map").on("click", (e) => {
+      binxAppOrgParkingNotificationMapping.fetchRecordsWithCurrentLocation();
+      return false;
+    });
+    $("#FitMapTrigger").on("click", (e) => {
+      e.preventDefault();
+      // If there are no notifications in the window, and we have passed a location, load the page without a location
+      if (binxAppOrgParkingNotificationMapping.zeroVisibleAtLocation()) {
+        window.location = binxAppOrgParkingNotificationMapping.urlForOpts([
+          ["search_southwest_coords", ""],
+          ["search_northeast_coords", ""],
+        ]);
+      } else {
+        binxMapping.fitMap();
+      }
+      return false; // prevent default action
+    });
+
+    $("#recordsTable, #parking-notification-nav-links").on(
+      "click",
+      ".linkWithSortableSearchParams",
+      (e) => {
+        const $target = $(e.target);
+        if ($target.attr("data-urlparams")) {
+          e.preventDefault();
+          let urlOpts = $target.attr("data-urlparams").split(",");
+          let urlParams = binxAppOrgParkingNotificationMapping.urlParamsForOpts(
+            [urlOpts]
+          );
+          window.location = `${location.pathname}?${urlParams.toString()}`;
+        }
+      }
+    );
   }
 
-  fetchRecords(opts = []) {
-    // Use the period selector urlParams - which will use the current period
+  urlForOpts(opts = []) {
+    return `${
+      location.pathname
+    }?${binxAppOrgParkingNotificationMapping
+      .urlParamsForOpts(opts)
+      .toString()}`;
+  }
+
+  fetchRecordsWithCurrentLocation(opts = []) {
+    // Add the current location, unless we're fetching the default location - or a location was passed in
+    if (!window.pageInfo.default_location) {
+      // check for the boundary box keys
+      const optsValues = opts.map((param) => param[0]);
+      if (!optsValues.includes("search_southwest_coords")) {
+        opts = opts.concat(binxMapping.boundingBoxParams());
+      }
+    }
+    return binxAppOrgParkingNotificationMapping.fetchRecords(opts);
+  }
+
+  urlParamsForOpts(opts = []) {
+    // Use the period selector urlParams - which will use the current period -
+    // even if the period is default (and not in the url)
     let urlParams = window.periodSelector.urlParamsWithNewPeriod();
 
     for (const param of opts) {
       urlParams.delete(param[0]); // remove any matching parameters
-      urlParams.append(param[0], param[1]);
+      if (param[1] !== null && param[1].length) {
+        urlParams.append(param[0], param[1]);
+      }
     }
+    return urlParams;
+  }
+
+  fetchRecords(opts = []) {
+    $("#redo-search-in-map").fadeOut();
+
+    const urlParams = binxAppOrgParkingNotificationMapping.urlParamsForOpts(
+      opts
+    );
+    const url = binxAppOrgParkingNotificationMapping.urlForOpts(opts);
 
     // Update the address bar to include the current parameters
-    history.replaceState(
-      {},
-      "",
-      `${location.pathname}?${urlParams.toString()}`
-    );
+    history.replaceState({}, "", url);
 
-    let url = `${location.pathname}?${urlParams.toString()}`;
     log.debug("fetching notifications: " + url);
 
     // Update the bike search panel to get specific bikes
@@ -59,6 +123,7 @@ export default class BinxAppOrgParkingNotificationMapping {
       url: url,
       success(data, textStatus, jqXHR) {
         binxAppOrgParkingNotificationMapping.fetchedRecords = true;
+        binxAppOrgParkingNotificationMapping.setPaginationInfo(jqXHR);
         binxAppOrgParkingNotificationMapping.renderOrganizedRecords(
           data.parking_notifications
         );
@@ -70,6 +135,12 @@ export default class BinxAppOrgParkingNotificationMapping {
     });
   }
 
+  setPaginationInfo(jqXHR) {
+    this.totalRecords = parseInt(jqXHR.getResponseHeader("Total"), 10);
+    this.perPage = parseInt(jqXHR.getResponseHeader("Per-Page"), 10);
+    this.page = parseInt(jqXHR.getResponseHeader("Page"), 10);
+  }
+
   // Grabs the visible markers, looks up the records from them and returns that list
   visibleRecords() {
     return binxMapping.markersInViewport().map((marker) => {
@@ -77,10 +148,20 @@ export default class BinxAppOrgParkingNotificationMapping {
     });
   }
 
+  zeroVisibleAtLocation() {
+    // If there is a stored location and there are no records there at all
+    return (
+      binxAppOrgParkingNotificationMapping.records.length === 0 &&
+      binxAppOrgParkingNotificationMapping
+        .urlParamsForOpts()
+        .getAll("search_southwest_coords").length
+    );
+  }
+
   // this loops and calls itself again if we haven't finished rendering the map and the records
   mapOrganizedRecords() {
     // if we have already rendered the mapRendered, then we're done!
-    if (binxAppOrgParkingNotificationMapping.mapRendered) {
+    if (binxMapping.mapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
@@ -112,9 +193,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     $("#recordsTable").on("click", ".map-cell a", (e) => {
       e.preventDefault();
       let recordId = parseInt(
-        $(e.target)
-          .parents("tr")
-          .attr("data-recordid"),
+        $(e.target).parents("tr").attr("data-recordid"),
         10
       );
       if (isNaN(recordId)) {
@@ -125,11 +204,11 @@ export default class BinxAppOrgParkingNotificationMapping {
       }
       let record = _.find(
         binxAppOrgParkingNotificationMapping.records,
-        function(record) {
+        function (record) {
           return recordId == record.id;
         }
       );
-      let marker = _.find(binxMapping.markersRendered, function(marker) {
+      let marker = _.find(binxMapping.markersRendered, function (marker) {
         return recordId == marker.binxId;
       });
       binxMapping.openInfoWindow(marker, recordId, record);
@@ -143,78 +222,24 @@ export default class BinxAppOrgParkingNotificationMapping {
   }
 
   inititalizeMapMarkers() {
-    binxMapping.addMarkers({ fitMap: true });
-    this.mapRendered = true;
+    binxMapping.addMarkers({
+      fitMap: window.pageInfo.default_location, // only fitMap if it's the default location
+    });
+
     // Add a trigger to the map when the viewport changes (after it has finished moving)
-    google.maps.event.addListener(binxMap, "idle", function() {
+    google.maps.event.addListener(binxMap, "idle", function () {
       // This is grabbing the markers in viewport and logging the ids for them.
       // We actually need to rerender the the marker table
       log.debug("rerendering table because map");
       binxAppOrgParkingNotificationMapping.renderRecordsTable(
         binxAppOrgParkingNotificationMapping.visibleRecords()
       );
+      if (binxMapping.mapRendered) {
+        $("#redo-search-in-map").fadeIn();
+        window.pageInfo.default_location = false;
+      }
     });
     this.addTableMapLinkHandler();
-  }
-
-  tableRowForRecord(record) {
-    if (typeof record !== "object" || typeof record.id !== "number") {
-      return "";
-    }
-    const showCellUrl = `${location.pathname}/${record.id}`;
-    const bikeCellUrl = `/bikes/${record.bike.id}`;
-    let bikeLink = `<a href="${bikeCellUrl}">${record.bike.title} ${
-      record.unregistered_bike
-        ? '<em class="text-warning small"> unregistered</em>'
-        : ""
-    }</a>`;
-    const impoundLink =
-      record.impund_record_id !== undefined
-        ? `<a href="${record.impund_record_id}" class="convertTime">${
-            record.resolved_at
-          }</a>`
-        : "";
-    const retrievedAtSpan = record.resolved_at
-      ? `<span class="convertTime preciseTime">${record.resolved_at}</span>`
-      : "";
-    return `<tr class="record-row" data-recordid="${
-      record.id
-    }"><td class="map-cell"><a>↑</a></td><td><a href="${showCellUrl}" class="convertTime">${
-      record.created_at
-    }</a> <span class="extended-col-info small"> - <em>${
-      record.kind_humanized
-    }</em> - by ${record.user_display_name}<strong>${
-      record.notification_number > 1
-        ? "- notification #" + record.notification_number
-        : ""
-    }</strong></span> <span class="extended-col-info d-block">${bikeLink}</span> <em class="small extended-col-info d-block status-cell">${
-      record.status
-    } status</em>
-    ${
-      impoundLink.length
-        ? "<strong class='small extended-col-info d-block'>Impounded: " +
-          impoundLink
-        : "</strong>"
-    }
-    ${
-      retrievedAtSpan.length
-        ? "<strong class='small extended-col-info d-block'>Retrieved: " +
-          retrievedAtSpan
-        : "</strong>"
-    }
-      </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
-      record.kind_humanized
-    }</em></td><td class="hidden-sm-cells">${
-      record.user_display_name
-    }</td><td class="hidden-sm-cells">${
-      record.notification_number > 1 ? record.notification_number : ""
-    }</td><td class="hidden-sm-cells status-cell">${
-      record.status
-    }</td><td class="hidden-sm-cells">${impoundLink}</td><td class="hidden-sm-cells">${retrievedAtSpan}</td>
-    <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${
-      record.id
-    }]" id="ids_${record.id}" value="${record.id}"></td>
-    `;
   }
 
   mapPopup(point) {
@@ -227,7 +252,7 @@ export default class BinxAppOrgParkingNotificationMapping {
     tableTop += `<thead class="small-header hidden-md-down">${$(
       ".list-table thead"
     ).html()}</thead>`;
-    return `${tableTop}${binxAppOrgParkingNotificationMapping.tableRowForRecord(
+    return `${tableTop}${binxAppOrgParkingNotifications.tableRowForRecord(
       record
     )}</tbody></table>`;
   }
@@ -235,9 +260,7 @@ export default class BinxAppOrgParkingNotificationMapping {
   renderRecordsTable(records) {
     let body_html = "";
     for (const record of Array.from(records)) {
-      body_html += binxAppOrgParkingNotificationMapping.tableRowForRecord(
-        record
-      );
+      body_html += binxAppOrgParkingNotifications.tableRowForRecord(record);
     }
     if (body_html.length < 2) {
       // If there aren't any records that were added, render a note about there not being any records
@@ -246,17 +269,40 @@ export default class BinxAppOrgParkingNotificationMapping {
 
     // Render the body - whether it says no records or records
     $("#recordsTable tbody").html(body_html);
+
+    binxAppOrgParkingNotificationMapping.updateTotalCount(records.length);
     // And localize the times since we added times to the table
     window.timeParser.localize();
-    $("#recordsCount .number").text(records.length);
+  }
+
+  updateTotalCount(renderedCount) {
+    $(".recordsCount .number").text(renderedCount);
     // render the total count too
-    $("#recordsTotalCount .number").text(
-      binxAppOrgParkingNotificationMapping.records.length
+    $(".recordsTotalCount .number").text(
+      binxAppOrgParkingNotificationMapping.totalRecords
     );
+    // If there are more total records, show the maxNumber columns
+    if (
+      binxAppOrgParkingNotificationMapping.totalRecords >=
+      binxAppOrgParkingNotificationMapping.perPage
+    ) {
+      $(".maxNumberDisplayed").slideDown();
+    } else {
+      $(".maxNumberDisplayed").slideUp();
+    }
+    // If there is a missmatch between the records found and the records visible, show fitToMap
+    if (
+      renderedCount !== binxAppOrgParkingNotificationMapping.records.length ||
+      binxAppOrgParkingNotificationMapping.zeroVisibleAtLocation()
+    ) {
+      $("#FitMapTrigger").slideDown();
+    } else {
+      $("#FitMapTrigger").slideUp();
+    }
   }
 
   addMarkerPointsForRecords(records) {
-    binxMapping.markerPointsToRender = records.map(function(record) {
+    binxMapping.markerPointsToRender = records.map(function (record) {
       return {
         id: record.id,
         lat: record.lat,

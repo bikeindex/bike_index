@@ -24,22 +24,22 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def permitted_parameters
     params.require(:organization)
-          .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+      .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
   end
 
   def edit_layout_pages
-    @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w(landing_page)
+    @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w[landing_page]
   end
 
   def find_and_authorize_organization
     @organization = Organization.friendly_find(params[:organization_id])
     unless current_user.developer?
       flash[:info] = "Sorry, you must be a developer to access that page."
-      redirect_to admin_organization_url(@organization) and return
+      redirect_to(admin_organization_url(@organization)) && return
     end
     unless @organization
       flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to admin_organizations_url and return
+      redirect_to(admin_organizations_url) && return
     end
   end
 end

@@ -1,6 +1,6 @@
 #invoiceForm.mt-4
   = form_for [:admin, @organization, @invoice] do |f|
-    = f.hidden_field :paid_feature_ids
+    = f.hidden_field :organization_feature_ids
     - if @invoice.errors.any?
       = render partial: "/shared/errors", locals: { name: "Invoice", obj: @invoice }
 
@@ -15,20 +15,20 @@
           %th
             Amount
         %tbody
-          - paid_feature_ids = @invoice.paid_feature_ids
-          - @paid_features.each do |paid_feature|
+          - organization_feature_ids = @invoice.organization_feature_ids
+          - @organization_features.each do |organization_feature|
             %tr
-              %td.paidFeatureCheck
+              %td.organizationFeatureCheck
                 / I know there is a way to make rails do this, but I'm having trouble making it happen, so whatever
-                = check_box_tag "paid_feature_ids_#{paid_feature.id}", paid_feature.id, paid_feature_ids.include?(paid_feature.id), { class: (paid_feature.one_time? ? "oneTime" : "recurring"), "data-amount" => paid_feature.amount, "data-id" => paid_feature.id }
+                = check_box_tag "organization_feature_ids_#{organization_feature.id}", organization_feature.id, organization_feature_ids.include?(organization_feature.id), { class: (organization_feature.one_time? ? "oneTime" : "recurring"), "data-amount" => organization_feature.amount, "data-id" => organization_feature.id }
 
               %td
-                = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
+                = link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature)
               %td
                 %small
-                  = paid_feature.kind.humanize
+                  = organization_feature.kind.humanize
               %td
-                = paid_feature.amount_formatted
+                = organization_feature.amount_formatted
 
           %tr
             %td{ style: "border-top: 2px solid black;" }
@@ -76,7 +76,7 @@
           = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
           = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
       .col-md-6
-        .form-group
+        .form-group#subscriptionEndsAt.collapse{ class: (@invoice.endless? ? "" : "show") }
           = f.label :end_at, "Coverage ends"
           - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
           = f.datetime_local_field :end_at, step: 60, required: true, class: "form-control"
@@ -85,9 +85,15 @@
         .form-group
           = f.label :notes
           = f.text_area :notes, rows: 4, class: "form-control"
-      .col-md-6
+      .col-md-3.col-6
         .form-group
           = f.submit "Save", class: 'btn btn-lg btn-success mt-4'
+      .col-md-3.col-6
+        .form-group#endlessCheckBox.text-right
+          .form-check.mt-4.mr-2
+            = f.check_box :is_endless
+            = f.label :is_endless, "Coverage never ends"
+
 
     %hr
     .row.mt-4

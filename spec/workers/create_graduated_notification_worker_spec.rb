@@ -12,16 +12,16 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
 
   describe "perform" do
     let(:graduated_notification_interval) { 1.year.to_i }
-    let(:organization) { FactoryBot.create(:organization_with_paid_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
     let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, created_at: Time.current - (3 * graduated_notification_interval)) }
 
     describe "enqueue notifications" do
       it "enqueues notifications" do
         expect(organization.deliver_graduated_notifications?).to be_truthy
         Sidekiq::Worker.clear_all
-        expect do
+        expect {
           instance.perform
-        end.to change(described_class.jobs, :count).by 1
+        }.to change(described_class.jobs, :count).by 1
         expect(described_class.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike.id])
       end
       context "organization does not have graduated_notification_interval" do
@@ -30,9 +30,9 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
           expect(organization.graduated_notification_interval).to be_blank
           expect(organization.deliver_graduated_notifications?).to be_falsey
           Sidekiq::Worker.clear_all
-          expect do
+          expect {
             instance.perform
-          end.to_not change(described_class.jobs, :count)
+          }.to_not change(described_class.jobs, :count)
         end
       end
     end
@@ -41,12 +41,12 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
       it "creates notification only once" do
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
-          expect do
+          expect {
             instance.perform
             instance.perform
             instance.perform
             instance.perform
-          end.to change(GraduatedNotification, :count).by 1
+          }.to change(GraduatedNotification, :count).by 1
         end
 
         expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -64,16 +64,16 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
 
       let!(:graduated_notification_remaining_expired) do
         FactoryBot.create(:graduated_notification,
-                          :marked_remaining,
-                          organization: organization,
-                          bike: bike,
-                          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
+          :marked_remaining,
+          organization: organization,
+          bike: bike,
+          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
       end
       let!(:graduated_notification_remaining) do
         FactoryBot.create(:graduated_notification,
-                          :marked_remaining,
-                          organization: organization,
-                          marked_remaining_at: Time.current - graduated_notification_interval + 2.days)
+          :marked_remaining,
+          organization: organization,
+          marked_remaining_at: Time.current - graduated_notification_interval + 2.days)
       end
 
       it "enqueues and creates" do
@@ -89,11 +89,11 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
-          expect do
+          expect {
             instance.perform
             instance.perform
             instance.perform
-          end.to change(GraduatedNotification, :count).by 1
+          }.to change(GraduatedNotification, :count).by 1
         end
         graduated_notification = GraduatedNotification.last
         expect(graduated_notification.status).to eq "pending"

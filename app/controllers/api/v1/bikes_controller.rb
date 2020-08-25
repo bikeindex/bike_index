@@ -21,15 +21,15 @@ module Api
 
       def index
         if params[:proximity] == "ip"
-          if Rails.env == "production"
-            params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
+          params[:proximity] = if Rails.env == "production"
+            request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           else
-            params[:proximity] = request.remote_ip
+            request.remote_ip
           end
         end
         if params[:ip_test]
-          info = { ip: params[:proximity], location: Geocoder.search(params[:proximity]) }
-          respond_with info and return
+          info = {ip: params[:proximity], location: Geocoder.search(params[:proximity])}
+          respond_with(info) && return
         end
         respond_with BikeSearcher.new(params).find_bikes.limit(20)
       end
@@ -46,11 +46,11 @@ module Api
           since_date = Time.at(params[:updated_since].to_i).utc.to_datetime
           stolen = stolen.where("updated_at >= ?", since_date)
         end
-        render json: { bikes: stolen.pluck(:bike_id) }
+        render json: {bikes: stolen.pluck(:bike_id)}
       end
 
       def close_serials
-        response = { bikes: [] }
+        response = {bikes: []}
         response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
         respond_with response
       end
@@ -66,15 +66,15 @@ module Api
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: "api_v1")
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-          render json: { bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike) } } and return
+          render(json: {bike: {web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}}) && return
         else
-          if bike.present?
-            e = bike.errors.full_messages.to_sentence
+          e = if bike.present?
+            bike.errors.full_messages.to_sentence
           else
-            e = @b_param.errors.full_messages.to_sentence
+            @b_param.errors.full_messages.to_sentence
           end
           Feedback.create(email: "contact@bikeindex.org", name: "Error mailer", title: "API Bike Creation error!", body: e)
-          render json: e, status: :unprocessable_entity and return
+          render(json: e, status: :unprocessable_entity) && return
         end
       end
 
@@ -83,16 +83,16 @@ module Api
         if organization.present? && organization.access_token == params[:access_token]
           @organization = organization
         else
-          render json: "Not authorized", status: :unauthorized and return
+          render(json: "Not authorized", status: :unauthorized) && return
         end
       end
 
       def de_string_params
         # Google app script doesn't support nested params -
         # So we're doing this.
-        params[:bike] = JSON.parse params[:bike] if params[:bike].kind_of?(String)
-        params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].kind_of?(String)
-        params[:components] = JSON.parse params[:components] if params[:components].kind_of?(String)
+        params[:bike] = JSON.parse params[:bike] if params[:bike].is_a?(String)
+        params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].is_a?(String)
+        params[:components] = JSON.parse params[:components] if params[:components].is_a?(String)
         params
       end
 

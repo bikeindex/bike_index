@@ -26,11 +26,14 @@
     = hidden_field_tag :organization_id, passive_organization&.to_param
     = hidden_field_tag :sort, params[:sort]
     = hidden_field_tag :direction, params[:direction]
+    = hidden_field_tag :search_stickers, params[:search_stickers]
+    = hidden_field_tag :search_address, params[:search_address]
 
 %hr{ style: "opacity: .3;" }
 
 :ruby
-  search_params = @interpreted_params.merge(organization_id: current_organization.to_param)
+  search_params = sortable_search_params.merge(@interpreted_params.merge(organization_id: current_organization.to_param))
+
   # TODO: Now that we have translations, we need to localize this. I believe the easiest way to do so would be to pull the text from the header cell and use that.
   column_renames = {
     "created_at_cell" => "Registered",
@@ -47,6 +50,7 @@
     "reg_address_cell" => "Address",
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
+    "avery_cell" => "Avery Exportable",
   }
   # Most columns are enabled by default, including organization specific registration columns
   default_columns = %w[created_at_cell
@@ -63,9 +67,11 @@
   # Some optional columns
   enabled_columns += ["extra_registration_number_cell"] unless enabled_columns.include?("extra_registration_number_cell")
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
+  enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
+  # If the search_stickers param or search_address is set, start with the settings panel open
+  settings_default_open = @search_stickers.present? || @search_address.present?
 
--# If the search_stickers param is set, start with the settings panel open
-.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => default_columns.to_json, class: (params[:search_stickers].present? ? "in" : "") }
+.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => default_columns.to_json, class: (settings_default_open ? "in" : "") }
   %h3.header-font-alt
     = t(".visible_columns")
   .row
@@ -83,9 +89,17 @@
         = t(".only_with_stickers_html")
       = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
         = t(".only_no_sticker_html")
+  - if current_organization.enabled?("reg_address")
+    %p.stickers-sort-btns
+      = t(".address")
+      = link_to t(".all"), organization_bikes_path(search_params.merge(search_address: nil)), class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}"
+      = link_to organization_bikes_path(search_params.merge(search_address: "with")), class: "btn btn-secondary #{@search_address == 'with' ? 'active' : ''}" do
+        = t(".only_with_address_html")
+      = link_to organization_bikes_path(search_params.merge(search_address: "none")), class: "btn btn-secondary #{@search_address == 'none' ? 'active' : ''}" do
+        = t(".only_no_address_html")
 
 %p.mt-4
-  - if @search_query_present || params[:search_stickers].present?
+  - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
     = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")))
   - else
     = t(".registered_bikes_html",
@@ -142,19 +156,11 @@
             - if @bike_sticker.present?
               %th
                 = t(".link")
-            - elsif params[:search_stickers].present?
-              %em.small
-                %a.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse" }
-                  - if @search_stickers == "with"
-                    = t(".only_with")
-                  - if @search_stickers == "none"
-                    = t(".only_not")
-
-        -# I don't know how to do this in a performant way :/
-        -# - if current_organization.enabled?("avery_export")
-        -#   %th{ class: "avery_export_cell" } Export
+        - if current_organization.enabled?("avery_export")
+          %th.hiddenColumn.hidden-xs-down.avery_cell=t(".avery")
         - if current_organization.enabled?("impound_bikes")
           %th.hiddenColumn.hidden-xs-down.impounded_cell=t(".impounded")
+
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -193,7 +199,7 @@
             - current_organization.additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
-                - bike_attr = PaidFeature.reg_field_bike_attrs[reg_field.to_sym]
+                - bike_attr = OrganizationFeature.reg_field_bike_attrs[reg_field.to_sym]
                 - if bike_attr == "registration_address"
                   - if bike.registration_address.present?
                     %small
@@ -223,6 +229,9 @@
                         = bike_sticker.code
                     - if index > 0
                       %br
+          - if current_organization.enabled?("avery_export")
+            %td.hiddenColumn.hidden-xs-down{ class: "avery_cell" }
+              = check_mark if bike.avery_exportable?
           - if current_organization.enabled?("impound_bikes")
             %td.hiddenColumn.hidden-xs-down{ class: "impounded_cell" }
               - if bike.status_impounded? && bike.current_impound_record&.created_at&.present?

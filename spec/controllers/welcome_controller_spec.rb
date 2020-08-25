@@ -10,7 +10,7 @@ RSpec.describe WelcomeController, type: :controller do
     end
     context "json request format" do
       it "renders revised_layout (ignoring response format)" do
-        get :index, params: { format: :json }
+        get :index, params: {format: :json}
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
         expect(flash).to_not be_present
@@ -37,7 +37,7 @@ RSpec.describe WelcomeController, type: :controller do
     it "renders embed without xframe block" do
       get :bike_creation_graph
       expect(response.code).to eq("200")
-      expect(response.headers["X-Frame-Options"]).not_to be_present
+      expect(response.headers["X-Frame-Options"]).to be_blank
     end
   end
 
@@ -85,7 +85,7 @@ RSpec.describe WelcomeController, type: :controller do
   describe "recovery_stories" do
     it "renders recovery stories" do
       FactoryBot.create_list(:recovery_display, 3)
-      get :recovery_stories, params: { per_page: 2 }
+      get :recovery_stories, params: {per_page: 2}
       expect(assigns(:recovery_displays).count).to eq 2
       expect(response.status).to eq(200)
       expect(response).to render_template("recovery_stories")
@@ -94,7 +94,7 @@ RSpec.describe WelcomeController, type: :controller do
 
     it "renders no recovery stories if requested page exceeds valid range" do
       FactoryBot.create_list(:recovery_display, 2)
-      get :recovery_stories, params: { per_page: 2, page: 2 }
+      get :recovery_stories, params: {per_page: 2, page: 2}
       expect(assigns(:recovery_displays)).to be_empty
       expect(response.status).to eq(200)
       expect(response).to render_template("recovery_stories")

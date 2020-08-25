@@ -45,7 +45,7 @@ class UserEmailsController < ApplicationController
   def ensure_user_email_ownership
     unless current_user && current_user.user_emails.pluck(:id).include?(params[:id].to_i)
       flash[:error] = translation(:you_must_be_signed_in)
-      redirect_to user_root_url and return
+      redirect_to(user_root_url) && return
     end
     @user_email = current_user.user_emails.find(params[:id])
   end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # In reality, this should be something like OrganizationFeatures. Initially all features were paid though
-class PaidFeature < ApplicationRecord
+class OrganizationFeature < ApplicationRecord
   include Amountable
-  KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
+  KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
@@ -34,7 +34,7 @@ class PaidFeature < ApplicationRecord
     impound_bikes_locations
     passwordless_users
     regional_bike_counts
-    regional_stickers
+    credibility_badges
     show_bulk_import
     show_multi_serial
     show_partial_registrations
@@ -42,8 +42,8 @@ class PaidFeature < ApplicationRecord
     skip_ownership_email
   ] + APPOINTMENT_FEATURES + BIKE_ACTIONS + REG_FIELDS).freeze
 
-  has_many :invoice_paid_features
-  has_many :invoices, through: :invoice_paid_features
+  has_many :invoice_organization_features
+  has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
   validates :currency, presence: true
@@ -55,7 +55,9 @@ class PaidFeature < ApplicationRecord
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
   # used by organization right now, but might be useful in other places
   def self.matching_slugs(slugs)
@@ -69,13 +71,17 @@ class PaidFeature < ApplicationRecord
       organization_affiliation: "organization_affiliation",
       extra_registration_number: "extra_registration_number",
       reg_phone: "phone",
-      reg_address: "registration_address",
+      reg_address: "registration_address"
     }
   end
 
-  def one_time?; standard_one_time? || custom_one_time? end
+  def one_time?
+    standard_one_time? || custom_one_time?
+  end
 
-  def recurring?; !one_time? end
+  def recurring?
+    !one_time?
+  end
 
   def locked?
     feature_slugs.any? && invoices.active.any?

@@ -8,14 +8,14 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
   end
 
   def get_oauth_token
-    response = conn.post("oauth/token") do |req|
+    response = conn.post("oauth/token") { |req|
       req.headers["Content-Type"] = "application/json"
       req.params = {
         grant_type: "refresh_token",
         client_id: credentials.app_id,
-        refresh_token: credentials.refresh_token,
+        refresh_token: credentials.refresh_token
       }
-    end
+    }
 
     unless response.status == 200 && response.body.is_a?(Hash)
       raise Project529ClientError, response.body
@@ -30,20 +30,20 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
     req_params = {
       updated_at: (updated_at.presence || Time.current - 20.days).strftime("%Y-%m-%d"),
       page: page,
-      per_page: per_page,
+      per_page: per_page
     }
 
     cache_key = [self.class.to_s, __method__.to_s, req_params]
 
     response =
-      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
-        response = conn.get("services/v1/bikes") do |req|
+      Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) {
+        response = conn.get("services/v1/bikes") { |req|
           req.headers["Content-Type"] = "application/json"
           req.params = req_params.merge(access_token: credentials.access_token)
-        end
+        }
 
-        { status: response.status, body: response.body.with_indifferent_access }
-      end
+        {status: response.status, body: response.body.with_indifferent_access}
+      }
 
     unless response[:status] == 200 && response[:body].is_a?(Hash)
       raise Project529ClientError, response
