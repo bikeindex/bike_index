@@ -9,42 +9,12 @@ RSpec.describe Organized::AppointmentsController, type: :request do
   let(:appointment_configuration) { location.appointment_configuration }
 
   describe "index" do
-    it "redirects to show" do
-      expect(current_organization.appointment_functionality_enabled?).to be_truthy
-      # there in only one location
-      expect(current_organization.locations.pluck(:id)).to eq([location.id])
-      get base_url
-      expect(assigns(:current_location)&.id).to eq location.id
-      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
-      expect(flash).to be_blank
-    end
-    context "with two locations" do
-      let!(:location2) { FactoryBot.create(:location, :with_virtual_line_on, organization: current_organization) }
-      it "renders" do
-        expect(location2.virtual_line_on?).to be_truthy
-        # there are two locations
-        expect(current_organization.locations.pluck(:id)).to match_array([location.id, location2.id])
-        get base_url
-        expect(assigns(:current_location)).to be_blank
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:index)
-        expect(flash).to be_blank
-
-        get "#{base_url}/#{location2.id}"
-        expect(assigns(:current_location)&.id).to eq location2.id
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-        expect(flash).to be_blank
-      end
-    end
-  end
-
-  describe "show" do
     it "renders" do
-      get "#{base_url}/#{location.to_param}"
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:show)
+      expect(current_organization.appointment_functionality_enabled?).to be_truthy
+      get base_url
       expect(flash).to be_blank
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
     end
   end
 
@@ -66,7 +36,7 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       expect(location.appointments.count).to eq 1
       new_appointment = location.appointments.last
 
-      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
+      expect(response).to redirect_to(organization_appointments_path(organization_id: current_organization.to_param))
       expect(flash[:success]).to be_present
 
       expect(new_appointment.status).to eq "on_deck"
@@ -87,7 +57,7 @@ RSpec.describe Organized::AppointmentsController, type: :request do
           appointment: appointment_params.merge(email: " ", status: "")
         }
       }.to change(Appointment, :count).by 1
-      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
+      expect(response).to redirect_to(organization_appointments_path(organization_id: current_organization.to_param))
       expect(flash[:success]).to be_present
 
       new_appointment2 = Appointment.last
@@ -102,7 +72,7 @@ RSpec.describe Organized::AppointmentsController, type: :request do
         put "#{base_url}/#{appointment.id}", params: {status: "being_helped"}
       }.to change(AppointmentUpdate, :count).by 1
       expect(flash[:success]).to be_present
-      expect(response).to redirect_to(organization_operate_line_path(location.to_param, organization_id: current_organization.to_param))
+      expect(response).to redirect_to(organization_appointments_path(organization_id: current_organization.to_param))
 
       appointment.reload
       expect(appointment.status).to eq "being_helped"
@@ -111,6 +81,41 @@ RSpec.describe Organized::AppointmentsController, type: :request do
       expect(appointment_update.status).to eq "being_helped"
       expect(appointment_update.user_id).to eq current_user.id
       expect(appointment_update.creator_kind).to eq "organization_member"
+    end
+    context "update multiple" do
+      let!(:appointment2) { FactoryBot.create(:appointment, status: "on_deck", organization: current_organization, location: location) }
+      it "updates multiple appointments" do
+        expect {
+          put "#{base_url}/multi_update", params: {
+            status: "being_helped",
+            organization: current_organization.to_param,
+            ids: {
+              appointment.id.to_s => appointment.id.to_s,
+              appointment2.id.to_s => appointment2.id.to_s
+            }
+          }
+        }.to change(AppointmentUpdate, :count).by 2
+        expect(response).to redirect_to organization_appointments_path(organization_id: current_organization.to_param)
+        expect(flash[:success]).to be_present
+        appointment.reload
+        appointment2.reload
+
+        expect(appointment.status).to eq "being_helped"
+        expect(appointment2.status).to eq "being_helped"
+
+        expect(appointment.appointment_updates.count).to eq 1
+        expect(appointment.appointment_updates.last.organization_member?).to be_truthy
+        expect(appointment2.appointment_updates.last.user_id).to eq current_user.id
+        # updating with no ids doesn't break
+        expect {
+          put "#{base_url}/multi_update", params: {
+            status: "being_helped",
+            organization: current_organization.to_param
+          }
+        }.to_not change(AppointmentUpdate, :count)
+        expect(response).to redirect_to organization_appointments_path(organization_id: current_organization.to_param)
+        expect(flash).to be_present
+      end
     end
   end
 end

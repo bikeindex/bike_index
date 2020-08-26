@@ -47,9 +47,9 @@
             %label.d-block &nbsp;
             = f.submit "Add to line!", class: "btn btn-success"
 
-- valid_update_statuses = [["Being helped", "being_helped"], ["Manually remove from line", "removed"], ["Left without being helped", "abandoned"], ["Page - they're needed", "paging"], ["On deck", "on_deck"], ["Waiting in line", "waiting"], ["Unable to find", "failed_to_find"]]
+- valid_update_statuses = %i[being_helped removed abandoned paging on_deck waiting].map { |k| [AppointmentUpdate::STATUS_HUMANIZED[k], k.to_s] }
 -# Form needs to wrap the table to get the checked appointment ids
-= form_tag organization_appointments_path(current_location.to_param, organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :put, action: "update" do
+= form_tag organization_appointment_path("multi_update", organization_id: current_organization.to_param), id: "multiAppointmentSelectForm", method: :patch, action: "update" do
 
   .showOnMultiSelect.collapse
     .row.mt-4

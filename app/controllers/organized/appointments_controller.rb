@@ -19,21 +19,21 @@ module Organized
 
     def update
       if params[:status].present?
-        if params.key?(:ids)
-          multi_appointment_update(params[:ids].keys)
+        if params[:id] == "multi_update"
+          multi_appointment_update(params[:ids]&.keys || [])
         else
           find_appointment
           appointment_update = @appointment.record_status_update(new_status: params[:status],
                                                                  updator_id: current_user.id,
                                                                  updator_kind: "organization_member")
           if appointment_update.present?
-            flash[:success] = "Appointment updated: #{params[:status].humanize}"
+            flash[:success] = "Appointment updated: #{appointment_update.status_humanized}"
           else
-            flash[:error] = "Unable to update that appointment! #{@appointment.errors.full_messages.to_sentence}"
+            flash[:error] = "Unable to update that appointment: #{@appointment.errors.full_messages.to_sentence}"
           end
         end
       end
-      redirect_back(fallback_location: appointments_root_path)
+      redirect_back(fallback_location: organization_appointments_path(organization_id: current_organization.to_param))
     end
 
     def create
@@ -44,16 +44,12 @@ module Organized
       else
         flash[:error] = @appointment.errors.full_messages.to_sentence
       end
-      redirect_back(fallback_location: appointments_root_path)
+      redirect_back(fallback_location: organization_appointments_path(organization_id: current_organization.to_param))
     end
 
     helper_method :available_appointments
 
     private
-
-    def appointments_root_path
-      organization_operate_line_path(@appointment.location.to_param, organization_id: current_organization.to_param)
-    end
 
     def sortable_columns
       %w[created_at name status reason] # may use sometime: appointment_at line_number

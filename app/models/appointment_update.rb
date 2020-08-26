@@ -22,6 +22,20 @@ class AppointmentUpdate < ApplicationRecord
     queue_worker: 3
   }
 
+  STATUS_HUMANIZED = {
+    pending: "Pending",
+    waiting: "Waiting in line",
+    organization_reordered: "Reordered",
+    on_deck: "On deck",
+    paging: "Page - they're needed",
+    # Below are resolved statuses - blank include for potential assignment later
+    failed_to_find: "Unable to find",
+    removed: "Manually remove from line",
+    abandoned: "Left without being helped",
+    being_helped: "Being helped", # Another blank before, for potential later assignment
+    finished: "Finished"
+  }
+
   belongs_to :appointment
   belongs_to :user
 
@@ -64,6 +78,10 @@ class AppointmentUpdate < ApplicationRecord
 
   def self.customer_creator_kind?(kind)
     customer_creator_kinds.include?(kind)
+  end
+
+  def status_humanized
+    STATUS_HUMANIZED[status.to_sym]
   end
 
   def update_only_status?

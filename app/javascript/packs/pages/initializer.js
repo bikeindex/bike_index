@@ -48,14 +48,16 @@ $(document).ready(function () {
       $(".updateLineStatusCollapse").collapse("toggle");
     });
   }
+
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
   // If we're trying to target all pages from a controller ;)
   const pageControllerId = bodyId.replace(/_[^_]*$/, "");
-  if ("organized_lines" == pageControllerId) {
+  log.debug(pageControllerId);
+  if ("organized_appointments" === pageControllerId) {
     window.binxAppOrganizedAppointments = new BinxAppOrganizedAppointments();
     binxAppOrganizedAppointments.init();
-  } else if ("organized_parking_notifications" == pageControllerId) {
+  } else if ("organized_parking_notifications" === pageControllerId) {
     window.binxAppOrgParkingNotifications = new BinxAppOrgParkingNotifications();
     binxAppOrgParkingNotifications.init();
   } else if ("organized_exports" === pageControllerId) {
