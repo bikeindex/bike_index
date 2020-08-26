@@ -4,7 +4,7 @@ import React, { useState, Fragment } from "react";
 import searchIcon from "images/stolen/search.svg";
 import SearchResults from "./SearchResults";
 import api from "../../api";
-import honeybadger from "../../utils/honeybadger";
+import honeybadger from "../../../utils/honeybadger";
 
 const MultiSerialSearch = () => {
   const [serialResults, setSerialResults] = useState(null);
@@ -12,7 +12,7 @@ const MultiSerialSearch = () => {
   const [loading, setLoading] = useState(false);
   const [fuzzySearching, setFuzzySearching] = useState(false);
 
-  const handleEventErrors = error => {
+  const handleEventErrors = (error) => {
     honeybadger.notify(error, { component: "MultiSerialSearch" });
     setLoading(false);
   };
@@ -26,8 +26,8 @@ const MultiSerialSearch = () => {
     */
     const tokens = searchTokens
       .split(/,|\n/)
-      .map(s => s.trim())
-      .filter(s => s);
+      .map((s) => s.trim())
+      .filter((s) => s);
     const uniqSerials = [...new Set(tokens)];
 
     try {
@@ -35,7 +35,7 @@ const MultiSerialSearch = () => {
         parallel request serials
       */
       const all = await Promise.all(
-        uniqSerials.map(serial => api.fetchSerialResults(serial))
+        uniqSerials.map((serial) => api.fetchSerialResults(serial))
       );
       const results = all.map(({ bikes }, index) => {
         const serial = uniqSerials[index];
@@ -43,7 +43,7 @@ const MultiSerialSearch = () => {
           bikes,
           serial,
           fuzzyBikes: [],
-          anchor: `#${encodeURI(serial)}`
+          anchor: `#${encodeURI(serial)}`,
         };
       });
       setSerialResults(results);
@@ -54,7 +54,7 @@ const MultiSerialSearch = () => {
     }
   };
 
-  const onChangeSearchTokens = e => {
+  const onChangeSearchTokens = (e) => {
     e.preventDefault();
     const tokens = e.target.value;
     setSearchTokens(tokens);

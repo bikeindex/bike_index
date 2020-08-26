@@ -39,7 +39,10 @@ $primary-nav-text-color: #a4a4a4;
 @import "../stylesheets/admin/general";
 @import "../stylesheets/admin/bikes";
 @import "../stylesheets/period_selection";
-@import "../stylesheets/customer_virtual_line";
+
+// Appointments
+@import "../stylesheets/appointments/customer_virtual_line";
+@import "../stylesheets/appointments/operate_line";
 
 // Uppy Styles
 @import "@uppy/core/dist/style.css";

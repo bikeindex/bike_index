@@ -53,7 +53,8 @@ $(document).ready(function () {
   const bodyId = document.getElementsByTagName("body")[0].id;
   // If we're trying to target all pages from a controller ;)
   const pageControllerId = bodyId.replace(/_[^_]*$/, "");
-  log.debug(pageControllerId);
+  // log.debug(pageControllerId);
+
   if ("organized_appointments" === pageControllerId) {
     window.binxAppOrganizedAppointments = new BinxAppOrganizedAppointments();
     binxAppOrganizedAppointments.init();

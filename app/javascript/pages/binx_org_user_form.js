@@ -3,7 +3,7 @@ import log from "../utils/log";
 function BinxAppOrgUserForm() {
   return {
     init() {
-      $("#multipleUserSelect").on("click", e => {
+      $("#multipleUserSelect").on("click", (e) => {
         e.preventDefault();
         $("#singleEmailInvite").slideUp();
         // Doing some weird stuff because we can't use collapse here (bootstrap isn't in this pack)
@@ -14,7 +14,7 @@ function BinxAppOrgUserForm() {
           "currently-hidden"
         );
       });
-    }
+    },
   };
 }
 

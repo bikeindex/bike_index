@@ -3,18 +3,18 @@ import ReactDOM from "react-dom";
 
 import ErrorBoundary from "@honeybadger-io/react";
 
-import SecondarySearches from "./components/SecondarySearches";
+import Customer from "./components/customer";
 import honeybadger from "../../utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-secondary-searches");
+  const el = document.getElementById("simpleViewJs");
   if (!el) {
     return;
   }
 
   ReactDOM.render(
     <ErrorBoundary honeybadger={honeybadger}>
-      <SecondarySearches interpretedParams={window.interpreted_params} />
+      <Customer />
     </ErrorBoundary>,
     el
   );

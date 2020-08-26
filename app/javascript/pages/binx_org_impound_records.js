@@ -26,7 +26,7 @@ export default class BinxAppOrgImpoundRecords {
         const updatedKind = $(
           "#impoundRecordUpdateForm #impound_record_update_kind"
         ).val();
-        $("#impoundRecordUpdateForm .collapseKind").each(function(
+        $("#impoundRecordUpdateForm .collapseKind").each(function (
           index,
           field
         ) {

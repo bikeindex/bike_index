@@ -6,7 +6,7 @@
 
 import Rails from "rails-ujs";
 import "bootstrap/dist/js/bootstrap";
-import "./pages/initializer";
+import "../pages/initializer";
 
 Rails.start();
 

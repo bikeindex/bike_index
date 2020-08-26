@@ -1,4 +1,4 @@
-import log from "../utils/log";
+import log from "./log";
 import moment from "moment-timezone";
 
 // Should be imported and initialized like this:

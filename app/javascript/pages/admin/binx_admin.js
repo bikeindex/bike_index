@@ -76,20 +76,14 @@ function BinxAdmin() {
 
     // Orgs location adding method
     adminLocations() {
-      $("form").on("click", ".remove_fields", function(event) {
+      $("form").on("click", ".remove_fields", function (event) {
         // We don't need to do anything except slide the input up, because the label is on it.
-        return $(this)
-          .closest("fieldset")
-          .slideUp();
+        return $(this).closest("fieldset").slideUp();
       });
-      return $("form").on("click", ".add_fields", function(event) {
+      return $("form").on("click", ".add_fields", function (event) {
         const time = new Date().getTime();
         const regexp = new RegExp($(this).data("id"), "g");
-        $(this).before(
-          $(this)
-            .data("fields")
-            .replace(regexp, time)
-        );
+        $(this).before($(this).data("fields").replace(regexp, time));
         event.preventDefault();
         LoadFancySelects();
       });
@@ -97,7 +91,7 @@ function BinxAdmin() {
 
     bikesMultiManufacturerUpdate() {
       window.toggleAllChecked = false;
-      $("#multi-mnfg-selector").on("click", function(event) {
+      $("#multi-mnfg-selector").on("click", function (event) {
         event.preventDefault();
         window.toggleAllChecked = !window.toggleAllChecked;
         $(".update-mnfg-select input").prop("checked", window.toggleAllChecked);

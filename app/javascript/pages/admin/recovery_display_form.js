@@ -13,7 +13,7 @@ function BinxAdminRecoveryDisplayForm() {
         this.toggleBikeImageForDisplay();
       }
       let self = this;
-      $("#use_image_for_display").on("click", e => {
+      $("#use_image_for_display").on("click", (e) => {
         e.preventDefault();
         self.toggleBikeImageForDisplay();
       });
@@ -38,11 +38,11 @@ function BinxAdminRecoveryDisplayForm() {
     },
 
     characterCounter() {
-      $("#characterCounter").on("keyup", e => {
+      $("#characterCounter").on("keyup", (e) => {
         e.preventDefault();
         this.setCharacterCount();
       });
-    }
+    },
   };
 }
 

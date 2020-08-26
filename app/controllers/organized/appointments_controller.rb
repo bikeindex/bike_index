@@ -11,7 +11,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @appointments = available_appointments.includes(:appointment_updates)
+      @appointments = matching_appointments.includes(:appointment_updates)
         .reorder("appointments.#{sort_column} #{sort_direction}")
         .page(@page).per(@per_page)
       @appointment ||= Appointment.new(location_id: current_location&.id, organization_id: current_organization.id)
@@ -47,7 +47,7 @@ module Organized
       redirect_back(fallback_location: organization_appointments_path(organization_id: current_organization.to_param))
     end
 
-    helper_method :available_appointments
+    helper_method :matching_appointments
 
     private
 
@@ -59,10 +59,10 @@ module Organized
       current_organization.appointments
     end
 
-    def available_appointments
-      available_appointments = permitted_appointments
-      available_appointments = available_appointments.where(location: current_location.id) if current_location.present?
-      available_appointments.where(created_at: @time_range)
+    def matching_appointments
+      matching_appointments = permitted_appointments
+      matching_appointments = matching_appointments.where(location: current_location.id) if current_location.present?
+      matching_appointments.where(created_at: @time_range)
     end
 
     def find_appointment

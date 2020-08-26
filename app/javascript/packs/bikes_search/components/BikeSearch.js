@@ -3,8 +3,8 @@
 import React, { Fragment, Component } from "react";
 
 import Loading from "../../Loading";
-import TimeParser from "../../utils/time_parser.js";
-import honeybadger from "../../utils/honeybadger";
+import TimeParser from "../../../utils/time_parser.js";
+import honeybadger from "../../../utils/honeybadger";
 
 class BikeSearch extends Component {
   // loading states :
@@ -14,7 +14,7 @@ class BikeSearch extends Component {
 
   state = {
     loading: null,
-    results: []
+    results: [],
   };
 
   componentDidMount() {
@@ -45,7 +45,7 @@ class BikeSearch extends Component {
     }
   };
 
-  handleError = error => {
+  handleError = (error) => {
     honeybadger.notify(error, { component: this.props.searchName });
   };
 
@@ -81,7 +81,7 @@ class BikeSearch extends Component {
     const stolenness = {
       non: "abandoned",
       all: "all",
-      stolen: "stolen"
+      stolen: "stolen",
     }[this.props.interpretedParams.stolenness];
 
     return (
@@ -91,7 +91,7 @@ class BikeSearch extends Component {
             {this.props.t("matches_found_html", { serial, stolenness })}
           </h3>
           <ul className="bike-boxes">
-            {this.state.results.map(bike => (
+            {this.state.results.map((bike) => (
               <Result key={bike.id} bike={bike} />
             ))}
           </ul>
