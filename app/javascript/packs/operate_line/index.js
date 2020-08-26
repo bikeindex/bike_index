@@ -7,7 +7,7 @@ import Customer from "./components/customer";
 import honeybadger from "../../utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("simpleViewJs");
+  const el = document.getElementById("operateLineJSView");
   if (!el) {
     return;
   }
