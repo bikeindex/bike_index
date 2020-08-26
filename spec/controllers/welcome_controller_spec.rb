@@ -37,7 +37,7 @@ RSpec.describe WelcomeController, type: :controller do
     it "renders embed without xframe block" do
       get :bike_creation_graph
       expect(response.code).to eq("200")
-      expect(response.headers["X-Frame-Options"]).not_to be_present
+      expect(response.headers["X-Frame-Options"]).to be_blank
     end
   end
 

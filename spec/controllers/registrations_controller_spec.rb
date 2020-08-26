@@ -6,7 +6,7 @@ RSpec.describe RegistrationsController, type: :controller do
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do
     expect(response.status).to eq(200)
-    expect(response.headers["X-Frame-Options"]).not_to be_present
+    expect(response.headers["X-Frame-Options"]).to be_blank
     expect(flash).to_not be_present
   end
   describe "new" do
@@ -15,7 +15,7 @@ RSpec.describe RegistrationsController, type: :controller do
       get :new, params: {organization_id: organization.id, stolen: true}
       expect(response).to render_template(:new)
       expect(response.status).to eq(200)
-      expect(response.headers["X-Frame-Options"]).to be_present
+      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       expect(flash).to_not be_present
     end
   end

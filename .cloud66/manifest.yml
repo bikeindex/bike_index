@@ -4,4 +4,4 @@ production:
       version: 9.4.6
   rails:
     configuration:
-      node_version: "10.14"
+      node_version: "12.18.3"

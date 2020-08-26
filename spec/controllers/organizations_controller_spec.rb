@@ -95,7 +95,7 @@ RSpec.describe OrganizationsController, type: :controller do
         get :embed, params: {id: organization.slug}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
-        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_falsey
         bike = assigns(:bike)
         expect(bike.stolen).to be_falsey
@@ -106,7 +106,7 @@ RSpec.describe OrganizationsController, type: :controller do
         get :embed, params: {id: organization.slug, stolen: 1}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
-        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy
@@ -119,7 +119,7 @@ RSpec.describe OrganizationsController, type: :controller do
         get :embed, params: {id: organization.slug, stolen: 1}
         expect(response).to render_template(:embed)
         expect(response.code).to eq("200")
-        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy
@@ -130,7 +130,7 @@ RSpec.describe OrganizationsController, type: :controller do
         get :embed_extended, params: {id: organization.slug, email: "something@example.com"}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed_extended)
-        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:persist_email)).to be_truthy
         bike = assigns(:bike)
         expect(bike.stolen).to be_falsey
@@ -156,7 +156,7 @@ RSpec.describe OrganizationsController, type: :controller do
         get :embed, params: {id: organization.slug, b_param_id_token: b_param.id_token}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
-        expect(response.headers["X-Frame-Options"]).not_to be_present
+        expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy

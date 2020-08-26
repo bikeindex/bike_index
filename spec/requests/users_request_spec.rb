@@ -115,4 +115,28 @@ RSpec.describe UsersController, type: :request do
       expect(ownership.user_id).to eq(user.id)
     end
   end
+
+  describe "update password" do
+    include_context :request_spec_logged_in_as_user
+    context "previous password was too short" do
+      # Prior to #1738 password requirement was 8 characters.
+      # Ensure users who had valid passwords for the previous requirements can update their password
+      it "updates password" do
+        current_user.update_attribute :password, "old_pass"
+        expect(current_user.reload.authenticate("old_pass")).to be_truthy
+        patch "#{base_url}/#{current_user.username}", params: {
+          user: {
+            current_password: "old_pass",
+            password: "172ddfasdf1LDF",
+            name: "Mr. Slick",
+            password_confirmation: "172ddfasdf1LDF"
+          }
+        }
+        expect(response).to redirect_to edit_my_account_path
+        expect(flash[:success]).to be_present
+        current_user.reload
+        expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
+      end
+    end
+  end
 end
