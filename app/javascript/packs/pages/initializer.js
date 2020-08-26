@@ -1,10 +1,9 @@
 import log from "../utils/log";
 import TimeParser from "../utils/time_parser.js";
 import BinxMapping from "./binx_mapping.js";
-import WalkrightupCustomer from "./walkrightup/customer.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
-import BinxAppOrgLines from "./binx_org_lines.js";
+import BinxAppOrganizedAppointments from "./organized/appointments.js";
 import BinxAppOrgParkingNotifications from "./binx_org_parking_notifications.js";
 import BinxAppOrgImpoundRecords from "./binx_org_impound_records.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
@@ -43,18 +42,19 @@ $(document).ready(function () {
     binxAdmin.init();
   }
 
-  // Load admin, whatever
   if ($("#customer-virtual-line-wrapper").length > 0) {
-    window.walkrightupCustomer = new WalkrightupCustomer();
-    walkrightupCustomer.init();
+    $("#updateLineStatus").on("click", (e) => {
+      e.preventDefault();
+      $(".updateLineStatusCollapse").collapse("toggle");
+    });
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
   // If we're trying to target all pages from a controller ;)
   const pageControllerId = bodyId.replace(/_[^_]*$/, "");
   if ("organized_lines" == pageControllerId) {
-    window.binxAppOrgLines = new BinxAppOrgLines();
-    binxAppOrgLines.init();
+    window.binxAppOrganizedAppointments = new BinxAppOrganizedAppointments();
+    binxAppOrganizedAppointments.init();
   } else if ("organized_parking_notifications" == pageControllerId) {
     window.binxAppOrgParkingNotifications = new BinxAppOrgParkingNotifications();
     binxAppOrgParkingNotifications.init();

@@ -339,7 +339,7 @@ Rails.application.routes.draw do
     resources :operate_lines, only: %i[index show edit update] do
       member { get :shop_display }
     end
-    resources :appointments, only: %i[create update]
+    resources :appointments
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do

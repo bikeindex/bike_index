@@ -1,6 +1,6 @@
-import log from "../utils/log";
+import log from "../../utils/log";
 
-export default class BinxAppOrgLines {
+export default class BinxAppOrganizedAppointments {
   init() {
     const updateCellDisplay = this.updateCellDisplay;
     $("#toggleUpdateMultiple").on("click", function (e) {

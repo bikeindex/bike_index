@@ -46,40 +46,4 @@ RSpec.describe Organized::OperateLinesController, type: :request do
       expect(flash).to be_blank
     end
   end
-
-  describe "update" do
-    let!(:appointment2) { FactoryBot.create(:appointment, status: "on_deck", organization: current_organization, location: location) }
-    it "updates multiple appointments" do
-      expect {
-        put "#{base_url}/#{location.to_param}", params: {
-          status: "being_helped",
-          organization: current_organization.to_param,
-          ids: {
-            appointment.id.to_s => appointment.id.to_s,
-            appointment2.id.to_s => appointment2.id.to_s
-          }
-        }
-      }.to change(AppointmentUpdate, :count).by 2
-      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
-      expect(flash[:success]).to be_present
-      appointment.reload
-      appointment2.reload
-
-      expect(appointment.status).to eq "being_helped"
-      expect(appointment2.status).to eq "being_helped"
-
-      expect(appointment.appointment_updates.count).to eq 1
-      expect(appointment.appointment_updates.last.organization_member?).to be_truthy
-      expect(appointment2.appointment_updates.last.user_id).to eq current_user.id
-      # updating with no ids doesn't break
-      expect {
-        put "#{base_url}/#{location.to_param}", params: {
-          status: "being_helped",
-          organization: current_organization.to_param
-        }
-      }.to_not change(AppointmentUpdate, :count)
-      expect(response).to redirect_to organization_operate_line_path(location.to_param, organization_id: current_organization.to_param)
-      expect(flash[:notice]).to be_present
-    end
-  end
 end

@@ -7,6 +7,11 @@
 
 .organized-appointment-table {
   line-height: 1.5;
+
+  // Because of the dropdown
+  &.full-screen-table {
+    overflow: visible;
+  }
   .multiselect-cell {
     padding: 0;
     vertical-align: center;
@@ -28,7 +33,16 @@
     // TODO: old bootstrap fucked this up
     .dropleft {
       &.dropdown-menu {
-        left: -50%;
+        width: 260px;
+        @include media-breakpoint-up(lg) {
+          left: -75%;
+        }
+        @include media-breakpoint-down(lg) {
+          left: -160px;
+        }
+        @include media-breakpoint-down(md) {
+          left: -200px;
+        }
       }
     }
   }

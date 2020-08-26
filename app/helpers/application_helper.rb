@@ -145,7 +145,7 @@ module ApplicationHelper
 
   def sortable_search_params
     search_param_keys = params.keys.select { |k| k.to_s.start_with?(/search_/) }
-    params.permit(:direction, :sort, :user_id, :organization_id, :query, :render_chart,
+    params.permit(:direction, :sort, :user_id, :organization_id, :location_id, :query, :render_chart,
       :period, :start_time, :end_time, :time_range_column, *search_param_keys)
   end
 
