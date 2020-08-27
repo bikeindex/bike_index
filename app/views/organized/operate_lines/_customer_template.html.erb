@@ -1,0 +1,22 @@
+<script id="operateLineCustomerTemplate" type="text/x-handlebars">
+  <ul class="operate-line-customers">
+    {{#each customers}}
+      <li class="customer-item" id="customer-{{this.id}}">
+        <div class="row">
+          <div class="col-1">
+            <a href="#" class="btn btn-danger btn-lg btn-customer-update" data-updatestatus="remove" data-customerid="{{this.id}}">X</a>
+          </div>
+          <div class="col-2">
+            <h3>{{this.line_number}}</h3>
+          </div>
+          <div class="col-8">
+            <h4>{{this.name}}</h4>
+          </div>
+          <div class="col-1">
+            <a href="#" class="btn btn-success btn-success btn-customer-update" data-updatestatus="help" data-customerid="{{this.id}}"><%= check_mark %></a>
+          </div>
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+</script>

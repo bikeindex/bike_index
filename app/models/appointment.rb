@@ -71,6 +71,10 @@ class Appointment < ApplicationRecord
     Location.unscoped.find_by_id(location_id)
   end
 
+  def status_humanized
+    AppointmentUpdate::STATUS_HUMANIZED[status.to_sym]
+  end
+
   def in_line?
     AppointmentUpdate.in_line_statuses.include?(status)
   end

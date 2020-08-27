@@ -1,39 +1,4 @@
 .organized-virtual-line-body {
-  background: #ccc;
-  h2 {
-    margin-top: 3rem;
-    margin-bottom: 0.5rem;
-    padding: 0 1rem;
-  }
-  .ticket-row {
-    width: 100%;
-    display: block;
-    padding: 1rem 0;
-    position: relative;
-    border: 1px solid #ccc;
-    margin: 12px 0 0 0;
-    h4 {
-      text-align: center;
-    }
-    a {
-      position: absolute;
-      top: 0;
-      padding: 1.5rem 1rem 0 1rem;
-      font-weight: bold;
-      font-size: 120%;
-      line-height: 1;
-      &.remove {
-        left: 0;
-      }
-      &.help {
-        right: 0;
-      }
-    }
-    &.on-deck-ticket {
-      font-size: 200%;
-    }
-  }
-
   // Little bit to make easier for phone view planning
   background: #ccc;
   #organized-virtual-line-wrapper {
@@ -41,5 +6,59 @@
     margin: 30px auto;
     background: #fff;
     padding: 1rem 0;
+  }
+
+  h2 {
+    margin: 0;
+    padding: 1rem 0;
+  }
+
+  #nextTicketsToHelp {
+    margin: 20px 0;
+  }
+
+  .operate-line-customers {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    li {
+      width: 100%;
+      display: block;
+      padding: 1rem 0;
+      position: relative;
+      border: 1px solid $gray-300;
+      margin: 0;
+      h4 {
+        text-align: center;
+      }
+      .btn-customer-update {
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        font-weight: bold;
+      }
+      // a {
+      //   position: absolute;
+      //   top: 0;
+      //   padding: 1.5rem 1rem 0 1rem;
+      //   font-weight: bold;
+      //   font-size: 120%;
+      //   line-height: 1;
+      //   &.remove {
+      //     left: 0;
+      //   }
+      //   &.help {
+      //     right: 0;
+      //   }
+      // }
+
+      &.on-deck-ticket {
+        font-size: 200%;
+      }
+    }
   }
 }

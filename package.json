@@ -25,6 +25,7 @@
     "core-js": "^3.6.3",
     "es6-promise": "^4.2.8",
     "eslint-plugin-react-hooks": "^1.6.0",
+    "handlebars": "^4.7.6",
     "honeybadger-js": "^0.5.5",
     "i18n-js": "^3.3.0",
     "ignore-loader": "^0.1.2",

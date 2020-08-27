@@ -12,6 +12,7 @@ module Organized
 
     def show
       @appointments = matching_appointments.includes(:appointment_updates)
+      @serialized_appointments = ActiveModel::ArraySerializer.new(@appointments, each_serializer: OperateLineCustomerSerializer, root: "customers")
       render layout: false
     end
 
