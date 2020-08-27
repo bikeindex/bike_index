@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :authenticate_user, only: %i[edit update]
+  before_action :authenticate_user, only: [:edit]
   before_action :skip_if_signed_in, only: %i[new globalid]
   before_action :assign_edit_template, only: %i[edit update]
   before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]

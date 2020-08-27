@@ -107,11 +107,6 @@ Rails.application.routes.draw do
       post :send_password_reset_email
       get :update_password_form_with_reset_token
       post :update_password_with_reset_token
-      # TODO: remove below
-      # get "request_password_reset"
-      post "password_reset"
-      get "password_reset", as: :password_reset_form
-      get "update_password"
     end
     member { get "unsubscribe" }
   end
