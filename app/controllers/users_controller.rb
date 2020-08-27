@@ -84,6 +84,8 @@ class UsersController < ApplicationController
   def update_password_with_reset_token
     if @user.present? && @user.update_attributes(permitted_password_reset_parameters)
       flash[:success] = translation(:password_reset_successfully)
+      # They got the password reset email, which counts as confirming their email
+      @user.confirm(@user.confirmation_token) if @user.unconfirmed?
       update_user_authentication_for_new_password
       sign_in_and_redirect(@user)
     elsif @user.present?
@@ -91,41 +93,6 @@ class UsersController < ApplicationController
       render :update_password_form_with_reset_token
     end
   end
-
-
-  # # # #
-
-  # def request_password_reset
-  # end
-
-  # def update_password
-  #   @user = current_user
-  # end
-
-  # def password_reset
-  #   if params[:token].present?
-  #     @user = User.find_by_password_reset_token(params[:token])
-  #     if @user.present? && !@user.auth_token_expired?("password_reset_token")
-  #       session[:return_to] = "password_reset"
-  #       # They got the password reset email, which counts as confirming their email
-  #       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
-  #       sign_in_and_redirect(@user)
-  #     else
-  #       flash[:error] = translation(:link_no_longer_valid)
-  #       render action: :request_password_reset
-  #     end
-  #   elsif params[:email].present?
-  #     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
-  #     if @user.present?
-  #       @user.send_password_reset_email
-  #     else
-  #       flash[:error] = translation(:email_not_found)
-  #       redirect_to request_password_reset_users_path
-  #     end
-  #   else
-  #     redirect_to request_password_reset_users_url
-  #   end
-  # end
 
   def show
     user = User.find_by_username(params[:id])
@@ -272,7 +239,7 @@ class UsersController < ApplicationController
     @user = User.find_by_password_reset_token(@token) if @token.present?
     return true if @user.present? && !@user.auth_token_expired?("password_reset_token")
     remove_session
-    flash[:error] = @user.blank? ? translation(:token_expired) : translation(:does_not_match_token)
+    flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return
   end
 
