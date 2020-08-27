@@ -38,6 +38,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq("Instructions to reset your password")
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.password_reset_token)
+      # And just to be sure, test the route a little more
+      expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.password_reset_token}/)
     end
   end
 

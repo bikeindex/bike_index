@@ -41,7 +41,7 @@
               = f.label :password, class: 'sr-only'
               = f.password_field :password, placeholder: 'password', class: 'form-control'
               .password-help-text
-                = t(".password_helper_text_html", better_password_link: link_to(t(".better_password"), "https://xkcd.com/936/"), tabindex: -1)
+                = t(".password_helper_text_html", better_password_link: link_to(t(".better_password"), "https://xkcd.com/936/", tabindex: -1))
 
             .checkbox.terms-and-conditions
               %label

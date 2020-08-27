@@ -2364,9 +2364,6 @@ nl:
         password: Wachtwoord
         sharing: Delen + persoonlijke pagina
         user_settings: Gebruikersinstellingen
-      password_reset:
-        email_not_found: Sorry, dat e-mailadres staat niet in ons systeem.
-        link_no_longer_valid: Het spijt ons, maar die link is niet langer geldig.
       show:
         user_not_sharing: Sorry, die gebruiker deelt zijn fietsen niet.
       unsubscribe:
@@ -2378,18 +2375,29 @@ nl:
           Bike Index via een organisatie wilt gebruiken
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
-        does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
-          de gebruiker
         successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
         thanks_for_accepting_tos: Bedankt voor het accepteren van de servicevoorwaarden!
-        token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord
-          opnieuw in te stellen.
         you_can_use_bike_index: Bedankt! Nu kunt u Bike Index gebruiken.
         you_can_use_bike_index_as_org: Bedankt! Nu kunt u Bike Index gebruiken als
           %{org_name}
       resend_confirmation_email:
         please_sign_in: Log in om de bevestiging opnieuw te verzenden
         resending_email: E-mailbevestiging opnieuw verzonden
+      find_user_from_password_reset_token!:
+        does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
+          de gebruiker
+        token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord
+          opnieuw in te stellen.
+      reset_password_token_update_form:
+        link_no_longer_valid: Het spijt ons, maar die link is niet langer geldig.
+      send_password_reset_email:
+        email_not_found: Sorry, dat e-mailadres staat niet in ons systeem.
+        reset_just_sent_wait_a_sec: Er is zojuist een nieuwe e-mail voor het opnieuw
+          instellen van het wachtwoord naar die e-mail gestuurd. Wacht een minuut
+          voordat u het opnieuw probeert.
+      update_password_with_reset_token:
+        password_reset_successfully: Wachtwoord opnieuw instellen. U bent aangemeld
+          bij Bike Index.
     concerns:
       controller_helpers:
         authenticate_user:
@@ -5297,12 +5305,6 @@ nl:
       better_password: beter
       password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
         is %{better_password_link}.
-    password_reset:
-      follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
-        in te stellen!
-      password_reset: Wachtwoord reset
-      weve_sent_an_email: We hebben een e-mail gestuurd naar het adres dat u bij ons
-        hebt geregistreerd.
     please_confirm_email:
       please_verify_your_email: Verifieer uw e-mailadres
       thanks_for_signing_up_for_bike_index: Bedankt voor het aanmelden voor Bike Index!
@@ -5314,28 +5316,34 @@ nl:
       did_not_get_an_email: Heb je geen e-mail ontvangen? Controleer je spam folder.
         Als je het niet kunt vinden, kun je het wel
       resend_confirmation_email: verzend de bevestigingsmail opnieuw.
-    request_password_reset:
-      enter_the_email_address: Voer het e-mailadres in dat je hebt gebruikt om je
-        aan te melden. We sturen u een e-mail met een link om uw wachtwoord opnieuw
-        in te stellen.
-      reset_your_password: Stel je wachtwoord opnieuw in
-      your_email_address: Uw e-mailadres
     show:
       bikes: Bikes
       stolen: Gestolen!
       this_user_has_no_bikes_yet: Deze gebruiker heeft nog geen fietsen!
       this_users_bikes: De fietsen van deze gebruiker
       abandoned: Verlaten
-    update_password:
+    request_password_reset_form:
+      enter_the_email_address: Voer het e-mailadres in dat je hebt gebruikt om je
+        aan te melden. We sturen u een e-mail met een link om uw wachtwoord opnieuw
+        in te stellen.
+      reset_your_password: Stel je wachtwoord opnieuw in
+      your_email_address: Uw e-mailadres
+    send_password_reset_email:
+      follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
+        in te stellen!
+      password_reset: Wachtwoord reset
+      weve_sent_an_email: We hebben een e-mail gestuurd naar het adres dat u bij ons
+        hebt geregistreerd.
+    update_password_form_with_reset_token:
       and_try_not_to_forget_it: en probeer het niet te vergeten ...
+      better_password: beter
       choose_a_new_password: Kies een nieuw wachtwoord!
       password: Wachtwoord
       password_confirmation: Wachtwoord bevestigen
-      update_password: password-update
-      update_your_password: Update uw wachtwoord
-      better_password: beter
       password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
         is %{better_password_link}.
+      update_password: password-update
+      update_your_password: Update uw wachtwoord
   welcome:
     choose_registration:
       add_a_bike_through: Voeg een fiets toe door
