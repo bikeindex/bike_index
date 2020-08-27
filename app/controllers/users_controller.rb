@@ -117,6 +117,10 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
+    unless @user.present? # Shouldn't happen, but block in case it does
+      flash[:error] = translation(:current_password_doesnt_match) # use random existing message because lazy
+      redirect_back(fallback_location: user_root_url)
+    end
     if params.dig(:user, :password).present?
       unless @user.authenticate(params.dig(:user, :current_password))
         @user.errors.add(:base, translation(:current_password_doesnt_match))
