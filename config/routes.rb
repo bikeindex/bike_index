@@ -102,10 +102,11 @@ Rails.application.routes.draw do
       get "please_confirm_email"
       post "resend_confirmation_email"
       get "confirm" # Get because needs to be called from a link in an email
-      get "request_password_reset"
-      post "password_reset"
-      get "password_reset", as: :password_reset_form
-      get "update_password"
+      # Replacing
+      get :request_password_reset_form
+      post :send_password_reset_email
+      get :update_password_form_with_reset_token
+      post :update_password_with_reset_token
     end
     member { get "unsubscribe" }
   end

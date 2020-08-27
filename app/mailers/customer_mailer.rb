@@ -21,7 +21,7 @@ class CustomerMailer < ApplicationMailer
 
   def password_reset_email(user)
     @user = user
-    @url = password_reset_form_users_url(token: @user.password_reset_token)
+    @url = update_password_form_with_reset_token_users_url(token: @user.password_reset_token)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email)

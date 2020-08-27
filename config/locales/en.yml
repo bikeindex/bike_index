@@ -1827,12 +1827,19 @@ en:
         password: Password
         sharing: Sharing + Personal Page
         user_settings: User Settings
-      password_reset:
-        email_not_found: Sorry, that email address isn't in our system.
-        link_no_longer_valid: We're sorry, but that link is no longer valid.
+      find_user_from_password_reset_token!:
+        does_not_match_token: Doesn't match user's password reset token
+        token_expired: Password reset token expired, try resetting password again.
       resend_confirmation_email:
         please_sign_in: Unable to find a user matching that email!
         resending_email: Email confirmation re-sent
+      reset_password_token_update_form:
+        link_no_longer_valid: We're sorry, but that link is no longer valid.
+      send_password_reset_email:
+        email_not_found: Sorry, that email address isn't in our system.
+        reset_just_sent_wait_a_sec: >-
+          Another password reset email was just sent to that email, please wait a
+          minute before trying again.
       show:
         user_not_sharing: Sorry, that user isn't sharing their bikes.
       unsubscribe:
@@ -1845,12 +1852,13 @@ en:
           through an organization
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
-        does_not_match_token: Doesn't match user's password reset token
         successfully_updated: Your information was successfully updated.
         thanks_for_accepting_tos: Thanks for accepting the terms of service!
-        token_expired: Password reset token expired, try resetting password again.
         you_can_use_bike_index: Thanks! Now you can use Bike Index.
         you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}
+      update_password_with_reset_token:
+        password_reset_successfully: Password reset successfully. You've been signed
+          in to Bike Index.
     welcome:
       recovery_stories:
         no_stories_to_display: No recovery stories to display
@@ -5343,11 +5351,6 @@ en:
       sign_up_using_globalid: Sign up using globaliD
       sign_up_using_strava: Sign up using Strava
       terms_and_conditions: terms and conditions
-    password_reset:
-      follow_the_link_back: Follow the link back to the site to reset your password!
-      password_reset: Password Reset
-      weve_sent_an_email: We've sent an email to the address you have on file with
-        us.
     please_confirm_email:
       did_not_get_an_email: >-
         Didn't get an email? Check your spam folder. If you can't find it, resend
@@ -5362,19 +5365,24 @@ en:
         We sent an email to <strong class="stolen-color">%{user_email}</strong> with
         a confirmation link in it. Follow the link in the email to finish signing
         up!
-    request_password_reset:
+    request_password_reset_form:
       enter_the_email_address: >-
         Enter the email address you used to sign up. We'll send you an email with
         a link to reset your password.
       reset_your_password: Reset your Password
       your_email_address: your email address
+    send_password_reset_email:
+      follow_the_link_back: Follow the link back to the site to reset your password!
+      password_reset: Password Reset
+      weve_sent_an_email: We've sent an email to the address you have on file with
+        us.
     show:
       abandoned: Abandoned
       bikes: Bikes
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
-    update_password:
+    update_password_form_with_reset_token:
       and_try_not_to_forget_it: and try not to forget it...
       better_password: better
       choose_a_new_password: Choose a new password!
