@@ -414,18 +414,18 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect(user.password_reset_token).to be_nil
       expect {
-        user.send_password_reset_email
+        expect(user.send_password_reset_email).to be_truthy
       }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
       expect(user.reload.password_reset_token).not_to be_nil
     end
 
     it "doesn't send another one immediately" do
       user = FactoryBot.create(:user)
-      user.send_password_reset_email
+      expect(user.send_password_reset_email).to be_truthy
       current_token = user.password_reset_token
       expect {
-        user.send_password_reset_email
-        user.send_password_reset_email
+        expect(user.send_password_reset_email).to be_falsey
+        expect(user.send_password_reset_email).to be_falsey
       }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
       expect(user.password_reset_token).to eq current_token

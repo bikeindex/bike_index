@@ -1,8 +1,9 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :authenticate_user, only: [:edit]
-  before_action :skip_if_signed_in, only: [:new, :globalid]
-  before_action :assign_edit_template, only: [:edit, :update]
+  before_action :authenticate_user, only: %i[edit update]
+  before_action :skip_if_signed_in, only: %i[new globalid]
+  before_action :assign_edit_template, only: %i[edit update]
+  before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -64,37 +65,67 @@ class UsersController < ApplicationController
     render :confirm_error_404
   end
 
-  def request_password_reset
+  def request_password_reset_form
   end
 
-  def update_password
-    @user = current_user
-  end
-
-  def password_reset
-    if params[:token].present?
-      @user = User.find_by_password_reset_token(params[:token])
-      if @user.present? && !@user.auth_token_expired?("password_reset_token")
-        session[:return_to] = "password_reset"
-        # They got the password reset email, which counts as confirming their email
-        @user.confirm(@user.confirmation_token) if @user.unconfirmed?
-        sign_in_and_redirect(@user)
-      else
-        flash[:error] = translation(:link_no_longer_valid)
-        render action: :request_password_reset
-      end
-    elsif params[:email].present?
-      @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
-      if @user.present?
-        @user.send_password_reset_email
-      else
-        flash[:error] = translation(:email_not_found)
-        render action: :request_password_reset
-      end
+  def send_password_reset_email
+    @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
+    if @user.present?
+      flash[:error] = translation(:reset_just_sent_wait_a_sec) unless @user.send_password_reset_email
     else
-      redirect_to request_password_reset_users_url
+      flash[:error] = translation(:email_not_found)
+      redirect_to request_password_reset_form_users_path
     end
   end
+
+  def update_password_form_with_reset_token
+  end
+
+  def update_password_with_reset_token
+    if @user.present? && @user.update_attributes(permitted_password_reset_parameters)
+      flash[:success] = translation(:password_reset_successfully)
+      update_user_authentication_for_new_password
+      sign_in_and_redirect(@user)
+    elsif @user.present?
+      @page_errors = @user.errors
+      render :update_password_form_with_reset_token
+    end
+  end
+
+
+  # # # #
+
+  # def request_password_reset
+  # end
+
+  # def update_password
+  #   @user = current_user
+  # end
+
+  # def password_reset
+  #   if params[:token].present?
+  #     @user = User.find_by_password_reset_token(params[:token])
+  #     if @user.present? && !@user.auth_token_expired?("password_reset_token")
+  #       session[:return_to] = "password_reset"
+  #       # They got the password reset email, which counts as confirming their email
+  #       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
+  #       sign_in_and_redirect(@user)
+  #     else
+  #       flash[:error] = translation(:link_no_longer_valid)
+  #       render action: :request_password_reset
+  #     end
+  #   elsif params[:email].present?
+  #     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
+  #     if @user.present?
+  #       @user.send_password_reset_email
+  #     else
+  #       flash[:error] = translation(:email_not_found)
+  #       redirect_to request_password_reset_users_path
+  #     end
+  #   else
+  #     redirect_to request_password_reset_users_url
+  #   end
+  # end
 
   def show
     user = User.find_by_username(params[:id])
@@ -119,17 +150,7 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
-    if params.dig(:user, :password_reset_token).present?
-      if @user.password_reset_token != params.dig(:user, :password_reset_token)
-        remove_session
-        flash[:error] = translation(:does_not_match_token)
-        redirect_to(my_account_url) && return
-      elsif @user.auth_token_expired?("password_reset_token")
-        remove_session
-        flash[:error] = translation(:token_expired)
-        redirect_to(my_account_url) && return
-      end
-    elsif params.dig(:user, :password).present?
+    if params.dig(:user, :password).present?
       unless @user.authenticate(params.dig(:user, :current_password))
         @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
@@ -162,9 +183,7 @@ class UsersController < ApplicationController
           end
         end
         if params.dig(:user, :password).present?
-          @user.generate_auth_token("auth_token")
-          @user.update_auth_token("password_reset_token")
-          @user.reload
+          update_user_authentication_for_new_password
           default_session_set(@user)
         end
       end
@@ -213,11 +232,15 @@ class UsersController < ApplicationController
   end
 
   def permitted_update_parameters
-    pparams = permitted_parameters.except(:email, :password_reset_token)
+    pparams = permitted_parameters.except(:email)
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end
     pparams
+  end
+
+  def permitted_password_reset_parameters
+    params.require(:user).permit(:password, :password_confirmation)
   end
 
   def edit_templates
@@ -242,5 +265,20 @@ class UsersController < ApplicationController
       flash[:success] ||= "Notification setting updated"
     end
     true
+  end
+
+  def find_user_from_password_reset_token!
+    @token = params[:token]
+    @user = User.find_by_password_reset_token(@token) if @token.present?
+    return true if @user.present? && !@user.auth_token_expired?("password_reset_token")
+    remove_session
+    flash[:error] = @user.blank? ? translation(:token_expired) : translation(:does_not_match_token)
+    redirect_to(request_password_reset_form_users_path) && return
+  end
+
+  def update_user_authentication_for_new_password
+    @user.generate_auth_token("auth_token") # Doesn't save user
+    @user.update_auth_token("password_reset_token") # saves users
+    @user.reload
   end
 end
