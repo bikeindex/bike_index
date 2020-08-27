@@ -18,11 +18,11 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-- [Ruby 2.5.8](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
+- [Ruby 2.5](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
 
 - [Rails 5.2](http://rubyonrails.org/)
 
-- [Node 10.13.0](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/) (We use [nvm](https://github.com/creationix/nvm) to manage our node version)
+- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/) (We use [nvm](https://github.com/creationix/nvm) to manage our node version)
 
 - PostgreSQL >= 9.6
 
