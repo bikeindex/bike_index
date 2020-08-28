@@ -22,7 +22,7 @@ class CreationState < ApplicationRecord
     if is_pos
       pos_kind.to_s.gsub("_pos", "").humanize
     elsif is_bulk
-      "bulk reg"
+      "bulk import"
     elsif origin.present?
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"

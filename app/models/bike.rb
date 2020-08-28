@@ -699,6 +699,10 @@ class Bike < ApplicationRecord
     registration_address["street"].present? && registration_address["city"].present?
   end
 
+  def address_source
+    # TODO: make this return where the address is coming from
+  end
+
   # Goes along with organization additional_registration_fields
   def registration_address
     return @registration_address if defined?(@registration_address)
