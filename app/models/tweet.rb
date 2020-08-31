@@ -51,7 +51,7 @@ class Tweet < ApplicationRecord
     if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
       return includes(:stolen_record).where(stolen_records: {bike_id: text})
     end
-    where("body_html ILIKE ?", "%#{text}%")
+    where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
   end
 
   def bike
@@ -67,12 +67,16 @@ class Tweet < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
     self.alignment ||= VALID_ALIGNMENTS.first
     unless VALID_ALIGNMENTS.include?(alignment)
       errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
     end
     self.kind ||= calculated_kind
+    if imported_tweet?
+      self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
+    else
+      self.body ||= tweeted_text
+    end
   end
 
   def trh
@@ -81,6 +85,15 @@ class Tweet < ApplicationRecord
 
   def tweeted_at
     TimeParser.parse(trh[:created_at])
+  end
+
+  def tweeted_image
+    return nil unless trh.dig(:media).present?
+    trh[:media].first&.dig(:media_url)
+  end
+
+  def tweeted_text
+    trh[:text]
   end
 
   def tweetor

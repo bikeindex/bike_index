@@ -2648,7 +2648,8 @@ CREATE TABLE public.tweets (
     twitter_account_id integer,
     stolen_record_id integer,
     original_tweet_id integer,
-    kind integer
+    kind integer,
+    body text
 );
 
 

@@ -82,6 +82,7 @@ RSpec.describe Tweet, type: :model do
       expect(tweet.tweeted_at.to_i).to eq 1497366412
       expect(tweet.tweetor_avatar).to eq "https://pbs.twimg.com/profile_images/505773652646711296/bTYbvFTy_normal.jpeg"
       expect(tweet.tweetor_name).to eq "BikeIndex Portland"
+      expect(tweet.tweeted_image).to be_blank
     end
   end
 end
