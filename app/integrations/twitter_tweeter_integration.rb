@@ -100,7 +100,7 @@ class TwitterTweeterIntegration
     # spaces between slugs
     # max_char = tweet_length - https_length - at_screen_name.length - 3
 
-    tweet_length = 140
+    tweet_length = 280
     https_length = 23
     media_length = 23
 
