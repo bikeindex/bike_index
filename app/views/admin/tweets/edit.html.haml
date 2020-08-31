@@ -80,7 +80,7 @@
 - if @tweet.retweets.any?
   %hr
   %h3 Retweets
-  = render "admin/tweets/tweets", tweets: @tweet.retweets
+  = render partial: "admin/tweets/table", locals: { tweets: @tweet.retweets }
 
 %hr
 

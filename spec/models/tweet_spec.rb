@@ -25,6 +25,19 @@ RSpec.describe Tweet, type: :model do
     end
   end
 
+  describe "admin_search" do
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let!(:tweet) { FactoryBot.create(:tweet, stolen_record_id: bike.current_stolen_record.id) }
+    it "finds the tweet" do
+      expect(tweet.kind).to eq "stolen_tweet"
+      expect(Tweet.admin_search("@PPBBIKETHEF").pluck(:id)).to eq([tweet.id])
+      # This matches the tweet body - but if passed a number, admin_search only matches the actual bike id
+      expect(Tweet.admin_search("119680 ").pluck(:id)).to eq([])
+      expect(Tweet.admin_search(" #{bike.id}").pluck(:id)).to eq([tweet.id])
+      expect(Tweet.admin_search("something else").pluck(:id)).to eq([])
+    end
+  end
+
   describe "#retweet?" do
     context "given no original tweet" do
       it "returns false" do

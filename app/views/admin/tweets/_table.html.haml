@@ -1,0 +1,52 @@
+- tweets ||= @tweets
+- render_sortable ||= false
+- skip_twitter_account ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        - if render_sortable
+          = sortable "created_at"
+        - else
+          Created
+      %th.small
+        Twitter ID
+      - unless skip_twitter_account
+        %th
+          - if render_sortable
+            = sortable "twitter_account_id"
+          - else
+            Twitter Account
+      %th
+        Tweet
+      %th
+        Stolen Record
+      %th
+        Image?
+      %th
+        Retweets
+    %tbody
+      - tweets.each do |tweet|
+        %tr
+          %td
+            %a.convertTime{ href: admin_tweet_path(tweet) }
+              = l(tweet.created_at, format: :convert_time)
+          %td
+            %small.less-strong
+              = link_to tweet.twitter_id, tweet.tweet_link
+          - unless skip_twitter_account
+            %td
+              - if tweet.twitter_account.present?
+                = link_to tweet.twitter_account.screen_name, admin_twitter_account_path(tweet.twitter_account)
+              - else
+                = tweet.tweetor
+          %td
+            = strip_tags(tweet.body_html)
+          %td
+            %small.less-strong
+              = link_to tweet.stolen_record.id, admin_stolen_bike_path(tweet.stolen_record) if tweet.stolen_record.present?
+          %td
+            = check_mark if tweet.image.present?
+          %td
+            = tweet.retweets.count

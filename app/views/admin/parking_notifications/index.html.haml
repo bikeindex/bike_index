@@ -1,7 +1,7 @@
 .admin-subnav
   .col-md-5
     %h1
-      parking notifications
+      Parking notifications
   .col-md-7
     %ul
       %li.nav-item
@@ -55,7 +55,7 @@
 
 = paginate @parking_notifications, views_prefix: "admin"
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.list-table#recordsTable
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
   %thead.small-header.hidden-md-down
     %th
       = sortable "created_at"

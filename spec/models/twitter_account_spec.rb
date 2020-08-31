@@ -87,6 +87,8 @@ RSpec.describe TwitterAccount, type: :model do
       expect(twitter_account.last_error).to be_blank
       expect(twitter_account.errored?).to be_falsey
       expect(TwitterAccount.errored.pluck(:id)).to eq([])
+      expect(TwitterAccount.friendly_find("#{twitter_account.screen_name.upcase}  ")).to eq twitter_account
+      expect(TwitterAccount.friendly_find("#{twitter_account.id}")).to eq twitter_account
     end
   end
 

@@ -1,8 +1,40 @@
-.row
-  .col-sm-9.col-md-10
-    %h1 Tweets
-  .col-sm-3.col-md-2
-    = link_to 'New Tweet', new_admin_tweet_path, class: "btn btn-success float-right"
+.admin-subnav
+  .col-md-3
+    %h1
+      Tweets
+  .col-md-9
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "active" : "") }
+          -# Not all search_kinds include tweets, so make it consistent
+          #{@search_kind.gsub(/_?tweet/, "").humanize} tweets
+        .dropdown-menu
+          - (%w[all not_stolen] + Tweet.kinds).each do |kind|
+            - kind_active = @search_kind == kind
+            = link_to "#{kind.gsub(/_?tweet/, "").humanize} tweets", admin_tweets_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "not_stolen"
+              .dropdown-divider
+      %li.nav-item
+        = link_to "New Tweet", new_admin_tweet_path, class: "nav-link"
+      %li.nav-item
+        = link_to "graph", admin_tweets_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-%h4= "#{Tweet.count} tweets stored"
-= render "admin/tweets/tweets", tweets: @tweets
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Tweets" }
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(matching_tweets.count)
+    matching tweets
+    %em
+      = humanized_time_range(@time_range)
+    - if @twitter_account.present?
+      %strong
+        from
+        = link_to twitter_account.screen_name, admin_twitter_account_path(@twitter_account)
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ",", defer: true
+
+= paginate @tweets, views_prefix: "admin"
+
+= render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_twitter_account: @twitter_account.present? }

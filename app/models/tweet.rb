@@ -1,4 +1,6 @@
 class Tweet < ApplicationRecord
+  KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, manual_tweet: 2}.freeze
+  VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
   validates :twitter_id, presence: true, uniqueness: true
   has_many :public_images, as: :imageable, dependent: :destroy
 
@@ -13,10 +15,17 @@ class Tweet < ApplicationRecord
 
   mount_uploader :image, ImageUploader
 
-  before_save :set_body_from_response
-  before_validation :ensure_valid_alignment
+  before_validation :set_calculated_attributes
 
+  enum kind: KIND_ENUM
+
+  scope :retweet, -> { where.not(original_tweet: nil) }
   scope :excluding_retweets, -> { where(original_tweet: nil) }
+  scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
   def self.friendly_find(id)
     return nil if id.blank?
@@ -35,6 +44,16 @@ class Tweet < ApplicationRecord
     end
   end
 
+  def self.admin_search(str)
+    return none unless str.present?
+    text = str.strip
+    # If passed a number, assume it is a bike ID and search for that bike_id
+    if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
+      return includes(:stolen_record).where(stolen_records: { bike_id: text })
+    end
+    where("body_html ILIKE ?", "%#{text}%")
+  end
+
   def retweet?
     original_tweet.present?
   end
@@ -43,16 +62,15 @@ class Tweet < ApplicationRecord
     twitter_id
   end
 
-  def ensure_valid_alignment
-    valid_alignments = %w[top-left top-right bottom-left bottom-right]
-    self.alignment ||= valid_alignments.first
-    return true if valid_alignments.include?(alignment)
-    errors[:base] << "#{alignment} is not one of valid alignments: #{valid_alignments}"
-  end
-
-  def set_body_from_response
-    return true unless body_html.blank? && twitter_response && twitter_response["text"].present?
-    self.body_html = self.class.auto_link_text(twitter_response["text"])
+  def set_calculated_attributes
+    if body_html.blank? && twitter_response&.dig("text").present?
+      self.body_html = self.class.auto_link_text(twitter_response["text"])
+    end
+    self.alignment ||= VALID_ALIGNMENTS.first
+    unless VALID_ALIGNMENTS.include?(alignment)
+      errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
+    end
+    self.kind ||= calculated_kind
   end
 
   def trh
@@ -105,5 +123,13 @@ class Tweet < ApplicationRecord
         end
       end
     end
+  end
+
+  private
+
+  def calculated_kind
+    return "stolen_tweet" if stolen_record.present?
+    return "imported_tweet" if twitter_id.present?
+    "manual_tweet"
   end
 end

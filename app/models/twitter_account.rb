@@ -39,6 +39,12 @@ class TwitterAccount < ApplicationRecord
     where("lower(screen_name) = ?", name.downcase.strip).first
   end
 
+  def self.friendly_find(str)
+    return nil if str.blank?
+    return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+    fuzzy_screen_name_find(str)
+  end
+
   def self.default_account
     where(default: true).first || national.first
   end
