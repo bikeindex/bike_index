@@ -53,12 +53,29 @@ class Admin::TweetsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_tweets
+  helper_method :matching_tweets, :permitted_search_kinds
 
   private
 
   def sortable_columns
-    %w[created_at twitter_account_id]
+    %w[created_at twitter_account_id kind]
+  end
+
+  def permitted_search_kinds
+    %w[all not_stolen] + Tweet.kinds
+  end
+
+  def matching_tweets
+    tweets = Tweet.excluding_retweets
+    @search_kind = permitted_search_kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
+    tweets = tweets.send(@search_kind) unless @search_kind == "all"
+
+    if params[:search_twitter_account_id].present?
+      @twitter_account = TwitterAccount.friendly_find(params[:search_twitter_account_id])
+      tweets = tweets.where(twitter_account_id: @twitter_account.id) if @twitter_account.present?
+    end
+    tweets = tweets.admin_search(params[:query]) if params[:query].present?
+    tweets.where(created_at: @time_range)
   end
 
   def permitted_parameters
@@ -72,21 +89,5 @@ class Admin::TweetsController < Admin::BaseController
 
   def fetch_twitter_response(tweet_id)
     TwitterClient.status(tweet_id).to_json
-  end
-
-  def matching_tweets
-    tweets = Tweet.excluding_retweets
-    if params[:search_kind] == "all"
-      @search_kind = "all"
-    else
-      @search_kind = Tweet.kinds.include?(params[:search_kind]) ? params[:search_kind] : "not_stolen"
-      tweets = tweets.send(@search_kind)
-    end
-    if params[:twitter_account_id].present?
-      @twitter_account = TwitterAccount.friendly_find(params[:twitter_account_id])
-      tweets = tweets.where(twitter_account_id: @twitter_account.id) if @twitter_account.present?
-    end
-    tweets = tweets.admin_search(params[:query]) if params[:query].present?
-    tweets.where(created_at: @time_range)
   end
 end

@@ -52,9 +52,6 @@
 %h3.mt-4
   = number_with_delimiter(@twitter_account.tweets.count)
   Tweets
-  %small
-    - if @twitter_account.tweets.count > 25
-      Showing most recent 25
-    %em
-      = link_to "view all", admin_tweets_path(twitter_account_id: @twitter_account.id)
+  %em.small
+    = link_to "view all", admin_tweets_path(search_twitter_account_id: @twitter_account.id)
 = render partial: "/admin/tweets/table", locals: { tweets: @twitter_account.tweets.reorder(created_at: :desc).limit(25), skip_twitter_account: true }

@@ -54,6 +54,10 @@ class Tweet < ApplicationRecord
     where("body_html ILIKE ?", "%#{text}%")
   end
 
+  def bike
+    stolen_record&.bike
+  end
+
   def retweet?
     original_tweet.present?
   end
@@ -110,7 +114,7 @@ class Tweet < ApplicationRecord
     @details_hash ||= begin
       {}.tap do |details|
         details[:notification_type] = "stolen_twitter_alerter"
-        details[:bike_id] = stolen_record&.bike&.id
+        details[:bike_id] = bike&.id
         details[:tweet_id] = twitter_id
         details[:tweet_string] = body_html
         details[:tweet_account_screen_name] = tweetor
