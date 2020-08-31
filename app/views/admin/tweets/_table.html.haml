@@ -49,10 +49,15 @@
               - else
                 = tweet.tweetor
           - unless skip_kind
-            %td
+            %td.small
               = tweet.kind&.gsub(/_?tweet/, "")&.humanize
           %td
-            = strip_tags(tweet.body_html)
+            - if tweet.retweet?
+              %strong RT:
+              = link_to tweet.original_tweet&.tweetor, admin_tweet_path(tweet.original_tweet)
+            - else
+              %small
+                = strip_tags(tweet.body_html)
           %td
             - if tweet.stolen_tweet?
               %small.less-strong
@@ -62,4 +67,5 @@
           %td
             = check_mark if tweet.image.present?
           %td
-            = tweet.retweets.count
+            - unless tweet.retweet?
+              = tweet.retweets.count

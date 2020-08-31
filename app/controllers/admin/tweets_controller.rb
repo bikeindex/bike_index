@@ -66,7 +66,8 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def matching_tweets
-    tweets = Tweet.excluding_retweets
+    tweets = Tweet
+    tweets = tweets.excluding_retweets unless ParamsNormalizer.boolean(params[:search_retweet])
     @search_kind = permitted_search_kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
     tweets = tweets.send(@search_kind) unless @search_kind == "all"
 

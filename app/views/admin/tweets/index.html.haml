@@ -5,13 +5,22 @@
   .col-md-9
     %ul
       %li.nav-item
+        - if ParamsNormalizer.boolean(params[:search_retweet])
+          = link_to "OG & Retweets", admin_tweets_path(sortable_search_params.except(:search_retweet)), class: "nav-link active"
+        - else
+          = link_to "OG tweets", admin_tweets_path(sortable_search_params.merge(search_retweet: true)), class: "nav-link"
+      %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
-          -# Not all search_kinds include tweets, so make it consistent
-          #{@search_kind.gsub(/_?tweet/, "").humanize} tweets
+          - if @search_kind == "all"
+            All kinds
+          - else
+            #{@search_kind.gsub(/_?tweet/, "").humanize} tweets
         .dropdown-menu
           - permitted_search_kinds.each do |kind|
             - kind_active = @search_kind == kind
-            = link_to "#{kind.gsub(/_?tweet/, "").humanize} tweets", admin_tweets_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - kind_display = "All kinds" if kind == "all"
+            - kind_display ||= "#{kind.gsub(/_?tweet/, "").humanize} tweets"
+            = link_to kind_display, admin_tweets_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}"
             - if kind == "not_stolen"
               .dropdown-divider
       %li.nav-item
@@ -49,4 +58,4 @@
 
 = paginate @tweets, views_prefix: "admin"
 
-= render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_twitter_account: @twitter_account.present?, skip_kind: @search_kind != "all" }
+= render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_twitter_account: @twitter_account.present? }

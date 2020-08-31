@@ -6,7 +6,8 @@
     = image_tag tweet.image_url if tweet.image?
     .tweet-display{ class: "tweet-align-#{tweet.alignment}" }
       %a.tweetor-header{ href: tweet.tweetor_link, target: '_blank' }
-        = image_tag tweet.tweetor_avatar
+        - if tweet.tweetor_avatar.present?
+          = image_tag tweet.tweetor_avatar
         %span.tweetor-name
           = tweet.tweetor_name
         %span.tweetor-handle
