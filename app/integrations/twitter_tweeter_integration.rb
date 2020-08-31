@@ -4,6 +4,8 @@ require "tempfile"
 require "open-uri"
 
 class TwitterTweeterIntegration
+  TWEET_LENGTH = 280
+
   attr_accessor \
     :bike,
     :bike_photo_url,
@@ -98,14 +100,13 @@ class TwitterTweeterIntegration
     # a REST client.configuration call
     #
     # spaces between slugs
-    # max_char = tweet_length - https_length - at_screen_name.length - 3
+    # max_char = TWEET_LENGTH - https_length - at_screen_name.length - 3
 
-    tweet_length = 280
     https_length = 23
     media_length = 23
 
     # spaces between slugs
-    max = tweet_length - https_length - stolen_slug.size - 3
+    max = TWEET_LENGTH - https_length - stolen_slug.size - 3
     max -= bike_photo_url ? media_length : 0
 
     max
@@ -142,12 +143,14 @@ class TwitterTweeterIntegration
 
     color = bike.frame_colors.first
     if color.start_with?("Silver")
-      color.replace "Gray"
-    elsif color.start_with?("Stickers")
-      color.replace ""
+      color = "Gray"
+    elsif color.start_with?("Yellow")
+      color = "Yellow"
+    elsif color.start_with?("Sticker")
+      color = "Stickers"
     end
 
-    manufacturer = bike.manufacturer&.name
+    manufacturer = bike.mnfg_name
     model = bike.frame_model
 
     full_length =

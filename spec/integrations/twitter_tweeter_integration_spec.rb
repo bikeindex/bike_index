@@ -13,50 +13,76 @@ RSpec.describe TwitterTweeterIntegration do
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }
       let(:default_account) { FactoryBot.create(:twitter_account_2, :active, :default) }
       let(:twitter_account) { FactoryBot.create(:twitter_account_1, :active) }
-
-      it "creates correct string without media" do
+      let(:tti) { TwitterTweeterIntegration.new(bike) }
+      before do
         expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
         allow(bike.current_stolen_record)
           .to(receive(:twitter_accounts_in_proximity).and_return([twitter_account]))
+      end
 
-        tti = TwitterTweeterIntegration.new(bike)
-
+      it "creates correct string without media" do
         expect(tti.build_bike_status).to(eq <<~STR.strip)
           STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id}
         STR
       end
 
-      it "creates correct string with append block" do
-        expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
-
-        twitter_account.append_block = "#bikeParty"
-        allow(bike.current_stolen_record)
-          .to(receive(:twitter_accounts_in_proximity).and_return([twitter_account]))
-
-        tti = TwitterTweeterIntegration.new(bike)
-        status = tti.build_bike_status
-
-        twitter_account.append_block = nil
-        expect(status).to(eq <<~STR.strip)
-          STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id} #bikeParty
-        STR
+      context "with manufacturer other" do
+        let(:manufacturer_other) { "Really cool manufacturer name" }
+        let(:color) { FactoryBot.create(:color, name: "Silver, gray or bare metal") }
+        let(:bike) do
+          FactoryBot.create(:stolen_bike,
+            primary_frame_color: color,
+            secondary_frame_color: Color.black,
+            manufacturer: Manufacturer.other,
+            manufacturer_other: manufacturer_other,
+            frame_model: "Bike lyfe")
+        end
+        let(:target) { "STOLEN - Gray #{manufacturer_other} Bike lyfe in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
+        it "does the long manufacturer" do
+          expect(tti.build_bike_status).to eq target
+        end
       end
 
-      it "creates correct string without append block if string is too long" do
-        expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
+      context "Yellow" do
+        let(:color) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "BH Bikes (Beistegui Hermanos)") }
+        let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: "ATOMX CARBON LYNX 5.5 PRO") }
+        let(:target) { "STOLEN - Stickers BH Bikes ATOMX CARBON LYNX 5.5 PRO in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
+        it "simplifies color" do
+          expect(tti.build_bike_status).to eq target
+        end
+      end
 
-        twitter_account.append_block = "#bikeParty"
-        bike.update(frame_model: "Large and sweet MTB, a much longer frame model")
-        allow(bike.current_stolen_record)
-          .to(receive(:twitter_accounts_in_proximity).and_return([twitter_account]))
+      context "Sticker" do
+        let(:color) { FactoryBot.create(:color, name: "Yellow or Gold") }
+        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
+        let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: "Warbird") }
+        let(:target) { "STOLEN - Yellow Salsa Warbird in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
+        it "simplifies color" do
+          expect(tti.build_bike_status).to eq target
+        end
+      end
 
-        tti = TwitterTweeterIntegration.new(bike)
-        status = tti.build_bike_status
+      context "with append_block" do
+        before { twitter_account.append_block = "#bikeParty" }
+        it "creates correct string with append block" do
+          expect(tti.build_bike_status).to(eq <<~STR.strip)
+            STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id} #bikeParty
+          STR
+        end
 
-        twitter_account.append_block = nil
-        expect(status).to(eq <<~STR.strip)
-          STOLEN - Blue Trek Large and sweet MTB, a much longer frame model in Tribeca https://bikeindex.org/bikes/#{bike.id}
-        STR
+        context "long string" do
+          # tweet without append block is 68 characters - so frame model needs to be >
+          # TWEET_LENGTH - 68 - 10 (#bikeParty) = 202
+          let(:long_string) { "Large and sweet MTB, a much longer frame model, because someone put a very long string in here that meanders back and forth and eventually comes to some sort of conclusion but not really! It keeps going" }
+          it "creates correct string without append block if string is too long" do
+            bike.update(frame_model: long_string)
+
+            expect(tti.build_bike_status).to(eq <<~STR.strip)
+              STOLEN - Blue Trek #{long_string} in Tribeca https://bikeindex.org/bikes/#{bike.id}
+            STR
+          end
+        end
       end
     end
 
