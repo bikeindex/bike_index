@@ -19,11 +19,9 @@ RSpec.describe TwitterTweeterIntegration do
         allow(bike.current_stolen_record)
           .to(receive(:twitter_accounts_in_proximity).and_return([twitter_account]))
       end
-
+      let(:target) { "STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
       it "creates correct string without media" do
-        expect(tti.build_bike_status).to(eq <<~STR.strip)
-          STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id}
-        STR
+        expect(tti.build_bike_status).to eq target
       end
 
       context "with manufacturer other" do
@@ -44,20 +42,10 @@ RSpec.describe TwitterTweeterIntegration do
       end
 
       context "Yellow" do
-        let(:color) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+        let(:color) { FactoryBot.create(:color, name: "Yellow or Gold") }
         let(:manufacturer) { FactoryBot.create(:manufacturer, name: "BH Bikes (Beistegui Hermanos)") }
         let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: "ATOMX CARBON LYNX 5.5 PRO") }
-        let(:target) { "STOLEN - Stickers BH Bikes ATOMX CARBON LYNX 5.5 PRO in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
-        it "simplifies color" do
-          expect(tti.build_bike_status).to eq target
-        end
-      end
-
-      context "Sticker" do
-        let(:color) { FactoryBot.create(:color, name: "Yellow or Gold") }
-        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
-        let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: "Warbird") }
-        let(:target) { "STOLEN - Yellow Salsa Warbird in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
+        let(:target) { "STOLEN - Yellow BH Bikes ATOMX CARBON LYNX 5.5 PRO in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
         it "simplifies color" do
           expect(tti.build_bike_status).to eq target
         end
@@ -65,22 +53,21 @@ RSpec.describe TwitterTweeterIntegration do
 
       context "with append_block" do
         before { twitter_account.append_block = "#bikeParty" }
+        let(:target) { "STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id} #bikeParty" }
         it "creates correct string with append block" do
-          expect(tti.build_bike_status).to(eq <<~STR.strip)
-            STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id} #bikeParty
-          STR
+          expect(tti.build_bike_status).to eq target
         end
 
         context "long string" do
           # tweet without append block is 68 characters - so frame model needs to be >
           # TWEET_LENGTH - 68 - 10 (#bikeParty) = 202
+          let(:color) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+          let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
+          let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: long_string) }
           let(:long_string) { "Large and sweet MTB, a much longer frame model, because someone put a very long string in here that meanders back and forth and eventually comes to some sort of conclusion but not really! It keeps going" }
+          let(:target) { "STOLEN - Stickers Salsa #{long_string} in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
           it "creates correct string without append block if string is too long" do
-            bike.update(frame_model: long_string)
-
-            expect(tti.build_bike_status).to(eq <<~STR.strip)
-              STOLEN - Blue Trek #{long_string} in Tribeca https://bikeindex.org/bikes/#{bike.id}
-            STR
+            expect(tti.build_bike_status).to eq target
           end
         end
       end
