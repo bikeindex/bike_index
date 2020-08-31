@@ -50,7 +50,7 @@ class TwitterTweeterIntegration
       twitter_id: posted_tweet.id,
       twitter_account_id: nearest_twitter_account&.id,
       stolen_record_id: stolen_record&.id,
-      twitter_response: posted_tweet.to_json
+      twitter_response: posted_tweet
     )
 
     unless tweet.save

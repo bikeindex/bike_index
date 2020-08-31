@@ -30,7 +30,7 @@ class Tweet < ApplicationRecord
   def self.friendly_find(id)
     return nil if id.blank?
     id = id.to_s
-    query = id.length > 7 ? {twitter_id: id} : {id: id}
+    query = id.length > 15 ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 
@@ -49,7 +49,7 @@ class Tweet < ApplicationRecord
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
     if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
-      return includes(:stolen_record).where(stolen_records: { bike_id: text })
+      return includes(:stolen_record).where(stolen_records: {bike_id: text})
     end
     where("body_html ILIKE ?", "%#{text}%")
   end
@@ -67,9 +67,7 @@ class Tweet < ApplicationRecord
   end
 
   def set_calculated_attributes
-    if body_html.blank? && twitter_response&.dig("text").present?
-      self.body_html = self.class.auto_link_text(twitter_response["text"])
-    end
+    self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
     self.alignment ||= VALID_ALIGNMENTS.first
     unless VALID_ALIGNMENTS.include?(alignment)
       errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
@@ -78,24 +76,24 @@ class Tweet < ApplicationRecord
   end
 
   def trh
-    twitter_response || {} # so we don't explode when there is no response
+    (twitter_response || {}).with_indifferent_access
   end
 
   def tweeted_at
-    Time.parse(trh["created_at"])
+    TimeParser.parse(trh[:created_at])
   end
 
   def tweetor
     return twitter_account.screen_name if twitter_account&.screen_name.present?
-    trh["user"] && trh["user"]["screen_name"]
+    trh.dig(:user, :screen_name)
   end
 
   def tweetor_avatar
-    trh["user"] && trh["user"]["profile_image_url_https"]
+    trh.dig(:user, :profile_image_url_https)
   end
 
   def tweetor_name
-    trh["user"] && trh["user"]["name"]
+    trh.dig(:user, :name)
   end
 
   def tweetor_link

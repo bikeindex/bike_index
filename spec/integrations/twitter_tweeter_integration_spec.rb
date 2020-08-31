@@ -127,10 +127,13 @@ RSpec.describe TwitterTweeterIntegration do
         .and_return([twitter_account]))
 
       integration = TwitterTweeterIntegration.new(bike)
-      integration.create_tweet
+      tweet = integration.create_tweet
 
-      expect(integration.tweet).to be_an_instance_of(Tweet)
+      expect(tweet).to be_an_instance_of(Tweet)
       expect(integration.retweets&.first).to be_an_instance_of(Twitter::Tweet)
+      expect(tweet.twitter_response).to be_an_instance_of(Hash)
+      expect(tweet.tweetor_avatar).to be_present
+      expect(tweet.body_html).to eq "STOLEN - Black Special_name10 in Tribeca https://t.co/6gqhQpUUsC"
     end
 
     it "creates a media tweet with retweets", vcr: true do
