@@ -106,6 +106,8 @@ class Admin::TweetsController < Admin::BaseController
 
   def find_tweet
     @tweet ||= Tweet.friendly_find(params[:id])
+    return @tweet if @tweet.present?
+    raise ActiveRecord::RecordNotFound
   end
 
   def fetch_twitter_response(tweet_id)

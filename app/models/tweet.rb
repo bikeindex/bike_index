@@ -54,9 +54,9 @@ class Tweet < ApplicationRecord
     where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
   end
 
+  # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def send_tweet
     return true unless app_tweet? && twitter_response.blank?
-    # TODO: Add actual testing of this. It isn't tested right now, sorry :/
     if image.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
@@ -89,6 +89,13 @@ class Tweet < ApplicationRecord
       retweet_account.set_error(retweet.errors.full_messages.to_sentence)
     end
     retweet
+  end
+
+  # Because of recoveries
+  def stolen_record
+    return nil unless stolen_record_id.present?
+    # Using super because maybe it will benefit from includes?
+    super || StolenRecord.unscoped.find(stolen_record_id)
   end
 
   def bike
@@ -131,7 +138,7 @@ class Tweet < ApplicationRecord
 
   def tweeted_image
     return nil unless trh.dig(:entities, :media).present?
-    trh.dig(:entities, :media).first&.dig(:media_url)
+    trh.dig(:entities, :media).first&.dig(:media_url_https)
   end
 
   def tweeted_text
@@ -192,7 +199,7 @@ class Tweet < ApplicationRecord
   private
 
   def calculated_kind
-    return "stolen_tweet" if stolen_record.present?
+    return "stolen_tweet" if stolen_record_id.present?
     return "imported_tweet" if twitter_id.present?
     "app_tweet"
   end

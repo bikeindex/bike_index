@@ -94,7 +94,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect {
         impound_record.save
       }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
-      expect{
+      expect {
         impound_record.update(updated_at: Time.current)
       }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
       expect {

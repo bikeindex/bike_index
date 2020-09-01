@@ -151,6 +151,7 @@ RSpec.describe TwitterTweeterIntegration do
 
       tweet = integration.tweet
       expect(tweet).to be_an_instance_of(Tweet)
+      expect(tweet.kind).to eq "stolen_tweet"
       expect(integration.retweets.first).to be_an_instance_of(Tweet)
       expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
     end
