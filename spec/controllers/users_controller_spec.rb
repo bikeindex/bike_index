@@ -545,7 +545,7 @@ RSpec.describe UsersController, type: :controller do
 
     it "updates the terms of service" do
       user.reload
-        expect(user.manually_set_address).to be_falsey
+      expect(user.manually_set_address).to be_falsey
       set_current_user(user)
       put :update, params: {id: user.username, user: {terms_of_service: "1"}}
       expect(response).to redirect_to(my_account_url)

@@ -15,7 +15,7 @@ class Bike < ApplicationRecord
     status_abandoned: 2,
     status_impounded: 3,
     unregistered_parking_notification: 4
-  }
+  }.freeze
 
   belongs_to :manufacturer
   belongs_to :primary_frame_color, class_name: "Color"
@@ -699,20 +699,22 @@ class Bike < ApplicationRecord
     registration_address["street"].present? && registration_address["city"].present?
   end
 
-  def address_source
-    # TODO: make this return where the address is coming from
+  def registration_address_source
+    return nil unless address_present?
+    return "user" if user&.address_set_manually
+    return "bike_update" if address_set_manually
+    b_params_address.present? ? "initial_creation" : nil
   end
 
   # Goes along with organization additional_registration_fields
   def registration_address
     return @registration_address if defined?(@registration_address)
-
-    @registration_address = if user&.address_present?
-      user&.address_hash
-    elsif address_set_manually
-      address_hash
+    @registration_address = case registration_address_source
+    when "user" then user&.address_hash
+    when "bike_update" then address_hash
+    when "initial_creation" then b_params_address
     else
-      b_params_address || {}
+      {}
     end
   end
 
@@ -889,11 +891,12 @@ class Bike < ApplicationRecord
   end
 
   def b_params_address
+    return @b_params_address if defined?(@b_params_address)
     bp_address = {}
     b_params.each do |b_param|
       bp_address = b_param.fetch_formatted_address
       break if bp_address.present?
     end
-    bp_address
+    @b_params_address = bp_address
   end
 end
