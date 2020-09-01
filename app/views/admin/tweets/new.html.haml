@@ -1,24 +1,49 @@
-%h1
-  New Tweet
-%p
-  = link_to 'View all tweets', admin_tweets_url
+.admin-subnav
+  .col-12
+    %h1
+      New Tweet
 
+#tweetForm
+  - if @tweet.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet }
 
-
-
-.card.bg-light
   = form_for [:admin, @tweet], url: { action: 'create', controller: 'tweets' } do |f|
-    - if @tweet.errors.any?
-      .card-header
-        = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet }
-    .card-body
-      %p
-        Get the twitter ID from the URL of the tweet. It's the final number at the end of the url
-      %p
-        e.g. for <code>https://twitter.com/stolenbikereg/status/874644243737751553</code> - 874644243737751553
-      .form-group
-        = f.label :twitter_id, 'Twitter id'
-        = f.text_field :twitter_id, class: "form-control"
+    .form-group
+      = f.label :kind, "Kind"
+      = f.select :kind, [["Import tweet", "imported_tweet"], ["Send tweet", "app_tweet"]], { prompt: "Choose kind", required: true }, class: "form-control"
 
-      .mt-4
-        = f.submit 'Create tweet!', class: 'btn btn-success'
+    .card.bg-light.collapse#kind-app_tweet{ class: (@tweet.kind == "app_tweet" ? "show" : "") }
+      .card-body
+        .row
+          .col-md-6
+            %p
+              %strong Send a tweet
+
+            .form-group.fancy-select.unfancy
+              = f.label :twitter_account_id do
+                Account
+                %small.less-strong
+                  Tweet will be sent from this account, and retweeted by all other active accounts
+              = f.collection_select(:twitter_account_id, TwitterAccount.all, :id, :screen_name, {}, { class: "form-control" })
+          .col-md-6
+            .form-group#characterCounterField
+              = f.label :body do
+                Tweet
+                %small.less-strong
+                  Make sure the text is under the character count
+              = f.text_area :body, rows: 4, class: "form-control"
+              %p.text-info.text-right{ style: "margin-top: -0.5rem; font-size: 150%;" }
+                %span#characterTotal
+
+    .card.bg-light.collapse#kind-imported_tweet{ class: (@tweet.kind == "imported_tweet" ? "show" : "") }
+      .card-body
+        %p
+          Get the twitter ID from the URL of the tweet. It's the final number at the end of the url
+        %p
+          e.g. for <code>https://twitter.com/stolenbikereg/status/874644243737751553</code> - 874644243737751553
+        .form-group
+          = f.label :twitter_id, 'Twitter id'
+          = f.text_field :twitter_id, class: "form-control"
+
+        .mt-4
+          = f.submit 'Create tweet!', class: 'btn btn-success'

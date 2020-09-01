@@ -5,6 +5,7 @@ import BinxAdminGraphs from "./graphs.js";
 import BinxAdminBikesEdit from "./bikes_edit.js";
 import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
+import BinxAdminTweet from "./tweet.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 import BinxAdminBlogs from "./blogs.js";
 import BinxAdminImageUploader from "./image_uploader.js";
@@ -34,6 +35,11 @@ function BinxAdmin() {
       if ($(".inputTriggerRecalculation").length) {
         const binxAdminInvoices = BinxAdminInvoices();
         binxAdminInvoices.init();
+      }
+
+      if ($("#tweetForm").length) {
+        const binxAdminTweet = BinxAdminTweet();
+        binxAdminTweet.init();
       }
 
       if ($("#admin_bikes_edit").length) {
@@ -76,20 +82,14 @@ function BinxAdmin() {
 
     // Orgs location adding method
     adminLocations() {
-      $("form").on("click", ".remove_fields", function(event) {
+      $("form").on("click", ".remove_fields", function (event) {
         // We don't need to do anything except slide the input up, because the label is on it.
-        return $(this)
-          .closest("fieldset")
-          .slideUp();
+        return $(this).closest("fieldset").slideUp();
       });
-      return $("form").on("click", ".add_fields", function(event) {
+      return $("form").on("click", ".add_fields", function (event) {
         const time = new Date().getTime();
         const regexp = new RegExp($(this).data("id"), "g");
-        $(this).before(
-          $(this)
-            .data("fields")
-            .replace(regexp, time)
-        );
+        $(this).before($(this).data("fields").replace(regexp, time));
         event.preventDefault();
         LoadFancySelects();
       });
@@ -97,7 +97,7 @@ function BinxAdmin() {
 
     bikesMultiManufacturerUpdate() {
       window.toggleAllChecked = false;
-      $("#multi-mnfg-selector").on("click", function(event) {
+      $("#multi-mnfg-selector").on("click", function (event) {
         event.preventDefault();
         window.toggleAllChecked = !window.toggleAllChecked;
         $(".update-mnfg-select input").prop("checked", window.toggleAllChecked);
