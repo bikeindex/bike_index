@@ -4,7 +4,8 @@ class Admin::TwitterAccountsController < Admin::BaseController
   skip_before_action :require_index_admin!, only: %(create)
 
   def index
-    @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
+    @twitter_accounts = matching_twitter_accounts
+      .reorder(sort_column + " " + sort_direction)
   end
 
   def show

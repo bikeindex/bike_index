@@ -26,7 +26,6 @@ ignore:
   - app/models/appointment_update.rb
   - app/models/concerns/geocodeable.rb
   - app/models/single_sign_on.rb
-  - app/models/twitter_client.rb
   - app/uploaders/alert_image_uploader.rb
   - app/uploaders/avatar_uploader.rb
   - spec/controllers/api/v1/bikes_controller_spec.rb

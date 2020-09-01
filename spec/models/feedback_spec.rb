@@ -43,6 +43,8 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.errors.count).to eq 0
       expect(feedback.id).to be_present
       expect(feedback.feedback_hash).to eq("package_size" => "small")
+      expect(feedback.kind).to eq "lead_for_school"
+      expect(feedback.humanized_kind).to eq "School lead"
     end
   end
 
@@ -70,8 +72,11 @@ RSpec.describe Feedback, type: :model do
 
   describe "lead_type" do
     context "non-lead feedback" do
+      let(:feedback) { Feedback.new(feedback_type: "manufacturer_update_request") }
       it "returns nil" do
-        expect(Feedback.new(feedback_type: "manufacturer_update_request").lead_type).to be_nil
+        feedback.set_calculated_attributes
+        expect(feedback.lead_type).to be_nil
+        expect(feedback.kind).to eq "manufacturer_update_request"
       end
     end
     context "lead type feedback" do

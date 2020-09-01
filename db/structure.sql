@@ -1109,7 +1109,8 @@ CREATE TABLE public.feedbacks (
     updated_at timestamp without time zone NOT NULL,
     feedback_type character varying(255),
     user_id integer,
-    feedback_hash jsonb
+    feedback_hash jsonb,
+    kind integer
 );
 
 
@@ -2647,7 +2648,9 @@ CREATE TABLE public.tweets (
     updated_at timestamp without time zone NOT NULL,
     twitter_account_id integer,
     stolen_record_id integer,
-    original_tweet_id integer
+    original_tweet_id integer,
+    kind integer,
+    body text
 );
 
 
@@ -5350,6 +5353,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200808175756'),
 ('20200810163704'),
 ('20200813154458'),
-('20200813221439');
+('20200813221439'),
+('20200831194703'),
+('20200901165655');
 
 

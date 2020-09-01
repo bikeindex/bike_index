@@ -1,9 +1,5 @@
 .admin-subnav
-  .col-6
-    %h3
-      = link_to 'View all tweets', admin_tweets_url
-  .col-auto
-    %small
+  .col-12.text-right
     = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
 
 = form_for [:admin, @tweet], url: { action: 'update', controller: 'tweets' } do |f|
@@ -11,36 +7,32 @@
     = render partial: "shared/errors", locals: { name: "Tweet", obj: @tweet}
 
   .row.mt-4
-    .col-md-3.my-auto
-      .form-group
-        = label :tweet_by, "Tweet by"
-        = text_field_tag :twitter_id, @tweet.tweetor, disabled: true, class: "form-control"
-    .col-md-3.my-auto
-      .form-group
-        = label :twitter_id, "Twitter ID"
-        = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true, class: "form-control"
     .col-md-6
-      .form-group.avatar-upload
-        = f.label :image, 'Tweet photo', class: 'control-label'
-        .avatar-img
-          - if @tweet.image?
-            = image_tag(@tweet.image_url(:small))
-          - else
-            %p
-              No picture!
-            .input-group
-              .custom-file
-              = f.label :image, "Tweet Image", class: "custom-file-label"
-              = f.file_field :image, class: "custom-file-input"
-        - if @tweet.image.present?
-          .form-check
-            = f.check_box :remove_image, class: "form-check-input"
-            = f.label :remove_image, class: "form-check-label"
+      - if @tweet.stolen_tweet?
+        - if @tweet.tweeted_image.present?
+          = image_tag(@tweet.tweeted_image)
+      - else
+        .form-group.avatar-upload
+          = f.label :image, 'Tweet photo', class: 'control-label'
+          .avatar-img
+            - if @tweet.image?
+              = image_tag(@tweet.image_url(:small))
+            - else
+              %p
+                No picture!
+              .input-group
+                .custom-file
+                = f.label :image, "Tweet Image", class: "custom-file-label"
+                = f.file_field :image, class: "custom-file-input"
+          - if @tweet.image.present?
+            .form-check
+              = f.check_box :remove_image, class: "form-check-input"
+              = f.label :remove_image, class: "form-check-label"
 
   .row
     .col-md-4
       .form-group
-        = f.label :body_html, 'Tweet display html'
+        = f.label :body_html, "Tweet display html"
         = f.text_area :body_html, rows: 4, class: "form-control"
 
     .col-md-8.my-auto
@@ -71,21 +63,4 @@
 
 %hr
 
-%h3 Landing page rendering
-.container
-  .row
-    .landing-why-col.clearfix
-      = render partial: 'landing_pages/tweet', locals: { tweet_id: @tweet.id }
-
-- if @tweet.retweets.any?
-  %hr
-  %h3 Retweets
-  = render "admin/tweets/tweets", tweets: @tweet.retweets
-
-%hr
-
-%h3 Twitter Response Data
-.container
-  .row
-    %pre{style: "max-height: 400px; overflow: scroll;"}
-      = @tweet.twitter_response.to_yaml
+= render partial: "display"

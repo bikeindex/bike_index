@@ -49,4 +49,5 @@
             %small.less-strong= twitter_account.state&.abbreviation
           %td
             %small.less-strong= twitter_account.country&.name
-          %td= twitter_account.tweets.count
+          %td
+            = number_with_delimiter(twitter_account.tweets.count)

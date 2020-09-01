@@ -1,0 +1,60 @@
+.row
+  .col-md-6
+    %table.table-list
+      %tr
+        %td
+          Account
+        %td
+          = @tweet.tweetor
+      %tr
+        %td
+          Tweet ID
+        %td
+          = @tweet.twitter_id
+      %tr
+        %td
+          Created
+        %td
+          %span.convertTime
+            = l @tweet.created_at, format: :convert_time
+      - if @tweet.stolen_record_id.present?
+        %tr
+          %td
+            Bike
+          %td
+            - link_text = @tweet.bike.title_string if @tweet.bike.present?
+            - link_text ||= @tweet.stolen_record.id
+            = link_to link_text, admin_stolen_bike_path(@tweet.stolen_record_id, stolen_record_id: true) if @tweet.stolen_record.present?
+  .col-md-6
+    %table.table-list
+      %tr
+        %td
+          Text
+        %td
+          = @tweet.tweeted_text
+      %tr
+        %td
+          Image
+        %td
+          - if @tweet.tweeted_image.present?
+            = image_tag @tweet.tweeted_image, style: "display: block; max-height: 200px; width: auto;"
+      %tr
+        %td
+          Kind
+        %td
+          - if @tweet.kind.present?
+            = @tweet.kind.gsub(/_?tweet/, "").humanize
+
+- if @tweet.imported_tweet?
+  %h3 Landing page rendering
+  .landing-why-col.clearfix
+    = render partial: 'landing_pages/tweet', locals: { tweet_id: @tweet.id }
+
+- if @tweet.retweets.any?
+  %h3.mt-4 Retweets
+  = render partial: "admin/tweets/table", locals: { tweets: @tweet.retweets, skip_retweets: true }
+
+%hr.mt-4
+
+%h3 Twitter Response Data
+= pretty_print_json(@tweet.twitter_response)

@@ -1,18 +1,60 @@
 .admin-subnav
-  .col-12
+  .col-sm-3
     %h1
       Feedback & Messages
+  .col-sm-9
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
+          - if @search_kind == "all"
+            All kinds
+          - else
+            = Feedback.humanized_kind(@search_kind)
+        .dropdown-menu
+          - permitted_kinds.each do |kind|
+            - kind_active = @search_kind == kind
+            - kind_display = "All kinds" if kind == "all"
+            - kind_display ||= Feedback.humanized_kind(kind)
+            = link_to kind_display, admin_feedbacks_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}"
+            - if kind == "stolen_tip"
+              .dropdown-divider
+      %li.nav-item
+        = link_to "Render type counts", admin_feedbacks_path(sortable_search_params.merge(search_feedback_type_counts: !@render_type_counts)), class: "nav-link btn btn-sm btn-outline-secondary #{@render_type_counts ? 'active' : ''}"
 
 .col-12.mt-4
   = column_chart time_range_counts(collection: available_feedbacks), stacked: true, thousands: ",", defer: true
 
 = render partial: "/shared/period_select"
 
+- if @render_type_counts
+  .row.mt-4.mb-4
+    .col-md-6.offset-md-3
+      .card
+        .card-body
+          %h3 Kinds
+          %table.table-list.wide-definition
+            %tbody
+              - Feedback.kinds.each do |kind|
+                - count = available_feedbacks.where(kind: kind).count
+                - next unless count > 0
+                %tr
+                  %td
+                    = link_to Feedback.humanized_kind(kind), admin_feedbacks_path(sortable_search_params.merge(search_kind: kind))
+                  %td
+                    = number_with_delimiter(count)
+              - nil_count = available_feedbacks.where(kind: nil).count
+              - if nil_count > 0
+                %tr
+                  %td
+                    Nil
+                  %td
+                    = number_with_delimiter(nil_count)
+
 %p
   = number_with_delimiter(@feedbacks.total_count)
-  - if params[:search_type].present?
+  - if @search_kind != "all"
     %strong
-      = params[:search_type].gsub("_request", "").humanize
+      = Feedback.humanized_kind(@search_kind)
 
   - if params[:search_bike_id].present?
     for #{link_to "bike##{params[:search_bike_id]}", admin_bike_path(params[:search_bike_id])}
@@ -37,7 +79,7 @@
       .form-group.mr-2.mb-2
         = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
       .form-group.mr-2.mb-2
-        = select_tag :search_type, options_for_select(Feedback.feedback_types.map { |t| [t.humanize, t] }, selected: params[:search_type]), { prompt: "Message type", class: "form-control" }
+        = select_tag :search_kind, options_for_select(Feedback.kinds.map { |t| [Feedback.humanized_kind(t), t] }, selected: params[:search_kind]), { prompt: "Kind", class: "form-control" }
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 = paginate @feedbacks, views_prefix: 'admin'
@@ -74,7 +116,7 @@
             - else
               = link_to feedback.email, admin_users_path(user_query: feedback.email)
           %td
-            = link_to feedback.humanized_type, admin_feedbacks_path(sortable_search_params.merge(search_type: feedback.feedback_type))
+            = link_to feedback.humanized_type, admin_feedbacks_path(sortable_search_params.merge(search_kind: feedback.feedback_type))
           %td
             - if feedback.bike_id.present?
               = link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"

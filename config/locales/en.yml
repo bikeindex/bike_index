@@ -5165,7 +5165,6 @@ en:
   stolen:
     index:
       ambassador: ambassador
-      bike_chopshop_report: Bike ChopShop report
       bike_index: Bike Index
       bike_index_will_broadcast: >-
         Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter
@@ -5208,7 +5207,6 @@ en:
         to %{register_it_link} first
       send_alert: Send alert!
       sign_in: sign in
-      someone_is_selling_a_stolen_bike: Someone is selling a stolen bike
       stolen_widget: stolen widget
       tell_everyone_you_know: >-
         Tell everyone you know about your stolen bike. Hit all your social networks

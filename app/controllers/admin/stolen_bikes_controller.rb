@@ -20,7 +20,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_stolen_bike_url
+    redirect_to edit_admin_stolen_bike_url(id: params[:id], stolen_record_id: params[:stolen_record_id])
   end
 
   def edit
