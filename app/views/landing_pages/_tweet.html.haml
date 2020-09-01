@@ -14,5 +14,5 @@
           %br
           @#{tweet.tweetor}
       .tweet-body
-        = tweet.body_html.html_safe
+        = tweet.body_html&.html_safe
       %a.body-link{ href: tweet.tweet_link, target: '_blank' }
