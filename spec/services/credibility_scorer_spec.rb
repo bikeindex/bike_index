@@ -50,8 +50,8 @@ RSpec.describe CredibilityScorer do
       let(:badge_array) { %i[user_trusted_organization_member creation_organization_trusted] }
       it "it returns just creation_organization_trusted" do
         expect(subject.permitted_badges_array(badge_array)).to eq([:creation_organization_trusted])
-        expect(subject.permitted_badges_hash(badge_array)).to eq({creation_organization_trusted: 20})
-        expect(subject.badge_value(badge_array)).to eq(20)
+        expect(subject.permitted_badges_hash(badge_array)).to eq({creation_organization_trusted: 30})
+        expect(subject.badge_value(badge_array)).to eq(30)
       end
     end
   end
