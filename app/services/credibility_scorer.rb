@@ -10,10 +10,10 @@ class CredibilityScorer
 
     creation: {
       created_this_month: -10,
-      creation_organization_trusted: 20,
+      creation_organization_trusted: 30,
       creation_organization_suspicious: -10,
-      long_time_registration: 10
-      no_creator: -10,
+      long_time_registration: 10,
+      no_creator: -10
     },
 
     ownership: {
@@ -25,18 +25,18 @@ class CredibilityScorer
       long_time_user: 10,
       user_ambassador: 50,
       user_connected_to_strava: 10,
-      user_handle_suspicious: -20
+      user_handle_suspicious: -20,
       user_has_bike_recovered: 10,
-      user_sent_in_bike_tips: 10,
+      user_sent_in_bike_tip: 10,
       user_supporter: 20,
-      user_trusted_organization_member: 20,
+      user_trusted_organization_member: 30
     },
 
     bike: {
       has_bike_sticker: 10,
-      has_photos: 10
+      has_photos: 10,
       serial_duplicated: -20,
-      serial_missing: -10,
+      serial_missing: -10
     }
   }.freeze
 
@@ -104,11 +104,17 @@ class CredibilityScorer
     return [] unless user.present?
     return [:user_banned] if user.banned
     return [:user_ambassador] if user.ambassador?
-    return [:user_trusted_organization_member] if user.organizations.any? { |o| organization_trusted?(o) }
     badges = []
+    badges += [:user_trusted_organization_member] if user.organizations.any? { |o| organization_trusted?(o) }
+    badges += [:user_has_bike_recovered] if StolenRecord.recovered.where(bike_id: user.rough_approx_bikes.limit(20).pluck(:id)).any?
+    badges += [:user_sent_in_bike_tip] if Feedback.where(user_id: user.id).stolen_tip.any?
+    badges += [:user_supporter] if user.payments.any?
     badges += [:long_time_user] if user.created_at < Time.current - 2.years
     badges += [:user_connected_to_strava] if user.integrations.strava.any?
-    badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }
+    # Don't mark suspicious if we trust them
+    unless (badges & %i[user_trusted_organization_member]).any?
+      badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }
+    end
     badges
   end
 

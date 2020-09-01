@@ -7,7 +7,7 @@ class Admin::FeedbacksController < Admin::BaseController
     per_page = params[:per_page] || 50
     @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
       .page(page).per(per_page)
-    @render_type_counts = @search_kind == "all" && ParamsNormalizer.boolean(params[:search_feedback_type_counts])
+    @render_type_counts = ParamsNormalizer.boolean(params[:search_feedback_type_counts])
   end
 
   def show
@@ -17,7 +17,7 @@ class Admin::FeedbacksController < Admin::BaseController
     end
   end
 
-  helper_method :available_feedbacks
+  helper_method :available_feedbacks, :permitted_kinds
 
   private
 
@@ -25,11 +25,15 @@ class Admin::FeedbacksController < Admin::BaseController
     %w[created_at feedback_type]
   end
 
+  def permitted_kinds
+    %w[all stolen_tip] + Feedback.kinds
+  end
+
   def matching_feedbacks
     feedbacks = Feedback
-    if params[:search_kind].present? && Feedback.kinds.include?(params[:search_kind])
+    if params[:search_kind].present? && permitted_kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]
-      feedbacks = feedbacks.where(kind: @search_kind)
+      feedbacks = feedbacks.send(@search_kind) unless @search_kind == "all"
     else
       @search_kind = "all"
     end

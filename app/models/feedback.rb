@@ -5,13 +5,14 @@ class Feedback < ApplicationRecord
     serial_update_request: 2,
     manufacturer_update_request: 3,
     bike_recovery: 4,
-    stolen_information: 5,
-    organization_created: 6,
-    organization_destroyed: 7,
-    lead_for_bike_shop: 8,
-    lead_for_city: 9,
-    lead_for_school: 10,
-    lead_for_law_enforcement: 11
+    tip_stolen_bike: 5,
+    tip_chop_shop: 6,
+    organization_created: 7,
+    organization_destroyed: 8,
+    lead_for_bike_shop: 9,
+    lead_for_city: 10,
+    lead_for_school: 11,
+    lead_for_law_enforcement: 12
   }.freeze
 
   validates_presence_of :body, :email, :title
@@ -28,6 +29,7 @@ class Feedback < ApplicationRecord
 
   scope :notification_types, -> { where.not(feedback_type: no_notification_types) }
   scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
+  scope :stolen_tip, -> { where(kind: stolen_tip_kinds) }
 
   def self.no_notification_types
     %w[manufacturer_update_request serial_update_request bike_delete_request]
@@ -48,9 +50,14 @@ class Feedback < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.stolen_tip_kinds
+    %w[tip_stolen_bike tip_chop_shop]
+  end
+
   def self.humanized_kind(str)
     return nil unless str.present?
-    str.gsub(/lead_for_/, "").gsub("_request", "").strip.humanize
+    return "#{str.gsub(/lead_for_/, "").strip.humanize} lead" if str.match?("lead")
+    str.gsub("_request", "").strip.humanize
   end
 
   def package_size=(val)
@@ -94,8 +101,13 @@ class Feedback < ApplicationRecord
     (feedback_hash || {})["phone_number"]
   end
 
-  def humanized_type
+  def humanized_kind
     self.class.humanized_kind(kind)
+  end
+
+  # Legacy method - TODO: replace with humanized_kind
+  def humanized_type
+    humanized_kind
   end
 
   def set_calculated_attributes
@@ -136,6 +148,10 @@ class Feedback < ApplicationRecord
   # Temporary fix - migrating to enum from a string
   # Some types have been removed - they no longer are relevant: organization_map, spokecard, shop_submission
   def calculated_kind
-    self.class.kinds.include?(feedback_type) ? feedback_type : "message"
+    return feedback_type if self.class.kinds.include?(feedback_type)
+    if feedback_type == "stolen_information"
+      return title.match?(/chop.?shop/i) ? "tip_chop_shop" : "tip_stolen_bike"
+    end
+    "message"
   end
 end

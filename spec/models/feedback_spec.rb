@@ -43,6 +43,8 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.errors.count).to eq 0
       expect(feedback.id).to be_present
       expect(feedback.feedback_hash).to eq("package_size" => "small")
+      expect(feedback.kind).to eq "lead_for_school"
+      expect(feedback.humanized_kind).to eq "School lead"
     end
   end
 

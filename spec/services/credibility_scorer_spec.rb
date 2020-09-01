@@ -207,12 +207,14 @@ RSpec.describe CredibilityScorer do
     describe "user_has_bike_recovered user_sent_in_bike_tips user_supporter" do
       let(:recovered_bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: user) }
       let(:stolen_record) { recovered_bike.current_stolen_record }
-      let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record, creator: user) }
+      let!(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, creator: user) }
+      let!(:feedback) { FactoryBot.create(:feedback, kind: "tip_stolen_bike", user: user) }
       it "returns the bike_badges" do
         stolen_record.add_recovery_information(recovered_description: "I recovered it!")
         stolen_record.reload
         expect(stolen_record.recovered?).to be_truthy
-        expect(subject.bike_user_badges(bike)).to match_array(%i[user_has_bike_recovered user_sent_in_bike_tips user_supporter])
+        bike.reload
+        expect(subject.bike_user_badges(bike)).to match_array(%i[user_has_bike_recovered user_sent_in_bike_tip user_supporter])
       end
     end
     describe "user_name_suspicious" do
