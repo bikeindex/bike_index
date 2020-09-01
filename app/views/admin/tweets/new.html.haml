@@ -20,7 +20,7 @@
               = f.label :twitter_account_id do
                 Account
                 %small.less-strong
-                  Tweet will be sent from this account, and retweeted by all other active accounts
+                  Tweet will be sent from this account
               = f.collection_select(:twitter_account_id, TwitterAccount.all, :id, :screen_name, { prompt: "Choose  " }, { class: "form-control" })
               .form-group.avatar-upload
                 = f.label :image, 'Tweet photo', class: 'control-label'
@@ -40,6 +40,21 @@
                 %span#characterTotal
         .mt-2
           = f.submit 'Send tweet!', class: 'btn btn-success'
+
+        .mt-4
+          %strong
+            Retweet:
+          %small
+            %a.less-strong.ml-2#checkAll{ href: "#" }
+              select all
+            %a.less-strong.ml-2#uncheckAll{ href: "#" }
+              unselect
+        .row#twitterAccountIds.mt-2
+          - TwitterAccount.active.each do |twitter_account|
+            .form-check
+              %label
+                = check_box_tag "twitter_account_ids[]", twitter_account.id, true, id: "#twitter_account_ids_#{twitter_account.id}", multiple: true
+                = twitter_account.screen_name
 
 
     .card.bg-light.collapse#kind-imported_tweet{ class: (@tweet.kind == "imported_tweet" ? "show in" : "") }

@@ -14,6 +14,15 @@ function BinxAdminTweet() {
         }
       });
 
+      $("#checkAll").on("click", (e) => {
+        e.preventDefault();
+        $("#twitterAccountIds input").prop("checked", true);
+      });
+      $("#uncheckAll").on("click", (e) => {
+        e.preventDefault();
+        $("#twitterAccountIds input").prop("checked", false);
+      });
+
       this.setCharacterCount();
       this.characterCounter();
     },

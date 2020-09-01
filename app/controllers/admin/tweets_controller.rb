@@ -37,7 +37,7 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def new
-    @tweet = Tweet.new
+    @tweet ||= Tweet.new(kind: "app_tweet")
   end
 
   def create
@@ -54,7 +54,7 @@ class Admin::TweetsController < Admin::BaseController
         retweet_accounts.each { |twitter_account| @tweet.retweet_to_account(twitter_account) }
       end
     else
-      raise StandardError, "Don't know how to deal with kind: '#{@tweet.kind}'"
+      raise StandardError, "Don't know how to create tweet with kind: '#{@tweet.kind}'"
     end
     if @tweet.id.present?
       redirect_to edit_admin_tweet_url(id: @tweet.id)
