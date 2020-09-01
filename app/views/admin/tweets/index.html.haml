@@ -30,6 +30,12 @@
 
   = render partial: "/shared/admin_current_header", locals: { viewing: "Tweets" }
 
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ",", defer: true
+
+.mt-2
+  = render partial: "/shared/period_select", locals: { include_future: true }
+
 .row.mt-4.mb-4
   .col-sm-5
     = number_with_delimiter(matching_tweets.count)
@@ -52,9 +58,6 @@
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
-- if @render_chart
-  = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ",", defer: true
-
 = paginate @tweets, views_prefix: "admin"
 
 = render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_twitter_account: @twitter_account.present? }

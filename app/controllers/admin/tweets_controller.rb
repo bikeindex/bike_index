@@ -77,6 +77,10 @@ class Admin::TweetsController < Admin::BaseController
 
   private
 
+  def earliest_period_date
+    Time.at(1498672508) # First tweet
+  end
+
   def sortable_columns
     %w[created_at twitter_account_id kind]
   end
