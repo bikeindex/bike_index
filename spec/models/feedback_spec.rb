@@ -70,8 +70,11 @@ RSpec.describe Feedback, type: :model do
 
   describe "lead_type" do
     context "non-lead feedback" do
+      let(:feedback) { Feedback.new(feedback_type: "manufacturer_update_request") }
       it "returns nil" do
-        expect(Feedback.new(feedback_type: "manufacturer_update_request").lead_type).to be_nil
+        feedback.set_calculated_attributes
+        expect(feedback.lead_type).to be_nil
+        expect(feedback.kind).to eq "manufacturer_update_request"
       end
     end
     context "lead type feedback" do

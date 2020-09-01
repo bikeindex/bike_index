@@ -5,9 +5,9 @@ class Admin::FeedbacksController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @render_type_counts = ParamsNormalizer.boolean(params[:search_feedback_type_counts])
     @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
       .page(page).per(per_page)
+    @render_type_counts = @search_kind == "all" && ParamsNormalizer.boolean(params[:search_feedback_type_counts])
   end
 
   def show
@@ -27,8 +27,11 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def matching_feedbacks
     feedbacks = Feedback
-    if params[:search_type].present? && Feedback.feedback_types.include?(params[:search_type])
-      feedbacks = feedbacks.where(feedback_type: params[:search_type] == "msg" ? nil : params[:search_type])
+    if params[:search_kind].present? && Feedback.kinds.include?(params[:search_kind])
+      @search_kind = params[:search_kind]
+      feedbacks = feedbacks.where(kind: @search_kind)
+    else
+      @search_kind = "all"
     end
     if params[:search_user_id].present?
       @user = User.username_friendly_find(params[:search_user_id])

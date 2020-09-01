@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -1109,7 +1109,8 @@ CREATE TABLE public.feedbacks (
     updated_at timestamp without time zone NOT NULL,
     feedback_type character varying(255),
     user_id integer,
-    feedback_hash jsonb
+    feedback_hash jsonb,
+    kind integer
 );
 
 
@@ -5353,6 +5354,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200810163704'),
 ('20200813154458'),
 ('20200813221439'),
-('20200831194703');
+('20200831194703'),
+('20200901165655');
 
 

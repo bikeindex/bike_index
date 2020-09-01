@@ -1,7 +1,27 @@
 class Feedback < ApplicationRecord
+  KIND_ENUM = {
+    message: 0,
+    bike_delete_request: 1,
+    serial_update_request: 2,
+    manufacturer_update_request: 3,
+    bike_recovery: 4,
+    stolen_information: 5,
+    organization_created: 6,
+    organization_destroyed: 7,
+    lead_for_bike_shop: 8,
+    lead_for_city: 9,
+    lead_for_school: 10,
+    lead_for_law_enforcement: 11
+  }.freeze
+
   validates_presence_of :body, :email, :title
+
   belongs_to :user
+
   before_validation :set_calculated_attributes
+
+  enum kind: KIND_ENUM
+
   attr_accessor :additional
 
   after_create :notify_admins
@@ -22,6 +42,15 @@ class Feedback < ApplicationRecord
   def self.feedback_types
     # Quick semi-hack to get a list of types, good enough till it's not ;)
     @feedback_types ||= distinct.pluck(:feedback_type).reject(&:blank?)
+  end
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
+
+  def self.humanized_kind(str)
+    return nil unless str.present?
+    str.gsub(/lead_for_/, "").gsub("_request", "").strip.humanize
   end
 
   def package_size=(val)
@@ -66,14 +95,14 @@ class Feedback < ApplicationRecord
   end
 
   def humanized_type
-    return "msg" unless feedback_type.present?
-    lead_type || feedback_type.gsub("_request", "").humanize
+    self.class.humanized_kind(kind)
   end
 
   def set_calculated_attributes
     generate_title
     set_user_attrs
     self.body ||= "lead" if lead?
+    self.kind ||= calculated_kind
   end
 
   def looks_like_spam?
@@ -100,5 +129,13 @@ class Feedback < ApplicationRecord
   def lead_type
     return nil unless lead?
     feedback_type.gsub(/lead_for_/, "").humanize
+  end
+
+  private
+
+  # Temporary fix - migrating to enum from a string
+  # Some types have been removed - they no longer are relevant: organization_map, spokecard, shop_submission
+  def calculated_kind
+    self.class.kinds.include?(feedback_type) ? feedback_type : "message"
   end
 end
