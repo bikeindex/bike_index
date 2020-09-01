@@ -8,9 +8,11 @@
     = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet }
 
   = form_for [:admin, @tweet], url: { action: "create", controller: "tweets" } do |f|
-    .form-group
-      = f.label :kind, "Kind"
-      = f.select :kind, [["Import tweet", "imported_tweet"], ["Send tweet", "app_tweet"]], { prompt: "Choose kind", required: true }, class: "form-control"
+    .row
+      .col-md-6.offset-md-3
+        .form-group.mb-4
+          = f.label :kind, "Kind"
+          = f.select :kind, [["Import tweet", "imported_tweet"], ["Send tweet", "app_tweet"]], { prompt: "Choose kind", required: true }, class: "form-control"
 
     .card.bg-light.collapse#kind-app_tweet{ class: (@tweet.kind == "app_tweet" ? "show in" : "") }
       .card-body
@@ -20,7 +22,7 @@
               = f.label :twitter_account_id do
                 Account
                 %small.less-strong
-                  Tweet will be sent from this account
+                  will sent the original tweet
               = f.collection_select(:twitter_account_id, TwitterAccount.all, :id, :screen_name, { prompt: "Choose  " }, { class: "form-control" })
               .form-group.avatar-upload
                 = f.label :image, 'Tweet photo', class: 'control-label'
@@ -41,16 +43,16 @@
               %p.text-info.text-right{ style: "margin-top: -0.4rem; font-size: 150%;" }
                 %span#characterTotal
 
-        .mt-2
+        .form-group
           = f.submit 'Send tweet!', class: 'btn btn-success'
 
         .mt-4
           %strong
             Retweet:
           %small
-            %a.less-strong.ml-2#checkAll{ href: "#" }
+            %a.btn.btn-outline-secondary.btn-sm.less-strong.ml-4#checkAll{ href: "#" }
               select all
-            %a.less-strong.ml-2#uncheckAll{ href: "#" }
+            %a.btn.btn-outline-secondary.btn-sm.less-strong.ml-4#uncheckAll{ href: "#" }
               unselect
         .row#twitterAccountIds.mt-2
           - TwitterAccount.active.each do |twitter_account|
@@ -58,10 +60,15 @@
               %label
                 = check_box_tag "twitter_account_ids[]", twitter_account.id, true, id: "#twitter_account_ids_#{twitter_account.id}", multiple: true
                 = twitter_account.screen_name
-
-
+        %em.small.less-strong
+          Even if checked, original account won't retweet itself (so feel free to leave it checked)
     .card.bg-light.collapse#kind-imported_tweet{ class: (@tweet.kind == "imported_tweet" ? "show in" : "") }
       .card-body
+        %p
+          %strong Import a tweet
+        %p
+          %em
+            This is primarily for adding a tweet to a landing page.
         %p
           Get the twitter ID from the URL of the tweet. It's the final number at the end of the url
         %p

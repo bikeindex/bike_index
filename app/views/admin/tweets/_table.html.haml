@@ -2,6 +2,7 @@
 - render_sortable ||= false
 - skip_twitter_account ||= false
 - skip_kind ||= false
+- skip_retweets ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
@@ -31,8 +32,9 @@
         Stolen Record
       %th
         Image?
-      %th
-        Retweets
+      - unless skip_retweets
+        %th
+          Retweets
     %tbody
       - tweets.each do |tweet|
         %tr
@@ -68,7 +70,8 @@
                 - link_text ||= tweet.stolen_record.id
                 = link_to link_text, admin_stolen_bike_path(tweet.stolen_record_id, stolen_record_id: true) if tweet.stolen_record.present?
           %td
-            = check_mark if tweet.image.present?
-          %td
-            - unless tweet.retweet?
-              = tweet.retweets.count
+            = check_mark if tweet.image.present? || tweet.tweeted_image.present?
+          - unless skip_retweets
+            %td
+              - unless tweet.retweet?
+                = tweet.retweets.count

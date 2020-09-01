@@ -4,7 +4,7 @@
 
 - organization_message_snippet = @organization.mail_snippets.enabled.graduated_notification.first
 
-- if organization_message_snippet.present?
+- if organization_message_snippet&.body&.present?
   = organization_message_snippet.body.html_safe
 
 - if bikes.count >= 1

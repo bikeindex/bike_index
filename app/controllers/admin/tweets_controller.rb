@@ -77,6 +77,10 @@ class Admin::TweetsController < Admin::BaseController
 
   private
 
+  def earliest_period_date
+    Time.at(1498672508) # First tweet
+  end
+
   def sortable_columns
     %w[created_at twitter_account_id kind]
   end
@@ -106,6 +110,8 @@ class Admin::TweetsController < Admin::BaseController
 
   def find_tweet
     @tweet ||= Tweet.friendly_find(params[:id])
+    return @tweet if @tweet.present?
+    raise ActiveRecord::RecordNotFound
   end
 
   def fetch_twitter_response(tweet_id)

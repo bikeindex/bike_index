@@ -1,7 +1,7 @@
 %h1= t(".html.youre_almost_done")
 
 - color_and_brand = []
-- color_and_brand << Color.find(@b_param.primary_frame_color_id).name if @b_param.primary_frame_color_id.present?
+- color_and_brand << Color.find(@b_param.primary_frame_color_id)&.name if @b_param.primary_frame_color_id.present?
 - color_and_brand << @b_param.mnfg_name
 - color_and_brand = color_and_brand.compact.join(" ")
 
