@@ -87,6 +87,8 @@ RSpec.describe TwitterAccount, type: :model do
       expect(twitter_account.last_error).to be_blank
       expect(twitter_account.errored?).to be_falsey
       expect(TwitterAccount.errored.pluck(:id)).to eq([])
+      expect(TwitterAccount.friendly_find("#{twitter_account.screen_name.upcase}  ")).to eq twitter_account
+      expect(TwitterAccount.friendly_find(twitter_account.id.to_s)).to eq twitter_account
     end
   end
 
@@ -110,5 +112,13 @@ RSpec.describe TwitterAccount, type: :model do
 
       expect(TwitterAccount.default_account_for_country("Canada").id).to eq(default.id)
     end
+  end
+
+  it "delegates class methods to the client instance", vcr: true do
+    FactoryBot.create(:twitter_account_1, :national, :active, :default)
+    tweet_id = 1170061123191791622
+    status = TwitterAccount.get_tweet(tweet_id)
+    expect(status).to be_an_instance_of(Twitter::Tweet)
+    expect(status.id).to eq(tweet_id)
   end
 end

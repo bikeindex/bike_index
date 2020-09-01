@@ -1,5 +1,7 @@
 class Tweet < ApplicationRecord
-  validates :twitter_id, presence: true, uniqueness: true
+  KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
+  VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
+  validates :twitter_id, uniqueness: true, allow_blank: true
   has_many :public_images, as: :imageable, dependent: :destroy
 
   belongs_to :twitter_account
@@ -13,15 +15,22 @@ class Tweet < ApplicationRecord
 
   mount_uploader :image, ImageUploader
 
-  before_save :set_body_from_response
-  before_validation :ensure_valid_alignment
+  before_validation :set_calculated_attributes
 
+  enum kind: KIND_ENUM
+
+  scope :retweet, -> { where.not(original_tweet: nil) }
   scope :excluding_retweets, -> { where(original_tweet: nil) }
+  scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
   def self.friendly_find(id)
     return nil if id.blank?
     id = id.to_s
-    query = id.length > 7 ? {twitter_id: id} : {id: id}
+    query = id.length > 15 ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 
@@ -35,6 +44,57 @@ class Tweet < ApplicationRecord
     end
   end
 
+  def self.admin_search(str)
+    return none unless str.present?
+    text = str.strip
+    # If passed a number, assume it is a bike ID and search for that bike_id
+    if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
+      return includes(:stolen_record).where(stolen_records: {bike_id: text})
+    end
+    where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
+  end
+
+  def send_tweet
+    return true unless app_tweet? && twitter_response.blank?
+    # TODO: Add actual testing of this. It isn't tested right now, sorry :/
+    if image.present?
+      Tempfile.open("foto.jpg") do |foto|
+        foto.binmode
+        foto.write open_image.read # TODO: Refactor this.
+        foto.rewind
+        tweeted = twitter_account.tweet(body, foto)
+        update(twitter_response: tweeted.as_json)
+      end
+    else
+      tweeted = twitter_account.tweet(body)
+      update(twitter_response: tweeted.as_json)
+    end
+    tweeted
+  end
+
+  # TODO: Add actual testing of this. It isn't tested right now, sorry :/
+  def retweet_to_account(retweet_account)
+    return nil if retweet_account.id.to_i == twitter_account_id.to_i
+    posted_retweet = retweet_account.retweet(twitter_id)
+    return nil if posted_retweet.blank?
+
+    retweet = Tweet.new(
+      twitter_id: posted_retweet.id,
+      twitter_account_id: retweet_account.id,
+      stolen_record_id: stolen_record_id,
+      original_tweet_id: id
+    )
+
+    unless retweet.save
+      retweet_account.set_error(retweet.errors.full_messages.to_sentence)
+    end
+    retweet
+  end
+
+  def bike
+    stolen_record&.bike
+  end
+
   def retweet?
     original_tweet.present?
   end
@@ -43,37 +103,52 @@ class Tweet < ApplicationRecord
     twitter_id
   end
 
-  def ensure_valid_alignment
-    valid_alignments = %w[top-left top-right bottom-left bottom-right]
-    self.alignment ||= valid_alignments.first
-    return true if valid_alignments.include?(alignment)
-    errors[:base] << "#{alignment} is not one of valid alignments: #{valid_alignments}"
-  end
-
-  def set_body_from_response
-    return true unless body_html.blank? && twitter_response && twitter_response["text"].present?
-    self.body_html = self.class.auto_link_text(twitter_response["text"])
+  def set_calculated_attributes
+    self.kind ||= calculated_kind
+    if imported_tweet?
+      self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
+      self.alignment ||= VALID_ALIGNMENTS.first
+      unless VALID_ALIGNMENTS.include?(alignment)
+        errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
+      end
+    else
+      if kind == "app_tweet" && twitter_id.blank?
+        errors[:base] << "You need to choose an account" unless twitter_account.present?
+        errors[:base] << "You need to include tweet text" unless body.present?
+      end
+      self.twitter_id ||= trh[:id]
+      self.body ||= tweeted_text
+    end
   end
 
   def trh
-    twitter_response || {} # so we don't explode when there is no response
+    (twitter_response || {}).with_indifferent_access
   end
 
   def tweeted_at
-    Time.parse(trh["created_at"])
+    TimeParser.parse(trh[:created_at])
+  end
+
+  def tweeted_image
+    return nil unless trh.dig(:entities, :media).present?
+    trh.dig(:entities, :media).first&.dig(:media_url)
+  end
+
+  def tweeted_text
+    trh[:text]
   end
 
   def tweetor
     return twitter_account.screen_name if twitter_account&.screen_name.present?
-    trh["user"] && trh["user"]["screen_name"]
+    trh.dig(:user, :screen_name)
   end
 
   def tweetor_avatar
-    trh["user"] && trh["user"]["profile_image_url_https"]
+    trh.dig(:user, :profile_image_url_https)
   end
 
   def tweetor_name
-    trh["user"] && trh["user"]["name"]
+    trh.dig(:user, :name)
   end
 
   def tweetor_link
@@ -92,7 +167,7 @@ class Tweet < ApplicationRecord
     @details_hash ||= begin
       {}.tap do |details|
         details[:notification_type] = "stolen_twitter_alerter"
-        details[:bike_id] = stolen_record&.bike&.id
+        details[:bike_id] = bike&.id
         details[:tweet_id] = twitter_id
         details[:tweet_string] = body_html
         details[:tweet_account_screen_name] = tweetor
@@ -105,5 +180,20 @@ class Tweet < ApplicationRecord
         end
       end
     end
+  end
+
+  # Because the way we load the image is different if it's remote or local
+  # This is hacky, but whatever. Copied from bulk_import
+  def open_image
+    local_image = image&._storage&.to_s == "CarrierWave::Storage::File"
+    local_image ? File.open(image.path, "r") : URI.open(image.url)
+  end
+
+  private
+
+  def calculated_kind
+    return "stolen_tweet" if stolen_record.present?
+    return "imported_tweet" if twitter_id.present?
+    "app_tweet"
   end
 end

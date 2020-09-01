@@ -1,0 +1,5 @@
+.admin-subnav
+  .col-12.text-right
+    = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
+
+= render partial: "display"

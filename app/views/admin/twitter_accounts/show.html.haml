@@ -1,9 +1,7 @@
 .admin-subnav
-  .col-6
-    .mr-4
-      = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-success"
-      = link_to "Check Credentials", check_credentials_admin_twitter_account_url(@twitter_account), class: "btn btn-success"
-
+  .col-12.text-center
+    = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-outline-success ml-2"
+    = link_to "Check Credentials", check_credentials_admin_twitter_account_url(@twitter_account), class: "btn btn-outline-success ml-2"
 - if @twitter_account.errored?
   .row.mt-4.mb-4
     .card.ml-auto.mr-auto.col-8
@@ -28,7 +26,7 @@
 .row
   .col-md-6
     %h1
-      %small Twitter Account:
+      %small account:
       = @twitter_account.screen_name
     %small
       = link_to "view on twitter", "https://twitter.com/#{@twitter_account.screen_name}", target: :_blank
@@ -52,7 +50,8 @@
       = @twitter_account.twitter_account_info.to_yaml
 
 %h3.mt-4
-  #{@twitter_account.tweets.count} Tweets
-  - if @twitter_account.tweets.count > 25
-    Showing most recent 25
-= render "admin/tweets/tweets", tweets: @twitter_account.tweets.reorder(:created_at).limit(25)
+  = number_with_delimiter(@twitter_account.tweets.count)
+  Tweets
+  %em.small
+    = link_to "view all", admin_tweets_path(search_twitter_account_id: @twitter_account.id)
+= render partial: "/admin/tweets/table", locals: { tweets: @twitter_account.tweets.reorder(created_at: :desc).limit(25), skip_twitter_account: true }

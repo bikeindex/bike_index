@@ -4,6 +4,8 @@ require "tempfile"
 require "open-uri"
 
 class TwitterTweeterIntegration
+  TWEET_LENGTH = 280
+
   attr_accessor \
     :bike,
     :bike_photo_url,
@@ -48,7 +50,7 @@ class TwitterTweeterIntegration
       twitter_id: posted_tweet.id,
       twitter_account_id: nearest_twitter_account&.id,
       stolen_record_id: stolen_record&.id,
-      twitter_response: posted_tweet.to_json
+      twitter_response: posted_tweet
     )
 
     unless tweet.save
@@ -60,26 +62,11 @@ class TwitterTweeterIntegration
   end
 
   def retweet(posted_tweet)
-    self.retweets = [posted_tweet]
+    self.retweets = [tweet]
 
     close_twitter_accounts.each do |twitter_account|
-      next if twitter_account.id.to_i == tweet.twitter_account_id.to_i
-      # retweet returns an array even with scalar parameters
-      posted_retweet = twitter_account.retweet(tweet.twitter_id)
-      next if posted_retweet.blank?
-
-      retweets << posted_retweet
-
-      retweet = Tweet.new(
-        twitter_id: posted_retweet.id,
-        twitter_account_id: twitter_account.id,
-        stolen_record_id: stolen_record.id,
-        original_tweet_id: tweet.id
-      )
-
-      unless retweet.save
-        twitter_account.set_error(retweet.errors.full_messages.to_sentence)
-      end
+      retweet = tweet.retweet_to_account(twitter_account)
+      retweets << retweet if retweet.present?
     end
 
     retweets
@@ -98,14 +85,13 @@ class TwitterTweeterIntegration
     # a REST client.configuration call
     #
     # spaces between slugs
-    # max_char = tweet_length - https_length - at_screen_name.length - 3
+    # max_char = TWEET_LENGTH - https_length - at_screen_name.length - 3
 
-    tweet_length = 140
     https_length = 23
     media_length = 23
 
     # spaces between slugs
-    max = tweet_length - https_length - stolen_slug.size - 3
+    max = TWEET_LENGTH - https_length - stolen_slug.size - 3
     max -= bike_photo_url ? media_length : 0
 
     max
@@ -142,12 +128,14 @@ class TwitterTweeterIntegration
 
     color = bike.frame_colors.first
     if color.start_with?("Silver")
-      color.replace "Gray"
-    elsif color.start_with?("Stickers")
-      color.replace ""
+      color = "Gray"
+    elsif color.start_with?("Yellow")
+      color = "Yellow"
+    elsif color.start_with?("Sticker")
+      color = "Stickers"
     end
 
-    manufacturer = bike.manufacturer&.name
+    manufacturer = bike.mnfg_name
     model = bike.frame_model
 
     full_length =

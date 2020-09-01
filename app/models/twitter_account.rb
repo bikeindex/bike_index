@@ -39,6 +39,12 @@ class TwitterAccount < ApplicationRecord
     where("lower(screen_name) = ?", name.downcase.strip).first
   end
 
+  def self.friendly_find(str)
+    return nil if str.blank?
+    return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+    fuzzy_screen_name_find(str)
+  end
+
   def self.default_account
     where(default: true).first || national.first
   end
@@ -64,6 +70,10 @@ class TwitterAccount < ApplicationRecord
       user_token: info["credentials"]["token"],
       user_secret: info["credentials"]["secret"]
     }
+  end
+
+  def self.get_tweet(tweet_id)
+    default_account.get_tweet(tweet_id)
   end
 
   def twitter_account_url
@@ -130,6 +140,10 @@ class TwitterAccount < ApplicationRecord
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil
+  end
+
+  def get_tweet(tweet_id)
+    twitter_client.status(tweet_id)
   end
 
   def should_be_reverse_geocoded?
