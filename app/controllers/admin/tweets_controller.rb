@@ -14,10 +14,19 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_tweet_url
+    pp @tweet.kind, @tweet.imported_tweet?
+    if @tweet.imported_tweet?
+      redirect_to edit_admin_tweet_path(params[:id])
+      return
+    end
   end
 
   def edit
+    pp @tweet.kind, @tweet.imported_tweet?
+    unless @tweet.imported_tweet?
+      redirect_to admin_tweet_path(params[:id])
+      return
+    end
   end
 
   def update

@@ -7,14 +7,6 @@
     = render partial: "shared/errors", locals: { name: "Tweet", obj: @tweet}
 
   .row.mt-4
-    .col-md-3.my-auto
-      .form-group
-        = label :tweet_by, "Tweet by"
-        = text_field_tag :twitter_id, @tweet.tweetor, disabled: true, class: "form-control"
-    .col-md-3.my-auto
-      .form-group
-        = label :twitter_id, "Twitter ID"
-        = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true, class: "form-control"
     .col-md-6
       - if @tweet.stolen_tweet?
         - if @tweet.tweeted_image.present?
@@ -71,19 +63,4 @@
 
 %hr
 
-- if @tweet.imported_tweet?
-  %h3 Landing page rendering
-  .container
-    .row
-      .landing-why-col.clearfix
-        = render partial: 'landing_pages/tweet', locals: { tweet_id: @tweet.id }
-
-- if @tweet.retweets.any?
-  %hr
-  %h3 Retweets
-  = render partial: "admin/tweets/table", locals: { tweets: @tweet.retweets }
-
-%hr
-
-%h3 Twitter Response Data
-= pretty_print_json(@tweet.twitter_response)
+= render partial: "display"

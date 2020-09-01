@@ -7,6 +7,5 @@ class TweetUpdateWorker < ApplicationWorker
     new_response = JSON.parse(new_response) if new_response.is_a?(String)
     tweet.body_html = nil if tweet.body_html == "text"
     tweet.update(twitter_response: new_response)
-    # tweet.update(twitter_response: new_response, twitter_response_jsonb: new_response)
   end
 end

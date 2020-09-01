@@ -1,5 +1,5 @@
 class Tweet < ApplicationRecord
-  KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, manual_tweet: 2}.freeze
+  KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
   validates :twitter_id, presence: true, uniqueness: true
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -88,8 +88,8 @@ class Tweet < ApplicationRecord
   end
 
   def tweeted_image
-    return nil unless trh.dig(:media).present?
-    trh[:media].first&.dig(:media_url)
+    return nil unless trh.dig(:entities, :media).present?
+    trh.dig(:entities, :media).first&.dig(:media_url)
   end
 
   def tweeted_text
