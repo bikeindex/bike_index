@@ -87,4 +87,19 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.location).to eq location2
     end
   end
+
+  describe "update_associations" do
+    let(:impound_record) { FactoryBot.build(:impound_record) }
+    it "enqueues for create and update, not destroy" do
+      expect {
+        impound_record.save
+      }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+      expect{
+        impound_record.update(updated_at: Time.current)
+      }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+      expect {
+        impound_record.destroy
+      }.to_not change(ImpoundUpdateBikeWorker.jobs, :count)
+    end
+  end
 end
