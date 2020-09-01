@@ -20,7 +20,7 @@ class Tweet < ApplicationRecord
   enum kind: KIND_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
-  scope :excluding_retweets, -> { where(original_tweet: nil) }
+  scope :not_retweet, -> { where(original_tweet: nil) }
   scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
 
   def self.kinds

@@ -139,6 +139,8 @@
             %span.text-danger
               POS Integration broken!
             = @organization.pos_kind.humanize
+          - elsif @organization.does_not_need_pos?
+            %small.less-strong Does not need POS integration
 
           -# Show link if it's lightspeed - or if it used to be lightspeed
           - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?

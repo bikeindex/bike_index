@@ -5636,7 +5636,6 @@ nl:
   stolen:
     index:
       ambassador: Ambassadeur
-      bike_chopshop_report: Bike ChopShop-rapport
       bike_index: Bike Index
       bike_index_will_broadcast: Bike Index zal je gestolen fiets op de lokale 'Gestolen
         Fiets Twitter-handle' publiceren en via andere social media verspreiden. Onze
@@ -5676,7 +5675,6 @@ nl:
         eerst %{register_it_link}
       send_alert: Stuur melding!
       sign_in: Log in
-      someone_is_selling_a_stolen_bike: Iemand verkoopt een gestolen fiets
       stolen_widget: gestolen widget
       tell_everyone_you_know: Vertel iedereen die je kent over je gestolen fiets.
         Gebruik hiervoor al je social media (Facebook, Instagram, Twitter, etc.) en

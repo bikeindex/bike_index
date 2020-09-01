@@ -51,10 +51,10 @@
                         = msg
             .report-type
               %label
-                = f.radio_button :title, t(".someone_is_selling_a_stolen_bike"), checked: true
+                = f.radio_button :title, "Someone is selling a stolen bike", checked: true
                 = t(".report_someone_selling_a_stolen_bike")
               %label
-                = f.radio_button :title, t(".bike_chopshop_report")
+                = f.radio_button :title, "Bike ChopShop report"
                 = t(".report_a_bicycle_chop_shop")
             %label
               - register_it_link = link_to t(".register_it"), new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;"
