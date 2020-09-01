@@ -49,7 +49,6 @@
       = hidden_field_tag :start_time, params[:start_time]
       = hidden_field_tag :search_twitter_account_id, params[:search_twitter_account_id]
       = hidden_field_tag :search_kind, params[:search_kind]
-      = hidden_field_tag :organization_id, params[:organization_id]
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"

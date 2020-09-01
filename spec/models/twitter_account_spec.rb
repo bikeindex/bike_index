@@ -118,7 +118,6 @@ RSpec.describe TwitterAccount, type: :model do
     FactoryBot.create(:twitter_account_1, :national, :active, :default)
     tweet_id = 1170061123191791622
     status = TwitterAccount.get_tweet(tweet_id)
-    pp status
     expect(status).to be_an_instance_of(Twitter::Tweet)
     expect(status.id).to eq(tweet_id)
   end

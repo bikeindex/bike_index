@@ -29,7 +29,9 @@ function BinxAdminTweet() {
 
     setCharacterCount() {
       $("#characterTotal").text(
-        `${$("#characterCounterField .form-control").val().length}/280`
+        `${$("#characterCounterField .form-control").val().length}/${
+          window.maxCharacterCount
+        }`
       );
     },
 
