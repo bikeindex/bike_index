@@ -1,7 +1,11 @@
 .admin-subnav
-  .col-12
+  .col-sm-3
     %h1
       Feedback & Messages
+  .col-sm-9
+    %ul
+      %li.nav-item
+        = link_to "Render type counts", admin_tweets_path(sortable_search_params.merge(search_feedback_type_counts: @render_type_counts)), class: "nav-link btn btn-sm btn-outline-secondary #{@render_type_counts ? 'active' : ''}"
 
 .col-12.mt-4
   = column_chart time_range_counts(collection: available_feedbacks), stacked: true, thousands: ",", defer: true

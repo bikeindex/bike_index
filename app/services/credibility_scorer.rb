@@ -9,11 +9,11 @@ class CredibilityScorer
     },
 
     creation: {
-      no_creator: -10,
+      created_this_month: -10,
       creation_organization_trusted: 20,
       creation_organization_suspicious: -10,
-      created_this_month: -10,
       long_time_registration: 10
+      no_creator: -10,
     },
 
     ownership: {
@@ -22,18 +22,21 @@ class CredibilityScorer
     },
 
     user: {
-      user_ambassador: 50,
-      user_trusted_organization_member: 20,
       long_time_user: 10,
+      user_ambassador: 50,
       user_connected_to_strava: 10,
       user_handle_suspicious: -20
+      user_has_bike_recovered: 10,
+      user_sent_in_bike_tips: 10,
+      user_supporter: 20,
+      user_trusted_organization_member: 20,
     },
 
     bike: {
-      serial_missing: -10,
-      serial_duplicated: -20,
       has_bike_sticker: 10,
       has_photos: 10
+      serial_duplicated: -20,
+      serial_missing: -10,
     }
   }.freeze
 

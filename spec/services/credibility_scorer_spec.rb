@@ -204,20 +204,32 @@ RSpec.describe CredibilityScorer do
         end
       end
     end
+    describe "user_has_bike_recovered user_sent_in_bike_tips user_supporter" do
+      let(:recovered_bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: user) }
+      let(:stolen_record) { recovered_bike.current_stolen_record }
+      let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record, creator: user) }
+      it "returns the bike_badges" do
+        stolen_record.add_recovery_information(recovered_description: "I recovered it!")
+        stolen_record.reload
+        expect(stolen_record.recovered?).to be_truthy
+        expect(subject.bike_user_badges(bike)).to match_array(%i[user_has_bike_recovered user_sent_in_bike_tips user_supporter])
+      end
+    end
     describe "user_name_suspicious" do
       let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
       it "returns user_name_suspicious" do
         expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
       end
-      context "user is member of trusted organization" do
+      context "user is member of trusted organization, supporter" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+        let!(:payment) { FactoryBot.create(:payment, user: user) }
         it "returns just user_trusted_organization_member" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
-          expect(subject.bike_user_badges(bike)).to match_array([:user_trusted_organization_member])
+          expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_member user_supporter])
         end
       end
-      context "user_handle_suspicious, long_time_user & strava" do
+      context "user_handle_suspicious, long_time_user & donation" do
         let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
         let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
         let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }

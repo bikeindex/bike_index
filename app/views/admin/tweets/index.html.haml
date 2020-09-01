@@ -8,7 +8,7 @@
         - if ParamsNormalizer.boolean(params[:search_retweet])
           = link_to "OG & Retweets", admin_tweets_path(sortable_search_params.except(:search_retweet)), class: "nav-link active"
         - else
-          = link_to "OG tweets", admin_tweets_path(sortable_search_params.merge(search_retweet: true)), class: "nav-link"
+          = link_to "OG tweets only", admin_tweets_path(sortable_search_params.merge(search_retweet: true)), class: "nav-link"
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
           - if @search_kind == "all"
@@ -60,4 +60,4 @@
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 = paginate @tweets, views_prefix: "admin"
 
-= render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_twitter_account: @twitter_account.present? }
+= render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true }
