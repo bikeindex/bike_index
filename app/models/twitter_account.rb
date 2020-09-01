@@ -72,6 +72,10 @@ class TwitterAccount < ApplicationRecord
     }
   end
 
+  def self.get_tweet(tweet_id)
+    default_account.get_tweet(tweet_id)
+  end
+
   def twitter_account_url
     "https://twitter.com/#{screen_name}"
   end
@@ -136,6 +140,10 @@ class TwitterAccount < ApplicationRecord
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil
+  end
+
+  def get_tweet(tweet_id)
+    twitter_client.status(tweet_id)
   end
 
   def should_be_reverse_geocoded?

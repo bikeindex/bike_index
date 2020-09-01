@@ -130,7 +130,7 @@ RSpec.describe TwitterTweeterIntegration do
       tweet = integration.create_tweet
 
       expect(tweet).to be_an_instance_of(Tweet)
-      expect(integration.retweets&.first).to be_an_instance_of(Twitter::Tweet)
+      expect(integration.retweets&.first).to be_an_instance_of(Tweet)
       expect(tweet.twitter_response).to be_an_instance_of(Hash)
       expect(tweet.tweetor_avatar).to be_present
       expect(tweet.body).to eq "STOLEN - Black Special_name10 in Tribeca https://t.co/6gqhQpUUsC"
@@ -151,7 +151,7 @@ RSpec.describe TwitterTweeterIntegration do
 
       tweet = integration.tweet
       expect(tweet).to be_an_instance_of(Tweet)
-      expect(integration.retweets.first).to be_an_instance_of(Twitter::Tweet)
+      expect(integration.retweets.first).to be_an_instance_of(Tweet)
       expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
     end
   end

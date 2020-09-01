@@ -62,18 +62,14 @@ RSpec.describe Admin::TweetsController, type: :request do
   end
 
   describe "create" do
-    context "imported_tweet" do
-      xit "gets the tweet from twitter" do
-        VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
-          expect {
-            post base_url, params: {tweet: {twitter_id: "839247587521679360"}, kind: "imported_tweet"}
-          }.to change(Tweet, :count).by(1)
-        end
-        expect(response).to redirect_to edit_admin_tweet_url
-        expect(flash[:success]).to be_present
-        assigns(:tweet)
-      end
-    end
+    # it "tweets" do
+    #   # TODO: Actually test
+    # end
+    # context "imported_tweet" do
+    #   it "gets the tweet from twitter" do
+    #     # TODO: Actually test
+    #   end
+    # end
   end
 
   describe "#destroy" do

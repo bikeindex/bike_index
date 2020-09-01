@@ -62,26 +62,12 @@ class TwitterTweeterIntegration
   end
 
   def retweet(posted_tweet)
-    self.retweets = [posted_tweet]
+    self.retweets = [tweet]
+
 
     close_twitter_accounts.each do |twitter_account|
-      next if twitter_account.id.to_i == tweet.twitter_account_id.to_i
-      # retweet returns an array even with scalar parameters
-      posted_retweet = twitter_account.retweet(tweet.twitter_id)
-      next if posted_retweet.blank?
-
-      retweets << posted_retweet
-
-      retweet = Tweet.new(
-        twitter_id: posted_retweet.id,
-        twitter_account_id: twitter_account.id,
-        stolen_record_id: stolen_record.id,
-        original_tweet_id: tweet.id
-      )
-
-      unless retweet.save
-        twitter_account.set_error(retweet.errors.full_messages.to_sentence)
-      end
+      retweet = tweet.retweet_to_account(twitter_account)
+      retweets << retweet if retweet.present?
     end
 
     retweets

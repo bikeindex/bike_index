@@ -7,24 +7,28 @@
   - if @tweet.errors.any?
     = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet }
 
-  = form_for [:admin, @tweet], url: { action: 'create', controller: 'tweets' } do |f|
+  = form_for [:admin, @tweet], url: { action: "create", controller: "tweets" } do |f|
     .form-group
       = f.label :kind, "Kind"
       = f.select :kind, [["Import tweet", "imported_tweet"], ["Send tweet", "app_tweet"]], { prompt: "Choose kind", required: true }, class: "form-control"
 
-    .card.bg-light.collapse#kind-app_tweet{ class: (@tweet.kind == "app_tweet" ? "show" : "") }
+    .card.bg-light.collapse#kind-app_tweet{ class: (@tweet.kind == "app_tweet" ? "show in" : "") }
       .card-body
         .row
           .col-md-6
-            %p
-              %strong Send a tweet
-
             .form-group.fancy-select.unfancy
               = f.label :twitter_account_id do
                 Account
                 %small.less-strong
                   Tweet will be sent from this account, and retweeted by all other active accounts
-              = f.collection_select(:twitter_account_id, TwitterAccount.all, :id, :screen_name, {}, { class: "form-control" })
+              = f.collection_select(:twitter_account_id, TwitterAccount.all, :id, :screen_name, { prompt: "Choose  " }, { class: "form-control" })
+              .form-group.avatar-upload
+                = f.label :image, 'Tweet photo', class: 'control-label'
+                .avatar-img
+                  .input-group
+                    .custom-file
+                    = f.label :image, "Tweet Image", class: "custom-file-label"
+                    = f.file_field :image, class: "custom-file-input"
           .col-md-6
             .form-group#characterCounterField
               = f.label :body do
@@ -32,10 +36,13 @@
                 %small.less-strong
                   Make sure the text is under the character count
               = f.text_area :body, rows: 4, class: "form-control"
-              %p.text-info.text-right{ style: "margin-top: -0.5rem; font-size: 150%;" }
+              %p.text-info.text-right{ style: "margin-top: -0.4rem; font-size: 150%;" }
                 %span#characterTotal
+        .mt-2
+          = f.submit 'Send tweet!', class: 'btn btn-success'
 
-    .card.bg-light.collapse#kind-imported_tweet{ class: (@tweet.kind == "imported_tweet" ? "show" : "") }
+
+    .card.bg-light.collapse#kind-imported_tweet{ class: (@tweet.kind == "imported_tweet" ? "show in" : "") }
       .card-body
         %p
           Get the twitter ID from the URL of the tweet. It's the final number at the end of the url

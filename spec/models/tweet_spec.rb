@@ -85,4 +85,15 @@ RSpec.describe Tweet, type: :model do
       expect(tweet.tweeted_image).to be_blank
     end
   end
+
+  describe "send_tweet" do
+    let(:twitter_account) { FactoryBot.create(:twitter_account, twitter_account_info: {stuff: ""}) }
+    let(:tweet) { Tweet.create(body: "testing new system", twitter_account: twitter_account, kind: "app_tweet") }
+    it "creates a tweet" do
+      expect(twitter_account).to receive(:tweet) { {something: "ffff"} }
+      tweet.send_tweet
+      tweet.reload
+      expect(tweet.twitter_response).to eq({"something" => "ffff"})
+    end
+  end
 end

@@ -1,7 +1,7 @@
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
-  validates :twitter_id, presence: true, uniqueness: true
+  validates :twitter_id, uniqueness: true, allow_blank: true
   has_many :public_images, as: :imageable, dependent: :destroy
 
   belongs_to :twitter_account
@@ -54,6 +54,41 @@ class Tweet < ApplicationRecord
     where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
   end
 
+  def send_tweet
+    return true unless app_tweet? && twitter_response.blank?
+    if image.present?
+      Tempfile.open("foto.jpg") do |foto|
+        foto.binmode
+        foto.write open_image.read # TODO: Refactor this.
+        foto.rewind
+        tweeted = twitter_account.tweet(body, foto)
+        update(twitter_response: tweeted.as_json)
+      end
+    else
+      tweeted = twitter_account.tweet(body)
+      update(twitter_response: tweeted.as_json)
+    end
+    tweeted
+  end
+
+  def retweet_to_account(retweet_account)
+    return nil if retweet_account.id.to_i == twitter_account_id.to_i
+    posted_retweet = retweet_account.retweet(twitter_id)
+    return nil if posted_retweet.blank?
+
+    retweet = Tweet.new(
+      twitter_id: posted_retweet.id,
+      twitter_account_id: retweet_account.id,
+      stolen_record_id: stolen_record_id,
+      original_tweet_id: id
+    )
+
+    unless retweet.save
+      retweet_account.set_error(retweet.errors.full_messages.to_sentence)
+    end
+    retweet
+  end
+
   def bike
     stolen_record&.bike
   end
@@ -67,14 +102,19 @@ class Tweet < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.alignment ||= VALID_ALIGNMENTS.first
-    unless VALID_ALIGNMENTS.include?(alignment)
-      errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
-    end
     self.kind ||= calculated_kind
     if imported_tweet?
       self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
+      self.alignment ||= VALID_ALIGNMENTS.first
+      unless VALID_ALIGNMENTS.include?(alignment)
+        errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
+      end
     else
+      if kind == "app_tweet"
+        errors[:base] << "You need to choose an account" unless twitter_account.present?
+        errors[:base] << "You need to include tweet text" unless body.present?
+      end
+      self.twitter_id ||= trh[:id]
       self.body ||= tweeted_text
     end
   end
@@ -140,11 +180,18 @@ class Tweet < ApplicationRecord
     end
   end
 
+  # Because the way we load the image is different if it's remote or local
+  # This is hacky, but whatever. Copied from bulk_import
+  def open_image
+    local_image = image&._storage&.to_s == "CarrierWave::Storage::File"
+    local_image ? File.open(image.path, "r") : URI.open(image.url)
+  end
+
   private
 
   def calculated_kind
     return "stolen_tweet" if stolen_record.present?
     return "imported_tweet" if twitter_id.present?
-    "manual_tweet"
+    "app_tweet"
   end
 end

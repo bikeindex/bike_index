@@ -37,11 +37,11 @@
       - tweets.each do |tweet|
         %tr
           %td
-            %a.convertTime{ href: admin_tweet_path(tweet) }
+            %a.convertTime{ href: admin_tweet_path(tweet.id) }
               = l(tweet.created_at, format: :convert_time)
           %td
             %small.less-strong
-              = link_to tweet.twitter_id, tweet.tweet_link
+              = link_to tweet.twitter_id || "ID MISSING!", tweet.tweet_link
           - unless skip_twitter_account
             %td
               - if tweet.twitter_account.present?
@@ -57,7 +57,10 @@
               = link_to tweet.original_tweet&.tweetor, admin_tweet_path(tweet.original_tweet)
             - else
               %small
-                = strip_tags(tweet.body_html)
+                - if tweet.body_html.present?
+                  = strip_tags(tweet.body_html)
+                - else
+                  = tweet.body
           %td
             - if tweet.stolen_tweet?
               %small.less-strong

@@ -16,14 +16,14 @@ class Admin::TweetsController < Admin::BaseController
   def show
     if @tweet.imported_tweet?
       redirect_to edit_admin_tweet_path(params[:id])
-      return
+      nil
     end
   end
 
   def edit
     unless @tweet.imported_tweet?
       redirect_to admin_tweet_path(params[:id])
-      return
+      nil
     end
   end
 
@@ -42,9 +42,22 @@ class Admin::TweetsController < Admin::BaseController
 
   def create
     @tweet = Tweet.new(permitted_parameters)
-    @tweet.twitter_response = fetch_twitter_response(@tweet.twitter_id)
-    if @tweet.save
-      redirect_to edit_admin_tweet_url(id: @tweet.twitter_id)
+    if @tweet.kind == "imported_tweet"
+      @tweet.twitter_account_id = nil
+      @tweet.body = nil # Blank the attributes that may have been accidentally passed
+      @tweet.twitter_response = fetch_twitter_response(@tweet.twitter_id)
+    elsif @tweet.kind == "app_tweet"
+      @tweet.twitter_id = nil
+      @tweet.save
+      if @tweet.id.present?
+        @tweet.send_tweet
+        retweet_accounts.each { |twitter_account| @tweet.retweet_to_account(twitter_account) }
+      end
+    else
+      raise StandardError, "Don't know how to deal with kind: '#{@tweet.kind}'"
+    end
+    if @tweet.id.present?
+      redirect_to edit_admin_tweet_url(id: @tweet.id)
     else
       render action: :new
     end
@@ -87,7 +100,7 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:tweet).permit(:twitter_id, :body_html, :image, :alignment,
+    params.require(:tweet).permit(:twitter_id, :body_html, :image, :alignment, :body, :twitter_account_id,
       :remote_image_url, :remove_image, :kind)
   end
 
@@ -96,6 +109,10 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def fetch_twitter_response(tweet_id)
-    TwitterClient.status(tweet_id).to_json
+    TwitterAccount.default_account.status(tweet_id).to_json
+  end
+
+  def retweet_accounts
+    (params[:twitter_account_ids] || []).map { |id| TwitterAccount.friendly_find(id) }
   end
 end
