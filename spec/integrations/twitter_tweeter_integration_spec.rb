@@ -152,7 +152,7 @@ RSpec.describe TwitterTweeterIntegration do
       tweet = integration.tweet
       expect(tweet).to be_an_instance_of(Tweet)
       expect(integration.retweets.first).to be_an_instance_of(Twitter::Tweet)
-      expect(tweet.tweeted_image).to be_blank # Because this BS is blank
+      expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
     end
   end
 end
