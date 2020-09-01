@@ -430,7 +430,7 @@ class Bike < ApplicationRecord
   end
 
   def first_owner_email
-    first_ownership.owner_email
+    first_ownership&.owner_email
   end
 
   def claimable_by?(u)
