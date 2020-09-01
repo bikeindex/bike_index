@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::TweetsController, type: :request do
-  let(:subject) { FactoryBot.create(:tweet, kind: "app_tweet") }
+  let(:subject) { FactoryBot.create(:tweet, kind: "app_tweet", twitter_id: "fake-id-to-skip-validations") }
   let(:base_url) { "/admin/tweets/" }
   include_context :request_spec_logged_in_as_superuser
 

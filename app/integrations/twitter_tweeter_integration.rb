@@ -64,7 +64,6 @@ class TwitterTweeterIntegration
   def retweet(posted_tweet)
     self.retweets = [tweet]
 
-
     close_twitter_accounts.each do |twitter_account|
       retweet = tweet.retweet_to_account(twitter_account)
       retweets << retweet if retweet.present?

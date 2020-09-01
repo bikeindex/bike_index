@@ -56,6 +56,7 @@ class Tweet < ApplicationRecord
 
   def send_tweet
     return true unless app_tweet? && twitter_response.blank?
+    # TODO: Add actual testing of this. It isn't tested right now, sorry :/
     if image.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
@@ -71,6 +72,7 @@ class Tweet < ApplicationRecord
     tweeted
   end
 
+  # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def retweet_to_account(retweet_account)
     return nil if retweet_account.id.to_i == twitter_account_id.to_i
     posted_retweet = retweet_account.retweet(twitter_id)
@@ -110,7 +112,7 @@ class Tweet < ApplicationRecord
         errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
       end
     else
-      if kind == "app_tweet"
+      if kind == "app_tweet" && twitter_id.blank?
         errors[:base] << "You need to choose an account" unless twitter_account.present?
         errors[:base] << "You need to include tweet text" unless body.present?
       end
