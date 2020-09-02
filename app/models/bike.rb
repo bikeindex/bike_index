@@ -706,8 +706,6 @@ class Bike < ApplicationRecord
       "bike_update"
     elsif b_params_address.present?
       "initial_creation"
-    else
-      nil
     end
   end
 
