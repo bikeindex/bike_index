@@ -344,19 +344,21 @@ RSpec.describe OrganizationExportWorker, type: :job do
               organization_affiliation: "community_member",
               phone: "7177423423",
               sticker: nil,
-              address: nil,
-              city: nil,
-              state: nil,
-              zipcode: nil,
+              address: "717 Market St",
+              city: "San Francisco",
+              state: "CA",
+              zipcode: "94103",
               partial_registration: nil
             }
           end
           it "returns expected values" do
-            bike.reload
-            expect(bike.registration_address_source).to eq "initial_creation"
+            VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+              bike.reload
+              expect(bike.registration_address_source).to eq "initial_creation"
+              expect(bike.registration_address).to eq target_address
+            end
             instance.perform(export.id)
             export.reload
-            pp export.written_headers
             expect(instance.export_headers).to eq export.written_headers
             expect(export.written_headers).to match_array target_full_row.keys.map(&:to_s)
             expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
@@ -365,7 +367,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
             generated_csv_string = export.file.read
             expect(generated_csv_string.split("\n").count).to eq 3
             bike_line = generated_csv_string.split("\n")[1]
-            pp bike_line
             expect(bike_line.split(",").count).to eq target_full_row.keys.count
             expect(bike_line).to eq instance.comma_wrapped_string(target_full_row.values).strip
 
