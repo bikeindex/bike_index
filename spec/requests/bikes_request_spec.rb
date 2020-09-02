@@ -640,6 +640,7 @@ RSpec.describe BikesController, type: :request do
       let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
       it "updates email and marks not user hidden" do
         bike.reload
+        expect(bike.claimed?).to be_falsey
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
         expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.unregistered_parking_notification?).to be_truthy
@@ -655,6 +656,7 @@ RSpec.describe BikesController, type: :request do
           expect(flash[:success]).to be_present
         }.to change(Ownership, :count).by 1
         bike.reload
+        expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.user_id).to be_blank
         expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
         expect(bike.created_by_parking_notification).to be_truthy
@@ -665,6 +667,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.created_by_parking_notification).to be_truthy
       end
       context "add extra information" do
+        let(:auto_user) { current_user }
         it "updates, doesn't change status" do
           bike.reload
           expect(bike.claimed?).to be_falsey
@@ -680,6 +683,7 @@ RSpec.describe BikesController, type: :request do
             expect(flash[:success]).to be_present
           }.to_not change(Ownership, :count)
           bike.reload
+          expect(bike.claimed?).to be_truthy
           expect(bike.description).to eq "sooo cool and stuff"
           expect(bike.created_by_parking_notification).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
