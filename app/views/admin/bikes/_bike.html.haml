@@ -29,6 +29,9 @@
                 %td.only-dev-visible ID
                 %td.only-dev-visible
                   %code= bike.id
+                  %small.ml-2
+                    status:
+                    %code= bike.status&.gsub("status_", "")
 
             %tr
               %td

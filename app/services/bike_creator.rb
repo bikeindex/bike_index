@@ -45,6 +45,7 @@ class BikeCreator
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,
+      can_edit_claimed: @b_param.unregistered_parking_notification?,
       organization_id: @bike.creation_organization_id
     }
   end

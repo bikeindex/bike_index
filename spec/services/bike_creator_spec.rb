@@ -308,6 +308,8 @@ RSpec.describe BikeCreator do
         expect(bike.visible_by?(User.new)).to be_falsey
         expect(bike.visible_by?(auto_user)).to be_truthy
         expect(bike.visible_by?(creator)).to be_truthy
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.current_parking_notification

@@ -21,6 +21,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(json_result).to eq("parking_notifications" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
+        expect(response.headers["Vary"]).to eq "Accept"
       end
       context "with an impound_record" do
         let(:impound_record) { FactoryBot.create(:impound_record) }

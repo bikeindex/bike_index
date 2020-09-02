@@ -110,6 +110,10 @@ RSpec.describe BikesController, type: :request do
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
           expect(bike.created_by_parking_notification).to be_truthy
+          get "#{base_url}/#{bike.id}/edit"
+          expect(response.status).to eq(200)
+          expect(assigns(:bike)).to eq bike
+          expect(bike.created_by_parking_notification).to be_truthy
         end
       end
     end
@@ -636,6 +640,7 @@ RSpec.describe BikesController, type: :request do
       let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
       it "updates email and marks not user hidden" do
         bike.reload
+        expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
         expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.unregistered_parking_notification?).to be_truthy
         expect(bike.user_hidden).to be_truthy
@@ -657,6 +662,34 @@ RSpec.describe BikesController, type: :request do
         expect(bike.user_hidden).to be_falsey
         expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
         expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
+        expect(bike.created_by_parking_notification).to be_truthy
+      end
+      context "add extra information" do
+        it "updates, doesn't change status" do
+          bike.reload
+          expect(bike.claimed?).to be_falsey
+          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.unregistered_parking_notification?).to be_truthy
+          expect(bike.user_hidden).to be_truthy
+          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+          expect(bike.ownerships.count).to eq 1
+          expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+          Sidekiq::Worker.clear_all
+          expect {
+            patch "#{base_url}/#{bike.id}", params: { bike: { description: "sooo cool and stuff" } }
+            expect(flash[:success]).to be_present
+          }.to_not change(Ownership, :count)
+          bike.reload
+          expect(bike.description).to eq "sooo cool and stuff"
+          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.unregistered_parking_notification?).to be_truthy
+          expect(bike.user_hidden).to be_truthy
+          # And make sure it still can be rendered
+          get "#{base_url}/#{bike.id}/edit"
+          expect(response.status).to eq(200)
+          expect(assigns(:bike)).to eq bike
+          expect(bike.created_by_parking_notification).to be_truthy
+        end
       end
     end
     context "adding location to a stolen bike" do
