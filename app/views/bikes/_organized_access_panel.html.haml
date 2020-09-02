@@ -130,7 +130,9 @@
                             %small invalid address
                         - if @bike.registration_address_source.present?
                           %br
-                          %small
+                          %small.less-strong
+                            %em
+                              Address source:
                             = @bike.registration_address_source.humanize
 
                   - else

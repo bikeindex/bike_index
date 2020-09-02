@@ -259,6 +259,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address).to eq target_address
+            expect(bike.registration_address_source).to eq "initial_creation"
             instance.perform(export.id)
           end
           export.reload
@@ -351,15 +352,20 @@ RSpec.describe OrganizationExportWorker, type: :job do
             }
           end
           it "returns expected values" do
+            bike.reload
+            expect(bike.registration_address_source).to eq "initial_creation"
             instance.perform(export.id)
             export.reload
+            pp export.written_headers
             expect(instance.export_headers).to eq export.written_headers
+            expect(export.written_headers).to match_array target_full_row.keys.map(&:to_s)
             expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
             expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
             expect(export.progress).to eq "finished"
             generated_csv_string = export.file.read
             expect(generated_csv_string.split("\n").count).to eq 3
             bike_line = generated_csv_string.split("\n")[1]
+            pp bike_line
             expect(bike_line.split(",").count).to eq target_full_row.keys.count
             expect(bike_line).to eq instance.comma_wrapped_string(target_full_row.values).strip
 
