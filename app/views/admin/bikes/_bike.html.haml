@@ -53,6 +53,28 @@
                 %small.convertTimezone
             %tr
               %td
+                Creation
+              %td
+                - if bike.creation_organization.present?
+                  = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
+                - else
+                  %small.less-strong
+                    self reg
+                - if bike.creation_description.present?
+                  \-
+                  %em
+                    Via
+                    = origin_display(bike.creation_description)
+                - if bike.creation_state&.bulk_import.present?
+                  %br
+                  Import
+                  = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
+                    \##{bike.creation_state.bulk_import_id}
+                    - if bike.creation_state.bulk_import.ascend?
+                      %small
+                        Ascend
+            %tr
+              %td
                 Updated
               %td
                 %span.convertTime
@@ -84,8 +106,8 @@
               %td
                 - if bike.user.donor?
                   <span class="donor-icon">D</span><span class="less-strong">onor</span>
-                - if bike.user.paid_org?
-                  %br
+                  - if bike.user.paid_org?
+                    %br
                 - if bike.user.paid_org?
                   <span class="less-strong">Paid</span> <span class="paid-org-icon">O</span><span class="less-strong">rganization member</span>
           - else
@@ -100,42 +122,35 @@
             %td
               %em.less-strong
                 = bike.cached_data
-          %tr
-            %td
-              Creation
-            %td
-              - if bike.creation_organization.present?
-                = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
-              - else
-                %small.less-strong
-                  self reg
-              - if bike.creation_description.present?
-                \-
-                %em
-                  Via
-                  = origin_display(bike.creation_description)
-              - if bike.creation_state&.bulk_import.present?
-                %br
-                Import
-                = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
-                  \##{bike.creation_state.bulk_import_id}
-                  - if bike.creation_state.bulk_import.ascend?
-                    %small
-                      Ascend
+          - address = bike.address_hash
           %tr
             %td
               Address
             %td
               %small
-                - address = bike.registration_address || bike.address
+
                 - if address.present? # Make this a little easier to see, don't use ruby specific hashes
                   \{
                   = address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                   \}
-                - if current_user.developer?
-                  %span.only-dev-visible.ml-2
-                    manual:
-                    = bike.address_set_manually
+
+          - reg_address = bike.registration_address
+          - if reg_address.present? && reg_address != address
+            %tr
+              %td
+                Reg Address
+              %td
+                %small
+
+                  - if reg_address.present? # Make this a little easier to see, don't use ruby specific hashes
+                    \{
+                    = reg_address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
+                    \}
+                    - if current_user.developer?
+                      %small.only-dev-visible.ml-2
+                        %em
+                          source:
+                        = bike.registration_address_source
 
           -# Only show phone if no stolen record
           - if stolen_record.blank? && bike.phone.present?

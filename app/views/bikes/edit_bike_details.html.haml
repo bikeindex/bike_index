@@ -87,8 +87,8 @@
             .form-well-input
               = f.text_field :extra_registration_number, class: 'form-control'
 
-          -# Only show the bike location fields if the bike isn't stolen
-          - unless @bike.current_stolen_record.present?
+          -# Only show the bike location fields if the bike isn't stolen and if the user hasn't set the address
+          - unless current_user.address_set_manually || @bike.current_stolen_record.present?
             .related-fields.no-divider-row
               .form-group.row.fancy-select-placeholder.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
                 = f.label :country_id, class: 'form-well-label'
@@ -118,12 +118,12 @@
                 .form-well-input
                   = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
 
+          - if @bike.sticker_organizations.none?
+            = render "shared/form_well_footer_save"
 
-          = render "shared/form_well_footer_save"
-
-          - if @bike.sticker_organizations.any?
-            %hr
-            .related-fields.mt-4
+          - else
+            %hr.d-none.d-md-block
+            .related-fields.mt-4.no-divider-row
               - if @bike.bike_stickers.any?
                 .form-group.row
                   %label.form-well-label

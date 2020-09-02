@@ -66,6 +66,17 @@
   }
 }
 
+@media (max-width: 400px) {
+  .edit-bike-page-bike_details {
+    .frame-sizes .frame-size-units {
+      right: 0.6rem;
+    }
+    .frame-size-other .form-well-input {
+      max-width: 5rem;
+    }
+  }
+}
+
 @media (min-width: $grid-breakpoint-md) {
   .edit-bike-page-bike_details {
     .frame-sizes {

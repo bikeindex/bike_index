@@ -15,7 +15,7 @@ class Bike < ApplicationRecord
     status_abandoned: 2,
     status_impounded: 3,
     unregistered_parking_notification: 4
-  }
+  }.freeze
 
   belongs_to :manufacturer
   belongs_to :primary_frame_color, class_name: "Color"
@@ -699,16 +699,27 @@ class Bike < ApplicationRecord
     registration_address["street"].present? && registration_address["city"].present?
   end
 
+  def registration_address_source
+    if user&.address_set_manually
+      "user"
+    elsif address_set_manually
+      "bike_update"
+    elsif b_params_address.present?
+      "initial_creation"
+    else
+      nil
+    end
+  end
+
   # Goes along with organization additional_registration_fields
   def registration_address
     return @registration_address if defined?(@registration_address)
-
-    @registration_address = if user&.address_present?
-      user&.address_hash
-    elsif address_set_manually
-      address_hash
+    @registration_address = case registration_address_source
+    when "user" then user&.address_hash
+    when "bike_update" then address_hash
+    when "initial_creation" then b_params_address
     else
-      b_params_address || {}
+      {}
     end
   end
 

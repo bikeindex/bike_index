@@ -207,6 +207,7 @@ class UsersController < ApplicationController
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end
+    pparams[:address_set_manually] = pparams["street"].present? unless @user.address_set_manually
     pparams
   end
 

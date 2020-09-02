@@ -27,7 +27,7 @@ RSpec.describe CreationState, type: :model do
     context "bulk" do
       let(:creation_state) { CreationState.new(is_bulk: true, origin: "api_v12") }
       it "returns bulk reg" do
-        expect(creation_state.creation_description).to eq "bulk reg"
+        expect(creation_state.creation_description).to eq "bulk import"
         expect(creation_state.is_pos).to be_falsey
       end
     end

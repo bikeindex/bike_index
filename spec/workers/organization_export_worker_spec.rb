@@ -259,6 +259,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address).to eq target_address
+            expect(bike.registration_address_source).to eq "initial_creation"
             instance.perform(export.id)
           end
           export.reload
@@ -343,17 +344,23 @@ RSpec.describe OrganizationExportWorker, type: :job do
               organization_affiliation: "community_member",
               phone: "7177423423",
               sticker: nil,
-              address: nil,
-              city: nil,
-              state: nil,
-              zipcode: nil,
+              address: "717 Market St",
+              city: "San Francisco",
+              state: "CA",
+              zipcode: "94103",
               partial_registration: nil
             }
           end
           it "returns expected values" do
+            VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+              bike.reload
+              expect(bike.registration_address_source).to eq "initial_creation"
+              expect(bike.registration_address).to eq target_address
+            end
             instance.perform(export.id)
             export.reload
             expect(instance.export_headers).to eq export.written_headers
+            expect(export.written_headers).to match_array target_full_row.keys.map(&:to_s)
             expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
             expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
             expect(export.progress).to eq "finished"

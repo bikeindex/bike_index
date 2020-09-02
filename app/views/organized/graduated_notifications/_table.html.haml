@@ -41,7 +41,7 @@
         %td
           -# NOTE: we permit viewing the non-primary notifications, but only link to the primary ones here
           - notification_link = graduated_notification.primary_notification_id.present? ? graduated_notification.primary_notification_id : graduated_notification.id
-          %a.convertTime.preciseTime{ href: organization_graduated_notification_path(notification_link.to_param, organization_id: graduated_notification.organization_id) }
+          %a.convertTime{ href: organization_graduated_notification_path(notification_link.to_param, organization_id: graduated_notification.organization_id) }
             = l(graduated_notification.created_at, format: :convert_time)
         %td.small
           - if graduated_notification.processed_at.present?

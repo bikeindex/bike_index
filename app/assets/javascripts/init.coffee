@@ -86,7 +86,7 @@ class BikeIndex.Init extends BikeIndex
       )
       history.replaceState({}, "", "#{location.pathname}#{$target.attr('href')}")
 
-  displayLocalDate: (time, preciseTime = false, withPreposition = false) ->
+  displayLocalDate: (time, preciseTime, withPreposition) ->
     # Ensure we return if it's a big future day
     if time < window.tomorrow
       if time > window.today
@@ -100,7 +100,7 @@ class BikeIndex.Init extends BikeIndex
       str = if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
     else
       str = if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
-    "on #{str}"
+    if withPreposition then "on #{str}" else str
 
   localizeTimes: ->
     window.localTimezone ||= moment.tz.guess()

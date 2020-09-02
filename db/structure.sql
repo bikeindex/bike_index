@@ -2809,7 +2809,8 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    general_alerts jsonb DEFAULT '[]'::jsonb
+    general_alerts jsonb DEFAULT '[]'::jsonb,
+    address_set_manually boolean DEFAULT false
 );
 
 
@@ -5355,6 +5356,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200813154458'),
 ('20200813221439'),
 ('20200831194703'),
-('20200901165655');
+('20200901165655'),
+('20200901181453');
 
 
