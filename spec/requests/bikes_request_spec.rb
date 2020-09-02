@@ -535,10 +535,14 @@ RSpec.describe BikesController, type: :request do
         expect(response).to redirect_to(bike_path(bike.id))
       end
       context "organization member" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
         let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization)}
         it "renders" do
           bike.reload
+          expect(bike.claimed?).to be_truthy
           expect(bike.status).to eq "status_impounded"
+          expect(bike.bike_organizations.map(&:organization_id)).to eq([])
+          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
           get "#{base_url}/#{bike.id}/edit"
           expect(flash).to be_blank
           expect(response).to render_template(:edit_bike_details)
@@ -669,8 +673,10 @@ RSpec.describe BikesController, type: :request do
       context "add extra information" do
         let(:auto_user) { current_user }
         it "updates, doesn't change status" do
+          bike.current_ownership.update(owner_email: current_user.email) # Can't figure out how to set this in the factory :(
           bike.reload
           expect(bike.claimed?).to be_falsey
+          expect(bike.claimable_by?(current_user)).to be_truthy
           expect(bike.created_by_parking_notification).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
           expect(bike.user_hidden).to be_truthy
