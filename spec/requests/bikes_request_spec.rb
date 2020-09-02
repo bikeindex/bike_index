@@ -674,7 +674,6 @@ RSpec.describe BikesController, type: :request do
           expect(bike.created_by_parking_notification).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
           expect(bike.user_hidden).to be_truthy
-          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
           expect(bike.ownerships.count).to eq 1
           expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
           Sidekiq::Worker.clear_all
@@ -683,7 +682,6 @@ RSpec.describe BikesController, type: :request do
             expect(flash[:success]).to be_present
           }.to_not change(Ownership, :count)
           bike.reload
-          expect(bike.claimed?).to be_truthy
           expect(bike.description).to eq "sooo cool and stuff"
           expect(bike.created_by_parking_notification).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
@@ -693,6 +691,10 @@ RSpec.describe BikesController, type: :request do
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
           expect(bike.created_by_parking_notification).to be_truthy
+          bike.reload
+          expect(bike.claimed?).to be_truthy # Claimed by the edit render
+          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.unregistered_parking_notification?).to be_truthy
         end
       end
     end
