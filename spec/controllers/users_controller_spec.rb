@@ -511,7 +511,7 @@ RSpec.describe UsersController, type: :controller do
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
       it "sets address, geocodes" do
         user.reload
-        expect(user.manually_set_address).to be_falsey
+        expect(user.address_set_manually).to be_falsey
         set_current_user(user)
         expect(user.notification_newsletters).to be_falsey
         put :update, params: {
@@ -539,18 +539,18 @@ RSpec.describe UsersController, type: :controller do
         expect(user.latitude).to eq default_location[:latitude]
         expect(user.longitude).to eq default_location[:longitude]
         expect(user.phone).to eq "3223232"
-        expect(user.manually_set_address).to be_truthy
+        expect(user.address_set_manually).to be_truthy
       end
     end
 
     it "updates the terms of service" do
       user.reload
-      expect(user.manually_set_address).to be_falsey
+      expect(user.address_set_manually).to be_falsey
       set_current_user(user)
       put :update, params: {id: user.username, user: {terms_of_service: "1"}}
       expect(response).to redirect_to(my_account_url)
       expect(user.reload.terms_of_service).to be_truthy
-      expect(user.manually_set_address).to be_falsey
+      expect(user.address_set_manually).to be_falsey
     end
 
     describe "preferred_language" do

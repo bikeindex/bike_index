@@ -88,7 +88,7 @@
               = f.text_field :extra_registration_number, class: 'form-control'
 
           -# Only show the bike location fields if the bike isn't stolen and if the user hasn't set the address
-          - if !current_user.manually_set_address && @bike.current_stolen_record.blank?
+          - unless current_user.address_set_manually || @bike.current_stolen_record.present?
             .related-fields.no-divider-row
               .form-group.row.fancy-select-placeholder.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
                 = f.label :country_id, class: 'form-well-label'
