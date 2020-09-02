@@ -700,7 +700,6 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
-    return nil unless address_present?
     return "user" if user&.address_set_manually
     return "bike_update" if address_set_manually
     return "initial_creation" if b_params_address.present?

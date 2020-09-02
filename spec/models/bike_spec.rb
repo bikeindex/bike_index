@@ -1063,12 +1063,13 @@ RSpec.describe Bike, type: :model do
     context "with user with address" do
       let(:country) { Country.united_states }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
-      let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007") }
+      let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007", address_set_manually: true) }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
         expect(user.address_hash).to eq default_location_registration_address
         bike.reload
+        expect(bike.registration_address_source).to eq "user"
         expect(bike.registration_address).to eq default_location_registration_address
       end
       context "ownership creator" do
@@ -1076,6 +1077,7 @@ RSpec.describe Bike, type: :model do
         it "returns nothing" do
           expect(user.address_hash).to eq default_location_registration_address
           expect(bike.user).to_not eq user
+          expect(bike.registration_address_source).to be_blank
           expect(bike.registration_address.values.compact).to eq([])
         end
       end
@@ -1127,7 +1129,6 @@ RSpec.describe Bike, type: :model do
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
           bike.reload
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
-          pp bike.send(:b_params_address)
           expect(bike.registration_address_source).to eq "initial_creation"
           expect(bike.registration_address).to eq target.as_json
         end
@@ -1140,7 +1141,7 @@ RSpec.describe Bike, type: :model do
             expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
             expect(bike.registration_address).to eq target.as_json
             expect(bike.address_set_manually).to be_truthy
-            expect(bike.registration_address_source).to eq "initial_creation"
+            expect(bike.registration_address_source).to eq "bike_update"
           end
         end
       end
