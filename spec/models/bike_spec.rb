@@ -990,13 +990,11 @@ RSpec.describe Bike, type: :model do
   describe "address_source" do
     let(:bike) { FactoryBot.create(:bike) }
     it "returns nil" do
-      expect(bike.address_source).to be_blank
       expect(bike.registration_address_source).to be_blank
     end
     context "address set on bike" do
       it "returns bike_update" do
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
-        expect(bike.address_source).to eq "bike_update"
         expect(bike.registration_address_source).to eq "bike_update"
       end
     end
@@ -1005,7 +1003,6 @@ RSpec.describe Bike, type: :model do
       let(:b_param_params) { {bike: {street: "2864 Milwaukee Ave"}} }
       it "returns creation_information" do
         bike.reload
-        expect(bike.address_source).to eq "initial_creation"
         expect(bike.registration_address_source).to eq "initial_creation"
       end
       context "user with address address_set_manually" do
@@ -1013,14 +1010,12 @@ RSpec.describe Bike, type: :model do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
         it "returns user address" do
           bike.reload
-          expect(bike.address_source).to eq "user"
           expect(bike.registration_address_source).to eq "user"
         end
       end
       context "with stolen record" do
         let(:bike) { FactoryBot.create(:stolen_bike) }
         it "returns initial_creation" do
-          expect(bike.address_source).to eq "stolen_record"
           expect(bike.registration_address_source).to eq "initial_creation"
         end
       end
@@ -1132,6 +1127,8 @@ RSpec.describe Bike, type: :model do
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
           bike.reload
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
+          pp bike.send(:b_params_address)
+          expect(bike.registration_address_source).to eq "initial_creation"
           expect(bike.registration_address).to eq target.as_json
         end
         context "with address_set_manually" do
@@ -1142,6 +1139,8 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
             expect(bike.registration_address).to eq target.as_json
+            expect(bike.address_set_manually).to be_truthy
+            expect(bike.registration_address_source).to eq "initial_creation"
           end
         end
       end
@@ -1634,7 +1633,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.address_hash).to eq({country: "US", state: "IL", street: nil, city: nil, zipcode: nil, latitude: nil, longitude: nil}.as_json)
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.should_be_geocoded?).to be_falsey
-          expect(bike.registration_address_source).to eq "stolen_record"
+          expect(bike.registration_address_source).to be_blank
         end
       end
       context "given a parking notification" do
@@ -1645,7 +1644,8 @@ RSpec.describe Bike, type: :model do
           expect(bike.current_parking_notification).to eq parking_notification
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           expect(bike.address_hash).to eq stolen_record.address_hash
-          expect(bike.registration_address_source).to eq "stolen_record"
+          expect(bike.address_set_manually).to be_falsey
+          expect(bike.registration_address_source).to be_blank
         end
       end
     end

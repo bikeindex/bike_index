@@ -128,6 +128,11 @@
                             %br
                           %span.text-warning
                             %small invalid address
+                        - if @bike.registration_address_source.present?
+                          %br
+                          %small
+                            = @bike.registration_address_source.humanize
+
                   - else
                     %tr
                       %td

@@ -2810,7 +2810,7 @@ CREATE TABLE public.users (
     last_login_ip character varying,
     magic_link_token text,
     general_alerts jsonb DEFAULT '[]'::jsonb,
-    manually_set_address boolean DEFAULT false
+    address_set_manually boolean DEFAULT false
 );
 
 

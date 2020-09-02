@@ -703,7 +703,8 @@ class Bike < ApplicationRecord
     return nil unless address_present?
     return "user" if user&.address_set_manually
     return "bike_update" if address_set_manually
-    b_params_address.present? ? "initial_creation" : nil
+    return "initial_creation" if b_params_address.present?
+    nil
   end
 
   # Goes along with organization additional_registration_fields
@@ -891,12 +892,11 @@ class Bike < ApplicationRecord
   end
 
   def b_params_address
-    return @b_params_address if defined?(@b_params_address)
     bp_address = {}
     b_params.each do |b_param|
       bp_address = b_param.fetch_formatted_address
       break if bp_address.present?
     end
-    @b_params_address = bp_address
+    bp_address
   end
 end
