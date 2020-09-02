@@ -700,10 +700,15 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
-    return "user" if user&.address_set_manually
-    return "bike_update" if address_set_manually
-    return "initial_creation" if b_params_address.present?
-    nil
+    if user&.address_set_manually
+      "user"
+    elsif address_set_manually
+      "bike_update"
+    elsif b_params_address.present?
+      "initial_creation"
+    else
+      nil
+    end
   end
 
   # Goes along with organization additional_registration_fields

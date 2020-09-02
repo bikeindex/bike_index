@@ -52,27 +52,27 @@
                   = l bike.created_at, format: :convert_time
                 %small.convertTimezone
             %tr
-            %td
-              Creation
-            %td
-              - if bike.creation_organization.present?
-                = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
-              - else
-                %small.less-strong
-                  self reg
-              - if bike.creation_description.present?
-                \-
-                %em
-                  Via
-                  = origin_display(bike.creation_description)
-              - if bike.creation_state&.bulk_import.present?
-                %br
-                Import
-                = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
-                  \##{bike.creation_state.bulk_import_id}
-                  - if bike.creation_state.bulk_import.ascend?
-                    %small
-                      Ascend
+              %td
+                Creation
+              %td
+                - if bike.creation_organization.present?
+                  = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
+                - else
+                  %small.less-strong
+                    self reg
+                - if bike.creation_description.present?
+                  \-
+                  %em
+                    Via
+                    = origin_display(bike.creation_description)
+                - if bike.creation_state&.bulk_import.present?
+                  %br
+                  Import
+                  = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
+                    \##{bike.creation_state.bulk_import_id}
+                    - if bike.creation_state.bulk_import.ascend?
+                      %small
+                        Ascend
             %tr
               %td
                 Updated
