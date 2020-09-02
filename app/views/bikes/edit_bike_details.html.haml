@@ -87,8 +87,10 @@
             .form-well-input
               = f.text_field :extra_registration_number, class: 'form-control'
 
-          -# Only show the bike location fields if the bike isn't stolen and if the user hasn't set the address
-          - unless current_user.address_set_manually || @bike.current_stolen_record.present?
+          -# If the user has set their address, that's the only way to update bike addresses
+          -# parking notifications, impounded, stolen etc use the associated record for their address
+          - skip_address_fields = %w[status_impounded unregistered_parking_notification status_stolen].include?(@bike.status) || @bike.user&.address_set_manually || @bike.current_stolen_record.present?
+          - unless skip_address_fields
             .related-fields.no-divider-row
               .form-group.row.fancy-select-placeholder.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
                 = f.label :country_id, class: 'form-well-label'

@@ -30,6 +30,7 @@ module Organized
       end
       @search_unregistered = %w[only_unregistered not_unregistered].include?(params[:search_unregistered]) ? params[:search_unregistered] : "all"
 
+      headers["Vary"] = "Accept" # When hitting back button, tell browser not use the json response
       respond_to do |format|
         format.html
         format.json do

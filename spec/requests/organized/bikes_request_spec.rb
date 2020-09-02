@@ -120,6 +120,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.user_hidden).to be_truthy
         expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.public_images.count).to eq 1
+        expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
 
         testable_bike_params.except(:serial_number).each do |k, v|
           pp k unless bike.send(k).to_s == v.to_s

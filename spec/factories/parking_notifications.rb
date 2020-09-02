@@ -27,7 +27,7 @@ FactoryBot.define do
         transient do
           ownership { FactoryBot.create(:ownership, creator: user, bike: bike) }
         end
-        bike { FactoryBot.create(:bike_organized, creator: user, organization: organization, status: "unregistered_parking_notification") }
+        bike { FactoryBot.create(:bike_organized, creator: user, can_edit_claimed: true, organization: organization, status: "unregistered_parking_notification") }
         after(:create) do |parking_notification, evaluator|
           evaluator.ownership.save
           parking_notification.bike.update_attributes(marked_user_hidden: true)
