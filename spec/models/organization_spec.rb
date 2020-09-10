@@ -18,17 +18,17 @@ RSpec.describe Organization, type: :model do
   describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
-      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, search_radius: 10)
+      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
       chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org, skip_geocoding: true, address_set_manually: true)
 
-      nyc_org2 = FactoryBot.create(:organization, :in_nyc, search_radius: 10)
+      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
       nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
 
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc, search_radius: 10)
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
       nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
@@ -54,13 +54,50 @@ RSpec.describe Organization, type: :model do
       # Make sure we get the bikes from the org or from nearby
       expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
         .to(match_array([chi_bike1, nyc_bike2, nyc_bike3]))
+    end
+  end
 
-      # TODO: Test the inclusion/exclusion of organizations with the same parent_organization_id
-      nyc_org2.reload
-      expect(nyc_org2.nearby_organizations.pluck(:id)).to match_array([nyc_org1.id, nyc_org3.id])
-      nyc_org2.update(parent_organization_id: nyc_org1)
-      nyc_org2.reload
-      expect(nyc_org2.nearby_organizations.pluck(:id)).to eq([nyc_org3.id])
+  describe "nearby_organizations inclusion/exclusion" do
+    # LAPD has precincts as child organizations - we need to make the individual organizations have search areas, and have that bubble up
+    include_context :geocoder_real
+    let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: %w[child_organizations regional_bike_counts]) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, organization: organization_parent) }
+    let(:country) { Country.united_states }
+    let(:state) { FactoryBot.create(:state_california) }
+    let(:organization_parent) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 50) }
+    let(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
+    let(:organization_child2) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
+    let(:organization_child3) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
+    let(:organization_shop) { FactoryBot.create(:organization, kind: "bike_shop") }
+    let(:location_parent) { organization_parent.locations.create(state: state, country: country, city: "Los Angeles", street: "100 West 1st Street", zipcode: "90012", name: organization_parent.name) }
+    let(:location_child1) { organization_child1.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90014", name: organization_child1.name) }
+    let(:location_child2) { organization_child2.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90017", name: organization_child2.name) }
+    let(:location_child3) { organization_child3.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "91325", name: organization_child3.name) }
+    let(:location_shop) { organization_shop.locations.create(state: state, country: country, city: "Los Angeles", street: "1626 S Hill St", zipcode: "90015", name: organization_shop.name) }
+    let(:organization_ids) { [organization_parent.id, organization_child1.id, organization_child2.id, organization_child3.id, organization_shop.id] }
+    it "matches organizations as expected" do
+      VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
+        invoice.update(organization_feature_ids: [organization_feature.id], child_enabled_feature_slugs_string: "regional_bike_counts, child_organizations")
+        expect([location_parent, location_child1, location_child2, location_child3, location_shop].count).to eq 5
+        UpdateOrganizationAssociationsWorker.new.perform(organization_ids)
+        organization_parent.reload && organization_child1.reload && organization_child2.reload && organization_child3.reload && organization_shop.reload
+
+        expect(organization_child1.enabled_feature_slugs).to match_array(%w[child_organizations regional_bike_counts])
+        expect(organization_shop.enabled_feature_slugs).to eq([])
+        expect(organization_shop.nearby_organizations.pluck(:id)).to eq([])
+        expect(organization_parent.nearby_organizations.pluck(:id)).to eq([organization_shop.id])
+        # Testing internal method, which is used for calculation
+        expect(organization_parent.send(:nearby_organizations_including_siblings).pluck(:id)).to eq([organization_shop.id])
+        expect(organization_child1.send(:nearby_organizations_including_siblings).pluck(:id)).to eq([organization_child2.id, organization_shop.id])
+        expect(organization_child1.nearby_organizations.pluck(:id)).to eq([organization_shop.id])
+        expect(organization_child2.nearby_organizations.pluck(:id)).to eq([organization_shop.id])
+        expect(organization_child3.nearby_organizations.pluck(:id)).to eq([])
+
+        expect(organization_parent.nearby_and_partner_organization_ids).to match_array(organization_ids)
+        expect(organization_child1.nearby_and_partner_organization_ids).to match_array(organization_ids - [organization_child3.id])
+        expect(organization_child2.nearby_and_partner_organization_ids).to match_array(organization_ids - [organization_child3.id])
+        expect(organization_child3.nearby_and_partner_organization_ids).to match_array([organization_child3.id, organization_parent.id])
+      end
     end
   end
 

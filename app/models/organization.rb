@@ -287,17 +287,13 @@ class Organization < ApplicationRecord
   end
 
   def nearby_organizations
-    return self.class.none unless regional? && search_coordinates_set?
-    return @nearby_organizations if defined?(@nearby_organizations)
-    nearby_organizations ||= self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
-    if parent_organization_id.present?
-      nearby_organizations = nearby_organizations.where.not(parent_organization_id: parent_organization_id)
-    end
-    @nearby_organizations = nearby_organizations.reorder(id: :asc)
+    # Have to do fancy dance to match null parent_organization_id values
+    @nearby_organizations = nearby_organizations_including_siblings
+      .where("parent_organization_id != ? or parent_organization_id is null", parent_organization_id)
   end
 
   def nearby_and_partner_organization_ids
-    [id] + child_ids + nearby_organizations.pluck(:id)
+    [id, parent_organization_id].compact + child_ids + nearby_organizations_including_siblings.pluck(:id)
   end
 
   def mail_snippet_body(snippet_kind)
@@ -421,7 +417,7 @@ class Organization < ApplicationRecord
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
-    self.regional_ids = nearby_organizations.pluck(:id) || []
+    self.regional_ids = nearby_organizations_including_siblings.pluck(:id) || []
     set_auto_user
     self.location_latitude = default_location&.latitude
     self.location_longitude = default_location&.longitude
@@ -480,6 +476,12 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def nearby_organizations_including_siblings
+    return self.class.none unless regional? && search_coordinates_set?
+    self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
+      .reorder(id: :asc)
+  end
 
   def strip_name_tags(str)
     strip_tags(name).gsub("&amp;", "&")
