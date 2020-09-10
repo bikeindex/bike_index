@@ -62,7 +62,7 @@ module BikeSearchable
           .compact.map(&:autocomplete_result_hash)
       end
       if interpreted_params[:colors].present?
-        items += colors.map { |id| Color.friendly_find(id)&.autocomplete_result_hash }.compact
+        items += interpreted_params[:colors].map { |id| Color.friendly_find(id)&.autocomplete_result_hash }.compact
       end
       items.flatten.compact
     end
@@ -102,6 +102,7 @@ module BikeSearchable
     end
 
     def searchable_query_items_colors(query_params)
+      # params[:colors] should be an array (or a comma delineated string) - otherwise we parse out of the query string
       if query_params[:colors].present?
         colors = query_params[:colors].is_a?(String) ? query_params[:colors].split(",") : query_params[:colors]
         return {colors: colors.map { |id| Color.friendly_id_find(id) }.compact}

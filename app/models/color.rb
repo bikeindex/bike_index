@@ -24,7 +24,7 @@ class Color < ApplicationRecord
   end
 
   def self.friendly_find(n)
-    # Use the FriendlyNameFindable version, then just the first part of the string, then anything
+    # Use the FriendlyNameFindable version, then the first part of the string (for slug), then grasp at straws
     super ||
       where("lower(name) ILIKE ?", "#{n.downcase.strip}%").first ||
       where("lower(name) ILIKE ?", "%#{n.downcase.strip}%").first
