@@ -51,21 +51,29 @@
   %h3.mt-4.uncap
     Registrations by related organizations
     = humanized_time_range(@time_range)
+  - render_regional_nearby = current_organization.child_organizations.first.regional?
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead
         %th Organization
         %th.small Signed up
-        %th Bikes
+        - if render_regional_nearby
+          %th Registered with org
+          %th Registered in area
+        - else
+          %th Bikes
       %tbody
         - current_organization.child_organizations.reorder(:name).each do |organization|
           %tr
             %td
-              = organization.name
+              = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
             %td
               %small.convertTime= l(organization.created_at, format: :convert_time)
             %td
               = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+            - if render_regional_nearby
+              %td
+                = number_with_delimiter(organization.nearby_bikes.where(created_at: @time_range).count)
 
 - if current_organization.nearby_organizations.any?
   %h3.mt-4.uncap

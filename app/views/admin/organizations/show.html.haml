@@ -23,12 +23,11 @@
   .col-md-6
     %table.table-list
       - if current_user.developer?
-        %tr
-          %td
+        %tr.small
+          %td.only-dev-visible
             ID
-          %td
-            %spand.less-strong.only-dev-visible
-              = @organization.id
+          %td.only-dev-visible
+            = @organization.id
       %tr
         %td
           Short Name
@@ -84,17 +83,14 @@
         %td
           = @organization.auto_user.email if @organization.auto_user.present?
       - if current_user.developer?
-        %tr
-          %td
+        %tr.small
+          %td.only-dev-visible
             API V1 token
-          %td
-            %pre.only-dev-visible#stupidLegacyToken{ style: "overflow-x: scroll;" }
+          %td.only-dev-visible
+            #stupidLegacyToken{ style: "overflow-x: scroll; " }
               %code.small
                 = @organization.access_token
-            :scss
-              @media (max-width: 1000px) {
-                #stupidLegacyToken { max-width: 250px; }
-              }
+
       %tr
         %td
           Users

@@ -1,0 +1,612 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=100%20West%201st%20Street,%20Los%20Angeles,%20CA%2090012,%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Sep 2020 16:18:12 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Los Angeles, CA
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=501
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+            ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "100",
+                         "short_name" : "100",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "West 1st Street",
+                         "short_name" : "W 1st St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Downtown Los Angeles",
+                         "short_name" : "Downtown Los Angeles",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles",
+                         "short_name" : "Los Angeles",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles County",
+                         "short_name" : "Los Angeles County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "90012",
+                         "short_name" : "90012",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "4112",
+                         "short_name" : "4112",
+                         "types" : [ "postal_code_suffix" ]
+                      }
+                   ],
+                   "formatted_address" : "100 W 1st St, Los Angeles, CA 90012, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 34.0519054,
+                         "lng" : -118.244526
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 34.0532543802915,
+                            "lng" : -118.2431770197085
+                         },
+                         "southwest" : {
+                            "lat" : 34.0505564197085,
+                            "lng" : -118.2458749802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJCUZHLknGwoARZwf-ITU7QoU",
+                   "plus_code" : {
+                      "compound_code" : "3Q24+Q5 Los Angeles, CA, USA",
+                      "global_code" : "85633Q24+Q5"
+                   },
+                   "types" : [ "street_address" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 10 Sep 2020 16:18:12 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=Los%20Angeles,%20CA%2090014,%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Sep 2020 16:18:13 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Los Angeles, CA
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=319
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+            ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "90014",
+                         "short_name" : "90014",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Downtown Los Angeles",
+                         "short_name" : "Downtown Los Angeles",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles",
+                         "short_name" : "Los Angeles",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles County",
+                         "short_name" : "Los Angeles County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Los Angeles, CA 90014, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 34.0480373,
+                            "lng" : -118.24524
+                         },
+                         "southwest" : {
+                            "lat" : 34.037303,
+                            "lng" : -118.257926
+                         }
+                      },
+                      "location" : {
+                         "lat" : 34.0434783,
+                         "lng" : -118.2519314
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 34.0480373,
+                            "lng" : -118.24524
+                         },
+                         "southwest" : {
+                            "lat" : 34.037303,
+                            "lng" : -118.257926
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJAf09JTTGwoARN_YCAlwyWA8",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 10 Sep 2020 16:18:13 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=Los%20Angeles,%20CA%2090017,%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Sep 2020 16:18:13 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Los Angeles, CA
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=372
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+            ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "90017",
+                         "short_name" : "90017",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Central LA",
+                         "short_name" : "Central LA",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles",
+                         "short_name" : "Los Angeles",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles County",
+                         "short_name" : "Los Angeles County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Los Angeles, CA 90017, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 34.060871,
+                            "lng" : -118.2541801
+                         },
+                         "southwest" : {
+                            "lat" : 34.0437269,
+                            "lng" : -118.274313
+                         }
+                      },
+                      "location" : {
+                         "lat" : 34.0543797,
+                         "lng" : -118.2672801
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 34.060871,
+                            "lng" : -118.2541801
+                         },
+                         "southwest" : {
+                            "lat" : 34.0437269,
+                            "lng" : -118.274313
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJW9EHUaXHwoARgRwmyTwx9OU",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 10 Sep 2020 16:18:14 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=Los%20Angeles,%20CA%2090019,%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Sep 2020 16:18:14 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Los Angeles, CA
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=330
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+            ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "90019",
+                         "short_name" : "90019",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Central LA",
+                         "short_name" : "Central LA",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles",
+                         "short_name" : "Los Angeles",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles County",
+                         "short_name" : "Los Angeles County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Los Angeles, CA 90019, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 34.05932,
+                            "lng" : -118.3090081
+                         },
+                         "southwest" : {
+                            "lat" : 34.036751,
+                            "lng" : -118.3738119
+                         }
+                      },
+                      "location" : {
+                         "lat" : 34.0489277,
+                         "lng" : -118.3403506
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 34.05932,
+                            "lng" : -118.3090081
+                         },
+                         "southwest" : {
+                            "lat" : 34.036751,
+                            "lng" : -118.3738119
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJk148aPm4woARliK8tZp97eo",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 10 Sep 2020 16:18:15 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=1626%20S%20Hill%20St,%20Los%20Angeles,%20CA%2090015,%20United%20States&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Sep 2020 16:18:15 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        X-Goog-Maps-Metro-Area:
+          - Los Angeles, CA
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=524
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+            ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+            ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "1626",
+                         "short_name" : "1626",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "South Hill Street",
+                         "short_name" : "S Hill St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Downtown Los Angeles",
+                         "short_name" : "Downtown Los Angeles",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles",
+                         "short_name" : "Los Angeles",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Los Angeles County",
+                         "short_name" : "Los Angeles County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "90015",
+                         "short_name" : "90015",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "1626 S Hill St, Los Angeles, CA 90015, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 34.0340409,
+                         "lng" : -118.2647776
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 34.0353898802915,
+                            "lng" : -118.2634286197085
+                         },
+                         "southwest" : {
+                            "lat" : 34.0326919197085,
+                            "lng" : -118.2661265802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJCQKde8XHwoARQff3KmeZj2Y",
+                   "types" : [ "subpremise" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Thu, 10 Sep 2020 16:18:15 GMT
+recorded_with: VCR 5.0.0

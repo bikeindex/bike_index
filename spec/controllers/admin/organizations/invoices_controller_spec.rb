@@ -67,11 +67,12 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.notes).to eq params[:notes]
       end
       context "with amount_do 0" do
+        let(:time) { (Time.current - 1.month).utc.to_s }
         it "makes the invoice active" do
           Sidekiq::Testing.inline! do
             invoice_params = params.merge(
               amount_due: "0",
-              end_at: "2020-09-05T23:00:00",
+              start_at: time,
               child_enabled_feature_slugs: %(parking_notifications passwordless_users)
             )
 
@@ -84,14 +85,15 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
             }.to change(Invoice, :count).by 1
 
             invoice = organization.invoices.last
+            expect(invoice.paid_in_full?).to be_truthy
             expect(invoice.active?).to be_truthy
             expect(organization.reload.is_paid).to be_truthy
             expect(organization.enabled_feature_slugs).to eq(%w[parking_notifications passwordless_users])
             expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
             expect(invoice.amount_due).to eq 0
             # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
-            expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
-            expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1536202800 + 2.years
+            expect(invoice.subscription_start_at.to_i).to be_within(1.day).of Time.parse(time).to_i
+            expect(invoice.subscription_end_at.to_i).to be_within(1.day).of (Time.parse(time) + 1.years).to_i
             expect(invoice.notes).to eq params[:notes]
           end
         end
