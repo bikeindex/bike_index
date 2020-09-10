@@ -1046,7 +1046,9 @@ RSpec.describe Bike, type: :model do
           expect(bike.owner_name).to eq "some name"
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
+          FactoryBot.create(:impound_record, bike: bike)
           bike.reload
+          expect(bike.avery_exportable?).to be_falsey
         end
       end
     end

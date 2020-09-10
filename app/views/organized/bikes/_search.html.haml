@@ -159,10 +159,10 @@
             - if @bike_sticker.present?
               %th
                 = t(".link")
-        - if show_avery_export
-          %th.hiddenColumn.hidden-xs-down.avery_cell=t(".avery")
         - if current_organization.enabled?("impound_bikes")
           %th.hiddenColumn.hidden-xs-down.impounded_cell=t(".impounded")
+        - if show_avery_export
+          %th.hiddenColumn.hidden-xs-down.avery_cell=t(".avery")
 
     %tbody
       - @bikes.each do |bike|
@@ -229,17 +229,17 @@
                         = bike_sticker.code
                     - if index > 0
                       %br
-          - if show_avery_export
+            - if current_organization.enabled?("impound_bikes")
+              %td.hiddenColumn.hidden-xs-down{ class: "impounded_cell" }
+                - if bike.status_impounded? && bike.current_impound_record&.created_at&.present?
+                  %small.convertTime
+                    = l bike.current_impound_record.created_at, format: :convert_time
+          - if show_avery_export # NOTE: this is outside of the cache for the bike
             %td.hiddenColumn.hidden-xs-down{ class: "avery_cell" }
               = check_mark if bike.avery_exportable?
-          - if current_organization.enabled?("impound_bikes")
-            %td.hiddenColumn.hidden-xs-down{ class: "impounded_cell" }
-              - if bike.status_impounded? && bike.current_impound_record&.created_at&.present?
-                %small.convertTime
-                  = l bike.current_impound_record.created_at, format: :convert_time
 - if @bikes.total_count > @bikes.count
   .paginate-container.paginate-container-bottom.row
     .col-sm-6.mb-2
       = paginate @bikes
     .col-sm-6.text-right
-      = select_tag :per_page, options_for_select([10, 25, 50].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }
+      = select_tag :per_page_select, options_for_select([10, 25, 50].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }

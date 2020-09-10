@@ -332,7 +332,7 @@ class Bike < ApplicationRecord
   end
 
   def avery_exportable?
-    owner_name.present? && valid_registration_address_present?
+    !impounded? && owner_name.present? && valid_registration_address_present?
   end
 
   def current_parking_notification

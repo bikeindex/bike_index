@@ -31,8 +31,16 @@ function BinxAppOrgBikes() {
       // When the avery cell is checked, add it to the params.
       $("#avery_cell").on("change", function (e) {
         let urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete("avery_export");
+        urlParams.delete("search_open");
         urlParams.append("avery_export", $("#avery_cell").prop("checked"));
         urlParams.append("search_open", true);
+        window.location = `${location.pathname}?${urlParams.toString()}`;
+      });
+      $("#per_page_select").on("change", function (e) {
+        let urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete("per_page");
+        urlParams.append("per_page", $("#per_page_select").val());
         window.location = `${location.pathname}?${urlParams.toString()}`;
       });
     },
