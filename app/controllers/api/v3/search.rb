@@ -7,7 +7,7 @@ module API
         params :non_serial_search_params do
           optional :query, type: String, desc: "Full text search"
           optional :manufacturer, type: String
-          optional :colors, type: Array
+          optional :colors, type: String, desc: "Color slugs or ids, comma delineated"
           optional :location, type: String, desc: "Location for proximity search", default: "IP"
           optional :distance, type: String, desc: "Distance in miles from `location` for proximity search", default: 10
           optional :stolenness, type: String, values: %w(non stolen proximity all) + [""], default: "stolen"

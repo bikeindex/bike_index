@@ -23,6 +23,13 @@ class Color < ApplicationRecord
     end
   end
 
+  def self.friendly_find(n)
+    # Use the FriendlyNameFindable version, then the first part of the string (for slug), then grasp at straws
+    super ||
+      where("lower(name) ILIKE ?", "#{n.to_s.downcase.strip}%").first ||
+      where("lower(name) ILIKE ?", "%#{n.to_s.downcase.strip}%").first
+  end
+
   def autocomplete_hash
     {
       id: id,
@@ -39,6 +46,10 @@ class Color < ApplicationRecord
 
   def search_id
     "c_#{id}"
+  end
+
+  def slug
+    name.downcase.split(/\W+/).first
   end
 
   def update_display_format
