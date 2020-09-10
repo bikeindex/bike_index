@@ -78,7 +78,7 @@ RSpec.describe Organization, type: :model do
     it "matches organizations as expected" do
       VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
         invoice.update(organization_feature_ids: [organization_feature.id], child_enabled_feature_slugs_string: "regional_bike_counts, child_organizations")
-        expect([location_parent, location_child1, location_child2, location_child3, location_shop].count).to eq 5
+        expect([location_parent, location_child1, location_child2, location_child3, location_shop].size).to eq 5
         UpdateOrganizationAssociationsWorker.new.perform(organization_ids)
         organization_parent.reload && organization_child1.reload && organization_child2.reload && organization_child3.reload && organization_shop.reload
 
