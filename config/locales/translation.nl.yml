@@ -3739,8 +3739,8 @@ nl:
       rad_power_serial: Serienummer Rad Power
       rad_power_serials_html: Rad Power-fietsen hebben hun serienummer op de <em>balhoofdbuis</em>
         . Dit zit aan de voorkant van de fiets.
-      some_schwinn_bicycles_also_html: Sommige Schwinn-fietsen hebben ook het unieke
-        identificatienummer (hun serienummer) op de balhoofdbuis.
+      some_schwinn_bicycles_also: Sommige Schwinn-fietsen hebben ook het unieke identificatienummer
+        (hun serienummer) op de balhoofdbuis.
     where:
       bike_index_partners: Bike Index-partners
       if_you_would_like_to_join_html: Als je een fietsenwinkel bent en je wilt meedoen,
