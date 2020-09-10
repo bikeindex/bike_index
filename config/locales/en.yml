@@ -4323,7 +4323,7 @@ en:
         bike: bike
         color: Color
         email_hidden: email hidden
-        impounded: Impounded
+        impounded: 'Impounded:'
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -4333,6 +4333,8 @@ en:
         only_no_sticker_html: Only <strong>no</strong> sticker
         only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
+        only_not_impounded_html: Bikes that <strong>are not</strong> impounded
+        only_impounded_html: Only <strong>impounded</strong> bikes
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
@@ -4348,6 +4350,9 @@ en:
         updated: Updated
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
+        impounded: Impounded
+        without_impounded_bikes: Hide impounded bikes
+        include_impounded_bikes: Include impounded bikes
         visible_columns: Visible columns
     bulk_imports:
       index:

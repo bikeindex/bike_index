@@ -150,12 +150,20 @@ module Organized
       else
         @search_address = false
       end
+      if search_impoundedness != "all"
+        bikes = @search_impoundedness == "impounded" ? bikes.status_impounded : bikes.where.not(status: "status_impounded")
+      end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
       @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+    end
+
+    def search_impoundedness
+      return "all" unless current_organization.enabled?("impound_bikes")
+      @search_impoundedness = %w[not impounded all].include?(params[:search_impoundedness]) ? params[:search_impoundedness] : "not"
     end
   end
 end
