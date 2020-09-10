@@ -4329,8 +4329,10 @@ en:
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
+        only_impounded_html: Only <strong>impounded</strong> bikes
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
+        only_not_impounded_html: Bikes that <strong>are not</strong> impounded
         only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name

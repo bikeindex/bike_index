@@ -69,10 +69,11 @@
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
   # If the search_stickers param or search_address is set, start with the settings panel open
-  settings_default_open = @search_stickers.present? || @search_address.present? || params[:search_open].present?
+  settings_default_open = @search_stickers.present? || @search_address.present? || params[:search_impoundedness].present? || params[:search_open].present?
   # NOTE: Checking avery incurs a performance hit - so only render it when the box is checked
   show_avery_export = current_organization.enabled?("avery_export") && ParamsNormalizer.boolean(params[:avery_export])
   initially_checked_columns += ["avery_cell"] if show_avery_export
+  initially_checked_columns += ["impounded_cell"] if @search_impoundedness == "impounded"
 
 .collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "") }
   %h3.header-font-alt
@@ -100,6 +101,15 @@
         = t(".only_with_address_html")
       = link_to organization_bikes_path(search_params.merge(search_address: "none")), class: "btn btn-secondary #{@search_address == 'none' ? 'active' : ''}" do
         = t(".only_no_address_html")
+
+  - if current_organization.enabled?("impound_bikes")
+    %p.stickers-sort-btns
+      = t(".impounded")
+      = link_to t(".all"), organization_bikes_path(search_params.merge(search_impoundedness: "all")), class: "btn btn-secondary #{@search_impoundedness == 'all' ? 'active' : ''}"
+      = link_to organization_bikes_path(search_params.merge(search_impoundedness: "not")), class: "btn btn-secondary #{@search_impoundedness == 'not' ? 'active' : ''}" do
+        = t(".only_not_impounded_html")
+      = link_to organization_bikes_path(search_params.merge(search_impoundedness: "impounded")), class: "btn btn-secondary #{@search_impoundedness == 'impounded' ? 'active' : ''}" do
+        = t(".only_impounded_html")
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
