@@ -61,9 +61,9 @@ module BikeSearchable
         items += [interpreted_params[:manufacturer]].flatten.map { |id| Manufacturer.friendly_find(id) }
           .compact.map(&:autocomplete_result_hash)
       end
-      if interpreted_params[:colors]
-        items += interpreted_params[:colors].map { |id| Color.friendly_find(id) }
-          .compact.map(&:autocomplete_result_hash)
+      if interpreted_params[:colors].present?
+        colors = interpreted_params[:colors].is_a?(String) ? interpreted_params[:colors].split(",") : interpreted_params[:colors]
+        items += colors.map { |id| Color.friendly_find(id) }.compact.map(&:autocomplete_result_hash)
       end
       items.flatten.compact
     end
