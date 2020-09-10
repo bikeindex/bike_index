@@ -119,19 +119,6 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.child_enabled_feature_slugs).to eq(%w[passwordless_users reg_address])
       end
     end
-    context "child_organizations regional" do
-      let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: %w[child_organizations])}
-      it "permits regional_bike_counts for child_organizations" do
-        invoice.organization_feature_ids = [organization_feature.id]
-        invoice.reload
-        expect(invoice.child_enabled_feature_slugs).to be_blank
-        invoice.update_attributes(child_enabled_feature_slugs_string: ["child_organizations"])
-        invoice.reload
-        expect(invoice.child_enabled_feature_slugs).to eq(["child_organizations"])
-        invoice.update_attributes(child_enabled_feature_slugs_string: "regional_bike_counts, party \n")
-        expect(invoice.child_enabled_feature_slugs).to eq(["regional_bike_counts"])
-      end
-    end
   end
 
   describe "organization_feature_ids" do

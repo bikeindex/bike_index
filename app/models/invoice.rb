@@ -143,9 +143,7 @@ class Invoice < ApplicationRecord
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end
-    has_regional_counts = val.include?("regional_bike_counts")
     valid_slugs = (val & feature_slugs)
-    valid_slugs += ["regional_bike_counts"] if has_regional_counts && !valid_slugs.include?("regional_bike_counts")
     self.child_enabled_feature_slugs = valid_slugs
   end
 

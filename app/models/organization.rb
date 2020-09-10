@@ -288,9 +288,12 @@ class Organization < ApplicationRecord
 
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
-    @nearby_organizations ||= self.class.within_bounding_box(bounding_box)
-      .where.not(id: child_ids + [id])
-      .reorder(id: :asc)
+    return @nearby_organizations if defined?(@nearby_organizations)
+    nearby_organizations ||= self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
+    if parent_organization_id.present?
+      nearby_organizations = nearby_organizations.where.not(parent_organization_id: parent_organization_id)
+    end
+    @nearby_organizations = nearby_organizations.reorder(id: :asc)
   end
 
   def nearby_and_partner_organization_ids
@@ -312,7 +315,7 @@ class Organization < ApplicationRecord
   end
 
   def organization_affiliation_options
-    translation_scope =
+    toranslation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
     %w[student employee community_member]

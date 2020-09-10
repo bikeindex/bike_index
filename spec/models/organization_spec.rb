@@ -18,17 +18,17 @@ RSpec.describe Organization, type: :model do
   describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
-      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, search_radius: 10)
       chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org, skip_geocoding: true, address_set_manually: true)
 
-      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
+      nyc_org2 = FactoryBot.create(:organization, :in_nyc, search_radius: 10)
       nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
 
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc, search_radius: 10)
       nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
@@ -54,6 +54,13 @@ RSpec.describe Organization, type: :model do
       # Make sure we get the bikes from the org or from nearby
       expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
         .to(match_array([chi_bike1, nyc_bike2, nyc_bike3]))
+
+      # TODO: Test the inclusion/exclusion of organizations with the same parent_organization_id
+      nyc_org2.reload
+      expect(nyc_org2.nearby_organizations.pluck(:id)).to match_array([nyc_org1.id, nyc_org3.id])
+      nyc_org2.update(parent_organization_id: nyc_org1)
+      nyc_org2.reload
+      expect(nyc_org2.nearby_organizations.pluck(:id)).to eq([nyc_org3.id])
     end
   end
 
