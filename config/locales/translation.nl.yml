@@ -3714,9 +3714,6 @@ nl:
       serial_search_input: Seriële zoekinvoer
       some_bikes_have_multiple_html: Sommige fietsen hebben <em>meerdere framenummers</em>
         .
-      some_schwinn_bicycles_have_html: Sommige Schwinn-fietsen hebben het unieke identificatienummer
-        (hun framenummer) op de <em>balhoofdbuis</em> . Dit bevindt zich aan de voorzijde
-        van de fiets.
       standard_serial_number: Standaard framenummer
       the_bottom_bracket_html: De <em>trapas</em> (waar framenummers zich meestal
         bevinden) is omcirkeld.
@@ -3739,6 +3736,11 @@ nl:
       when_adding_a_bike_to_the_index: Wanneer u een fiets aan de index toevoegt,
         kunt u het beste alle groepen cijfers en letters invoeren die door spaties
         worden gescheiden.
+      rad_power_serial: Serienummer Rad Power
+      rad_power_serials_html: Rad Power-fietsen hebben hun serienummer op de <em>balhoofdbuis</em>
+        . Dit zit aan de voorkant van de fiets.
+      some_schwinn_bicycles_also: Sommige Schwinn-fietsen hebben ook het unieke identificatienummer
+        (hun serienummer) op de balhoofdbuis.
     where:
       bike_index_partners: Bike Index-partners
       if_you_would_like_to_join_html: Als je een fietsenwinkel bent en je wilt meedoen,

@@ -2638,8 +2638,8 @@ en:
         - email %{link} if you're having trouble.
       in_this_picture_html: >-
         In this picture <em>200910427-2A</em> is a manufacturer number and not a serial
-        number. However, to make bikes as easy as possible to find, we'd love it if
-        you entered all numbers you encounter.
+        number. However, to make bikes as easy as possible to find, feel free to enter
+        all numbers you encounter.
       jump_back_to_footnote: Jump back to footnote %{num} in the text.
       look_serial: Look serial number
       most_bicycles_have_their_serial_number_en: >-
@@ -2650,13 +2650,17 @@ en:
         Okay, fine, so <em>maybe</em> there are a few bikes without serial numbers,
         but this is rare and typical only on hand made bikes or really old bicycles.
       our_search_form: our search form
-      schwinn_serial: Schwinn serial number.
+      rad_power_serial: Rad Power serial number
+      rad_power_serials_html: >-
+        Rad Power bikes have their serial number on the <em>head tube</em>. This is
+        on the front of the bike.
+      schwinn_serial: Schwinn serial number
       searching_serials_on_bike_index: Searching serials on Bike Index
       serial_search_input: Serial search input
       some_bikes_have_multiple_html: Some bikes have <em>multiple serial numbers</em>.
-      some_schwinn_bicycles_have_html: >-
-        Some Schwinn bicycles have the unique identifying number (their serial number)
-        on the <em>head tube</em>. This is on the front of the bike.
+      some_schwinn_bicycles_also: >-
+        Some Schwinn bicycles also have the unique identifying number (their serial
+        number) on the head tube.
       standard_serial_number: Standard serial number
       the_bottom_bracket_html: >-
         The <em>bottom bracket</em> (where serial numbers are typically located) is
