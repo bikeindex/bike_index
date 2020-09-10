@@ -4324,7 +4324,6 @@ en:
         color: Color
         email_hidden: email hidden
         impounded: Impounded
-        include_impounded_bikes: Include impounded bikes
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -4352,7 +4351,6 @@ en:
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
-        without_impounded_bikes: Hide impounded bikes
     bulk_imports:
       index:
         added: Added

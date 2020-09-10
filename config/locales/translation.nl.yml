@@ -4480,11 +4480,9 @@ nl:
         avery: Avery?
         only_no_address_html: Alleen <strong>geen</strong> adres
         only_with_address_html: Alleen <strong>met</strong> adres
-        include_impounded_bikes: Inclusief in beslag genomen fietsen
         only_impounded_html: Alleen in <strong>beslag genomen</strong> fietsen
         only_not_impounded_html: Fietsen die <strong>niet in</strong> beslag <strong>worden</strong>
           genomen
-        without_impounded_bikes: Verberg in beslag genomen fietsen
     bulk_imports:
       index:
         added: Toegevoegd
