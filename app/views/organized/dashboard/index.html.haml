@@ -57,8 +57,11 @@
       %thead
         %th Organization
         %th.small Signed up
-        %th Internally registered
-        %th Registered in area
+        - if render_regional_nearby
+          %th Registered with org
+          %th Registered in area
+        - else
+          %th Bikes
       %tbody
         - current_organization.child_organizations.reorder(:name).each do |organization|
           %tr

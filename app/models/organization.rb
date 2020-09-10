@@ -315,7 +315,7 @@ class Organization < ApplicationRecord
   end
 
   def organization_affiliation_options
-    toranslation_scope =
+    translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
     %w[student employee community_member]
