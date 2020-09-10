@@ -103,6 +103,8 @@
             Features passed on to children
             %small.em
               If this is for a parent organization, choose which features from this invoice should apply to the child organizations
+            %small
+              you can include <code>regional_bike_counts</code> even if parent doesn't have it
           = f.text_area :child_enabled_feature_slugs_string, rows: 2, placeholder: "comma separated list of features", class: "form-control"
           %small.below-input-help
             %em
