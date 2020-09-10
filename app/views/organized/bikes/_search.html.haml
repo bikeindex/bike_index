@@ -2,7 +2,6 @@
 
 - path_for_search ||= organization_bikes_path(organization_id: current_organization.to_param)
 - skip_view_just_stolen ||= @bike_sticker.present?
-- skip_view_with_impounded ||= skip_view_just_stolen
 
 .mb-4
   = form_tag path_for_search, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
