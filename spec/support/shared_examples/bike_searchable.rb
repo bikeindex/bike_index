@@ -66,9 +66,8 @@ RSpec.shared_examples "bike_searchable" do
         end
         context "parsing interpreted_params" do
           let(:query_params) { target.merge(serial: "PPPPXXX") }
-          it "returns itself without calling the db" do
+          it "returns itself without calling the db for manufacturer" do
             expect(Manufacturer).to_not receive(:friendly_find)
-            expect(Color).to_not receive(:friendly_find)
             expect(Bike.searchable_interpreted_params(interpreted_params, ip: ip_address)).to eq interpreted_params
           end
         end
