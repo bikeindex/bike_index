@@ -103,7 +103,7 @@ RSpec.describe "Search API V3", type: :request do
         {
           serial: "s",
           manufacturer: manufacturer.id,
-          color_ids: [color.id],
+          colors: "#{color.slug}",
           location: "Chicago, IL",
           distance: 20,
           stolenness: "stolen",

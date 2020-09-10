@@ -9,6 +9,14 @@ RSpec.describe Color, type: :model do
       color = FactoryBot.create(:color, name: "Poopy PANTERS")
       expect(Color.friendly_find("poopy panters")).to eq(color)
     end
+    context "slug from color serializer" do
+      let(:color) { FactoryBot.create(:color, name: "Silver, gray or bare metal") }
+      it "finds" do
+        expect(color.slug).to eq "silver"
+        expect(Color.friendly_find("Silver, gray or bare metal")).to eq color
+        expect(Color.friendly_find("silveR")).to eq color
+      end
+    end
   end
 
   describe "autocomplete_hash" do
