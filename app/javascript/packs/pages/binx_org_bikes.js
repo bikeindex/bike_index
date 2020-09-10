@@ -28,6 +28,13 @@ function BinxAppOrgBikes() {
         $("#stolenness").val(stolenness);
         return $("#bikes_search_form").submit();
       });
+      // When the avery cell is checked, add it to the params.
+      $("#avery_cell").on("change", function (e) {
+        let urlParams = new URLSearchParams(window.location.search);
+        urlParams.append("avery_export", $("#avery_cell").prop("checked"));
+        urlParams.append("search_open", true);
+        window.location = `${location.pathname}?${urlParams.toString()}`;
+      });
     },
 
     selectStoredVisibleColumns() {

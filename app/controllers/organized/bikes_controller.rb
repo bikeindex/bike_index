@@ -6,7 +6,7 @@ module Organized
 
     def index
       @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
+      @per_page = params[:per_page] || 10
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
