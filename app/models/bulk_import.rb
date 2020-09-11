@@ -4,7 +4,7 @@ class BulkImport < ApplicationRecord
 
   belongs_to :organization
   belongs_to :user
-  validates_presence_of :file
+  validates_presence_of :file, unless: :file_cleaned
   has_many :creation_states
   has_many :bikes, through: :creation_states
 

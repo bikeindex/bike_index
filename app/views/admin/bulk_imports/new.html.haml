@@ -1,18 +1,25 @@
-%h1
-  New Bulk Import
-= form_for [:admin, @bulk_import] do |f|
+.admin-subnav
+  %h1
+    New Bulk Import
+
+.row
+  .col-sm-6
+    = form_for [:admin, @bulk_import] do |f|
+      - if @bulk_import.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Bulk Import", obj: @bulk_import }
+
+      .form-group.fancy-select.unfancy
+        = f.label :organization_id
+        = f.collection_select(:organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: true }, class: "form-control")
+      .form-group
+        .input-group
+          .custom-file
+          = f.label :file, "CSV", class: "custom-file-label"
+          = f.file_field :file, class: "custom-file-input"
+      .form-group
+        = f.label :no_notify do
+          = f.check_box :no_notify
+          Don't send emails to registrations
 
 
-  - if @bulk_import.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Bulk Import", obj: @bulk_import }
-
-  .form-group.fancy-select.unfancy
-    = f.label :organization_id
-    = f.collection_select(:organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: true }, class: "form-control w-50")
-  .form-group
-    = f.label :file, "CSV:"
-    = f.file_field :file, class: "form-control-file mb-2"
-  .form-group
-    = f.label :no_notify, "Don't send emails to registrations"
-    = f.check_box :no_notify
-  = f.submit 'Create', class: "btn btn-success float-right"
+      = f.submit 'Create', class: "btn btn-success float-right"

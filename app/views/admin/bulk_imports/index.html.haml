@@ -76,7 +76,7 @@
                     Missing Ascend Organization!
             %td
               - if bulk_import.organization.present?
-                = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization.to_param)
+                = link_to bulk_import.organization.name, admin_bulk_imports_url(sortable_search_params.merge(organization_id: bulk_import.organization.to_param))
               - else
                 = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
               %small
