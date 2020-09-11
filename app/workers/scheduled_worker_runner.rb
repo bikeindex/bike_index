@@ -49,6 +49,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ScheduleSearchForExternalRegistryBikesWorker,
       FetchProject529BikesWorker,
       UpdateExchangeRatesWorker,
+      CleanBulkImportWorker,
       self
     ]
   end

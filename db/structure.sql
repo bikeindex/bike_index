@@ -632,7 +632,8 @@ CREATE TABLE public.bulk_imports (
     import_errors json DEFAULT '{}'::json,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_ascend boolean DEFAULT false
+    is_ascend boolean DEFAULT false,
+    file_cleaned boolean DEFAULT false
 );
 
 
@@ -5357,6 +5358,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200813221439'),
 ('20200831194703'),
 ('20200901165655'),
-('20200901181453');
+('20200901181453'),
+('20200911230445');
 
 
