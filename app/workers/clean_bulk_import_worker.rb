@@ -12,6 +12,7 @@ class CleanBulkImportWorker < ScheduledWorker
   def perform(import_id = nil)
     return enqueue_workers unless import_id.present?
     bulk_import = BulkImport.find(import_id)
+    return true if bulk_import.file_cleaned
     bulk_import.file_cleaned = true
     bulk_import.file&.remove!
     bulk_import.save
