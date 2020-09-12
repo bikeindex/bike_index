@@ -4422,6 +4422,8 @@ en:
         errors: Errors
         file: File
         file_removed: file removed
+        file_removed_explanation: after a few days, we delete the uploaded file to
+          save space
         manufacturer: Manufacturer
         model: Model
         progress: Progress

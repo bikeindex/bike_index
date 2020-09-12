@@ -7,9 +7,8 @@
 - # TODO: add translations
 
 .organized-records
-  .text-right.mb-4
+  .new-unregistered-btn-wrap
     = link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: current_organization, parking_notification: true), class: "btn btn-sm btn-outline-primary"
-
   .map-wrapper
     #map
     %a#redo-search-in-map.currently-hidden{ href: "#" }
@@ -158,9 +157,9 @@
                     = select_tag :kind, options_for_select(parking_notification_repeat_kinds), { prompt: "...", class: "form-control", required: true }
                   .col-xs-6.text-center
                     = submit_tag "Create notifications", class: "btn btn-success btn-md-lg"
-
-    -# only hide status on current - because otherwise it displays the time things were resolved
-    = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status == "current", render_sortable: true }
+    .full-screen-table
+      -# only hide status on current - because otherwise it displays the time things were resolved
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [], hide_status: @search_status == "current", render_sortable: true }
 
 :javascript
   window.pageInfo = #{@page_data.to_json}

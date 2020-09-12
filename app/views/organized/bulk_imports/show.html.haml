@@ -24,10 +24,10 @@
         = t(".file")
       %td
         - if @bulk_import.file_cleaned?
-          %em.text-warning= t(".file_removed")
+          %span.text-warning= t(".file_removed")
+          %em.small.less-strong= t(".file_removed_explanation")
         - else
           = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
-
     %tr
       %td
         = t(".creator")

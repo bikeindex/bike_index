@@ -31,7 +31,8 @@
         %td
           %small
             - if @bulk_import.file_cleaned?
-              %em.text-warning file removed
+              %span.text-warning file removed
+              %em.small.less-strong after a few days, we delete the uploaded file to save space
             - else
               = link_to @bulk_import.file_url, @bulk_import.file_url
       %tr
@@ -67,8 +68,8 @@
         %td
           - if @bulk_import.organization.present?
             = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "less-strong"
-            %br
-            %em.strong
+            \|
+            %strong
               = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
           - else
             None
@@ -85,6 +86,11 @@
   Bikes - #{@bulk_import.bikes.count}
   - if @bulk_import.bikes.count > 25
     %small
-      Last 25 shown <em>use organization view for paginated list</em>
+      Last 25 shown
+      - if @bulk_import.organization.present?
+        %em
+          use
+          = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
+          for paginated list
 
 = render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
