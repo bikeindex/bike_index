@@ -207,7 +207,7 @@
     Related Notifications
     %em
       (#{related_notifications.count + 1} total)
-  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true }
+  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true, render_internal_notes: true }
 
 - if @parking_notification.send_email?
   %h2.uncap.mt-4 Preview of email sent:

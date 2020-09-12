@@ -300,13 +300,13 @@
           = pluralize number_with_delimiter(parking_notifications.resolved.count), "resolved notification"
       for #{@bike.type}
     - if parking_notifications.current.any?
-      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true }
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true, render_internal_notes: true }
 
     - if parking_notifications.resolved.any?
       .collapse#resolvedParkingNotificationTable
         %p.mb-0
           %strong Resolved notifications
-        = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.resolved.limit(10), skip_bike: true, skip_map_cell: true, render_address: true }
+        = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.resolved.limit(10), skip_bike: true, skip_map_cell: true, render_address: true, render_internal_notes: true }
 
     - if @bike.status_impounded?
       %hr

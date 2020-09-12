@@ -57,9 +57,9 @@
           - display_status = ImpoundRecord.statuses_humanized[kind.to_sym] || "All statuses"
           = link_to display_status, organization_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
 
-
-- skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)
-= render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: @search_status != "all" }
+.full-screen-table
+  - skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)
+  = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: @search_status != "all" }
 
 .paginate-container.paginate-container-bottom
   = paginate @impound_records

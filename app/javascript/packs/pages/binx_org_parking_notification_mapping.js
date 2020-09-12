@@ -248,9 +248,9 @@ export default class BinxAppOrgParkingNotificationMapping {
       point.id,
     ]);
     let tableTop =
-      '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
+      '<table class="table table table-striped table-hover table-bordered table-sm parking-notifications-table"><tbody>';
     tableTop += `<thead class="small-header hidden-md-down">${$(
-      ".list-table thead"
+      "thead"
     ).html()}</thead>`;
     return `${tableTop}${binxAppOrgParkingNotifications.tableRowForRecord(
       record

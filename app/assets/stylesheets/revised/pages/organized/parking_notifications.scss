@@ -24,7 +24,7 @@
     display: none;
   }
 
-  .list-table {
+  .parking-notifications-table {
     .map-cell {
       display: table-cell;
       padding: 0;
@@ -84,11 +84,18 @@
 // For small tables, we want to just have two cells, so that it isn't too wide for the page
 // This is outside of the above scope because it is also shown on non-organized pages
 @include media-breakpoint-down(md) {
+  // For small tables, we want to make the line-height not stupid for the expanded cell
+  .parking-notifications-table td {
+    line-height: 1.5;
+  }
+
   .extended-col-info {
-    line-height: 1.25;
-    display: inline-block !important;
+    display: inline !important;
     &.d-block {
       display: block !important;
+    }
+    &.d-inline-block {
+      display: inline-block !important;
     }
   }
 
@@ -98,6 +105,15 @@
 
   .hidden-sm-cells {
     display: none !important;
+  }
+}
+
+.new-unregistered-btn-wrap {
+  text-align: right;
+  margin-bottom: 24px;
+  .btn {
+    max-width: 100%;
+    white-space: break-spaces;
   }
 }
 
