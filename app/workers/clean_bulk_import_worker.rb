@@ -18,7 +18,7 @@ class CleanBulkImportWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    BulkImport.ascend.where("created_at < ?", self.class.clean_before)
+    BulkImport.ascend.where(file_cleaned: false).where("created_at < ?", self.class.clean_before)
       .limit(1_000)
       .pluck(:id).each { |id| self.class.perform_async(id) }
   end
