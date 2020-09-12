@@ -29,10 +29,10 @@
         %td
           File
         %td
-          - if @bulk_import.file_cleaned?
-            %span.text-warning file removed
-          - else
-            %small
+          %small
+            - if @bulk_import.file_cleaned?
+              %em.text-warning file removed
+            - else
               = link_to @bulk_import.file_url, @bulk_import.file_url
       %tr
         %td

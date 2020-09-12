@@ -4421,6 +4421,7 @@ en:
         creator: Creator
         errors: Errors
         file: File
+        file_removed: file removed
         manufacturer: Manufacturer
         model: Model
         progress: Progress

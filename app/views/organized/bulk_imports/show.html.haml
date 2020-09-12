@@ -23,7 +23,10 @@
       %td
         = t(".file")
       %td
-        = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
+        - if @bulk_import.file_cleaned?
+          %em.text-warning= t(".file_removed")
+        - else
+          = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
 
     %tr
       %td
