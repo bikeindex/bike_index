@@ -37,7 +37,7 @@
       %th
         %small=t(".notification_number")
     %th.status-cell Status
-    - if render_internal_notes
+    - if render_internal_notes # NOTE: JS never renders with this, so it isn't included in the JS template
       %th.small Notes
     - unless skip_resolved
       %th.status-cell
@@ -51,7 +51,7 @@
       %tr
         - unless skip_map_cell
           %td
-        %td.expanded-col-when-sm
+        %td
           %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
           %span.extended-col-info.small
@@ -75,7 +75,7 @@
                 Resolved:
               %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
-          - if render_internal_notes # NOTE: This is not passed to JS rendering ever and so isn't dealt with there
+          - if render_internal_notes
             - if parking_notification.internal_notes.present?
               %small.extended-col-info.d-block
                 %strong
