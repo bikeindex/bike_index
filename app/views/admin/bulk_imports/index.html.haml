@@ -80,7 +80,10 @@
               - else
                 = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
               %small
-                = bulk_import.file_filename
+                - if bulk_import.file_cleaned?
+                  %em.text-warning file removed
+                - else
+                  = bulk_import.file_filename
             %td
               = bulk_import.creation_states.count # Don't need to do bikes through creation states
 = paginate @bulk_imports, views_prefix: 'admin'

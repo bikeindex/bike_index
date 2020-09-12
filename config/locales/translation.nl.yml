@@ -4554,6 +4554,7 @@ nl:
         progress: Vooruitgang
         sent_to: Verzonden naar
         sent_to_a_new_owner: "(verzonden naar een nieuwe eigenaar)"
+        file_removed: Bestand verwijderd
     exports:
       index:
         bikes_in_export: Fietsen in export
