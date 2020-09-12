@@ -4555,6 +4555,8 @@ nl:
         sent_to: Verzonden naar
         sent_to_a_new_owner: "(verzonden naar een nieuwe eigenaar)"
         file_removed: Bestand verwijderd
+        file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
+          om ruimte te besparen
     exports:
       index:
         bikes_in_export: Fietsen in export
