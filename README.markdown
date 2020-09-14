@@ -18,17 +18,19 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-- [Ruby 2.5](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
+_We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of the following dependencies that Bike Index uses._
+
+- [Ruby 2.5](http://www.ruby-lang.org/en/)
 
 - [Rails 5.2](http://rubyonrails.org/)
 
-- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/) (We use [nvm](https://github.com/creationix/nvm) to manage our node version)
+- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/)
 
 - PostgreSQL >= 9.6
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
 
-- [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/). The [RailsCast on Resque](http://railscasts.com/episodes/271-resque?view=asciicast) is a good resource for getting up and running with Redis.
+- [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/).
 
 - *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast) - you will need to install and start memcached `/usr/local/bin/memcached`)
 
