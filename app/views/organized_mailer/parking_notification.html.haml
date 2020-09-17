@@ -47,7 +47,7 @@
 
 <img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@parking_notification.latitude},#{@parking_notification.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@parking_notification.latitude},#{@parking_notification.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
 
-- if @retrieval_link_url.present?
+- if @retrieval_link_url.present? && !@parking_notification.impound_notification?
   .mark-retrieved-box
     = link_to "I picked up my #{@bike.type}", @retrieval_link_url, class: "binx-button"
     %p

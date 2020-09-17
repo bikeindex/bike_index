@@ -174,6 +174,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(parking_notification.retrieval_link_token).to be_present
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.body.encoded).to match "map" # includes location
+      expect(mail.body.encoded).to match "I picked up my"
       expect(mail.body.encoded).to match target_retrieval_link_url
       expect(mail.reply_to).to eq([parking_notification.reply_to_email])
     end
@@ -183,7 +184,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(parking_notification.retrieval_link_token).to_not be_present
         expect(mail.body.encoded).to match header_mail_snippet.body
         expect(mail.body.encoded).to match "map" # includes location
-        expect(mail.body.encoded).to_not match target_retrieval_link_url
+        expect(mail.body.encoded).to_not match "I picked up my"
         expect(mail.reply_to).to eq([parking_notification.reply_to_email])
       end
     end
