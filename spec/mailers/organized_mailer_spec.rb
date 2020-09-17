@@ -177,6 +177,16 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match target_retrieval_link_url
       expect(mail.reply_to).to eq([parking_notification.reply_to_email])
     end
+    context "impound" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, kind: "impound_notification") }
+      it "renders email, doesn't include retrieval link" do
+        expect(parking_notification.retrieval_link_token).to_not be_present
+        expect(mail.body.encoded).to match header_mail_snippet.body
+        expect(mail.body.encoded).to match "map" # includes location
+        expect(mail.body.encoded).to_not match target_retrieval_link_url
+        expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+      end
+    end
   end
 
   describe "graduated_notification" do
