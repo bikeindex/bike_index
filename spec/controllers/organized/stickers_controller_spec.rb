@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::StickersController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:stickers_root_path) { organization_stickers_path(organization_id: organization.to_param) }
-  let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "partee") }
+  let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "laxee") }
 
   before { set_current_user(user) if user.present? }
 
@@ -53,19 +53,27 @@ RSpec.describe Organized::StickersController, type: :controller do
           expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker.id, bike_sticker2.id])
         end
         context "with query search" do
-          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
-          let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
+          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "lax01222") }
+          let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization, code: "lax122") }
+          let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "lax01222") }
           before { bike_sticker_claimed.claim(user: user, bike: FactoryBot.create(:bike).id) }
-          it "renders" do
-            get :index, params: {organization_id: organization.to_param, search_claimedness: "unclaimed", query: "part"}
+          it "renders, finds the stickers we expect" do
+            get :index, params: {organization_id: organization.to_param, search_claimedness: "unclaimed", query: "lax"}
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
+            expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker.id, bike_sticker2.id])
+
+            get :index, params: {organization_id: organization.to_param, query: "lax12"}
+            expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker2.id, bike_sticker_claimed.id])
+            get :index, params: {organization_id: organization.to_param, query: "lax0122"}
+            expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker2.id, bike_sticker_claimed.id])
+            get :index, params: {organization_id: organization.to_param, query: "lax1222"}
+            expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
           end
         end
         context "with bike_query" do
           let!(:bike) { FactoryBot.create(:bike) }
-          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
+          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "lax") }
           before { bike_sticker_claimed.claim(user: user, bike: bike.id) }
           it "renders" do
             expect(BikeSticker.where(bike_id: bike.id).pluck(:id)).to eq([bike_sticker_claimed.id])
