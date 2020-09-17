@@ -62,7 +62,7 @@ RSpec.describe Organized::StickersController, type: :controller do
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker.id, bike_sticker2.id])
-
+            # And check that searches match expected things
             get :index, params: {organization_id: organization.to_param, query: "lax12"}
             expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker2.id, bike_sticker_claimed.id])
             get :index, params: {organization_id: organization.to_param, query: "lax0122"}
