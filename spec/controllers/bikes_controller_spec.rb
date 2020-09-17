@@ -1430,7 +1430,7 @@ RSpec.describe BikesController, type: :controller do
           context "bike code not found" do
             it "renders errors" do
               expect(bike.bike_stickers.count).to eq 0
-              put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 10"}
+              put :update, params: {id: bike.id, bike: bike_attrs, bike_sticker: "A 150"}
               expect(flash[:error]).to be_present
               bike.reload
               expect(bike.description).to eq "42"

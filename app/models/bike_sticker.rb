@@ -30,9 +30,9 @@ class BikeSticker < ApplicationRecord
       code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
     # split into letters/numbers
-    code.scan(/[^\d]+|\d+/).map do |seg|
+    code.scan(/[^\d]+|\d+/).map { |seg|
       seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
-    end.join("")
+    }.join("")
   end
 
   def self.calculated_code_integer(str)

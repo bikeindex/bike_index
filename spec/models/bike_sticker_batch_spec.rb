@@ -46,7 +46,7 @@ RSpec.describe BikeStickerBatch, type: :model do
       expect {
         bike_sticker_batch.create_codes(1, initial_code_integer: 12)
       }.to change(BikeSticker, :count).by 1
-      expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003 XD00012])
+      expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003 XD12])
       expect(bike_sticker_batch.non_sequential_integers).to eq([[12, 9999]])
     end
     context "without a prefix" do
