@@ -15,21 +15,26 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.normalize_code(url2)).to eq "12"
       expect(BikeSticker.normalize_code(url3)).to eq "12"
       expect(BikeSticker.normalize_code(url4)).to eq "12"
+      expect(BikeSticker.normalize_code("Ca012")).to eq "CA12"
+      expect(BikeSticker.normalize_code("LA 0011 12")).to eq "LA1112"
+      expect(BikeSticker.normalize_code("L A 011 12")).to eq "LA1112"
     end
   end
 
   describe "basic stuff" do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
-    let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: 12, bike: bike1) }
+    let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "12", bike: bike1) }
     let!(:sticker) { FactoryBot.create(:bike_sticker, code: 12, organization_id: organization.id) }
     let!(:sticker_dupe) { FactoryBot.build(:bike_sticker, code: "00012", organization_id: organization.id) }
+    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "c000112", organization_id: organization.id) }
     let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
     it "calls the things we expect and finds the things we expect" do
       expect(BikeSticker.claimed.count).to eq 2
-      expect(BikeSticker.unclaimed.count).to eq 1
+      expect(BikeSticker.unclaimed.count).to eq 2
       expect(BikeSticker.spokecard.count).to eq 2
-      expect(BikeSticker.sticker.count).to eq 1
+      expect(BikeSticker.sticker.count).to eq 2
+      expect(sticker2.code).to eq "C112" # Side effect, we're ok with this
       expect(BikeSticker.lookup("92233720368547758999")).to be_blank # Outside of range
       expect(BikeSticker.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.to_param)).to eq sticker
@@ -37,9 +42,13 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: "whateves")).to eq spokecard
       expect(BikeSticker.lookup("000012")).to eq spokecard
-      expect(BikeSticker.admin_text_search("1").pluck(:id)).to match_array([spokecard_text.id, spokecard.id, sticker.id])
-      expect(BikeSticker.admin_text_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id, spokecard_text.id])
-      expect(BikeSticker.admin_text_search("0012").pluck(:id)).to match_array([spokecard.id, sticker.id])
+      expect(BikeSticker.admin_text_search("1").pluck(:id)).to match_array([spokecard_text.id, spokecard.id, sticker.id, sticker2.id])
+      expect(BikeSticker.admin_text_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id, spokecard_text.id, sticker2.id])
+      expect(BikeSticker.admin_text_search("0012").pluck(:id)).to match_array([spokecard.id, sticker.id, sticker2.id])
+      expect(BikeSticker.admin_text_search("c112").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.admin_text_search("c0112").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.admin_text_search("c11").pluck(:id)).to eq([sticker2.id])
+
       expect(BikeSticker.admin_text_search("a").pluck(:id)).to match_array([spokecard_text.id])
       expect(spokecard.claimed?).to be_truthy
       expect(sticker_dupe.save).to be_falsey
@@ -139,7 +148,7 @@ RSpec.describe BikeSticker, type: :model do
     it "doesn't permit duplicates" do
       expect(sticker.code).to eq "12"
       expect(sticker2.code).to eq "12"
-      expect(spokecard2.code).to eq "A00000012"
+      expect(spokecard2.code).to eq "A12"
       [sticker, sticker2, spokecard, spokecard2].each { |bike_sticker| expect(bike_sticker).to be_valid }
       expect(sticker_dupe_number.save).to be_falsey
       expect(sticker_dupe_number.errors.messages.to_s).to match(/already been taken/i)

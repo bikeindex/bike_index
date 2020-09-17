@@ -29,7 +29,10 @@ class BikeSticker < ApplicationRecord
       code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
       code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
-    code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+    # split into letters/numbers
+    code.scan(/[^\d]+|\d+/).map { |seg|
+      seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
+    }.join("")
   end
 
   def self.calculated_code_integer(str)
