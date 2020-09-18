@@ -119,6 +119,19 @@ class CredibilityScorer
     badges
   end
 
+  # This badges is displayed on the organization show page
+  def self.organization_suspicious?(organization)
+    return true if organization.blank?
+    !organization.approved
+  end
+
+  # This badges is displayed on the organization show page
+  def self.organization_trusted?(organization)
+    return false unless organization.present?
+    return true if organization.paid?
+    %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
+  end
+
   #
   # Individual methods for badges below here. Maybe should be private?
   # TODO: Figure out a better structure for this
@@ -127,16 +140,6 @@ class CredibilityScorer
   def self.creation_age_badge(obj)
     return :long_time_registration if obj.created_at < Time.current - 1.year
     obj.created_at > Time.current - 1.month ? :created_this_month : nil
-  end
-
-  def self.organization_suspicious?(organization)
-    return true if organization.blank?
-    !organization.approved
-  end
-
-  def self.organization_trusted?(organization)
-    return false unless organization.present?
-    organization.paid? || organization.bike_shop? && organization.does_not_need_pos?
   end
 
   def self.suspiscious_handle?(str)

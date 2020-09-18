@@ -252,6 +252,34 @@ RSpec.describe CredibilityScorer do
     end
   end
 
+  describe "organization_trusted?" do
+    let(:organization) { FactoryBot.create(:organization, pos_kind: "does_not_need_pos") }
+    it "is false" do
+      expect(subject.organization_trusted?(organization)).to be_falsey
+    end
+    context "manual pos kind" do
+      let(:organization1) { FactoryBot.create(:organization, manual_pos_kind: "does_not_need_pos") }
+      let(:organization2) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos") }
+      it "is truthy" do
+        expect(subject.organization_trusted?(organization1)).to be_truthy
+        expect(subject.organization_trusted?(organization2)).to be_truthy
+      end
+    end
+  end
+
+  describe "organization_suspicious?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    it "is false" do
+      expect(subject.organization_suspicious?(organization)).to be_falsey
+    end
+    context "not approved" do
+      let(:organization) { FactoryBot.create(:organization, approved: false) }
+      it "is true" do
+        expect(subject.organization_suspicious?(organization)).to be_truthy
+      end
+    end
+  end
+
   describe "suspiscious_handle?" do
     ["shady-p@yahoo.com", "bike thief", "hoogivzzafudge5150@hotmail.co", "mj", "fuckyou@stuff.com", "cunt-edu"].each do |str|
       it "is truthy for #{str}" do
