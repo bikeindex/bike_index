@@ -119,13 +119,13 @@ class CredibilityScorer
     badges
   end
 
-  # This badges is displayed on the organization show page
+  # This badge is displayed on the organization show page
   def self.organization_suspicious?(organization)
     return true if organization.blank?
     !organization.approved
   end
 
-  # This badges is displayed on the organization show page
+  # This badge is displayed on the organization show page
   def self.organization_trusted?(organization)
     return false unless organization.present?
     return true if organization.paid?
@@ -133,7 +133,7 @@ class CredibilityScorer
   end
 
   #
-  # Individual methods for badges below here. Maybe should be private?
+  # Internal methods for badges below here. Probably should be private?
   # TODO: Figure out a better structure for this
   #
 
