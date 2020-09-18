@@ -8,7 +8,7 @@ RSpec.describe CredibilityScorer do
   describe "all_badges" do
     it "is a one dimensional hash" do
       expect(CredibilityScorer.all_badges.is_a?(Hash)).to be_truthy
-      expect(CredibilityScorer.all_badges.first).to eq([:created_by_point_of_sale, 100])
+      expect(CredibilityScorer.all_badges.first).to eq([:created_at_point_of_sale, 100])
     end
   end
 
@@ -25,9 +25,9 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "with over 100" do
-      let(:badge_array) { %i[user_ambassador created_by_point_of_sale] }
+      let(:badge_array) { %i[user_ambassador created_at_point_of_sale] }
       it "returns the value" do
-        expect(subject.permitted_badges_hash(badge_array)).to eq({created_by_point_of_sale: 100, user_ambassador: 50})
+        expect(subject.permitted_badges_hash(badge_array)).to eq({created_at_point_of_sale: 100, user_ambassador: 50})
         expect(subject.badge_value(badge_array)).to eq(150)
       end
     end
@@ -77,9 +77,9 @@ RSpec.describe CredibilityScorer do
     context "pos registrations" do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
-      it "returns with created_by_point_of_sale" do
-        expect(subject.creation_badges(bike_lightspeed_pos.creation_state)).to include(:created_by_point_of_sale)
-        expect(subject.creation_badges(bike_ascend_pos.creation_state)).to match_array([:created_by_point_of_sale])
+      it "returns with created_at_point_of_sale" do
+        expect(subject.creation_badges(bike_lightspeed_pos.creation_state)).to include(:created_at_point_of_sale)
+        expect(subject.creation_badges(bike_ascend_pos.creation_state)).to match_array([:created_at_point_of_sale])
       end
     end
     context "with organization" do
@@ -93,7 +93,7 @@ RSpec.describe CredibilityScorer do
       context "bike shop with does_not_need_pos" do
         let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "does_not_need_pos") }
         it "returns with trusted organization" do
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_trusted, :created_this_month])
+          expect(subject.creation_badges(creation_state)).to match_array([:created_at_point_of_sale])
         end
       end
       context "paid organization" do
@@ -101,10 +101,10 @@ RSpec.describe CredibilityScorer do
         it "returns with trusted organization" do
           expect(organization.is_paid).to be_truthy
           expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_trusted, :created_this_month])
-          # It doesn't return anything but created_by_point_of_sale
+          # It doesn't return anything but created_at_point_of_sale
           creation_state.update(is_pos: true)
-          expect(subject.creation_badges(creation_state)).to eq([:created_by_point_of_sale])
-          expect(instance.badges).to eq([:created_by_point_of_sale])
+          expect(subject.creation_badges(creation_state)).to eq([:created_at_point_of_sale])
+          expect(instance.badges).to eq([:created_at_point_of_sale])
           expect(instance.score).to eq 100
         end
       end

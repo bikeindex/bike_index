@@ -55,6 +55,12 @@
           Kind
         %td
           = @organization.kind.humanize
+          - if CredibilityScorer.organization_trusted?(@organization)
+            %span.badge.badge-success Trusted
+            %small.less-strong credibility
+          - elsif CredibilityScorer.organization_suspicious?(@organization)
+            %span.badge.badge-warning Suspicious
+            %small.less-strong credibility
       %tr
         %td
           Slug

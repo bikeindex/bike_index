@@ -4,7 +4,7 @@ class CredibilityScorer
 
   BADGES = {
     overrides: {
-      created_by_point_of_sale: 100,
+      created_at_point_of_sale: 100,
       user_banned: -200
     },
 
@@ -65,10 +65,11 @@ class CredibilityScorer
 
   def self.creation_badges(creation_state = nil)
     return [] unless creation_state.present?
-    return [:created_by_point_of_sale] if creation_state.is_pos
+    return [:created_at_point_of_sale] if creation_state.is_pos
     c_badges = [creation_age_badge(creation_state)].compact
     c_badges << :no_creator if creation_state.creator.blank?
     if creation_state.organization_id.present?
+      return [:created_at_point_of_sale] if creation_state.organization.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(creation_state.organization)
       c_badges << :creation_organization_trusted if organization_trusted?(creation_state.organization)
     end
