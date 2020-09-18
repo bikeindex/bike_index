@@ -4,7 +4,7 @@ class CredibilityScorer
 
   BADGES = {
     overrides: {
-      created_by_point_of_sale: 100,
+      created_at_point_of_sale: 100,
       user_banned: -200
     },
 
@@ -65,10 +65,11 @@ class CredibilityScorer
 
   def self.creation_badges(creation_state = nil)
     return [] unless creation_state.present?
-    return [:created_by_point_of_sale] if creation_state.is_pos
+    return [:created_at_point_of_sale] if creation_state.is_pos
     c_badges = [creation_age_badge(creation_state)].compact
     c_badges << :no_creator if creation_state.creator.blank?
     if creation_state.organization_id.present?
+      return [:created_at_point_of_sale] if creation_state.organization.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(creation_state.organization)
       c_badges << :creation_organization_trusted if organization_trusted?(creation_state.organization)
     end
@@ -118,24 +119,27 @@ class CredibilityScorer
     badges
   end
 
+  # This badge is displayed on the organization show page
+  def self.organization_suspicious?(organization)
+    return true if organization.blank?
+    !organization.approved
+  end
+
+  # This badge is displayed on the organization show page
+  def self.organization_trusted?(organization)
+    return false unless organization.present?
+    return true if organization.paid?
+    %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
+  end
+
   #
-  # Individual methods for badges below here. Maybe should be private?
+  # Internal methods for badges below here. Probably should be private?
   # TODO: Figure out a better structure for this
   #
 
   def self.creation_age_badge(obj)
     return :long_time_registration if obj.created_at < Time.current - 1.year
     obj.created_at > Time.current - 1.month ? :created_this_month : nil
-  end
-
-  def self.organization_suspicious?(organization)
-    return true if organization.blank?
-    !organization.approved
-  end
-
-  def self.organization_trusted?(organization)
-    return false unless organization.present?
-    organization.paid? || organization.bike_shop? && organization.does_not_need_pos?
   end
 
   def self.suspiscious_handle?(str)

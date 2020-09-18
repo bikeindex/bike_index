@@ -33,6 +33,10 @@
           Short Name
         %td
           = @organization.short_name
+          - if CredibilityScorer.organization_trusted?(@organization)
+            %span.badge.badge-success.ml-2 Trusted credibility
+          - elsif CredibilityScorer.organization_suspicious?(@organization)
+            %span.badge.badge-warning.ml-2 Suspicious credibility
       %tr
         %td
           Map
