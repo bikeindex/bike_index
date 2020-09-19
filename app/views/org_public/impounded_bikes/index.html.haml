@@ -79,8 +79,16 @@
                 = impound_record.location&.name
           %td
             - if impound_record.bike.present?
-              %a{ href: bike_path(impound_record.bike) }
-                Bike details
+              - bike = impound_record.bike
+              %a{ href: bike_path(bike.to_param) }
+                = bike.frame_colors.to_sentence
+                %strong
+                  = bike.mnfg_name
+                - if bike.frame_model.present?
+                  %em
+                    = bike.frame_model_truncated
+                - unless bike.cycle_type == "bike"
+                  %small= bike.type
 
 .paginate-container.paginate-container-bottom
   = paginate @impound_records

@@ -11,6 +11,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   end
 
   context "organization not enabled" do
+    include_context :request_spec_logged_in_as_organization_member
     it "redirects" do
       expect(current_organization.enabled?("impound_bikes")).to be_falsey
       expect(current_organization.public_impound_bikes).to be_falsey
@@ -27,6 +28,16 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
       get base_url
       expect(flash[:error]).to be_present
       expect(response).to redirect_to root_url
+    end
+    context "logged in as organization member" do
+      include_context :request_spec_logged_in_as_organization_member
+      it "renders" do
+        expect(current_organization.public_impound_bikes).to be_truthy
+        get base_url
+        expect(flash[:success]).to be_present
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+      end
     end
   end
 

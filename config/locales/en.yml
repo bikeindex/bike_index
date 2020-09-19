@@ -1426,6 +1426,10 @@ en:
       switch_to_new_bike_id: Switch to a new bike ID
       theft_details: "%{bike_abandoned} Details"
       update: Update
+      this_was_impounded: This %{bike_type} was impounded
+      impounded_at: Impounded at
+      by: by
+      from: from
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
       where_did_you_see_this_bike: >-

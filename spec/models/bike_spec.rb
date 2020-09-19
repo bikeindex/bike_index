@@ -629,6 +629,7 @@ RSpec.describe Bike, type: :model do
           impound_record.save
           bike.reload
           expect(bike.status).to eq "status_impounded"
+          expect(bike.serial_display).to eq "Hidden"
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorized?(organization_member)).to be_truthy
