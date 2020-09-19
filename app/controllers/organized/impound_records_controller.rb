@@ -37,7 +37,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[display_id created_at updated_at user_id resolved_at]
+      %w[display_id created_at updated_at user_id resolved_at location_id]
     end
 
     def bike_search_params_present?

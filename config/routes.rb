@@ -360,6 +360,7 @@ Rails.application.routes.draw do
 
   # This is the public organizations section
   resources :organization, only: [], path: "", module: "org_public" do
+    resources :impounded_bikes, only: %i[index]
     resource :walkrightup, only: %i[show], controller: "walkrightup" # walkrightups is stupid
     get "WalkRightUp", to: "walkrightup#show"
     resources :customer_appointments, only: %i[show update create] do
