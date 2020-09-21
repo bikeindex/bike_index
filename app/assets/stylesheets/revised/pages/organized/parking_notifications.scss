@@ -107,9 +107,9 @@
         width: 98%;
         white-space: normal;
         line-height: 1;
-        &.dropdown-item {
-          margin-top: 0.5rem;
-        }
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-top: 0.5rem;
       }
     }
   }
