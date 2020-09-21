@@ -2232,7 +2232,8 @@ CREATE TABLE public.parking_notifications (
     retrieved_kind integer,
     retrieval_link_token text,
     retrieved_by_id bigint,
-    image text
+    image text,
+    image_processing boolean DEFAULT false NOT NULL
 );
 
 

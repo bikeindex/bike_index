@@ -12,6 +12,23 @@
   }
 }
 
+.parking-notification-show-image {
+  width: 100%;
+  position: relative;
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  img {
+    display: block;
+    height: 100%;
+    width: auto;
+    margin: 0 auto;
+  }
+}
+
 .organized-records {
   #map {
     width: 100%;

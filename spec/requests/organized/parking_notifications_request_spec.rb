@@ -216,21 +216,22 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(bike.status).to eq "status_with_owner"
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
-          expect {
-            post base_url, params: {
-              organization_id: current_organization.to_param,
-              parking_notification: parking_notification_params
-            }
-            expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
-            expect(flash[:success]).to be_present
-          }.to change(ParkingNotification, :count).by(1)
-          expect(ProcessParkingNotificationWorker.jobs.count).to eq 1
-          ProcessParkingNotificationWorker.drain
+          Sidekiq::Testing.inline! do
+            expect {
+              post base_url, params: {
+                organization_id: current_organization.to_param,
+                parking_notification: parking_notification_params
+              }
+              expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+              expect(flash[:success]).to be_present
+            }.to change(ParkingNotification, :count).by(1)
+          end
           expect(ActionMailer::Base.deliveries.count).to eq 1
 
           parking_notification = ParkingNotification.last
           expect(parking_notification.impound_record_id).to be_blank
           expect(parking_notification.image).to be_present
+          expect(parking_notification.image_processing).to be_falsey
 
           expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
           expect(parking_notification.user).to eq current_user
@@ -297,6 +298,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.resolved_at).to be_within(5).of parking_notification.created_at
+          expect(parking_notification.image_processing).to be_falsey
 
           parking_notification_initial.reload
           expect(parking_notification_initial.status).to eq "impounded"
