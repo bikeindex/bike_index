@@ -31,7 +31,7 @@ class ParkingNotification < ActiveRecord::Base
   enum status: STATUS_ENUM
   enum retrieved_kind: RETRIEVED_KIND_ENUM
 
-  attr_accessor :is_repeat, :use_entered_address
+  attr_accessor :is_repeat, :use_entered_address, :image_cache
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }

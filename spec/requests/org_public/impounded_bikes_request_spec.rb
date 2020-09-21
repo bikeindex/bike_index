@@ -5,9 +5,9 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
-    expect do
+    expect {
       get "/some-unknown-organization/impounded_bikes"
-    end.to raise_error(ActiveRecord::RecordNotFound)
+    }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   context "organization not enabled" do

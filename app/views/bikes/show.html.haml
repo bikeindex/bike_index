@@ -61,15 +61,15 @@
         = t(".this_was_impounded", bike_type: @bike.type.titleize)
       - if @bike.current_impound_record.present?
         = t(".impounded_at")
-        %span.convertTime
+        %em.convertTime
           = l @bike.current_impound_record.created_at, format: :convert_time
-        %small.convertTimezone
+        %em.small.convertTimezone
         = t(".by")
         %strong
           = @bike.current_impound_record.organization&.name
         - if @bike.current_impound_record.parking_notification.present?
-        = t(".from")
-        = @bike.current_impound_record.parking_notification.address(skip_default_country: true)
+          = t(".from")
+          = @bike.current_impound_record.parking_notification.address
 
   .row
     .col-md-8

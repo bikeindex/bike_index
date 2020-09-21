@@ -31,7 +31,6 @@ module OrgPublic
       redirect_to user_root_url && return
     end
 
-
     def sortable_columns
       %w[created_at display_id location_id]
     end

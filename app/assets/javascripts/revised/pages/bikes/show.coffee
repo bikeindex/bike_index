@@ -90,17 +90,9 @@ class BikeIndex.BikesShow extends BikeIndex
         $(".address-group").collapse("hide")
         $(".ifManualRequired input").attr("required", false)
 
-    # Updated the file upload field to show the filename.
-    # This works for bootstrap 4alpha, which is a shitty version
-    $("input.custom-file-input[type=file]").on "change", (e) =>
-      # The issue is that the files list isn't actually an array. So we can't map it
-      files = []
-      i = 0
-      while (i < e.target.files.length)
-        files.push(e.target.files[i].name)
-        i++
-      # This bootstrap version has the label in an after field - so to update it, we have to add the styles to the page
-      $("<style>#customFileSpanContent:after{content:'#{files.join(", ")}';}</style>").appendTo("head")
+    $('.avatar-upload-field').change (event) ->
+      name = event.target.files[0].name
+      $(event.target).parent().find('.file-upload-text').text(name)
 
   showOrganizedAccessPanel: ->
     # Sometimes, the notification form may already be showing

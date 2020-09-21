@@ -32,7 +32,6 @@ binxApp.enableFilenameForUploads = function () {
 $(document).ready(function () {
   window.timeParser = new TimeParser();
   window.timeParser.localize();
-  log.debug("fasdfasdfsfsdf");
   // Period selector
   if ($("#timeSelectionBtnGroup").length) {
     window.periodSelector = PeriodSelector();

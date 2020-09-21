@@ -2154,6 +2154,10 @@ nl:
         om een parkeermelding op te nemen"
       not_registered: Niet echt geregistreerd!
       paint_description: Kleurbeschrijving
+      by: Door
+      from: uit
+      impounded_at: In beslag genomen fietsen
+      this_was_impounded: Deze %{bike_type} werd in beslag genomen
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -5822,3 +5826,9 @@ nl:
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
+  org_public:
+    impounded_bikes:
+      index:
+        search_bike_descriptions: Zoek fietsbeschrijvingen
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
