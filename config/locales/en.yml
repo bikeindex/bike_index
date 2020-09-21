@@ -4627,6 +4627,12 @@ en:
         user: user
         you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+  org_public:
+    impounded_bikes:
+      index:
+        search_bike_descriptions: Search bike descriptions
+        search_for_serial_number: Search for serial number
+        search_owner_email: Search owner email
   organized_mailer:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"

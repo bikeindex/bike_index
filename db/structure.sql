@@ -2066,7 +2066,8 @@ CREATE TABLE public.organizations (
     manual_pos_kind integer,
     passwordless_user_domain character varying,
     graduated_notification_interval bigint,
-    lightspeed_register_with_phone boolean DEFAULT false
+    lightspeed_register_with_phone boolean DEFAULT false,
+    public_impound_bikes boolean DEFAULT false
 );
 
 
@@ -5362,6 +5363,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200901165655'),
 ('20200901181453'),
 ('20200911230445'),
-('20200921165203');
+('20200921165203'),
+('20200921203331');
 
 

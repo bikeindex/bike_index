@@ -55,10 +55,10 @@
         .checkbox
           %label{ style: "line-height: 1.5em;" }
             = f.check_box :public_impound_bikes
-            Publicly accessible page to browse impounded bikes
+            Publicly accessible impound page
             %small.less-strong
-              if checked, #{link_to impounded_bikes_path(organization_id: current_organization.to_param), impounded_bikes_path(organization_id: current_organization.to_param)} will be accessible by everyone.
-              %em serials are never displayed for impounded bikes, so they can be used for verification of ownership
+              if checked, #{link_to organization_impounded_bikes_path(organization_id: current_organization.to_param), organization_impounded_bikes_path(organization_id: current_organization.to_param)} will be accessible by everyone.
+              %em Serials are never displayed for impounded bikes, so they can be used for verification of ownership
 
   .form-group.row
     = f.label :website, class: 'org-form-label'

@@ -23,7 +23,7 @@ module OrgPublic
       if current_organization.enabled?("impound_bikes")
         return true if current_organization.public_impound_bikes?
         if current_user&.authorized?(current_organization)
-          flash[:success] = "This page is not publicly visible (it's only visible to organization members)."
+          flash[:success] = "This page is not publicly visible (it's only visible to organization members)"
           return true
         end
       end

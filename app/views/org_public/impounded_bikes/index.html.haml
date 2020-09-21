@@ -2,6 +2,7 @@
 
 .organized-page-header
   %h1
+    %strong= current_organization.name
     Impounded bikes
 
 = render partial: "/shared/period_select"
@@ -42,24 +43,15 @@
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header.hidden-md-down
       %th
-        - if render_sortable
-          = sortable "display_id", "ID"
-        - else
-          Impound ID
+        = sortable "display_id", "ID"
       %th
-        - if render_sortable
-          = sortable "created_at", "Impounded&nbsp;at"
-        - else
-          = "Impounded&nbsp;at"
+        = sortable "created_at", "Impounded&nbsp;at"
       %th
         Impounded from
 
       - unless skip_location
         %th
-          - if render_sortable
-            = sortable "location_id"
-          - else
-            Impound Location
+          = sortable "location_id"
       %th Bike
 
     %tbody
