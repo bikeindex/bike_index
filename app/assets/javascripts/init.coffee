@@ -36,7 +36,6 @@ class BikeIndex.Init extends BikeIndex
     if body_id.match 'landing_pages_'
       return window.pageScript = new BikeIndex.LandingPage
     # All the rest per-page javascripts
-    console.log(body_id)
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
       welcome_recovery_stories: BikeIndex.WelcomeRecoveryStories
