@@ -206,6 +206,45 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_abandoned"
       end
 
+      context "with photo" do
+        let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
+        let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
+        it "creates and adds photo" do
+          FactoryBot.create(:state_new_york)
+          expect(current_organization.enabled?("parking_notifications")).to be_truthy
+          bike.reload
+          expect(bike.status).to eq "status_with_owner"
+          Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Testing.inline! do
+            expect {
+              post base_url, params: {
+                organization_id: current_organization.to_param,
+                parking_notification: parking_notification_and_photo_params
+              }
+              expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
+              expect(flash[:success]).to be_present
+            }.to change(ParkingNotification, :count).by(1)
+          end
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+
+          parking_notification = ParkingNotification.last
+          expect(parking_notification.impound_record_id).to be_blank
+          expect(parking_notification.image).to be_present
+          expect(parking_notification.image_processing).to be_falsey
+
+          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
+          expect(parking_notification.user).to eq current_user
+          expect(parking_notification.organization).to eq current_organization
+          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.location_from_address).to be_falsey
+
+          bike.reload
+          expect(bike.status).to eq "status_abandoned"
+          expect(bike.serial_display).to eq "Hidden"
+        end
+      end
+
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
         let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
@@ -259,6 +298,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.resolved_at).to be_within(5).of parking_notification.created_at
+          expect(parking_notification.image_processing).to be_falsey
 
           parking_notification_initial.reload
           expect(parking_notification_initial.status).to eq "impounded"

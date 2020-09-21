@@ -149,7 +149,16 @@
           %td= t(".internal_notes")
           %td= @parking_notification.internal_notes
 
-#map_canvas{ style: "height: 400px;" }
+- if @parking_notification.image.present? || @parking_notification.image_processing
+  .row
+    .col-lg-6.mt-2
+      #map_canvas{ style: "height: 400px;" }
+    .col-lg-6.mt-2
+      .parking-notification-show-image{ style: "height: 400px;" }
+        = link_to(image_tag(@parking_notification.image_url(:large)), @parking_notification.image_url)
+
+- else
+  #map_canvas{ style: "height: 400px;" }
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <script src="https://maps.googleapis.com/maps/api/js?key=#{ENV["GOOGLE_MAPS"]}&sensor=false" type="text/javascript">
