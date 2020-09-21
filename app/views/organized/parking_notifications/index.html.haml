@@ -27,31 +27,36 @@
   .row.mt-2.mb-4
     .col-sm-12
       %ul.nav#parking-notification-nav-links
-        %li.nav-item
+        - status_display_hash = { all: { m: "All statuses"}, current: { m: "Current notifications" }, impounded: { m: "Impounded notifications", s: "impound notifications or notifications followed up by impounding" }, replaced: { m: "Replaced notifications", s: "notifications replaced by follow up notifications" }, retrieved: { m: "Retrieved notifications", s: "notifications retrieved by owner" } }
+        %li.nav-item.parking-notification-status-li
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            #{@search_status.humanize} notifications
-            - if @search_status == "all"
-              statuses
+            - current_status = status_display_hash[@search_status.to_sym]
+            = current_status[:m]
+            - if current_status[:s].present?
+              %small.less-strong= current_status[:s]
+
           .dropdown-menu
-            - (["all"] + ParkingNotification.statuses).each do |status|
-              - status_active = @search_status == status
+            -# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision
+            - status_display_hash.each do |status, display_hash|
+              - status_active = @search_status == status.to_s
               - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
-              - status_display = "#{status.humanize} notifications"
-              - status_display += " statuses" if status == "all"
-              = link_to status_display, organization_parking_notifications_path(status_link_params), class: "dropdown-item linkWithSortableSearchParams #{status_active ? 'active' : ''}", "data-urlparams" => "search_status,#{status}"
-              - if status == "all" # Add a divider after all
+              = link_to organization_parking_notifications_path(status_link_params), class: "dropdown-item linkWithSortableSearchParams #{status_active ? 'active' : ''}", "data-urlparams" => "search_status,#{status}" do
+                = display_hash[:m]
+                - if display_hash[:s].present?
+                  %small.less-strong= display_hash[:s]
+              - if status == :all # Add a divider after all
                 .dropdown-divider
         %li.nav-item
           - search_kind = ParkingNotification.kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
             = search_kind.humanize
             - if search_kind == "all"
-              kinds
+              types
           .dropdown-menu
             - (["all"] + ParkingNotification.kinds).each do |kind|
               - kind_active = params[:search_kind] == kind
               - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_kind: (kind_active ? nil : kind))
-              - kind_display = kind == "all" ? "All kinds" : "#{kind.humanize}"
+              - kind_display = kind == "all" ? "All types" : "#{kind.humanize}"
               = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item linkWithSortableSearchParams #{kind_active ? 'active' : ''}", "data-urlparams" => "search_kind,#{kind}"
               - if kind == "all" # Add a divider after all
                 .dropdown-divider
