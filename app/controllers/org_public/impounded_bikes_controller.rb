@@ -29,7 +29,6 @@ module OrgPublic
       end
       flash[:error] = "#{current_organization.short_name} doesn't have that feature enabled, please email support@bikeindex.org if this is a surprise"
       redirect_to user_root_url
-      return
     end
 
     def sortable_columns
