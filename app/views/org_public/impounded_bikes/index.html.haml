@@ -4,7 +4,7 @@
   %h1.cleafix.impounded-bikes-header{ class: (current_organization.display_avatar? ? "with-avatar" : "") }
     - if current_organization.display_avatar?
       = image_tag current_organization.avatar.url(:large)
-    %strong= current_organization.name
+    %strong.uncap= current_organization.name
     Impounded bikes
 
   = render partial: "/shared/period_select", locals: { prepend_text: "Impounded during:" }
