@@ -35,6 +35,9 @@
   .btn-success {
     margin-right: 15px;
   }
+  .end-time-control {
+    margin-left: 0;
+  }
 
   @include media-breakpoint-down(sm) {
     justify-content: flex-start;
@@ -44,6 +47,9 @@
       max-width: 75%;
       position: relative;
       padding-left: 15px;
+    }
+    .end-time-control {
+      margin-left: 0;
     }
   }
 }

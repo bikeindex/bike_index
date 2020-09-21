@@ -70,7 +70,7 @@
       = t(".organization_logo")
     .col-sm-4
       - if @organization.avatar?
-        = image_tag(@organization.avatar_url(:thumb))
+        = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
 
       %label.file
         = f.file_field :avatar, class: 'avatar-upload-field'

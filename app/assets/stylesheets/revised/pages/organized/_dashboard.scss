@@ -77,6 +77,9 @@
     margin-right: 15px;
   }
 
+  .end-time-control {
+    margin-left: 1rem;
+  }
   @include media-breakpoint-down(sm) {
     justify-content: flex-start;
     margin: 15px 0 25px;
@@ -87,6 +90,26 @@
       max-width: 75%;
       position: relative;
       padding-left: 0;
+    }
+    .end-time-control {
+      margin-left: 0;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .custom-time-selection {
+    .form-group {
+      display: block;
+      max-width: 100%;
+      flex: 0 0 100%;
+      label {
+        text-align: left;
+        display: inline-block;
+      }
+    }
+    #updatePeriodSelectCustom {
+      margin-top: 6px;
     }
   }
 }

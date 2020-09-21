@@ -61,8 +61,10 @@ module OrganizedHelper
       %w[bikes recoveries],
       %w[bikes incompletes],
       %w[exports show],
+      %w[exports new],
       %w[users new],
-      %w[dashboard index]
+      %w[dashboard index],
+      %w[impounded_bikes index]
     ].include?([controller_name, action_name])
   end
 
