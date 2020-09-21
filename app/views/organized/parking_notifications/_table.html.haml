@@ -28,9 +28,9 @@
       %th=t(".address")
     %th
       - if render_sortable
-        = sortable "kind"
+        = sortable "kind", "Type"
       - else
-        Kind
+        Type
     %th
       =t(".by")
     - unless skip_repeat
