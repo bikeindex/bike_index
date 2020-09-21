@@ -83,7 +83,8 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "with organization" do
-      let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: created_at) }
+      let(:created_at) { Time.current - 20.days }
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:creation_state) { bike.creation_state }
       it "returns created this month" do
@@ -109,19 +110,20 @@ RSpec.describe CredibilityScorer do
         end
       end
       context "deleted organization, long_time_registration" do
-        let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: Time.current - 366.days) }
-        let(:organization) { FactoryBot.create(:organization, approved: false) } # Organizations are verified by default
+        let(:created_at) { Time.current - 366.days }
         it "returns with creation_organization_suspiscious" do
           organization.destroy
+
           expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
-    end
-    context "registered 6 months ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 6.months, bike: bike) }
-      it "returns nothing" do
-        expect(subject.creation_age_badge(creation_state)).to eq nil
-        expect(subject.creation_badges(creation_state)).to eq([])
+      context "unapproved organization, 6 months ago" do
+        let(:created_at) { Time.current - 6.months }
+        let(:organization) { FactoryBot.create(:organization, approved: false) } # Organizations are verified by default
+        it "returns with creation_organization_suspiscious" do
+          expect(subject.creation_age_badge(creation_state)).to eq nil
+          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious])
+        end
       end
     end
     context "registered 2 years ago" do
