@@ -70,9 +70,9 @@ export default class TimeParser {
       );
       // Include the year if it isn't the current year
       if (time.year() === moment().year()) {
-        return prefix + time.format("MMM Do[,]") + hourStr;
+        return prefix + time.format("MMM Do[,] ") + hourStr;
       } else {
-        return prefix + time.format("YYYY-MM-DD") + hourStr;
+        return prefix + time.format("YYYY-MM-DD ") + hourStr;
       }
     }
     // Otherwise, format in basic format

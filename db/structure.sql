@@ -2231,7 +2231,9 @@ CREATE TABLE public.parking_notifications (
     resolved_at timestamp without time zone,
     retrieved_kind integer,
     retrieval_link_token text,
-    retrieved_by_id bigint
+    retrieved_by_id bigint,
+    image text,
+    image_processing boolean DEFAULT false NOT NULL
 );
 
 
@@ -5359,6 +5361,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200831194703'),
 ('20200901165655'),
 ('20200901181453'),
-('20200911230445');
+('20200911230445'),
+('20200921165203');
 
 
