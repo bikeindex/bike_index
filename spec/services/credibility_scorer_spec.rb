@@ -114,6 +114,8 @@ RSpec.describe CredibilityScorer do
         it "returns with creation_organization_suspiscious" do
           organization.destroy
           expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
+          organization.really_destroy! # Check this too, just in case
+          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
       context "unapproved organization, 6 months ago" do

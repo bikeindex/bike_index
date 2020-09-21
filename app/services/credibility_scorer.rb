@@ -69,8 +69,8 @@ class CredibilityScorer
     c_badges = [creation_age_badge(creation_state)].compact
     c_badges << :no_creator if creation_state.creator.blank?
     if creation_state.organization_id.present?
-      organization = Organization.unscoped.find(creation_state.organization_id)
-      return [:created_at_point_of_sale] if organization.does_not_need_pos?
+      organization = Organization.unscoped.find_by_id(creation_state.organization_id)
+      return [:created_at_point_of_sale] if organization&.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(organization)
       c_badges << :creation_organization_trusted if organization_trusted?(organization)
     end
@@ -122,7 +122,7 @@ class CredibilityScorer
 
   # This badge is displayed on the organization show page
   def self.organization_suspicious?(organization)
-    return true if organization.deleted?
+    return true if organization.blank? || organization.deleted?
     !organization.approved
   end
 
