@@ -113,7 +113,6 @@ RSpec.describe CredibilityScorer do
         let(:created_at) { Time.current - 366.days }
         it "returns with creation_organization_suspiscious" do
           organization.destroy
-
           expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
