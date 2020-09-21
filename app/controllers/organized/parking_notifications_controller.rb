@@ -127,7 +127,7 @@ module Organized
         .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :image, :latitude, :longitude,
           :accuracy, :street, :city, :zipcode, :state_id, :country_id)
         .merge(user_id: current_user.id, organization_id: current_organization.id,
-          use_entered_address: use_entered_address)
+               use_entered_address: use_entered_address)
     end
 
     def create_and_send_repeats(kind, ids)

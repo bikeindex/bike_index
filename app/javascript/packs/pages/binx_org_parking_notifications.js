@@ -95,6 +95,10 @@ export default class BinxAppOrgParkingNotifications {
 
   mainTableCell(record, userLink) {
     const showCellUrl = `${location.pathname}/${record.id}`;
+    const notesCell =
+      record.internal_notes.length > 1
+        ? `<small class="extended-col-info d-block"><strong>Notes:</strong> ${record.internal_notes}</strong></small>`
+        : "";
 
     return `<a href="${showCellUrl}" class="convertTime">${
       record.created_at
@@ -111,7 +115,7 @@ export default class BinxAppOrgParkingNotifications {
       ${this.statusSpan(record.status)}${
       record.resolved_at ? `: ${this.retrievedAtEl(record)}` : ""
     }
-    </em></span>`;
+    </em></span>${notesCell}`;
   }
 
   tableRowForRecord(record) {
@@ -133,7 +137,9 @@ export default class BinxAppOrgParkingNotifications {
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${this.statusSpan(
       record.status
-    )}</td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
+    )}</td><td class="hidden-sm-cells"><small>${
+      record.internal_notes
+    }</small></td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
       record
     )}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${

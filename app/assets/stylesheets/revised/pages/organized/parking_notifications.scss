@@ -85,9 +85,33 @@
     padding: 0.6rem;
   }
 }
+
 #parking-notification-nav-links {
   li {
     display: inline-block;
+  }
+  // the status dropdown has big phrases in it - manage it
+  // This is probably something broken in bootstrap 4alpha - but it overflows the screen
+  // Fix it here
+  @include media-breakpoint-down(md) {
+    .parking-notification-status-li {
+      position: relative;
+      width: 100%;
+      .dropdown-toggle {
+        display: block;
+        small {
+          display: block; // break line for small screens
+        }
+      }
+      .dropdown-menu a {
+        width: 98%;
+        white-space: normal;
+        line-height: 1;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-top: 0.5rem;
+      }
+    }
   }
 }
 
