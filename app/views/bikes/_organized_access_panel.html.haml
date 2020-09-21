@@ -362,12 +362,12 @@
                     = f.radio_button :kind, kind
                     = ParkingNotification.kinds_humanized[kind.to_sym]
 
-          .row.mt-4
-            .col-sm-6
+          .row
+            .col-sm-6.mt-4
               = f.label :image, class: "custom-file" do
                 = f.file_field :image, class: "custom-file-input"
                 %span.custom-file-control#customFileSpanContent
-            .col-sm-6
+            .col-sm-6.mt-4
               = submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true
 
           .row.mt-4

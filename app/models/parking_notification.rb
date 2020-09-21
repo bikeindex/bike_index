@@ -8,6 +8,7 @@ class ParkingNotification < ActiveRecord::Base
   MAX_PER_PAGE = 250
 
   mount_uploader :image, ImageUploaderBackgrounded
+  store_in_background :image
 
   belongs_to :bike
   belongs_to :user

@@ -220,7 +220,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             expect {
               post base_url, params: {
                 organization_id: current_organization.to_param,
-                parking_notification: parking_notification_params
+                parking_notification: parking_notification_and_photo_params
               }
               expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
               expect(flash[:success]).to be_present
@@ -230,6 +230,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
           parking_notification = ParkingNotification.last
           expect(parking_notification.impound_record_id).to be_blank
+          pp parking_notification.image
           expect(parking_notification.image).to be_present
           expect(parking_notification.image_processing).to be_falsey
 

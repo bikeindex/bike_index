@@ -151,9 +151,9 @@
 
 - if @parking_notification.image.present? || @parking_notification.image_processing
   .row
-    .col-lg-6
+    .col-lg-6.mt-2
       #map_canvas{ style: "height: 400px;" }
-    .col-lg-6
+    .col-lg-6.mt-2
       .parking-notification-show-image{ style: "height: 400px;" }
         = link_to(image_tag(@parking_notification.image_url(:large)), @parking_notification.image_url)
 
