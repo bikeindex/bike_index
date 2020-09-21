@@ -6,7 +6,8 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
   MAX_PER_PAGE = 250
-  max_paginates_per 250
+
+  mount_uploader :image, ImageUploaderBackgrounded
 
   belongs_to :bike
   belongs_to :user

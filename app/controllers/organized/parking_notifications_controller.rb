@@ -124,9 +124,10 @@ module Organized
     def permitted_parameters
       use_entered_address = ParamsNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
       params.require(:parking_notification)
-        .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :latitude, :longitude, :accuracy,
-          :street, :city, :zipcode, :state_id, :country_id)
-        .merge(user_id: current_user.id, organization_id: current_organization.id, use_entered_address: use_entered_address)
+        .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :image, :latitude, :longitude,
+          :accuracy, :street, :city, :zipcode, :state_id, :country_id)
+        .merge(user_id: current_user.id, organization_id: current_organization.id,
+          use_entered_address: use_entered_address)
     end
 
     def create_and_send_repeats(kind, ids)
