@@ -34,7 +34,7 @@
 - if @render_chart
   = column_chart time_range_counts(collection: matching_parking_notifications), stacked: true, thousands: ",", defer: true
   - unless params[:organization_id].present?
-    .row.mt-2
+    .row.mt-4
       .col-md-6.offset-md-3
         %table.table-list.wide-definition
           %tbody
@@ -50,7 +50,7 @@
                 %td
                   = number_with_delimiter(number)
 
-.mt-2.mb-4
+.mt-4.mb-4
   = render partial: "/shared/period_select"
 
 = paginate @parking_notifications, views_prefix: "admin"

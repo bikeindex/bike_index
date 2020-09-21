@@ -31,8 +31,24 @@
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_impound_records), stacked: true, thousands: ",", defer: true
+  - unless params[:organization_id].present?
+    .row.mt-4
+      .col-md-6.offset-md-3
+        %table.table-list.wide-definition
+          %tbody
+            - matching_impound_record_per_org_id = matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }
+            - matching_impound_record_per_org_id.sort_by { |id, number| number }.each do |id, number|
+              - organization = Organization.unscoped.find_by_id(id) if id.present?
+              %tr
+                %td
+                  - if organization.present?
+                    = link_to organization.short_name, admin_impound_records_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
+                  - else
+                    = link_to "no organization", admin_impound_records_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
+                %td
+                  = number_with_delimiter(number)
 
-.mt-2.mb-4
+.mt-4.mb-4
   = render partial: "/shared/period_select"
 
 = paginate @impound_records, views_prefix: "admin"

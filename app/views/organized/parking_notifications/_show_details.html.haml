@@ -15,7 +15,7 @@
           %td= t(".by")
           %td= @parking_notification.user.display_name
         %tr
-          %td Kind
+          %td Type
           %td
             %strong
               = @parking_notification.kind_humanized
@@ -48,8 +48,9 @@
                           = l(impound_notification.created_at, format: :convert_time)
                       by #{impound_notification.user.display_name}
                   - if @parking_notification.impound_record_id.present?
+                    %br
                     View the
-                    = link_to "impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: current_organization.to_param)
+                    = link_to "Impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: current_organization.to_param)
                   - else
                     %small.less-strong
                       Impound record not found. Try reloading the page?
@@ -216,7 +217,7 @@
     Related Notifications
     %em
       (#{related_notifications.count + 1} total)
-  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true, render_internal_notes: true }
+  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true }
 
 - if @parking_notification.send_email?
   %h2.uncap.mt-4 Preview of email sent:

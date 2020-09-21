@@ -6,7 +6,6 @@
 - hide_status ||= false
 - skip_resolved ||= false
 - render_sortable ||= false
-- render_internal_notes ||= false
 
 - # TODO: add translations
 :css
@@ -28,17 +27,16 @@
       %th=t(".address")
     %th
       - if render_sortable
-        = sortable "kind"
+        = sortable "kind", "Type"
       - else
-        Kind
+        Type
     %th
       =t(".by")
     - unless skip_repeat
       %th
         %small=t(".notification_number")
     %th.status-cell Status
-    - if render_internal_notes # NOTE: JS never renders with this, so it isn't included in the JS template
-      %th.small Notes
+    %th.small Notes
     - unless skip_resolved
       %th.status-cell
         %small=t(".resolved")
@@ -75,12 +73,11 @@
                 Resolved:
               %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
-          - if render_internal_notes
-            - if parking_notification.internal_notes.present?
-              %small.extended-col-info.d-block
-                %strong
-                  Notes:
-                = parking_notification.internal_notes
+          - if parking_notification.internal_notes.present?
+            %small.extended-col-info.d-block
+              %strong
+                Notes:
+              = parking_notification.internal_notes
 
         - if render_address
           %td.hidden-sm-cells
@@ -104,10 +101,9 @@
               = parking_notification.notification_number
         %td.hidden-sm-cells.status-cell
           = status_display(parking_notification.status)
-        - if render_internal_notes
-          %td.hidden-sm-cells
-            %small
-              = parking_notification.internal_notes
+        %td.hidden-sm-cells
+          %small
+            = parking_notification.internal_notes
         - unless skip_resolved
           %td.hidden-sm-cells.status-cell
             - if parking_notification.impound_record_id.present?

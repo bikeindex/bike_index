@@ -277,6 +277,7 @@
 
 - if passive_organization.enabled?("parking_notifications")
   - parking_notifications = passive_organization.parking_notifications.where(bike_id: @bike.id).order(id: :desc)
+
   .parking-notifications-wrap
     .row.mt-2.mb-2
       .col-xs-8.col-md-6
@@ -290,33 +291,40 @@
               .d-none.d-md-inline
                 of
                 = "notifications".pluralize(parking_notifications.count)
+    - if @bike.status_impounded?
+      - impound_record = @bike.current_impound_record&.organization_id == passive_organization.id ? @bike.current_impound_record : nil
+      %h3.uncap.mt-2
+        %span.text-danger
+          #{@bike.type&.titleize} is impounded!
+        - if impound_record.present?
+          = link_to "Impound record ##{impound_record.display_id}", organization_impound_record_path(impound_record.display_id, organization_id: passive_organization.to_param)
+          %em.small created by this impound notification:
 
+    -# The parking notification that impounded the bike is never current - but we want to show it separately
+    - current_impound_notification = parking_notifications.impound_notification.where(impound_record_id: impound_record.id).first
+    - if current_impound_notification.present?
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [current_impound_notification], skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true, hide_status: true }
+      .mt-4{ style: "padding-bottom: 12px;" }
+
+    - resolved_notifications = parking_notifications.resolved.where.not(id: current_impound_notification&.id)
     %p{ style: "margin-top: -12px;" }
-      = pluralize number_with_delimiter(parking_notifications.current.count), "current notification"
+      = pluralize number_with_delimiter(parking_notifications.current.count), "current notifications"
       - if parking_notifications.resolved.count > 0
         \-
         %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }
           show
-          = pluralize number_with_delimiter(parking_notifications.resolved.count), "resolved notification"
+          = pluralize number_with_delimiter(resolved_notifications.count), "resolved notification"
       for #{@bike.type}
     - if parking_notifications.current.any?
-      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true, render_internal_notes: true }
+      = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true }
 
-    - if parking_notifications.resolved.any?
+    - if resolved_notifications.any?
       .collapse#resolvedParkingNotificationTable
         %p.mb-0
           %strong Resolved notifications
-        = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.resolved.limit(10), skip_bike: true, skip_map_cell: true, render_address: true, render_internal_notes: true }
+        = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: resolved_notifications.limit(10), skip_bike: true, skip_map_cell: true, render_address: true }
 
-    - if @bike.status_impounded?
-      %hr
-      %h3.uncap.mt-4.text-center
-        %span.text-warning
-          #{@bike.type} is impounded!
-        - if @bike.current_impound_record.present? && @bike.current_impound_record.organization_id == passive_organization.id
-          = link_to "Impound record ##{@bike.current_impound_record.display_id}", organization_impound_record_path(@bike.current_impound_record.display_id, organization_id: passive_organization.to_param)
-
-    - else
+    - unless @bike.status_impounded?
       - parking_notification_open = params[:parking_notification].present?
 
       .text-center#openNewParkingNotification.collapse{ class: (parking_notification_open ? "" : "in") }

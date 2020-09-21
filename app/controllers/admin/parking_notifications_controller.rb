@@ -18,6 +18,10 @@ class Admin::ParkingNotificationsController < Admin::BaseController
     %w[created_at organization_id kind updated_at user_id resolved_at]
   end
 
+  def earliest_period_date
+    Time.at(1580400881) # 14 days before first parking notification created
+  end
+
   def matching_parking_notifications
     return @matching_parking_notifications if defined?(@matching_parking_notifications)
     parking_notifications = ParkingNotification

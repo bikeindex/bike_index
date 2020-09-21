@@ -12,6 +12,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
     :notification_number,
     :impound_record_id,
     :unregistered_bike,
+    :internal_notes,
     :resolved_at
 
   def perform_caching
