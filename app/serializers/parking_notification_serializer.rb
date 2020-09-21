@@ -13,6 +13,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
     :impound_record_id,
     :unregistered_bike,
     :internal_notes,
+    :image_url,
     :resolved_at
 
   def perform_caching
@@ -45,6 +46,10 @@ class ParkingNotificationSerializer < ApplicationSerializer
 
   def impound_record_id
     object.impound_record_id
+  end
+
+  def image_url
+    object.image_url
   end
 
   def bike

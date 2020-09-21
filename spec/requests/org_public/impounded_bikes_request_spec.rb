@@ -43,12 +43,21 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
 
   context "organization has impound_bikes" do
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, public_impound_bikes: true, enabled_feature_slugs: "impound_bikes") }
-
+    let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, organization: current_organization) }
+    let!(:bike) { parking_notification.bike }
     it "renders" do
       expect(current_organization.public_impound_bikes).to be_truthy
+      bike.reload
+      expect(bike.status_impounded).to be_truthy
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template :index
+      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+      # Also test that we can view the bike!
+      get "bikes/#{bike.to_param}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :show
     end
   end
 end

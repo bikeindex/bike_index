@@ -102,6 +102,8 @@
         %td.hidden-sm-cells.status-cell
           = status_display(parking_notification.status)
         %td.hidden-sm-cells
+          - if parking_notification.image_url.present?
+            📷
           %small
             = parking_notification.internal_notes
         - unless skip_resolved
