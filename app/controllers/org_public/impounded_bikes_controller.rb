@@ -19,7 +19,7 @@ module OrgPublic
 
     def ensure_public_impound_bikes!
       # It will 404 if there isn't an current_organization because of OrgPublic before action
-      return false unless current_organization.present?
+      return ensure_current_organization! unless current_organization.present?
       if current_organization.enabled?("impound_bikes")
         return true if current_organization.public_impound_bikes?
         if current_user&.authorized?(current_organization)
@@ -28,7 +28,8 @@ module OrgPublic
         end
       end
       flash[:error] = "#{current_organization.short_name} doesn't have that feature enabled, please email support@bikeindex.org if this is a surprise"
-      redirect_to user_root_url && return
+      redirect_to user_root_url
+      return
     end
 
     def sortable_columns

@@ -137,9 +137,7 @@ export default class BinxAppOrgParkingNotifications {
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${this.statusSpan(
       record.status
-    )}</td><td class="hidden-sm-cells">${
-      record.image_url.length ? "📷" : ""
-    }<small>${
+    )}</td><td class="hidden-sm-cells">${record.image_url ? "📷" : ""}<small>${
       record.internal_notes
     }</small></td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
       record

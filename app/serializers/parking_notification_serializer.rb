@@ -48,10 +48,6 @@ class ParkingNotificationSerializer < ApplicationSerializer
     object.impound_record_id
   end
 
-  def image_url
-    object.image_url
-  end
-
   def bike
     bike_obj = object.bike
     {

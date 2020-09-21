@@ -4,6 +4,7 @@ module Organized
 
     def show
       @organization.ensure_auto_user
+      @page_title = "#{@organization.short_name} settings"
     end
 
     def locations
