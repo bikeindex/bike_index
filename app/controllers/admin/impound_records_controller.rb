@@ -19,6 +19,10 @@ class Admin::ImpoundRecordsController < Admin::BaseController
     %w[created_at organization_id location_id updated_at status user_id resolved_at]
   end
 
+  def earliest_period_date
+    Time.at(1580853693) # 14 days before first impound record created
+  end
+
   def matching_impound_records
     return @matching_impound_records if defined?(@matching_impound_records)
     impound_records = ImpoundRecord
