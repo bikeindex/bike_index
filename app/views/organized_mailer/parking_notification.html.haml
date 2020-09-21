@@ -59,4 +59,4 @@
 
 - if @parking_notification.image.present?
   %a{ href: @parking_notification.image_url }
-    = image_tag @parking_notification.image_url(:large), style: "display: block; margin: 20px auto; width: auto; height: 100%; max-height: 400px;"
+    = image_tag @parking_notification.image_url(:large), style: "display: block; margin: 20px auto; width: auto; max-width: 100%; height: auto; max-height: 400px;"

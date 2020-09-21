@@ -1374,6 +1374,7 @@ en:
       abandoned: Abandoned
       at: at
       bike_photo: "%{bike_type} photo"
+      by: by
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
       componentcmodel_name: "%{componentcmodel_name}"
@@ -1388,11 +1389,13 @@ en:
       distinguishing_features: Distinguishing features
       frame_material: Frame Material
       frame_size: Frame size
+      from: from
       front: Front
       front_rear: Front & rear
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
+      impounded_at: Impounded
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
@@ -1425,6 +1428,7 @@ en:
       stolen: Stolen
       switch_to_new_bike_id: Switch to a new bike ID
       theft_details: "%{bike_abandoned} Details"
+      this_was_impounded: This %{bike_type} was impounded
       update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
@@ -4055,6 +4059,12 @@ en:
     precision:
       format:
         delimiter: ''
+  org_public:
+    impounded_bikes:
+      index:
+        search_bike_descriptions: Search bike descriptions
+        search_for_serial_number: Search for serial number
+        search_owner_email: Search owner email
   organization_invitations:
     not_available:
       contact_us: Contact us

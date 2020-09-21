@@ -47,6 +47,18 @@
             Add phone to registrations
             %small.less-strong
               if checked, bikes from Lightspeed POS will be registered with their phone number (if one is available)
+  - if @organization.enabled?("impound_bikes")
+    .form-group.row
+      %label.org-form-label
+        Impounded bikes
+      .col-sm-4
+        .checkbox
+          %label{ style: "line-height: 1.5em;" }
+            = f.check_box :public_impound_bikes
+            Publicly accessible impound page
+            %small.less-strong
+              if checked, #{link_to organization_impounded_bikes_path(organization_id: current_organization.to_param), organization_impounded_bikes_path(organization_id: current_organization.to_param)} will be accessible by everyone.
+              %em Serials are never displayed for impounded bikes, so they can be used for verification of ownership
 
   .form-group.row
     = f.label :website, class: 'org-form-label'

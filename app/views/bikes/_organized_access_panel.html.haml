@@ -301,7 +301,7 @@
           %em.small created by this impound notification:
 
     -# The parking notification that impounded the bike is never current - but we want to show it separately
-    - current_impound_notification = parking_notifications.impound_notification.where(impound_record_id: impound_record.id).first
+    - current_impound_notification = parking_notifications.impound_notification.where(impound_record_id: impound_record&.id).first
     - if current_impound_notification.present?
       = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: [current_impound_notification], skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true, hide_status: true }
       .mt-4{ style: "padding-bottom: 12px;" }
@@ -372,9 +372,12 @@
 
           .row
             .col-sm-6.mt-4
-              = f.label :image, class: "custom-file" do
-                = f.file_field :image, class: "custom-file-input"
-                %span.custom-file-control#customFileSpanContent
+              .avatar-upload-wrapper
+                %label.file
+                  = f.file_field :image, class: "avatar-upload-field"
+                  %span.file-custom
+                    %span.file-upload-text Choose file
+                  = f.hidden_field :image_cache
             .col-sm-6.mt-4
               = submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true
 

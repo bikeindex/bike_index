@@ -49,12 +49,27 @@
               = submit_tag t(".update"), class: "btn btn-success"
 
   -# Authorize check here, even though we're checking in controller too, because
-  -# otherwise we're displaying user data
+  -# otherwise we're displaying user data - so it's critical to be sure
   - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
     = render partial: "organized_access_panel"
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status"
+  - if @bike.status_impounded?
+    .alert.alert-warning.mt-4.mb-4
+      %h4
+        = t(".this_was_impounded", bike_type: @bike.type.titleize)
+      - if @bike.current_impound_record.present?
+        = t(".impounded_at")
+        %em.convertTime
+          = l @bike.current_impound_record.created_at, format: :convert_time
+        %em.small.convertTimezone
+        = t(".by")
+        %strong
+          = @bike.current_impound_record.organization&.name
+        - if @bike.current_impound_record.parking_notification.present?
+          = t(".from")
+          = @bike.current_impound_record.parking_notification.address
 
   .row
     .col-md-8

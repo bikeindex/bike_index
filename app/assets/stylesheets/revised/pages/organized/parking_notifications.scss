@@ -23,8 +23,10 @@
   }
   img {
     display: block;
-    height: 100%;
+    height: auto;
     width: auto;
+    max-height: 100%;
+    max-width: 100%;
     margin: 0 auto;
   }
 }

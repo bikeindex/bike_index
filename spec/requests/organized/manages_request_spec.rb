@@ -108,6 +108,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
+            public_impound_bikes: true,
             locations_attributes: [],
           }
         end
