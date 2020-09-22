@@ -4064,7 +4064,6 @@ en:
       index:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email
   organization_invitations:
     not_available:
       contact_us: Contact us

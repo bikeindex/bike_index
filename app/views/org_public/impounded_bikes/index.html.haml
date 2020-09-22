@@ -1,14 +1,13 @@
 -# TODO: add translations
 
-.container
-  %h1.clearfix
+.container.public-impounded-bikes
+  %h1.cleafix.impounded-bikes-header{ class: (current_organization.display_avatar? ? "with-avatar" : "") }
     - if current_organization.display_avatar?
-      = image_tag current_organization.avatar.url(:medium), class: "float-left mr-2"
-    %strong= current_organization.name
+      = image_tag current_organization.avatar.url(:large)
+    %strong.uncap= current_organization.name
     Impounded bikes
 
-.container-fluid
-  = render partial: "/shared/period_select"
+  = render partial: "/shared/period_select", locals: { prepend_text: "Impounded during:" }
 
   .mt-4
     = form_tag organization_impounded_bikes_path(organization_id: current_organization.to_param), id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
@@ -21,9 +20,7 @@
           multiple: true
 
         = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
-        .sidebyside-queries
-          = text_field_tag :search_email, params[:search_email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
-          = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
+        = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field'
 
       .search-button-wrap
         = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
@@ -84,3 +81,6 @@
 
   .paginate-container.paginate-container-bottom
     = paginate @impound_records
+
+-# include javascript because of period select
+= javascript_pack_tag "application"
