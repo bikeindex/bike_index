@@ -1,6 +1,6 @@
 class CreationState < ApplicationRecord
   belongs_to :bike
-  belongs_to :organization
+  belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization
   belongs_to :creator, class_name: "User"
   belongs_to :bulk_import
 
