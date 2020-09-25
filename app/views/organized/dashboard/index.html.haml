@@ -3,11 +3,17 @@
     %em= current_organization.name
     Dashboard
 
+-# colors = { green: "#178813", red: "#d12310", orange: "#ffc281", blue: "#88a2e0" }
 = column_chart organization_dashboard_bikes_graph_data, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
 
 - if current_organization.enabled?("claimed_ownerships")
+  :ruby
+    claimed_ownerships = [
+      # {name: "Registrations sent to new owner", data: time_range_counts(collection: @ownerships_to_new_owner, column: "ownerships.created_at")},
+      {name: "Registrations claimed", data: time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at")}
+    ]
   .mt-4
-  = column_chart [{name: "Registrations claimed", data: time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at")}], thousands: ",", defer: true
+  = column_chart claimed_ownerships, thousands: ",", defer: true, stacked: true, colors: ["#88a2e0", "#ffc281"]
 
 %div{ style: "margin-top: 50px;" }
   = render partial: "/shared/period_select"
@@ -25,6 +31,9 @@
         %td Registered with #{current_organization.name}
         %td= number_with_delimiter(@bikes_in_organization_count)
       - if current_organization.enabled?("claimed_ownerships")
+        -# %tr
+        -#   %td Registrations sent to new owners
+        -#   %td= number_with_delimiter(@ownerships_to_new_owner.count)
         %tr
           %td Registrations claimed by their owners
           %td= number_with_delimiter(@claimed_ownerships.count)

@@ -25,10 +25,14 @@ module Organized
         @bikes_in_region_not_in_organizations_count = @bikes_not_in_organizations.count
       end
       if current_organization.enabled?("claimed_ownerships")
-        # In general, we're not using creation_organization_id - mostly, it should be accessed through that
-        # but this requires that for joining
-        @claimed_ownerships = Ownership.unscoped.claimed.joins(:bike).where(bikes: { creation_organization_id: current_organization.id })
-          .where(claimed_at: @time_range)
+        non_org_ownerships = Ownership.unscoped.joins(:bike).where(bikes: { creation_organization_id: current_organization.id })
+          .where.not(owner_email: current_organization.users.pluck(:email))
+        # In general, we're not using Bike#creation_organization_id - mostly, it should be accessed through creation_state
+        # but this requires creation_organization_id for ease of joining
+        @claimed_ownerships = non_org_ownerships.where(claimed_at: @time_range)
+        # We added this - but it isn't a relevant metric for most organizations.
+        # It's only relevant to organizations that register to themselves first (e.g. Pro's Closet)
+        @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
       end
     end
 
