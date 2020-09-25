@@ -71,6 +71,7 @@ class Ownership < ApplicationRecord
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
     end
+    self.claimed_at ||= Time.current if claimed?
   end
 
   def send_notification_and_update_other_ownerships

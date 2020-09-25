@@ -34,6 +34,7 @@ class OrganizationFeature < ApplicationRecord
     impound_bikes_locations
     passwordless_users
     regional_bike_counts
+    claimed_ownerships
     credibility_badges
     show_bulk_import
     show_multi_serial

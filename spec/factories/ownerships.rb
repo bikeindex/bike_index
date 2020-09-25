@@ -10,6 +10,7 @@ FactoryBot.define do
     trait :claimed do
       claimed { true }
       user { FactoryBot.create(:user, email: owner_email) }
+      claimed_at { Time.current - 1.hour }
     end
     factory :ownership_claimed, traits: [:claimed]
     factory :ownership_organization_bike do

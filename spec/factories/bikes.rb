@@ -26,7 +26,12 @@ FactoryBot.define do
         claimed { false }
       end
       after(:create) do |bike, evaluator|
-        create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email, user: evaluator.user, claimed: evaluator.claimed)
+        create(:ownership,
+          bike: bike,
+          creator: bike.creator,
+          owner_email: bike.owner_email,
+          user: evaluator.user,
+          claimed: evaluator.claimed)
         bike.reload
       end
     end
@@ -34,11 +39,18 @@ FactoryBot.define do
     trait :with_ownership_claimed do
       transient do
         user { FactoryBot.create(:user) }
+        claimed_at { Time.current - 1.day }
       end
       creator { user }
       owner_email { user.email }
+      created_at { claimed_at }
       after(:create) do |bike, evaluator|
-        create(:ownership_claimed, bike: bike, creator: bike.creator, owner_email: bike.owner_email, user: evaluator.user)
+        create(:ownership_claimed,
+          bike: bike,
+          creator: bike.creator,
+          owner_email: bike.owner_email,
+          user: evaluator.user,
+          claimed_at: claimed_at)
         bike.reload
       end
     end

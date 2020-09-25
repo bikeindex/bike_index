@@ -279,7 +279,7 @@ class Organization < ApplicationRecord
   end
 
   def overview_dashboard?
-    parent? || regional?
+    parent? || regional? || enabled?("claimed_ownerships")
   end
 
   def bike_stickers
