@@ -6,7 +6,8 @@
 = column_chart organization_dashboard_bikes_graph_data, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
 
 - if current_organization.enabled?("claimed_ownerships")
-  = column_chart time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at"), thousands: ",", defer: true
+  .mt-4
+  = column_chart [{name: "Registrations claimed", data: time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at")}], thousands: ",", defer: true
 
 %div{ style: "margin-top: 50px;" }
   = render partial: "/shared/period_select"
@@ -23,6 +24,10 @@
       %tr
         %td Registered with #{current_organization.name}
         %td= number_with_delimiter(@bikes_in_organization_count)
+      - if current_organization.enabled?("claimed_ownerships")
+        %tr
+          %td Registrations claimed by their owners
+          %td= number_with_delimiter(@claimed_ownerships.count)
       - if current_organization.parent?
         %tr
           %td Registered by related organizations
