@@ -29,8 +29,10 @@ module Organized
           .where.not(owner_email: current_organization.users.pluck(:email))
         # In general, we're not using Bike#creation_organization_id - mostly, it should be accessed through creation_state
         # but this requires creation_organization_id for ease of joining
-        @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
         @claimed_ownerships = non_org_ownerships.where(claimed_at: @time_range)
+        # We added this - but it isn't a relevant metric for most organizations.
+        # It's only relevant to organizations that register to themselves first (e.g. Pro's Closet)
+        @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
       end
     end
 
