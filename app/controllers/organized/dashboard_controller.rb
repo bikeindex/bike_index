@@ -24,6 +24,12 @@ module Organized
         @bikes_in_nearby_organizations_count = Bike.organization(current_organization.regional_ids).where(created_at: @time_range).count
         @bikes_in_region_not_in_organizations_count = @bikes_not_in_organizations.count
       end
+      if current_organization.enabled?("claimed_ownerships")
+        # In general, we're not using creation_organization_id - mostly, it should be accessed through that
+        # but this requires that for joining
+        @claimed_ownerships = Ownership.unscoped.claimed.joins(:bike).where(bikes: { creation_organization_id: current_organization.id })
+          .where(claimed_at: @time_range)
+      end
     end
 
     private

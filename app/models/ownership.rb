@@ -14,6 +14,7 @@ class Ownership < ApplicationRecord
 
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
+  scope :claimed, -> { where(claimed: true) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create

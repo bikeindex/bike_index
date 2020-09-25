@@ -50,7 +50,7 @@ FactoryBot.define do
           creator: bike.creator,
           owner_email: bike.owner_email,
           user: evaluator.user,
-          claimed_at: claimed_at)
+          claimed_at: evaluator.claimed_at)
         bike.reload
       end
     end
