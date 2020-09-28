@@ -22,8 +22,11 @@
     .row.main-body-row
       .landing-why-col
         %h3= t(".register_bikes_for_your_customers")
-        %p= t(".for_completely_free_we_provide_you_with_t")
-        %p= t(".build_goodwill_with_your_customers_with_a")
+        %p
+          = t(".for_completely_free_we_provide_you_with_t")
+
+        %p
+          = t(".build_goodwill_with_your_customers_with_a")
 
         %p
           - network_link = link_to t(".network_of_shop_partners"), where_path
@@ -31,6 +34,11 @@
           - new_org_link = link_to t(".here"), new_organization_path
           = t(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
           = t(".once_you_do_this_link_your_account_to_you")
+
+        %p
+          - security_link = link_to t(".security_link"), "https://bikeindex.org/info/security-faq-pos-integrations"
+          = t(".curious_what_information_html", security_link: security_link)
+
 
           = image_tag "ascend-logo.png", class: "landing-lightspeed-logo", alt: "Ascend logo"
           = image_tag "lightspeed_logo.png", class: "landing-lightspeed-logo", alt: "Lightspeed logo"
