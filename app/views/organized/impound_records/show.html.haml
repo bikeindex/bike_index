@@ -91,11 +91,14 @@
               %h3.uncap
                 Update impound record
               - if @parking_notification.present? && @parking_notification.unregistered_bike?
-                %small
-                  You cannot mark this
+                %p{ style: "margin: -12px 0 24px; line-height: 1.5;" }
+                  %span.text-warning Unregistered bikes
+                  cannot be updated with
                   %em
                     = ImpoundRecordUpdate.kinds_humanized[:retrieved_by_owner]
-                  because it is an unregistered bike
+                  %br
+                  %small
+                    Use either <em>transfered to a new owner</em> or <em>removed from Bike Index</em>.
 
             .card-body#impoundRecordUpdateForm
               .row
