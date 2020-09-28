@@ -51,9 +51,10 @@
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
                       %li
-                        - if bike.stolen
-                          = link_to t(".printable_pdf"), pdf_bike_path(bike)
-                        - else
+                        -# Hide printable PDF because it isn't working right now :(
+                        -# - if bike.stolen
+                        -#   = link_to t(".printable_pdf"), pdf_bike_path(bike)
+                        - unless bike.stolen
                           = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 
             .paginate-container.paginate-container-bottom

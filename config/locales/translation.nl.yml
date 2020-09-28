@@ -5810,7 +5810,6 @@ nl:
       mark_bike_stolen: Markeer fiets als gestolen
       next: Volgende stappen
       primary_colors: Primaire kleuren
-      printable_pdf: Afdrukbaar (pdf)
       register_new_items: Registreer nieuwe items
       serial: Serie
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,

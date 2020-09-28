@@ -25,7 +25,7 @@ module Organized
         @bikes_in_region_not_in_organizations_count = @bikes_not_in_organizations.count
       end
       if current_organization.enabled?("claimed_ownerships")
-        non_org_ownerships = Ownership.unscoped.joins(:bike).where(bikes: { creation_organization_id: current_organization.id })
+        non_org_ownerships = Ownership.unscoped.joins(:bike).where(bikes: {creation_organization_id: current_organization.id})
           .where.not(owner_email: current_organization.users.pluck(:email))
         # In general, we're not using Bike#creation_organization_id - mostly, it should be accessed through creation_state
         # but this requires creation_organization_id for ease of joining
