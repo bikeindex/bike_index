@@ -2418,9 +2418,10 @@ en:
         created for every bicycle you sell. All you need to do is add the customer's
         email address and the bicycle's serial number during a normal Lightspeed Retail
         checkout.
-      all_you_have_to_do_is_go_to_html: >-
+      security_link_text: POS integration FAQ
+      all_you_have_to_do_is_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
-        Index to access your Lightspeed Account.
+        Index to access your Lightspeed Account. Curious about what we collect? Read the %{security_link}.
       already_have_a_sophisticated_html: >-
         Already have a sophisticated email connection with your customers? Bike Index
         can integrate with your existing flow - email %{link} for setup.
@@ -3579,7 +3580,7 @@ en:
       related_articles: 'Related articles:'
       sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
         for your shop %{new_org_link}.
-      security_link: security and privacy of the integrations here
+      security_link_text: security and privacy of the integrations here
       curious_what_information_html: Curious what information is collected? Read about the %{security_link}.
       trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
       use_lightspeed_retail: Use Lightspeed Retail?
