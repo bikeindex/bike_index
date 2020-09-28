@@ -90,6 +90,13 @@
             .card-title
               %h3.uncap
                 Update impound record
+              - if @parking_notification.present? && @parking_notification.unregistered_bike?
+                %small
+                  You cannot mark this
+                  %em
+                    = ImpoundRecordUpdate.kinds_humanized[:retrieved_by_owner]
+                  because it is an unregistered bike
+
             .card-body#impoundRecordUpdateForm
               .row
                 .col-sm-6
