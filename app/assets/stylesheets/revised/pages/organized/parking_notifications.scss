@@ -63,12 +63,6 @@
     }
   }
 
-  table {
-    @include media-breakpoint-down(md) {
-      line-height: 1.25;
-    }
-  }
-
   #placeSearch {
     max-width: 60%;
     display: none;
@@ -86,6 +80,11 @@
     border-radius: 1px;
     padding: 0.6rem;
   }
+}
+
+// Wherever this table is, it has multiple lines and looks stupid with line-height 2
+.parking-notifications-table td {
+  line-height: 1.5em;
 }
 
 #parking-notification-nav-links {
@@ -129,7 +128,7 @@
 @include media-breakpoint-down(md) {
   // For small tables, we want to make the line-height not stupid for the expanded cell
   .parking-notifications-table td {
-    line-height: 1.5;
+    line-height: 1.25;
   }
 
   .extended-col-info {

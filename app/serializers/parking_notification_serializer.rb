@@ -12,6 +12,7 @@ class ParkingNotificationSerializer < ApplicationSerializer
     :notification_number,
     :impound_record_id,
     :unregistered_bike,
+    :message,
     :internal_notes,
     :image_url,
     :resolved_at

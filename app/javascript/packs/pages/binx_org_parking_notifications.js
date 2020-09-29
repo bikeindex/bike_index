@@ -93,12 +93,8 @@ export default class BinxAppOrgParkingNotifications {
     return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="convertTime small">${record.resolved_at}</a>`;
   }
 
-  mainTableCell(record, userLink) {
+  mainTableCell(record, userLink, messageNoteCell) {
     const showCellUrl = `${location.pathname}/${record.id}`;
-    const notesCell =
-      record.internal_notes.length > 1
-        ? `<small class="extended-col-info d-block"><strong>Notes:</strong> ${record.internal_notes}</strong></small>`
-        : "";
 
     return `<a href="${showCellUrl}" class="convertTime">${
       record.created_at
@@ -115,7 +111,7 @@ export default class BinxAppOrgParkingNotifications {
       ${this.statusSpan(record.status)}${
       record.resolved_at ? `: ${this.retrievedAtEl(record)}` : ""
     }
-    </em></span>${notesCell}`;
+    </em></span><small class="extended-col-info d-block">${messageNoteCell}</small>`;
   }
 
   tableRowForRecord(record) {
@@ -126,9 +122,25 @@ export default class BinxAppOrgParkingNotifications {
       ? `<a href="${window.location}&user_id=${record.user_id}" class="linkWithSortableSearchParams" data-urlparams="user_id,${record.user_id}">${record.user_display_name}</a>`
       : "";
 
+    let messageNoteCell = "";
+    if (record.message && record.message.length) {
+      messageNoteCell += `<strong>Message:</strong> ${record.message}`;
+      if (record.internal_notes && record.internal_notes.length) {
+        messageNoteCell += "<br>";
+      }
+    }
+    if (record.internal_notes && record.internal_notes.length) {
+      messageNoteCell += `<strong>Note:</strong> ${record.internal_notes}`;
+    }
+    log.debug(messageNoteCell);
+
     return `<tr class="record-row" data-recordid="${
       record.id
-    }"><td class="map-cell"><a>↑</a></td><td>${this.mainTableCell(record)}
+    }"><td class="map-cell"><a>↑</a></td><td>${this.mainTableCell(
+      record,
+      userLink,
+      messageNoteCell
+    )}
     </td><td class="hidden-sm-cells">${this.bikeLink(
       record
     )}</td><td class="hidden-sm-cells"><em>${
@@ -137,9 +149,9 @@ export default class BinxAppOrgParkingNotifications {
       record.notification_number > 1 ? record.notification_number : ""
     }</td><td class="hidden-sm-cells status-cell">${this.statusSpan(
       record.status
-    )}</td><td class="hidden-sm-cells">${record.image_url ? "📷" : ""}<small>${
-      record.internal_notes
-    }</small></td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
+    )}</td><td class="hidden-sm-cells">${
+      record.image_url ? "📷" : ""
+    }<small>${messageNoteCell}</small></td><td class="hidden-sm-cells status-cell">${this.retrievedAtEl(
       record
     )}</td>
     <td class="multiselect-cell table-cell-check collapse"><input type="checkbox" name="ids[${

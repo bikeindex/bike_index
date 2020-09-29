@@ -36,7 +36,7 @@
       %th
         %small=t(".notification_number")
     %th.status-cell Status
-    %th.small Notes
+    %th.small Message/Notes
     - unless skip_resolved
       %th.status-cell
         %small=t(".resolved")
@@ -46,6 +46,17 @@
           = check_mark
   %tbody
     - parking_notifications.each do |parking_notification|
+      - message_notes_cell = capture_haml do
+        - if parking_notification.internal_notes.present?
+          %strong
+            Notes:
+          = parking_notification.internal_notes
+          - if parking_notification.message.present?
+            %br
+        - if parking_notification.message.present?
+          %strong
+            Message:
+          = parking_notification.message
       %tr
         - unless skip_map_cell
           %td
@@ -73,11 +84,9 @@
                 Resolved:
               %small.convertTime
                 = l(parking_notification.resolved_at, format: :convert_time)
-          - if parking_notification.internal_notes.present?
+          - if message_notes_cell.present?
             %small.extended-col-info.d-block
-              %strong
-                Notes:
-              = parking_notification.internal_notes
+              = message_notes_cell
 
         - if render_address
           %td.hidden-sm-cells
@@ -105,7 +114,8 @@
           - if parking_notification.image_url.present?
             📷
           %small
-            = parking_notification.internal_notes
+            = message_notes_cell
+
         - unless skip_resolved
           %td.hidden-sm-cells.status-cell
             - if parking_notification.impound_record_id.present?
