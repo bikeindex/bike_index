@@ -1,4 +1,6 @@
 .form-well-header.container{ data: { template: @edit_template } }
+  -# Show alerts if bike is impounded or has current notifications
+  = render partial: "owner_bike_status_alerts"
   .edit-bike-header
     %h1
       - if @bike.stolen && @bike.fetch_current_stolen_record.present?
