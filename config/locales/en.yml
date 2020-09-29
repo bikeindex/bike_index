@@ -3445,11 +3445,12 @@ en:
       ascend_knowledge_base_article: Acend's Knowledge base article
       automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
         using Ascend POS
-      email_shops_html: >-
-        Email %{shops_email_link} if you have any questions. Thank you for registering
+      email_shops_security_html: >-
+        Email %{shops_email_link} if you have any questions, or check out the %{security_link}. Thank you for registering
         bikes in Bike Index!
       email_us_the_password_to_finish_setting_u: Email us the password to finish setting
         up!
+      security_link_text: POS integration FAQ
       follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong>
         on Bike Index
       if_your_shop_uses_lightspeed_html: >-
@@ -3470,7 +3471,7 @@ en:
         number will be stored for them to access. But don’t worry: <a target="none"
         href="%{privacy_path}">we will never give out any of your customer data</a>.
       we_have_a_new_free_bicycle_registration: >-
-        We have a new, free bicycle registration for bike shops. If you’re a shop
+        We have a free bicycle registration for bike shops. If you’re a shop
         that uses Ascend as your POS, our new Ascend point of sale integration will
         allow you to register each bike you sell automatically. Setup takes about
         10 minutes.
@@ -3581,7 +3582,7 @@ en:
       sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
         for your shop %{new_org_link}.
       security_link_text: security and privacy of the integrations here
-      curious_what_information_html: Curious what information is collected? Read about the %{security_link}.
+      curious_what_information_html: Curious what information is collected? Read the %{security_link}.
       trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
       use_lightspeed_retail: Use Lightspeed Retail?
       used_at_bike_shops_everywhere: Used at bike shops everywhere
