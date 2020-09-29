@@ -525,7 +525,7 @@ RSpec.describe BikesController, type: :request do
       expect(assigns(:bike).id).to eq bike.id
     end
     context "with impound_record" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike)}
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
       before { ImpoundUpdateBikeWorker.new.perform(impound_record.id)}
       it "redirects with flash error" do
         bike.reload
@@ -534,6 +534,26 @@ RSpec.describe BikesController, type: :request do
         expect(flash[:error]).to match(/impounded/i)
         expect(response).to redirect_to(bike_path(bike.id))
       end
+      context "unclaimed" do
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
+        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+        let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
+        it "claims, but then redirects with flash error" do
+          expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check
+          bike.reload
+          expect(bike.current_ownership.claimed?).to be_falsey
+          expect(bike.claimable_by?(current_user)).to be_truthy
+          expect(bike.authorized?(current_user)).to be_falsey
+          expect(bike.status).to eq "status_impounded"
+          get "#{base_url}/#{bike.id}/edit"
+          expect(flash[:error]).to match(/impounded/i)
+          expect(response).to redirect_to(bike_path(bike.id))
+          bike.reload
+          expect(bike.current_ownership.claimed?).to be_truthy
+          expect(bike.user.id).to eq current_user.id
+          expect(bike.authorized?(current_user)).to be_falsey
+        end
+      end
       context "organization member" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
         let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization)}
@@ -541,6 +561,7 @@ RSpec.describe BikesController, type: :request do
           bike.reload
           expect(bike.claimed?).to be_truthy
           expect(bike.status).to eq "status_impounded"
+          expect(bike.created_by_parking_notification).to be_falsey
           expect(bike.bike_organizations.map(&:organization_id)).to eq([])
           expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
           get "#{base_url}/#{bike.id}/edit"
@@ -548,6 +569,32 @@ RSpec.describe BikesController, type: :request do
           expect(response).to render_template(:edit_bike_details)
           expect(assigns(:bike).id).to eq bike.id
         end
+      end
+    end
+    context "impounded unregistered_parking_notification by current_user" do
+      let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, kind: "impound_notification") }
+      let(:bike) { parking_notification.bike }
+      let(:current_organization) { parking_notification.organization }
+      let(:current_user) { parking_notification.user }
+      let!(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, bike: bike, user: current_user, organization: current_organization) }
+      before { ProcessParkingNotificationWorker.new.perform(parking_notification.id) }
+      it "renders" do
+        parking_notification.reload
+        impound_record = parking_notification.impound_record
+        expect(impound_record).to be_present
+        bike.reload
+        expect(bike.current_impound_record&.id).to eq impound_record.id
+        expect(bike.user).to eq current_user
+        expect(bike.claimed?).to be_truthy
+        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.bike_organizations.map(&:organization_id)).to eq([current_organization.id])
+        expect(bike.authorized?(current_user)).to be_truthy
+        expect(bike.authorized_by_organization?(u: current_user)).to be_truthy # Because it's impounded
+        get "#{base_url}/#{bike.id}/edit"
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_bike_details)
+        expect(assigns(:bike).id).to eq bike.id
       end
     end
   end

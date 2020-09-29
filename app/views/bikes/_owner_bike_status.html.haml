@@ -2,8 +2,19 @@
 - if @bike.impounded?
   .alert.alert-danger.mt-4.mb-4
     %h3.uncap
+      Your
       = @bike.type
       is currently impounded!
+    Impounded
+    %em.convertTime
+      = l @bike.current_impound_record.created_at, format: :convert_time
+    %em.small.convertTimezone
+    by
+    %strong
+      = @bike.current_impound_record.organization&.name
+    - if @bike.current_impound_record.parking_notification.present?
+      from
+      = @bike.current_impound_record.parking_notification.address
 - if @bike.parking_notifications.active.any?
   - parking_notifications = @bike.parking_notifications.active.reorder(created_at: :desc)
   .alert.alert-warning.mt-4.mb-4

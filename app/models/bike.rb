@@ -423,7 +423,9 @@ class Bike < ApplicationRecord
     return true unless u.present? || org.present?
     # We have either a org or a user - if no user, we only need to check org
     return editable_organization_ids.include?(org.id) if u.blank?
-    return false if claimable_by?(u) || u == owner # authorized by owner, not organization
+    unless current_impound_record.present?
+      return false if claimable_by?(u) || u == owner # authorized by owner, not organization
+    end
     # Ensure the user is part of the organization and the organization can edit if passed both
     return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
     editable_organizations.any? { |o| u.member_of?(o) }
@@ -434,7 +436,7 @@ class Bike < ApplicationRecord
   end
 
   def claimable_by?(u)
-    return false if u.blank? || current_ownership.blank? || current_ownership.claimed? || current_impound_record.present?
+    return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
     user == u || current_ownership.claimable_by?(u)
   end
 
@@ -447,7 +449,7 @@ class Bike < ApplicationRecord
   def authorize_and_claim_for_user(u)
     return authorized?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
-    true
+    authorized?(u)
   end
 
   def sticker_organizations
