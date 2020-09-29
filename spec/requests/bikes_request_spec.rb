@@ -19,9 +19,9 @@ RSpec.describe BikesController, type: :request do
     context "admin hidden (fake delete)" do
       before { ownership.bike.update_attributes(hidden: true) }
       it "404s" do
-        expect do
+        expect {
           get "#{base_url}/#{bike.id}"
-        end.to raise_error(ActiveRecord::RecordNotFound)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
     context "user hidden bike" do
@@ -48,19 +48,19 @@ RSpec.describe BikesController, type: :request do
       context "non-owner non-admin viewing" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "404s" do
-          expect do
+          expect {
             get "#{base_url}/#{bike.id}"
-          end.to raise_error(ActiveRecord::RecordNotFound)
+          }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
       context "organization viewing" do
         let(:can_edit_claimed) { false }
         let(:ownership) do
           FactoryBot.create(:ownership_organization_bike,
-                            :claimed,
-                            organization: organization,
-                            can_edit_claimed: can_edit_claimed,
-                            user: FactoryBot.create(:user))
+            :claimed,
+            organization: organization,
+            can_edit_claimed: can_edit_claimed,
+            user: FactoryBot.create(:user))
         end
         let(:organization) { FactoryBot.create(:organization) }
         let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
@@ -68,9 +68,9 @@ RSpec.describe BikesController, type: :request do
           expect(bike.user).to_not eq current_user
           expect(bike.organizations.pluck(:id)).to eq([organization.id])
           expect(bike.visible_by?(current_user)).to be_falsey
-          expect do
+          expect {
             get "#{base_url}/#{bike.id}"
-          end.to raise_error(ActiveRecord::RecordNotFound)
+          }.to raise_error(ActiveRecord::RecordNotFound)
         end
         context "bike organization editable" do
           let(:can_edit_claimed) { true }
@@ -97,9 +97,9 @@ RSpec.describe BikesController, type: :request do
       let!(:bike) { parking_notification.bike }
 
       it "404s" do
-        expect do
+        expect {
           get "#{base_url}/#{bike.id}"
-        end.to raise_error(ActiveRecord::RecordNotFound)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
       context "with org member" do
         include_context :request_spec_logged_in_as_organization_member
@@ -342,9 +342,9 @@ RSpec.describe BikesController, type: :request do
           expect(bike.graduated?(organization)).to be_falsey
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           put "#{base_url}/#{bike.id}/resolve_token", params: {
-                                                    token: graduated_notification.marked_remaining_link_token,
-                                                    token_type: "graduated_notification",
-                                                  }
+            token: graduated_notification.marked_remaining_link_token,
+            token_type: "graduated_notification"
+          }
           expect(response).to redirect_to(bike_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload
@@ -526,7 +526,7 @@ RSpec.describe BikesController, type: :request do
     end
     context "with impound_record" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
-      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id)}
+      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
       it "redirects with flash error" do
         bike.reload
         expect(bike.status).to eq "status_impounded"
@@ -556,7 +556,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "organization member" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization)}
+        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
         it "renders" do
           bike.reload
           expect(bike.claimed?).to be_truthy
@@ -603,7 +603,7 @@ RSpec.describe BikesController, type: :request do
     context "setting a bike_sticker" do
       it "gracefully fails if the number is weird" do
         expect(bike.bike_stickers.count).to eq 0
-        patch "#{base_url}/#{bike.id}", params: { bike_sticker: "02891426438 " }
+        patch "#{base_url}/#{bike.id}", params: {bike_sticker: "02891426438 "}
         expect(flash[:error]).to be_present
         bike.reload
         expect(bike.bike_stickers.count).to eq 0
@@ -612,7 +612,7 @@ RSpec.describe BikesController, type: :request do
     context "setting address for bike" do
       let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
       let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }
-      let(:update_attributes) { { street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "" } }
+      let(:update_attributes) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "sets the address for the bike" do
         expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -625,7 +625,7 @@ RSpec.describe BikesController, type: :request do
         VCR.use_cassette("bike_request-set_manual_address") do
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: { bike: update_attributes }
+            patch "#{base_url}/#{bike.id}", params: {bike: update_attributes}
           end
         end
         bike.reload
@@ -644,7 +644,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.stolen?).to be_falsey
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+          patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
           expect(flash[:success]).to be_present
         end
         bike.reload
@@ -657,7 +657,7 @@ RSpec.describe BikesController, type: :request do
         expect(stolen_record.date_stolen).to be_within(5).of Time.current
       end
       context "bike has location" do
-        let(:location_attrs) { { country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true } }
+        let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
         it "marks the bike stolen, doesn't set a location, blanks bike location" do
           bike.update_attributes(location_attrs)
           bike.reload
@@ -665,13 +665,13 @@ RSpec.describe BikesController, type: :request do
           expect(bike.stolen?).to be_falsey
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: { bike: { stolen: true } }
+            patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
             expect(flash[:success]).to be_present
           end
           bike.reload
           expect(bike.stolen?).to be_truthy
           expect(bike.to_coordinates.compact).to eq([])
-          expect(bike.address_hash).to eq({ country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil }.as_json)
+          expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
 
           stolen_record = bike.current_stolen_record
           expect(stolen_record).to be_present
@@ -702,8 +702,8 @@ RSpec.describe BikesController, type: :request do
         Sidekiq::Worker.clear_all
         expect {
           patch "#{base_url}/#{bike.id}", params: {
-                                            bike: { owner_email: "newuser@example.com" },
-                                          }
+            bike: {owner_email: "newuser@example.com"}
+          }
           expect(flash[:success]).to be_present
         }.to change(Ownership, :count).by 1
         bike.reload
@@ -731,7 +731,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
           Sidekiq::Worker.clear_all
           expect {
-            patch "#{base_url}/#{bike.id}", params: { bike: { description: "sooo cool and stuff" } }
+            patch "#{base_url}/#{bike.id}", params: {bike: {description: "sooo cool and stuff"}}
             expect(flash[:success]).to be_present
           }.to_not change(Ownership, :count)
           bike.reload
@@ -776,7 +776,7 @@ RSpec.describe BikesController, type: :request do
           police_report_department: "Manahattan",
           proof_of_ownership: "0",
           receive_notifications: "1",
-          id: stolen_record.id,
+          id: stolen_record.id
         }
       end
 
@@ -791,8 +791,8 @@ RSpec.describe BikesController, type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
-                                            bike: { stolen: "true", stolen_records_attributes: { "0" => stolen_params } },
-                                          }
+            bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}
+          }
           expect(flash[:success]).to be_present
         end
         bike.reload
