@@ -1097,9 +1097,17 @@ en:
       other_organizations: Other organizations
       remove: Remove
     edit_ownership:
+      impound_record_page: Impound record page
       sell_trade_or_give_away_this_bike: >-
         Sell, trade or give away this %{bike_type}? Enter the new owner's email to
         transfer the registration.
+      this_bike_is_currently_impounded_html: >-
+        This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
+        If you update the email address here, <em class="text-warning">the %{bike_type}
+        will still be impounded</em>.
+      to_transfer_use_impound_record_page_html: >-
+        If you want to transfer the bike to a new owner, update it with "Transferred
+        To New Owner" from the %{link_to_impound_record_page}.
       transfer_ownership: Transfer Ownership
     edit_photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload

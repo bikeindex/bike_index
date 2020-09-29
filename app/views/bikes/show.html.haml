@@ -54,8 +54,8 @@
     = render partial: "organized_access_panel"
 
   - if current_user.present? && @bike.user == current_user
-    = render partial: "owner_bike_status"
-  - if @bike.status_impounded?
+    = render partial: "owner_bike_status_alerts"
+  - elsif @bike.status_impounded? # if the current user is the bike owner, it renders a special impounded message in owner_bike_status_alerts
     .alert.alert-warning.mt-4.mb-4
       %h4
         = t(".this_was_impounded", bike_type: @bike.type.titleize)

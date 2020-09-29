@@ -8,7 +8,17 @@
           .form-well-form-header
             %h3= t(".transfer_ownership")
           .col-xs-12
-            %p= t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
+            %p
+              - if @bike.current_impound_record.present? && @bike.authorized_by_organization?(u: current_user)
+                - impound_record = @bike.current_impound_record
+                - if impound_record.organization.present? # I don't think there is a scenario where the org would be nil, but just in case...
+                  = t(".this_bike_is_currently_impounded_html", impound_record_id: impound_record.display_id, bike_type: @bike.type)
+                  %br
+                  .mt-2
+                  - link_to_impound_record_page = link_to t(".impound_record_page"), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization.to_param)
+                  = t(".to_transfer_use_impound_record_page_html", link_to_impound_record_page: link_to_impound_record_page)
+              - else
+                = t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
