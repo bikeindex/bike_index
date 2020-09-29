@@ -286,13 +286,6 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def message_and_note
-    [
-      message.present? ? "MESSAGE: #{message}" : nil,
-      internal_notes.present? ? "NOTE: #{internal_notes}" : nil,
-    ].compact.join(", ")
-  end
-
   def process_notification
     # Update the bike immediately, inline
     bike&.update(updated_at: Time.current)

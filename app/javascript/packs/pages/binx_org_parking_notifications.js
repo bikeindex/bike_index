@@ -122,14 +122,17 @@ export default class BinxAppOrgParkingNotifications {
       ? `<a href="${window.location}&user_id=${record.user_id}" class="linkWithSortableSearchParams" data-urlparams="user_id,${record.user_id}">${record.user_display_name}</a>`
       : "";
 
-    let messageNotes = [];
+    let messageNoteCell = "";
     if (record.message && record.message.length) {
-      messageNotes << `<strong>Message: ${record.message}</strong>`;
+      messageNoteCell += `<strong>Message:</strong> ${record.message}`;
+      if (record.internal_notes && record.internal_notes.length) {
+        messageNoteCell += "<br>";
+      }
     }
     if (record.internal_notes && record.internal_notes.length) {
-      messageNotes << `<strong>Note: ${record.internal_notes}</strong>`;
+      messageNoteCell += `<strong>Note:</strong> ${record.internal_notes}`;
     }
-    const messageNoteCell = messageNotes.join(", ");
+    log.debug(messageNoteCell);
 
     return `<tr class="record-row" data-recordid="${
       record.id
