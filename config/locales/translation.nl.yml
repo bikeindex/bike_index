@@ -1827,6 +1827,14 @@ nl:
         weggeven? Voer het e-mailadres van de nieuwe eigenaar in om de registratie
         over te dragen.
       transfer_ownership: Eigendom overdragen
+      impound_record_page: In beslag genomen record pagina
+      this_bike_is_currently_impounded_html: Deze %{bike_type} is momenteel in beslag
+        genomen met inbeslagname record <strong># %{impound_record_id}</strong> .
+        Als u het e-mailadres hier bijwerkt, wordt <em class="text-warning">de %{bike_type}
+        nog steeds in beslag genomen</em> .
+      to_transfer_use_impound_record_page_html: Als u de fiets aan een nieuwe eigenaar
+        wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
+        de %{link_to_impound_record_page}.
     edit_photos:
       drag_and_drop_files_here_html: Sleep bestanden hier naartoe of gebruik de knop
         <strong>Foto's uploaden</strong>
