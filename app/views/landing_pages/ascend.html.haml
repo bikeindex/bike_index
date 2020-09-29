@@ -29,4 +29,5 @@
             = t(".email_us_the_password_to_finish_setting_u")
         %p
           - shops_email_link = link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"
-          = t(".email_shops_html", shops_email_link: shops_email_link)
+          - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
+          = t(".email_shops_security_html", shops_email_link: shops_email_link, security_link: security_link)

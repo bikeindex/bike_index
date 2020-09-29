@@ -3559,9 +3559,6 @@ nl:
         wordt automatisch een vermelding op Bike Index gemaakt voor elke fiets die
         u verkoopt. Het enige wat u hoeft te doen is het e-mailadres van de klant
         en het serienummer van de fiets toevoegen tijdens een normale Lightspeed Retail-kassa.
-      all_you_have_to_do_is_go_to_html: Het enige wat u hoeft te doen is naar %{link}
-        te gaan, waar u wordt gevraagd Bike Index te autoriseren voor toegang tot
-        uw Lightspeed-account.
       bicycles_sold_before_you_activated_lights: Fietsen die zijn verkocht voordat
         u Lightspeed Retail-integratie hebt geactiveerd, worden niet geregistreerd.
       bike_index_cofounder: Medeoprichter van Bike Index
@@ -3606,6 +3603,10 @@ nl:
       already_have_a_sophisticated_html: Heeft u al een geavanceerde e-mailverbinding
         met uw klanten? Bike Index kan worden geïntegreerd met uw bestaande stroom
         - e-mail %{link} voor configuratie.
+      all_you_have_to_do_is_html: Het enige wat je hoeft te doen is naar %{link} te
+        gaan, waar je wordt gevraagd om Bike Index te autoriseren om toegang te krijgen
+        tot je Lightspeed-account. Benieuwd naar wat we verzamelen? Lees de %{security_link}.
+      security_link_text: POS-integratie FAQ
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -3868,8 +3869,6 @@ nl:
       ascend_knowledge_base_article: 'Ascend basis kennisartikel '
       automatic_bicycle_registration: Automatische fietsregistratie voor fietsenwinkels
         met behulp van Ascend POS
-      email_shops_html: E-mail %{shops_email_link} als je vragen hebt. Bedankt voor
-        het registreren van fietsen in Bike Index!
       email_us_the_password_to_finish_setting_u: E-mail ons het wachtwoord om het
         instellen af te ronden!
       follow_the_setup_instructions_html: Volg de installatie-instructies <strong>%{ascend_link}</strong>
@@ -3894,6 +3893,10 @@ nl:
         voor fietsenwinkels. Als u een winkel bent die Ascend als POS-intergratie
         gebruikt, kunt u met onze nieuwe Ascend 'point of sale integration' elke fiets
         die u verkoopt automatisch registreren. Installatie duurt ongeveer 10 minuten.
+      email_shops_security_html: E-mail %{shops_email_link} als je vragen hebt, of
+        bekijk de %{security_link}. Bedankt voor het registreren van fietsen in Bike
+        Index!
+      security_link_text: POS-integratie FAQ
     bike_shop_packages:
       additional: Extra
       bike_index_for_bike_shops: 'Bike Index voor fietsenwinkels '
@@ -4004,6 +4007,9 @@ nl:
       trusted_by_bike_shops_everywhere: Vertrouwd door fietsenwinkels overal ter wereld
       use_lightspeed_retail: Lightspeed Retail gebruiken?
       used_at_bike_shops_everywhere: Overal gebruikt door fietsenwinkels
+      curious_what_information_html: Benieuwd welke informatie wordt verzameld? Lees
+        de %{security_link}.
+      security_link_text: veiligheid en privacy van de integraties hier
     for_cities:
       actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
         En doe het goedkoop.

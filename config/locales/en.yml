@@ -2418,9 +2418,10 @@ en:
         created for every bicycle you sell. All you need to do is add the customer's
         email address and the bicycle's serial number during a normal Lightspeed Retail
         checkout.
-      all_you_have_to_do_is_go_to_html: >-
+      all_you_have_to_do_is_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
-        Index to access your Lightspeed Account.
+        Index to access your Lightspeed Account. Curious about what we collect? Read
+        the %{security_link}.
       already_have_a_sophisticated_html: >-
         Already have a sophisticated email connection with your customers? Bike Index
         can integrate with your existing flow - email %{link} for setup.
@@ -2439,6 +2440,7 @@ en:
         Once you have a Bike Index account set up for your shop, there will be a link
         on this page to take you to the integration.
       privacy_policy_here: Privacy Policy here
+      security_link_text: POS integration FAQ
       sign_your_shop_up: Sign your shop up
       the_bicycles_owner_will_receive_an_email: >-
         The bicycle's owner will receive an email with all the information he or she
@@ -3444,9 +3446,9 @@ en:
       ascend_knowledge_base_article: Acend's Knowledge base article
       automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
         using Ascend POS
-      email_shops_html: >-
-        Email %{shops_email_link} if you have any questions. Thank you for registering
-        bikes in Bike Index!
+      email_shops_security_html: >-
+        Email %{shops_email_link} if you have any questions, or check out the %{security_link}.
+        Thank you for registering bikes in Bike Index!
       email_us_the_password_to_finish_setting_u: Email us the password to finish setting
         up!
       follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong>
@@ -3463,16 +3465,16 @@ en:
         create Bike Index accounts for your customers. Their new bikes will be waiting
         for them upon login. They just have to check their email, and their new bike
         will be waiting for them.
+      security_link_text: POS integration FAQ
       sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
       then_if_a_customers_bike_goes_missing_html: >-
         Then, if a customer’s bike goes missing, their bike’s information and serial
         number will be stored for them to access. But don’t worry: <a target="none"
         href="%{privacy_path}">we will never give out any of your customer data</a>.
       we_have_a_new_free_bicycle_registration: >-
-        We have a new, free bicycle registration for bike shops. If you’re a shop
-        that uses Ascend as your POS, our new Ascend point of sale integration will
-        allow you to register each bike you sell automatically. Setup takes about
-        10 minutes.
+        We have a free bicycle registration for bike shops. If you’re a shop that
+        uses Ascend as your POS, our new Ascend point of sale integration will allow
+        you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
       additional: Additional
       bike_index_for_bike_shops: Bike Index for bike shops
@@ -3552,6 +3554,8 @@ en:
         Index for your customers. Other than setup, you're done! Learn more about
         the Ascend integration %{ascend_link}.
       connect_your_lightspeed_account: connect your Lightspeed account
+      curious_what_information_html: Curious what information is collected? Read the
+        %{security_link}.
       do_right_by_your_customers: Do right by your customers in just 5 clicks.
       dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask
         us about %{printed_materials}.
@@ -3577,6 +3581,7 @@ en:
       printed_materials: printed materials
       register_bikes_for_your_customers: Register bikes for your customers
       related_articles: 'Related articles:'
+      security_link_text: security and privacy of the integrations here
       sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
         for your shop %{new_org_link}.
       trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
