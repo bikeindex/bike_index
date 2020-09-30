@@ -13,6 +13,12 @@
             = @manufacturer.id
         %tr
           %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @manufacturer.created_at, format: :convert_time
+        %tr
+          %td
             Slug
           %td
             = @manufacturer.slug
