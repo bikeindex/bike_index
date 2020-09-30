@@ -1,28 +1,39 @@
 - payment ||= @payment
 
-%table.table-list
-  %tr
-    %td
-      Method
-    %td
-      %span.less-strong
-      = payment.payment_method
-  %tr
-    %td
-      Amount
-    %td
-      = payment.amount_formatted
-  - if payment.stripe_id.present?
-    %tr
-      %td
-        Stripe ID
-      %td
-        = link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
-  %tr
-    %td
-      For
-    %td
-      - if payment.theft_alert.present?
-        = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
-      - else
-        = payment.display_kind
+.row
+  .col-md-6
+    %table.table-list
+      %tr
+        %td Method
+        %td
+          %span.less-strong= payment.payment_method
+      %tr
+        %td Amount
+        %td= payment.amount_formatted
+      - if payment.stripe_id.present?
+        %tr
+          %td Stripe ID
+          %td= link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+      %tr
+        %td For
+        %td
+          - if payment.theft_alert.present?
+            = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+          - else
+            = payment.display_kind
+  .col-md-6
+    %table.table-list
+      %tr
+        %td Created
+        %td
+          %span.convertTime.preciseTime
+            = l payment.created_at, format: :convert_time
+      %tr
+        %td User
+        %td
+          - if payment.user.present?
+            = link_to payment.email, edit_admin_user_url(payment.user.id)
+          - else
+            = payment.email
+            %em.small.less-strong
+              no matching user

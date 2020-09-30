@@ -10,7 +10,7 @@
   - if @payment.errors.any?
     = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
 
-  - organizations = Organization.all
+  - organizations = Organization.approved
   .row
     .col-md-6
       .form-group.fancy-select.unfancy
