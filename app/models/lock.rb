@@ -8,6 +8,7 @@ class Lock < ApplicationRecord
   validates_presence_of :lock_type
 
   def manufacturer_name
+    return "Other" if manufacturer.blank?
     if manufacturer.name == "Other" && manufacturer_other.present?
       manufacturer_other
     else
