@@ -80,6 +80,17 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns(:locks).first).to eq(lock)
           end
         end
+        context "with lock with deleted manufacturer" do
+          let(:lock) { FactoryBot.create(:lock, user: current_user) }
+          it "renders and user things are assigned" do
+            lock.manufacturer.destroy
+            get base_url
+            expect(response.status).to eq(200)
+            expect(response).to render_template("show")
+            expect(assigns(:locks).count).to eq 1
+            expect(assigns(:locks).pluck(:id)).to eq([lock.id])
+          end
+        end
         context "with show_general_alert" do
           before { current_user.update_column :general_alerts, ["has_stolen_bikes_without_locations"] }
           it "renders with show_general_alert" do
