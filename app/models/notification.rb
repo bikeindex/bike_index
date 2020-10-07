@@ -2,12 +2,19 @@
 # (other than graduated_notifications and parking_notifications)
 class Notification < ApplicationRecord
   KIND_ENUM = {
-    confirmation_email: 0
+    confirmation_email: 0,
+    phone_verification: 5,
   }.freeze
+
+  MESSAGE_CHANNEL_ENUM = {
+    email: 0,
+    text: 1
+  }
 
   belongs_to :user
 
   enum kind: KIND_ENUM
+  enum message_channel: MESSAGE_CHANNEL_ENUM
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 

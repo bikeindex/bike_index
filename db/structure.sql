@@ -1855,7 +1855,9 @@ CREATE TABLE public.notifications (
     kind integer,
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    message_channel integer DEFAULT 0,
+    twilio_sid text
 );
 
 
@@ -5366,6 +5368,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200911230445'),
 ('20200921165203'),
 ('20200921203331'),
-('20200925175027');
+('20200925175027'),
+('20201007214754');
 
 

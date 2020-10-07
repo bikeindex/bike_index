@@ -77,6 +77,7 @@ gem "wkhtmltopdf-binary"
 # API wrappers
 gem "simple_spark" # Sparkpost gem - we use it to send newsletters
 gem "twitter" # Twitter. For rendering tweets
+gem "twilio-ruby" # Twilio, for verifying phone numbers
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
