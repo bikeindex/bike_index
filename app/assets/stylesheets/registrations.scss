@@ -340,27 +340,19 @@ img {
   }
 
   // Per organization settings
-  &.umd {
-    .submit-wrapper .btn {
-      background: #e03a3e;
-    }
+  &.umd .submit-wrapper .btn {
+    background: #e03a3e;
   }
-
-  &.uw {
-    .submit-wrapper .btn {
-      background: #4b2e83;
-    }
+  &.uw .submit-wrapper .btn {
+    background: #4b2e83;
   }
-
-  &.upitt {
-    .submit-wrapper .btn {
-      background: #102f59;
-    }
+  &.upitt .submit-wrapper .btn {
+    background: #102f59;
   }
-
-  &.psu {
-    .submit-wrapper .btn {
-      background: #074378;
-    }
+  &.psu .submit-wrapper .btn {
+    background: #074378;
+  }
+  &.lapd .submit-wrapper .btn {
+    background: #4062a8;
   }
 }
