@@ -25,4 +25,9 @@ class Notification < ApplicationRecord
   def email_success?
     delivery_status == "email_success"
   end
+
+  def twilio_response
+    return nil unless twilio_sid.present?
+    TwilioIntegration.get_message(twilio_sid)
+  end
 end
