@@ -1856,6 +1856,8 @@ CREATE TABLE public.notifications (
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    notifiable_type character varying,
+    notifiable_id bigint,
     message_channel integer DEFAULT 0,
     twilio_sid text
 );
@@ -2767,6 +2769,40 @@ ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
+-- Name: user_phones; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_phones (
+    id bigint NOT NULL,
+    user_id bigint,
+    phone character varying,
+    confirmation_code character varying,
+    confirmed_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: user_phones_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_phones_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_phones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_phones_id_seq OWNED BY public.user_phones.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3358,6 +3394,13 @@ ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_phones id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_phones ALTER COLUMN id SET DEFAULT nextval('public.user_phones_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3929,6 +3972,14 @@ ALTER TABLE ONLY public.twitter_accounts
 
 ALTER TABLE ONLY public.user_emails
     ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_phones user_phones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_phones
+    ADD CONSTRAINT user_phones_pkey PRIMARY KEY (id);
 
 
 --
@@ -4529,6 +4580,13 @@ CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON publ
 
 
 --
+-- Name: index_notifications_on_notifiable_type_and_notifiable_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_notifiable_type_and_notifiable_id ON public.notifications USING btree (notifiable_type, notifiable_id);
+
+
+--
 -- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4820,6 +4878,13 @@ CREATE INDEX index_twitter_accounts_on_state_id ON public.twitter_accounts USING
 --
 
 CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (user_id);
+
+
+--
+-- Name: index_user_phones_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_phones_on_user_id ON public.user_phones USING btree (user_id);
 
 
 --
@@ -5369,6 +5434,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200921165203'),
 ('20200921203331'),
 ('20200925175027'),
-('20201007214754');
+('20201008202006'),
+('20201008204248');
 
 

@@ -3,7 +3,7 @@
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
-    phone_verification: 5,
+    phone_verification: 5
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -12,6 +12,7 @@ class Notification < ApplicationRecord
   }
 
   belongs_to :user
+  belongs_to :notifiable, polymorphic: true
 
   enum kind: KIND_ENUM
   enum message_channel: MESSAGE_CHANNEL_ENUM

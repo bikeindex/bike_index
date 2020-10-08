@@ -19,15 +19,15 @@ RSpec.describe TwilioIntegration do
     it "sends a message, stores the sid" do
       VCR.use_cassette("twilio_integration-send_notification", match_requests_on: [:path]) do
         expect(notification.twilio_sid).to be_blank
-        result = instance.send_notification(notification, to: "5102224444", body: "This is a test message")
+        instance.send_notification(notification, to: "5102224444", body: "This is a test message")
         notification.reload
         expect(notification.twilio_sid).to be_present
-        og_sid = notification.twilio_sid
+        notification.twilio_sid
         expect(notification.delivery_status).to eq "queued"
         # test credentials don't have access to fetch, too lazy to stub
         # instance.send_notification(notification, to: "5102224444", body: "This is a test message")
         # notification.reload
-        # expect(notification.twilio_sid).to eq og_sid
+        # expect(notification.twilio_sid).to eq original sid
         # expect(notification.delivery_status).to eq "delivered"
       end
     end
