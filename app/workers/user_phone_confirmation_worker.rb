@@ -1,8 +1,15 @@
-class AdditionalEmailConfirmationWorker < ApplicationWorker
+class UserPhoneConfirmationWorker < ApplicationWorker
   sidekiq_options queue: "notify"
 
-  def perform(user_email_id)
-    user_email = UserEmail.find(user_email_id)
-    CustomerMailer.additional_email_confirmation(user_email).deliver_now
+  def perform(user_phone_id)
+    user_phone = UserPhone.find(user_phone_id)
+    notification = Notification.create(user: user_phone.user,
+                                       kind: "phone_verification",
+                                       message_channel: "text",
+                                       notifiable: user_phone)
+
+    TwilioIntegration.new.send_notification(notification,
+      to: user_phone.phone,
+      body: user_phone.confirmation_message)
   end
 end
