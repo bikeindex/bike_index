@@ -276,6 +276,10 @@ class User < ApplicationRecord
     organizations.bike_shop.any?
   end
 
+  def phone_waiting_confirmation?
+    user_phones.waiting_confirmation.any?
+  end
+
   def default_organization
     return @default_organization if defined?(@default_organization) # Memoize, permit nil
     @default_organization = organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed

@@ -11,5 +11,9 @@ class UserPhoneConfirmationWorker < ApplicationWorker
     TwilioIntegration.new.send_notification(notification,
       to: user_phone.phone,
       body: user_phone.confirmation_message)
+
+    # Manually run after user change to add a general alert to the user
+    # (rather than spinning up a new worker)
+    AfterUserChangeWorker.new.perform(user_phone.user_id, user_phone.user)
   end
 end

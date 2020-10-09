@@ -8,14 +8,14 @@ class UserPhone < ApplicationRecord
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
+  scope :waiting_confirmation, -> { unconfirmed.where("updated_at > ?", confirmation_timeout) }
 
   def self.confirmation_timeout
     Time.current - 31.minutes
   end
 
   def self.find_confirmation_code(str)
-    unconfirmed.where(created_at: confirmation_timeout..Time.current)
-    where(confirmation_code: str.gsub(/\s/, "")).first
+    waiting_confirmation.where(confirmation_code: str.gsub(/\s/, "")).first
   end
 
   def self.add_phone_for_user_id(user_id, phone_number)
@@ -25,10 +25,12 @@ class UserPhone < ApplicationRecord
     up = new(user_id: user_id, phone: phone)
     up.generate_confirmation
     up.send_confirmation_text
+    up
   end
 
   def normalize_phone
     self.phone = Phonifyer.phonify(phone)
+    self.confirmation_code ||= new_confirmation
   end
 
   def confirmed?
@@ -41,10 +43,14 @@ class UserPhone < ApplicationRecord
 
   def confirm!
     return true if confirmed?
-    update(confirmed_at: Time.current)
+    result = update(confirmed_at: Time.current)
+    # Bump user to reset the general_alerts
+    user.update(updated_at: Time.current, skip_update: false)
+    result
   end
 
   def confirmation_display
+    return nil unless confirmation_code.present?
     confirmation_code[0..2] + " " + confirmation_code[3..-1]
   end
 
@@ -57,6 +63,12 @@ class UserPhone < ApplicationRecord
   end
 
   def generate_confirmation
-    update_attribute :confirmation_code, (SecureRandom.random_number(9e6) + 1e6).to_i
+    update_attribute :confirmation_code, new_confirmation
+  end
+
+  private
+
+  def new_confirmation
+    (SecureRandom.random_number(9e6) + 1e6).to_i
   end
 end

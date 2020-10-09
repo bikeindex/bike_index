@@ -1,8 +1,8 @@
 class AfterUserChangeWorker < ApplicationWorker
   sidekiq_options retry: false
 
-  def perform(user_id)
-    user = User.find_by_id(user_id)
+  def perform(user_id, user = nil)
+    user ||= User.find_by_id(user_id)
     return false unless user.present?
 
     current_alerts = user_general_alerts(user)
@@ -24,6 +24,8 @@ class AfterUserChangeWorker < ApplicationWorker
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
       alerts << "stolen_bikes_without_locations"
     end
+
+    alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
 
     alerts.sort
   end

@@ -3,15 +3,18 @@ require "rails_helper"
 RSpec.describe UserPhone, type: :model do
   describe "find_confirmation_code" do
     let!(:user_phone1) { FactoryBot.create(:user_phone, confirmation_code: "2929292") }
-    let!(:user_phone2) { FactoryBot.create(:user_phone, confirmation_code: "2929292", created_at: Time.current - 1.hour) }
+    let!(:user_phone2) { FactoryBot.create(:user_phone, confirmation_code: "2929292", updated_at: Time.current - 1.hour) }
     let!(:user_phone3) { FactoryBot.create(:user_phone, confirmation_code: "2929291") }
     it "finds only confirmation codes in past 30 minutes" do
+      expect(user_phone1.user.phone_waiting_confirmation?).to be_truthy
+      expect(user_phone2.user.phone_waiting_confirmation?).to be_falsey
       expect(UserPhone.find_confirmation_code("2 92  92 92")).to eq user_phone1
       expect(UserPhone.find_confirmation_code("02 92 92 9")).to be_blank
       UserPhone.find_confirmation_code("2 92 92 \n92").confirm!
       user_phone1.reload
       expect(user_phone1.confirmed?).to be_truthy
       expect(user_phone1.confirmed_at).to be_within(1).of Time.current
+      expect(user_phone1.user.phone_waiting_confirmation?).to be_falsey
     end
   end
 
