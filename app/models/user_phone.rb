@@ -1,15 +1,18 @@
 class UserPhone < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :user
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   validates_presence_of :user_id
   validates :phone, presence: true, uniqueness: {scope: :user_id}
 
-  before_validation :normalize_phone
+  before_validation :set_calculated_attributes
 
+  scope :legacy, -> { where(confirmation_code: "legacy_migration") }
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
-  scope :waiting_confirmation, -> { unconfirmed.where("updated_at > ?", confirmation_timeout) }
+  scope :waiting_confirmation, -> { unconfirmed.where("updated_at > ?", confirmation_timeout).where.not(confirmation_code: "legacy_migration") }
 
   def self.confirmation_timeout
     Time.current - 31.minutes
@@ -23,10 +26,7 @@ class UserPhone < ApplicationRecord
     phone = Phonifyer.phonify(phone_number)
     matching_phone = where(user_id: user_id, phone: phone).first
     if matching_phone.present?
-      if matching_phone.updated_at < Time.current - 2.minutes
-        matching_phone.generate_confirmation
-        matching_phone.send_confirmation_text
-      end
+      matching_phone.resend_confirmation_if_reasonable!
       return matching_phone
     end
     up = new(user_id: user_id, phone: phone)
@@ -35,9 +35,25 @@ class UserPhone < ApplicationRecord
     up
   end
 
-  def normalize_phone
-    self.phone = Phonifyer.phonify(phone)
-    self.confirmation_code ||= new_confirmation
+  def expired?
+    unconfirmed? && updated_at < self.class.confirmation_timeout
+  end
+
+  # How phones pre-UserPhone model were migrated in
+  def legacy?
+    confirmation_code == "legacy_migration"
+  end
+
+  # Protect against overenthusiastic clicking
+  def resend_confirmation?
+    return true if legacy?
+    unconfirmed? && updated_at < Time.current - 2.minutes
+  end
+
+  def resend_confirmation_if_reasonable!
+    return false unless resend_confirmation?
+    generate_confirmation
+    send_confirmation_text
   end
 
   def confirmed?
@@ -63,6 +79,11 @@ class UserPhone < ApplicationRecord
 
   def confirmation_message
     "Bike Index confirmation code:  #{confirmation_display}"
+  end
+
+  def set_calculated_attributes
+    self.phone = Phonifyer.phonify(phone)
+    self.confirmation_code ||= new_confirmation
   end
 
   def send_confirmation_text

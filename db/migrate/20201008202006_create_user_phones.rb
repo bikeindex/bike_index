@@ -5,6 +5,7 @@ class CreateUserPhones < ActiveRecord::Migration[5.2]
       t.string :phone
       t.string :confirmation_code
       t.datetime :confirmed_at
+      t.datetime :deleted_at
 
       t.timestamps
     end

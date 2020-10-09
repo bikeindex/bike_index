@@ -118,7 +118,7 @@ Rails.application.routes.draw do
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
   resources :user_embeds, only: [:show]
-  resources :user_phones, only: [:create]
+  resources :user_phones, only: %i[update destroy]
   resources :user_emails, only: [:destroy] do
     member do
       post "resend_confirmation"

@@ -37,15 +37,12 @@
   .form-group.row.mt-2
     = f.label :phone, class: "form-well-label"
     .form-well-input
-      = f.text_field :phone, value: phone_display(@user.phone), class: "form-control"
-      - if @user.phone.present?
-        - unless @user.current_user_phone.confirmed?
-          %small.below-input-help
-            = link_to t(".verify_this_phone_number"), user_phones_path(phone: @user.phone), method: :post, action: "create"
-
-      -# Need to render the verified phone numbers here
-      -# @user.user_phones.confirmed.each do |user_phone|
-
+      = f.text_field :phone, value: phone_display(@user.phone), placeholder: t(".add_new_phone_number"), class: "form-control"
+      - if @user.user_phones.any?
+        %ul
+          - @user.user_phones.confirmed.each do |user_phone|
+            %li
+              = phone_display(@user.phone)
 
 
   .related-fields

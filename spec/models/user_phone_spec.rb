@@ -63,22 +63,14 @@ RSpec.describe UserPhone, type: :model do
       expect(notification.twilio_sid).to be_present
 
       # But, if updated more than 2 minutes ago, send another
-      user_phone.update(updated_at: Time.current - 5.minutes)
+      user_phone.update_column :updated_at, Time.current - 5.minutes
+      expect(user_phone.resend_confirmation?).to be_truthy
       VCR.use_cassette("user_phone-add_phone_for_user_id_again", match_requests_on: [:path]) do
-        Sidekiq::Testing.inline! {
-          expect {
-            UserPhone.add_phone_for_user_id(user.id, phone)
-          }
-        }
+        Sidekiq::Testing.inline! { UserPhone.add_phone_for_user_id(user.id, phone) }
       end
       user_phone.reload
       expect(user_phone.confirmation_code).to_not eq og_confirmation_code
       expect(user_phone.notifications.count).to eq 2
-    end
-    context "user_phone confirmation updated out" do
-      it "sends a new confirmation code" do
-
-      end
     end
   end
 end

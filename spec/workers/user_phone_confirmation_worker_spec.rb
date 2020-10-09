@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe UserPhoneConfirmationWorker, type: :job do
   let(:instance) { described_class.new }
-  let(:user) { FactoryBot.create(:admin) }
+  let(:user) { FactoryBot.create(:user) }
   let(:user_phone) { FactoryBot.create(:user_phone, user: user, phone: "2134442323") }
 
   it "adds the phone for the user" do
@@ -19,7 +19,7 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
     expect(user_phone.notifications.count).to eq 1
     user.reload
     expect(user.phone_waiting_confirmation?).to be_truthy
-    # Confirm that admins still get this alert, because we want them to
+
     expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
   end
 end

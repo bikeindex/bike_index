@@ -5307,16 +5307,16 @@ en:
     edit_root:
       add_additional_email: Add additional email
       additional_email: Additional email
-      address: Address
+      address: Street address
       any_use_of_your_personal_information_html: >-
         Any use of your personal information is governed by the terms of our %{privacy_policy}.
-        We do not sell, trade, or rent your personal information to third parties.
+        We do not sell, trade, or rent your personal information.
+      add_new_phone_number: Add a new phone number
       choose_country: Choose country
       choose_language: Choose language
       city: City
       confirmed_emails: Confirmed emails
       daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
-      verify_this_phone_number: Verify this phone number
       give_us_permission_html: >-
         Give us permission to contact you if we believe your bike has been stolen,
         <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>

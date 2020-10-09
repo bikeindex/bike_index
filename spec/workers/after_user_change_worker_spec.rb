@@ -9,6 +9,32 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  describe "phone_waiting_confirmation" do
+    let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
+    let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
+    it "adds general_alerts" do
+      instance.perform(user.id)
+      user.reload
+      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+    end
+    context "legacy_migration" do
+      let!(:user_phone) { FactoryBot.create(:user_phone, user: user, confirmation_code: "legacy_migration") }
+      it "does not add if it's the only user_phone" do
+        expect(user_phone.legacy?).to be_truthy
+        expect(user.phone_waiting_confirmation?).to be_falsey
+        instance.perform(user.id)
+        user.reload
+        expect(user.general_alerts).to eq([])
+        # Add another user phone, and it does add the alert though
+        FactoryBot.create(:user_phone, user: user)
+        expect(user.phone_waiting_confirmation?).to be_truthy
+        instance.perform(user.id)
+        user.reload
+        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      end
+    end
+  end
+
   describe "stolen records missing locations" do
     let(:user) { FactoryBot.create(:user) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }

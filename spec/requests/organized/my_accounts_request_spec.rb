@@ -91,8 +91,8 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns(:locks).pluck(:id)).to eq([lock.id])
           end
         end
-        context "with show_general_alert" do
-          before { current_user.update_column :general_alerts, ["has_stolen_bikes_without_locations"] }
+        context "with user_phone" do
+          before { current_user.update_column :general_alerts, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
             get base_url
 

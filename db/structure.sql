@@ -2778,6 +2778,7 @@ CREATE TABLE public.user_phones (
     phone character varying,
     confirmation_code character varying,
     confirmed_at timestamp without time zone,
+    deleted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
