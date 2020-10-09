@@ -19,10 +19,11 @@ class OwnershipCreator
   def new_ownership_params
     {
       bike_id: @bike.id,
-      owner_email: @bike.owner_email,
+      owner_email: @bike.owner_email.blank? ? @bike.phone : @bike.owner_email,
       creator_id: creator_id,
       example: @bike.example,
       current: true,
+      is_phone: @bike.owner_email.blank? && @bike.phone.present?,
       send_email: @send_email,
       user_hidden: @user_hidden
     }
@@ -30,6 +31,7 @@ class OwnershipCreator
 
   def add_errors_to_bike(ownership)
     problems = ownership.errors.messages
+    pp problems
     problems.each do |message|
       @bike.errors.add(message[0], message[1][0])
     end

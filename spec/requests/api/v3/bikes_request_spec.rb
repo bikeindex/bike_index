@@ -71,6 +71,21 @@ RSpec.describe "Bikes API V3", type: :request do
       end
     end
 
+    context "with a phone instead of an email" do
+      let(:phone_bike) { bike_attrs.merge(owner_email: "1112224444", owner_email_is_phone_number: true) }
+      it "creates" do
+        expect {
+          post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+          pp json_result
+        }.to change(Bike, :count).by 1
+        bike_result = json_result["bike"]
+        pp bike_result
+        bike = Bike.last
+        expect(bike.owner_email).to be_blank
+        expect(bike.phone).to eq(phone_bike[:phone])
+      end
+    end
+
     context "given a matching pre-existing bike record" do
       context "if the POSTer is authorized to update" do
         it "does not create a new record" do

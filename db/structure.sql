@@ -548,7 +548,8 @@ CREATE TABLE public.bikes (
     street character varying,
     state_id bigint,
     address_set_manually boolean DEFAULT false,
-    created_by_parking_notification boolean DEFAULT false
+    created_by_parking_notification boolean DEFAULT false,
+    phone character varying
 );
 
 
@@ -2145,7 +2146,8 @@ CREATE TABLE public.ownerships (
     send_email boolean DEFAULT true,
     user_hidden boolean DEFAULT false NOT NULL,
     impound_record_id bigint,
-    claimed_at timestamp without time zone
+    claimed_at timestamp without time zone,
+    is_phone boolean DEFAULT false
 );
 
 
@@ -5436,6 +5438,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200921203331'),
 ('20200925175027'),
 ('20201008202006'),
-('20201008204248');
+('20201008204248'),
+('20201009210429');
 
 

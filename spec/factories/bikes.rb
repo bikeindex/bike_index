@@ -55,6 +55,11 @@ FactoryBot.define do
       end
     end
 
+    trait :phone_registration do
+      owner_email { nil }
+      phone { "8887776666" }
+    end
+
     # THIS FACTORY SHOULD NEVER BE USED, except in other factories - there needs to be a stolen record created in addition to this.
     # use with_stolen_record instead
     trait :stolen_trait do

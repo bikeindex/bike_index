@@ -5,7 +5,8 @@ class Ownership < ApplicationRecord
   validates_presence_of :creator_id
   validates_presence_of :bike_id
   validates :owner_email,
-    format: {with: /\A.+@.+\..+\z/, message: "invalid format"}
+    format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
+    unless: :phone_registration?
 
   belongs_to :bike, touch: true
   belongs_to :user, touch: true
@@ -29,6 +30,10 @@ class Ownership < ApplicationRecord
 
   def self_made?
     creator_id == user_id
+  end
+
+  def phone_registration?
+    is_phone
   end
 
   def owner

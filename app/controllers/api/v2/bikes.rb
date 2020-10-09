@@ -125,6 +125,7 @@ module API
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs
