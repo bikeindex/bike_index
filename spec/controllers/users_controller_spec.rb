@@ -559,11 +559,29 @@ RSpec.describe UsersController, type: :controller do
         user.reload
         expect(user.phone).to eq "15005550006"
         expect(user.user_phones.count).to eq 1
+        expect(user.phone_waiting_confirmation?).to be_truthy
+        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+
         user_phone = user.user_phones.reorder(:created_at).last
         expect(user_phone.phone).to eq "15005550006"
         expect(user_phone.confirmed?).to be_falsey
         expect(user_phone.confirmation_code).to be_present
         expect(user_phone.notifications.count).to eq 1
+      end
+      context "without background" do
+        it "still shows general alert" do
+          user.reload
+          expect(user.phone).to be_blank
+          expect(user.user_phones.count).to eq 0
+          set_current_user(user)
+          put :update, params: {id: user.id, user: {phone: "15005550006"}}
+          expect(flash[:success]).to be_present
+          user.reload
+          expect(user.phone).to eq "15005550006"
+          expect(user.user_phones.count).to eq 0
+          expect(user.phone_waiting_confirmation?).to be_truthy
+          expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+        end
       end
     end
 

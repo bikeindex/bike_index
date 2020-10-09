@@ -304,6 +304,12 @@ RSpec.describe User, type: :model do
   describe "updating phone" do
     let(:user) { FactoryBot.create(:user, phone: " ") }
     before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") }}
+    it "updates general alerts without background processing" do
+      user.reload
+      expect(user.general_alerts).to be_blank
+      user.update(phone: "6669996666")
+      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+    end
     it "adds user phone, if blank" do
       user.reload
       user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
@@ -318,6 +324,7 @@ RSpec.describe User, type: :model do
       user.reload
       expect(user.phone).to eq "6669996666"
       expect(user.user_phones.count).to eq 1
+      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
       user_phone = user.user_phones.reorder(:created_at).last
       expect(user_phone.phone).to eq "6669996666"
       expect(user_phone.confirmed?).to be_falsey
