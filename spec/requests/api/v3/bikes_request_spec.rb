@@ -76,13 +76,12 @@ RSpec.describe "Bikes API V3", type: :request do
       it "creates" do
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
-          pp json_result
         }.to change(Bike, :count).by 1
         bike_result = json_result["bike"]
-        pp bike_result
         bike = Bike.last
         expect(bike.owner_email).to be_blank
-        expect(bike.phone).to eq(phone_bike[:phone])
+        expect(bike.phone).to eq(phone_bike[:owner_email])
+        expect(bike.current_ownership.phone_registration?).to be_truthy
       end
     end
 

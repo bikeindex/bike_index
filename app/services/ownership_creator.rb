@@ -31,7 +31,6 @@ class OwnershipCreator
 
   def add_errors_to_bike(ownership)
     problems = ownership.errors.messages
-    pp problems
     problems.each do |message|
       @bike.errors.add(message[0], message[1][0])
     end
