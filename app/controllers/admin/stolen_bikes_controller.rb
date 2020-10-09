@@ -74,6 +74,7 @@ class Admin::StolenBikesController < Admin::BaseController
     elsif params[:update_action] == "delete"
       selected_image.destroy
       flash[:success] = "Image deleted"
+      @bike.current_stolen_record.generate_alert_image
     elsif params[:update_action] == "regenerate_alert_image"
       if @bike.current_stolen_record.generate_alert_image(bike_image: selected_image)
         flash[:success] = "Promoted alert bike image updated."
