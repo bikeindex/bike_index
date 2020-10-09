@@ -45,6 +45,6 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
 
     # Remove duplicates
     (organization_ids + parent_ids + regional_child_ids + regional_parents.map(&:id))
-      .flatten.map(&:to_i).reject(&:blank?).uniq
+      .flatten.map(&:to_i).compact.reject { |i| i == 0 }.uniq
   end
 end
