@@ -126,7 +126,7 @@
                 %li.divider-nav-item
                 %li
                   = link_to t(".super_admin_view", org_name: passive_organization.short_name), admin_organization_path(passive_organization)
-        - else
+        - elsif current_user.blank?
           .center-navbar-signup-link-container
             = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
 

@@ -89,12 +89,16 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         end
         describe "delete image" do
           it "deletes image" do
+            bike.current_stolen_record.generate_alert_image(bike_image: public_image)
+            bike.reload
+            expect(bike.current_stolen_record.alert_image).to be_present
             expect(bike.public_images.count).to eq 1
             put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "delete"}
             expect(response).to redirect_to(:edit_admin_stolen_bike)
             expect(flash[:success]).to be_present
             bike.reload
             expect(bike.public_images.count).to eq 0
+            expect(bike.current_stolen_record.alert_image).to be_blank
           end
         end
       end
