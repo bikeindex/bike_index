@@ -34,6 +34,7 @@ class User < ApplicationRecord
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
   has_many :user_emails, dependent: :destroy
+  has_many :user_phones, dependent: :destroy
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
@@ -88,11 +89,11 @@ class User < ApplicationRecord
     fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
-  def self.username_friendly_find(n)
-    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-      where(id: n).first
+  def self.username_friendly_find(str)
+    if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+      where(id: str).first
     else
-      find_by_username(n)
+      find_by_username(str)
     end
   end
 
@@ -319,6 +320,14 @@ class User < ApplicationRecord
     "law_enforcement"
   end
 
+  def phone_waiting_confirmation?
+    user_phones.waiting_confirmation.any?
+  end
+
+  def current_user_phone
+    user_phones.where(phone: phone).last
+  end
+
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.username = Slugifyer.slugify(username) if username
@@ -361,8 +370,8 @@ class User < ApplicationRecord
     self.attributes = {auth_token_type => SecurityTokenizer.new_token(time)}
   end
 
-  def access_tokens_for_application(i)
-    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: i)
+  def access_tokens_for_application(toke)
+    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: toke)
   end
 
   protected

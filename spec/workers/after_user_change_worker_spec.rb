@@ -9,6 +9,74 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  describe "add_phones_for_verification" do
+    let(:phone) { "4334445555" }
+    let(:user) { FactoryBot.create(:user, phone: phone) }
+    it "adds the phone, in a streamlined way without calling multiple times" do
+      user.reload
+      expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! {
+        expect {
+          instance.perform(user.id)
+          user.update(phone: phone)
+          user.update(phone: nil)
+        }.to change(UserPhone, :count).by 1
+      }
+      user_phone = UserPhone.last
+      expect(user_phone.user_id).to eq user.id
+      expect(user_phone.confirmed?).to be_falsey
+      expect(user_phone.confirmation_code).to be_present
+      expect(user_phone.phone).to eq phone
+      expect(user_phone.notifications.count).to eq 1
+      expect(user_phone.notifications.last.twilio_sid).to eq "asd7c80123123sdddf"
+    end
+    context "existing user phone" do
+      let(:user_phone) { FactoryBot.create(:user_phone, phone: phone) }
+      let(:user) { user_phone.user }
+      it "does not add the phone if the phone is present" do
+        user.reload
+        expect {
+          instance.perform(user.id)
+        }.to_not change(UserPhone, :count)
+        user.update(phone: phone)
+        user_phone.destroy
+        user.reload
+        expect {
+          instance.perform(user.id)
+        }.to_not change(UserPhone, :count)
+        user.reload
+        expect(user.phone).to eq phone
+      end
+    end
+  end
+
+  describe "phone_waiting_confirmation" do
+    let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
+    let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
+    it "adds general_alerts" do
+      instance.perform(user.id)
+      user.reload
+      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+    end
+    context "legacy_migration" do
+      let!(:user_phone) { FactoryBot.create(:user_phone, user: user, confirmation_code: "legacy_migration") }
+      it "does not add if it's the only user_phone" do
+        expect(user_phone.legacy?).to be_truthy
+        expect(user.phone_waiting_confirmation?).to be_falsey
+        instance.perform(user.id)
+        user.reload
+        expect(user.general_alerts).to eq([])
+        # Add another user phone, and it does add the alert though
+        FactoryBot.create(:user_phone, user: user)
+        expect(user.phone_waiting_confirmation?).to be_truthy
+        instance.perform(user.id)
+        user.reload
+        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      end
+    end
+  end
+
   describe "stolen records missing locations" do
     let(:user) { FactoryBot.create(:user) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }

@@ -3,7 +3,8 @@
 class UpdateOrganizationAssociationsWorker < ApplicationWorker
   def perform(org_ids)
     organization_ids_for_update = associated_organization_ids(org_ids)
-    organization_ids_for_update.uniq.each do |id|
+
+    organization_ids_for_update.each do |id|
       organization = Organization.find(id)
       # Critical that locations skip_update, so we don't loop
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
@@ -40,10 +41,10 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       .map { |o| o.nearby_organizations.pluck(:id) }
 
     # Also update standard parents
-    parent_ids = organization_ids.map { |o| Organization.where(id: organization_ids).pluck(:parent_organization_id) }
+    parent_ids = organization_ids.map { |o| Organization.where(id: o).pluck(:parent_organization_id) }
 
     # Remove duplicates
     (organization_ids + parent_ids + regional_child_ids + regional_parents.map(&:id))
-      .flatten.reject(&:blank?).compact.map(&:to_i).uniq
+      .flatten.map(&:to_i).reject { |i| i == 0 }.uniq
   end
 end

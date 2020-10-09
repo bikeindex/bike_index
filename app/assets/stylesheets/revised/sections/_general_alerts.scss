@@ -1,0 +1,34 @@
+.confirm-phone-number-popover {
+  position: fixed;
+  bottom: 0;
+  left: 15%;
+  width: 70%;
+  background: rgba($blue-faint, 0.95);
+  border: 1px solid $blue-light;
+  padding: 1rem 1rem 0.5rem;
+  text-align: center;
+  margin: 0 auto;
+  z-index: $zoom-img-wrap-z-index + 10;
+  border-radius: 2px;
+  a {
+    padding: 0.5rem 1rem;
+    text-decoration: underline;
+  }
+}
+
+// This is the breakpoint where the bottom select comes out
+// for editing users and bikes
+@media (min-width: 768px) {
+  .confirm-phone-number-popover {
+    border-radius: 2px 2px 0 0;
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .confirm-phone-number-popover {
+    width: 90%;
+    left: 5%;
+    bottom: 60px; // avoid the select
+  }
+}

@@ -112,12 +112,13 @@ Rails.application.routes.draw do
   end
   get :edit_my_account, to: "users#edit", as: :edit_my_account
   # TODO: Move edit_my_account into my_account controller
-  resource :my_account, only: %i[show]
+  resource :my_account, only: %i[show update]
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
   resources :user_embeds, only: [:show]
+  resources :user_phones, only: %i[update destroy]
   resources :user_emails, only: [:destroy] do
     member do
       post "resend_confirmation"

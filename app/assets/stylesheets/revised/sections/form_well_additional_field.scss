@@ -22,3 +22,29 @@
     margin-top: $vertical-height;
   }
 }
+
+.form-well .user-phone-list {
+  font-weight: $normal-font-weight;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  text-align: right;
+  li {
+    position: relative;
+  }
+}
+
+@media (min-width: $grid-breakpoint-sm) {
+  #users_edit .user-phone-list {
+    text-align: left;
+    li:before {
+      content: "";
+      position: absolute;
+      background: $blue-dark;
+      top: 0.6em;
+      left: 0.33em;
+      width: 0.33em;
+      height: 0.33em;
+      border-radius: 0.33em;
+    }
+  }
+}

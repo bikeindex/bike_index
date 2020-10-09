@@ -1,9 +1,11 @@
 class AfterUserChangeWorker < ApplicationWorker
   sidekiq_options retry: false
 
-  def perform(user_id)
-    user = User.find_by_id(user_id)
+  def perform(user_id, user = nil)
+    user ||= User.find_by_id(user_id)
     return false unless user.present?
+
+    add_phones_for_verification(user)
 
     current_alerts = user_general_alerts(user)
     unless user.general_alerts == current_alerts
@@ -13,7 +15,11 @@ class AfterUserChangeWorker < ApplicationWorker
 
   def user_general_alerts(user)
     alerts = []
-    return alerts if user.superuser # No alerts for superusers
+
+    alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
+
+    # Ignore alerts below for superusers
+    return alerts if user.superuser
 
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.theft_alert_missing_photo? }
       alerts << "theft_alert_without_photo"
@@ -26,5 +32,14 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     alerts.sort
+  end
+
+  def add_phones_for_verification(user)
+    return false if user.phone.blank?
+    return false if user.user_phones.unscoped.where(phone: user.phone).present?
+    user_phone = user.user_phones.create!(phone: user.phone)
+    # Run this in the same process, rather than a different worker, so we update the general alerts
+    UserPhoneConfirmationWorker.new.perform(user_phone.id, false)
+    true
   end
 end

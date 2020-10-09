@@ -165,6 +165,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/sections/side_boxes";
 @import "revised/sections/tables";
 @import "revised/sections/embeded_tweet";
+@import "revised/sections/general_alerts";
 
 // Shared organized styles
 @import "revised/pages/organized/forms";
@@ -337,6 +338,10 @@ body {
   margin-left: 0;
 }
 
+.ml-auto {
+  margin-left: auto;
+}
+
 .mr-4 {
   margin-right: 2 * $vertical-height;
 }
@@ -347,6 +352,10 @@ body {
 
 .mr-0 {
   margin-right: 0;
+}
+
+.mr-auto {
+  margin-right: auto;
 }
 
 .small {

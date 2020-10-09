@@ -543,6 +543,30 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    describe "updating phone" do
+      it "updates and adds the phone" do
+        user.reload
+        expect(user.phone).to be_blank
+        expect(user.user_phones.count).to eq 0
+        set_current_user(user)
+        Sidekiq::Worker.clear_all
+        VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+          Sidekiq::Testing.inline! {
+            put :update, params: {id: user.id, user: {phone: "15005550006"}}
+          }
+        end
+        expect(flash[:success]).to be_present
+        user.reload
+        expect(user.phone).to eq "15005550006"
+        expect(user.user_phones.count).to eq 1
+        user_phone = user.user_phones.reorder(:created_at).last
+        expect(user_phone.phone).to eq "15005550006"
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to be_present
+        expect(user_phone.notifications.count).to eq 1
+      end
+    end
+
     it "updates the terms of service" do
       user.reload
       expect(user.address_set_manually).to be_falsey

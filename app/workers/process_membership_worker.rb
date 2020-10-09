@@ -13,8 +13,8 @@ class ProcessMembershipWorker < ApplicationWorker
     end
 
     # Bust cache keys on user and organization
-    membership.user&.update_attributes(updated_at: Time.current)
-    membership.organization.update_attributes(updated_at: Time.current) if membership.organization.present?
+    membership.user&.update_attributes(updated_at: Time.current, skip_update: true)
+    membership.organization.update_attributes(updated_at: Time.current, skip_update: true) if membership.organization.present?
 
     # Assign ambassador tasks too
     if membership.ambassador? && membership.user.present?

@@ -1,7 +1,31 @@
 -# Note: This should only ever render one alert - hence the elsif
 -# The alerts are in priority from highest to lowest
 
-- if current_user.general_alerts.include?("stolen_bikes_without_locations")
+- if current_user.general_alerts.include?("phone_waiting_confirmation")
+  - if current_user.phone_waiting_confirmation?
+    - phone_number = current_user.user_phones.waiting_confirmation.reorder(:updated_at).last
+
+    .confirm-phone-number-popover
+      %a.less-strong{ href: "#", data: { toggle: "modal", target: "#confirmPhoneNumber" } }
+        = t(".confirm_your_phone_number")
+
+    - modal_title = t(".verify_number", phone_number: phone_display(phone_number.phone))
+    - modal_body = capture_haml do
+      .modal-body
+        = form_tag user_phone_path(phone_number.to_param), method: :patch, action: "update", class: "form" do
+          .form-group
+            = label_tag :confirmation_code, t(".verification_code")
+            = text_field_tag :confirmation_code, "", required: true, class: "form-control"
+          .modal-btn-footer
+            .form-submit-button
+              = submit_tag modal_title, class: "btn btn-success btn-lg"
+
+    = render partial: "shared/modal", locals: { title: modal_title, modal_body: modal_body, id: "confirmPhoneNumber" }
+  - else
+    -# Gross hack to force updating, the phone waiting for confirmation has expired
+    - current_user.update(updated_at: Time.current, skip_update: false)
+
+- elsif current_user.general_alerts.include?("stolen_bikes_without_locations")
   - without_location_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.without_location? }
   - if without_location_bikes.present?
 
@@ -18,7 +42,7 @@
 
     = render partial: "shared/modal", locals: { title: t(".stolen_missing_location_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true }
 
-- if current_user.general_alerts.include?("theft_alert_without_photo")
+- elsif current_user.general_alerts.include?("theft_alert_without_photo")
   - missing_photo_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
   - if missing_photo_bikes.present?
 

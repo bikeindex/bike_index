@@ -1,0 +1,73 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.twilio.com/2010-04-01/Accounts/ACaaf3fd927e285a0be17407d1be369451/Messages.json
+    body:
+      encoding: UTF-8
+      string: Body=Bike+Index+confirmation+code%3A++494+6067&From=%2B15005550006&To=2342342345
+    headers:
+      User-Agent:
+      - twilio-ruby/5.40.4 (ruby/x86_64-darwin18 2.5.8-p224)
+      Accept-Charset:
+      - utf-8
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 201
+      message: CREATED
+    headers:
+      Date:
+      - Fri, 09 Oct 2020 16:55:53 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '803'
+      Connection:
+      - keep-alive
+      Twilio-Concurrent-Requests:
+      - '1'
+      Twilio-Request-Id:
+      - RQ9683abed54324b2194c8da6da7af7d12
+      Twilio-Request-Duration:
+      - '0.059'
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - Accept, Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match,
+        If-Unmodified-Since
+      Access-Control-Allow-Methods:
+      - GET, POST, DELETE, OPTIONS
+      Access-Control-Expose-Headers:
+      - ETag
+      Access-Control-Allow-Credentials:
+      - 'true'
+      X-Powered-By:
+      - AT-5000
+      X-Shenanigans:
+      - none
+      X-Home-Region:
+      - us1
+      X-Api-Domain:
+      - api.twilio.com
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: UTF-8
+      string: '{"sid": "SM52b93eec0f8d4ac39fac64dfe44e2074", "date_created": "Fri,
+        09 Oct 2020 16:55:53 +0000", "date_updated": "Fri, 09 Oct 2020 16:55:53 +0000",
+        "date_sent": null, "account_sid": "ACaaf3fd927e285a0be17407d1be369451", "to":
+        "+12342342345", "from": "+15005550006", "messaging_service_sid": null, "body":
+        "Bike Index confirmation code:  494 6067", "status": "queued", "num_segments":
+        "1", "num_media": "0", "direction": "outbound-api", "api_version": "2010-04-01",
+        "price": null, "price_unit": "USD", "error_code": null, "error_message": null,
+        "uri": "/2010-04-01/Accounts/ACaaf3fd927e285a0be17407d1be369451/Messages/SM52b93eec0f8d4ac39fac64dfe44e2074.json",
+        "subresource_uris": {"media": "/2010-04-01/Accounts/ACaaf3fd927e285a0be17407d1be369451/Messages/SM52b93eec0f8d4ac39fac64dfe44e2074/Media.json"}}'
+    http_version:
+  recorded_at: Fri, 09 Oct 2020 16:55:53 GMT
+recorded_with: VCR 5.0.0
