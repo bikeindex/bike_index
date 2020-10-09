@@ -5228,6 +5228,9 @@ nl:
       without_photo_all_is_lost: Als je geen foto's van je fiets hebt, zoek dan een
         stockafbeelding op internet en upload deze. Zonder een afbeelding is de gepromote
         waarschuwing niet effectief.
+      confirm_your_phone_number: Bevestig uw telefoonnummer
+      verification_code: Verificatie code
+      verify_number: Verifieer %{phone_number}
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5285,6 +5288,10 @@ nl:
       why_you_should_text: Lees waarom u zou moeten
       daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
       stolen_hot_sheets: Gestolen Bike Hot Sheets
+      add_new_phone_number: Voeg een nieuw telefoonnummer toe
+      remove_number: nummer verwijderen
+      unconfirmed: niet bevestigd!
+      verified: Geverifieerd
     edit_sharing:
       additional_link: Aanvullende link
       choose_file: Kies bestand...

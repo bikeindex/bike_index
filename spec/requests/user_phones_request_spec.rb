@@ -206,9 +206,10 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "destroy" do
-      it "removes the user_phone" do
+      it "removes the user_phone, deletes user.phone" do
         user_phone.reload
         current_user.reload
+        current_user.update(phone: user_phone.phone)
         expect(current_user.user_phones.count).to eq 1
         expect {
           delete "#{base_url}/#{user_phone.to_param}"
@@ -217,6 +218,23 @@ RSpec.describe UserPhonesController, type: :request do
 
         current_user.reload
         expect(current_user.user_phones.count).to eq 0
+        expect(current_user.phone).to be_blank
+      end
+      context "user has a different phone" do
+        it "does not delete user.phone" do
+          user_phone.reload
+          current_user.reload
+          current_user.update(phone: "727282822")
+          expect(current_user.user_phones.count).to eq 1
+          expect {
+            delete "#{base_url}/#{user_phone.to_param}"
+          }.to change(UserPhone, :count).by(-1)
+          expect(flash[:success]).to be_present
+
+          current_user.reload
+          expect(current_user.user_phones.count).to eq 0
+          expect(current_user.phone).to eq "727282822"
+        end
       end
       context "not users phone" do
         let!(:user_phone2) { FactoryBot.create(:user_phone) }

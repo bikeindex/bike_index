@@ -292,12 +292,55 @@ RSpec.describe User, type: :model do
   end
 
   describe "email and phone" do
-    let(:user) { FactoryBot.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
+    let(:user) { FactoryBot.build(:user, email: "SOMethinG@example.com\n", phone: "77383ddp+83887") }
     before(:each) { user.set_calculated_attributes }
 
     it "strips the non-digit numbers from the phone input and normalizes the email" do
       expect(user.phone).to eq("77383ddp+83887")
       expect(user.email).to eq("something@example.com")
+    end
+  end
+
+  describe "updating phone" do
+    let(:user) { FactoryBot.create(:user, phone: " ") }
+    before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") }}
+    it "adds user phone, if blank" do
+      user.reload
+      user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
+      expect(user.user_phones.count).to eq 0
+      expect(user.phone).to be_blank
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! {
+        expect {
+          user.update(phone: "6669996666")
+        }.to change(Notification, :count).by 1
+      }
+      user.reload
+      expect(user.phone).to eq "6669996666"
+      expect(user.user_phones.count).to eq 1
+      user_phone = user.user_phones.reorder(:created_at).last
+      expect(user_phone.phone).to eq "6669996666"
+      expect(user_phone.confirmed?).to be_falsey
+      expect(user_phone.confirmation_code).to be_present
+      expect(user_phone.notifications.count).to eq 1
+      expect(user_phone.notifications.last.twilio_sid).to eq "party"
+
+      # And it adds a new phone if updated again
+      Sidekiq::Testing.inline! {
+        expect {
+          user.update(phone: "9996669999")
+        }.to change(Notification, :count).by 1
+      }
+      user.reload
+      expect(user.phone).to eq "9996669999"
+      expect(user.user_phones.count).to eq 2
+      user_phone2 = user.user_phones.reorder(:created_at).last
+      expect(user_phone2.phone).to eq "9996669999"
+      expect(user_phone2.confirmation_code).to be_present
+      expect(user_phone2.confirmed?).to be_falsey
+      expect(user_phone2.id).to_not eq user_phone.id
+      expect(user_phone2.confirmation_code).to_not eq user_phone.confirmation_code
+      expect(user_phone.notifications.count).to eq 1
     end
   end
 

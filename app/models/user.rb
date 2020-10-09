@@ -89,11 +89,11 @@ class User < ApplicationRecord
     fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
-  def self.username_friendly_find(n)
-    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-      where(id: n).first
+  def self.username_friendly_find(str)
+    if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+      where(id: str).first
     else
-      find_by_username(n)
+      find_by_username(str)
     end
   end
 
@@ -325,7 +325,7 @@ class User < ApplicationRecord
   end
 
   def current_user_phone
-    user_phones.where(phone: phone).first
+    user_phones.where(phone: phone).last
   end
 
   def set_calculated_attributes
@@ -370,8 +370,8 @@ class User < ApplicationRecord
     self.attributes = {auth_token_type => SecurityTokenizer.new_token(time)}
   end
 
-  def access_tokens_for_application(i)
-    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: i)
+  def access_tokens_for_application(toke)
+    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: toke)
   end
 
   protected

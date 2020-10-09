@@ -29,6 +29,9 @@ class UserPhonesController < ApplicationController
   end
 
   def destroy
+    if current_user.phone == @user_phone.phone
+      current_user.update(phone: nil)
+    end
     @user_phone.destroy
     flash[:success] = "Phone removed from your account"
     redirect_back(fallback_location: my_account_url)

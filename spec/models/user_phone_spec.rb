@@ -31,6 +31,7 @@ RSpec.describe UserPhone, type: :model do
 
     it "adds a user_phone" do
       expect(user.phone).to be_blank
+      Sidekiq::Worker.clear_all
       VCR.use_cassette("user_phone-add_phone_for_user_id", match_requests_on: [:path]) do
         Sidekiq::Testing.inline! {
           expect {

@@ -5,6 +5,8 @@ class AfterUserChangeWorker < ApplicationWorker
     user ||= User.find_by_id(user_id)
     return false unless user.present?
 
+    add_phones_for_verification(user)
+
     current_alerts = user_general_alerts(user)
     unless user.general_alerts == current_alerts
       user.update_attributes(general_alerts: current_alerts, skip_update: true)
@@ -30,5 +32,14 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     alerts.sort
+  end
+
+  def add_phones_for_verification(user)
+    return false if user.phone.blank?
+    return false if user.user_phones.unscoped.where(phone: user.phone).present?
+    user_phone = user.user_phones.create!(phone: user.phone)
+    # Run this in the same process, rather than a different worker, so we update the general alerts
+    UserPhoneConfirmationWorker.new.perform(user_phone.id, false)
+    true
   end
 end

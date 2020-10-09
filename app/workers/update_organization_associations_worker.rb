@@ -3,6 +3,8 @@
 class UpdateOrganizationAssociationsWorker < ApplicationWorker
   def perform(org_ids)
     organization_ids_for_update = associated_organization_ids(org_ids)
+    # pp organization_ids_for_update
+    # fail
     organization_ids_for_update.uniq.each do |id|
       organization = Organization.find(id)
       # Critical that locations skip_update, so we don't loop
