@@ -40,6 +40,7 @@ class AfterUserChangeWorker < ApplicationWorker
     user_phone = user.user_phones.create!(phone: user.phone)
     # Run this in the same process, rather than a different worker, so we update the general alerts
     UserPhoneConfirmationWorker.new.perform(user_phone.id, false)
+    user.reload
     true
   end
 end

@@ -330,6 +330,9 @@ class User < ApplicationRecord
 
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
+    if phone_changed? # Rather than waiting for twilio to send, immediately update general_alerts
+      self.general_alerts = (general_alerts || []) + ["phone_waiting_confirmation"]
+    end
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
