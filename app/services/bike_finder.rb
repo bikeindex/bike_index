@@ -10,7 +10,7 @@ module BikeFinder
   # - any email associated with any owner (via user.user_emails)
   #
   # Return a Bike object, or nil
-  def self.find_matching(serial:, owner_email:)
+  def self.find_matching(serial:, owner_email: nil, phone_number: nil)
     email = EmailNormalizer.normalize(owner_email)
 
     candidate_user_ids =

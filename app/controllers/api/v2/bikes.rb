@@ -135,7 +135,8 @@ module API
           # Search for a bike matching the provided serial number / owner email
           found_bike = BikeFinder.find_matching(
             serial: params[:serial],
-            owner_email: params[:owner_email],
+            owner_email: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
+            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil
           )
 
           # if a matching bike is and can be updated by the submitter, update

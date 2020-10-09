@@ -53,8 +53,8 @@ class Ownership < ApplicationRecord
     save
   end
 
-  def claimable_by?(u)
-    u == User.fuzzy_email_find(owner_email) || u == user
+  def claimable_by?(passed_user)
+    passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
   end
 
   def organization
