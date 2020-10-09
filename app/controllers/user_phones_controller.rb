@@ -5,7 +5,7 @@ class UserPhonesController < ApplicationController
     if params[:phone].present?
       user_phone = UserPhone.add_phone_for_user_id(current_user.id, params[:phone])
       if user_phone.valid?
-        flash[:success] = "Phone added to your account. Please verify your number using the code we've texted to you"
+        flash[:success] = "Please verify your number using the code we texted you"
       else
         flash[:error] = "Unable to add phone number!"
       end

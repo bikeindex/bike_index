@@ -34,7 +34,12 @@ RSpec.describe UserPhone, type: :model do
       VCR.use_cassette("user_phone-add_phone_for_user_id", match_requests_on: [:path]) do
         Sidekiq::Testing.inline! {
           expect {
-            UserPhone.add_phone_for_user_id(user.id, phone)
+            user_phone = UserPhone.add_phone_for_user_id(user.id, phone)
+            og_confirmation_code = user_phone.confirmation_code
+
+            user_phone2 = UserPhone.add_phone_for_user_id(user.id, phone)
+            expect(user_phone2.id).to eq user_phone.id
+            expect(user_phone2.confirmation_code).to eq og_confirmation_code
           }.to change(UserPhone, :count).by 1
         }
       end
@@ -49,12 +54,31 @@ RSpec.describe UserPhone, type: :model do
       expect(user_phone.confirmation_code.length).to be < 8
       expect(user_phone.confirmation_message).to eq "Bike Index confirmation code:  #{user_phone.confirmation_display}"
       expect(user_phone.notifications.count).to eq 1
+      og_confirmation_code = user_phone.confirmation_code
 
       notification = user_phone.notifications.first
       expect(notification.kind).to eq "phone_verification"
       expect(notification.message_channel).to eq "text"
       expect(notification.user).to eq user
       expect(notification.twilio_sid).to be_present
+
+      # But, if updated more than 2 minutes ago, send another
+      user_phone.update(updated_at: Time.current - 5.minutes)
+      VCR.use_cassette("user_phone-add_phone_for_user_id_again", match_requests_on: [:path]) do
+        Sidekiq::Testing.inline! {
+          expect {
+            UserPhone.add_phone_for_user_id(user.id, phone)
+          }
+        }
+      end
+      user_phone.reload
+      expect(user_phone.confirmation_code).to_not eq og_confirmation_code
+      expect(user_phone.notifications.count).to eq 2
+    end
+    context "user_phone confirmation updated out" do
+      it "sends a new confirmation code" do
+
+      end
     end
   end
 end

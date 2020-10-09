@@ -2,7 +2,8 @@ class UserPhone < ApplicationRecord
   belongs_to :user
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_presence_of :user_id, :phone
+  validates_presence_of :user_id
+  validates :phone, presence: true, uniqueness: {scope: :user_id}
 
   before_validation :normalize_phone
 
@@ -21,7 +22,13 @@ class UserPhone < ApplicationRecord
   def self.add_phone_for_user_id(user_id, phone_number)
     phone = Phonifyer.phonify(phone_number)
     matching_phone = where(user_id: user_id, phone: phone).first
-    return matching_phone if matching_phone.present?
+    if matching_phone.present?
+      if matching_phone.updated_at < Time.current - 2.minutes
+        matching_phone.generate_confirmation
+        matching_phone.send_confirmation_text
+      end
+      return matching_phone
+    end
     up = new(user_id: user_id, phone: phone)
     up.generate_confirmation
     up.send_confirmation_text

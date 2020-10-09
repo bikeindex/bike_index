@@ -13,7 +13,11 @@ class AfterUserChangeWorker < ApplicationWorker
 
   def user_general_alerts(user)
     alerts = []
-    return alerts if user.superuser # No alerts for superusers
+
+    alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
+
+    # Ignore alerts below for superusers
+    return alerts if user.superuser
 
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.theft_alert_missing_photo? }
       alerts << "theft_alert_without_photo"
@@ -24,8 +28,6 @@ class AfterUserChangeWorker < ApplicationWorker
     if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
       alerts << "stolen_bikes_without_locations"
     end
-
-    alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
 
     alerts.sort
   end

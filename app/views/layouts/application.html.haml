@@ -126,7 +126,7 @@
                 %li.divider-nav-item
                 %li
                   = link_to t(".super_admin_view", org_name: passive_organization.short_name), admin_organization_path(passive_organization)
-        - else
+        - elsif current_user.blank?
           .center-navbar-signup-link-container
             = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
 
@@ -190,6 +190,7 @@
     - if donation_request.present?
       = render "/shared/law_enforcement_donation_modal", locals: { kind: donation_request }
     - elsif show_general_alert
+
       = render "/shared/user_general_alert"
 
     = render 'shared/footer_revised'

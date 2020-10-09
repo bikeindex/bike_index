@@ -5316,6 +5316,7 @@ en:
       city: City
       confirmed_emails: Confirmed emails
       daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
+      verify_this_phone_number: Verify this phone number
       give_us_permission_html: >-
         Give us permission to contact you if we believe your bike has been stolen,
         <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
