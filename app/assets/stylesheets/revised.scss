@@ -338,6 +338,10 @@ body {
   margin-left: 0;
 }
 
+.ml-auto {
+  margin-left: auto;
+}
+
 .mr-4 {
   margin-right: 2 * $vertical-height;
 }
@@ -348,6 +352,10 @@ body {
 
 .mr-0 {
   margin-right: 0;
+}
+
+.mr-auto {
+  margin-right: auto;
 }
 
 .small {

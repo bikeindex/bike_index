@@ -37,13 +37,23 @@
   .form-group.row.mt-2
     = f.label :phone, class: "form-well-label"
     .form-well-input
-      = f.text_field :phone, value: phone_display(@user.phone), placeholder: t(".add_new_phone_number"), class: "form-control"
-      - if @user.user_phones.any?
-        %ul
-          - @user.user_phones.confirmed.each do |user_phone|
-            %li
-              = phone_display(@user.phone)
-
+      = f.text_field :phone, value: "", placeholder: t(".add_new_phone_number"), class: "form-control"
+    - if @user.user_phones.any?
+      .form-well-input-static-full-width.ml-auto
+        %ul.user-phone-list
+          - @user.user_phones.each do |user_phone|
+            %li.row
+              .col-sm-8
+                = phone_display(user_phone.phone)
+                - if user_phone.confirmed?
+                  %small.less-strong= t(".verified")
+                - else
+                  %small.text-warning= t(".unconfirmed")
+              .col-sm-4.text-right
+                - if user_phone.resend_confirmation?
+                  = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
+                - else
+                  = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
 
   .related-fields
     .form-group.row.fancy-select.unfancy

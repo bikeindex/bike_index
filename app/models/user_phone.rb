@@ -15,7 +15,7 @@ class UserPhone < ApplicationRecord
   scope :waiting_confirmation, -> { unconfirmed.where("updated_at > ?", confirmation_timeout).where.not(confirmation_code: "legacy_migration") }
 
   def self.confirmation_timeout
-    Time.current - 31.minutes
+    Time.current - 1.hour
   end
 
   def self.find_confirmation_code(str)

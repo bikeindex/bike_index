@@ -2,20 +2,6 @@ class UserPhonesController < ApplicationController
   before_action :authenticate_user
   before_action :find_user_phone
 
-  # def create
-  #   if params[:phone].present?
-
-  #   elsif params[:confirmation_code].present?
-  #     phone = current_user.user_phones.find_confirmation_code(params[:confirmation_code])
-  #     if phone.present?
-  #       phone.confirm!
-  #     else
-  #       flash[:error] = "Unable to verify that phone number! Maybe the code expired? Please try again"
-  #     end
-  #   end
-  #   redirect_back(fallback_location: my_account_url)
-  # end
-
   def update
     if params[:resend_confirmation].present?
       if @user_phone.confirmed?

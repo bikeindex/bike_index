@@ -45,7 +45,6 @@ RSpec.describe UserPhonesController, type: :request do
         expect(user_phone.confirmation_code).to_not eq "6666666"
         expect(user_phone.resend_confirmation?).to be_falsey
 
-
         # And then, so we don't have to set everything up again, test confirmation in here
         VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
           patch "#{base_url}/#{user_phone.to_param}", params: {confirmation_code: user_phone.confirmation_code}
@@ -83,17 +82,17 @@ RSpec.describe UserPhonesController, type: :request do
       end
       context "outside of confirmation time" do
         it "does not confirm" do
-          user_phone.update_column :updated_at, Time.current - 1.hour
+          user_phone.update_column :updated_at, Time.current - 5.hours
           user_phone.reload
           expect(user_phone.confirmed?).to be_falsey
           Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! {
+          Sidekiq::Testing.inline! do
             expect {
               VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
                 patch "#{base_url}/#{user_phone.to_param}", params: {confirmation_code: "6666666"}
               end
             }.to change(Notification, :count).by 1
-          }
+          end
           expect(flash[:error]).to match(/expire/i)
 
           current_user.reload
@@ -116,11 +115,11 @@ RSpec.describe UserPhonesController, type: :request do
           expect(user_phone.confirmed?).to be_falsey
           expect(user_phone.resend_confirmation?).to be_falsey
           Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! {
+          Sidekiq::Testing.inline! do
             expect {
               patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
             }.to_not change(Notification, :count)
-          }
+          end
 
           current_user.reload
           expect(current_user.user_phones.count).to eq 1
@@ -143,13 +142,13 @@ RSpec.describe UserPhonesController, type: :request do
           current_user.reload
           expect(current_user.phone_waiting_confirmation?).to be_falsey
           Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! {
+          Sidekiq::Testing.inline! do
             VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
               expect {
                 patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
               }.to change(Notification, :count).by 1
             end
-          }
+          end
           expect(flash[:success]).to be_present
           current_user.reload
           expect(current_user.user_phones.count).to eq 1
@@ -171,11 +170,11 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.reload
           expect(user_phone.confirmed?).to be_truthy
           Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! {
+          Sidekiq::Testing.inline! do
             expect {
               patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
             }.to_not change(Notification, :count)
-          }
+          end
           expect(flash[:error]).to be_present
 
           current_user.reload
@@ -194,11 +193,11 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.reload
           expect(user_phone.resend_confirmation?).to be_truthy
           Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! {
+          Sidekiq::Testing.inline! do
             expect {
               patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
             }.to raise_error(ActiveRecord::RecordNotFound)
-          }
+          end
           current_user.reload
           expect(current_user.user_phones.count).to eq 0
           expect(current_user.phone_waiting_confirmation?).to be_falsey
