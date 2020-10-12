@@ -5,10 +5,9 @@ module BikeFinder
   # Matches based on the normalized serial number, and `owner_email` should be
   # found via:
   #
-  # - the bike's owner_email attribute
+  # - the bike's owner_email attribute (whether it's a phone or email)
   # - the email attribute of any of the bike's owner's (user / creator: via bike.ownerships)
   # - any email associated with any owner (via user.user_emails)
-  # - the bike's phone attribute
   # - the phone attribute of any of the bike's owner's (user / creator: via bike.ownerships)
   # - the phone associated with any owner (via user.user_phones)
   #
@@ -19,12 +18,14 @@ module BikeFinder
 
     candidate_user_ids = find_matching_user_ids(email, phone)
 
-    Bike
-      .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
-      .where(serial_normalized: SerialNormalizer.new(serial: serial).normalized)
+    bikes = Bike.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
+      .where("bikes.serial_normalized @@ ?", SerialNormalizer.new(serial: serial).normalized) # @@ is used in BikeSearchable, replicated here
       .where(
-        "bikes.owner_email = ? OR ownerships.user_id IN (?) OR ownerships.creator_id IN (?)",
+        "bikes.owner_email = ? OR bikes.owner_email = ? OR ownerships.owner_email = ? OR ownerships.owner_email = ? OR ownerships.user_id IN (?) OR ownerships.creator_id IN (?)",
         email,
+        phone,
+        email,
+        phone,
         candidate_user_ids,
         candidate_user_ids
       )

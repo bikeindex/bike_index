@@ -549,7 +549,7 @@ CREATE TABLE public.bikes (
     state_id bigint,
     address_set_manually boolean DEFAULT false,
     created_by_parking_notification boolean DEFAULT false,
-    phone character varying
+    is_phone boolean DEFAULT false
 );
 
 

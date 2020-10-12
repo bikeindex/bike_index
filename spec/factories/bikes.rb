@@ -56,8 +56,8 @@ FactoryBot.define do
     end
 
     trait :phone_registration do
-      owner_email { nil }
-      phone { "8887776666" }
+      sequence(:owner_email) { |n| "888#{n}".rjust(10, "3").to_s }
+      is_phone { true }
     end
 
     # THIS FACTORY SHOULD NEVER BE USED, except in other factories - there needs to be a stolen record created in addition to this.

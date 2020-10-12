@@ -95,6 +95,39 @@ RSpec.describe BikeFinder do
 
       expect(result).to eq(bike)
     end
+
+    context "with phone" do
+      let(:serial1) { "socool" }
+      let(:serial2) { "Another-serial-number" }
+      let(:user1) { FactoryBot.create(:user, phone: phone1) }
+      let(:phone1) { "2342342345" }
+      let(:phone2) { "8883337777" }
+      let(:bike1) { FactoryBot.create(:bike, owner_email: user1.email, serial_number: serial1) }
+      let!(:bike1_ownership) { FactoryBot.create(:ownership, bike: bike1, owner_email: phone1, is_phone: true) }
+      # Bike without an existing matching user
+      let!(:bike2) { FactoryBot.create(:bike, :phone_registration, owner_email: phone2, serial_number: serial2) }
+      it "matches based on phone" do
+        bike1.reload # Update the seria
+        bike2.reload
+        expect(bike1.phone_registration?).to be_falsey
+        expect(bike1.serial_normalized).to eq "50C001"
+        expect(bike1.creator.id).to_not eq user1.id
+        expect(bike2.phone_registration?).to be_truthy
+        expect(bike2.serial_normalized).to eq "AN0THER 5ER1A1 NUM8ER"
+        expect(BikeFinder.find_matching_user_ids(bike1.creator.email)).to eq([bike1.creator.id])
+        expect(BikeFinder.find_matching_user_ids(bike1.creator.email, "92929292")).to eq([bike1.creator.id])
+        expect(BikeFinder.find_matching_user_ids("s@stuff.com", phone1)).to eq([user1.id])
+
+        expect(BikeFinder.find_matching(serial: "50C001", phone: " #{phone1}  ")&.id).to eq bike1.id
+        expect(BikeFinder.find_matching(serial: serial1, owner_email: "a@b.com", phone: phone1)&.id).to eq bike1.id
+        expect(BikeFinder.find_matching(serial: serial1, phone: phone2)&.id).to be_blank
+
+        expect(BikeFinder.find_matching(serial: serial2, phone: phone1)&.id).to be_blank
+        expect(BikeFinder.find_matching(serial: serial2, phone: phone2)&.id).to eq bike2.id
+        expect(BikeFinder.find_matching(serial: serial2, phone: phone1)&.id).to be_blank
+        expect(BikeFinder.find_matching(serial: serial2, owner_email: "a@b.com", phone: phone2)&.id).to eq bike2.id
+      end
+    end
   end
 
   describe "matching_user_ids" do

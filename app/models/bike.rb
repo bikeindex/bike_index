@@ -481,7 +481,12 @@ class Bike < ApplicationRecord
     contact_owner_user? ? owner_email : creator&.email
   end
 
+  def phone_registration?
+    is_phone
+  end
+
   def phone
+    return owner_email
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
