@@ -8,17 +8,16 @@ module BikeFinder
   # - the bike's owner_email attribute
   # - the email attribute of any of the bike's owner's (user / creator: via bike.ownerships)
   # - any email associated with any owner (via user.user_emails)
+  # - the bike's phone attribute
+  # - the phone attribute of any of the bike's owner's (user / creator: via bike.ownerships)
+  # - the phone associated with any owner (via user.user_phones)
   #
   # Return a Bike object, or nil
-  def self.find_matching(serial:, owner_email: nil, phone_number: nil)
+  def self.find_matching(serial:, owner_email: nil, phone: nil)
     email = EmailNormalizer.normalize(owner_email)
+    phone = Phonifyer.phonify(phone)
 
-    candidate_user_ids =
-      User
-        .joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
-        .where("users.email = ? OR user_emails.email = ?", email, email)
-        .select(:id)
-        .distinct
+    candidate_user_ids = find_matching_user_ids(email, phone)
 
     Bike
       .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
@@ -30,5 +29,18 @@ module BikeFinder
         candidate_user_ids
       )
       .first
+  end
+
+  def self.find_matching_user_ids(email = nil, phone = nil)
+    return [] if email.blank? && phone.blank?
+    users = User.joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
+      .joins("LEFT JOIN user_phones ON user_phones.user_id = users.id")
+    if email.present? && phone.present?
+      users.where("users.email = ? OR user_emails.email = ? OR users.phone = ? OR user_phones.phone = ?", email, email, phone, phone)
+    elsif email.present?
+      users.where("users.email = ? OR user_emails.email = ?", email, email)
+    elsif phone.present?
+      users.where("users.phone = ? OR user_phones.phone = ?", phone, phone)
+    end.distinct.pluck(:id)
   end
 end

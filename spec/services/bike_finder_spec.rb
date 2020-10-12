@@ -96,4 +96,57 @@ RSpec.describe BikeFinder do
       expect(result).to eq(bike)
     end
   end
+
+  describe "matching_user_ids" do
+    let(:user1) { FactoryBot.create(:user, phone: "7273824888") }
+    let(:phone) { "2342342345" }
+    let(:user_phone) { FactoryBot.create(:user_phone, phone: phone, user: user1) }
+    let(:email) { "example@bikeindex.org" }
+    let(:user2) { FactoryBot.create(:user, email: "something@stuff.com") }
+    let(:user_email) { FactoryBot.create(:user_email, email: email, user: user2, confirmation_token: "lkhiunmluujhm") }
+    it "finds by email or phone, even if not confirmed" do
+      user_phone.reload
+      user_email.reload
+      expect(user1.confirmed?).to be_falsey
+      expect(user_phone.confirmed?).to be_falsey
+      expect(user1.phone).to_not eq phone
+      expect(user2.confirmed?).to be_falsey
+      expect(user_email.confirmed?).to be_falsey
+      expect(user2.email).to_not eq email
+      expect(BikeFinder.find_matching_user_ids(email)).to eq([user2.id])
+      expect(BikeFinder.find_matching_user_ids("something@stuff.com")).to eq([user2.id])
+      expect(BikeFinder.find_matching_user_ids(email, "1234567890")).to eq([user2.id])
+      expect(BikeFinder.find_matching_user_ids(nil, phone)).to eq([user1.id])
+      expect(BikeFinder.find_matching_user_ids(nil, "7273824888")).to eq([user1.id])
+      expect(BikeFinder.find_matching_user_ids("example@example.com", phone)).to eq([user1.id])
+      expect(BikeFinder.find_matching_user_ids(email, phone)).to match_array([user2.id, user1.id])
+    end
+    context "confirmed email and phone" do
+      let(:user1) { FactoryBot.create(:user_confirmed, phone: phone2) }
+      let(:phone2) { "5432234234" }
+      let(:email2) { "fake@bikeindex.org" }
+      let(:user_phone) { FactoryBot.create(:user_phone_confirmed, phone: phone, user: user1) }
+      let(:email) { "example@bikeindex.org" }
+      let(:user2) { FactoryBot.create(:user_confirmed, email: email2) }
+      let(:user_email) { FactoryBot.create(:user_email, email: email, user: user2, confirmation_token: nil) }
+      it "finds users confirmed email" do
+        user_phone.reload
+        user_email.reload
+        expect(user1.confirmed?).to be_truthy
+        expect(user_phone.confirmed?).to be_truthy
+        expect(user2.confirmed?).to be_truthy
+        expect(user_email.confirmed?).to be_truthy
+        expect(BikeFinder.find_matching_user_ids(email)).to eq([user2.id])
+        expect(BikeFinder.find_matching_user_ids(email2)).to eq([user2.id])
+        expect(BikeFinder.find_matching_user_ids(email, "1234567890")).to eq([user2.id])
+        expect(BikeFinder.find_matching_user_ids(email2, "1234567890")).to eq([user2.id])
+        expect(BikeFinder.find_matching_user_ids(nil, phone)).to eq([user1.id])
+        expect(BikeFinder.find_matching_user_ids(nil, phone2)).to eq([user1.id])
+        expect(BikeFinder.find_matching_user_ids("example@example.com", phone)).to eq([user1.id])
+        expect(BikeFinder.find_matching_user_ids("example@example.com", phone2)).to eq([user1.id])
+        expect(BikeFinder.find_matching_user_ids(email, phone)).to match_array([user2.id, user1.id])
+        expect(BikeFinder.find_matching_user_ids(email2, phone2)).to match_array([user2.id, user1.id])
+      end
+    end
+  end
 end
