@@ -3974,7 +3974,6 @@ nl:
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 manieren om community te laten
         groeien voor uw fietsenwinkel
-      ascend_retail: Ascend Retail
       bike_index_for_bike_shops: Bike Index voor fietsenwinkels
       bikes_before_they: Laten we ons verenigen om fietsendiefstal tegen te gaan en
         bescherm ook de fietsen van uw klanten, voordat ze überhaupt verkocht zijn.
@@ -3992,10 +3991,6 @@ nl:
       driving_service_revenues_with_bicycle_reg: 'Lopende service inkomsten met behulp
         van fietsregistratie '
       features_and_pricing: Functies & prijzen
-      for_completely_free_we_provide_you_with_t: Wij bieden u gratis de middelen die
-        u nodig heeft, om elke fiets die u verkoopt in Bike Index, te registreren
-        via uw POS. Het kost slechts een paar minuten om het te verwerken met uw Ascend-
-        of Lightspeed Retail-account,
       here: hier
       join_our_network_link_html: Doe mee met onze %{network_link}.
       learn_more: Leer meer
@@ -4018,6 +4013,13 @@ nl:
       curious_what_information_html: Benieuwd welke informatie wordt verzameld? Lees
         de %{security_link}.
       security_link_text: veiligheid en privacy van de integraties hier
+      automatic_registration_at_point_of_sale: Automatische registratie op het verkooppunt
+      for_free_we_provide_you_with_t: We bieden je gratis de tools die nodig zijn
+        om elke fiets die je verkoopt automatisch te registreren in Bike Index via
+        je POS. Het enige dat nodig is, is een paar minuten installatie, met je Ascend-
+        of Lightspeed Retail-account.
+      sign_up_for_free: Gratis inschrijven
+      use_ascend: Ascend gebruiken?
     for_cities:
       actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
         En doe het goedkoop.
