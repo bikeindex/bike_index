@@ -3548,7 +3548,8 @@ en:
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
         bike shop
-      ascend_retail: Ascend Retail
+      automatic_registration_at_point_of_sale: Automatic registration at point of
+        sale
       bike_index_for_bike_shops: Bike Index for Bike Shops
       bikes_before_they: >-
         Unite against bike theft and protect your customers bikes before they're even
@@ -3562,25 +3563,21 @@ en:
         Index for your customers. Other than setup, you're done! Learn more about
         the Ascend integration %{ascend_link}.
       connect_your_lightspeed_account: connect your Lightspeed account
-      curious_what_information_html: Curious what information is collected? Read the
-        %{security_link}.
+      curious_what_information_html: Curious what information is collected? Read about
+        the %{security_link}.
       do_right_by_your_customers: Do right by your customers in just 5 clicks.
       dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask
         us about %{printed_materials}.
       driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle
         registration
-      features_and_pricing: Features & Pricing
-      for_completely_free_we_provide_you_with_t: >-
-        For completely free we provide you with the tools needed to automatically
-        register each bike you sell in Bike Index through your POS. All it takes is
-        a few minutes of setup, either with your Ascend or Lightspeed Retail account.
+      for_free_we_provide_you_with_t: >-
+        For free we provide you with the tools needed to automatically register each
+        bike you sell in Bike Index through your POS. All it takes is a few minutes
+        of setup, either with your Ascend or Lightspeed Retail account.
       here: here
       join_our_network_link_html: Join our %{network_link}.
       learn_more: Learn more
       network_of_shop_partners: network of shop partners
-      once_you_do_this_link_your_account_to_you: >-
-        Once you do this, link your account to your Lightspeed or register bikes in
-        Bike Index through Ascend.
       or: or
       our_official_lightspeed_integration_provi: >-
         Our official Lightspeed integration provides entirely automated registration
@@ -3592,7 +3589,9 @@ en:
       security_link_text: security and privacy of the integrations here
       sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
         for your shop %{new_org_link}.
+      sign_up_for_free: Sign up for free
       trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
+      use_ascend: Use Ascend?
       use_lightspeed_retail: Use Lightspeed Retail?
       used_at_bike_shops_everywhere: Used at bike shops everywhere
     for_cities:

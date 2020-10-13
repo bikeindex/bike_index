@@ -13,9 +13,9 @@
   }
 }
 
-$landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcement",
-  "cities", "ambassadors-how-to", "ambassadors-current", "campus-packages",
-  "shop-packages", "cities-packages";
+$landing-page-targets: "bike_shops", "school", "community_groups",
+  "law_enforcement", "cities", "ambassadors-how-to", "ambassadors-current",
+  "campus-packages", "shop-packages", "cities-packages";
 
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
@@ -47,7 +47,6 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
   }
 }
 
-
 // Including root-landing-page because required for footer, also ambassadors
 .signup-landing-page,
 .root-landing-page {
@@ -64,7 +63,6 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
     .svgicon-body {
       fill: #fff;
     }
-
   }
 }
 
@@ -348,10 +346,17 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
     }
   }
 
-  .landing-lightspeed-logo {
-    max-width: 280px;
-    margin: (2 * $vertical-height) 0 (-1 * $vertical-height) 0;
-    display: block;
+  h3.with-landing-pos-logo {
+    margin-top: 6 * $vertical-height;
+    img {
+      max-width: 280px;
+      margin: -43px 0 0 1rem;
+      display: block;
+      float: right;
+    }
+    .landing-ascend-logo {
+      margin-top: -33px; // slightly different aspect ratio
+    }
   }
 }
 
