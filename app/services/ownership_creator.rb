@@ -23,6 +23,7 @@ class OwnershipCreator
       creator_id: creator_id,
       example: @bike.example,
       current: true,
+      is_phone: @bike.phone_registration?,
       send_email: @send_email,
       user_hidden: @user_hidden
     }

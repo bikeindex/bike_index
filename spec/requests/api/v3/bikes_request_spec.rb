@@ -71,21 +71,79 @@ RSpec.describe "Bikes API V3", type: :request do
       end
     end
 
+    context "with a phone instead of an email" do
+      let(:phone) { "1112224444" }
+      let(:phone_bike) { bike_attrs.merge(owner_email: phone, owner_email_is_phone_number: true) }
+      it "creates" do
+        expect {
+          post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+        }.to change(Bike, :count).by 1
+
+        bike_result = json_result["bike"]
+        bike = Bike.last
+        expect(bike.phone_registration?).to be_truthy
+        expect(bike.owner_email).to eq phone
+        expect(bike.phone).to eq phone
+        expect(bike.current_ownership.phone_registration?).to be_truthy
+      end
+      context "matching phone bike already registered" do
+        let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: phone_bike[:serial]) }
+        let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, creator: user, bike: bike) }
+        it "returns that bike" do
+          bike.reload
+          expect(user.authorized?(bike)).to be_truthy
+          expect(bike.phone_registration?).to be_truthy
+          expect(bike.current_ownership.phone_registration?).to be_truthy
+          expect {
+            post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+          }.to_not change(Bike, :count)
+
+          bike_result = json_result["bike"]
+          expect(bike_result["id"]).to eq bike.id
+          expect(bike_result.to_s).to_not match(phone)
+          expect(bike_result.to_s).to_not match(bike.owner_email)
+        end
+      end
+      context "matching bike for user with phone" do
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, serial_number: phone_bike[:serial]) }
+        it "returns that bike" do
+          user.update(phone: phone)
+          user.reload
+          bike.reload
+          expect(user.authorized?(bike)).to be_truthy
+          expect(bike.phone_registration?).to be_falsey
+          expect(bike.current_ownership.phone_registration?).to be_falsey
+          expect {
+            post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+          }.to_not change(Bike, :count)
+
+          bike_result = json_result["bike"]
+          expect(bike_result["id"]).to eq bike.id
+          expect(bike_result.to_s).to_not match(phone)
+          expect(bike_result.to_s).to_not match(bike.owner_email)
+        end
+      end
+    end
+
     context "given a matching pre-existing bike record" do
       context "if the POSTer is authorized to update" do
         it "does not create a new record" do
+          user_email = FactoryBot.create(:user_email, user: user, email: "something@stuff.com", confirmation_token: "fake")
+          user_email.reload
+          expect(user_email.confirmed?).to be_falsey
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
 
           expect(response.status).to eq(201)
           expect(response.status_message).to eq("Created")
-          bike1 = json_result["bike"]
+          bike1_result = json_result["bike"]
 
-          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-
-          bike2 = json_result["bike"]
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(owner_email: "something@stuff.com").to_json, headers: json_headers
+          bike2_result = json_result["bike"]
           expect(response.status).to eq(302)
           expect(response.status_message).to eq("Found")
-          expect(bike1["id"]).to eq(bike2["id"])
+          expect(bike1_result["id"]).to eq(bike2_result["id"])
+          bike = Bike.find bike1_result["id"]
+          expect(bike.owner_email).to eq bike_attrs[:owner_email]
         end
 
         it "updates the pre-existing record" do

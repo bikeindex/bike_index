@@ -34,6 +34,11 @@ RSpec.describe Ownership, type: :model do
       ownership = FactoryBot.build_stubbed(:ownership, owner_email: "name+two@email.com")
       expect(ownership).to be_valid
     end
+
+    it "allows phone" do
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "7654321111", is_phone: true)
+      expect(ownership).to be_valid
+    end
   end
 
   describe "mark_claimed" do

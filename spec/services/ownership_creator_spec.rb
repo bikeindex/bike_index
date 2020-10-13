@@ -49,6 +49,7 @@ RSpec.describe OwnershipCreator do
       bike.update_attribute :hidden, true
       ownership_creator = OwnershipCreator.new(bike: bike)
       expect(ownership_creator.current_is_hidden).to be_truthy
+      expect(ownership.phone_registration?).to be_falsey
     end
     it "returns false" do
       bike = Bike.new
@@ -58,13 +59,13 @@ RSpec.describe OwnershipCreator do
   end
 
   describe "add_errors_to_bike" do
-    xit "adds the errors to the bike" do
+    it "adds the errors to the bike" do
       ownership = Ownership.new
       bike = Bike.new
       ownership.errors.add(:problem, "BALLZ")
       creator = OwnershipCreator.new(bike: bike)
       creator.add_errors_to_bike(ownership)
-      expect(bike.errors.messages[:problem]).to eq("BALLZ")
+      expect(bike.errors.messages[:problem]).to eq(["BALLZ"])
     end
   end
 
@@ -82,6 +83,18 @@ RSpec.describe OwnershipCreator do
       allow(ownership_creator).to receive(:new_ownership_params).and_return(new_params)
       expect(ownership_creator).to receive(:add_errors_to_bike).and_return(true)
       expect { ownership_creator.create_ownership }.to raise_error(OwnershipNotSavedError)
+    end
+  end
+
+  describe "phone registration" do
+    let(:bike) { FactoryBot.create(:bike, :phone_registration) }
+    let(:ownership_creator) { OwnershipCreator.new(bike: bike, send_email: false) }
+    it "adds as a phone registration" do
+      expect(bike.phone).to be_present
+      ownership = ownership_creator.create_ownership
+      expect(ownership.calculated_send_email).to be_falsey
+      expect(ownership.phone_registration?).to be_truthy
+      expect(ownership.owner_email).to eq bike.phone
     end
   end
 end

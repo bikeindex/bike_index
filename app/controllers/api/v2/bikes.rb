@@ -121,6 +121,7 @@ module API
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
+          optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
@@ -134,7 +135,8 @@ module API
           # Search for a bike matching the provided serial number / owner email
           found_bike = BikeFinder.find_matching(
             serial: params[:serial],
-            owner_email: params[:owner_email],
+            owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
+            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil
           )
 
           # if a matching bike is and can be updated by the submitter, update
@@ -152,8 +154,10 @@ module API
             end
 
             begin
+              # Don't update the email (or is_phone), because maybe they have different user emails
+              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))
               BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: b_param.params)
+                .new(user: current_user, bike: @bike, b_params: bike_update_params)
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
@@ -165,7 +169,6 @@ module API
 
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
-          b_param.clean_params
           b_param.save
 
           bike = BikeCreator.new(b_param).create_bike
@@ -229,10 +232,9 @@ module API
         }
         params do
           requires :id, type: Integer, desc: "Bike ID"
-          requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
+          requires :file, type: Rack::Multipart::UploadedFile, desc: "Attachment."
         end
         post ":id/image", serializer: PublicImageSerializer, root: "image" do
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
           public_image = PublicImage.new(imageable: @bike, image: params[:file])

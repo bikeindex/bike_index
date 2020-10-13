@@ -5,7 +5,8 @@ class Ownership < ApplicationRecord
   validates_presence_of :creator_id
   validates_presence_of :bike_id
   validates :owner_email,
-    format: {with: /\A.+@.+\..+\z/, message: "invalid format"}
+    format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
+    unless: :phone_registration?
 
   belongs_to :bike, touch: true
   belongs_to :user, touch: true
@@ -31,6 +32,10 @@ class Ownership < ApplicationRecord
     creator_id == user_id
   end
 
+  def phone_registration?
+    is_phone
+  end
+
   def owner
     if claimed? && user.present?
       user
@@ -48,8 +53,8 @@ class Ownership < ApplicationRecord
     save
   end
 
-  def claimable_by?(u)
-    u == User.fuzzy_email_find(owner_email) || u == user
+  def claimable_by?(passed_user)
+    passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
   end
 
   def organization

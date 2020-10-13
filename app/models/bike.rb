@@ -90,6 +90,7 @@ class Bike < ApplicationRecord
   scope :non_stolen, -> { where(stolen: false) }
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
+  scope :unorganized, -> { where(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :non_abandoned, -> { where(abandoned: false) }
@@ -481,7 +482,12 @@ class Bike < ApplicationRecord
     contact_owner_user? ? owner_email : creator&.email
   end
 
+  def phone_registration?
+    is_phone
+  end
+
   def phone
+    return owner_email if phone_registration?
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone

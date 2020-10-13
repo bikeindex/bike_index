@@ -25,6 +25,9 @@ class BParam < ApplicationRecord
     # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
     h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
+    if h["bike"].key?("owner_email_is_phone_number")
+      h["bike"]["is_phone"] = ParamsNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
+    end
     org = Organization.friendly_find(h["bike"].delete("organization_slug"))
     h["bike"]["creation_organization_id"] = org.id if org.present?
     # Move un-nested params outside of bike
