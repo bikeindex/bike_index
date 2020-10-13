@@ -3570,7 +3570,6 @@ en:
         us about %{printed_materials}.
       driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle
         registration
-      features_and_pricing: Features & Pricing
       for_free_we_provide_you_with_t: >-
         For free we provide you with the tools needed to automatically register each
         bike you sell in Bike Index through your POS. All it takes is a few minutes
@@ -3579,9 +3578,6 @@ en:
       join_our_network_link_html: Join our %{network_link}.
       learn_more: Learn more
       network_of_shop_partners: network of shop partners
-      once_you_do_this_link_your_account_to_you: >-
-        Once you do this, link your account to your Lightspeed or register bikes in
-        Bike Index through Ascend.
       or: or
       our_official_lightspeed_integration_provi: >-
         Our official Lightspeed integration provides entirely automated registration
