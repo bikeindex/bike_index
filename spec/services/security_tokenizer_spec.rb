@@ -13,7 +13,6 @@ RSpec.describe SecurityTokenizer do
   describe "new_password_token" do
     let(:token) { SecurityTokenizer.new_password_token }
     it "is slightly shorter" do
-      pp token
       expect(token.length).to be < 72 # Max password length
       expect(token).to match("-")
       expect(SecurityTokenizer.token_time(token)).to be > (Time.current - 2)
