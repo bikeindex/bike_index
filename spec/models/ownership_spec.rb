@@ -6,6 +6,7 @@ RSpec.describe Ownership, type: :model do
       ownership = Ownership.new(owner_email: "   SomE@dd.com ")
       ownership.set_calculated_attributes
       expect(ownership.owner_email).to eq("some@dd.com")
+      expect(ownership.claimed?).to be_falsey
       expect(ownership.token).to be_present
     end
   end
@@ -55,8 +56,6 @@ RSpec.describe Ownership, type: :model do
       let!(:ownership) { FactoryBot.create(:ownership_claimed, claimed_at: claimed_at) }
       it "is claimed" do
         expect(ownership.claimed?).to be_truthy
-        expect(ownership.self_made?).to be_truthy
-        expect(ownership.token).to be_blank
         ownership.mark_claimed
         ownership.reload
         expect(ownership.claimed?).to be_truthy

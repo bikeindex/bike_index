@@ -29,7 +29,7 @@ class Ownership < ApplicationRecord
   end
 
   def self_made?
-    creator_id == user_id
+    creator_id.present? && creator_id == user_id
   end
 
   def phone_registration?
@@ -49,7 +49,9 @@ class Ownership < ApplicationRecord
   def mark_claimed
     self.claimed = true
     u = User.fuzzy_email_find(owner_email)
-    self.user_id ||= u.id if u.present?
+    return false unless u.present?
+    self.user_id ||= u.id
+    self.token = nil
     save
   end
 
