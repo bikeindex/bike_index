@@ -16,13 +16,13 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       user.reload
       expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
       Sidekiq::Worker.clear_all
-      Sidekiq::Testing.inline! {
+      Sidekiq::Testing.inline! do
         expect {
           instance.perform(user.id)
           user.update(phone: phone)
           user.update(phone: nil)
         }.to change(UserPhone, :count).by 1
-      }
+      end
       user_phone = UserPhone.last
       expect(user_phone.user_id).to eq user.id
       expect(user_phone.confirmed?).to be_falsey

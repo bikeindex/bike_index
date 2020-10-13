@@ -7,7 +7,7 @@ class SecurityTokenizer
   end
 
   # Passwords have to be less than 72 characters. Lazy hack
-  def self.new_password_token(time = nil)
+  def self.new_short_token(time = nil)
     new_token(time).slice(12, 50)
   end
 

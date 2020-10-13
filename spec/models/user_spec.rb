@@ -303,7 +303,7 @@ RSpec.describe User, type: :model do
 
   describe "updating phone" do
     let(:user) { FactoryBot.create(:user, phone: " ") }
-    before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") }}
+    before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") } }
     it "updates general alerts without background processing" do
       user.reload
       expect(user.general_alerts).to be_blank
@@ -316,11 +316,11 @@ RSpec.describe User, type: :model do
       expect(user.user_phones.count).to eq 0
       expect(user.phone).to be_blank
       Sidekiq::Worker.clear_all
-      Sidekiq::Testing.inline! {
+      Sidekiq::Testing.inline! do
         expect {
           user.update(phone: "6669996666")
         }.to change(Notification, :count).by 1
-      }
+      end
       user.reload
       expect(user.phone).to eq "6669996666"
       expect(user.user_phones.count).to eq 1
@@ -333,11 +333,11 @@ RSpec.describe User, type: :model do
       expect(user_phone.notifications.last.twilio_sid).to eq "party"
 
       # And it adds a new phone if updated again
-      Sidekiq::Testing.inline! {
+      Sidekiq::Testing.inline! do
         expect {
           user.update(phone: "9996669999")
         }.to change(Notification, :count).by 1
-      }
+      end
       user.reload
       expect(user.phone).to eq "9996669999"
       expect(user.user_phones.count).to eq 2
