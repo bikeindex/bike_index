@@ -76,6 +76,7 @@ class Ownership < ApplicationRecord
     if id.blank? # Some things to set only on create
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
+      self.token ||= SecurityTokenizer.new_short_token
     end
     self.claimed_at ||= Time.current if claimed?
   end

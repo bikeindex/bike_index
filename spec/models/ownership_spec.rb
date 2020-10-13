@@ -6,6 +6,7 @@ RSpec.describe Ownership, type: :model do
       ownership = Ownership.new(owner_email: "   SomE@dd.com ")
       ownership.set_calculated_attributes
       expect(ownership.owner_email).to eq("some@dd.com")
+      expect(ownership.token).to be_present
     end
   end
 

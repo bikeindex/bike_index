@@ -7,12 +7,13 @@ class SecurityTokenizer
   end
 
   # Passwords have to be less than 72 characters. Lazy hack
-  def self.new_short_token(time = nil)
-    new_token(time).slice(12, 50)
+  def self.new_short_token
+    new_token.split("-")[1].slice(2, 21)
   end
 
   def self.token_time(str)
-    t = str.to_s.split("-")[0]
+    t, toke = str.to_s.split("-")
+    return nil unless t.present? && toke.present?
     t = t.present? && t.to_i > EARLIEST_TOKEN_TIME ? t.to_i : EARLIEST_TOKEN_TIME
     Time.at(t)
   end

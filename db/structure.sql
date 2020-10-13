@@ -2147,7 +2147,8 @@ CREATE TABLE public.ownerships (
     user_hidden boolean DEFAULT false NOT NULL,
     impound_record_id bigint,
     claimed_at timestamp without time zone,
-    is_phone boolean DEFAULT false
+    is_phone boolean DEFAULT false,
+    token text
 );
 
 
@@ -5439,6 +5440,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200925175027'),
 ('20201008202006'),
 ('20201008204248'),
-('20201009210429');
+('20201009210429'),
+('20201013204925');
 
 
