@@ -13,37 +13,32 @@
 
     .ribbon.mobile-contact-link
       .container
-        %h2
-          = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
-            = t(".features_and_pricing")
-            %span.chevron &raquo;
+        %h2= link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
 
   .container
     .row.main-body-row
       .landing-why-col
         %h3= t(".register_bikes_for_your_customers")
         %p
-          = t(".for_completely_free_we_provide_you_with_t")
-
-        %p
           = t(".build_goodwill_with_your_customers_with_a")
-
         %p
           - network_link = link_to t(".network_of_shop_partners"), where_path
           = t(".join_our_network_link_html", network_link: network_link)
           - new_org_link = link_to t(".here"), new_organization_path
           = t(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
-          = t(".once_you_do_this_link_your_account_to_you")
+
+        %h3= t(".automatic_registration_at_point_of_sale")
+        %p
+          = t(".for_free_we_provide_you_with_t")
 
         %p
           - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
           = t(".curious_what_information_html", security_link: security_link)
 
 
-          = image_tag "ascend-logo.png", class: "landing-lightspeed-logo", alt: "Ascend logo"
-          = image_tag "lightspeed_logo.png", class: "landing-lightspeed-logo", alt: "Lightspeed logo"
-
-        %h3= t(".use_lightspeed_retail")
+        %h3.with-landing-pos-logo
+          = image_tag "lightspeed_logo.png", class: "", alt: "Lightspeed logo"
+          = t(".use_lightspeed_retail")
         %p= t(".our_official_lightspeed_integration_provi")
 
         %p
@@ -51,7 +46,9 @@
           = t(".or")
           = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path(organization_id: passive_organization&.id)
 
-        %h3= t(".ascend_retail")
+        %h3.with-landing-pos-logo
+          = image_tag "ascend-logo.png", class: "landing-ascend-logo", alt: "Ascend logo"
+          = t(".use_ascend")
 
         %p
           - ascend_link = link_to t(".here"), ascend_path
@@ -78,9 +75,7 @@
         .next-steps-wrap
           %header
             = t(".used_at_bike_shops_everywhere")
-            = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
-              = t(".features_and_pricing")
-              %span.chevron &raquo;
+            = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
           .trusted-by
             .header= t(".trusted_by_bike_shops_everywhere")
             = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
