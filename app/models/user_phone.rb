@@ -67,8 +67,7 @@ class UserPhone < ApplicationRecord
   def confirm!
     return true if confirmed?
     result = update(confirmed_at: Time.current)
-    # Bump user to reset the general_alerts
-    user.update(updated_at: Time.current, skip_update: false)
+    AfterPhoneConfirmedWorker.perform_async(id)
     result
   end
 
