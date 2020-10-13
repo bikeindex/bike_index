@@ -486,7 +486,7 @@ class Bike < ApplicationRecord
   end
 
   def phone
-    return owner_email
+    return owner_email if phone_registration?
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
