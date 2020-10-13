@@ -44,12 +44,12 @@ RSpec.describe Ownership, type: :model do
   end
 
   describe "mark_claimed" do
-    it "associates with a user" do
+    it "doesn't update if user isn't present" do
       ownership = FactoryBot.create(:ownership)
       ownership.mark_claimed
-      expect(ownership.claimed?).to be_truthy
-      expect(ownership.claimed_at).to be_within(1).of Time.current
-      expect(ownership.token).to be_blank
+      ownership.reload
+      expect(ownership.claimed?).to be_falsey
+      expect(ownership.claimed_at).to be_blank
     end
     context "factory ownership_claimed" do
       let(:claimed_at) { Time.current - 2.weeks }

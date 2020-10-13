@@ -47,9 +47,9 @@ class Ownership < ApplicationRecord
   end
 
   def mark_claimed
-    self.claimed = true
     u = User.fuzzy_email_find(owner_email)
     return false unless u.present?
+    self.claimed = true
     self.user_id ||= u.id
     self.token = nil
     save
