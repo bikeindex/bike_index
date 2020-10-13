@@ -90,6 +90,13 @@ class Ownership < ApplicationRecord
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
   end
 
+  def create_user_registration_for_phone_registration!(user)
+    return true unless phone_registration? && current
+    update(claimed: true, user_id: user.id)
+    bike.update(owner_email: user.email, is_phone: false)
+    bike.ownerships.create(send_email: false, owner_email: user.email, creator_id: user.id)
+  end
+
   private
 
   def spam_risky_email?

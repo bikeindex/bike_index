@@ -19,6 +19,8 @@ RSpec.describe UserPhonesController, type: :request do
   context "with user present" do
     include_context :request_spec_logged_in_as_user
     let!(:user_phone) { FactoryBot.create(:user_phone, user: current_user, confirmation_code: "6666666", phone: phone) }
+    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone) }
+    let!(:ownership) { FactoryBot.create(:ownership, is_phone: true, owner_email: phone, bike: bike) }
     it "resends if reasonable and verifies" do
       expect(current_user).to be_present
       user_phone.update_column :updated_at, Time.current - 5.minutes
@@ -26,6 +28,8 @@ RSpec.describe UserPhonesController, type: :request do
       expect(user_phone.confirmed?).to be_falsey
       expect(user_phone.confirmation_code).to eq "6666666"
       expect(user_phone.resend_confirmation?).to be_truthy
+      bike.reload
+      expect(bike.ownerships.count).to eq 1
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! {
         VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
@@ -58,6 +62,11 @@ RSpec.describe UserPhonesController, type: :request do
         user_phone.reload
         expect(user_phone.confirmed?).to be_truthy
         expect(user_phone.confirmed_at).to be_within(5).of Time.current
+
+        bike.reload
+        expect(bike.ownerships.count).to eq 2
+        expect(bike.current_ownership.user).to eq current_user
+        expect(bike.phone_registration?).to be_falsey
       }
     end
 
