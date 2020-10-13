@@ -121,11 +121,11 @@ module API
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
+          optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
-          optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs
@@ -135,7 +135,7 @@ module API
           # Search for a bike matching the provided serial number / owner email
           found_bike = BikeFinder.find_matching(
             serial: params[:serial],
-            owner_email: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
+            owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil
           )
 
@@ -167,7 +167,6 @@ module API
 
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
-          b_param.clean_params
           b_param.save
 
           bike = BikeCreator.new(b_param).create_bike

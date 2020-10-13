@@ -11,7 +11,8 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration
-    render_finished_registration(Bike.find)
+    unclaimed_unorganized_bikes = Bike.unorganized.left_joins(:ownerships).where(ownerships: {claimed: false})
+    render_finished_registration(unclaimed_unorganized_bikes)
   end
 
   def finished_registration_organization
