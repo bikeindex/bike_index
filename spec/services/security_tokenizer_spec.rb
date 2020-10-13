@@ -24,7 +24,7 @@ RSpec.describe SecurityTokenizer do
     let(:token) { SecurityTokenizer.new_short_token }
     it "is short" do
       expect(token.length).to_not match("-")
-      expect(SecurityTokenizer.token_time(token)).to eq SecurityTokenizer::EARLIEST_TOKEN_TIME
+      expect(SecurityTokenizer.token_time(token)).to eq Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME)
       expect(token.length).to be < 30
     end
   end
