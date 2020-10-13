@@ -154,8 +154,10 @@ module API
             end
 
             begin
+              # Don't update the email (or is_phone), because maybe they have different user emails
+              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))
               BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: b_param.params)
+                .new(user: current_user, bike: @bike, b_params: bike_update_params)
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
@@ -230,10 +232,9 @@ module API
         }
         params do
           requires :id, type: Integer, desc: "Bike ID"
-          requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
+          requires :file, type: Rack::Multipart::UploadedFile, desc: "Attachment."
         end
         post ":id/image", serializer: PublicImageSerializer, root: "image" do
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
           public_image = PublicImage.new(imageable: @bike, image: params[:file])
