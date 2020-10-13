@@ -67,7 +67,7 @@ class UserPhone < ApplicationRecord
   def confirm!
     return true if confirmed?
     result = update(confirmed_at: Time.current)
-    MergePhoneWorker.perform_async(id)
+    AfterPhoneConfirmedWorker.perform_async(id)
     result
   end
 

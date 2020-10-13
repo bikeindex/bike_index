@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MergePhoneWorker, type: :job do
+RSpec.describe AfterPhoneConfirmedWorker, type: :job do
   let(:subject) { described_class }
   let(:instance) { subject.new }
 

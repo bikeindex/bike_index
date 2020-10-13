@@ -1,4 +1,4 @@
-class MergePhoneWorker < ApplicationWorker
+class AfterPhoneConfirmedWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   def perform(user_phone_id)
