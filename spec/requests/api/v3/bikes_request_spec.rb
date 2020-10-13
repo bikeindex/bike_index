@@ -85,6 +85,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.owner_email).to eq phone
         expect(bike.phone).to eq phone
         expect(bike.current_ownership.phone_registration?).to be_truthy
+        expect(bike.current_ownership.calculated_send_email).to be_falsey
       end
       context "matching phone bike already registered" do
         let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: phone_bike[:serial]) }

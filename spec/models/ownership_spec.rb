@@ -48,12 +48,15 @@ RSpec.describe Ownership, type: :model do
       ownership.mark_claimed
       expect(ownership.claimed?).to be_truthy
       expect(ownership.claimed_at).to be_within(1).of Time.current
+      expect(ownership.token).to be_blank
     end
     context "factory ownership_claimed" do
       let(:claimed_at) { Time.current - 2.weeks }
       let!(:ownership) { FactoryBot.create(:ownership_claimed, claimed_at: claimed_at) }
       it "is claimed" do
         expect(ownership.claimed?).to be_truthy
+        expect(ownership.self_made?).to be_truthy
+        expect(ownership.token).to be_blank
         ownership.mark_claimed
         ownership.reload
         expect(ownership.claimed?).to be_truthy
