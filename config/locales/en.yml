@@ -3562,8 +3562,8 @@ en:
         Index for your customers. Other than setup, you're done! Learn more about
         the Ascend integration %{ascend_link}.
       connect_your_lightspeed_account: connect your Lightspeed account
-      curious_what_information_html: Curious what information is collected? Read the
-        %{security_link}.
+      curious_what_information_html: Curious what information is collected? Read about
+        the %{security_link}.
       do_right_by_your_customers: Do right by your customers in just 5 clicks.
       dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask
         us about %{printed_materials}.
