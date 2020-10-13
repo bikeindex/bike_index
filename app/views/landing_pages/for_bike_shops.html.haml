@@ -36,7 +36,7 @@
           = t(".curious_what_information_html", security_link: security_link)
 
 
-        %h3.with-landing-pos-logo
+        %h3.clearfix.with-landing-pos-logo
           = image_tag "lightspeed_logo.png", class: "", alt: "Lightspeed logo"
           = t(".use_lightspeed_retail")
         %p= t(".our_official_lightspeed_integration_provi")
@@ -46,7 +46,7 @@
           = t(".or")
           = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path(organization_id: passive_organization&.id)
 
-        %h3.with-landing-pos-logo
+        %h3.clearfix.with-landing-pos-logo
           = image_tag "ascend-logo.png", class: "landing-ascend-logo", alt: "Ascend logo"
           = t(".use_ascend")
 

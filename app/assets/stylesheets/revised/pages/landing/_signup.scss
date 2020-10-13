@@ -347,15 +347,15 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
   }
 
   h3.with-landing-pos-logo {
-    margin-top: 4 * $vertical-height;
+    margin-top: 6 * $vertical-height;
     img {
       max-width: 280px;
-      margin: -2rem 0 0 1rem;
-      display: inline-block;
+      margin: -43px 0 0 1rem;
+      display: block;
       float: right;
     }
     .landing-ascend-logo {
-      margin-top: -1rem; // slightly different aspect ratio
+      margin-top: -33px; // slightly different aspect ratio
     }
   }
 }
