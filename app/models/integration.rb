@@ -41,7 +41,7 @@ class Integration < ApplicationRecord
   end
 
   def create_user(email:, name:)
-    password = SecurityTokenizer.new_short_token
+    password = SecurityTokenizer.new_password_token
     i_user = User.new(email: email,
                       name: name,
                       password: password,
