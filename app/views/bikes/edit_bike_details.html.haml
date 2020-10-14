@@ -53,7 +53,7 @@
                 = t(".frame_size")
               .form-well-input
                 .ordinal-sizes.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
-                  - %w(xs s m l xl).each do |size|
+                  - %w(xxs xs s m l xl xxl).each do |size|
                     - active = (@bike.frame_size == size)
                     %label.btn.btn-secondary{ class: ('active' if active), data: { size: size } }
                       %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }

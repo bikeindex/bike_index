@@ -27,7 +27,7 @@ RSpec.describe BikesController, type: :request do
     context "organized user and bike" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:organization2) { FactoryBot.create(:organization) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, organization: organization, can_edit_claimed: false)}
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, organization: organization, can_edit_claimed: false) }
       let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization2) }
       it "includes passive organization, even when redirected from sticker from other org" do
