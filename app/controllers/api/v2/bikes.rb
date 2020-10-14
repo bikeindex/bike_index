@@ -80,6 +80,19 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
+        # Search for a bike matching the provided serial number / owner email
+        def find_owned_bike
+          BikeFinder.find_matching(serial: params[:serial],
+            owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
+            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
+        end
+
+        def created_bike_serialized(bike, include_claim_token)
+          serialized = BikeV2ShowSerializer.new(bike, root: false)
+          claim_url = serialized.url + (include_claim_token ? "?t=#{bike.current_ownership.token}" : "")
+          { bike: serialized, claim_url: claim_url }
+        end
+
         def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_and_claim_for_user(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
@@ -93,6 +106,30 @@ module API
         end
         get ":id", serializer: BikeV2ShowSerializer, root: "bike" do
           find_bike
+        end
+
+        desc "Check if a bike is already registered", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
+          notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
+        }
+        params do
+          requires :serial, type: String, desc: "The serial number for the bike"
+          requires :manufacturer, type: String, desc: "Manufacturer name or ID"
+          # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
+          requires :owner_email, type: String, desc: "Owner email"
+          optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
+          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
+          requires :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
+          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          use :bike_attrs
+        end
+        post "check_if_registered" do
+          organization = Organization.friendly_find(params[:organization_slug])
+          if organization.present? && current_user.authorized?(organization)
+            { registered: find_owned_bike.present? }
+          else
+            error!("You are not authorized for that organization", 401)
+          end
         end
 
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
@@ -124,21 +161,15 @@ module API
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
-          optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
+          optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs
           end
         end
-        post "/", serializer: BikeV2ShowSerializer, root: "bike" do
-          # Search for a bike matching the provided serial number / owner email
-          found_bike = BikeFinder.find_matching(
-            serial: params[:serial],
-            owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
-            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil
-          )
-
+        post "/" do
+          found_bike = find_owned_bike
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
@@ -164,7 +195,7 @@ module API
             end
 
             status :found
-            return @bike.reload
+            return created_bike_serialized(@bike.reload, false)
           end
 
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
@@ -174,7 +205,7 @@ module API
           bike = BikeCreator.new(b_param).create_bike
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-            bike
+            created_bike_serialized(bike, true)
           else
             e = bike.present? ? bike.errors : b_param.errors
             error!(e.full_messages.to_sentence, 401)

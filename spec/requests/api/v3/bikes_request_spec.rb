@@ -26,6 +26,44 @@ RSpec.describe "Bikes API V3", type: :request do
     end
   end
 
+  describe "check_if_registered" do
+    let(:bike_attrs) do
+      {
+        organization_slug: organization.id,
+        serial: "69 non-example",
+        manufacturer: manufacturer.name,
+        rear_tire_narrow: "true",
+        rear_wheel_bsd: "559",
+        color: color.name,
+        year: "1969",
+        owner_email: phone,
+        frame_material: "steel",
+        owner_email_is_phone_number: true
+      }
+    end
+    let(:phone) { "2221114444" }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_attrs[:serial]) }
+    let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
+    let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes read_organization_membership") }
+    it "returns 401" do
+      post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+      expect(response.code).to eq("401")
+    end
+    context "user is organization member" do
+      let(:user) { FactoryBot.create(:organization_member) }
+      let!(:organization) { user.organizations.first }
+      it "returns success" do
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect(json_result[:registered].to_s).to eq "true"
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.merge(serial: "ffff").to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect(json_result[:registered].to_s).to eq "false"
+      end
+    end
+  end
+
   describe "create" do
     let(:bike_attrs) do
       {
@@ -78,9 +116,11 @@ RSpec.describe "Bikes API V3", type: :request do
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
         }.to change(Bike, :count).by 1
+        expect(json_result[:claim_url]).to match(/t=/)
 
         bike_result = json_result["bike"]
         bike = Bike.last
+        expect(bike_result[:id]).to eq bike.id
         expect(bike.phone_registration?).to be_truthy
         expect(bike.owner_email).to eq phone
         expect(bike.phone).to eq phone
@@ -98,6 +138,8 @@ RSpec.describe "Bikes API V3", type: :request do
           expect {
             post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
           }.to_not change(Bike, :count)
+          expect(json_result[:claim_url]).to be_present
+          expect(json_result[:claim_url]).to_not match(/t=/)
 
           bike_result = json_result["bike"]
           expect(bike_result["id"]).to eq bike.id
