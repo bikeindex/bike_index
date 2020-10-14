@@ -12,7 +12,7 @@
             Created
         - unless skip_bike
           %th Bike
-        %th Creator
+        %th User
         %th
           - if render_sortable
             = sortable "theft_alert_plan_id", "Plan"
@@ -47,7 +47,7 @@
               - if theft_alert.bike.present?
                 = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
           %td
-            = link_to theft_alert.creator.display_name, edit_admin_user_path(theft_alert.creator.to_param)
+            = link_to theft_alert.user.display_name, edit_admin_user_path(theft_alert.user.to_param)
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small

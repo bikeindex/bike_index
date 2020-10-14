@@ -44,7 +44,7 @@ class AdminMailer < ApplicationMailer
   def theft_alert_notification(theft_alert, notification_type: :purchased)
     @theft_alert = theft_alert
     @theft_alert_plan = theft_alert.theft_alert_plan
-    @creator = theft_alert.creator
+    @user = theft_alert.user
     @bike = theft_alert.bike
     if notification_type == :recovered
       @recovered = true
