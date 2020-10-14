@@ -7567,6 +7567,16 @@ p {
   transition: transform 200ms linear;
 }
 
+// We're not doing headroom correctly, so just remove it for now
+@media (max-width: 600px) {
+  body.swagger-section {
+    padding-top: 0;
+    #header {
+      position: relative;
+    }
+  }
+}
+
 #header.headroom--pinned {
   -webkit-transform: translate(0, 0%);
   -ms-transform: translate(0, 0%);
