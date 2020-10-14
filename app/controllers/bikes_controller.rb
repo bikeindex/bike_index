@@ -34,8 +34,10 @@ class BikesController < ApplicationController
     end
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
-      # If there was an organization_id passed, and the user isn't authorized for that org, set the passive organization to be something they can access
-      set_passive_organization(current_user.default_organization) if passive_organization.blank? && current_user&.default_organization.present?
+    end
+    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
+    if params[:organization_id].present? && passive_organization.blank? && current_user&.default_organization.present?
+      set_passive_organization(current_user.default_organization)
     end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
