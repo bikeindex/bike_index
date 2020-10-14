@@ -48,8 +48,8 @@ RSpec.describe Ownership, type: :model do
       ownership = FactoryBot.create(:ownership)
       ownership.mark_claimed
       ownership.reload
-      expect(ownership.claimed?).to be_falsey
-      expect(ownership.claimed_at).to be_blank
+      expect(ownership.claimed?).to be_truthy
+      expect(ownership.claimed_at).to be_present
     end
     context "factory ownership_claimed" do
       let(:claimed_at) { Time.current - 2.weeks }
