@@ -116,9 +116,11 @@ RSpec.describe "Bikes API V3", type: :request do
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
         }.to change(Bike, :count).by 1
+        expect(json_result[:claim_url]).to match(/t=/)
 
         bike_result = json_result["bike"]
         bike = Bike.last
+        expect(bike_result[:id]).to eq bike.id
         expect(bike.phone_registration?).to be_truthy
         expect(bike.owner_email).to eq phone
         expect(bike.phone).to eq phone
@@ -136,6 +138,8 @@ RSpec.describe "Bikes API V3", type: :request do
           expect {
             post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
           }.to_not change(Bike, :count)
+          expect(json_result[:claim_url]).to be_present
+          expect(json_result[:claim_url]).to_not match(/t=/)
 
           bike_result = json_result["bike"]
           expect(bike_result["id"]).to eq bike.id

@@ -87,6 +87,12 @@ module API
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
         end
 
+        def created_bike_serialized(bike, include_claim_token)
+          serialized = BikeV2ShowSerializer.new(bike, root: false)
+          claim_url = serialized.url + (include_claim_token ? "?t=#{bike.current_ownership.token}" : "")
+          { bike: serialized, claim_url: claim_url }
+        end
+
         def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_and_claim_for_user(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
@@ -162,7 +168,7 @@ module API
             use :components_attrs
           end
         end
-        post "/", serializer: BikeV2ShowSerializer, root: "bike" do
+        post "/" do
           found_bike = find_owned_bike
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
@@ -189,7 +195,7 @@ module API
             end
 
             status :found
-            return @bike.reload
+            return created_bike_serialized(@bike.reload, false)
           end
 
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
@@ -199,7 +205,7 @@ module API
           bike = BikeCreator.new(b_param).create_bike
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-            bike
+            created_bike_serialized(bike, true)
           else
             e = bike.present? ? bike.errors : b_param.errors
             error!(e.full_messages.to_sentence, 401)
