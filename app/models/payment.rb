@@ -14,7 +14,10 @@ class Payment < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :invoice
+
   has_one :theft_alert
+
+  has_many :notifications, as: :notifiable
 
   validate :email_or_organization_present
   validates :currency, presence: true
@@ -59,7 +62,7 @@ class Payment < ApplicationRecord
   end
 
   def send_invoice_email
-    EmailInvoiceWorker.perform_async(id) if payment_method == "stripe"
+    EmailReceiptWorker.perform_async(id) if payment_method == "stripe"
   end
 
   def email_or_organization_present

@@ -2,18 +2,18 @@ FactoryBot.define do
   factory :theft_alert do
     stolen_record { create(:stolen_record) }
     theft_alert_plan { FactoryBot.create(:theft_alert_plan) }
-    creator { FactoryBot.create(:user_confirmed) }
+    user { FactoryBot.create(:user_confirmed) }
     status { "pending" }
     notes { nil }
 
     trait :paid do
-      payment { FactoryBot.create(:payment, user: creator) }
+      payment { FactoryBot.create(:payment, user: user) }
     end
 
     trait :begun do
       status { "active" }
       sequence(:facebook_post_url) do |n|
-        "https://facebook.com/user.#{creator.id}/posts/#{n}"
+        "https://facebook.com/user.#{user.id}/posts/#{n}"
       end
       begin_at { Time.current }
       end_at { begin_at + theft_alert_plan.duration_days.days }

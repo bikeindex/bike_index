@@ -214,7 +214,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         expect(stolen_record.can_share_recovery).to be_truthy
       end
       context "with a promoted alert" do
-        let!(:theft_alert) { FactoryBot.create(:theft_alert_ended, stolen_record: stolen_record, creator: user) }
+        let!(:theft_alert) { FactoryBot.create(:theft_alert_ended, stolen_record: stolen_record, user: user) }
         it "sends an email to admins" do
           expect(theft_alert.active?).to be_falsey
           bike.reload

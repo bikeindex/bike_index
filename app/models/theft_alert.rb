@@ -4,7 +4,7 @@ class TheftAlert < ApplicationRecord
 
   validates :theft_alert_plan,
     :status,
-    :creator,
+    :user_id,
     presence: true
 
   validate :alert_cannot_begin_in_past_or_after_ends
@@ -12,11 +12,10 @@ class TheftAlert < ApplicationRecord
   belongs_to :stolen_record
   belongs_to :theft_alert_plan
   belongs_to :payment
-  belongs_to :creator,
-    class_name: "User",
-    foreign_key: :user_id
+  belongs_to :user
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
+  scope :paid, -> { where.not(payment_id: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
   delegate :duration_days, to: :theft_alert_plan

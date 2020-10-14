@@ -6,7 +6,7 @@ class TheftAlertsController < ApplicationController
     theft_alert = TheftAlert.create!(
       stolen_record: @bike.current_stolen_record,
       theft_alert_plan: theft_alert_plan,
-      creator: current_user
+      user: current_user
     )
 
     payment = TheftAlertPaymentCreator.create!(

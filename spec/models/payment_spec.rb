@@ -9,7 +9,7 @@ RSpec.describe Payment, type: :model do
       it "enqueues an email job, associates the user" do
         expect {
           payment
-        }.to change(EmailInvoiceWorker.jobs, :size).by(1)
+        }.to change(EmailReceiptWorker.jobs, :size).by(1)
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
@@ -21,7 +21,7 @@ RSpec.describe Payment, type: :model do
       it "does not enqueue an email" do
         expect {
           payment # it is created here
-        }.to_not change(EmailInvoiceWorker.jobs, :size)
+        }.to_not change(EmailReceiptWorker.jobs, :size)
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present

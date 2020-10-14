@@ -1,0 +1,18 @@
+- skip_have_fun ||= false
+
+- unless skip_have_fun
+  - week_or_weekend = [5, 6].include?(Time.current.wday) ? "weekend" : "week"
+  %p
+    Have a good #{week_or_weekend}. I hope you have a chance to get out and ride!
+
+%p{ style: "color: #888; margin-top: 2rem;" }
+  Lily Williams
+  %br
+  Communications Director
+  %br
+  BikeIndex.org
+%p
+  Share Bike Index with your friends:
+  = link_to "Facebook", "https://bit.ly/36ju29N"
+  \&
+  = link_to "Twitter", "https://bit.ly/2XbInAW"

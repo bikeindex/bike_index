@@ -19,7 +19,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:old_user) { FactoryBot.create(:user_confirmed, email: email) }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, creator: old_user) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
 
       let(:organization) { membership.organization }
       let(:membership) { FactoryBot.create(:membership_claimed, user: old_user) }
