@@ -24,6 +24,37 @@ RSpec.describe BikesController, type: :request do
         }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
+    context "organized user and bike" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:organization2) { FactoryBot.create(:organization) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, organization: organization, can_edit_claimed: false)}
+      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization2) }
+      it "includes passive organization, even when redirected from sticker from other org" do
+        current_user.reload
+        expect(current_user.organizations.count).to eq 1
+        expect(current_user.authorized?(bike)).to be_falsey
+        expect(current_user.authorized?(bike_sticker)).to be_falsey
+        get "#{base_url}/#{bike.id}"
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:passive_organization)&.id).to eq organization.id
+        expect(assigns(:passive_organization_registered)).to be_truthy
+        expect(assigns(:passive_organization_authorized)).to be_falsey
+        expect(response).to render_template(:show)
+        expect(response).to render_template("_organized_access_panel")
+        # Scanning sticker should redirect to bike path
+        get "#{base_url}/scanned/#{bike_sticker.code}/?organization_id=#{organization2.slug}"
+        expect(response).to redirect_to(bike_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.to_param))
+        # ... test the response that is redirects
+        get "#{base_url}/#{bike.to_param}?scanned_id=#{bike_sticker.code}&organization_id=#{organization2.to_param}"
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:passive_organization)&.id).to eq organization.id
+        expect(assigns(:passive_organization_registered)).to be_truthy
+        expect(assigns(:passive_organization_authorized)).to be_falsey
+        expect(response).to render_template(:show)
+        expect(response).to render_template("_organized_access_panel")
+      end
+    end
     context "user hidden bike" do
       before { bike.update_attributes(marked_user_hidden: "true") }
       context "owner of bike viewing" do
@@ -82,6 +113,8 @@ RSpec.describe BikesController, type: :request do
             expect(response.status).to eq(200)
             expect(response).to render_template(:show)
             expect(assigns(:bike).id).to eq bike.id
+            expect(assigns(:passive_organization_registered)).to be_truthy
+            expect(assigns(:passive_organization_authorized)).to be_truthy
             expect(flash).to_not be_present
           end
         end

@@ -32,13 +32,15 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
+    if params[:scanned_id].present?
+      @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
+      # If there was an organization_id passed, and the user isn't authorized for that org, set the passive organization to be something they can access
+      set_passive_organization(current_user.default_organization) if passive_organization.blank? && current_user&.default_organization.present?
+    end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
     @bike = @bike.decorate
-    if params[:scanned_id].present?
-      @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
-    end
     find_token
     respond_to do |format|
       format.html { render :show }
