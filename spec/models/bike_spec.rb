@@ -375,12 +375,27 @@ RSpec.describe Bike, type: :model do
     end
     context "ordinal letter" do
       let(:frame_size) { "M" }
+      before { bike.clean_frame_size }
       it "is cool with ordinal sizing" do
-        bike.clean_frame_size
         expect(bike.frame_size).to eq("m")
         expect(bike.frame_size_unit).to eq("ordinal")
       end
+      context "XXS" do
+        let(:frame_size) { "xXs" }
+        it "is cool with it" do
+          expect(bike.frame_size).to eq("xxs")
+          expect(bike.frame_size_unit).to eq("ordinal")
+        end
+      end
+      context "XXL" do
+        let(:frame_size) { "XXL" }
+        it "is cool with it" do
+          expect(bike.frame_size).to eq("xxl")
+          expect(bike.frame_size_unit).to eq("ordinal")
+        end
+      end
     end
+
     context "ordinal string" do
       let(:frame_size) { "Med" }
       it "is sets on save" do
