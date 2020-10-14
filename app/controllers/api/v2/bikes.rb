@@ -94,6 +94,14 @@ module API
       end
 
       resource :bikes do
+        desc "View bike with a given ID"
+        params do
+          requires :id, type: Integer, desc: "Bike id"
+        end
+        get ":id", serializer: BikeV2ShowSerializer, root: "bike" do
+          find_bike
+        end
+
         desc "Check if a bike is already registered", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
@@ -109,21 +117,13 @@ module API
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
           use :bike_attrs
         end
-        post "check_already_registered" do
+        post "check_if_registered" do
           organization = Organization.friendly_find(params[:organization_slug])
           if organization.present? && current_user.authorized?(organization)
-            { already_registered: find_owned_bike.present? }
+            { registered: find_owned_bike.present? }
           else
             error!("You are not authorized for that organization", 401)
           end
-        end
-
-        desc "View bike with a given ID"
-        params do
-          requires :id, type: Integer, desc: "Bike id"
-        end
-        get ":id", serializer: BikeV2ShowSerializer, root: "bike" do
-          find_bike
         end
 
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {

@@ -26,7 +26,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
   end
 
-  describe "check_already_registered" do
+  describe "check_if_registered" do
     let(:bike_attrs) do
       {
         organization_slug: organization.id,
@@ -47,19 +47,19 @@ RSpec.describe "Bikes API V3", type: :request do
     let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes read_organization_membership") }
     it "returns 401" do
-      post "/api/v3/bikes/check_already_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+      post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
       expect(response.code).to eq("401")
     end
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
       it "returns success" do
-        post "/api/v3/bikes/check_already_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result[:already_registered].to_s).to eq "true"
-        post "/api/v3/bikes/check_already_registered?access_token=#{token.token}", params: bike_attrs.merge(serial: "ffff").to_json, headers: json_headers
+        expect(json_result[:registered].to_s).to eq "true"
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.merge(serial: "ffff").to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result[:already_registered].to_s).to eq "false"
+        expect(json_result[:registered].to_s).to eq "false"
       end
     end
   end
