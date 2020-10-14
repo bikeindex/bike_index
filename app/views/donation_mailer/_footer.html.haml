@@ -1,3 +1,11 @@
+- skip_chance_to_ride ||= false
+- week_or_weekend = [5, 6].include?(Time.current.wday) ? "weekend" : "week"
+
+%p
+  Have a good #{week_or_weekend}.
+  - unless skip_chance_to_ride
+    I hope you have a chance to get out and ride!
+
 %p{ style: "color: #888; margin-top: 2rem;" }
   Lily Williams
   %br
