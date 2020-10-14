@@ -32,6 +32,11 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
+    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
+    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
+    if params[:organization_id].present? && passive_organization.blank? && current_user&.default_organization.present?
+      set_passive_organization(current_user.default_organization)
+    end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
