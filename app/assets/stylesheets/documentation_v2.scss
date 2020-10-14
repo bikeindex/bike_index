@@ -7697,6 +7697,10 @@ p {
   }
 }
 
+#swagger-ui-container {
+  max-width: 100%; // override bs
+}
+
 .swagger-ui-wrap .operations .content > ul {
   list-style-type: square;
 }
