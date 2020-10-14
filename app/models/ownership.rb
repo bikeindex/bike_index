@@ -29,7 +29,7 @@ class Ownership < ApplicationRecord
   end
 
   def self_made?
-    creator_id == user_id
+    creator_id.present? && creator_id == user_id
   end
 
   def phone_registration?
@@ -48,6 +48,7 @@ class Ownership < ApplicationRecord
 
   def mark_claimed
     self.claimed = true
+    self.token = nil
     u = User.fuzzy_email_find(owner_email)
     self.user_id ||= u.id if u.present?
     save
@@ -65,7 +66,8 @@ class Ownership < ApplicationRecord
   end
 
   def calculated_send_email
-    return false if !send_email || bike.blank? || bike.example? || spam_risky_email?
+    return false if !send_email || bike.blank? || phone_registration? || bike.example?
+    return false if spam_risky_email?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     return true unless organization.present?
     !organization.enabled?("skip_ownership_email")
@@ -76,7 +78,7 @@ class Ownership < ApplicationRecord
     if id.blank? # Some things to set only on create
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
-      self.token ||= SecurityTokenizer.new_short_token
+      self.token ||= SecurityTokenizer.new_short_token unless claimed?
     end
     self.claimed_at ||= Time.current if claimed?
   end
