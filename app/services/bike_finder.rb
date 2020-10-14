@@ -17,7 +17,7 @@ module BikeFinder
     phone = Phonifyer.phonify(phone)
 
     candidate_user_ids = find_matching_user_ids(email, phone)
-    bikes = Bike.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
+    Bike.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
       .where("bikes.serial_normalized @@ ?", SerialNormalizer.new(serial: serial).normalized) # @@ is used in BikeSearchable, replicated here
       .where(
         "bikes.owner_email = ? OR bikes.owner_email = ? OR ownerships.owner_email = ? OR ownerships.owner_email = ? OR ownerships.user_id IN (?) OR ownerships.creator_id IN (?)",

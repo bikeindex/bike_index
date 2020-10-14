@@ -120,8 +120,8 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
       expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
       body = mail.body.encoded
-      expect(body).to include(theft_alert.creator.name)
-      expect(body).to include(theft_alert.creator.email)
+      expect(body).to include(theft_alert.user.name)
+      expect(body).to include(theft_alert.user.email)
       expect(body).to include(theft_alert.theft_alert_plan.name)
       expect(body).to include(theft_alert.bike.title_string)
       expect(body).to include("payments/#{theft_alert.payment.id}/edit")
@@ -136,8 +136,8 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
         expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
         body = mail.body.encoded
-        expect(body).to include(theft_alert.creator.name)
-        expect(body).to include(theft_alert.creator.email)
+        expect(body).to include(theft_alert.user.name)
+        expect(body).to include(theft_alert.user.email)
         expect(body).to include(theft_alert.theft_alert_plan.name)
         expect(body).to include(theft_alert.bike.title_string)
         expect(body).to include("Payment Failed")

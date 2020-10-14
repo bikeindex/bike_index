@@ -202,7 +202,7 @@ class BikesController < ApplicationController
           .theft_alerts
           .includes(:theft_alert_plan)
           .creation_ordered_desc
-          .where(creator: current_user)
+          .where(user: current_user)
           .references(:theft_alert_plan)
     end
 
