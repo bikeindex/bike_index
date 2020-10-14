@@ -32,9 +32,6 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
-    if params[:scanned_id].present?
-      @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
-    end
     # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
     # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
     if params[:organization_id].present? && passive_organization.blank? && current_user&.default_organization.present?
@@ -44,6 +41,9 @@ class BikesController < ApplicationController
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
     @bike = @bike.decorate
+    if params[:scanned_id].present?
+      @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
+    end
     find_token
     respond_to do |format|
       format.html { render :show }
