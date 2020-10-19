@@ -41,7 +41,7 @@
                 = t(".stolen_at")
               = l stolen_record.date_stolen, format: :dotted
 
-          - if @bike.current_ownership.new_registration? && @bike.pos?
+          - if @bike.current_ownership&.new_registration? && @bike.pos?
             %li
               %em.less-strong
                 = t(".color_may_be_incorrect")
