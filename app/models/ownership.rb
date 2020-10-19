@@ -103,7 +103,9 @@ class Ownership < ApplicationRecord
 
   def prior_ownerships
     return Ownership.none unless bike.present?
-    bike.ownerships.where("id < ?", id).reorder(:id)
+    ownerships = bike.ownerships
+    ownerships = ownerships.where("id < ?", id) if id.present?
+    ownerships.reorder(:id)
   end
 
   def send_notification_and_update_other_ownerships

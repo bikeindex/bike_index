@@ -52,8 +52,14 @@ RSpec.describe Ownership, type: :model do
       context "transfer from organization to new user" do
         let(:membership) { FactoryBot.create(:membership, organization: organization) }
         let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: membership.invited_email) }
-        let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
+        let(:ownership2) { FactoryBot.build(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
         it "returns new_registration" do
+          # Before save, still works
+          expect(ownership2.current).to be_truthy
+          expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
+          expect(ownership2.first?).to be_falsey
+          expect(ownership2.second?).to be_truthy
+          ownership2.save
           ownership2.reload
           ownership1.reload
           expect(ownership1.current?).to be_falsey

@@ -86,7 +86,7 @@ module Organized
       @ownership = @bike.current_ownership
       @user = @ownership.owner
       @vars = {
-        new_bike: (@bike.ownerships.count == 1),
+        new_bike: (@ownership.new_registration?,
         email: @ownership.owner_email,
         new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
         registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)

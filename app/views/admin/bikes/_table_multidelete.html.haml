@@ -36,7 +36,7 @@
         %td.d-none.d-sm-table-cell
           .less-strong-hold
             = bike.creation_organization.name if bike.creation_organization.present?
-            - if bike.registered_new
+            - if bike.pos?
               %span.less-strong-right
                 pos
         %td.d-none.d-lg-table-cell

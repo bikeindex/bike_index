@@ -32,7 +32,7 @@
 
   = t(".text.bike_date", date: l(stolen_record.date_stolen, format: :dotted))
 
-- if (@bike.ownerships.count == 1 && @bike.registered_new)
+- if @bike.current_ownership.new_registration? && @bike.pos?
   = t(".text.color_may_be_incorrect")
   = "\n"
 
