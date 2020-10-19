@@ -7,7 +7,8 @@
     = javascript_pack_tag "application_standalone"
     = stylesheet_pack_tag "application_css"
     - if params[:hide_dev].present?
-      <style>.only-dev-visible { display: none; }</style>
+      -# TODO: tie this to the current instance of rack-mini-profiler - so that pp=disabled effects this as well
+      <style>.only-dev-visible { display: none !important; }</style>
 
   / manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
