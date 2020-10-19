@@ -49,7 +49,11 @@ class Tweet < ApplicationRecord
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
     if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
-      return includes(:stolen_record).where(stolen_records: {bike_id: text})
+      if text.to_i > 2147483647 # max rails integer, assume it's a twitter_id instead
+        return where("twitter_id ILIKE ?", "%#{text}%")
+      else
+        return includes(:stolen_record).where(stolen_records: {bike_id: text})
+      end
     end
     where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
   end

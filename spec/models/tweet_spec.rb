@@ -27,7 +27,8 @@ RSpec.describe Tweet, type: :model do
 
   describe "admin_search" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
-    let!(:tweet) { FactoryBot.create(:tweet, stolen_record_id: bike.current_stolen_record.id) }
+    let(:twitter_id) { "067802552792796306" }
+    let!(:tweet) { FactoryBot.create(:tweet, stolen_record_id: bike.current_stolen_record.id, twitter_id: twitter_id) }
     it "finds the tweet" do
       expect(tweet.kind).to eq "stolen_tweet"
       expect(Tweet.admin_search("@PPBBIKETHEF").pluck(:id)).to eq([tweet.id])
@@ -35,6 +36,9 @@ RSpec.describe Tweet, type: :model do
       expect(Tweet.admin_search("119680 ").pluck(:id)).to eq([])
       expect(Tweet.admin_search(" #{bike.id}").pluck(:id)).to eq([tweet.id])
       expect(Tweet.admin_search("something else").pluck(:id)).to eq([])
+      # Ensure passing a tweet id finds the tweet, and passing most of a tweet id finds the tweet too!
+      expect(Tweet.admin_search(twitter_id).pluck(:id)).to eq([tweet.id])
+      expect(Tweet.admin_search(twitter_id.slice(0, twitter_id.length - 1)).pluck(:id)).to eq([tweet.id])
     end
   end
 
