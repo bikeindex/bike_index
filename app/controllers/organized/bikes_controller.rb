@@ -138,7 +138,7 @@ module Organized
         bikes = if @search_claimedness == "initial"
           bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
         else
-          bikes.joins(:ownerships).where(ownerships: {current: true}).where.not(ownerships: {previous_ownership_id: nil})
+          bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
         end
       else
         @search_claimedness = "all"

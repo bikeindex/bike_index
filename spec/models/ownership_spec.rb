@@ -92,7 +92,7 @@ RSpec.describe Ownership, type: :model do
       it "returns new_registration" do
         expect(ownership.claimed?).to be_falsey
         expect(ownership.new_registration?).to be_truthy
-        expect(ownership.claim_message).to eq "new_registration"
+        expect(ownership.claim_message).to be_blank
       end
     end
   end

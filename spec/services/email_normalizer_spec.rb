@@ -13,4 +13,16 @@ RSpec.describe EmailNormalizer do
       end
     end
   end
+
+  describe "obfuscate" do
+    it "removes some stuff" do
+      expect(EmailNormalizer.obfuscate("seth@example.com")).to eq "se**@e********om"
+    end
+    it "doesn't remove things if there aren't enough characters" do
+      expect(EmailNormalizer.obfuscate("s@e.com")).to eq "s@e**om" # good enough
+    end
+    it "removes subdomains" do
+      expect(EmailNormalizer.obfuscate("s*th@example.stuff.com")).to eq "s***@e**************om"
+    end
+  end
 end

@@ -1,0 +1,28 @@
+- signed_in_user ||= nil
+- ownership = bike.current_ownership
+
+%p
+  - if ownership.organization.display_avatar?
+    = image_tag ownership.organization.avatar.url(:medium), class: "claim-message-org-avatar"
+  %strong
+    - if ownership.organization.present?
+      = ownership.organization.name
+    - elsif ownership.creator.name.present?
+      = ownership.creator.name
+    - else
+      = EmailNormalizer.obfuscate(ownership.creator.email)
+  registered your #{bike.type} on Bike Index, a free, non-profit, bike registry and stolen bike recovery platform.
+
+%p
+  Bike Index is a public resource for registering bikes. We've reunited over
+  %strong
+    = as_currency(Counts.recoveries_value)
+  in stolen bicycles to date. We're privacy-centric and sit in the background unless you need us.
+
+%p
+  If your #{bike.type} is stolen we supercharge the odds your #{bike.type} returns to you with law enforcement connections, pawnshop databases, social media alerts, and our community.
+
+%p
+  To see your #{bike.type} and claim it as your own,
+  = link_to "sign up", new_user_path
+  with the email address where you received your registration email. Add photos and details of the #{bike.type} to show what makes your ride yours. Hopefully, your #{bike.type} won’t be stolen, but if it is, we'll be here when you need us most.

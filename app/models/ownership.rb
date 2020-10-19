@@ -85,7 +85,7 @@ class Ownership < ApplicationRecord
   end
 
   def claim_message
-    return nil if claimed? || !current?
+    return nil if claimed? || !current? || user.present?
     new_registration? ? "new_registration" : "transferred_registration"
   end
 
