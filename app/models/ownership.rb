@@ -32,6 +32,10 @@ class Ownership < ApplicationRecord
     creator_id.present? && creator_id == user_id
   end
 
+  def new_registration?
+
+  end
+
   def phone_registration?
     is_phone
   end
@@ -65,6 +69,11 @@ class Ownership < ApplicationRecord
     impound_record&.organization
   end
 
+  def claim_message
+    return nil if claimed? || user.present?
+    new_registration? ? "new_registration" : "transferred_registration"
+  end
+
   def calculated_send_email
     return false if !send_email || bike.blank? || phone_registration? || bike.example?
     return false if spam_risky_email?
@@ -83,10 +92,13 @@ class Ownership < ApplicationRecord
     self.claimed_at ||= Time.current if claimed?
   end
 
+  def prior_memberships
+    return Ownership.none unless bike.present?
+    bike.ownerships.where("id < ?", id)
+  end
+
   def send_notification_and_update_other_ownerships
-    if bike.present?
-      bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
-    end
+    prior_memberships.current.each { |o| o.update(current: false) }
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)

@@ -14,7 +14,7 @@ RSpec.describe BikesController, type: :request do
         get "#{base_url}/#{bike.id}"
         expect(response).to render_template(:show)
         expect(assigns(:bike).id).to eq bike.id
-        expect(assigns(:enable_rack_profiler)).to be_falsey
+        expect(assigns(:display_dev_info?)).to be_falsey
       end
     end
     context "admin hidden (fake delete)" do

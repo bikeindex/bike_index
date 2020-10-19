@@ -11,6 +11,64 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "claim_message" do
+    let(:email) { "joe@example.com" }
+    let(:ownership) { Ownership.new }
+    it "returns new_registration" do
+      expect(ownership.new_registration?).to be_truthy
+      expect(ownership.claim_message).to eq "new_registration"
+    end
+    context "transfered ownership" do
+      let(:bike) { FactoryBot.create(:bike, owner_email: email) }
+      let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
+      let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
+      it "returns transfered_ownership" do
+        expect(ownership2.prior_memberships.pluck(:id)).to eq([ownership1.id])
+        expect(ownership2.new_registration?).to be_falsey
+        expect(ownership2.claim_message).to eq "transferred_registration"
+      end
+    end
+    context "organization" do
+      let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, owner_email: email) }
+      let(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
+      it "returns new_registration" do
+        ownership.reload
+        expect(ownership.organization).to eq organization
+        expect(ownership.user).to be_blank
+        expect(ownership.new_registration?).to be_truthy
+        expect(ownership.claim_message).to eq "new_registration"
+      end
+      context "transfer from organization to new user" do
+        let(:membership) { FactoryBot.create(:membership, organization: organization) }
+        let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: membership.invited_email) }
+        let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
+        it "returns new_registration" do
+          bike.reload
+          expect(ownership1.organization).to eq organization
+          expect(ownership2.organization).to eq organization
+          expect(ownership2.prior_memberships.pluck(:id)).to eq([ownership1.id])
+          # Registrations that were initially from an organization member, then transfered outside of the organization,
+          # count as "new" - because some organizations pre-register bikes
+          expect(ownership2.new_registration?).to be_truthy
+          expect(ownership2.claim_message).to eq "new_registration"
+        end
+      end
+    end
+    context "claimed" do
+      let(:ownership) { Ownership.new(claimed: true) }
+      it "returns nil" do
+        expect(ownership.claim_message).to be_blank
+      end
+    end
+    context "existing user" do
+      let(:ownership) { Ownership.new(user: User.new(confirmed: true)) }
+      it "returns nil" do
+        expect(ownership.claim_message).to be_blank
+      end
+    end
+  end
+
   describe "validate owner_email format" do
     it "disallows owner_emails without an @ sign" do
       ownership = FactoryBot.build_stubbed(:ownership, owner_email: "n/a")
