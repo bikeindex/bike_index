@@ -12,6 +12,7 @@ class Ownership < ApplicationRecord
   belongs_to :user, touch: true
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
+  belongs_to :previous_ownership, class_name: "Ownership"
 
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
@@ -38,6 +39,9 @@ class Ownership < ApplicationRecord
 
   def new_registration?
     return true if first?
+    # If this was first registered to an organization and is now being transfered
+    # (either because it was pre-registered or an unregistered impounded bike)
+    # it counts as a new registration
     second? && organization.present?
   end
 
@@ -97,6 +101,7 @@ class Ownership < ApplicationRecord
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
+      self.previous_ownership_id = prior_ownerships.pluck(:id).last
     end
     self.claimed_at ||= Time.current if claimed?
   end

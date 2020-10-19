@@ -2147,7 +2147,8 @@ CREATE TABLE public.ownerships (
     impound_record_id bigint,
     claimed_at timestamp without time zone,
     is_phone boolean DEFAULT false,
-    token text
+    token text,
+    previous_ownership_id bigint
 );
 
 

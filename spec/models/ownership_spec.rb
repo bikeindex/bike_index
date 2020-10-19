@@ -29,12 +29,14 @@ RSpec.describe Ownership, type: :model do
         expect(ownership1.claim_message).to be_blank
         expect(ownership1.organization&.id).to eq bike.organizations.first.id
         expect(ownership1.first?).to be_truthy
+        expect(ownership1.previous_ownership_id).to be_blank
         expect(ownership2.current?).to be_truthy
         expect(ownership2.first?).to be_falsey
         expect(ownership2.second?).to be_truthy
         expect(ownership2.organization&.id).to be_blank
         expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
         expect(ownership2.new_registration?).to be_falsey
+        expect(ownership2.previous_ownership_id).to eq ownership1.id
         expect(ownership2.claim_message).to eq "transferred_registration"
       end
     end
@@ -65,11 +67,13 @@ RSpec.describe Ownership, type: :model do
           expect(ownership1.current?).to be_falsey
           expect(ownership1.organization&.id).to eq organization.id
           expect(ownership1.first?).to be_truthy
+          expect(ownership1.previous_ownership_id).to be_blank
           expect(ownership2.current?).to be_truthy
           expect(ownership2.first?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.organization&.id).to eq organization.id
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
+          expect(ownership2.previous_ownership_id).to eq ownership1.id
           # Registrations that were initially from an organization member, then transfered outside of the organization,
           # count as "new" - because some organizations pre-register bikes
           expect(ownership2.new_registration?).to be_truthy

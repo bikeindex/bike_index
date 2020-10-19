@@ -65,17 +65,21 @@ RSpec.describe BikesController, type: :request do
         get "#{base_url}/#{bike.id}?t=#{ownership.token}"
         expect(response).to render_template(:show)
         expect(assigns(:bike).id).to eq bike.id
-        expect(assigns(:claim_message)).to be_blank "new_registration"
+        expect(assigns(:claim_message)).to eq "new_registration"
         bike.reload
         expect(bike.current_ownership.claimed?).to be_falsey
         expect(bike.current_ownership.current?).to be_truthy
       end
       context "ownership claimed" do
+        let(:ownership) { FactoryBot.create(:ownership_claimed) }
+        let(:current_user) { ownership.user }
         it "no claim_message" do
+          bike.reload
+          expect(bike.current_ownership.claimed).to be_truthy
           get "#{base_url}/#{bike.id}?t=#{ownership.token}"
           expect(response).to render_template(:show)
           expect(assigns(:bike).id).to eq bike.id
-          expect(assigns(:claim_message)).to eq "new_registration"
+          expect(assigns(:claim_message)).to be_blank
         end
       end
     end
