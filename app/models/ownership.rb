@@ -71,7 +71,7 @@ class Ownership < ApplicationRecord
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
     # Some organizations pre-register bikes and then transfer them. Handle that
-    if second? && creator.member_of?(bike.creation_organization)
+    if second? && creator&.member_of?(bike.creation_organization)
       return bike.creation_organization
     end
     # Otherwise, this is only an organization ownership if it's an impound transfer
@@ -79,7 +79,7 @@ class Ownership < ApplicationRecord
   end
 
   def claim_message
-    return nil if claimed? || user.present?
+    return nil if claimed? || !current?
     new_registration? ? "new_registration" : "transferred_registration"
   end
 

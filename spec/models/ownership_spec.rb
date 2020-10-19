@@ -13,7 +13,7 @@ RSpec.describe Ownership, type: :model do
 
   describe "claim_message" do
     let(:email) { "joe@example.com" }
-    let(:ownership) { Ownership.new }
+    let(:ownership) { Ownership.new(current: true) }
     it "returns new_registration" do
       expect(ownership.new_registration?).to be_truthy
       expect(ownership.claim_message).to eq "new_registration"
@@ -26,6 +26,7 @@ RSpec.describe Ownership, type: :model do
         ownership2.reload
         ownership1.reload
         expect(ownership1.current?).to be_falsey
+        expect(ownership1.claim_message).to be_blank
         expect(ownership1.organization&.id).to eq bike.organizations.first.id
         expect(ownership1.first?).to be_truthy
         expect(ownership2.current?).to be_truthy
@@ -71,15 +72,17 @@ RSpec.describe Ownership, type: :model do
       end
     end
     context "claimed" do
-      let(:ownership) { Ownership.new(claimed: true) }
+      let(:ownership) { Ownership.new(current: true, claimed: true) }
       it "returns nil" do
         expect(ownership.claim_message).to be_blank
       end
     end
     context "existing user" do
-      let(:ownership) { Ownership.new(user: User.new(confirmed: true)) }
-      it "returns nil" do
-        expect(ownership.claim_message).to be_blank
+      let(:ownership) { Ownership.new(current: true, user: User.new(confirmed: true)) }
+      it "returns new_registration" do
+        expect(ownership.claimed?).to be_falsey
+        expect(ownership.new_registration?).to be_truthy
+        expect(ownership.claim_message).to eq "new_registration"
       end
     end
   end

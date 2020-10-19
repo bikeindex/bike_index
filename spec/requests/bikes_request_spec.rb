@@ -15,6 +15,7 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:show)
         expect(assigns(:bike).id).to eq bike.id
         expect(assigns(:display_dev_info?)).to be_falsey
+        expect(assigns(:claim_message)).to be_blank
       end
     end
     context "admin hidden (fake delete)" do
@@ -23,6 +24,59 @@ RSpec.describe BikesController, type: :request do
         expect {
           get "#{base_url}/#{bike.id}"
         }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+    context "second ownership, from organization, with claim token" do
+      let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, owner_email: "new_user@stuff.com", creator: organization.auto_user) }
+      let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
+      let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
+      let(:current_user) { nil }
+      it "renders claim_message" do
+        ownership2.reload
+        expect(ownership2.second?).to be_truthy
+        expect(ownership2.current?).to be_truthy
+        expect(ownership2.claimed?).to be_falsey
+        expect(ownership2.claim_message).to eq "new_registration"
+        get "#{base_url}/#{bike.id}?t=#{ownership2.token}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:claim_message)).to eq "new_registration"
+      end
+    end
+    context "with creator logged in & claim token" do
+      it "renders claim_message" do
+        expect(bike.claimable_by?(current_user)).to be_falsey
+        expect(current_user.authorized?(bike)).to be_truthy
+        get "#{base_url}/#{bike.id}?t=#{ownership.token}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:claim_message)).to eq "new_registration"
+      end
+    end
+    context "with user and claim token" do
+      let!(:current_user) { FactoryBot.create(:user_confirmed, email: ownership.owner_email) }
+      it "renders claim_message" do
+        bike.reload
+        expect(bike.current_ownership.claim_message).to eq "new_registration"
+        expect(bike.current_ownership.claimed?).to be_falsey
+        expect(bike.current_ownership.current?).to be_truthy
+        expect(bike.claimable_by?(current_user)).to be_truthy
+        get "#{base_url}/#{bike.id}?t=#{ownership.token}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:claim_message)).to be_blank "new_registration"
+        bike.reload
+        expect(bike.current_ownership.claimed?).to be_falsey
+        expect(bike.current_ownership.current?).to be_truthy
+      end
+      context "ownership claimed" do
+        it "no claim_message" do
+          get "#{base_url}/#{bike.id}?t=#{ownership.token}"
+          expect(response).to render_template(:show)
+          expect(assigns(:bike).id).to eq bike.id
+          expect(assigns(:claim_message)).to eq "new_registration"
+        end
       end
     end
     context "organized user and bike" do
@@ -151,7 +205,6 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
-
     describe "graduated_notification_remaining param" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
       let!(:bike) { graduated_notification.bike }
@@ -222,7 +275,6 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
-
     describe "parking_notification_retrieved param" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
       let(:creator) { parking_notification.user }

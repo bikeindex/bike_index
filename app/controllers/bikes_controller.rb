@@ -400,6 +400,11 @@ class BikesController < ApplicationController
   end
 
   def find_token
+    # First, deal with claim_token
+    if params[:t].present? && @bike.current_ownership.token == params[:t]
+      @claim_message = @bike.current_ownership&.claim_message
+    end
+    # Then deal with parking notification and graduated notification tokens
     @token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence
     return false if @token.blank?
     if params[:parking_notification_retrieved].present?
