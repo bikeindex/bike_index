@@ -68,7 +68,7 @@
                     #{current_organization.short_name} (<em>#{retrieved_notification.retrieved_by.display_name}</em>)
                   - else
                     the user
-                  - if current_user.developer?
+                  - if display_dev_info?
                     %br
                     %small.only-dev-visible
                       %span.less-strong developer info:

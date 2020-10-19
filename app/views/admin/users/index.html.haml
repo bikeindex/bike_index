@@ -2,7 +2,7 @@
   .col-5
     %h1
       Manage
-    - if current_user.developer?
+    - if display_dev_info?
       %em.less-strong.only-dev-visible
         current_user ##{current_user.id}
   .col-7

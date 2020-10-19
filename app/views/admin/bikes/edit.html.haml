@@ -206,14 +206,14 @@
           %td
             %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
               = l ownership.created_at, format: :convert_time
-            - if current_user.developer?
+            - if display_dev_info?
               %small.less-strong.only-dev-visible
                 = ownership.id
           %td
             - creator = ownership.creator
             - if creator.blank?
               %em.text-warning user deleted
-              - if current_user.developer
+              - if display_dev_info?
                 %span.only-dev-visible
                   \##{ownership.creator_id}
             - elsif creator.name.present?

@@ -3,8 +3,6 @@
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
 
-- unless current_user.developer? && params[:hide_dev].blank?
-  <style>.bikeTable .only-dev-visible { display: none !important; }</style>
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header

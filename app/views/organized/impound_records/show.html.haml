@@ -22,7 +22,7 @@
           %td ID
           %td
             %strong= @impound_record.display_id
-            - if current_user.developer?
+            - if display_dev_info?
               %small.only-dev-visible.ml-2
                 %em.less-strong real id:
                 %code

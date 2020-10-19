@@ -8,7 +8,7 @@
         = link_to "organization's view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
       %li.nav-item
         = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
-      - if current_user.developer?
+      - if display_dev_info?
         %li.nav-item.only-dev-visible
           = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
 
@@ -22,11 +22,11 @@
 .row
   .col-md-6
     %table.table-list
-      - if current_user.developer?
-        %tr.small
-          %td.only-dev-visible
+      - if display_dev_info?
+        %tr.small.only-dev-visible
+          %td
             ID
-          %td.only-dev-visible
+          %td
             = @organization.id
       %tr
         %td
@@ -86,7 +86,7 @@
           Auto user email
         %td
           = @organization.auto_user.email if @organization.auto_user.present?
-      - if current_user.developer?
+      - if display_dev_info?
         %tr.small
           %td.only-dev-visible
             API V1 token
@@ -146,7 +146,7 @@
           - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
             = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
 
-          - if current_user.developer? && @organization.manual_pos_kind.present?
+          - if display_dev_info? && @organization.manual_pos_kind.present?
             %br
             %small.only-dev-visible
               %em.less-strong manual POS kind set:

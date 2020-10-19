@@ -39,7 +39,7 @@
         = f.label :slug, "Slug:"
         %p.less-strong
           = @organization.slug
-  - if current_user.developer?
+  - if display_dev_info?
     .col-6.col-lg-3.only-dev-visible
       .form-group
         = f.label :previous_slug do
@@ -92,7 +92,7 @@
       = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
       %em.small To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization
   .col-md-6
-    - if current_user.developer?
+    - if display_dev_info?
       .mt-4.only-dev-visible.mb-4
         %label.less-strong.d-block
           Manually set POS kind
