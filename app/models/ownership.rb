@@ -21,7 +21,11 @@ class Ownership < ApplicationRecord
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?
-    bike&.ownerships&.reorder(:created_at)&.first&.id == id
+    prior_ownerships.blank?
+  end
+
+  def second?
+    prior_ownerships.count == 1
   end
 
   def claimed?
@@ -33,7 +37,8 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-
+    return true if first?
+    second? && organization.present?
   end
 
   def phone_registration?
@@ -65,6 +70,10 @@ class Ownership < ApplicationRecord
   def organization
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
+    # Some organizations pre-register bikes and then transfer them. Handle that
+    if second? && creator.member_of?(bike.creation_organization)
+      return bike.creation_organization
+    end
     # Otherwise, this is only an organization ownership if it's an impound transfer
     impound_record&.organization
   end
@@ -92,13 +101,13 @@ class Ownership < ApplicationRecord
     self.claimed_at ||= Time.current if claimed?
   end
 
-  def prior_memberships
+  def prior_ownerships
     return Ownership.none unless bike.present?
-    bike.ownerships.where("id < ?", id)
+    bike.ownerships.where("id < ?", id).reorder(:id)
   end
 
   def send_notification_and_update_other_ownerships
-    prior_memberships.current.each { |o| o.update(current: false) }
+    prior_ownerships.current.each { |o| o.update(current: false) }
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
