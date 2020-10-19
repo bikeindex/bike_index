@@ -19,7 +19,7 @@
               %a.btn.btn-secondary.active{ data: { amount: @initial_amount * 100 } }
                 #{ @initial_amount }$
           - else
-            - numbers = [15, 25, 50, 100, 200, 300, 500]
+            - numbers = [3, 15, 25, 50, 100, 200, 500]
             - numbers.each do |amount|
               %li.col-xs-4
                 %a.btn.btn-secondary{ data: { amount: amount * 100 } }
@@ -53,3 +53,5 @@
     = hidden_field_tag :stripe_currency, default_currency
     = hidden_field_tag :stripe_email
     = hidden_field_tag :is_payment, @is_payment
+
+<script>ga("send", {hitType: "event", eventCategory: "donation-form", eventAction: "form-load", eventLabel: "donation_page"});</script>
