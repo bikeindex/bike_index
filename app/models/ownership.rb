@@ -12,7 +12,7 @@ class Ownership < ApplicationRecord
   belongs_to :user, touch: true
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
-  belongs_to :previous_ownership, class_name: "Ownership"
+  belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
@@ -22,7 +22,7 @@ class Ownership < ApplicationRecord
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?
-    prior_ownerships.blank?
+    prior_ownerships.blank? # TODO: switch after migration to previous_ownership_id.present?
   end
 
   def second?
