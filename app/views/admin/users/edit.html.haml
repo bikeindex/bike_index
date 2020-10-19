@@ -4,8 +4,8 @@
       %small
         Editing
       = @user.display_name
-      - if current_user.developer?
-        %em.small.less-strong
+      - if display_dev_info?
+        %em.small.less-strong.only-dev-visible
           id: #{@user.id}
     %table.table-list
       %tbody
@@ -250,8 +250,8 @@
           = f.check_box :superuser, class: "form-check-input"
           = f.label :superuser, class: "form-check-label"
       .form-group
-        - if current_user.developer?
-          .form-check.form-check-inline
+        - if display_dev_info?
+          .form-check.form-check-inline.only-dev-visible
             = f.check_box :developer, class: "form-check-input"
             = f.label :developer, class: "form-check-label"
     .col-6

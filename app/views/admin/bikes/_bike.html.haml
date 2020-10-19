@@ -24,10 +24,10 @@
           = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
         %table.table-list.mb-0
           %tbody
-            - if current_user.developer?
-              %tr.small
-                %td.only-dev-visible ID
-                %td.only-dev-visible
+            - if display_dev_info?
+              %tr.small.only-dev-visible
+                %td ID
+                %td
                   %code= bike.id
                   %small.ml-2
                     status:
@@ -45,7 +45,7 @@
                 = bike.frame_colors.to_sentence
                 - if bike.render_paint_description?
                   %small.less-strong= bike.paint_description
-                - elsif bike.paint.present? && current_user.developer
+                - elsif bike.paint.present? && display_dev_info?
                   %small.only-dev-visible= bike.paint_description
             %tr
               %td
@@ -149,7 +149,7 @@
                     \{
                     = reg_address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                     \}
-                    - if current_user.developer?
+                    - if display_dev_info?
                       %small.only-dev-visible.ml-2
                         %em
                           source:
@@ -178,10 +178,10 @@
       .col-md-6
         %table.table-list
           %tbody
-            - if current_user.developer?
-              %tr.small
-                %td.only-dev-visible ID
-                %td.only-dev-visible
+            - if display_dev_info?
+              %tr.small.only-dev-visible
+                %td ID
+                %td
                   %code= stolen_record.id
             %tr
               %td

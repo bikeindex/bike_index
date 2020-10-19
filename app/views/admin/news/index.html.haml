@@ -27,8 +27,8 @@
             .less-strong-hold
               %small.convertTime
                 = l blog.published_at, format: :convert_time
-              - if current_user.developer?
-                %small.less-strong-right
+              - if display_dev_info?
+                %small.less-strong-right.only-dev-visible
                   = blog.id
           %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email

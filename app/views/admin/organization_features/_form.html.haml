@@ -12,7 +12,7 @@
       .form-group
         = f.label :name
         = f.text_field :name, class: "form-control"
-  - if current_user.developer?
+  - if display_dev_info?
     .row.only-dev-visible
       .col-md-6
         .form-group
