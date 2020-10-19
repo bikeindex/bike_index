@@ -18,11 +18,11 @@ RSpec.describe Ownership, type: :model do
       expect(ownership.new_registration?).to be_truthy
       expect(ownership.claim_message).to eq "new_registration"
     end
-    context "transfered ownership" do
+    context "transferred ownership" do
       let(:bike) { FactoryBot.create(:bike_organized, owner_email: email) }
       let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
       let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
-      it "returns transfered_ownership" do
+      it "returns transferred_ownership" do
         ownership2.reload
         ownership1.reload
         expect(ownership1.current?).to be_falsey
@@ -74,7 +74,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership2.organization&.id).to eq organization.id
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
           expect(ownership2.previous_ownership_id).to eq ownership1.id
-          # Registrations that were initially from an organization member, then transfered outside of the organization,
+          # Registrations that were initially from an organization member, then transferred outside of the organization,
           # count as "new" - because some organizations pre-register bikes
           expect(ownership2.new_registration?).to be_truthy
           expect(ownership2.claim_message).to eq "new_registration"

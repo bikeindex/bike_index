@@ -1,9 +1,25 @@
-%p
-  - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-  - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
-  = t(".num_bikes_registered_html", num_bikes: num_bikes)
-  %em
-    = humanized_time_range(@time_range)
+.row.mt-4.mb-4
+  .col-sm-8
+    %p
+      - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
+      - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
+      = t(".num_bikes_registered_html", num_bikes: num_bikes)
+      %em
+        = humanized_time_range(@time_range)
+
+  - if current_organization.enabled?("claimed_ownerships")
+    .col-sm-4
+      %ul.nav
+        .dropdown
+          %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_claimedness == "all" ? "" : "active") }
+            #{@search_claimedness.titleize} registrations
+          .dropdown-menu
+            - %w[all initial transferred].each do |claimedness|
+              - claimedness_active = claimedness == @search_claimedness
+              = link_to "#{claimedness.titleize} registrations", organization_bikes_path(search_claimedness: claimedness), class: "dropdown-item #{claimedness_active ? 'active' : ''}"
+              - if claimedness == "all" # Add a divider after all
+                .dropdown-divider
+
 .full-screen-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header

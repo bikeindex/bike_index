@@ -1,3 +1,28 @@
+- if @claim_message.present?
+  .container
+    .row.mt-4.mb-4
+      .col-md-10.offset-md-1
+        .card
+          .card-block
+            %p
+              Thesis (or name?) registered your bike on Bike Index, a free, non-profit, bike registry and stolen bike recovery platform.
+
+            %p
+              Bike Index is a public resource for registering bikes. We've reunited over
+              %strong
+                = as_currency(Counts.recoveries_value)
+              in stolen bicycles to date. We're privacy-centric and sit in the background unless you need us.
+
+            %p
+              If your bike is stolen we supercharge the odds your bike returns to you with law enforcement connections, pawnshop databases, social media alerts, and our Bike Index community.
+
+            %p
+              To see your bike and claim it as your own,
+              = link_to "sign up", new_user_path
+              with the email address where you received your registration email. Add photos and details of the bike to show what makes your ride yours. Hopefully, your bike won’t be stolen, but if it is, we'll be here when you need us most.
+
+
+
 - if @token.present? && @matching_notification.present?
   - modal_title = @matching_notification.subject
   - modal_body = capture_haml do

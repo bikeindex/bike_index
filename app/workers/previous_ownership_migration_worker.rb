@@ -5,6 +5,6 @@ class PreviousOwnershipMigrationWorker < ApplicationWorker
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
     return true unless bike.present? && bike.ownerships.count > 1
-    bike.ownerships.each { |o| o.update(updated_at: Time.current) }
+    bike.ownerships.each { |o| o.update(updated_at: Time.current, previous_ownership_id: o.prior_ownerships.pluck(:id).last) }
   end
 end

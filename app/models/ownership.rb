@@ -14,9 +14,11 @@ class Ownership < ApplicationRecord
   belongs_to :impound_record
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
-  default_scope { order(:created_at) }
+  default_scope { order(:id) }
   scope :current, -> { where(current: true) }
   scope :claimed, -> { where(claimed: true) }
+  scope :initial, -> { where(previous_ownership_id: nil) }
+  scope :transferred, -> { where.not(previous_ownership_id: nil) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
@@ -39,7 +41,7 @@ class Ownership < ApplicationRecord
 
   def new_registration?
     return true if first?
-    # If this was first registered to an organization and is now being transfered
+    # If this was first registered to an organization and is now being transferred
     # (either because it was pre-registered or an unregistered impounded bike)
     # it counts as a new registration
     second? && organization.present?
