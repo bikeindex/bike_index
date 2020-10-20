@@ -51,7 +51,10 @@
           %td
             = bike.frame_colors.to_sentence
           %td
-            = bike.first_owner_email
+            - if current_organization.enabled?("claimed_ownerships")
+              = bike.owner_email
+            - else
+              = bike.first_owner_email
             %small.less-strong
               - if bike.creation_description
                 = origin_display(bike.creation_description)

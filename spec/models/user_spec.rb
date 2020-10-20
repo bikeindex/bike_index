@@ -86,11 +86,15 @@ RSpec.describe User, type: :model do
 
       it "validates preferred_language" do
         subject.preferred_language = nil
-        expect(subject.valid?).to eq(true)
+        expect(subject).to be_valid
         subject.preferred_language = "en"
-        expect(subject.valid?).to eq(true)
+        expect(subject).to be_valid
         subject.preferred_language = "klingon"
-        expect(subject.valid?).to eq(false)
+        expect(subject).to_not be_valid
+        # We have actually make preferred_language nil, or some with_locale calls can break
+        user = FactoryBot.create(:user, preferred_language: " ")
+        expect(user.preferred_language).to eq nil
+        expect(user).to be_valid
       end
     end
 

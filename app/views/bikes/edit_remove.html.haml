@@ -1,3 +1,4 @@
+
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
@@ -44,7 +45,11 @@
               = render 'shared/trash_icon'
               = t(".delete_this_bike", bike_type: @bike.type)
 
-
+-# Don't redirect to admin, because admin doesn't actually include js for rendering BikeIndexAlerts
+- after_delete_redirect = current_user.superuser ? my_account_path : user_root_url
+-# Referenced by the edit_remove.coffee file, so we can redirect there afterward
+:javascript
+  window.userRootUrl = "#{after_delete_redirect}";
 - modal_title = t(".modal_title", bike_type: @bike.type)
 - modal_body = capture_haml do
   = form_tag do |t|
