@@ -12,20 +12,17 @@
       = ownership.creator.name
     - else
       = EmailNormalizer.obfuscate(ownership&.creator.email)
-  registered your #{bike.type} on Bike Index, a free, non-profit, bike registry and stolen bike recovery platform.
+  = t(".registered_your_bike_on_index", bike_type: bike.type)
+
 
 %p
-  Bike Index is a public resource for registering bikes. We've reunited over
-  %strong
-    = as_currency(Counts.recoveries_value)
-  in stolen bicycles to date. We're privacy-centric and sit in the background unless you need us.
+  = t(".public_resource_reunited_value_html", value: as_currency(Counts.recoveries_value))
 
 %p
-  If your #{bike.type} is stolen we supercharge the odds your #{bike.type} returns to you with law enforcement connections, pawnshop databases, social media alerts, and our community.
+  = t(".supercharge_if_your_bike_stolen", bike_type: bike.type)
 
 - unless skip_to_see
-  =
   %p
-    To see your #{bike.type} and claim it as your own,
-    = link_to "sign up", new_user_url
-    with the email address where you received your registration email. Add photos and details of the #{bike.type} to show what makes your ride yours. Hopefully, your #{bike.type} won’t be stolen, but if it is, we'll be here when you need us most.
+    - sign_up = t(".sign_up")
+    = t(".to_see_your_bike_sign_up_html", bike_type: bike.type, sign_up_link: link_to(sign_up, new_user_url))
+
