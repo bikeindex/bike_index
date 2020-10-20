@@ -1,3 +1,7 @@
+-# `MailSnippet`s are only available in english for now
+- if @organization&.mail_snippet_body('welcome').present?
+  = @organization.mail_snippet_body('welcome').html_safe
+
 - if @ownership.claim_message.present?
   = render partial: "/shared/claim_message", locals: { bike: @bike, skip_to_see: true }
 
@@ -6,22 +10,18 @@
     %h2{ style: 'margin-bottom: 12px;' }
       = t(".html.welcome_to_bike_index")
 
-  -# `MailSnippet`s are only available in english for now
-  - is_rendering_in_english = I18n.locale == :en
-  - if is_rendering_in_english && @organization&.mail_snippet_body('welcome').present?
-    = @organization.mail_snippet_body('welcome').html_safe
+  -# used to be logic in here, but the @ownership.claim_message should mostly take this over
+  - if @bike.abandoned?
+    %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
+  - elsif @bike.stolen?
+    %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
+    %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
   - else
-    - if @bike.abandoned?
-      %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
-    - elsif @bike.stolen?
-      %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
-      %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
-    - else
-      %h1
-        - if @organization.present?
-          = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
-        - else
-          = t(".html.bike_register_with_bike_index", biketype: @bike.type)
+    %h1
+      - if @organization.present?
+        = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
+      - else
+        = t(".html.bike_register_with_bike_index", biketype: @bike.type)
 
   %p
     - org_name = @creation_org&.name || @ownership&.creator&.display_name
