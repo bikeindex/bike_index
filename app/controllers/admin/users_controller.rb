@@ -80,6 +80,9 @@ class Admin::UsersController < Admin::BaseController
     users = users.ambassadors if @search_ambassadors
     users = users.superusers if @search_superusers
     users = users.admin_text_search(params[:query]) if params[:query].present?
+    if params[:search_phone].present?
+      users = users.search_phone(params[:search_phone])
+    end
     users.where(created_at: @time_range)
   end
 end
