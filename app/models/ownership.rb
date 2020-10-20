@@ -24,7 +24,7 @@ class Ownership < ApplicationRecord
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?
-    prior_ownerships.blank? # TODO: switch after migration to previous_ownership_id.present?
+    previous_ownership_id.blank?
   end
 
   def second?
