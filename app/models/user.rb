@@ -329,6 +329,7 @@ class User < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     if phone_changed? # Rather than waiting for twilio to send, immediately update general_alerts
       self.general_alerts = (general_alerts || []) + ["phone_waiting_confirmation"]
