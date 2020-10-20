@@ -340,7 +340,7 @@ RSpec.describe Bike, type: :model do
     it "finds by stolen_record" do
       bike1.reload
       expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
-      # Ideally this would keep the scope, but whatever
+      # Ideally this would keep the scope, but it doesn't. So document that behavior here
       expect(Bike.where(id: [bike2.id]).search_phone("2223334444").pluck(:id)).to eq([bike1.id, bike2.id])
       expect(Bike.search_phone("2223334444").pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(Bike.search_phone("23334444").pluck(:id)).to match_array([bike1.id, bike2.id])
