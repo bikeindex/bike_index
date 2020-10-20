@@ -3,15 +3,15 @@
 - skip_to_see ||= false
 
 %p
-  - if ownership.organization.display_avatar?
+  - if ownership.organization&.display_avatar?
     = image_tag ownership.organization.avatar.url(:medium), class: "claim-message-org-avatar"
   %strong
     - if ownership.organization.present?
       = ownership.organization.name
-    - elsif ownership.creator.name.present?
+    - elsif ownership.creator&.name.present?
       = ownership.creator.name
     - else
-      = EmailNormalizer.obfuscate(ownership.creator.email)
+      = EmailNormalizer.obfuscate(ownership&.creator.email)
   registered your #{bike.type} on Bike Index, a free, non-profit, bike registry and stolen bike recovery platform.
 
 %p
