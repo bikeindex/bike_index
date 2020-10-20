@@ -240,11 +240,12 @@ RSpec.describe CredibilityScorer do
         let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
         let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
         let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
+        let!(:user_phone) { FactoryBot.create(:user_phone_confirmed, user: user) }
         let(:info) { JSON.parse(strava_file) }
         let!(:integration) { FactoryBot.create(:integration, information: info) }
         it "returns all" do
           expect(user.integrations.pluck(:id)).to eq([integration.id])
-          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :long_time_user, :user_connected_to_strava])
+          expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :user_verified_phone, :long_time_user, :user_connected_to_strava])
         end
         context "ambassador" do
           let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
