@@ -145,7 +145,10 @@ class Admin::BikesController < Admin::BaseController
       else
         @user.bikes
       end
+    elsif params[:search_phone].present?
+      bikes = Bike.search_phone(params[:search_phone])
     else
+      # This unscopes, so it doesn't work with anything above
       bikes = Bike.unscoped
       # do example here because it doesn't work w/ @user and also unscopes
       bikes = bikes.example if params[:search_example] == "example_only"
