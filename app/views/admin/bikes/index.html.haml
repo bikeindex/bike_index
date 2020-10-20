@@ -145,6 +145,8 @@
 
       = hidden_field_tag :organization_id
       .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
+      .form-group.mr-2.mb-2
         = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
