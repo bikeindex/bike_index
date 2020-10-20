@@ -139,7 +139,7 @@
     %h4
       User has #{ pluralize(@bikescount, "bike") }
   .col-md-6.text-right
-    = link_to "Show all user bikes", admin_bikes_path(search_user_id: @user.id)
+    = link_to "Show all user bikes", admin_bikes_path(user_id: @user.id)
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 

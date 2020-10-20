@@ -65,7 +65,7 @@
         = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
 - if @render_chart
   .col-12.mt-2.mb-4
-    - if params[:search_email] || params[:search_user_id].present?
+    - if params[:search_email] || params[:user_id].present?
       %hr
       %h2.mt-4.text-warning Can't graph with user search
     - else
@@ -95,7 +95,7 @@
       Matching Bikes
       %em
         = humanized_time_range(@time_range)
-    - if (params.keys & %w[search_user_id search_manufacturer_id]).any? || current_organization.present?
+    - if (params.keys & %w[user_id search_manufacturer_id]).any? || current_organization.present?
       %ul.mt-0
         - if current_organization.present?
           %li
@@ -109,7 +109,7 @@
                 viewing all associated bikes -
                 = link_to "view only bikes created by", admin_bikes_path(sortable_search_params.merge(search_only_creation_organization: true))
 
-        - if params[:search_user_id].present?
+        - if params[:user_id].present?
           %li
             - if @user.present?
               Owned by
@@ -117,7 +117,7 @@
             - else
               No user found for
               %code
-                = params[:search_user_id]
+                = params[:user_id]
         - if params[:search_manufacturer_id].present?
           %li
             - if @manufacturer.present?
@@ -141,7 +141,7 @@
       = hidden_field_tag :search_pos, params[:search_pos]
       = hidden_field_tag :search_origin, params[:search_origin]
       = hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization]
-      = hidden_field_tag :search_user_id, params[:search_user_id]
+      = hidden_field_tag :user_id, params[:user_id]
 
       = hidden_field_tag :organization_id
       .form-group.ml-auto.mr-2.mb-2
