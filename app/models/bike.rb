@@ -151,6 +151,13 @@ class Bike < ApplicationRecord
       query.present? ? admin_search(query) : all
     end
 
+    def search_phone(str)
+      q = "%#{Phonifyer.phonify(str)}%"
+      unscoped.includes(:stolen_records)
+        .where("stolen_records.phone ILIKE ? OR stolen_records.secondary_phone ILIKE ?", q, q)
+        .distinct.references(:stolen_records)
+    end
+
     def friendly_find(bike_str)
       return nil unless bike_str.present?
       bike_str = bike_str.to_s.strip

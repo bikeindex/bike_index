@@ -331,6 +331,24 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "search_phone" do
+    let(:stolen_record1) { FactoryBot.create(:stolen_record, phone: "2223334444") }
+    let(:bike1) { stolen_record1.bike }
+    let!(:stolen_record2) { FactoryBot.create(:stolen_record, phone: "111222333", bike: bike1) }
+    let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
+    let(:bike2) { stolen_record3.bike }
+    it "finds by stolen_record" do
+      bike1.reload
+      expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
+      # Ideally this would keep the scope, but it doesn't. So document that behavior here
+      expect(Bike.where(id: [bike2.id]).search_phone("2223334444").pluck(:id)).to eq([bike1.id, bike2.id])
+      expect(Bike.search_phone("2223334444").pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(Bike.search_phone("23334444").pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(Bike.search_phone("233344").pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(Bike.search_phone("11222333").pluck(:id)).to match_array([bike1.id, bike2.id])
+    end
+  end
+
   describe "owner" do
     it "doesn't break if the owner is deleted" do
       delete_user = FactoryBot.create(:user)

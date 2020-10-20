@@ -116,7 +116,7 @@ class User < ApplicationRecord
     q = "%#{Phonifyer.phonify(str)}%"
     includes(:user_phones)
       .where("users.phone ILIKE ? OR user_phones.phone ILIKE ?", q, q)
-      .distinct.references(:user_emails)
+      .distinct.references(:user_phones)
   end
 
   def self.from_auth(auth)
