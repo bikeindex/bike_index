@@ -1,5 +1,6 @@
 - signed_in_user ||= nil
 - ownership = bike.current_ownership
+- skip_to_see ||= false
 
 %p
   - if ownership.organization.display_avatar?
@@ -22,7 +23,8 @@
 %p
   If your #{bike.type} is stolen we supercharge the odds your #{bike.type} returns to you with law enforcement connections, pawnshop databases, social media alerts, and our community.
 
-%p
-  To see your #{bike.type} and claim it as your own,
-  = link_to "sign up", new_user_path
-  with the email address where you received your registration email. Add photos and details of the #{bike.type} to show what makes your ride yours. Hopefully, your #{bike.type} won’t be stolen, but if it is, we'll be here when you need us most.
+- unless skip_to_see
+  %p
+    To see your #{bike.type} and claim it as your own,
+    = link_to "sign up", new_user_url
+    with the email address where you received your registration email. Add photos and details of the #{bike.type} to show what makes your ride yours. Hopefully, your #{bike.type} won’t be stolen, but if it is, we'll be here when you need us most.

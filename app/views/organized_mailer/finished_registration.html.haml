@@ -1,45 +1,49 @@
-- if @vars[:new_user]
-  %h2{ style: 'margin-bottom: 12px;' }
-    = t(".html.welcome_to_bike_index")
+- if @ownership.claim_message.present?
+  = render partial: "/shared/claim_message", locals: { bike: @bike, skip_to_see: true }
 
--# `MailSnippet`s are only available in english for now
-- is_rendering_in_english = I18n.locale == :en
-- if is_rendering_in_english && @organization&.mail_snippet_body('welcome').present?
-  = @organization.mail_snippet_body('welcome').html_safe
 - else
-  - if @bike.abandoned?
-    %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
-  - elsif @bike.stolen?
-    %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
-    %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
+  - if @vars[:new_user]
+    %h2{ style: 'margin-bottom: 12px;' }
+      = t(".html.welcome_to_bike_index")
+
+  -# `MailSnippet`s are only available in english for now
+  - is_rendering_in_english = I18n.locale == :en
+  - if is_rendering_in_english && @organization&.mail_snippet_body('welcome').present?
+    = @organization.mail_snippet_body('welcome').html_safe
   - else
-    %h1
-      - if @organization.present?
-        = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
-      - else
-        = t(".html.bike_register_with_bike_index", biketype: @bike.type)
+    - if @bike.abandoned?
+      %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
+    - elsif @bike.stolen?
+      %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
+      %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
+    - else
+      %h1
+        - if @organization.present?
+          = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
+        - else
+          = t(".html.bike_register_with_bike_index", biketype: @bike.type)
 
-%p
-  - org_name = @creation_org&.name || @ownership&.creator&.display_name
+  %p
+    - org_name = @creation_org&.name || @ownership&.creator&.display_name
 
-  - bike_type = if @bike.stolen? && @bike.abandoned?
-    - t(".html.recovered_biketype", biketype: @bike.type)
-  - elsif @bike.stolen?
-    - t(".html.stolen_biketype", biketype: @bike.type)
-  - else
-    - @bike.type
+    - bike_type = if @bike.stolen? && @bike.abandoned?
+      - t(".html.recovered_biketype", biketype: @bike.type)
+    - elsif @bike.stolen?
+      - t(".html.stolen_biketype", biketype: @bike.type)
+    - else
+      - @bike.type
 
-  - if @vars[:registered_by_owner]
-    = t(".html.you_added_a_bike_type_on_bike_index", bike_type: bike_type)
-  - elsif @vars[:new_registration]
-    = t(".html.org_added_a_bike_html", org_name: org_name, bike_type: bike_type)
-  - else
-    = t(".html.org_sent_a_bike_html", org_name: org_name, bike_type: bike_type)
+    - if @vars[:registered_by_owner]
+      = t(".html.you_added_a_bike_type_on_bike_index", bike_type: bike_type)
+    - elsif @vars[:new_registration]
+      = t(".html.org_added_a_bike_html", org_name: org_name, bike_type: bike_type)
+    - else
+      = t(".html.org_sent_a_bike_html", org_name: org_name, bike_type: bike_type)
 
-- unless @ownership.claimed
-  %h2= t(".html.youre_almost_done_registering")
+  - unless @ownership.claimed
+    %h2= t(".html.youre_almost_done_registering")
 
-= render partial: 'shared/email_bike_box'
+= render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike, t: @ownership.token, email: @vars[:email]) }
 
 - if @bike.stolen
   %p
@@ -65,7 +69,7 @@
   - if @vars[:registered_by_owner]
     = link_to t(".html.claim_the_biketype", biketype: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
   - else
-    = link_to t(".html.confirm_this_biketype", biketype: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
+    = link_to t(".html.confirm_this_biketype", biketype: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), class: 'binx-button'
 
   - if @bike.stolen?
     %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)

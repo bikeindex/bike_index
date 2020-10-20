@@ -5,6 +5,7 @@ class OrganizedMailer < ApplicationMailer
           parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
   helper :organized
+  helper :money # Required to render currency for bike recoveries
 
   def partial_registration(b_param)
     @b_param = b_param
