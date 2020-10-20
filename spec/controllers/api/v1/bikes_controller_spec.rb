@@ -251,8 +251,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           frame_size_unit: nil,
           rear_gear_type_slug: rear_gear_type.slug,
           front_gear_type_slug: front_gear_type.slug,
-          handlebar_type_slug: "forward",
-          registered_new: true,
+          handlebar_type_slug: "forward"
         }
         components = [
           {

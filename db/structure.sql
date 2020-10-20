@@ -520,7 +520,6 @@ CREATE TABLE public.bikes (
     pdf character varying(255),
     abandoned boolean DEFAULT false NOT NULL,
     paint_id integer,
-    registered_new boolean,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
     serial_normalized character varying(255),
@@ -2148,7 +2147,8 @@ CREATE TABLE public.ownerships (
     impound_record_id bigint,
     claimed_at timestamp without time zone,
     is_phone boolean DEFAULT false,
-    token text
+    token text,
+    previous_ownership_id bigint
 );
 
 
@@ -5441,6 +5441,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201008202006'),
 ('20201008204248'),
 ('20201009210429'),
-('20201013204925');
+('20201013204925'),
+('20201019200213');
 
 

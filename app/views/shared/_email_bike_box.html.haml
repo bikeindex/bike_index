@@ -1,5 +1,5 @@
 - @ownership ||= @bike.current_ownership
-- bike_url ||= ownership_url(@ownership)
+- bike_url ||= bike_url(@bike, t: @ownership.token)
 - thumb_url = @bike.thumb_path || @bike.stock_photo_url
 
 - unless thumb_url.present?
@@ -41,7 +41,7 @@
                 = t(".stolen_at")
               = l stolen_record.date_stolen, format: :dotted
 
-          - if (@bike.ownerships.count == 1 && @bike.registered_new)
+          - if @bike.current_ownership&.new_registration? && @bike.pos?
             %li
               %em.less-strong
                 = t(".color_may_be_incorrect")

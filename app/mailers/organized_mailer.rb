@@ -5,6 +5,7 @@ class OrganizedMailer < ApplicationMailer
           parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
   helper :organized
+  helper :money # Required to render currency for bike recoveries
 
   def partial_registration(b_param)
     @b_param = b_param
@@ -25,7 +26,7 @@ class OrganizedMailer < ApplicationMailer
     @user = ownership.owner
     @bike = Bike.unscoped.find(@ownership.bike_id)
     @vars = {
-      new_bike: (@bike.ownerships.count == 1),
+      new_bike: ownership.new_registration?,
       email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
       registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)

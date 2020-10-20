@@ -13,7 +13,11 @@ module Organized
         search_organization_bikes
       else
         @per_page = params[:per_page] || 50
-        @available_bikes = organization_bikes.where(created_at: @time_range)
+        @available_bikes = if current_organization.enabled?("claimed_ownerships")
+          claimed_ownerships_search
+        else
+          organization_bikes.where(created_at: @time_range)
+        end
         @bikes = @available_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
       end
     end
@@ -125,6 +129,21 @@ module Organized
       else
         organization_bikes_path
       end
+    end
+
+    def claimed_ownerships_search
+      bikes = organization_bikes
+      if %w[transferred initial].include?(params[:search_claimedness])
+        @search_claimedness = params[:search_claimedness]
+        bikes = if @search_claimedness == "initial"
+          bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
+        else
+          bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
+        end
+      else
+        @search_claimedness = "all"
+      end
+      bikes.where(created_at: @time_range)
     end
 
     def search_organization_bikes

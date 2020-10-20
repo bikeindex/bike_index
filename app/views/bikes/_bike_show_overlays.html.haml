@@ -1,3 +1,13 @@
+- if @claim_message.present?
+  .container
+    .row.mt-4.mb-4
+      .col-md-10.offset-md-1
+        .card
+          .card-block
+            = render partial: "/shared/claim_message", locals: { bike: @bike, signed_in_user: current_user }
+
+
+
 - if @token.present? && @matching_notification.present?
   - modal_title = @matching_notification.subject
   - modal_body = capture_haml do

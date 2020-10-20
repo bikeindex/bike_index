@@ -2758,7 +2758,7 @@ en:
         %{link}.
       may_be_terminated: >-
         You understand that the technical processing and transmission of the Service,
-        including your Content, may be transfered unencrypted and involve (a) transmissions
+        including your Content, may be transferred unencrypted and involve (a) transmissions
         over various networks; and (b) changes to conform and adapt to technical requirements
         of connecting networks or devices.
       no_abuse: >-
@@ -4897,6 +4897,24 @@ en:
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
   shared:
+    claim_message:
+      public_resource_reunited_value_html: >-
+        Bike Index is a public resource for registering bikes. We've reunited over
+        <strong>%{value}</strong> in stolen bicycles to date. We're privacy-centric
+        and sit in the background unless you need us.
+      registered_your_bike_on_index: >-
+        registered your %{bike_type} on Bike Index, a free, non-profit, bike registry
+        and stolen bike recovery platform.
+      sign_up: sign up
+      supercharge_if_your_bike_stolen: >-
+        If your %{bike_type} is stolen we supercharge the odds your %{bike_type} returns
+        to you with law enforcement connections, pawnshop databases, social media
+        alerts, and our community.
+      to_see_your_bike_sign_up_html: >-
+        To see your %{bike_type} and claim it as your own, %{sign_up_link} with the
+        email address where you received your registration email. Add photos and details
+        of the %{bike_type} to show what makes your ride yours. Hopefully, your %{bike_type}
+        won’t be stolen, but if it is, we'll be here when you need us most.
     content_skeleton:
       about: About
       bicycle_serials: Bicycle serials

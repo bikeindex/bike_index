@@ -3,6 +3,10 @@
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
 
+- unless display_dev_info?
+  -# required because of caching
+  <style>.only-dev-visible { display: none !important; } </style>
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header

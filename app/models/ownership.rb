@@ -12,16 +12,23 @@ class Ownership < ApplicationRecord
   belongs_to :user, touch: true
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
+  belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
-  default_scope { order(:created_at) }
+  default_scope { order(:id) }
   scope :current, -> { where(current: true) }
   scope :claimed, -> { where(claimed: true) }
+  scope :initial, -> { where(previous_ownership_id: nil) }
+  scope :transferred, -> { where.not(previous_ownership_id: nil) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?
-    bike&.ownerships&.reorder(:created_at)&.first&.id == id
+    prior_ownerships.blank? # TODO: switch after migration to previous_ownership_id.present?
+  end
+
+  def second?
+    prior_ownerships.count == 1
   end
 
   def claimed?
@@ -30,6 +37,14 @@ class Ownership < ApplicationRecord
 
   def self_made?
     creator_id.present? && creator_id == user_id
+  end
+
+  def new_registration?
+    return true if first?
+    # If this was first registered to an organization and is now being transferred
+    # (either because it was pre-registered or an unregistered impounded bike)
+    # it counts as a new registration
+    second? && organization.present?
   end
 
   def phone_registration?
@@ -61,8 +76,17 @@ class Ownership < ApplicationRecord
   def organization
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
+    # Some organizations pre-register bikes and then transfer them. Handle that
+    if second? && creator&.member_of?(bike.creation_organization)
+      return bike.creation_organization
+    end
     # Otherwise, this is only an organization ownership if it's an impound transfer
     impound_record&.organization
+  end
+
+  def claim_message
+    return nil if claimed? || !current? || user.present?
+    new_registration? ? "new_registration" : "transferred_registration"
   end
 
   def calculated_send_email
@@ -79,14 +103,20 @@ class Ownership < ApplicationRecord
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
+      self.previous_ownership_id = prior_ownerships.pluck(:id).last
     end
     self.claimed_at ||= Time.current if claimed?
   end
 
+  def prior_ownerships
+    return Ownership.none unless bike.present?
+    ownerships = bike.ownerships
+    ownerships = ownerships.where("id < ?", id) if id.present?
+    ownerships.reorder(:id)
+  end
+
   def send_notification_and_update_other_ownerships
-    if bike.present?
-      bike.ownerships.current.where.not(id: id).each { |o| o.update(current: false) }
-    end
+    prior_ownerships.current.each { |o| o.update(current: false) }
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)

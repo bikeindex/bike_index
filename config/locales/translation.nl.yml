@@ -5230,6 +5230,23 @@ nl:
       confirm_your_phone_number: Bevestig uw telefoonnummer
       verification_code: Verificatie code
       verify_number: Verifieer %{phone_number}
+    claim_message:
+      public_resource_reunited_value_html: Bike Index is een openbare bron voor het
+        registreren van fietsen. We zijn tot nu toe meer dan <strong>%{value}</strong>
+        herenigd in gestolen fietsen. We zijn privacygericht en zitten op de achtergrond,
+        tenzij u ons nodig heeft.
+      registered_your_bike_on_index: registreerde uw %{bike_type} op Bike Index, een
+        gratis, non-profit, fietsregistratieplatform en platform voor het herstellen
+        van gestolen fietsen.
+      sign_up: Registreren
+      supercharge_if_your_bike_stolen: Als uw %{bike_type} wordt gestolen, vergroten
+        we de kans dat uw %{bike_type} terugkeert naar u met wetshandhavingsverbindingen,
+        pandjeshuisdatabases, sociale media-waarschuwingen en onze community.
+      to_see_your_bike_sign_up_html: Om uw %{bike_type} te zien en te claimen als
+        uw eigen %{sign_up_link}, met het e-mailadres waarop u uw registratie-e-mail
+        heeft ontvangen. Voeg foto's en details van de %{bike_type} toe om te laten
+        zien wat jouw rit van jou maakt. Hopelijk wordt je %{bike_type} niet gestolen,
+        maar als dat zo is, zijn we er wanneer je ons het meest nodig hebt.
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
