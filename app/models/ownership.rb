@@ -24,7 +24,8 @@ class Ownership < ApplicationRecord
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
   def first?
-    id.present? ? previous_ownership_id.blank? : previous_ownerships.none?
+    # If the ownership is created, use the id created in set_calculated_attributes
+    id.present? ? previous_ownership_id.blank? : prior_ownerships.none?
   end
 
   def second?
