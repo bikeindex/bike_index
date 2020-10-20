@@ -103,7 +103,20 @@
         %td
           Phone
         %td
-          = phone_display(@user.phone)
+          - display_phone = @user.phone.present?
+          - if display_phone || @user.user_phones.any?
+            %ul
+              - @user.user_phones.each do |user_phone|
+                %li
+                  = phone_display(user_phone.phone)
+                  %small.less-strong{ class: user_phone.confirmed? ? "text-success" : "text-warning" }
+                    = user_phone.confirmed? ? "confirmed" : "unconfirmed"
+                  - if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone)
+                    - display_phone = false
+              - if display_phone
+                %li
+                  = phone_display(@user.phone)
+                  %small.less-strong.text-warning unconfirmed
       %tr
         %td
           Website
@@ -139,7 +152,7 @@
     %h4
       User has #{ pluralize(@bikescount, "bike") }
   .col-md-6.text-right
-    = link_to "Show all user bikes", admin_bikes_path(search_user_id: @user.id)
+    = link_to "Show all user bikes", admin_bikes_path(user_id: @user.id)
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 

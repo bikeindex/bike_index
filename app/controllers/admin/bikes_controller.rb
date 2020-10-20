@@ -138,8 +138,8 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def matching_bikes
-    if params[:search_user_id].present?
-      @user = User.username_friendly_find(params[:search_user_id])
+    if params[:user_id].present?
+      @user = User.username_friendly_find(params[:user_id])
       bikes = if @user.rough_approx_bikes.count > 25
         @user.rough_approx_bikes
       else

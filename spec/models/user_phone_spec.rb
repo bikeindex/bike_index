@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe UserPhone, type: :model do
   describe "find_confirmation_code" do
     let!(:user_phone1) { FactoryBot.create(:user_phone, confirmation_code: "2929292") }
-    let!(:user_phone2) { FactoryBot.create(:user_phone, confirmation_code: "2929292", updated_at: Time.current - 3.hours) }
-    let!(:user_phone3) { FactoryBot.create(:user_phone, confirmation_code: "2929291") }
+    let!(:user_phone2) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929292", updated_at: Time.current - 3.hours) }
+    let!(:user_phone3) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929291") }
     it "finds only confirmation codes in past 30 minutes" do
       expect(user_phone1.user.phone_waiting_confirmation?).to be_truthy
       expect(user_phone2.user.phone_waiting_confirmation?).to be_falsey
@@ -15,6 +15,9 @@ RSpec.describe UserPhone, type: :model do
       expect(user_phone1.confirmed?).to be_truthy
       expect(user_phone1.confirmed_at).to be_within(1).of Time.current
       expect(user_phone1.user.phone_waiting_confirmation?).to be_falsey
+      expect(User.search_phone("1112223333").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])
+      expect(User.search_phone("11122233").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])
+      expect(User.search_phone("11222333").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])
     end
   end
 

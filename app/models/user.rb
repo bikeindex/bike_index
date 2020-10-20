@@ -112,6 +112,13 @@ class User < ApplicationRecord
       .distinct.references(:user_emails)
   end
 
+  def self.search_phone(str)
+    q = "%#{Phonifyer.phonify(str)}%"
+    includes(:user_phones)
+      .where("users.phone ILIKE ? OR user_phones.phone ILIKE ?", q, q)
+      .distinct.references(:user_emails)
+  end
+
   def self.from_auth(auth)
     return nil unless auth&.kind_of?(Array)
     where(id: auth[0], auth_token: auth[1]).first

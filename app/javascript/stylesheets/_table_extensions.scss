@@ -37,6 +37,9 @@
       width: 85%; // This is effectively min-width for tables
     }
   }
+  td ul {
+    margin-bottom: 0;
+  }
   tr.active-row {
     background-color: #ebf5fb !important;
     a {
