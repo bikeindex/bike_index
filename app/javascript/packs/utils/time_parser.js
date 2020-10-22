@@ -78,9 +78,9 @@ export default class TimeParser {
     // Otherwise, format in basic format
     if (time.year() === moment().year()) {
       if (classList.contains("withPreposition")) {
-        return prefix + time.format("MMM Do[,]") + " at " + time.format("ha");
+        return prefix + time.format("MMM Do");
       } else {
-        return prefix + time.format("MMM Do[,] ha");
+        return prefix + time.format("MMM Do");
       }
     } else {
       return prefix + time.format("YYYY-MM-DD");

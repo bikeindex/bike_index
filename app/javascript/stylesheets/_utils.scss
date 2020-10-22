@@ -1,6 +1,19 @@
 // Handy helper classes
 .less-strong {
   opacity: 0.65;
+  // Couldn't get & + input to work, so manually specifying the applicable element classes
+  a:hover,
+  & + a:hover,
+  .btn:hover,
+  &.btn:hover,
+  .btn:focus,
+  &.btn:focus,
+  .form-control:hover,
+  &.form-control:hover,
+  .form-control:focus,
+  &.form-control:focus {
+    opacity: 1;
+  }
 }
 
 .gray-link {
