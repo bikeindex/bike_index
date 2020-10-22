@@ -46,7 +46,7 @@
               = t(".delete_this_bike", bike_type: @bike.type)
 
 -# Don't redirect to admin, because admin doesn't actually include js for rendering BikeIndexAlerts
-- after_delete_redirect = current_user.superuser ? my_account_path : user_root_url
+- after_delete_redirect = current_user&.superuser ? my_account_path : user_root_url
 -# Referenced by the edit_remove.coffee file, so we can redirect there afterward
 :javascript
   window.userRootUrl = "#{after_delete_redirect}";
