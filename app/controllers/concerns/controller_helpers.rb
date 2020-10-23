@@ -325,8 +325,7 @@ module ControllerHelpers
       flash[:notice] = translation(:please_sign_in,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
       store_return_to
-      set_passive_organization(passed_organization)
-      sign_in_path = passed_organization.enabled?("passwordless_users") ? magic_link_session_path : new_session_path
+      sign_in_path = set_passive_organization(passed_organization)&.enabled?("passwordless_users") ? magic_link_session_path : new_session_path
       redirect_to(sign_in_path) && return
     end
     set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
