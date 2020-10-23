@@ -18,6 +18,30 @@ RSpec.describe BikesController, type: :request do
         expect(assigns(:claim_message)).to be_blank
       end
     end
+    context "organization_id & sign_in_if_not" do
+      let(:current_user) { nil }
+      let(:organization) { FactoryBot.create(:organization) }
+      it "redirects to sign in" do
+        get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=true"
+        expect(response).to redirect_to new_session_path
+        expect(flash[:notice]).to be_present
+      end
+      context "organization doesn't exist" do
+        it "redirects to sign in" do
+          get "#{base_url}/#{bike.to_param}?organization_id=not-an-actual-organization&sign_in_if_not=true"
+          expect(response).to redirect_to new_session_path
+          expect(flash[:notice]).to be_present
+        end
+      end
+      context "organization passwordless users" do
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+        it "redirects to magic link, because organization sign in" do
+          get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=1"
+          expect(flash[:notice]).to be_present
+          expect(response).to redirect_to(magic_link_session_path)
+        end
+      end
+    end
     context "admin hidden (fake delete)" do
       before { ownership.bike.update_attributes(hidden: true) }
       it "404s" do
