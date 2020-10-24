@@ -60,6 +60,7 @@ class Admin::TweetsController < Admin::BaseController
     if @tweet.id.present?
       redirect_to edit_admin_tweet_url(id: @tweet.id)
     else
+      flash[:error] ||= "Unable to create tweet"
       render action: :new
     end
   end
