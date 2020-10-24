@@ -46,6 +46,7 @@ class Admin::TweetsController < Admin::BaseController
       @tweet.twitter_account_id = nil
       @tweet.body = nil # Blank the attributes that may have been accidentally passed
       @tweet.twitter_response = fetch_twitter_response(@tweet.twitter_id)
+      @tweet.save
     elsif @tweet.kind == "app_tweet"
       @tweet.twitter_id = nil
       @tweet.save
@@ -115,7 +116,7 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def fetch_twitter_response(tweet_id)
-    TwitterAccount.default_account.status(tweet_id).to_json
+    TwitterAccount.default_account.get_tweet(tweet_id).as_json
   end
 
   def retweet_accounts
