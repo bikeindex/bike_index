@@ -26,3 +26,15 @@
     text-indent: 20px;
   }
 }
+
+.embeded-tweet-break-top .embeded-tweet {
+  margin-top: 0;
+  @include media-breakpoint-up(lg) {
+    margin-top: -66px;
+    margin-left: -30px;
+    margin-right: 0;
+  }
+  @include media-breakpoint-up(xl) {
+    margin-right: -30px;
+  }
+}
