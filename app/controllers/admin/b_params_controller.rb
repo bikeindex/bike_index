@@ -1,4 +1,4 @@
-class Admin::FailedBikesController < Admin::BaseController
+class Admin::BParamsController < Admin::BaseController
   include SortableTable
   before_action :set_period, only: [:index]
 
@@ -7,7 +7,7 @@ class Admin::FailedBikesController < Admin::BaseController
     per_page = params.fetch(:per_page, 25)
 
     @b_params = matching_b_params
-        .includes(:creator)
+        .includes(:creator, :organization)
         .reorder("b_params.#{sort_column} #{sort_direction}")
         .page(page)
         .per(per_page)
@@ -22,16 +22,22 @@ class Admin::FailedBikesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at email]
+    %w[created_at updated_at creator_id origin created_bike_id email]
   end
 
   def matching_b_params
     matching_b_params = BParam
-    if params[:search_failedness] == "only_failed"
+    if params[:search_completeness] == "only_incomplete"
+      @search_completeness = "only_incomplete"
       matching_b_params = matching_b_params.without_bike
-    elsif params[:search_failedness] == "only_created"
+    elsif params[:search_completeness] == "only_complete"
+      @search_completeness = "only_succeeded"
       matching_b_params = matching_b_params.with_bike
+    else
+      @search_completeness = "all"
     end
+    matching_b_params = matching_b_params.where(organization_id: current_organization.id) if params[:organization_id].present?
+    matching_b_params = matching_b_params.email_search(params[:query]) if params[:query].present?
     matching_b_params.where(created_at: @time_range)
   end
 end

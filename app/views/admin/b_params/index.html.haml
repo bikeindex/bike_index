@@ -1,0 +1,103 @@
+.admin-subnav
+  .col-5
+    %h1
+      Partial Bikes
+  .col-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_completeness != "all" ? "active" : "") }
+          = @search_completeness.humanize
+        .dropdown-menu
+          - %w[all only_incomplete only_complete].each do |kind|
+            - kind_active = @search_completeness == kind
+            = link_to kind.humanize, admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", admin_b_params_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Partial bikes" }
+
+- if @render_chart
+  - if @search_completeness == "all"
+    - b_params_data = [{name: "incomplete", data: time_range_counts(collection: matching_b_params.without_bike)},{name: "completed", data: time_range_counts(collection: matching_b_params.with_bike)}]
+    = column_chart b_params_data, stacked: true, thousands: ",", defer: true, colors: ["#ffc281", "#178813"]
+  - else
+    = column_chart time_range_counts(collection: matching_b_params), stacked: true, thousands: ",", defer: true
+
+.mt-4
+  = render partial: "/shared/period_select"
+
+.row.mt-4
+  .col-md-5
+    %p
+      = number_with_delimiter(matching_b_params.count, delimiter: ',')
+      failed bikes
+      %em
+        #{humanized_time_range(@time_range)},
+      %strong
+        = number_with_delimiter(matching_b_params.where("created_at > ?", Time.current - 24.hours).count)
+      today
+  .col-md-7
+    = form_tag admin_b_params_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :search_completeness, params[:search_completeness]
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light.sortable
+      %th
+        = sortable "created_at"
+      %th.small
+        = sortable "updated_at"
+      %th
+        = sortable "email"
+      %th
+        = sortable "creator_id"
+      %th
+        = sortable "created_bike_id", "Bike"
+      %th
+        %small
+          = sortable "origin"
+      %th.small
+        Organization
+      %th Errors
+      %th Data
+    %tbody
+      - @b_params.each do |b_param|
+        %tr
+          %td
+            %a.convertTime.preciseTime{ href: admin_b_param_url(b_param.id) }
+              = l b_param.created_at, format: :convert_time
+          %td
+            %small.convertTime.preciseTime
+              = l b_param.updated_at, format: :convert_time
+          %td
+            = b_param.email
+          %td
+            %small.less-strong
+              - if b_param.creator.present?
+                = link_to b_param.creator.display_name, admin_user_path(b_param.creator_id)
+          %td
+            - if b_param.created_bike_id.present?
+              = link_to b_param.created_bike_id, admin_bike_path(b_param.created_bike_id)
+          %td
+            %small
+              = b_param.origin&.humanize
+          %td
+            - if b_param.creation_organization.present?
+              = link_to b_param.creation_organization.name, admin_b_params_path(organization_id: b_param.creation_organization.id)
+          %td
+            - if b_param.bike_errors.present?
+              = b_param.bike_errors.each { |f| f.to_s.humanize}
+            - if b_param.errors.present?
+              = b_param.errors.each_key { |f| f.to_s.humanize}
+            / - if b_param.params.creation_organization_id && b_param.params.creation_organization_id
+            /   - organization = Organization.find(b_param.params.creation_organization_id)
+            /   = organization.name
+          %td
+            %div{ style: "max-width: 450px; overflow: scroll; white-space: nowrap;" }
+              = pretty_print_json(b_param.params)
+
+.paginate-container
+  = paginate @b_params

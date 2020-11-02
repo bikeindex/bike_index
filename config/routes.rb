@@ -222,7 +222,7 @@ Rails.application.routes.draw do
         get :variable
       end
     end
-    resources :failed_bikes, only: %i[index show]
+    resources :b_params, only: %i[index show]
     resources :feedbacks, only: %i[index show]
     resources :ownerships, only: %i[edit update]
     resources :tweets
