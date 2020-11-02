@@ -180,7 +180,6 @@ Rails.application.routes.draw do
       end
       member { get :get_destroy }
     end
-    resources :partial_bikes, only: [:index]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
@@ -222,7 +221,7 @@ Rails.application.routes.draw do
         get :variable
       end
     end
-    resources :failed_bikes, only: %i[index show]
+    resources :b_params, only: %i[index show]
     resources :feedbacks, only: %i[index show]
     resources :ownerships, only: %i[edit update]
     resources :tweets

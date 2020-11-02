@@ -1,0 +1,54 @@
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            ID
+          %td
+            = @b_param.id
+        %tr
+          %td
+            Creator
+          %td
+            -if @b_param.creator.present?
+              = @b_param.creator.email
+            -else
+              No Creator
+        %tr
+          %td
+            created_at
+          %td.convertTime.preciseTime
+            = l @b_param.created_at, format: :convert_time
+        %tr
+          %td
+            Modified at
+          %td.convertTime.preciseTime
+            = l @b_param.updated_at, format: :convert_time
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Organization
+          %td
+            - if @b_param.creation_organization.present?
+              = @b_param.creation_organization.name
+        %tr
+          %td
+            Created bike
+          %td
+            - if @b_param.created_bike_id.present?
+              = link_to @b_param.created_bike_id, admin_bike_path(@b_param.created_bike_id)
+
+%h3.mt-4
+  Bike
+
+= pretty_print_json(@b_param.params)
+
+
+
+%h3.mt-4
+  Bike Errors
+
+= pretty_print_json(@b_param.bike_errors)
