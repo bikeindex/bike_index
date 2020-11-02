@@ -1,20 +1,36 @@
-%h1
-  Manage Failed Bikes
+.admin-subnav
+  .col-5
+    %h1
+      Manage Failed Bikes
+  .col-7
+    %ul
+      %li.nav-item
+        = link_to "graph", admin_failed_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-%h4
-  = number_with_delimiter(@b_params.total_count, delimiter: ',')
-  failed bikes,
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_b_params), stacked: true, thousands: ",", defer: true
+
+.mt-4
+  = render partial: "/shared/period_select"
+
+%p.mt-4
+  = number_with_delimiter(matching_b_params.count, delimiter: ',')
+  failed bikes
   %em
-    = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count
-    today
+    #{humanized_time_range(@time_range)},
+  %strong
+    = number_with_delimiter(matching_b_params.where("created_at > ?", Time.current - 24.hours).count)
+  today
 
-.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead.thead-light
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light.sortable
       %th
-        Date
+        = sortable "created_at"
+      %th.small
+        = sortable "updated_at"
       %th
-        Email
+        = sortable "email"
       %th
         Errors
     %tbody
@@ -23,6 +39,9 @@
           %td
             %a.convertTime.preciseTime{ href: admin_failed_bike_url(b_param.id) }
               = l b_param.created_at, format: :convert_time
+          %td
+            %small.convertTime.preciseTime
+              = l b_param.updated_at, format: :convert_time
           %td
             = b_param.creator.email if b_param.creator
           %td
