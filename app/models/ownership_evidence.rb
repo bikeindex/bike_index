@@ -1,0 +1,2 @@
+class OwnershipEvidence < ApplicationRecord
+end
