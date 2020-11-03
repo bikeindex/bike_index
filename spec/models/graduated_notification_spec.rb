@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe GraduatedNotification, type: :model do
-  let(:graduated_notification_interval) { 2.days.to_i }
+  let(:graduated_notification_interval) { 3.days.to_i }
   let(:organization) do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: ["graduated_notifications"],

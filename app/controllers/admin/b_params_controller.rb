@@ -7,10 +7,10 @@ class Admin::BParamsController < Admin::BaseController
     per_page = params.fetch(:per_page, 25)
 
     @b_params = matching_b_params
-        .includes(:creator, :organization)
-        .reorder("b_params.#{sort_column} #{sort_direction}")
-        .page(page)
-        .per(per_page)
+      .includes(:creator, :organization)
+      .reorder("b_params.#{sort_column} #{sort_direction}")
+      .page(page)
+      .per(per_page)
   end
 
   def show

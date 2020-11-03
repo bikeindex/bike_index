@@ -7,7 +7,7 @@ RSpec.describe base_url, type: :request do
 
   describe "index" do
     it "responds with OK and renders the index template" do
-      get "#{base_url}"
+      get base_url
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
       get "#{base_url}?query=something"
