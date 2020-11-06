@@ -1,4 +1,12 @@
 class PublicImage < ApplicationRecord
+  KIND_ENUM = {
+    photo_uncategorized: 0,
+    photo_stock: 3,
+    photo_of_user_with_bike: 4, # ownership evidence
+    photo_of_serial: 5, # ownership evidence
+    photo_of_receipt: 6 # ownership evidence
+  }.freeze
+
   mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
   belongs_to :imageable, polymorphic: true
 
@@ -17,6 +25,7 @@ class PublicImage < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.kind ||= "photo_uncategorized"
     self.name = (name || default_name).truncate(100)
     return true if listing_order && listing_order > 0
     self.listing_order = imageable&.public_images&.length || 0
