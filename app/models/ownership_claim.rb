@@ -1,10 +1,11 @@
 # t.references :impound_record, index: true
 # t.references :stolen_record, index: true
 # t.references :user, index: true
-# t.text :serial
-# t.text :bike_description
 # t.text :message
-class OwnershipEvidence < ApplicationRecord
+# t.json :data
+# t.integer :status
+# t.datetime :submitted_at
+class OwnershipClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
     submitted: 1,

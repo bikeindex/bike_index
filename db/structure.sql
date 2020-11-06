@@ -2128,6 +2128,43 @@ ALTER SEQUENCE public.other_listings_id_seq OWNED BY public.other_listings.id;
 
 
 --
+-- Name: ownership_claims; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ownership_claims (
+    id bigint NOT NULL,
+    impound_record_id bigint,
+    stolen_record_id bigint,
+    user_id bigint,
+    message text,
+    data json,
+    status integer,
+    submitted_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: ownership_claims_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ownership_claims_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ownership_claims_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ownership_claims_id_seq OWNED BY public.ownership_claims.id;
+
+
+--
 -- Name: ownerships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3293,6 +3330,13 @@ ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: ownership_claims id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ownership_claims ALTER COLUMN id SET DEFAULT nextval('public.ownership_claims_id_seq'::regclass);
+
+
+--
 -- Name: ownerships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3856,6 +3900,14 @@ ALTER TABLE ONLY public.organizations
 
 ALTER TABLE ONLY public.other_listings
     ADD CONSTRAINT other_listings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ownership_claims ownership_claims_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ownership_claims
+    ADD CONSTRAINT ownership_claims_pkey PRIMARY KEY (id);
 
 
 --
@@ -4661,6 +4713,27 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 
 
 --
+-- Name: index_ownership_claims_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownership_claims_on_impound_record_id ON public.ownership_claims USING btree (impound_record_id);
+
+
+--
+-- Name: index_ownership_claims_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownership_claims_on_stolen_record_id ON public.ownership_claims USING btree (stolen_record_id);
+
+
+--
+-- Name: index_ownership_claims_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownership_claims_on_user_id ON public.ownership_claims USING btree (user_id);
+
+
+--
 -- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5442,6 +5515,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201008204248'),
 ('20201009210429'),
 ('20201013204925'),
-('20201019200213');
+('20201019200213'),
+('20201103001935');
 
 
