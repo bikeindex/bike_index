@@ -2322,7 +2322,8 @@ CREATE TABLE public.public_images (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_private boolean DEFAULT false NOT NULL,
-    external_image_url text
+    external_image_url text,
+    kind integer DEFAULT 0
 );
 
 
@@ -5442,6 +5443,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201008204248'),
 ('20201009210429'),
 ('20201013204925'),
-('20201019200213');
+('20201019200213'),
+('20201103001935');
 
 
