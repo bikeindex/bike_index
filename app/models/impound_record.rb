@@ -48,6 +48,11 @@ class ImpoundRecord < ApplicationRecord
       .where(impound_records: {id: pluck(:id)})
   end
 
+  # Non-organizations don't "impound" bikes, they "find" them
+  def public_label
+    organization.present? ? "impounded" : "found"
+  end
+
   # Get it unscoped, because unregistered_bike notifications
   def bike
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
