@@ -38,11 +38,18 @@ class OwnershipEvidence < ApplicationRecord
   def set_calculated_attributes
     self.data ||= {}
     self.data[:photos] = photo_data
+    self.status = calculated_status
   end
 
   private
 
+  def calculated_status
+    return status
+    # impound_record_updates - can influence this
+  end
+
   # Because the photos may be assigned to other things. Or may change to be assigned to other things
   def photo_data
+    {}
   end
 end
