@@ -2309,43 +2309,6 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
--- Name: property_claims; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.property_claims (
-    id bigint NOT NULL,
-    impound_record_id bigint,
-    stolen_record_id bigint,
-    user_id bigint,
-    message text,
-    data json,
-    status integer,
-    submitted_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: property_claims_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.property_claims_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: property_claims_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.property_claims_id_seq OWNED BY public.property_claims.id;
-
-
---
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3359,13 +3322,6 @@ ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.pay
 
 
 --
--- Name: property_claims id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.property_claims ALTER COLUMN id SET DEFAULT nextval('public.property_claims_id_seq'::regclass);
-
-
---
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3933,14 +3889,6 @@ ALTER TABLE ONLY public.parking_notifications
 
 ALTER TABLE ONLY public.payments
     ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
-
-
---
--- Name: property_claims property_claims_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.property_claims
-    ADD CONSTRAINT property_claims_pkey PRIMARY KEY (id);
 
 
 --
@@ -4805,27 +4753,6 @@ CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 
 
 --
--- Name: index_property_claims_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_property_claims_on_impound_record_id ON public.property_claims USING btree (impound_record_id);
-
-
---
--- Name: index_property_claims_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_property_claims_on_stolen_record_id ON public.property_claims USING btree (stolen_record_id);
-
-
---
--- Name: index_property_claims_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_property_claims_on_user_id ON public.property_claims USING btree (user_id);
-
-
---
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5517,7 +5444,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201009210429'),
 ('20201013204925'),
 ('20201019200213'),
-('20201103001935'),
-('20201106181158');
+('20201103001935');
 
 
