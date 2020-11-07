@@ -5,7 +5,7 @@
 # t.json :data
 # t.integer :status
 # t.datetime :submitted_at
-class PropertyClaim < ApplicationRecord
+class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
     submitted: 1,

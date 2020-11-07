@@ -2,9 +2,9 @@ class PublicImage < ApplicationRecord
   KIND_ENUM = {
     photo_uncategorized: 0,
     photo_stock: 3,
-    photo_of_user_with_bike: 4, # property claim
-    photo_of_serial: 5, # property claim
-    photo_of_receipt: 6 # property claim
+    photo_of_user_with_bike: 4, # impound_claim
+    photo_of_serial: 5, # impound_claim
+    photo_of_receipt: 6 # impound_claim
   }.freeze
 
   mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
