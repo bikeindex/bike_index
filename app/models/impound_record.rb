@@ -50,7 +50,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   # Non-organizations don't "impound" bikes, they "find" them
-  def public_label
+  def kind
     organization.present? ? "impounded" : "found"
   end
 

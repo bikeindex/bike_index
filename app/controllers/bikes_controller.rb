@@ -324,12 +324,13 @@ class BikesController < ApplicationController
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   # Also provides testable protection against seeing organization info on bikes
   def assign_current_organization
-    org = current_organization || passive_organization # Has to be up here to process #current_organization first
-    # If forced false, or no user present, skip this
+    org = current_organization || passive_organization # actually call #current_organization first
+    # If forced false, or no user present, skip everything else
     return true if @current_organization_force_blank || current_user.blank?
     # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
     # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-    if params[:organization_id].present? && current_organization.blank? && current_user.default_organization.present?
+    if current_user.default_organization.present? && params[:organization_id].present?
+      return true if org.present? && current_user.authorized?(org)
       set_passive_organization(current_user.default_organization)
     else
       # If current_user isn't authorized for the organization, force assign nil
