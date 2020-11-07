@@ -150,26 +150,31 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "Admin viewing" do
-        let(:current_user) { FactoryBot.create(:admin) }
-        let(:organization) { FactoryBot.create(:organization) }
+        let(:current_user) { FactoryBot.create(:organization_admin, superuser: true) }
+        let(:organization) { current_user.default_organization }
+        let(:organization2) { FactoryBot.create(:organization) }
         it "responds with success" do
+          current_user.reload
+          expect(current_user.default_organization).to be_present
+          expect(current_user.superuser?).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(assigns(:bike).id).to eq bike.id
           expect(flash).to_not be_present
-          expect(assigns(:current_organization)&.id).to be_blank
-          expect(session[:passive_organization_id]).to eq "0"
-          # Renders with current organization passed
-          get "#{base_url}/#{bike.id}?organization_id=#{organization.id}"
-          expect(response).to render_template(:show)
-          expect(flash).to_not be_present
           expect(assigns(:current_organization)&.id).to eq organization.id
           expect(session[:passive_organization_id]).to eq organization.id
+          # Renders with current organization passed
+          get "#{base_url}/#{bike.id}?organization_id=#{organization2.id}"
+          expect(response).to render_template(:show)
+          expect(flash).to_not be_present
+          expect(assigns(:current_organization)&.id).to eq organization2.id
+          expect(session[:passive_organization_id]).to eq organization2.id
           # Renders with no organization, if organization set to false
           get "#{base_url}/#{bike.id}?organization_id=false"
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
+          expect(assigns(:current_organization_force_blank)).to be_truthy
           expect(assigns(:current_organization)&.id).to be_blank
           expect(session[:passive_organization_id]).to eq "0"
         end

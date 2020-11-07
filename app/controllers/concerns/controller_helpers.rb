@@ -250,6 +250,7 @@ module ControllerHelpers
     return @current_organization if defined?(@current_organization)
     if params[:organization_id] == "false" # Enable removing current organization
       @current_organization = nil
+      @current_organization_force_blank = true
     else
       @current_organization = Organization.friendly_find(params[:organization_id])
       # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
