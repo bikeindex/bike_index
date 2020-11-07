@@ -71,6 +71,9 @@
           = t(".from")
           = @bike.current_impound_record.parking_notification.address
 
+  - if @impound_claim.present?
+    = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, contact_owner_open: @contact_owner_open }
+
   .row
     .col-md-8
       %h1.bike-title
@@ -280,4 +283,19 @@
               %strong
                 = t(".owners_phone_number")
               = phone_link(@stolen_record.phone)
+      - if @bike.display_create_impounded_claim?(current_user) && !@contact_owner_open
+        - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+
+        .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+          %p.preface
+            %em
+              Does this look like your #{@bike.type}?
+          %h3
+            Claim
+            = @bike.current_impound_record.kind
+            #{@bike.type}
+
+          %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
+            Start claim
+
       .ad-block#right300x600

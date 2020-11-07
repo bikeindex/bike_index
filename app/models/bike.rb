@@ -473,6 +473,10 @@ class Bike < ApplicationRecord
     stolen? && current_stolen_record.present?
   end
 
+  def display_create_impounded_claim?(u = nil)
+    current_impound_record.present?
+  end
+
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if stolen? && current_stolen_record.present?

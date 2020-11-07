@@ -32,6 +32,11 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
+    if current_user.present? && @bike.display_create_impounded_claim?(current_user)
+      @contact_owner_open = params[:contact_owner].present?
+      @impound_claim = @bike.current_impound_record.impound_claims.where(user_id: current_user.id).first
+      @impound_claim ||= @bike.current_impound_record.impound_claims.build
+    end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)

@@ -1,0 +1,22 @@
+- impound_claim ||= @impound_claim
+-# start open if passed as open, or if there is an existing impound_claim
+- start_open ||= contact_owner_open || impound_claim.id.present?
+
+#impound_claim.collapse{ class: ("in" if start_open) }
+  .card.impound-claim-panel.mt-4.mb-4
+    .card-block
+      .card-title
+        %h3.header-font-alt
+          - if impound_claim.id.present?
+            Your claim for this
+          - else
+            Claim this
+          = impound_record.kind
+          = @bike.type
+      .card-body
+        - if impound_claim.id.present?
+          %h3.text-danger
+            NOT DONE YET
+        - else
+          = form_for impound_claim do |f|
+            = f.hidden_field :impound_record_id, value: impound_claim.id

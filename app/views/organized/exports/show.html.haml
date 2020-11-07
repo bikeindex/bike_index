@@ -46,7 +46,7 @@
 
           - if bike_ids.present?
             %a.small.less-strong{ href: "#show_exported_bikes",
-                                 'aria-controls' => 'new_stolen_message',
+                                 'aria-controls' => 'show_exported_bikes',
                                  'data-toggle' => 'collapse' }
               - if @export&.rows.to_i > 100
                 = t(".show_first_100_bikes_in_export")

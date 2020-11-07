@@ -733,8 +733,9 @@ RSpec.describe Bike, type: :model do
   describe "display_contact_owner?" do
     let(:bike) { Bike.new }
     let(:admin) { User.new(superuser: true) }
+    let(:owner) { User.new }
+    before { allow(bike).to receive(:owner) { owner } }
     it "is falsey if bike doesn't have stolen record" do
-      allow(bike).to receive(:owner) { User.new }
       expect(bike.contact_owner?).to be_falsey
       expect(bike.contact_owner?(User.new)).to be_falsey
       expect(bike.contact_owner?(admin)).to be_truthy
@@ -746,6 +747,28 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(User.new)).to be_truthy
         expect(bike.display_contact_owner?).to be_truthy
+        expect(bike.display_contact_owner?(admin)).to be_truthy
+        expect(bike.display_contact_owner?(owner)).to be_truthy
+      end
+    end
+  end
+
+  describe "display_create_impounded_claim?" do
+    let(:bike) { Bike.new }
+    let(:admin) { User.new(superuser: true) }
+    let(:owner) { User.new }
+    before { allow(bike).to receive(:owner) { owner } }
+    it "is falsey if bike doesn't have impounded" do
+      expect(bike.display_create_impounded_claim?).to be_falsey
+    end
+    context "impound bike" do
+      let(:impound_record) { ImpoundRecord.new(bike: bike) }
+      before { allow(bike).to receive(:current_impound_record) { impound_record } }
+      it "is truthy" do
+        expect(bike.display_create_impounded_claim?).to be_truthy
+        expect(bike.display_create_impounded_claim?(User.new)).to be_truthy
+        expect(bike.display_create_impounded_claim?(admin)).to be_truthy
+        expect(bike.display_create_impounded_claim?(owner)).to be_truthy
       end
     end
   end

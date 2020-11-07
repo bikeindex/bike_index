@@ -442,6 +442,26 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+    context "with impound_record" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      it "includes an impound_claim" do
+        expect(bike.current_impound_record).to be_present
+        get "#{base_url}/#{bike.id}"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:impound_claim)).to be_present
+        expect(assigns(:impound_claim)&.id).to be_blank
+      end
+      context "current_user has impound_claim" do
+        let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
+        it "uses impound_claim" do
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+        end
+      end
+    end
   end
 
   describe "update token" do
@@ -920,7 +940,7 @@ RSpec.describe BikesController, type: :request do
         stolen_record.reload
         expect(bike.current_stolen_record).to eq stolen_record
         expect(stolen_record.without_location?).to be_truthy
-        og_alert_image_id = stolen_record.alert_image.id
+        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(og_alert_image_id).to be_present
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
