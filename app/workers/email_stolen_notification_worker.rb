@@ -5,7 +5,7 @@ class EmailStolenNotificationWorker < ApplicationWorker
     stolen_notification = StolenNotification.find(stolen_notification_id)
     if stolen_notification.permitted_send?
       CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
-    else
+    elsif stolen_notification.bike.present?
       AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
     end
   end
