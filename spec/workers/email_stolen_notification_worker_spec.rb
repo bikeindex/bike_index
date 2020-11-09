@@ -98,4 +98,13 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       end
     end
   end
+
+  context "bike deleted" do
+    before { stolen_notification.bike.destroy }
+    it "doesn't explode" do
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      instance.perform(stolen_notification.id)
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+    end
+  end
 end
