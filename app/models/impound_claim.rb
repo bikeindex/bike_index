@@ -26,13 +26,12 @@ class ImpoundClaim < ApplicationRecord
 
   enum status: STATUS_ENUM
 
-  # Maybe it's going to be an actual relation someday! consistent accessor
-  def impound_record_bike
+  def bike_claimed
     impound_record&.bike
   end
 
-  # Maybe it's going to be an actual relation someday! consistent accessor
-  def stolen_record_bike
+  # I realize the tense is wrong for pending - but meh
+  def bike_submitted
     stolen_record&.bike
   end
 

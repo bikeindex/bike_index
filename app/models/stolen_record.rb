@@ -98,6 +98,11 @@ class StolenRecord < ApplicationRecord
     recovered_at.present? && recovered_at < self.class.recovering_user_recording_start
   end
 
+  # At some point, we may want to associate this via the bike's ownership at time of creation or something
+  def user
+    bike&.user
+  end
+
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?
     address.present?

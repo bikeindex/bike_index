@@ -44,6 +44,16 @@ class ImpoundRecord < ApplicationRecord
     ImpoundRecordUpdate.kinds_humanized_short
   end
 
+  # Using class here to make it easier to update/translate the specific word later
+  def self.impounded_kind
+    "impounded"
+  end
+
+  # Using class here to make it easier to update/translate the specific word later
+  def self.found_kind
+    "found"
+  end
+
   def self.bikes
     Bike.unscoped.includes(:impound_records)
       .where(impound_records: {id: pluck(:id)})
@@ -51,7 +61,7 @@ class ImpoundRecord < ApplicationRecord
 
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
-    organization.present? ? "impounded" : "found"
+    organization.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
   # Get it unscoped, because unregistered_bike notifications

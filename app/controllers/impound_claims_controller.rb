@@ -1,36 +1,48 @@
-class BikeStickersController < ApplicationController
-  before_action :find_bike_sticker
+class ImpoundClaimsController < ApplicationController
+  before_action :authenticate_user
+  before_action :find_impound_claim, only: [:update]
 
-  def update
-    @bike_sticker.claim_if_permitted(user: current_user, bike: params[:bike_id])
-    if @bike_sticker.errors.any?
-      flash[:error] = @bike_sticker.errors.full_messages.to_sentence
-    else
-      flash[:success] = "#{@bike_sticker.kind.titleize} #{@bike_sticker.code} - #{@bike_sticker.claimed? ? "claimed" : "unclaimed"}"
-      if @bike_sticker.bike.present?
-        redirect_to(bike_path(@bike_sticker.bike_id)) && return
+  def create
+    impound_claim = ImpoundClaim.new(permitted_create_params)
+    impound_record = impound_claim.impound_record
+    stolen_record = impound_claim.stolen_record
+    bike_type = stolen_record&.bike&.type || impound_record&.bike&.type || "bike"
+    impound_type = "#{impound_record&.kind || ImpoundRecord.impounded_kind} #{bike_type}"
+    errors = []
+    if impound_claim.impound_record.blank?
+      errors << "Unable to find that #{impound_type}"
+    elsif !impound_record.active?
+      errors << "That #{impound_type} has been #{impound_record.status_humanized} and cannot be claimed"
+    end
+    if stolen_record.blank?
+      errors << "Unable to find that bike"
+    elsif stolen_record.user != current_user
+      errors << "It doesn't look like you own the #{bike_type} you're claiming matches the #{impound_type}"
+    end
+    if errors.blank?
+      impound_claim.save
+      if impound_claim.valid?
+        flash[:success] = "Claim started, please continue to add information"
+      else
+        errors = impound_claim.errors.full_messages
       end
     end
-    redirect_back(fallback_location: root_url)
+    flash[:error] = errors.to_sentence if errors.any?
+    redirect_back(fallback_location: bike_path(impound_claim.bike_claimed))
+  end
+
+  def update
+    redirect_back(fallback_location: bike_path(impound_claim.bike_claimed))
   end
 
   protected
 
-  def bike_sticker_code
-    params.dig(:bike_sticker, :code) || params[:id]
+  def permitted_create_params
+    params.require(:impound_claim).permit(:impound_record_id, :stolen_record_id)
+      .merge(user_id: current_user.id, status: "pending")
   end
 
-  def find_bike_sticker
-    unless current_user.present?
-      flash[:error] = translation(:must_be_signed_in)
-      redirect_back(fallback_location: scanned_bike_path(params[:id], organization_id: params[:organization_id]))
-      return
-    end
-    bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker_code, organization_id: passive_organization&.id, user: current_user)
-    # use the loosest lookup
-    @bike_sticker = bike_sticker if bike_sticker.present?
-    return @bike_sticker if @bike_sticker.present?
-    flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
-    redirect_back(fallback_location: root_url) && return
+  def find_impound_claim
+    @impound_claim = current_user.impound_claims.find_by_id(params[:id])
   end
 end

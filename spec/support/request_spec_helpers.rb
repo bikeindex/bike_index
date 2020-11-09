@@ -17,6 +17,11 @@ module RequestSpecHelpers
     before { log_in(current_user) }
   end
 
+  RSpec.shared_context :request_spec_logged_in_as_user_if_present do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    before { log_in(current_user) if current_user.present? }
+  end
+
   RSpec.shared_context :request_spec_logged_in_as_superuser do
     let(:current_user) { FactoryBot.create(:admin) }
     before { log_in(current_user) }

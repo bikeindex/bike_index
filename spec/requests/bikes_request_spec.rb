@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe BikesController, type: :request do
+  include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes" }
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-  before { log_in(current_user) if current_user.present? }
 
   describe "show" do
     context "example bike" do

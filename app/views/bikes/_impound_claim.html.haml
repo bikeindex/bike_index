@@ -10,13 +10,17 @@
           - if impound_claim.id.present?
             Your claim for this
           - else
-            Claim this
+            File a claim for this
           = impound_record.kind
           = @bike.type
       .card-body
         - if impound_claim.id.present?
           %h3.text-danger
-            NOT DONE YET
+            NOT built yet
         - else
           = form_for impound_claim do |f|
             = f.hidden_field :impound_record_id, value: impound_claim.id
+            %h3
+              Which bike does this impound record co
+            -# TODO: include a way to create the bike right here
+            - bikes = current_user.rough_approx_bikes.reorder(:created_at).limit(10)
