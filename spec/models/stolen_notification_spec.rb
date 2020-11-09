@@ -2,21 +2,10 @@ require "rails_helper"
 
 RSpec.describe StolenNotification, type: :model do
   describe "create" do
-    let(:stolen_notification) { FactoryBot.build(:stolen_notification) }
     it "enqueues an email job" do
       expect {
-        stolen_notification.save
+        FactoryBot.create(:stolen_notification)
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
-      expect(stolen_notification.permitted_send?).to be_truthy
-    end
-    context "bike deleted" do
-      before { stolen_notification.bike.destroy }
-      it "doesn't explode" do
-        expect {
-          stolen_notification.save
-        }.to_not change(EmailStolenNotificationWorker.jobs, :size)
-        expect(stolen_notification.permitted_send?).to be_falsey
-      end
     end
   end
 
