@@ -44,17 +44,19 @@ RSpec.describe ImpoundClaimsController, type: :request do
         expect(flash[:error]).to eq "That impounded bike record has been marked 'Owner retrieved bike' and cannot be claimed"
       end
     end
-    # context "not a stolen bike" do
-    #   it "errors" do
-    #   end
-    # end
-    # context "not users stolen bike" do
-    #   it "errors" do
-    #   end
-    # end
-    # context "user not signed in" do
-    #   it "errors" do
-    #   end
-    # end
+    context "not users stolen bike" do
+      let(:bike_submitted) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
+      it "errors" do
+        expect do
+          post base_url, params: {
+            impound_claim: {
+              impound_record_id: impound_record.id,
+              stolen_record_id: stolen_record.id
+            }
+          }
+        end.to_not change(ImpoundClaim, :count)
+        expect(flash[:error]).to match(/own/i)
+      end
+    end
   end
 end

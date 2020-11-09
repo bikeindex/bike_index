@@ -185,6 +185,9 @@
 
   .impound-claim-panel {
     border-radius: 2px;
+    label {
+      line-height: 1.5;
+    }
   }
 
   // This is the first title, that only shows up if you're a paid organization or superuser

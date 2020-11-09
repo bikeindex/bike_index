@@ -22,17 +22,17 @@ class ImpoundClaimsController < ApplicationController
     if errors.blank?
       impound_claim.save
       if impound_claim.valid?
-        flash[:success] = "Claim started, please continue to add information"
+        flash[:success] = "Claim started, please add information"
       else
         errors = impound_claim.errors.full_messages
       end
     end
     flash[:error] = errors.to_sentence if errors.any?
-    redirect_back(fallback_location: bike_path(impound_claim.bike_claimed))
+    redirect_to bike_path(impound_claim.bike_claimed, contact_owner: 1)
   end
 
   def update
-    redirect_back(fallback_location: bike_path(impound_claim.bike_claimed))
+    redirect_back(fallback_location: bike_path(impound_claim.bike_claimed, contact_owner: 1))
   end
 
   protected

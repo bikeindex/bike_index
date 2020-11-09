@@ -1,3 +1,5 @@
+-# You really should pass impound_record and impound_claim in
+- impound_record ||= @bike.current_impound_record
 - impound_claim ||= @impound_claim
 -# start open if passed as open, or if there is an existing impound_claim
 - start_open ||= contact_owner_open || impound_claim.id.present?
@@ -14,13 +16,31 @@
           = impound_record.kind
           = @bike.type
       .card-body
-        - if impound_claim.id.present?
+        - if impound_claim.id.blank?
+          - bikes = current_user.rough_approx_bikes.stolen.reorder(created_at: :desc).limit(10)
+          - if bikes.none?
+            %p
+              You have to have a stolen bike registered to file a claim for this #{impound_record.kind} #{impound_record.bike.type}.
+              %br
+              %strong
+                Add #{link_to "a stolen bike here", new_bike_url(stolen: true)}.
+          - else
+            = form_for impound_claim do |f|
+              = f.hidden_field :impound_record_id, value: impound_record.id
+              -# TODO: include a way to create the bike right here
+              .row
+                .col-lg-8
+                  .form-group
+                    = f.label :stolen_record_id do
+                      Select the stolen bike you own which matches this #{impound_record.kind} #{impound_record.bike&.type}
+                      %small.less-strong
+                        not registered yet? #{link_to "add it here", new_bike_url(stolen: true)}.
+                    - stolen_select_opts = bikes.map { |b| [b.title_string, b.current_stolen_record&.id] }
+                    = f.select(:stolen_record_id, stolen_select_opts, {prompt: "Choose stolen bike"}, {required: true, class: "form-control"})
+                .col-lg-4
+                  .form-group.submit-button
+                    %label.d-none.d-lg-block &nbsp;
+                    = submit_tag "Start claim", class: "btn btn-success btn-lg"
+        - else
           %h3.text-danger
             NOT built yet
-        - else
-          = form_for impound_claim do |f|
-            = f.hidden_field :impound_record_id, value: impound_claim.id
-            %h3
-              Which bike does this impound record co
-            -# TODO: include a way to create the bike right here
-            - bikes = current_user.rough_approx_bikes.reorder(:created_at).limit(10)
