@@ -12,7 +12,7 @@ class ImpoundClaimsController < ApplicationController
     if impound_claim.impound_record.blank?
       errors << "Unable to find that #{impound_type}"
     elsif !impound_record.active?
-      errors << "That #{impound_type} has been #{impound_record.status_humanized} and cannot be claimed"
+      errors << "That #{impound_type} record has been marked '#{impound_record.status_humanized}' and cannot be claimed"
     end
     if stolen_record.blank?
       errors << "Unable to find that bike"

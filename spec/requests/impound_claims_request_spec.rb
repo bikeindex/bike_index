@@ -22,6 +22,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
           }
         }
       end.to change(ImpoundClaim, :count).by 1
+      expect(flash[:success]).to be_present
       impound_claim = ImpoundClaim.last
       expect(impound_claim.status).to eq "pending"
       expect(impound_claim.user&.id).to eq current_user.id
@@ -40,7 +41,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
           }
         end.to_not change(ImpoundClaim, :count)
         expect(impound_record.active?).to be_falsey
-        expect(flash[:error]).to eq "That impounded bike record has been marked Owner retrieved bike and cannot be claimed"
+        expect(flash[:error]).to eq "That impounded bike record has been marked 'Owner retrieved bike' and cannot be claimed"
       end
     end
     # context "not a stolen bike" do
