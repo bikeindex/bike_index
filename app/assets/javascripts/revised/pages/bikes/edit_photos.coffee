@@ -10,7 +10,10 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
 
     $('.saveBikeChanges').click (e) ->
       e.preventDefault()
-      location.reload(true)
+      if $("#permittedReturnTo").length
+        window.location = $("#permittedReturnTo").attr("data-path")
+      else
+        location.reload(true)
 
   initializeImageUploads: ->
     initializeSortablePhotos = @initializeSortablePhotos

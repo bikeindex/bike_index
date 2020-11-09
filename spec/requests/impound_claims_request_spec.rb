@@ -5,8 +5,8 @@ RSpec.describe ImpoundClaimsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:impound_record) { FactoryBot.create(:impound_record) }
   let(:bike_claimed) { impound_record.bike }
-  let(:bike_submitted) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: current_user) }
-  let(:stolen_record) { bike_submitted.current_stolen_record }
+  let(:bike_submitting) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: current_user) }
+  let(:stolen_record) { bike_submitting.current_stolen_record }
 
   describe "create" do
     it "creates an impound claim for a stolen bike" do
@@ -26,7 +26,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
       impound_claim = ImpoundClaim.last
       expect(impound_claim.status).to eq "pending"
       expect(impound_claim.user&.id).to eq current_user.id
-      expect(impound_claim.bike_submitted&.id).to eq bike_submitted.id
+      expect(impound_claim.bike_submitting&.id).to eq bike_submitting.id
       expect(impound_claim.bike_claimed&.id).to eq bike_claimed.id
     end
     context "not a current impound_record" do
@@ -45,7 +45,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
       end
     end
     context "not users stolen bike" do
-      let(:bike_submitted) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
+      let(:bike_submitting) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
       it "errors" do
         expect do
           post base_url, params: {

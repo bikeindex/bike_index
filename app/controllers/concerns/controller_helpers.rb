@@ -122,6 +122,7 @@ module ControllerHelpers
 
   def return_to_if_present
     if session[:return_to].present? || cookies[:return_to].present? || params[:return_to]
+      # NOTE: This is duplicated in permitted_return_to
       target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
@@ -140,6 +141,13 @@ module ControllerHelpers
     elsif session[:discourse_redirect]
       redirect_to(discourse_authentication_url) && (return true)
     end
+  end
+
+  def permitted_return_to
+    target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
+    return nil if invalid_return_to?(target)
+    # Either starting with our URL or /
+    return target if target.match(/\A#{ENV["BASE_URL"]}/) || target.match(%r{\A/})
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away

@@ -72,7 +72,9 @@
           = @bike.current_impound_record.parking_notification.address
 
   - if @impound_claim.present?
-    = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, contact_owner_open: @contact_owner_open }
+    -# This is open if passed there is an existing impound_claim
+    - @contact_owner_open = true if @impound_claim.id.present? && !@contact_owner_open
+    = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, start_open: @contact_owner_open }
 
   .row
     .col-md-8

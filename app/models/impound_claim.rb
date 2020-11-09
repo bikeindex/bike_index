@@ -30,8 +30,7 @@ class ImpoundClaim < ApplicationRecord
     impound_record&.bike
   end
 
-  # I realize the tense is wrong for pending - but meh
-  def bike_submitted
+  def bike_submitting
     stolen_record&.bike
   end
 

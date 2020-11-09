@@ -1,8 +1,7 @@
 -# You really should pass impound_record and impound_claim in
 - impound_record ||= @bike.current_impound_record
 - impound_claim ||= @impound_claim
--# start open if passed as open, or if there is an existing impound_claim
-- start_open ||= contact_owner_open || impound_claim.id.present?
+- start_open ||= false
 
 #impound_claim.collapse{ class: ("in" if start_open) }
   .card.impound-claim-panel.mt-4.mb-4
@@ -42,5 +41,25 @@
                     %label.d-none.d-lg-block &nbsp;
                     = submit_tag "Start claim", class: "btn btn-success btn-lg"
         - else
-          %h3.text-danger
-            NOT built yet
+          - bike_submitting = impound_claim.bike_submitting.decorate
+          .row
+            .col-lg-8
+              .bike-boxes
+                = render partial: "/bikes/bike", locals: { bike: bike_submitting }
+            .col-lg-4
+              %p
+                Prove to
+                %em= impound_record.creator_public_display_name
+                that this #{impound_record.bike.type} is yours by providing details that only the owner would have.
+              -# Here are recommended things to add:
+
+              = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true) }
+
+
+          .row
+            .col-md-6
+              Add a note to submit this bike
+            .col-lg-4
+              .form-group.submit-button
+                %label.d-none.d-lg-block &nbsp;
+                = submit_tag "Start claim", class: "btn btn-success btn-lg"

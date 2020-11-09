@@ -73,6 +73,11 @@ class ImpoundRecord < ApplicationRecord
     parking_notification&.user
   end
 
+  # When there are non-organized impounds, extra logic will be necessary here
+  def creator_public_display_name
+    organization.name
+  end
+
   def active?
     self.class.active_statuses.include?(status)
   end

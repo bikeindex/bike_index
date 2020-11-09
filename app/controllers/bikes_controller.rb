@@ -167,7 +167,7 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
-
+    @permitted_return_to = permitted_return_to
     requested_page = target_edit_template(requested_page: params[:page])
     @edit_template = requested_page[:template]
     if !requested_page[:is_valid]
