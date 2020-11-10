@@ -3919,7 +3919,6 @@ nl:
       sign_up: Registreren
       sign_up_now: Meld je nu aan
       simply_the_best_bike_registry: Het beste fietsregister
-      supporting_shop: Ondersteunende Winkel
       try_for_free: Probeer gratis
       year: jaar
     campus_packages:
@@ -3935,7 +3934,6 @@ nl:
       contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
       forever: Voor altijd
       free: GRATIS
-      keep_us_pedaling: Houd ons fietsende
       package_title: "%{name} pakket"
       questions_want_to_get_started: Vragen? Wilt u beginnen?
       sign_up: Registreren
@@ -3955,14 +3953,10 @@ nl:
       free: GRATIS
       give_your_constituents_the_bike_registry_: Geef uw afnemers het fietsregister
         dat ze willen
-      keep_us_pedaling: Houd ons fietsende
-      metropolis: Metropolis
       package_title: "%{name} pakket"
       questions_want_to_get_started: Vragen? Wilt u beginnen?
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      small_city: Kleine stad
-      town: Stad
       try_for_free: Probeer gratis
       year: jaar
     find_out_more:
@@ -4891,8 +4885,6 @@ nl:
   plan_features:
     add_form_fields: Voeg specifieke formuliervelden toe aan uw bestemmingspagina
     add_logos: Voeg logo's en tekst toe aan Bike Index-e-mails
-    automated_migration: Geautomatiseerde migratie van afgestudeerde fietsen uit het
-      systeem
     automatic_registration_through_pos: Automatische registratie via uw POS
     contact_registrants: Neem contact op met registranten die de registratie niet
       hebben voltooid
