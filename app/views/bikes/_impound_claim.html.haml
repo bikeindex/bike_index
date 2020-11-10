@@ -42,18 +42,23 @@
           - bike_submitting = impound_claim.bike_submitting.decorate
           = form_for impound_claim do |f|
             = f.hidden_field :status
-
             .row
               .col-lg-8.mb-4
                 .bike-boxes
                   = render partial: "/bikes/bike", locals: { bike: bike_submitting }
-                .form-group.mt-4
-                  = f.label :message do
-                    Message
-                    %small.less-strong
-                      verify your ownership - add additional details that prove this #{bike_submitting.type} is yours
-                  = f.text_area :message, class: "form-control"
-                = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
+                - if impound_claim.unsubmitted?
+                  .form-group.mt-4
+                    = f.label :message do
+                      Message
+                      %small.less-strong
+                        verify your ownership - add additional details that prove this #{bike_submitting.type} is yours
+                    = f.text_area :message, class: "form-control"
+                  = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
+                - else
+                  %em
+                    This claim was submitted
+                    %span.convertTime.withPreposition
+                      = l impound_claim.created_at, format: :convert_time
               .col-lg-4
                 %p
                   Prove to
@@ -62,11 +67,12 @@
 
                 -# Here are recommended things to add:
                 = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true) }
-                .mt-4
-                %a.btn.btn-success#submitClaimButton{ href: "#" }
-                  Submit claim
-                %em.small.less-strong.d-lg-block
-                  you will no longer be able to edit this claim!
+                - if impound_claim.unsubmitted?
+                  .mt-4
+                    %a.btn.btn-success#submitClaimButton{ href: "#" }
+                      Submit claim
+                    %em.small.less-strong.d-lg-block
+                      you will no longer be able to edit this claim!
 
 
 

@@ -8,10 +8,10 @@
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
-    submitted: 1,
+    submitting: 1,
     approved: 2,
     rejected: 3,
-    cancelled: 4
+    canceled: 4
   }.freeze
 
   belongs_to :impound_record
@@ -26,6 +26,9 @@ class ImpoundClaim < ApplicationRecord
 
   enum status: STATUS_ENUM
 
+  scope :unsubmitted, -> { where(submitted_at: nil) }
+  scope :submitted, -> { where.not(submitted_at: nil) }
+
   def bike_claimed
     impound_record&.bike
   end
@@ -34,10 +37,19 @@ class ImpoundClaim < ApplicationRecord
     stolen_record&.bike
   end
 
+  def unsubmitted?
+    submitted_at.blank?
+  end
+
+  def submitted?
+    !unsubmitted?
+  end
+
   def set_calculated_attributes
     self.data ||= {}
     self.data[:photos] = photo_data
     self.status = calculated_status
+    self.submitted_at ||= Time.current if status == "submitting"
   end
 
   private

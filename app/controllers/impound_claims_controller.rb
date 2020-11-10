@@ -33,7 +33,11 @@ class ImpoundClaimsController < ApplicationController
 
   def update
     if @impound_claim.update(permitted_update_params)
-      flash[:success] = "Claim saved"
+      flash[:success] = if @impound_claim.submitting?
+        "Claim submitted!"
+      else
+        "Claim saved"
+      end
     else
       flash[:error] = "Unable to save: #{@impound_claim.errors.full_messages.to_sentence}"
     end
@@ -48,10 +52,13 @@ class ImpoundClaimsController < ApplicationController
   end
 
   def permitted_update_params
-    params.require(:impound_claim).permit(:message, :status)
+    permitted_statuses = %w[pending submitting canceled]
+    update_params = params.require(:impound_claim).permit(:message, :status)
+    update_params[:status] = "pending" unless permitted_statuses.include?(update_params[:status])
+    update_params
   end
 
   def find_impound_claim
-    @impound_claim = current_user.impound_claims.find(params[:id])
+    @impound_claim = current_user.impound_claims.pending.find(params[:id])
   end
 end

@@ -64,11 +64,10 @@ RSpec.describe ImpoundClaimsController, type: :request do
     let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, user: current_user) }
     it "updates" do
       patch "#{base_url}/#{impound_claim.id}", params: {
-        impound_claim: {
-          message: "A new message"
-        }
+        impound_claim: {message: "A new message",status: "approved"}
       }
       expect(flash[:success]).to be_present
+      expect(flash[:success]).to_not match(/submit/)
       impound_claim.reload
       expect(impound_claim.message).to eq "A new message"
       expect(impound_claim.status).to eq "pending"
@@ -76,15 +75,26 @@ RSpec.describe ImpoundClaimsController, type: :request do
     context "with status submitted" do
       it "submits" do
         patch "#{base_url}/#{impound_claim.id}", params: {
-          impound_claim: {
-            message: "I'm submitting",
-            status: "submitted"
-          }
+          impound_claim: {message: "I'm submitting",status: "submitting"}
         }
-        expect(flash[:success]).to be_present
+        expect(flash[:success]).to match(/submit/)
         impound_claim.reload
         expect(impound_claim.message).to eq "I'm submitting"
-        expect(impound_claim.status).to eq "submitted"
+        expect(impound_claim.status).to eq "submitting"
+        expect(impound_claim.submitted?).to be_truthy
+      end
+    end
+    context "submitted claim" do
+      let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, user: current_user, status: "submitting") }
+      it "does not update" do
+        expect do
+          patch "#{base_url}/#{impound_claim.id}", params: {
+            impound_claim: {message: "A new message", status: "pending"}
+          }
+        end.to raise_error(ActiveRecord::RecordNotFound)
+        impound_claim.reload
+        expect(impound_claim.message).to be_blank
+        expect(impound_claim.status).to eq "submitting"
       end
     end
     context "not users impound_claim" do
@@ -92,9 +102,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
       it "does not update" do
         expect do
           patch "#{base_url}/#{impound_claim.id}", params: {
-            impound_claim: {
-              message: "A new message"
-            }
+            impound_claim: {message: "A new message"}
           }
         end.to raise_error(ActiveRecord::RecordNotFound)
         impound_claim.reload
