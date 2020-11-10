@@ -4801,8 +4801,10 @@ en:
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
     ongoing_programming: Ongoing programming, hosting, and support
     organization_dashboard: >-
-      City and Police dashboard - analyze statistics on local registration based on
-      zip code
+      City and Law enforcement dashboard - analyze statistics on local registration based on zip code
+    law_enforcement_list_html: >-
+      Law enforcement tools: <ol class="le-list"><li>Bulk serial search</li><li>Flagged duplicate registrations and bike credibility scores</li><li>Ability to message users even if they haven't marked bikes as stolen</li><li>Cross-database search</li><li>Integration with LeadsOnline</li><li>Daily stolen bikes hot sheet</li><li>Public-facing impound page</li></ol>
+    department_landing_page: Department-branded registration landing page
     priority_programming_support: Priority programming, hosting, and support
     qr_sticker: QR sticker scanning and messaging
     qr_sticker_scanning_and_messaging: QR sticker scanning and messaging
