@@ -2,7 +2,7 @@
 -# Maybe there is a way to calculate this dynamically, skipping for now
 - current_path ||= "/bikes/#{impound_claim.bike_claimed}"
 
-.stolen-checklist-wrap
+.stolen-checklist-wrap.mt-2
   %ul.stolen-checklist
     - verified_phone_number = current_user.user_phones.confirmed.any?
     %li{ class: verified_phone_number ? "completed-item" : "" }
@@ -18,7 +18,7 @@
       %span.checklist-text
         #{bike_submitting.type.titleize} theft location and time
 
-    - serial_known = bike_submitting.serial_unknown?
+    - serial_known = !bike_submitting.serial_unknown?
     %li{ class: serial_known ? "completed-item" : "" }
       %span.checklist-checkbox
         = "&#10003;".html_safe if serial_known
@@ -47,5 +47,14 @@
         = "&#10003;".html_safe if photo_of_you_and_bike
       %span.checklist-text
         = link_to "Photo of you with the #{bike_submitting.type}", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+
+    - message_present = impound_claim.message.present?
+    %li{ class: message_present ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if message_present
+      %span.checklist-text
+        Message to
+        %em= impound_claim.impound_record.creator_public_display_name
+        verifying your ownership
 
 

@@ -30,6 +30,7 @@ class User < ApplicationRecord
 
   has_many :integrations, dependent: :destroy
   has_many :creation_states, inverse_of: :creator, foreign_key: :creator_id
+  has_many :impound_claims
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy

@@ -27,39 +27,46 @@
             = form_for impound_claim do |f|
               = f.hidden_field :impound_record_id, value: impound_record.id
               -# TODO: include a way to create the bike right here
-              .row
-                .col-lg-8
-                  .form-group
-                    = f.label :stolen_record_id do
-                      Select the stolen bike you own which matches this #{impound_record.kind} #{impound_record.bike&.type}
-                      %small.less-strong
-                        not registered yet? #{link_to "add it here", new_bike_url(stolen: true)}.
+              .form-group
+                = f.label :stolen_record_id do
+                  Select the stolen bike you own which matches this #{impound_record.kind} #{impound_record.bike&.type}
+                  %small.less-strong
+                    not registered yet? #{link_to "add it here", new_bike_url(stolen: true)}.
+                .row
+                  .col-lg-8.mb-2
                     - stolen_select_opts = bikes.map { |b| [b.title_string, b.current_stolen_record&.id] }
                     = f.select(:stolen_record_id, stolen_select_opts, {prompt: "Choose stolen bike"}, {required: true, class: "form-control"})
-                .col-lg-4
-                  .form-group.submit-button
-                    %label.d-none.d-lg-block &nbsp;
-                    = submit_tag "Start claim", class: "btn btn-success btn-lg"
+                  .col-lg-4.text-right
+                    = submit_tag "Start claim", class: "btn btn-success"
         - else
           - bike_submitting = impound_claim.bike_submitting.decorate
-          .row
-            .col-lg-8
-              .bike-boxes
-                = render partial: "/bikes/bike", locals: { bike: bike_submitting }
-            .col-lg-4
-              %p
-                Prove to
-                %em= impound_record.creator_public_display_name
-                that this #{impound_record.bike.type} is yours by providing details that only the owner would have.
-              -# Here are recommended things to add:
+          = form_for impound_claim do |f|
+            = f.hidden_field :status
 
-              = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true) }
+            .row
+              .col-lg-8.mb-4
+                .bike-boxes
+                  = render partial: "/bikes/bike", locals: { bike: bike_submitting }
+                .form-group.mt-4
+                  = f.label :message do
+                    Message
+                    %small.less-strong
+                      verify your ownership - add additional details that prove this #{bike_submitting.type} is yours
+                  = f.text_area :message, class: "form-control"
+                = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
+              .col-lg-4
+                %p
+                  Prove to
+                  %em= impound_record.creator_public_display_name
+                  that this #{impound_record.bike.type} is yours by providing details that only the owner would have.
+
+                -# Here are recommended things to add:
+                = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true) }
+                .mt-4
+                %a.btn.btn-success#submitClaimButton{ href: "#" }
+                  Submit claim
+                %em.small.less-strong.d-lg-block
+                  you will no longer be able to edit this claim!
 
 
-          .row
-            .col-md-6
-              Add a note to submit this bike
-            .col-lg-4
-              .form-group.submit-button
-                %label.d-none.d-lg-block &nbsp;
-                = submit_tag "Start claim", class: "btn btn-success btn-lg"
+
