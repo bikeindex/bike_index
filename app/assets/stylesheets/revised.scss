@@ -112,6 +112,9 @@ $modal-backdrop-opacity: 0.8;
 // Other (non-bootstrap) external styles
 @import "legacy_includes/zoom.scss";
 
+// Backport of future bootstrap utilities
+@import "revised/mixins/bootstrap_utilities";
+
 $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 
 .zoom-overlay {
@@ -302,62 +305,6 @@ body {
   text-align: right;
 }
 
-.mt-4 {
-  margin-top: 2 * $vertical-height;
-}
-
-.mt-2 {
-  margin-top: $vertical-height;
-}
-
-.mt-0 {
-  margin-top: 0;
-}
-
-.mb-4 {
-  margin-bottom: 2 * $vertical-height;
-}
-
-.mb-2 {
-  margin-bottom: $vertical-height;
-}
-
-.mb-0 {
-  margin-bottom: 0;
-}
-
-.ml-4 {
-  margin-left: 2 * $vertical-height;
-}
-
-.ml-2 {
-  margin-left: $vertical-height;
-}
-
-.ml-0 {
-  margin-left: 0;
-}
-
-.ml-auto {
-  margin-left: auto;
-}
-
-.mr-4 {
-  margin-right: 2 * $vertical-height;
-}
-
-.mr-2 {
-  margin-right: $vertical-height;
-}
-
-.mr-0 {
-  margin-right: 0;
-}
-
-.mr-auto {
-  margin-right: auto;
-}
-
 .small {
   @extend small;
 }
@@ -418,30 +365,6 @@ body {
 
 .text-underline {
   text-decoration: underline;
-}
-
-// Taken from bootstrap 4.3.1
-//
-// Utilities for common `display` values
-//
-
-$displays: none, inline, inline-block, block, table, table-row, table-cell, flex,
-  inline-flex !default;
-
-@function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
-  @return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
-}
-
-@each $breakpoint in map-keys($grid-breakpoints) {
-  @include media-breakpoint-up($breakpoint) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-    @each $value in $displays {
-      .d#{$infix}-#{$value} {
-        display: $value !important;
-      }
-    }
-  }
 }
 
 $dev-color: #9400d3;
