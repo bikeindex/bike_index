@@ -3964,6 +3964,11 @@ nl:
         beschikbaar.
       find_out_more_html: "%{get_in_touch_link} voor meer informatie."
       get_in_touch_link: Neem contact op
+      all_accounts_come_with_bike_index: Alle accounts worden geleverd met de Bike
+        Index-community en hulpmiddelen voor outreaching via sociale media, e-mail-
+        en video-ondersteuning en zoeken in het Bike Index-register.
+      want_qr_stickers: Wilt u QR-stickers? Vraag ons hoe hun kosten de prijs van
+        een pakket compenseren.
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 manieren om community te laten
         groeien voor uw fietsenwinkel
@@ -4883,18 +4888,11 @@ nl:
           verwijderd van het registreren van uw fiets in het meest uitgebreide fietsregister
           ter wereld.
   plan_features:
-    add_form_fields: Voeg specifieke formuliervelden toe aan uw bestemmingspagina
-    add_logos: Voeg logo's en tekst toe aan Bike Index-e-mails
     automatic_registration_through_pos: Automatische registratie via uw POS
-    contact_registrants: Neem contact op met registranten die de registratie niet
-      hebben voltooid
     create_organization_account: Maak een organisatieaccount en neem contact op met
       registranten
     export_custom_data: Aangepaste gegevens exporteren naar CSV / XLSX-bestanden
-    import_csv_file: CSV-bestand van registraties importeren uit eerder systeem
-    landing_page: Landingspagina voor merkregistratie
     mailing_stickers: Elk postadres opgemaakt XLS-export voor poststickers
-    ongoing_programming: Doorlopende programmering, hosting en ondersteuning
     qr_sticker: QR sticker scannen en berichten verzenden
     social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
     staff_accounts: Personeelsrekeningen
@@ -4915,6 +4913,13 @@ nl:
     qr_sticker_scanning_and_messaging: QR sticker scannen en berichten verzenden
     school_landing_page: Landingspagina voor registratie van het schoolmerk
     search_bikes_organization: Zoek fietsen in uw organisatieaccount
+    department_landing_page: Landingspagina voor registratie van een afdelingsmerk
+    law_enforcement_list_html: Wetshandhavingsinstrumenten:<ol class="le-list"><li>
+      Bulk serieel zoeken</li><li> Gemarkeerde dubbele registraties en geloofwaardigheidsscores
+      van fietsen</li><li> Mogelijkheid om gebruikers een bericht te sturen, zelfs
+      als ze fietsen niet als gestolen hebben gemarkeerd</li><li> Cross-database zoeken</li><li>
+      Integratie met LeadsOnline</li><li> Dagelijks gestolen fietsen hot sheet</li><li>
+      Openbare inbeslagname pagina</li></ol>
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een
