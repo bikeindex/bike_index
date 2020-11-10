@@ -71,6 +71,10 @@ $compare-packages-blue: rgb(19, 71, 106);
       }
     }
   }
+  .le-list {
+    padding-left: 1em;
+    margin-top: 0.25rem;
+  }
 }
 
 .packages-price-list-small-screens {
@@ -150,7 +154,7 @@ $compare-packages-blue: rgb(19, 71, 106);
     }
     .contact-us-callout-wrapper .contact-us-callout {
       float: right;
-      margin: 0 0 -4px;
+      margin: 0 0 -40px;
       min-width: 30%;
     }
     .packages-price-list {
@@ -234,6 +238,12 @@ $compare-packages-blue: rgb(19, 71, 106);
           &:first-of-type {
             border-top-color: transparent;
             border-left-color: transparent;
+          }
+          .btn {
+            margin-top: 0.5em;
+            // particularly on the /cities_packages page, the columns are really wide, so try to cut the width a little
+            padding-left: 0.5em;
+            padding-right: 0.5em;
           }
         }
         h4 {
