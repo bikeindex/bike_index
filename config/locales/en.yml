@@ -3497,7 +3497,6 @@ en:
       sign_up: Sign up
       sign_up_now: Sign Up Now
       simply_the_best_bike_registry: Simply the best bike registry
-      supporting_shop: Supporting Shop
       try_for_free: Try For Free
       year: year
     campus_packages:
@@ -3511,8 +3510,6 @@ en:
       contact_us_for_trial: Contact us for a free trial
       forever: Forever
       free: Free
-      keep_us_pedaling: Keep us pedaling
-      number_of_members: "%{range} Members"
       package_title: "%{name} package"
       questions_want_to_get_started: Questions? Want to get started?
       sign_up: Sign up
@@ -3531,20 +3528,21 @@ en:
       free: Free
       give_your_constituents_the_bike_registry_: Give your constituents the bike registry
         they want
-      keep_us_pedaling: Keep us pedaling
-      metropolis: Metropolis
       package_title: "%{name} package"
       questions_want_to_get_started: Questions? Want to get started?
       sign_up: Sign up
       sign_up_now: Sign Up Now
-      small_city: Small City
-      town: Town
       try_for_free: Try For Free
       year: year
     find_out_more:
+      all_accounts_come_with_bike_index: >-
+        All accounts come with Bike Index community and social media outreach tools,
+        email and video support, and search of the Bike Index registry.
       custom_development_available: A la carte features and custom development available.
       find_out_more_html: "%{get_in_touch_link} to find out more."
       get_in_touch_link: Get in touch
+      want_qr_stickers: Want QR stickers? Ask us how their cost offsets the price
+        of a package.
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
         bike shop
@@ -4781,28 +4779,36 @@ en:
       payment_to_bike_index: Payment to Bike Index
       select_an_amount_in_usd: Select an amount (in USD)
   plan_features:
-    abandoned_bike_suite: >-
-      Abandoned bike suite - contact bike owners and log abandonment and impound bike
-      records
-    add_form_fields: Add specific form fields to your landing page
-    add_logos: Add logos and text to Bike Index emails
-    automated_migration: Automated migration of graduated bikes out of system
     automatic_registration_through_pos: Automatic registration through your POS
-    contact_registrants: Contact registrants who have not finished registration
+    campus_bike_management_suite: >-
+      Campus bike management suite - tag bikes, contact owners, log abandonment and
+      impound bike records, send follow-up notifications
+    contact_unfinished_registrants: Contact registrants who have not finished registration
     create_organization_account: Create organization account and contact registrants
-    embed_a_registration_form: >-
-      Embed a registration form on your website so people can register in your organization
-      account
+    custom_form_fields: Add custom form fields to your registration page
+    customize_emails: Customize emails you send from Bike Index
+    department_landing_page: Department-branded registration landing page
+    embed_registration_form: Embed your organization's custom registration form on
+      your website
     export_custom_data: Export custom data into CSV/XLSX files
-    import_csv_file: Import CSV file of registrations from former system
-    landing_page: Branded registration landing page
+    graduated_bikes: Automated migration of graduated bikes out of system
+    import_registrations_from_previous: Import registrations from a former registration
+      system
+    law_enforcement_list_html: >-
+      Law enforcement tools: <ol class="le-list"><li>Bulk serial search</li><li>Flagged
+      duplicate registrations and bike credibility scores</li><li>Ability to message
+      users even if they haven't marked bikes as stolen</li><li>Cross-database search</li><li>Integration
+      with LeadsOnline</li><li>Daily stolen bikes hot sheet</li><li>Public-facing
+      impound page</li></ol>
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
-    ongoing_programming: Ongoing programming, hosting, and support
     organization_dashboard: >-
-      City and Police dashboard - analyze statistics on local registration based on
-      zip code
+      City and Law enforcement dashboard - analyze statistics on local registration
+      based on zip code
+    priority_programming_support: Priority programming, hosting, and support
     qr_sticker: QR sticker scanning and messaging
-    search_bikes_in_organization: Search bikes in organization account
+    qr_sticker_scanning_and_messaging: QR sticker scanning and messaging
+    school_landing_page: School-branded registration landing page
+    search_bikes_organization: Search bikes in your organization account
     social_media_and_email_marketing: Social Media and Email marketing campaign assets
     staff_accounts: Staff accounts
   public_images:
