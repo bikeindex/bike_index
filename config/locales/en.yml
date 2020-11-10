@@ -3535,9 +3535,14 @@ en:
       try_for_free: Try For Free
       year: year
     find_out_more:
+      all_accounts_come_with_bike_index: >-
+        All accounts come with Bike Index community and social media outreach tools,
+        email and video support, and search of the Bike Index registry.
       custom_development_available: A la carte features and custom development available.
       find_out_more_html: "%{get_in_touch_link} to find out more."
       get_in_touch_link: Get in touch
+      want_qr_stickers: Want QR stickers? Ask us how their cost offsets the price
+        of a package.
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
         bike shop

@@ -2,7 +2,7 @@
 
 :ruby
   plans = {
-    free: { cost: 0 }
+    free: { cost: 0 },
     supporting: { cost: 499 },
     small: { cost: 3999 },
     medium: { cost: 5999, popular: true },
@@ -12,7 +12,7 @@
   plan_features = [
     { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.create_organization_account") },
     { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.embed_registration_form") },
-    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },,
+    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },
     { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.import_csv_file") },
     { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.organization_dashboard") },
     { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: t("plan_features.staff_accounts") },
