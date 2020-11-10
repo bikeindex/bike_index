@@ -2,17 +2,17 @@
 
 :ruby
   plans = {
-    free: { cost: 0, subhead: nil },
-    supporting: { cost: 499, subhead: t(".keep_us_pedaling")},
-    small: { cost: 3999, subhead: t(".town") },
-    medium: { cost: 5999, subhead: t(".small_city"), popular: true },
-    large: { cost: 7999, subhead: t(".metropolis") },
+    free: { cost: 0 }
+    supporting: { cost: 499 },
+    small: { cost: 3999 },
+    medium: { cost: 5999, popular: true },
+    large: { cost: 7999 },
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.create_organization_account") },
-    { free: true, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.embed_a_registration_form") },
-    { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.search_bikes_in_organization") },
+    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.create_organization_account") },
+    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.embed_registration_form") },
+    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },,
     { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.import_csv_file") },
     { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.organization_dashboard") },
     { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: t("plan_features.staff_accounts") },

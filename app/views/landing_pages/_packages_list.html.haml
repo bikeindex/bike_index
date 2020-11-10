@@ -4,15 +4,13 @@
       - unless render_features # Bottom section doesn't render this duplicate "free"
         %h4= t(".free")
       %section
-        %h5 &nbsp;
         %h3= t(".free")
         %p= t(".forever")
         %a.btn.btn-primary{ href: new_organization_path }
           = t(".sign_up_now")
     - else
-      %h4 #{plan.to_s.titleize} #{lead_type.titleize}
+      %h4 #{plan.to_s.titleize}
       %section
-        %h5= plan_data[:subhead]
         =# TODO: localized price points
         %h3= number_to_currency(plan_data[:cost], precision: 0)
         %p

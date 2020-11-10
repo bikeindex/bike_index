@@ -2,16 +2,16 @@
 
 :ruby
   plans = {
-    free: { cost: 0, subhead: nil },
-    supporting: { cost: 199, subhead: t(".supporting_shop")}
+    free: { cost: 0 },
+    supporting: { cost: 199 }
   }
   plan_sizes = plans.keys
   plan_features = [
     { free: true,  supporting: true, title: t("plan_features.create_organization_account")},
-    { free: true,  supporting: true, title: t("plan_features.embed_a_registration_form")},
+    { free: true,  supporting: true, title: t("plan_features.embed_registration_form")},
     { free: true,  supporting: true, title: t("plan_features.automatic_registration_through_pos")},
     { free: true,  supporting: true, title: t("plan_features.social_media_and_email_marketing")},
-    { free: false, supporting: true, title: t("plan_features.search_bikes_in_organization")},
+    { free: false, supporting: true, title: t("plan_features.search_bikes_organization")},
     { free: false, supporting: true, title: t("plan_features.import_csv_file")},
   ]
 
