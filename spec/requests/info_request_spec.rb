@@ -56,7 +56,7 @@ RSpec.describe InfoController, type: :request do
             get "/#{page}"
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == "support_bike_index"
+            if page == "donate"
               expect(response).to render_template("layouts/payments_layout")
             else
               expect(response).to render_template("layouts/application")
