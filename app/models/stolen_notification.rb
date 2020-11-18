@@ -14,7 +14,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def permitted_send?
-    return false unless bike.contact_owner?(sender)
+    return false unless bike&.contact_owner?(sender)
     return true if sender.send_unstolen_notifications?
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
   end

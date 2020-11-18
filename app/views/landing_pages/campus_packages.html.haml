@@ -2,29 +2,29 @@
 
 :ruby
   plans = {
-    free: { cost: 0, subhead: nil },
-    supporting: { cost: 299, subhead: t(".keep_us_pedaling")},
-    small: { cost: 3999, subhead: t(".number_of_members", range: "0-10k") },
-    medium: { cost: 5999, subhead: t(".number_of_members", range: "10k-20k"), popular: true },
-    large: { cost: 8999, subhead: t(".number_of_members", range: "20k+") },
+    free: { cost: 0 },
+    supporting: { cost: 299 },
+    bronze: { cost: 1999 },
+    silver: { cost: 5999, popular: true },
+    gold: { cost: 8999 },
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.create_organization_account") },
-    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.embed_a_registration_form") },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: t("plan_features.search_bikes_in_organization") },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: t("plan_features.abandoned_bike_suite") },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: t("plan_features.import_csv_file") },
-    { free: "3", supporting: "3", small: "10", medium: "unlimited", large: "unlimited", title: t("plan_features.staff_accounts") },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.landing_page") },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.qr_sticker") },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.ongoing_programming") },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.contact_registrants") },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.add_logos") },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.export_custom_data") },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.add_form_fields") },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.automated_migration") },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.mailing_stickers") },
+    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.create_organization_account") },
+    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.embed_registration_form") },
+    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },
+    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.import_registrations_from_previous") },
+    { free: false, supporting: false, bronze: true, silver: true, gold: true, title: t("plan_features.campus_bike_management_suite") },
+    { free: false, supporting: false, bronze: true, silver: true, gold: true, title: t("plan_features.qr_sticker_scanning_and_messaging") },
+    { free: "3", supporting: "3", bronze: "10", silver: "20", gold: "unlimited", title: t("plan_features.staff_accounts") },
+    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.school_landing_page") },
+    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.priority_programming_support") },
+    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.contact_unfinished_registrants") },
+    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.graduated_bikes") },
+    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.customize_emails") },
+    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.custom_form_fields") },
+    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.export_custom_data") },
+    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.mailing_stickers") },
   ]
 
 .signup-landing-page.signup-landing-page-packages.signup-landing-page-campus-packages
@@ -56,7 +56,7 @@
                 = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
               - else
                 %th
-                  %h4 #{plan.to_s.titleize} #{lead_type}
+                  %h4= plan.to_s.titleize
                   %h3= number_to_currency(plan_data[:cost], precision: 0)
                   %p
                     = default_currency
