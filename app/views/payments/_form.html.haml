@@ -12,6 +12,7 @@
     .select-amount
       - unless @is_payment
         %p= t(".select_an_amount_in_usd")
+      !!!!CONSOLIDATE into one form!!!!
       %form#bikeindex-stripe-initial-form
         %ul.row.amount-list
           - if @is_payment # If payment, have one non-arbitrary button
@@ -33,6 +34,9 @@
           = submit_tag t(".next"), class: 'btn btn-primary'
 
       %p.nfp-info
+        - unless @is_payment
+          = link_to t(".what_does_your_donantion_do"), info_url("end-2020-with-a-donation-to-bike-index")
+          %br
         - nonprofit_link = link_to t(".501c3_nonprofit"), news_url("bike-index--now-a-nonprofit")
         = t(".bike_index_is_a_nonprofit_html", nonprofit_link: nonprofit_link)
 

@@ -4770,6 +4770,7 @@ en:
       your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
     form:
       501c3_nonprofit: 501(c)(3) nonprofit
+      what_does_your_donantion_do: What does your donation do?
       bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
       donate_to_bike_index: Donate to Bike Index
       donate_today: Donate today
