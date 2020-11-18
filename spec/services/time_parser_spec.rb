@@ -47,6 +47,29 @@ RSpec.describe TimeParser do
         expect(subject.parse(time)).to be_within(1).of time
       end
     end
+    context "2017-3" do
+      let(:target_date) { Date.parse("2017-03-01") }
+      it "parses out the beginning of the month" do
+        expect(subject.parse("2017-3").to_date).to eq target_date
+        expect(subject.parse("2017-3", "Europe/London").to_date).to eq target_date
+        expect(subject.parse("2017-03").to_date).to eq target_date
+        expect(subject.parse("2017-03-").to_date).to eq target_date
+        expect(subject.parse("2017/03").to_date).to eq target_date
+        # And all the reverse, for americans
+        expect(subject.parse("3-2017").to_date).to eq target_date
+        expect(subject.parse("3/2017").to_date).to eq target_date
+        expect(subject.parse("03/2017").to_date).to eq target_date
+        # TODO: make this work - currently, it interprets without an ArgumentError and doesn't hit special formatting
+        # expect(subject.parse("03-2017").to_date).to eq target_date
+      end
+    end
+    context "not a date" do
+      it "errors" do
+        expect {
+          subject.parse("3fbd3770-1b71-4f21-8647-a1804e404aca")
+        }.to raise_error(ArgumentError)
+      end
+    end
   end
 
   describe "timezone_parser" do
