@@ -12,7 +12,11 @@ class BikeIndex.Payments extends BikeIndex
     $('.amount-list a').click (e) =>
       @selectPaymentOption(e)
     $('.amount-list input').focus (e) =>
-      @selectPaymentOption(e)
+      $target = $(e.target)
+      if $target.attr("data-amount") || $target.attr("id") == "arbitrary-amount"
+        console.log $(e.target).attr("data-amount")
+        @selectPaymentOption(e)
+      true
 
   # Returns null if there isn't a valid value selected
   getAmountCentsSelected: ->
