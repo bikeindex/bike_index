@@ -6,7 +6,7 @@
       = yield
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
-      - if @blog.present? && @blog.title_slug == Blog.donation_info_post_slug
+      - if @blog.present? && @blog.title_slug == Blog.donation_2020_post_slug
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
