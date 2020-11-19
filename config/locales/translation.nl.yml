@@ -5196,13 +5196,6 @@ nl:
       related: Verwant
       sign_up_your_organization: Meld uw organisatie aan
       where: Waar
-    donation_modal:
-      is_a_nonprofit_html: Bike Index is een %{blog_link} <br> <strong>U</strong>
-        financiert onze efforst om fietsdiefstal te bestrijden!
-      nonprofit_501c3: 501 (c) (3) non-profit
-      skip: Overslaan
-      header: Help onze inspanningen ondersteunen!
-      subheader: Als non-profit vertrouwen wij op uw steun.
     law_enforcement_donation_modal:
       bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
         afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties
@@ -5253,6 +5246,19 @@ nl:
         heeft ontvangen. Voeg foto's en details van de %{bike_type} toe om te laten
         zien wat jouw rit van jou maakt. Hopelijk wordt je %{bike_type} niet gestolen,
         maar als dat zo is, zijn we er wanneer je ons het meest nodig hebt.
+    donation_form:
+      501c3_nonprofit: 501 (c) (3) non-profit
+      bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
+      donate_to_bike_index: Doneer aan Bike Index
+      next: volgende>
+      other_amount: Ander bedrag (USD)
+      payment_to_bike_index: Betaling aan fietsindex
+      skip: Overslaan
+      subheader_one: Doneer aan onze inzamelingsactie voor het einde van het jaar.
+      subheader_two_html: "<strong>U</strong> kunt fietsdiefstal bestrijden."
+      what_does_your_donation_do: Wat doet uw schenking?
+    donation_modal:
+      donation_header: Red een fiets in 2021
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5514,15 +5520,8 @@ nl:
       your_donation_saved_bikes: Uw donatie van € %{amount} heeft zojuist de fietsen
         gered.
     form:
-      501c3_nonprofit: non-profit organisatie
-      bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
-      donate_today: Doneer vandaag nog
-      next: volgende>
-      other_amount: Ander bedrag
       pay_bike_index: Pay Bike Index
-      donate_to_bike_index: Doneer aan Bike Index
-      payment_to_bike_index: Betaling aan fietsindex
-      select_an_amount_in_usd: Selecteer een bedrag (in USD)
+      donation_header: Red een fiets in 2021
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien

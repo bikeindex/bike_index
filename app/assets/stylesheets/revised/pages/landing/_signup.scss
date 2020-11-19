@@ -217,6 +217,38 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
   }
 }
 
+$contact-us-gutter: 30px;
+
+.next-steps-wrap {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  padding: 0;
+  background: $gray-darker;
+  border: 3px solid black;
+  border-radius: $border-radius;
+  background-color: white;
+  max-width: 270px;
+
+  main {
+    padding: (1.5 * $vertical-height) $contact-us-gutter;
+  }
+
+  header {
+    background-color: $gray-darkest;
+    color: white;
+    text-align: center;
+    line-height: 1;
+    padding: 20px 15px 25px 15px;
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 2 * $vertical-height;
+    font-size: 12px;
+  }
+}
+
 .signup-landing-page {
   .main-body-row {
     @include media-breakpoint-down(md) {
@@ -259,8 +291,6 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
     }
   }
 
-  $contact-us-gutter: 30px;
-
   .next-steps-col {
     margin-top: -9.5 * $vertical-height;
 
@@ -277,36 +307,6 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
       @include make-col(4);
 
       @include make-col-offset(1);
-    }
-
-    .next-steps-wrap {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-      padding: 0;
-      background: $gray-darker;
-      border: 3px solid black;
-      border-radius: $border-radius;
-      background-color: white;
-      max-width: 270px;
-
-      main {
-        padding: (1.5 * $vertical-height) $contact-us-gutter;
-      }
-    }
-
-    header {
-      background-color: $gray-darkest;
-      color: white;
-      text-align: center;
-      line-height: 1;
-      padding: 20px 15px 25px 15px;
-    }
-
-    .btn {
-      width: 100%;
-      margin-top: 2 * $vertical-height;
-      font-size: 12px;
     }
   }
 

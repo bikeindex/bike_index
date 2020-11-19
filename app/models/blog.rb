@@ -43,6 +43,10 @@ class Blog < ApplicationRecord
       find_by_title_slug(str) || find_by_title(str)
   end
 
+  def self.donation_info_post_slug
+    "end-2020-with-a-donation-to-bike-index"
+  end
+
   def info?
     is_info
   end

@@ -3,14 +3,15 @@
     -# Unless one of the permitted pages, wrap it in .legacy-content-wrap
     - additional_class = %w().include?(content_page_type) ? "" : "legacy-content-wrap"
     .col-md-8.primary-content-block{ class: additional_class }
-
       = yield
     .col-md-4.primary-content-menu
-      - if donation_nav_group?
-        %nav.content-nav-group
-          %h3= t(".related")
-          %ul
-       - else
+      -# check if this is a donation info page
+      - if @blog.present? && @blog.title_slug == Blog.donation_info_post_slug
+        .next-steps-wrap
+          %header
+            Make a difference in bike theft.
+            = link_to "Donate today", donate_path, class: "btn btn-primary"
+      - else
         %nav.content-nav-group
           %h3= t(".related")
           %ul

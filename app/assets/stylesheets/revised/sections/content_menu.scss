@@ -17,15 +17,23 @@ $horizontal-content-menu-padding: $vertical-height;
 
       a {
         display: block;
-
-        // padding: $horizontal-content-menu-padding;
         color: $gray;
       }
     }
   }
 
+  // crappy hack to make the donation floating column be a little less shitty
+  @include media-breakpoint-up(md) {
+    .next-steps-wrap {
+      top: 85px;
+    }
+  }
+
   @include media-breakpoint-down(md) {
     width: 100%;
+    .next-steps-wrap {
+      max-width: 100%;
+    }
   }
 
   @include media-breakpoint-down(lg) {
