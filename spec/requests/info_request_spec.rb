@@ -75,8 +75,14 @@ RSpec.describe InfoController, type: :request do
     it "redirects support_the_index" do
       get "/support_bike_index"
       expect(response).to redirect_to donate_path
-      get "/support_the_bike_index"
+      get "/support_the_bike_index?amount="
       expect(response).to redirect_to donate_path
+    end
+    context "with amount param" do
+      it "redirects to payments" do
+        get "/support_bike_index?amount=12"
+        expect(response).to redirect_to new_payment_path(amount: 12)
+      end
     end
   end
 
