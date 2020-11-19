@@ -29,7 +29,7 @@ RSpec.describe InfoController, type: :request do
 
   describe "static pages" do
     pages = %w[about protect_your_bike where serials image_resources resources security
-      dev_and_design support_bike_index terms vendor_terms privacy lightspeed]
+      dev_and_design donate terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do
@@ -37,7 +37,7 @@ RSpec.describe InfoController, type: :request do
             get "/#{page}"
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == "support_bike_index"
+            if page == "donate"
               expect(response).to render_template("layouts/payments_layout")
             else
               expect(response).to render_template("layouts/application")
@@ -56,7 +56,7 @@ RSpec.describe InfoController, type: :request do
             get "/#{page}"
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == "support_bike_index"
+            if page == "donate"
               expect(response).to render_template("layouts/payments_layout")
             else
               expect(response).to render_template("layouts/application")
@@ -64,6 +64,19 @@ RSpec.describe InfoController, type: :request do
           end
         end
       end
+    end
+  end
+
+  describe "support_the_index and support_bike_index" do
+    it "redirects support_the_index" do
+      get "/support_the_index"
+      expect(response).to redirect_to donate_path
+    end
+    it "redirects support_the_index" do
+      get "/support_bike_index"
+      expect(response).to redirect_to donate_path
+      get "/support_the_bike_index"
+      expect(response).to redirect_to donate_path
     end
   end
 
@@ -79,11 +92,11 @@ RSpec.describe InfoController, type: :request do
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
     end
-    context "support_bike_index" do
+    context "donate" do
       it "renders without show alert" do
-        get "/support_bike_index"
+        get "/donate"
         expect(response.code).to eq("200")
-        expect(response).to render_template("support_bike_index")
+        expect(response).to render_template("donate")
         expect(flash).to_not be_present
         expect(assigns(:show_general_alert)).to be_falsey
       end
