@@ -53,15 +53,15 @@ class InfoController < ApplicationController
   end
 
   def support_bike_index
-    redirect_to donate_url
+    redirect_to_donation_or_payment
   end
 
   def support_the_index
-    redirect_to donate_url
+    redirect_to_donation_or_payment
   end
 
   def support_the_bike_index
-    redirect_to donate_url
+    redirect_to_donation_or_payment
   end
 
   def dev_and_design
@@ -69,5 +69,15 @@ class InfoController < ApplicationController
 
   def how_not_to_buy_stolen
     redirect_to "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
+  end
+
+  private
+
+  def redirect_to_donation_or_payment
+    if params[:amount].present?
+      redirect_to new_payment_path(amount: params[:amount])
+    else
+      redirect_to donate_url
+    end
   end
 end
