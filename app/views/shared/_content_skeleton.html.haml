@@ -7,10 +7,10 @@
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
       - if @blog.present? && @blog.title_slug == Blog.donation_info_post_slug
-        .next-steps-wrap
+        .next-steps-wrap.donation
           %header
-            Make a difference in bike theft.
-            = link_to "Donate today", donate_path, class: "btn btn-primary"
+            = t(".make_a_difference")
+            = link_to t(".donate_today"), donate_path, class: "btn btn-primary"
       - else
         %nav.content-nav-group
           %h3= t(".related")
