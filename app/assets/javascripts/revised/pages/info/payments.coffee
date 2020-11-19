@@ -14,7 +14,6 @@ class BikeIndex.Payments extends BikeIndex
     $('.amount-list input').focus (e) =>
       $target = $(e.target)
       if $target.attr("data-amount") || $target.attr("id") == "arbitrary-amount"
-        console.log $(e.target).attr("data-amount")
         @selectPaymentOption(e)
       true
 
