@@ -11,6 +11,8 @@ class BikeIndex.Payments extends BikeIndex
       return false
     $('.amount-list a').click (e) =>
       @selectPaymentOption(e)
+
+    # If the arbitrary amount is selected (and on keyboard movement), select the appropriate target
     $('.amount-list input').focus (e) =>
       $target = $(e.target)
       if $target.attr("data-amount") || $target.attr("id") == "arbitrary-amount"
