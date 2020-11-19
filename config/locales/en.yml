@@ -4769,16 +4769,8 @@ en:
       xoxo: XOXO,
       your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
     form:
-      501c3_nonprofit: 501(c)(3) nonprofit
-      what_does_your_donantion_do: What does your donation do?
-      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
-      donate_to_bike_index: Donate to Bike Index
-      donate_today: Donate today
-      next: next  >
-      other_amount: Other amount
+      donation_header: Save a bike in 2021
       pay_bike_index: Pay Bike Index
-      payment_to_bike_index: Payment to Bike Index
-      select_an_amount_in_usd: Select an amount (in USD)
   plan_features:
     automatic_registration_through_pos: Automatic registration through your POS
     campus_bike_management_suite: >-
@@ -4922,6 +4914,17 @@ en:
         email address where you received your registration email. Add photos and details
         of the %{bike_type} to show what makes your ride yours. Hopefully, your %{bike_type}
         won’t be stolen, but if it is, we'll be here when you need us most.
+    donation_form:
+      subheader_one: Donate to our end of the year fundraising campaign.
+      subheader_two_html: <strong>You</strong> can fight bike theft.
+      501c3_nonprofit: 501(c)(3) nonprofit
+      what_does_your_donation_do: What does your donation do?
+      skip: No donation
+      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
+      donate_to_bike_index: Donate to Bike Index
+      next: next  >
+      other_amount: Other amount (USD)
+      payment_to_bike_index: Payment to Bike Index
     content_skeleton:
       about: About
       bicycle_serials: Bicycle serials
@@ -4937,13 +4940,7 @@ en:
       sign_up_your_organization: Sign up your organization
       where: Where
     donation_modal:
-      header: Help support our efforts!
-      is_a_nonprofit_html: >-
-        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforts to fight
-        bike theft!
-      nonprofit_501c3: 501(c)(3) nonprofit
-      skip: No donation
-      subheader: As a non-profit, we rely on your support.
+      donation_header: Save a bike in 2021
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit

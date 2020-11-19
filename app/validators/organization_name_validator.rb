@@ -8,7 +8,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     integrations lightspeed lightspeed_interface locks logout manufacturers manufacturers_tsv
     my_account news o oauth organizations ownerships pages payments privacy protect_your_bike
     public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
-    stolen stolen_notifications store support_bike_index support_the_bike_index support_the_index terms
+    stolen stolen_notifications store donate support_bike_index support_the_bike_index support_the_index terms
     theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where].freeze
 
   def self.valid?(str)

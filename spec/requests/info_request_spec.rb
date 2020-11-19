@@ -75,6 +75,8 @@ RSpec.describe InfoController, type: :request do
     it "redirects support_the_index" do
       get "/support_bike_index"
       expect(response).to redirect_to donate_path
+      get "/support_the_bike_index"
+      expect(response).to redirect_to donate_path
     end
   end
 

@@ -61,7 +61,7 @@ class InfoController < ApplicationController
   end
 
   def support_the_bike_index
-    redirect_to support_the_index_url
+    redirect_to donate_url
   end
 
   def dev_and_design
