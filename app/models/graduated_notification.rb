@@ -174,7 +174,7 @@ class GraduatedNotification < ApplicationRecord
     # We don't want to re-mark remaining
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
-    associated_notifications.each { |n| n.update(updated_at: Time.current, skip_update: true, marked_remaining_at: marked_remaining_at) }
+    associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) } if primary_notification?
     # Long shot - but update any graduated notifications that might have been missed, just in case
     organization.graduated_notifications.where(bike_id: bike_id).active.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?

@@ -207,6 +207,33 @@ RSpec.describe GraduatedNotification, type: :model do
         # And test that we update to set the primary notification on the other one after creation
         graduated_notification2.reload
         expect(graduated_notification2.primary_notification?).to be_falsey
+
+        # test that processing one processes them all
+        expect(graduated_notification1.bike_organization.deleted?).to be_falsey
+        expect(graduated_notification1.processed?).to be_falsey
+        expect(graduated_notification2.bike_organization.deleted?).to be_falsey
+        expect(graduated_notification2.processed?).to be_falsey
+        expect {
+          graduated_notification1.process_notification
+        }.to change(ActionMailer::Base.deliveries, :count).by 1
+        graduated_notification1.reload
+        graduated_notification2.reload
+        expect(graduated_notification1.bike_organization.deleted?).to be_truthy
+        expect(graduated_notification1.processed?).to be_truthy
+        expect(graduated_notification1.marked_remaining?).to be_falsey
+        expect(graduated_notification2.bike_organization.deleted?).to be_truthy
+        expect(graduated_notification2.processed?).to be_truthy
+        expect(graduated_notification2.marked_remaining?).to be_falsey
+        # Test that mark_remaining! one marks them all remaining
+        graduated_notification1.mark_remaining!
+        graduated_notification1.reload
+        graduated_notification2.reload
+        expect(graduated_notification1.bike_organization.deleted?).to be_falsey
+        expect(graduated_notification1.processed?).to be_truthy
+        expect(graduated_notification1.marked_remaining?).to be_truthy
+        expect(graduated_notification2.bike_organization.deleted?).to be_falsey
+        expect(graduated_notification2.processed?).to be_truthy
+        expect(graduated_notification2.marked_remaining?).to be_truthy
       end
       context "multiple secondary created, without primary_notification_id" do
         let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: "test@example.edu") }
