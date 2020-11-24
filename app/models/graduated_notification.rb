@@ -23,8 +23,8 @@ class GraduatedNotification < ApplicationRecord
   scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :not_marked_remaining, -> { where.not(status: "marked_remaining") }
-  scope :primary_notifications, -> { where("primary_notification_id = id") }
-  scope :secondary_notifications, -> { where.not("primary_notification_id  = id") }
+  scope :primary_notification, -> { where("primary_notification_id = id") }
+  scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.statuses

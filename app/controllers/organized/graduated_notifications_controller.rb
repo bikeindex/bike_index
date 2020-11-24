@@ -53,7 +53,7 @@ module Organized
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
       else
         @separate_non_primary_notifications = false
-        a_graduated_notifications = a_graduated_notifications.primary_notifications
+        a_graduated_notifications = a_graduated_notifications.primary_notification
       end
 
       @available_graduated_notifications = a_graduated_notifications.where(created_at: @time_range)

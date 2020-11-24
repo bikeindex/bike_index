@@ -200,8 +200,8 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
         expect(graduated_notification2.processable?).to be_falsey
 
-        expect(GraduatedNotification.primary_notifications.pluck(:id)).to eq([graduated_notification1.id])
-        expect(GraduatedNotification.secondary_notifications.pluck(:id)).to eq([graduated_notification2.id])
+        expect(GraduatedNotification.primary_notification.pluck(:id)).to eq([graduated_notification1.id])
+        expect(GraduatedNotification.secondary_notification.pluck(:id)).to eq([graduated_notification2.id])
 
         expect(graduated_notification1.associated_notifications.pluck(:id)).to eq([graduated_notification2.id])
         # And test that we update to set the primary notification on the other one after creation
