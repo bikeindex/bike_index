@@ -102,7 +102,7 @@ $payments-page-breakpoint: "sm";
   .select-amount {
     background: #efefef;
     width: 100%;
-    padding: (2 * $vertical-height) $half-gutter;
+    padding: $vertical-height $half-gutter (2 * $vertical-height);
 
     @include media-breakpoint-down($payments-page-breakpoint) {
       border-radius: 1px;
@@ -118,9 +118,15 @@ $payments-page-breakpoint: "sm";
 
     li {
       margin-top: 2 * $vertical-height;
+      // There is too much padding on xs screens, so remove it
+      @include media-breakpoint-down("sm") {
+        padding-left: 7.5px;
+        padding-right: 7.5px;
+      }
     }
 
-    a {
+    a,
+    .btn {
       font-family: $header-font-family;
       font-size: 18px;
       display: block;
@@ -132,20 +138,16 @@ $payments-page-breakpoint: "sm";
       border-color: $blue;
     }
   }
-
-  .next-step {
+  .next-steps {
     margin-top: 2 * $vertical-height;
-
     .btn {
-      border-radius: 0.25rem;
+      display: inline-block;
       width: auto;
-      display: block;
-      margin: 0 auto;
     }
   }
 
   .nfp-info {
-    margin: 18px 0 -12px;
+    margin-bottom: -12px;
     color: $less-strong-font-color;
 
     a {

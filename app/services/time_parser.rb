@@ -2,6 +2,8 @@
 
 class TimeParser
   DEFAULT_TIMEZONE = ActiveSupport::TimeZone["Central Time (US & Canada)"].freeze
+  EARLIEST_YEAR = 1900
+  LATEST_YEAR = Time.current.year + 100
 
   def self.parse(time_str = nil, timezone_str = nil)
     return nil unless time_str.present?
@@ -15,24 +17,26 @@ class TimeParser
       time
     end
   rescue ArgumentError => e
-    # Try to parse some other, unexpected formats - for now, just one
+    # Try to parse some other, unexpected formats -
     ie11_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+)}.match(time_str)
-    raise e unless ie11_formatted
+    just_date = %r{(?<year>\d{4})[^\d|\w](?<month>\d\d?)}.match(time_str)
+    just_date_backward = %r{(?<month>\d\d?)[^\d|\w](?<year>\d{4})}.match(time_str)
+    raise e unless ie11_formatted || just_date || just_date_backward
 
-    # Time zones are hell
-    Time.zone = parse_timezone(timezone_str)
+    # Get the successful matching regex group, and then reformat it in an expected way
+    regex_match = [ie11_formatted, just_date, just_date_backward].compact.first
+    new_str = %w[year month day]
+      .map { |component| regex_match[component] if regex_match.names.include?(component) }
+      .compact
+      .join("-")
 
-    time_str =
-      %i[year month day]
-        .map { |component| ie11_formatted[component] }
-        .join("-")
+    # If we end up with an unreasonable year, throw an error
+    raise e unless new_str.split("-").first.to_i.between?(EARLIEST_YEAR, LATEST_YEAR)
 
-    time = Time.zone.parse(time_str)
-      .in_time_zone(parse_timezone(timezone_str))
-      .beginning_of_day
-
-    Time.zone = DEFAULT_TIMEZONE
-    time
+    # Add the day, if there isn't one
+    new_str += "-01" unless regex_match.names.include?("day")
+    # Run it through TimeParser again
+    parse(new_str, timezone_str)
   end
 
   def self.parse_timezone(timezone_str)

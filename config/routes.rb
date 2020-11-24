@@ -298,11 +298,13 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "integrations#create"
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
-  %w[support_bike_index support_the_index support_the_bike_index protect_your_bike
+  %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
     serials about where vendor_terms resources image_resources privacy terms security
     how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end
+  get "why-donate", to: "info#why_donate", as: "why_donate"
+  get "why_donate", to: redirect("/why-donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
   resources :info, only: [:show]
 

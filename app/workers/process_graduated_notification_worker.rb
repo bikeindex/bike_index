@@ -16,7 +16,7 @@ class ProcessGraduatedNotificationWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    GraduatedNotification.pending.primary_notifications.pluck(:id).each do |id|
+    GraduatedNotification.pending.primary_notification.pluck(:id).each do |id|
       self.class.perform_async(id)
     end
   end
