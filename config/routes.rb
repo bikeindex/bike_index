@@ -302,6 +302,8 @@ Rails.application.routes.draw do
     how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end
+  get "why-donate", to: "info#why_donate", as: "why_donate"
+  get "why_donate", to: redirect("/why-donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
   resources :info, only: [:show]
 

@@ -37,7 +37,7 @@
 
 .nfp-info.mt-2
   - unless is_payment
-    = link_to t(".what_does_your_donation_do"), news_url(Blog.donation_2020_post_slug), target: "_blank"
+    = link_to t(".what_does_your_donation_do"), why_donate_path, target: "_blank"
     %span.d-block.mt-4
   %small
     - nonprofit_link = link_to t(".501c3_nonprofit"), news_url("bike-index--now-a-nonprofit"), target: "_blank"

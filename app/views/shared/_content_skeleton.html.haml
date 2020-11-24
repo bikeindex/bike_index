@@ -6,18 +6,27 @@
       = yield
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
-      - if @blog.present? && @blog.title_slug == Blog.donation_2020_post_slug
+      - if @blog.present? && @blog.title_slug == Blog.why_donate_slug
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
             = link_to t(".donate_today"), donate_path, class: "btn btn-primary"
-          %ul.mt-2
-            %li
-              = link_to "Donate $5", donate_path(initial_amount: 5)
-            %li
-              = link_to "Donate $50", donate_path(initial_amount: 50)
-            %li
-              = link_to "Donate $200", donate_path(initial_amount: 200)
+          %ul
+            %li.mt-3
+              = link_to "Donate $5", donate_path(initial_amount: 5), class: "btn btn-secondary donate-btn"
+            %li.mt-2
+              = link_to "Donate $50", donate_path(initial_amount: 50), class: "btn btn-secondary donate-btn"
+            %li.mt-2.mb-2
+              = link_to "Donate $200", donate_path(initial_amount: 200), class: "btn btn-secondary donate-btn"
+        :scss
+          .next-steps-wrap .btn.donate-btn {
+            display: inline-block !important;
+            width: auto;
+            margin-top: 0;
+          }
+          .next-steps-wrap.donation {
+            border-radius: 4px;
+          }
       - else
         %nav.content-nav-group
           %h3= t(".related")
@@ -49,7 +58,7 @@
               = active_link t(".bicycle_serials"), serials_path
             - if %w(news about manufacturers).include?(content_page_type)
               %li
-                = active_link t(".donate"), news_url(Blog.donation_2020_post_slug)
+                = active_link t(".donate"), why_donate_path
             - if %w(news serials manufacturers).include?(content_page_type)
               %li
                 = active_link t(".bike_index_store"), store_path

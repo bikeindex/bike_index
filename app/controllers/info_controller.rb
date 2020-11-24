@@ -8,7 +8,6 @@ class InfoController < ApplicationController
       redirect_to(news_path(@blog.to_param)) && return
     end
     @page_id = "news_show" # Override to make styles same as news
-    @blogger = @blog.user
   end
 
   def about
@@ -45,6 +44,11 @@ class InfoController < ApplicationController
   end
 
   def image_resources
+  end
+
+  def why_donate
+    @blog = Blog.friendly_find(Blog.why_donate_slug)
+    render "/news/show"
   end
 
   def donate

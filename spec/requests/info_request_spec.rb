@@ -84,6 +84,22 @@ RSpec.describe InfoController, type: :request do
         expect(response).to redirect_to new_payment_path(amount: 12)
       end
     end
+    context "why_donate" do
+      it "redirects to why-donate" do
+        get "/why_donate"
+        expect(response).to redirect_to("/why-donate")
+      end
+    end
+  end
+
+  describe "why-donate" do
+    let!(:blog) { FactoryBot.create(:blog, title: Blog.why_donate_slug) }
+    it "renders the blog" do
+      get "/why-donate"
+      expect(response.code).to eq "200"
+      expect(response).to render_template("news/show")
+      expect(assigns(:blog)).to eq blog
+    end
   end
 
   describe "user with stolen info" do
