@@ -10,7 +10,7 @@
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
-            = link_to t(".donate_today"), donate_path, class: "btn btn-primary"
+            = link_to t(".donate_today"), news_url(Blog.donation_2020_post_slug), class: "btn btn-primary"
       - else
         %nav.content-nav-group
           %h3= t(".related")
@@ -42,7 +42,7 @@
               = active_link t(".bicycle_serials"), serials_path
             - if %w(news about manufacturers).include?(content_page_type)
               %li
-                = active_link t(".donate"), support_the_index_path
+                = active_link t(".donate"), news_url(Blog.donation_2020_post_slug)
             - if %w(news serials manufacturers).include?(content_page_type)
               %li
                 = active_link t(".bike_index_store"), store_path
