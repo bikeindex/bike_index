@@ -20,7 +20,7 @@
 
   %p
     - recoveries_count = number_with_delimiter(Counts.recoveries)
-    - donations_link = link_to t(".donation"), donate_url
+    - donations_link = link_to t(".donation"), news_url(Blog.donation_2020_post_slug)
     - ambassadors_link = link_to t(".ambassador"), ambassadors_url
     = t(".we_wish_you_the_best_of_luck_html", recoveries_count: recoveries_count, donations_link: donations_link, ambassadors_link: ambassadors_link)
 
