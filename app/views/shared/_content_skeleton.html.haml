@@ -11,12 +11,14 @@
           %header
             = t(".make_a_difference")
             = link_to t(".donate_today"), donate_path, class: "btn btn-primary"
-          %ul.mt-2
-            %li
+          .text-center.mt-2
+            %strong
               = link_to "Donate $5", donate_path(initial_amount: 5)
-            %li
+          .text-center.mt-2
+            %strong
               = link_to "Donate $50", donate_path(initial_amount: 50)
-            %li
+          .text-center.mt-2.mb-2
+            %strong
               = link_to "Donate $200", donate_path(initial_amount: 200)
       - else
         %nav.content-nav-group

@@ -19,5 +19,9 @@ RSpec.describe OrganizationNameValidator do
     it { expect(OrganizationNameValidator.valid?("stores")).to be_falsey }
 
     it { expect(OrganizationNameValidator.valid?("400")).to be_falsey }
+
+    it { expect(OrganizationNameValidator.valid?("for-schools")).to be_falsey }
+
+    it { expect(OrganizationNameValidator.valid?("why-donate")).to be_falsey }
   end
 end
