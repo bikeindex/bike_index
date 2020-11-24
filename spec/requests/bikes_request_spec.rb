@@ -448,6 +448,47 @@ RSpec.describe BikesController, type: :request do
         expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
       end
+      context "with associated_notifications" do
+        let(:graduated_notification) { FactoryBot.create(:graduated_notification) } # so that it isn't processed prior to second creation
+        let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: bike.owner_email, created_at: bike.created_at + 1.hour) }
+        let!(:graduated_notification2) { FactoryBot.create(:graduated_notification, bike: bike2, organization: organization) }
+        it "marks both bikes remaining" do
+          graduated_notification.process_notification
+          graduated_notification.reload
+          expect(graduated_notification.associated_bikes.pluck(:id)).to match_array([bike.id, bike2.id])
+          expect(graduated_notification.associated_notifications.pluck(:id)).to eq([graduated_notification2.id])
+          bike.reload
+          expect(graduated_notification.processed?).to be_truthy
+          expect(graduated_notification.marked_remaining_link_token).to be_present
+          expect(bike.claimed?).to be_falsey # Test this works even with unclaimed bike
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          graduated_notification2.reload
+          bike2.reload
+          expect(graduated_notification2.associated_bikes.pluck(:id)).to match_array([bike.id, bike2.id])
+          expect(graduated_notification2.primary_notification_id).to eq graduated_notification.id
+          expect(graduated_notification2.processed?).to be_truthy
+          expect(graduated_notification2.marked_remaining_link_token).to be_present
+          expect(bike2.user).to be_blank # Test this works even with unclaimed bike
+          expect(bike2.graduated?(organization)).to be_truthy
+          expect(bike2.bike_organizations.pluck(:organization_id)).to eq([])
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
+          expect(response).to redirect_to(bike_path(bike.id))
+          expect(flash[:success]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(graduated_notification.marked_remaining?).to be_truthy
+          expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          bike2.reload
+          graduated_notification2.reload
+          expect(bike2.graduated?(organization)).to be_falsey
+          expect(graduated_notification2.marked_remaining?).to be_truthy
+          expect(graduated_notification2.marked_remaining_at).to be_within(2).of Time.current
+          expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        end
+      end
       context "already marked recovered" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
         it "doesn't update, but flash success" do
