@@ -87,7 +87,7 @@ RSpec.describe InfoController, type: :request do
     context "why_donate" do
       it "redirects to why-donate" do
         get "/why_donate"
-        expect(response).to redirect_to ("/why-donate")
+        expect(response).to redirect_to("/why-donate")
       end
     end
   end
