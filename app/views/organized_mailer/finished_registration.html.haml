@@ -59,7 +59,7 @@
 - if @vars[:donation_message]
   .donate-message
     %h5
-      - donating_link = link_to t(".html.donating"), news_url(Blog.donation_2020_post_slug)
+      - donating_link = link_to t(".html.donating"), why_donate_url
       = t(".html.please_consider_donating_html", donating_link: donating_link)
     %p
       - prioritize_link = link_to t(".html.prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso')

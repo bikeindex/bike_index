@@ -22,7 +22,5 @@ class NewsController < ApplicationController
       @next_item = true unless @page >= @blog.listicles.count
       @prev_item = true unless @page == 1
     end
-
-    @blogger = @blog.user
   end
 end

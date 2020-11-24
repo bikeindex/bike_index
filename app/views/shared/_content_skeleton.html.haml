@@ -6,7 +6,7 @@
       = yield
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
-      - if @blog.present? && @blog.title_slug == Blog.donation_2020_post_slug
+      - if @blog.present? && @blog.title_slug == Blog.why_donate_slug
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
@@ -49,7 +49,7 @@
               = active_link t(".bicycle_serials"), serials_path
             - if %w(news about manufacturers).include?(content_page_type)
               %li
-                = active_link t(".donate"), news_url(Blog.donation_2020_post_slug)
+                = active_link t(".donate"), why_donate_path
             - if %w(news serials manufacturers).include?(content_page_type)
               %li
                 = active_link t(".bike_index_store"), store_path

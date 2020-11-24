@@ -43,7 +43,7 @@ class Blog < ApplicationRecord
       find_by_title_slug(str) || find_by_title(str)
   end
 
-  def self.donation_2020_post_slug
+  def self.why_donate_slug
     "end-2020-with-a-donation-to-bike-index"
   end
 
