@@ -11,6 +11,13 @@
           %header
             = t(".make_a_difference")
             = link_to t(".donate_today"), news_url(Blog.donation_2020_post_slug), class: "btn btn-primary"
+          %ul.mt-2
+            %li
+              = link_to "Donate $5", donate_path(initial_amount: 5)
+            %li
+              = link_to "Donate $50", donate_path(initial_amount: 50)
+            %li
+              = link_to "Donate $200", donate_path(initial_amount: 200)
       - else
         %nav.content-nav-group
           %h3= t(".related")
