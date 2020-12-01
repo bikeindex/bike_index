@@ -23,8 +23,7 @@ class BikeCreator
     bike = BikeCreatorVerifier.new(@b_param, bike).verify
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
-    bike = add_front_wheel_size(bike)
-    bike
+    add_front_wheel_size(bike)
   end
 
   def create_bike

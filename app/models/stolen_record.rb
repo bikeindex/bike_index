@@ -336,7 +336,7 @@ class StolenRecord < ApplicationRecord
     self.date_stolen ||= Time.current
     year = date_stolen.year
     if date_stolen.year < (Time.current - 100.years).year
-      decade = year.to_s.chars.last(2).join("")
+      decade = year.to_s[-2..-1].chars.join("")
       corrected = date_stolen.change(year: "20#{decade}".to_i)
       self.date_stolen = corrected
     end

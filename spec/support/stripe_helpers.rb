@@ -24,5 +24,5 @@ module StripeHelpers
     @approved_card_token ||= Stripe::Token.create(card: stripe_card(:visa))
   end
 
-  alias stripe_token stripe_token_approved
+  alias_method :stripe_token, :stripe_token_approved
 end

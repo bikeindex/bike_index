@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
-  RUN_EXTERNAL_STOP_HELING_TESTS = ENV["STOP_HELING_BASE_URL"] != "test"
+RUN_EXTERNAL_STOP_HELING_TESTS = ENV["STOP_HELING_BASE_URL"] != "test"
 
+RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
   before do
     null_cache = ActiveSupport::Cache.lookup_store(:null_store)
     allow(Rails).to receive(:cache).and_return(null_cache)
