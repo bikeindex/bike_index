@@ -16,7 +16,12 @@ class Counts
     end
 
     def recovery_average_value
-      1428 # 2019/5/20 - calculated by averaging the value of the recoveries that had listed values
+      1599 # updated with calculated_recovery_average_value on 2020/12/1
+    end
+
+    # This method isn't called in normal operation
+    def calculated_recovery_average_value
+      valued_recoveries.sum / valued_recoveries.count
     end
 
     def beginning_of_week
@@ -55,7 +60,7 @@ class Counts
 
     def assign_recoveries
       # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
-      assign_for("recoveries", StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day).count + 2_041)
+      assign_for("recoveries", calculated_recoveries.count + 2_041)
     end
 
     def assign_week_creation_chart
@@ -67,9 +72,8 @@ class Counts
     end
 
     def assign_recoveries_value
-      valued = StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
       # Sum of the recovered bikes with estimated_values + recovery_average_value * the number of bikes without an estimated_value
-      assign_for("recoveries_value", valued.sum + (recoveries - valued.count) * recovery_average_value)
+      assign_for("recoveries_value", valued_recoveries.sum + (recoveries - valued_recoveries.count) * recovery_average_value)
     end
 
     def recoveries_value
@@ -77,6 +81,14 @@ class Counts
     end
 
     protected
+
+    def calculated_recoveries
+      StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day)
+    end
+
+    def valued_recoveries
+      @valued_recoveries ||= calculated_recoveries.pluck(:estimated_value).reject(&:blank?)
+    end
 
     # Should be the new canonical way of using redis
     def redis
