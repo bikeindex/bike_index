@@ -5,7 +5,7 @@ import { shallow, mount } from "enzyme";
 import toJson from "enzyme-to-json";
 import { bikeResponse } from "helpers/bikes";
 import { event } from "helpers/utils";
-import api from "../../api";
+import api from "../api";
 import SearchResults from "./SearchResults";
 
 /*
@@ -13,7 +13,7 @@ import SearchResults from "./SearchResults";
 */
 jest.mock("../../api");
 api.fetchFuzzyResults.mockImplementation(
-  () => new Promise(resolve => resolve(bikeResponse))
+  () => new Promise((resolve) => resolve(bikeResponse))
 );
 
 /*
@@ -25,8 +25,8 @@ const serialResults = [
     ...bikeResponse,
     fuzzyBikes: [],
     serial: "two",
-    anchor: "#mock"
-  }
+    anchor: "#mock",
+  },
 ];
 
 describe("<SearchResults />", () => {
