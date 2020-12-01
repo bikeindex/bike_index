@@ -166,6 +166,10 @@ class Organization < ApplicationRecord
     permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
   end
 
+  def self.example
+    Organization.find_by_id(92) || Organization.create(name: "Example organization")
+  end
+
   # never geocode, use default_location lat/long
   def should_be_geocoded?
     false
