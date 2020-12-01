@@ -2,21 +2,8 @@
 # Remove from this list as you refactor files.
 ---
 ignore:
-  - app/controllers/api/base.rb
-  - app/controllers/api/v2/bikes.rb
-  - app/controllers/api/v2/bikes_search.rb
-  - app/controllers/api/v2/manufacturers.rb
-  - app/controllers/api/v2/me.rb
-  - app/controllers/api/v2/root_v2.rb
-  - app/controllers/api/v2/selections.rb
-  - app/controllers/api/v2/users.rb
-  - app/controllers/api/v3/me.rb
-  - app/controllers/api/v3/organizations.rb
-  - app/controllers/api/v3/root_v3.rb
-  - app/controllers/api/v3/search.rb
   - app/controllers/org_public/customer_appointments_controller.rb
   - app/controllers/organized/appointment_configurations_controller.rb
-  - app/controllers/organized/hot_sheets_controller.rb
   - app/controllers/organized/lines_controller.rb
   - app/models/appointment.rb
   - app/models/appointment_configuration.rb
