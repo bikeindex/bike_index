@@ -118,7 +118,7 @@ module API
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          optional :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
+          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           requires :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
           use :bike_attrs
