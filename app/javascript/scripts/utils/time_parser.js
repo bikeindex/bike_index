@@ -1,4 +1,4 @@
-import log from "../utils/log";
+import log from "./log";
 import moment from "moment-timezone";
 
 // TimeParser updates all HTML elements with class '.convertTime', making them:
