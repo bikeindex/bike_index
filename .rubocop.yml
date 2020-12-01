@@ -41,38 +41,3 @@ Metrics/ParameterLists:
 
 Style:
   Enabled: false
-
-Lint/BinaryOperatorWithIdenticalOperands: # (new in 0.89)
-  Enabled: true
-Lint/ConstantDefinitionInBlock: # (new in 0.91)
-  Enabled: true
-Lint/DuplicateElsifCondition: # (new in 0.88)
-  Enabled: true
-Lint/DuplicateRequire: # (new in 0.90)
-  Enabled: true
-Lint/DuplicateRescueException: # (new in 0.89)
-  Enabled: true
-Lint/EmptyConditionalBody: # (new in 0.89)
-  Enabled: true
-Lint/EmptyFile: # (new in 0.90)
-  Enabled: true
-Lint/FloatComparison: # (new in 0.89)
-  Enabled: true
-Lint/IdentityComparison: # (new in 0.91)
-  Enabled: true
-Lint/MissingSuper: # (new in 0.89)
-  Enabled: true
-Lint/OutOfRangeRegexpRef: # (new in 0.89)
-  Enabled: true
-Lint/SelfAssignment: # (new in 0.89)
-  Enabled: true
-Lint/TopLevelReturnWithArgument: # (new in 0.89)
-  Enabled: true
-Lint/TrailingCommaInAttributeDeclaration: # (new in 0.90)
-  Enabled: true
-Lint/UnreachableLoop: # (new in 0.89)
-  Enabled: true
-Lint/UselessMethodDefinition: # (new in 0.90)
-  Enabled: true
-Lint/UselessTimes: # (new in 0.91)
-  Enabled: true
