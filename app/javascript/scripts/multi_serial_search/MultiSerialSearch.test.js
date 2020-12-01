@@ -11,7 +11,7 @@ import MultiSerialSearch from "./MultiSerialSearch";
 /*
   api mocks
 */
-jest.mock("../../api");
+jest.mock("../api");
 api.fetchSerialResults.mockImplementation(
   () => new Promise((resolve) => resolve(bikeResponse))
 );

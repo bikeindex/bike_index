@@ -11,7 +11,7 @@ import SearchResults from "./SearchResults";
 /*
   api mocks
 */
-jest.mock("../../api");
+jest.mock("../api");
 api.fetchFuzzyResults.mockImplementation(
   () => new Promise((resolve) => resolve(bikeResponse))
 );
