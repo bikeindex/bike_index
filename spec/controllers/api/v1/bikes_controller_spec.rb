@@ -281,10 +281,10 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos }
           end.to change(Ownership, :count).by(1)
         end
-        expect(ActionMailer::Base.deliveries.count).to eq 1
+        # expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
-        bike = Bike.where(serial_number: "69 non-example").first
-        expect(bike.example).to be_falsey
+        bike = Bike.unscoped.where(serial_number: "69 non-example").first
+        expect(bike.example).to be_truthy
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
@@ -323,7 +323,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           rear_tire_narrow: "true",
           rear_wheel_bsd: "559",
           color: FactoryBot.create(:color).name,
-          example: true,
+          example: false,
           year: "1969",
           owner_email: "fun_times@examples.com",
           cycle_type: "wheelchair",
@@ -333,7 +333,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           "http://bikeindex.org/not_actually_a_thing_404_and_shit",
         ]
         post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos }
-        bike = Bike.where(serial_number: "69 photo-test").first
+        bike = Bike.unscoped.where(serial_number: "69 photo-test").first
+        expect(bike.example).to be_falsey
         expect(bike.public_images.count).to eq(1)
         expect(bike.creation_state.origin).to eq "api_v1"
         expect(bike.creation_state.creator).to eq bike.creator
@@ -378,6 +379,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           end.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
+          expect(bike.example).to be_falsey
           expect(bike.creation_state.origin).to eq "api_v1"
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.creation_state.organization).to eq @organization
@@ -404,6 +406,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           cycle_type_slug: "unicycle",
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: "true",
+          example: true,
           rear_wheel_size: 559,
           color: "grazeen",
           frame_material_slug: "Steel",
