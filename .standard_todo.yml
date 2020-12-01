@@ -24,7 +24,6 @@ ignore:
   - app/models/appointment.rb
   - app/models/appointment_configuration.rb
   - app/models/appointment_update.rb
-  - app/models/concerns/geocodeable.rb
   - app/models/single_sign_on.rb
   - app/uploaders/alert_image_uploader.rb
   - app/uploaders/avatar_uploader.rb
@@ -45,7 +44,6 @@ ignore:
   - spec/requests/api/v3/me_request_spec.rb
   - spec/requests/api/v3/organizations_request_spec.rb
   - spec/requests/api/v3/search_request_spec.rb
-  - spec/requests/locale_detection_request_spec.rb
   - spec/requests/org_public/customer_appointments_request_spec.rb
   - spec/requests/org_public/walkrightup_request_spec.rb
   - spec/requests/organized/appointment_configurations_request_spec.rb
@@ -54,9 +52,3 @@ ignore:
   - spec/requests/organized/graduated_notifications_request_spec.rb
   - spec/requests/organized/hot_sheets_request_spec.rb
   - spec/requests/organized/lines_request_spec.rb
-  - spec/requests/organized/manages_request_spec.rb
-  - spec/requests/organized/my_accounts_request_spec.rb
-  - spec/requests/organized/users_request_spec.rb
-  - spec/requests/sessions_request_spec.rb
-  - spec/requests/theft_alerts_request_spec.rb
-  - spec/requests/users_request_spec.rb
