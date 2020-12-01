@@ -61,4 +61,3 @@ ignore:
   - spec/requests/sessions_request_spec.rb
   - spec/requests/theft_alerts_request_spec.rb
   - spec/requests/users_request_spec.rb
-  - spec/routing/organizations_rounting_spec.rb
