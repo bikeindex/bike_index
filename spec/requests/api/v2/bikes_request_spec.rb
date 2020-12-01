@@ -161,7 +161,6 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "creates an example bike" do
-      FactoryBot.create(:organization, name: "Example organization")
       ActionMailer::Base.deliveries = []
       post "/api/v2/bikes?access_token=#{token.token}",
            params: bike_attrs.merge(test: true).to_json,

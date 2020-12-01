@@ -394,7 +394,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "creates an example bike if the bike is from example, and include all the options" do
         FactoryBot.create(:color, name: "Black")
-        org = FactoryBot.create(:organization, name: "Example organization")
+        org = Organization.example
         user = FactoryBot.create(:user)
         FactoryBot.create(:membership_claimed, user: user, organization: org)
         manufacturer = FactoryBot.create(:manufacturer)
