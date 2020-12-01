@@ -4,9 +4,9 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
   describe "send_notification_email" do
     it "returns correct code if authentication fails" do
       bike = FactoryBot.create(:bike)
-      options = { some_stuff: "things",
+      options = {some_stuff: "things",
                  other_stuff: "Things",
-                 bike_id: bike.id }
+                 bike_id: bike.id}
       post :create, params: options
       expect(response.code).to eq("401")
     end
@@ -24,12 +24,12 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
           tweet_account_screen_name: "bikeindex",
           tweet_account_name: "Bike Index",
           tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
-          retweet_screen_names: [],
-        },
+          retweet_screen_names: []
+        }
       }
-      expect do
+      expect {
         post :create, params: options
-      end.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
+      }.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
@@ -53,12 +53,12 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
           tweet_account_screen_name: "bikeindex",
           tweet_account_name: "Bike Index",
           tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
-          retweet_screen_names: [],
-        },
+          retweet_screen_names: []
+        }
       }
-      expect do
+      expect {
         post :create, params: options
-      end.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
+      }.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
