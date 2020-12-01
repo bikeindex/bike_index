@@ -98,7 +98,7 @@ class Counts
     end
 
     def redis_pool
-      @redis ||= ConnectionPool.new(timeout: 1, size: 2) {
+      @redis_pool ||= ConnectionPool.new(timeout: 1, size: 2) {
         Redis.new
       }
     end
