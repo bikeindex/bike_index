@@ -99,7 +99,7 @@ class Bike < ApplicationRecord
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
   scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
-  scope :example, -> { where(example: true) }
+  scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
