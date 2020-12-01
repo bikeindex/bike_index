@@ -7,7 +7,7 @@ module Organized
       @ambassadors =
         Ambassador
           .includes(:memberships)
-          .where(memberships: { organization: current_organization })
+          .where(memberships: {organization: current_organization})
           .includes(:ambassador_task_assignments)
           .sort_by { |ambassador| -ambassador.percent_complete }
 
@@ -21,8 +21,10 @@ module Organized
       end
     end
 
-    def resources; end
+    def resources
+    end
 
-    def getting_started; end
+    def getting_started
+    end
   end
 end

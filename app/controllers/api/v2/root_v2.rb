@@ -2,7 +2,7 @@ module API
   module V2
     class RootV2 < API::Base
       format :json
-      version %w(v3 v2)
+      version %w[v3 v2]
       default_error_formatter :json
       content_type :json, "application/json"
       use ::WineBouncer::OAuth2
@@ -28,7 +28,7 @@ module API
                                   description: "This is the API for Bike Index. It's authenticated with OAuth2 and is generally pretty awesome",
                                   contact: "support@bikeindex.org",
                                   license_url: "https://github.com/bikeindex/bike_index/blob/main/LICENSE",
-                                  terms_of_service_url: "https://bikeindex.org/terms",
+                                  terms_of_service_url: "https://bikeindex.org/terms"
                                 }
       route :any, "*path" do
         raise StandardError, "Unable to find endpoint"

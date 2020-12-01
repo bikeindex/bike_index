@@ -125,13 +125,19 @@ module Geocodeable
 
   # Override assignment to enable friendly finding state and country
   def state=(val)
-    return super unless val.is_a?(String)
-    self.state = State.fuzzy_find(val)
+    if val.is_a?(String)
+      self.state = State.fuzzy_find(val)
+    else
+      super
+    end
   end
 
   def country=(val)
-    return super unless val.is_a?(String)
-    self.country = Country.fuzzy_find(val)
+    if val.is_a?(String)
+      self.country = Country.fuzzy_find(val)
+    else
+      super
+    end
   end
 
   def metric_units?

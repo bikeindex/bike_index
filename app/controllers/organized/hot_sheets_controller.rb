@@ -6,7 +6,7 @@ module Organized
 
     def show
       @current = params[:day].blank?
-      @day = @current ? nil : (params[:day]).to_date
+      @day = @current ? nil : params[:day].to_date
       @hot_sheet = HotSheet.for(current_organization, @day)
     end
 
@@ -35,7 +35,7 @@ module Organized
       return true if current_user.superuser? || current_organization.enabled?("hot_sheet")
 
       flash[:error] = translation(:org_does_not_have_access)
-      redirect_to organization_root_path and return
+      redirect_to(organization_root_path) && return
     end
 
     def set_current_hot_sheet_configuration
@@ -48,7 +48,7 @@ module Organized
 
     def permitted_parameters
       params.require(:hot_sheet_configuration)
-            .permit([:is_on, :timezone_str, :send_hour, :search_radius_miles, :search_radius_kilometers])
+        .permit([:is_on, :timezone_str, :send_hour, :search_radius_miles, :search_radius_kilometers])
     end
   end
 end

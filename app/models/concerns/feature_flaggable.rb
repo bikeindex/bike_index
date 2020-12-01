@@ -6,5 +6,5 @@ module FeatureFlaggable
     "#{self.class.name}:#{id}"
   end
 
-  alias flipper_id feature_flag_id
+  alias_method :flipper_id, :feature_flag_id
 end

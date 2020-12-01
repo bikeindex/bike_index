@@ -13,7 +13,7 @@ module API
         end
 
         params :stolen_search do
-          optional :proximity, type: String, desc: "Center of location for proximity search", documentation: { example: "45.521728,-122.67326" }
+          optional :proximity, type: String, desc: "Center of location for proximity search", documentation: {example: "45.521728,-122.67326"}
           optional :proximity_square, type: Integer, desc: "Size of the proximity search", default: 100
           optional :stolen_before, type: Integer, desc: "Bikes stolen before timestamp"
           optional :stolen_after, type: Integer, desc: "Bikes stolen after timestamp"
@@ -34,7 +34,7 @@ module API
       end
       resource :bikes_search, desc: "Searching for bikes" do
         desc "All bike search", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             If you want to find any matching bike, use this endpoint.
             You can not use location information here, since this includes non_stolen bikes (which don't have location information)
           NOTE
@@ -48,7 +48,7 @@ module API
         end
 
         desc "Stolen bike search", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             If you want to search for bikes stolen near a specific location, you need to use this endpoint.
             Keep in mind that it only returns stolen bikes - so if you do a serial search, and nothing turns up that doesn't mean that the bike isn't registered.
             **Notes on location searching**:
@@ -78,7 +78,7 @@ module API
         end
 
         desc "Count of bikes matching search", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             Include all the options you would pass in your search. This will respond with a hash of the number of bikes matching your search for each type:
 
             ```javascript
@@ -105,7 +105,7 @@ module API
         end
 
         desc "Close serials", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             We can find bikes with serials close to the serial you search you input.
             Close serials are serials that are off by one or two characters
             Note: [Homoglyph](https://en.wikipedia.org/wiki/Homoglyph) matching happens for all endpoints (e.g. 1GGGGO will find IGGG0), you don't need to use `close_serials` to get it.
@@ -121,13 +121,13 @@ module API
         end
 
         desc "All stolen bikes", {
-          notes: <<-NOTE,
+          notes: <<-NOTE
             Returns all the stolen bikes. Not paginated, the response is over > 10mb
 
             This is a cached response, updated a few times a day. The most recent update time is in the `Last-Modified` header.
 
             Note: this redirects to a static, cached JSON file. It doesn't work in the documentation.
-            NOTE
+          NOTE
         }
         get "/all_stolen" do
           all_stolen = FileCacheMaintainer.cached_all_stolen
