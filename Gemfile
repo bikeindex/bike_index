@@ -72,7 +72,7 @@ gem "stripe", "~> 3.3.2"
 # Making other files
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
-# gem "wkhtmltopdf-binary"
+gem "wkhtmltopdf-binary"
 
 # API wrappers
 gem "simple_spark" # Sparkpost gem - we use it to send newsletters
