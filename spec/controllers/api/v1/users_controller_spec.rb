@@ -15,9 +15,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       set_current_user(u)
       get :current, format: :json
       expect(response.code).to eq("200")
-      result = JSON.parse(response.body)
-      expect(result).to include("user_present" => true)
-      expect(result["email"]).to_not be_present
+      expect(json_result).to include("user_present" => true)
+      expect(json_result["email"]).to_not be_present
       expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
       expect(response.headers["Access-Control-Request-Method"]).not_to be_present
     end

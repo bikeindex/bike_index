@@ -5,8 +5,8 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update Vagrantfile and CircleCI config if Ruby version is bumped
-ruby "2.5.8"
+# Update CircleCI config if Ruby version is bumped
+ruby "2.7.2"
 gem "rack", "2.0.8"
 gem "rails", "5.2.4"
 
