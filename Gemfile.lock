@@ -220,7 +220,7 @@ GEM
     grape_logging (1.8.3)
       grape
       rack
-    groupdate (4.2.0)
+    groupdate (5.2.1)
       activesupport (>= 5)
     guard (2.16.2)
       formatador (>= 0.2.4)
@@ -641,7 +641,7 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
-    tzinfo (1.2.7)
+    tzinfo (1.2.8)
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
