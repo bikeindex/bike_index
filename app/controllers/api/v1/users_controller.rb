@@ -11,7 +11,7 @@ module Api
 
       def current
         if current_user.present?
-          respond_with current_user
+          respond_with current_user, serializer: UserSerializer
         else
           respond_with user_present: false
         end

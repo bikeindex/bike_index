@@ -14,7 +14,7 @@ jobs:
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
-      - image: circleci/ruby:2.5.8-stretch-node
+      - image: circleci/ruby:2.7.2-buster-node
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
@@ -234,9 +234,12 @@ jobs:
                               -- ${TESTFILES}
       - run:
           name: "Jest: Tests"
-          command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          command: |
+            mkdir -p test-results/junit
+            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+            JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
+            JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
 
       - run:
           name: Code Climate Test Coverage
@@ -256,7 +259,7 @@ jobs:
 
   upload-coverage:
     docker:
-      - image: circleci/ruby:2.5.8-stretch-node
+      - image: circleci/ruby:2.7.2-buster-node
     environment:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
     working_directory: ~/bikeindex/bike_index
