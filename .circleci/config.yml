@@ -234,9 +234,12 @@ jobs:
                               -- ${TESTFILES}
       - run:
           name: "Jest: Tests"
-          command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          command: |
+            mkdir -p test-results/junit
+            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+            JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
+            JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
 
       - run:
           name: Code Climate Test Coverage
