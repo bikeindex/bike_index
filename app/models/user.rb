@@ -90,7 +90,7 @@ class User < ApplicationRecord
   end
 
   def self.username_friendly_find(str)
-    if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+    if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
       where(id: str).first
     else
       find_by_username(str)

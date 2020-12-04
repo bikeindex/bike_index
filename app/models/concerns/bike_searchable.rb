@@ -148,7 +148,7 @@ module BikeSearchable
         return false unless ip.present?
         location = Geocoder.search(ip)
         if defined?(location.first.data) && location.first.data.is_a?(Array)
-          location = location.first.data.reverse.compact.select { |i| i.match(/\A\D*\z/).present? }
+          location = location.first.data.reverse.compact.select { |i| i.match(/\A\D+\z/).present? }
         end
       end
 

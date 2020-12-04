@@ -112,7 +112,7 @@ RSpec.describe Export, type: :model do
     it "assigns the bike ids" do
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
-      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}  "
+      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}?organization_id=#{organization.slug}  "
       export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
