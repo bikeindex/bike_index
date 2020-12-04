@@ -128,6 +128,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
     end
 
+    context "just organization_affiliation" do
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export::PERMITTED_HEADERS, bike_code_start: "fff"}) }
+    end
+
     context "all unpaid headers" do
       # Setting up what we have, rather than waiting on everything
       # Also - test that it doesn't explode if unable to assign stickers
@@ -218,6 +222,25 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(bike_sticker.claimed?).to be_truthy
           expect(bike_sticker.bike).to eq bike
           expect(bike_sticker.user).to eq user
+        end
+      end
+      context "header only organization_affiliation" do
+        let(:target_headers) { %w[organization_affiliation] }
+        let(:export_options) { {headers: target_headers} }
+        it "returns the expected values" do
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_falsey
+          instance.perform(export.id)
+          export.reload
+          expect(instance.export_headers).to eq target_headers
+          expect(export.progress).to eq "finished"
+          generated_csv_string = export.file.read
+          bike_line = generated_csv_string.split("\n").last
+          expect(bike_line.split(",").count).to eq target_headers.count
+          expect(bike_line).to eq "\"community_member\""
+
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_falsey
         end
       end
       context "including every available field + stickers" do
