@@ -70,7 +70,9 @@
               .form-well-input
                 = f.hidden_field :frame_size_unit
                 = f.hidden_field :frame_size
-                = f.number_field :frame_size_number, class: 'form-control'
+                - if @bike.frame_size_number.present?
+                  - @bike.frame_size_number = @bike.frame_size_number.round if @bike.frame_size_number.to_i == @bike.frame_size_number
+                = f.number_field :frame_size_number, class: 'form-control', step: 0.1
 
           .form-group.row.unnested-field
             = f.label :name, t(".bike_name"), class: 'form-well-label'
