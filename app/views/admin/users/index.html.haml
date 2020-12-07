@@ -8,6 +8,9 @@
   .col-7
     %ul
       %li.nav-item
+        - banned_search_params = sortable_search_params.merge(search_banned: !@search_banned)
+        = link_to "Banned", admin_users_path(banned_search_params), class: @search_banned ? "nav-link active" : "nav-link"
+      %li.nav-item
         - ambassadors_search_params = sortable_search_params.merge(search_ambassadors: !@search_ambassadors)
         = link_to "Ambassadors", admin_users_path(ambassadors_search_params), class: @search_ambassadors ? "nav-link active" : "nav-link"
       %li.nav-item

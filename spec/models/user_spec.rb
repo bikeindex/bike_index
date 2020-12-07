@@ -120,9 +120,11 @@ RSpec.describe User, type: :model do
       end
 
       it "is bannable" do
+        expect(user.banned?).to be_falsey
         user.banned = true
         user.save
         expect(user.authenticate("testme21")).to eq(false)
+        expect(user.banned?).to be_truthy
       end
     end
 

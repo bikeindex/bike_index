@@ -59,7 +59,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(theft_alert).to be_present
       end
 
-      it "merges bikes and memberships and deletes user" do
+      def expect_merged_bikes_and_memberships
         user.reload
         expect(user.memberships.count).to eq 1
         expect(user.ownerships.count).to eq 0
@@ -101,6 +101,17 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(Doorkeeper::Application.where(owner_id: user.id).count).to eq 1
         expect(bike.creator).to eq user
         expect(pre_created_ownership.creator_id).to eq user.id
+      end
+
+      it "merges bikes and memberships and deletes user" do
+        expect_merged_bikes_and_memberships
+      end
+      context "banned user" do
+        let(:old_user) { FactoryBot.create(:user_confirmed, email: email, banned: true) }
+        it "merges and marks banned" do
+          expect_merged_bikes_and_memberships
+          expect(user.banned?).to be_truthy
+        end
       end
     end
 
