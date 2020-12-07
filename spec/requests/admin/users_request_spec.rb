@@ -44,6 +44,9 @@ RSpec.describe Admin::UsersController, type: :request do
     context "non developer" do
       let(:user_subject) { FactoryBot.create(:user, confirmed: false) }
       it "updates all the things that can be edited (finding via user id)" do
+        user_subject.reload
+        og_auth_token = user_subject.auth_token
+        expect(user_subject.banned?).to be_falsey
         put "#{base_url}/#{user_subject.id}", params: {
           user: {
             name: "New Name",
@@ -62,24 +65,31 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.superuser).to be_truthy
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
-        expect(user_subject.banned).to be_truthy
+        expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
+        # Bump the auth token, because we want to sign out the user
+        expect(user_subject.auth_token).to_not eq og_auth_token
       end
     end
     context "developer" do
       let(:current_user) { FactoryBot.create(:admin_developer) }
       it "updates developer" do
+        user_subject.reload
+        og_auth_token = user_subject.auth_token
         put "#{base_url}/#{user_subject.id}", params: {
           user: {
             developer: true,
             email: user_subject.email,
             superuser: false,
             can_send_many_stolen_notifications: true,
-            banned: true
+            banned: false
           }
         }
         user_subject.reload
         expect(user_subject.developer).to be_truthy
+        expect(user_subject.banned?).to be_falsey
+        # Shouldn't bump the auth token, because we want to sign out the user
+        expect(user_subject.auth_token).to eq og_auth_token
       end
     end
   end
