@@ -100,13 +100,5 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(assigns(:end_time)).to be_within(5).of Time.current
       end
     end
-    context "organization without overview_dashboard?" do
-      it "renders" do
-        current_organization.reload
-        expect(current_organization.overview_dashboard?).to be_falsey
-        get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to render_template(:index)
-      end
-    end
   end
 end
