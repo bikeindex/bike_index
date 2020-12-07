@@ -56,11 +56,15 @@ RSpec.describe Organized::BaseController, type: :request do
       let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 50) }
       let!(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: current_organization) }
       let!(:bike) { FactoryBot.create(:bike_organized, organization: organization_child1) }
-      it "renders" do
+      it "does not rendern" do
         current_organization.update(updated_at: Time.current)
         current_organization.reload
         expect(current_organization.parent?).to be_truthy
-        expect(current_organization.overview_dashboard?).to be_truthy
+        expect(current_organization.overview_dashboard?).to be_falsey
+        get "/o/#{current_organization.to_param}/dashboard"
+        expect(response).to redirect_to(organization_bikes_path)
+        # ... but it renders if the current_user is superuser
+        current_user.update(superuser: true)
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to render_template(:index)
       end

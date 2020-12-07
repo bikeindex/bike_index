@@ -13,6 +13,12 @@ module Organized
     end
 
     def index
+      # Only render this page if the organization has overview_dashboard (or it's a superuser)
+      if !current_organization.overview_dashboard? && !current_user.superuser?
+        redirect_to organization_bikes_path
+        return
+      end
+
       @child_organizations = current_organization.child_organizations
       @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
