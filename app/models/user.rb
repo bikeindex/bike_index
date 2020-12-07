@@ -43,6 +43,7 @@ class User < ApplicationRecord
   belongs_to :state
   belongs_to :country
 
+  scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superusers, -> { where(superuser: true) }
@@ -161,6 +162,10 @@ class User < ApplicationRecord
 
   def developer?
     developer
+  end
+
+  def banned?
+    banned
   end
 
   def ambassador?
