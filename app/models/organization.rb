@@ -135,7 +135,7 @@ class Organization < ApplicationRecord
   end
 
   def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
   end
 
   def self.admin_text_search(n)

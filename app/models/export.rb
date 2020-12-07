@@ -139,11 +139,8 @@ class Export < ApplicationRecord
   end
 
   def custom_bike_ids=(val)
-    custom_ids = val.split(/\s+|,/).map { |cid|
-      id = cid.gsub(/\D*/, "")
-      id.present? ? id.to_i : nil
-    }.compact.uniq
-    custom_ids = nil unless custom_ids.any?
+    custom_ids = val.split(/\s+|,/).map { |cid| bike_id_from_url(cid) }.compact.uniq
+    custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end
 
@@ -245,6 +242,17 @@ class Export < ApplicationRecord
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
       bikes.where("bikes.created_at < ?", end_at)
+    end
+  end
+
+  def bike_id_from_url(bike_url)
+    return nil unless bike_url.present?
+    id_str = bike_url.strip
+    if id_str.match?(/\A\d+\z/)
+      id_str.to_i
+    else
+      bike_id = id_str[/bikes\/\d+/i]
+      bike_id.present? ? bike_id.gsub(/bikes\//i, "").to_i : nil
     end
   end
 end

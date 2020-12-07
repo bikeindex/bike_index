@@ -48,7 +48,7 @@ class Tweet < ApplicationRecord
     return none unless str.present?
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
-    if text.is_a?(Integer) || text.match(/\A\d*\z/).present?
+    if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
       if text.to_i > 2147483647 # max rails integer, assume it's a twitter_id instead
         return where("twitter_id ILIKE ?", "%#{text}%")
       else

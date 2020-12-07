@@ -30,7 +30,7 @@ class Manufacturer < ApplicationRecord
 
     def friendly_find(n)
       return nil if n.blank?
-      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+      if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
         ns = Slugifyer.manufacturer(n)

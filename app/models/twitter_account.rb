@@ -41,7 +41,7 @@ class TwitterAccount < ApplicationRecord
 
   def self.friendly_find(str)
     return nil if str.blank?
-    return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+    return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
     fuzzy_screen_name_find(str)
   end
 
