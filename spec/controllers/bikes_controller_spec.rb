@@ -1744,7 +1744,13 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.owner).to_not eq(user)
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
-        put :update, params: {id: bike.id, bike: {description: "new description", handlebar_type: "forward"}}
+        put :update, params: {id: bike.id, bike: {
+          description: "new description",
+          handlebar_type: "forward",
+          frame_size: "50cm",
+          frame_size_number: 54,
+          frame_size_unit: "cm"
+        }}
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1752,6 +1758,9 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.frame_size_unit).to eq "cm"
+        expect(bike.frame_size_number).to eq 54
+        expect(bike.frame_size).to eq "54cm"
       end
       context "bike is claimed" do
         let(:claimed) { true }
