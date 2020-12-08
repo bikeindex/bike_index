@@ -1330,6 +1330,7 @@ RSpec.describe BikesController, type: :controller do
             city: "Rotterdam",
             zipcode: "3035",
             country_id: Country.netherlands.id,
+            organization_affiliation: "something weird",
             components_attributes: {
               "0" => {
                 "_destroy" => "1",
@@ -1351,6 +1352,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.country&.name).to eq(Country.netherlands.name)
           expect(bike.zipcode).to eq "3035"
           expect(bike.city).to eq "Rotterdam"
+          expect(bike.organization_affiliation).to eq "something weird"
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey

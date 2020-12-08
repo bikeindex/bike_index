@@ -199,14 +199,15 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
         let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_falsey
-          expect(bike.phone).to eq "7177423423"
-          expect(bike.extra_registration_number).to eq "cool extra serial"
-          expect(bike.organization_affiliation).to eq "community_member"
-          expect(export.assign_bike_codes?).to be_truthy
-
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+            bike.reload
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_falsey
+            expect(bike.phone).to eq "7177423423"
+            expect(bike.extra_registration_number).to eq "cool extra serial"
+            expect(bike.organization_affiliation).to eq "community_member"
+            expect(export.assign_bike_codes?).to be_truthy
+
             expect(bike.registration_address).to eq target_address
             instance.perform(export.id)
           end
