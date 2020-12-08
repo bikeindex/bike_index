@@ -128,7 +128,7 @@ class Bike < ApplicationRecord
         propulsion_type street zipcode country_id state_id city belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden
+        components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
         stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids].map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                                                                                                                      components_attributes: Component.old_attr_accessible]).freeze
@@ -765,8 +765,18 @@ class Bike < ApplicationRecord
     end
   end
 
+  def organization_affiliation=(val)
+    conditional_information["organization_affiliation"] = val
+  end
+
   def organization_affiliation
-    b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
+    # TODO: make conditional_information hold more things
+    o_affiliation = conditional_information["organization_affiliation"]
+    return o_affiliation if o_affiliation.present?
+    previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
+    return nil unless previous_o_affiliation.present?
+    update(organization_affiliation: previous_o_affiliation)
+    previous_o_affiliation
   end
 
   def external_image_urls

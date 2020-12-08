@@ -50,7 +50,7 @@ RSpec.shared_context :geocoder_default_location do
   end
 
   before do
-    Geocoder.configure(lookup: :test, ip_lookup: :test)
+    Geocoder.configure(lookup: :test, ip_lookup: :test, api_key: ENV["GOOGLE_GEOCODER"])
     Geocoder::Lookup::Test.set_default_stub([default_location.as_json])
   end
 end
