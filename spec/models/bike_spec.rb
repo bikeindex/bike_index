@@ -251,7 +251,7 @@ RSpec.describe Bike, type: :model do
   describe "organization_affiliation" do
     let(:bike) { FactoryBot.create(:bike) }
     it "sets if searched" do
-      expect(bike.organization_affiliation).to be_blank
+      expect(bike.organization_affiliation).to eq "" # We expect it to be a string
       expect(bike.conditional_information).to eq({})
       bike.update(organization_affiliation: "community_member")
       bike.reload
