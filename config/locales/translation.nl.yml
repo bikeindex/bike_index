@@ -1790,6 +1790,7 @@ nl:
       city: City
       state: Staat
       street: Straat
+      organization_affiliation: "%{org_name} aansluiting"
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
