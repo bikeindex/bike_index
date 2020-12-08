@@ -1049,6 +1049,7 @@ en:
       model_year: Model year
       nevermind: Nevermind
       other_serial_or_registration_number: Other serial or registration number
+      organization_affiliation: "%{org_name} affiliation"
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
       seat_tube_length: Seat tube length

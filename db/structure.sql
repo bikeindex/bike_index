@@ -548,7 +548,8 @@ CREATE TABLE public.bikes (
     state_id bigint,
     address_set_manually boolean DEFAULT false,
     created_by_parking_notification boolean DEFAULT false,
-    is_phone boolean DEFAULT false
+    is_phone boolean DEFAULT false,
+    conditional_information jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -5444,6 +5445,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201009210429'),
 ('20201013204925'),
 ('20201019200213'),
-('20201103001935');
+('20201103001935'),
+('20201208002014');
 
 
