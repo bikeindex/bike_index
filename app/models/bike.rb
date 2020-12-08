@@ -774,7 +774,7 @@ class Bike < ApplicationRecord
     o_affiliation = conditional_information["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
-    return nil unless previous_o_affiliation.present?
+    return "" unless previous_o_affiliation.present?
     update(organization_affiliation: previous_o_affiliation)
     previous_o_affiliation
   end
