@@ -12,9 +12,9 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
     let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: current_organization) }
     let!(:graduated_notification_remaining) do
       FactoryBot.create(:graduated_notification,
-                        :marked_remaining,
-                        organization: current_organization,
-                        marked_remaining_at: Time.current - current_organization.graduated_notification_interval + 2.days)
+        :marked_remaining,
+        organization: current_organization,
+        marked_remaining_at: Time.current - current_organization.graduated_notification_interval + 2.days)
     end
     it "renders with correct things" do
       expect(GraduatedNotification.current.pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id])
@@ -48,9 +48,9 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
     context "different organization's" do
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
       it "raises not found" do
-        expect do
+        expect {
           get "#{base_url}/#{graduated_notification.id}"
-        end.to raise_error(ActiveRecord::RecordNotFound)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

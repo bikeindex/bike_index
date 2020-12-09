@@ -12,7 +12,7 @@ RSpec.describe "Swagger API V2 docs", type: :request do
 
         get "/api/v2/swagger_doc#{path}"
 
-        code = (desc =~ /deprecated/i) ? 404 : 200
+        code = /deprecated/i.match?(desc) ? 404 : 200
         expect(response.status).to eq(code)
       end
     end

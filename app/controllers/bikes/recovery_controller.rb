@@ -14,11 +14,10 @@ module Bikes
       if @stolen_record.add_recovery_information(permitted_params.to_h)
         EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
         flash[:success] = translation(:bike_recovered)
-        redirect_to bike_path(@bike)
       else
         session[:recovery_link_token] = params[:token]
-        redirect_to bike_path(@bike)
       end
+      redirect_to bike_path(@bike)
     end
 
     private
@@ -36,11 +35,11 @@ module Bikes
     def find_bike
       @bike = Bike.unscoped.find(params[:bike_id])
     rescue ActiveRecord::StatementInvalid => e
-      raise e.to_s =~ /PG..NumericValueOutOfRange/ ? ActiveRecord::RecordNotFound : e
+      raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
 
     def ensure_token_match!
-      @stolen_record = StolenRecord.find_matching_token(bike_id: @bike && @bike.id,
+      @stolen_record = StolenRecord.find_matching_token(bike_id: @bike&.id,
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
@@ -48,7 +47,7 @@ module Bikes
       else
         flash[:error] = translation(:incorrect_token)
       end
-      redirect_to bike_path(@bike) and return
+      redirect_to(bike_path(@bike)) && return
     end
   end
 end

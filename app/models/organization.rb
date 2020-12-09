@@ -135,7 +135,7 @@ class Organization < ApplicationRecord
   end
 
   def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
   end
 
   def self.admin_text_search(n)
@@ -164,6 +164,10 @@ class Organization < ApplicationRecord
     return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
     domain = str.split("@").last
     permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+  end
+
+  def self.example
+    Organization.find_by_id(92) || Organization.create(name: "Example organization")
   end
 
   # never geocode, use default_location lat/long
@@ -279,7 +283,7 @@ class Organization < ApplicationRecord
   end
 
   def overview_dashboard?
-    parent? || regional? || enabled?("claimed_ownerships")
+    regional? || enabled?("claimed_ownerships")
   end
 
   def bike_stickers

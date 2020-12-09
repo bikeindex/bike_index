@@ -44,6 +44,7 @@ class User < ApplicationRecord
   belongs_to :state
   belongs_to :country
 
+  scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superusers, -> { where(superuser: true) }
@@ -91,7 +92,7 @@ class User < ApplicationRecord
   end
 
   def self.username_friendly_find(str)
-    if str.is_a?(Integer) || str.match(/\A\d*\z/).present?
+    if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
       where(id: str).first
     else
       find_by_username(str)
@@ -162,6 +163,10 @@ class User < ApplicationRecord
 
   def developer?
     developer
+  end
+
+  def banned?
+    banned
   end
 
   def ambassador?

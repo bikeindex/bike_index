@@ -25,6 +25,7 @@ class MergeAdditionalEmailWorker < ApplicationWorker
     Doorkeeper::Application.where(owner_id: old_user.id).each { |i| i.update_attribute :owner_id, user_email.user_id }
     CustomerContact.where(user_id: old_user.id).each { |i| i.update_attribute :user_id, user_email.user_id }
     CustomerContact.where(creator_id: old_user.id).each { |i| i.update_attribute :creator_id, user_email.user_id }
+    user_email.user.update(banned: true) if old_user.banned?
     old_user.reload # so we don't trigger dependent destroys
     old_user.destroy
   end

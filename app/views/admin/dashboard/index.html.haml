@@ -1,6 +1,13 @@
 %h1.text-center
   Go Hard
 
+- if Organization.example.blank?
+  .alert.alert-danger
+    %h4
+      Example organization is broken!
+    %p
+      This breaks things. Tell Seth.
+
 %h2.mb-4.mt-4
   Recent
   = link_to "Bikes", admin_bikes_url

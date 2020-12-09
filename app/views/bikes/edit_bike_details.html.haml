@@ -72,7 +72,9 @@
               .form-well-input
                 = f.hidden_field :frame_size_unit
                 = f.hidden_field :frame_size
-                = f.number_field :frame_size_number, class: 'form-control'
+                - if @bike.frame_size_number.present?
+                  - @bike.frame_size_number = @bike.frame_size_number.round if @bike.frame_size_number.to_i == @bike.frame_size_number
+                = f.number_field :frame_size_number, class: 'form-control', step: 0.1
 
           .form-group.row.unnested-field
             = f.label :name, t(".bike_name"), class: 'form-well-label'
@@ -121,6 +123,13 @@
                 = f.label :zipcode, class: 'form-well-label'
                 .form-well-input
                   = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
+
+          - organization_with_affiliation = @bike.organizations.with_enabled_feature_slugs("organization_affiliation").first
+          - if organization_with_affiliation.present?
+            .form-group.row.unnested-field
+              = f.label :organization_affiliation, t(".organization_affiliation", org_name: organization_with_affiliation.short_name), class: "form-well-label"
+              .form-well-input
+                = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
 
           - if @bike.sticker_organizations.none?
             = render "shared/form_well_footer_save"

@@ -1330,6 +1330,7 @@ RSpec.describe BikesController, type: :controller do
             city: "Rotterdam",
             zipcode: "3035",
             country_id: Country.netherlands.id,
+            organization_affiliation: "something weird",
             components_attributes: {
               "0" => {
                 "_destroy" => "1",
@@ -1351,6 +1352,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.country&.name).to eq(Country.netherlands.name)
           expect(bike.zipcode).to eq "3035"
           expect(bike.city).to eq "Rotterdam"
+          expect(bike.organization_affiliation).to eq "something weird"
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey
@@ -1744,7 +1746,13 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.owner).to_not eq(user)
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
-        put :update, params: {id: bike.id, bike: {description: "new description", handlebar_type: "forward"}}
+        put :update, params: {id: bike.id, bike: {
+          description: "new description",
+          handlebar_type: "forward",
+          frame_size: "50cm",
+          frame_size_number: 54,
+          frame_size_unit: "cm"
+        }}
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1752,6 +1760,9 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.frame_size_unit).to eq "cm"
+        expect(bike.frame_size_number).to eq 54
+        expect(bike.frame_size).to eq "54cm"
       end
       context "bike is claimed" do
         let(:claimed) { true }

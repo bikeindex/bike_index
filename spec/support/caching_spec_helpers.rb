@@ -12,31 +12,31 @@ RSpec.shared_context :caching_enabled do
   end
 end
 
+class MemoryCacheStore
+  def fetch(key)
+    return store[key] if store[key]
+    store[key] = yield
+  end
+
+  def clear
+    store.clear
+  end
+
+  def store
+    @store ||= {}
+  end
+
+  def read(key)
+    store[key]
+  end
+
+  def as_json
+    store.as_json
+  end
+end
+
 RSpec.shared_context :caching_basic do
   include_context :caching_enabled
-
-  class MemoryCacheStore
-    def fetch(key)
-      return store[key] if store[key]
-      store[key] = yield
-    end
-
-    def clear
-      store.clear
-    end
-
-    def store
-      @store ||= {}
-    end
-
-    def read(key)
-      store[key]
-    end
-
-    def as_json
-      store.as_json
-    end
-  end
 
   let(:cache) { MemoryCacheStore.new }
 end

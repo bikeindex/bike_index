@@ -248,6 +248,35 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "organization_affiliation" do
+    let(:bike) { FactoryBot.create(:bike) }
+    it "sets if searched" do
+      expect(bike.organization_affiliation).to eq "" # We expect it to be a string
+      expect(bike.conditional_information).to eq({})
+      bike.update(organization_affiliation: "community_member")
+      bike.reload
+      expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
+      expect(bike.organization_affiliation).to eq "community_member"
+    end
+    context "with b_param value" do
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
+      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"}} }
+      it "gets b_param value" do
+        bike.reload
+        expect(b_param.organization_affiliation).to eq "employee"
+        expect(bike.conditional_information).to eq({})
+        expect(bike.organization_affiliation).to eq "employee"
+        expect(bike.conditional_information).to eq({"organization_affiliation" => "employee"})
+        bike.update(organization_affiliation: "student")
+        bike.reload
+        b_param.reload
+        expect(bike.organization_affiliation).to eq "student"
+        expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
+        expect(b_param.organization_affiliation).to eq "employee"
+      end
+    end
+  end
+
   describe "phoneable_by?" do
     let(:bike) { Bike.new }
     let(:user) { User.new }

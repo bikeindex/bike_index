@@ -99,7 +99,7 @@ RSpec.describe BulkImportWorker, type: :job do
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.line_import_errors).to be_nil
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Missing or stray quote in line 1", 1]])
+          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           # Note: we don't have auto-resume built in right now. You have to manually go in through the console
           # and set the progress to be "ongoing", then re-enqueue
           bulk_import.update_attribute :progress, "ongoing"
@@ -110,7 +110,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bulk_import.bikes.count).to eq 1
           bike_matches_target(bulk_import.bikes.first)
           # And make sure it hasn't updated the file_import_errors
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Missing or stray quote in line 1", 1]])
+          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           expect(bulk_import.progress).to eq "finished"
         end
       end

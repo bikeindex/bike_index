@@ -99,7 +99,7 @@ class Bike < ApplicationRecord
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
   scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
-  scope :example, -> { where(example: true) }
+  scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
@@ -128,7 +128,7 @@ class Bike < ApplicationRecord
         propulsion_type street zipcode country_id state_id city belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden
+        components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
         stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids].map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                                                                                                                      components_attributes: Component.old_attr_accessible]).freeze
@@ -665,10 +665,13 @@ class Bike < ApplicationRecord
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
-      self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
+      # Don't overwrite frame_size_number if frame_size_number was passed
+      if frame_size_number.blank? || !frame_size_number_changed?
+        self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
+      end
     end
 
-    unless frame_size_unit.present?
+    if frame_size_unit.blank?
       self.frame_size_unit = if frame_size_number.present?
         if frame_size_number < 30 # Good guessing?
           "in"
@@ -766,8 +769,18 @@ class Bike < ApplicationRecord
     end
   end
 
+  def organization_affiliation=(val)
+    conditional_information["organization_affiliation"] = val
+  end
+
   def organization_affiliation
-    b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
+    # TODO: make conditional_information hold more things
+    o_affiliation = conditional_information["organization_affiliation"]
+    return o_affiliation if o_affiliation.present?
+    previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
+    return "" unless previous_o_affiliation.present?
+    update(organization_affiliation: previous_o_affiliation)
+    previous_o_affiliation
   end
 
   def external_image_urls
