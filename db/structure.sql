@@ -25,7 +25,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -1344,6 +1344,43 @@ CREATE SEQUENCE public.hot_sheets_id_seq
 --
 
 ALTER SEQUENCE public.hot_sheets_id_seq OWNED BY public.hot_sheets.id;
+
+
+--
+-- Name: impound_claims; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.impound_claims (
+    id bigint NOT NULL,
+    impound_record_id bigint,
+    stolen_record_id bigint,
+    user_id bigint,
+    message text,
+    data json,
+    status integer,
+    submitted_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: impound_claims_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.impound_claims_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: impound_claims_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.impound_claims_id_seq OWNED BY public.impound_claims.id;
 
 
 --
@@ -3155,6 +3192,13 @@ ALTER TABLE ONLY public.hot_sheets ALTER COLUMN id SET DEFAULT nextval('public.h
 
 
 --
+-- Name: impound_claims id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_claims ALTER COLUMN id SET DEFAULT nextval('public.impound_claims_id_seq'::regclass);
+
+
+--
 -- Name: impound_record_updates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3698,6 +3742,14 @@ ALTER TABLE ONLY public.hot_sheet_configurations
 
 ALTER TABLE ONLY public.hot_sheets
     ADD CONSTRAINT hot_sheets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: impound_claims impound_claims_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_claims
+    ADD CONSTRAINT impound_claims_pkey PRIMARY KEY (id);
 
 
 --
@@ -4436,6 +4488,27 @@ CREATE INDEX index_hot_sheet_configurations_on_organization_id ON public.hot_she
 --
 
 CREATE INDEX index_hot_sheets_on_organization_id ON public.hot_sheets USING btree (organization_id);
+
+
+--
+-- Name: index_impound_claims_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_impound_record_id ON public.impound_claims USING btree (impound_record_id);
+
+
+--
+-- Name: index_impound_claims_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_stolen_record_id ON public.impound_claims USING btree (stolen_record_id);
+
+
+--
+-- Name: index_impound_claims_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_user_id ON public.impound_claims USING btree (user_id);
 
 
 --
@@ -5446,6 +5519,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201013204925'),
 ('20201019200213'),
 ('20201103001935'),
-('20201208002014');
+('20201208002014'),
+('20201209192637');
 
 
