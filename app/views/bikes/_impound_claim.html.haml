@@ -37,7 +37,7 @@
                     - stolen_select_opts = bikes.map { |b| [b.title_string, b.current_stolen_record&.id] }
                     = f.select(:stolen_record_id, stolen_select_opts, {prompt: "Choose stolen bike"}, {required: true, class: "form-control"})
                   .col-lg-4.text-right
-                    = submit_tag "Start claim", class: "btn btn-success"
+                    = submit_tag "Open claim", class: "btn btn-success"
         - else
           - bike_submitting = impound_claim.bike_submitting.decorate
           = form_for impound_claim do |f|
@@ -72,7 +72,7 @@
                     %a.btn.btn-success#submitClaimButton{ href: "#" }
                       Submit claim
                     %em.small.less-strong.d-lg-block
-                      you will no longer be able to edit this claim!
+                      you will no longer be able to edit this!
 
 
 

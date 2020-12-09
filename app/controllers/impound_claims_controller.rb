@@ -22,7 +22,7 @@ class ImpoundClaimsController < ApplicationController
     if errors.blank?
       @impound_claim.save
       if @impound_claim.valid?
-        flash[:success] = "Claim started, please add information"
+        flash[:success] = "Claim opened, please add information"
       else
         errors = @impound_claim.errors.full_messages
       end
