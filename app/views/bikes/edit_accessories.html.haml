@@ -3,6 +3,8 @@
 
 - handlebar_type_other = "other" # Because we're assigning as an enum
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
+  - if params[:return_to].present?
+    = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: 'bikes/edit_primary_menu'
