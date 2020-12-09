@@ -1,4 +1,5 @@
 - bike_submitting ||= impound_claim.bike_submitting
+- render_optional ||= false
 -# Maybe there is a way to calculate this dynamically, skipping for now
 - current_path ||= "/bikes/#{impound_claim.bike_claimed}"
 
@@ -16,7 +17,7 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if theft_information
       %span.checklist-text
-        #{bike_submitting.type.titleize} theft location and time
+        Loss/theft location and time
 
     - serial_known = !bike_submitting.serial_unknown?
     %li{ class: serial_known ? "completed-item" : "" }
@@ -26,6 +27,9 @@
         #{bike_submitting.type.titleize} has serial number
         - unless serial_known
           = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, page: "bike_details", return_to: current_path), class: "small"
+        - if render_optional
+          %em.small.less-strong
+            optional
 
     - if bike_submitting.creation_state&.is_pos
       %li.completed-item
@@ -33,6 +37,9 @@
           &#10003;
         %span.checklist-text
           Verified purchase (registered at Point Of Sale by #{bike_submitting.creation_state.organization.display_name})
+          - if render_optional
+            %em.small.less-strong
+              optional
     - else
       - proof_of_purchase_photo = bike_submitting.public_images.photo_of_receipt.any?
       %li{ class: proof_of_purchase_photo ? "completed-item" : "" }
@@ -40,6 +47,9 @@
           = "&#10003;".html_safe if proof_of_purchase_photo
         %span.checklist-text
           = link_to "Photo of the receipt", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+          - if render_optional
+            %em.small.less-strong
+              optional
 
     - photo_of_you_and_bike = bike_submitting.public_images.photo_of_user_with_bike.any?
     %li{ class: photo_of_you_and_bike ? "completed-item" : "" }
@@ -47,6 +57,9 @@
         = "&#10003;".html_safe if photo_of_you_and_bike
       %span.checklist-text
         = link_to "Photo of you with the #{bike_submitting.type}", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+        - if render_optional
+          %em.small.less-strong
+            optional
 
     - message_present = impound_claim.message.present?
     %li{ class: message_present ? "completed-item" : "" }

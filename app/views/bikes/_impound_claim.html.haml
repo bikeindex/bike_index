@@ -66,7 +66,7 @@
                   that this #{impound_record.bike.type} is yours by providing details that only the owner would have.
 
                 -# Here are recommended things to add:
-                = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true) }
+                = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(@bike.to_param, contact_owner: true), render_optional: true }
                 - if impound_claim.unsubmitted?
                   .mt-4
                     %a.btn.btn-success#submitClaimButton{ href: "#" }
