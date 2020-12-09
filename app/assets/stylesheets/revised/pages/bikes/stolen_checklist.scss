@@ -11,8 +11,9 @@ $checklist-border: #919197;
   li {
     display: block;
     padding: 0 0 0 2rem;
-    margin: 0 0 0.25rem;
+    margin: 0.5rem 0 0;
     position: relative;
+    line-height: 1.5;
 
     .checklist-checkbox,
     .checklist-uncheckbox {

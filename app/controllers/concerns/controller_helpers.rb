@@ -122,6 +122,7 @@ module ControllerHelpers
 
   def return_to_if_present
     if session[:return_to].present? || cookies[:return_to].present? || params[:return_to]
+      # NOTE: This is duplicated in permitted_return_to
       target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
@@ -140,6 +141,13 @@ module ControllerHelpers
     elsif session[:discourse_redirect]
       redirect_to(discourse_authentication_url) && (return true)
     end
+  end
+
+  def permitted_return_to
+    target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
+    return nil if invalid_return_to?(target)
+    # Either starting with our URL or /
+    return target if target.match(/\A#{ENV["BASE_URL"]}/) || target.match(%r{\A/})
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
@@ -248,9 +256,14 @@ module ControllerHelpers
   def current_organization
     # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
-    @current_organization = Organization.friendly_find(params[:organization_id])
-    # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
-    return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
+    if params[:organization_id] == "false" # Enable removing current organization
+      @current_organization = nil
+      @current_organization_force_blank = true
+    else
+      @current_organization = Organization.friendly_find(params[:organization_id])
+      # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
+      return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
+    end
     set_passive_organization(@current_organization)
   end
 

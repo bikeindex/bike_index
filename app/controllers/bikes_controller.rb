@@ -32,11 +32,6 @@ class BikesController < ApplicationController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
-    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
-    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-    if params[:organization_id].present? && passive_organization.blank? && current_user&.default_organization.present?
-      set_passive_organization(current_user.default_organization)
-    end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
@@ -165,7 +160,7 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
-
+    @permitted_return_to = permitted_return_to
     requested_page = target_edit_template(requested_page: params[:page])
     @edit_template = requested_page[:template]
     unless requested_page[:is_valid]
@@ -326,10 +321,19 @@ class BikesController < ApplicationController
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   # Also provides testable protection against seeing organization info on bikes
   def assign_current_organization
-    org = current_organization || passive_organization
-    # If current_user isn't authorized for the organization, force assign nil
-    return true if org.blank? || org.present? && current_user&.authorized?(org)
-    set_passive_organization(nil)
+    org = current_organization || passive_organization # actually call #current_organization first
+    # If forced false, or no user present, skip everything else
+    return true if @current_organization_force_blank || current_user.blank?
+    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
+    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
+    if current_user.default_organization.present? && params[:organization_id].present?
+      return true if org.present? && current_user.authorized?(org)
+      set_passive_organization(current_user.default_organization)
+    else
+      # If current_user isn't authorized for the organization, force assign nil
+      return true if org.blank? || org.present? && current_user.authorized?(org)
+      set_passive_organization(nil)
+    end
   end
 
   def permitted_search_params

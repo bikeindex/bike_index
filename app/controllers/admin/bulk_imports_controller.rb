@@ -46,7 +46,7 @@ class Admin::BulkImportsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:bulk_import).permit(%i[organization_id file no_notify])
+    params.require(:bulk_import).permit(:organization_id, :file, :no_notify)
   end
 
   def default_period

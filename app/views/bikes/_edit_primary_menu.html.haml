@@ -1,6 +1,8 @@
 - is_disabled ||= false
 
 %nav.primary-edit-form-well-menu
+  - if @permitted_return_to.present?
+    %span#permittedReturnTo{ "data-path" => @permitted_return_to }
   - if @bike.stolen?
     %h3.nav-group-header= t(".theft_information")
     %ul
