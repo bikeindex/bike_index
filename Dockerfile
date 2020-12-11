@@ -25,4 +25,4 @@ COPY ./yarn.lock /src/yarn.lock
 
 RUN gem install bundler --conservative && bundle install
 
-RUN yarn install
+RUN yarn install --check-files
