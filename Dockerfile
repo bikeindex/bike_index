@@ -1,4 +1,4 @@
-FROM ruby:2.5.8
+FROM ruby:2.7.2
 WORKDIR /src
 
 RUN apt-get update -yq \
