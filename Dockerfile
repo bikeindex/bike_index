@@ -8,7 +8,7 @@ RUN apt-get update -yq \
     && apt-get install imagemagick \
 
     # node js
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash \
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash \
     && apt-get install nodejs -yq \
 
     # yarn
