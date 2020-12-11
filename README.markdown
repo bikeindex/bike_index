@@ -72,6 +72,7 @@ For running you need to have [docker](https://docs.docker.com/engine/install/) a
 - Add `docker-compose run app` before any other rails command, f.e.:
   - `docker-compose run app rails console` for Rails console
   - `docker-compose run app bundle exec rspec` for running tests
+  - `docker-compose run app yarn install` to install or update JS dependencies
 
 - Go to [localhost:3001](http://localhost:3001)
 
