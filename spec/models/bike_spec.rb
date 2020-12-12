@@ -1582,7 +1582,7 @@ RSpec.describe Bike, type: :model do
       let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
       it "adds valid organization but not invalid one" do
         bike.bike_organization_ids = [organization.id, organization_2.id, organization_invalid.id]
-        expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+        expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
       end
     end
     context "different organization" do
