@@ -235,6 +235,9 @@
                 = stolen_record.address
                 - if stolen_record.without_location?
                   %em.small.text-warning missing address (user alerted)
+                - else
+                  %code.small.ml-1
+                    shown: #{stolen_record.show_address}
             %tr
               %td
                 Phone
