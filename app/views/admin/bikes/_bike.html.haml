@@ -236,7 +236,7 @@
                 - if stolen_record.without_location?
                   %em.small.text-warning missing address (user alerted)
                 - else
-                  %code.small.ml-1
+                  %code.small.ml-1{ title: "When true, the street address is shown publicly. Otherwise no street address is shown" }
                     shown: #{stolen_record.show_address}
             %tr
               %td
