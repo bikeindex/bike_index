@@ -1,0 +1,95 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=NA&key=AIzaSyDH8ejgPgtdVFMB6USR8PifSL1F_AEY8Wg&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Tue, 15 Dec 2020 18:38:31 GMT
+        Pragma:
+          - no-cache
+        Expires:
+          - Fri, 01 Jan 1990 00:00:00 GMT
+        Cache-Control:
+          - no-cache, must-revalidate
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=33
+        Alt-Svc:
+          - h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443";
+            ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+        Transfer-Encoding:
+          - chunked
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "United States",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 71.5388001,
+                            "lng" : -66.885417
+                         },
+                         "southwest" : {
+                            "lat" : 18.7763,
+                            "lng" : 170.5957
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.09024,
+                         "lng" : -95.712891
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 49.38,
+                            "lng" : -66.94
+                         },
+                         "southwest" : {
+                            "lat" : 25.82,
+                            "lng" : -124.39
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+                   "types" : [ "country", "political" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Tue, 15 Dec 2020 18:38:31 GMT
+recorded_with: VCR 5.0.0

@@ -67,6 +67,13 @@ RSpec.describe Geohelper do
           expect(Geohelper.formatted_address_hash(nil)).to eq({})
         end
       end
+      context "NA" do
+        it "returns empty" do
+          VCR.use_cassette("geohelper-na-formatted_address_hash", match_requests_on: [:path]) do
+            expect(Geohelper.formatted_address_hash("NA")).to eq({})
+          end
+        end
+      end
     end
 
     # This is an internal method, and probably shouldn't be called from elsewhere in the code
@@ -78,6 +85,24 @@ RSpec.describe Geohelper do
         it "returns our desires" do
           expect(Geohelper.address_hash_from_geocoder_string(address_str)).to eq target.as_json
         end
+      end
+    end
+  end
+
+  describe "ignored_coordinates?" do
+    it "returns false" do
+      expect(Geohelper.ignored_coordinates?(42.8490197, -106.3015341)).to be_falsey
+    end
+    context "37.09024,-95.712891" do
+      it "returns truthy" do
+        expect(Geohelper.ignored_coordinates?(37.09024,-95.712891)).to be_truthy
+        expect(Geohelper.ignored_coordinates?(37.090241212,-95.71289333)).to be_truthy
+      end
+    end
+    context "71.5388001,-66.885417" do
+      it "returns truthy" do
+        expect(Geohelper.ignored_coordinates?(71.5388001,-66.885417)).to be_truthy
+        expect(Geohelper.ignored_coordinates?(71.5388005,-66.885418)).to be_truthy # Just in case
       end
     end
   end
