@@ -95,14 +95,14 @@ RSpec.describe Geohelper do
     end
     context "37.09024,-95.712891" do
       it "returns truthy" do
-        expect(Geohelper.ignored_coordinates?(37.09024,-95.712891)).to be_truthy
-        expect(Geohelper.ignored_coordinates?(37.090241212,-95.71289333)).to be_truthy
+        expect(Geohelper.ignored_coordinates?(37.09024, -95.712891)).to be_truthy
+        expect(Geohelper.ignored_coordinates?(37.090241212, -95.71289333)).to be_truthy
       end
     end
     context "71.5388001,-66.885417" do
       it "returns truthy" do
-        expect(Geohelper.ignored_coordinates?(71.5388001,-66.885417)).to be_truthy
-        expect(Geohelper.ignored_coordinates?(71.5388005,-66.885418)).to be_truthy # Just in case
+        expect(Geohelper.ignored_coordinates?(71.5388001, -66.885417)).to be_truthy
+        expect(Geohelper.ignored_coordinates?(71.5388005, -66.885418)).to be_truthy # Just in case
       end
     end
   end

@@ -65,10 +65,10 @@ class Admin::GraphsController < Admin::BaseController
         name: "Registered",
         data: helpers.time_range_counts(collection: bikes)
       },
-      {
-        name: "Stolen bikes",
-        data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
-      }]
+        {
+          name: "Stolen bikes",
+          data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
+        }]
     elsif @bike_graph_kind == "origin"
       CreationState.origins.map do |origin|
         {
