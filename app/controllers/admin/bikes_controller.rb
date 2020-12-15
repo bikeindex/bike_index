@@ -159,11 +159,14 @@ class Admin::BikesController < Admin::BaseController
     end
     bikes = bikes.non_example if params[:search_example] == "non_example_only"
     if current_organization.present?
-      bikes = if params[:search_only_creation_organization].present?
+      bikes = if ParamsNormalizer.boolean(params[:search_only_creation_organization])
         bikes.includes(:creation_states).where(creation_states: {organization_id: current_organization.id})
       else
         bikes.organization(current_organization)
       end
+    elsif params[:organization_id] == "false"
+      # Have to include deleted_at or else we get nil
+      bikes = bikes.includes(:creation_states).where(deleted_at: nil, creation_states: {organization_id: nil})
     end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     if params[:search_stolen].present?
