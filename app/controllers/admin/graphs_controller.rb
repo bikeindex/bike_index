@@ -55,6 +55,10 @@ class Admin::GraphsController < Admin::BaseController
     bikes
   end
 
+  def default_period
+    "year"
+  end
+
   def bike_graph_kinds
     %w[stolen origin pos]
   end

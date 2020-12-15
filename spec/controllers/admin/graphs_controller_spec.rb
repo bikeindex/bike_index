@@ -50,7 +50,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "users" do
       it "returns json" do
-        get :variable, params: {search_kind: "users", timezone: "America/Los_Angeles"}
+        get :variable, params: {search_kind: "users", timezone: "America/Los_Angeles", period: "all"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
         expect(assigns(:start_time)).to be_within(1.day).of earliest_time
@@ -75,7 +75,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
         get :variable, params: {search_kind: "recoveries", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_time)).to be_within(1.day).of earliest_time
+        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end
       context "passed date and time" do
@@ -96,7 +96,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
         get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_time)).to be_within(1.day).of earliest_time
+        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
         expect(assigns(:bike_graph_kind)).to eq "stolen"
         # And it gets the other kinds too
