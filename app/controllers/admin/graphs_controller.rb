@@ -12,28 +12,28 @@ class Admin::GraphsController < Admin::BaseController
     set_variable_graphing_timing
 
     if @kind == "users"
-      chart_data = User.where(created_at: @start_at..@end_at)
-        .group_by_period(@group_period, :created_at, time_zone: @timezone)
-        .count
+      chart_data = helpers.time_range_counts(collection: User.where(created_at: @time_range))
+        # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+        # .count
     elsif @kind == "payments"
       chart_data = [
         {
           name: "All",
-          data: Payment.where(created_at: @start_at..@end_at)
-            .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range))
+            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            # .count
         },
         {
           name: "Payments",
-          data: Payment.where(created_at: @start_at..@end_at).payment
-            .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).payment)
+            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            # .count
         },
         {
           name: "Donations",
-          data: Payment.where(created_at: @start_at..@end_at).donation
-            .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).donation)
+            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            # .count
         }
       ]
     elsif @kind == "bikes"
@@ -41,22 +41,22 @@ class Admin::GraphsController < Admin::BaseController
       chart_data = [
         {
           name: "Registered",
-          data: bikes.where(created_at: @start_at..@end_at)
-            .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+          data: helpers.time_range_counts(collection: bikes.where(created_at: @time_range))
+            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            # .count
         },
         {
           name: "Stolen bikes",
-          data: StolenRecord.where(created_at: @start_at..@end_at)
-            .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+          data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
+            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            # .count
         }
       ]
     elsif @kind == "recoveries"
       recoveries = StolenRecord.unscoped
-      chart_data = recoveries.where(recovered_at: @start_at..@end_at)
-        .group_by_period(@group_period, :recovered_at, time_zone: @timezone)
-        .count
+      chart_data = helpers.time_range_counts(collection: recoveries.where(recovered_at: @time_range))
+        # .group_by_period(@group_period, :recovered_at, time_zone: @timezone)
+        # .count
     end
     if chart_data.present?
       render json: chart_data.chart_json
@@ -76,7 +76,7 @@ class Admin::GraphsController < Admin::BaseController
 
   def bikes
     bikes = Bike.unscoped
-    case params[:start_at]
+    case params[:start_time]
     when "past_year"
       range = 1.year.ago.midnight..Time.current
     else
@@ -89,37 +89,37 @@ class Admin::GraphsController < Admin::BaseController
     render json: bgraph.chart_json
   end
 
-  def show
-    @graph_type = params[:id]
-    range = date_range("2013-01-18 21:03:08")
-    @xaxis = month_list(range).to_json
-    @values1 = range_values(range, "#{params[:id]}_value").to_json
-    if params[:id] == "bikes"
-      @values2 = range_values(range, "stolen_bike_value").to_json
-    end
-  end
+  # def show
+  #   @graph_type = params[:id]
+  #   range = date_range("2013-01-18 21:03:08")
+  #   @xaxis = month_list(range).to_json
+  #   @values1 = range_values(range, "#{params[:id]}_value").to_json
+  #   if params[:id] == "bikes"
+  #     @values2 = range_values(range, "stolen_bike_value").to_json
+  #   end
+  # end
 
-  def stolen_locations
-  end
+  # def stolen_locations
+  # end
 
-  def review
-    start_day = (1.week.ago - 1.day).to_date
-    end_day = 1.day.ago.to_date
-    xaxis = []
-    days_from_this_week = (start_day..end_day).map
+  # def review
+  #   start_day = (1.week.ago - 1.day).to_date
+  #   end_day = 1.day.ago.to_date
+  #   xaxis = []
+  #   days_from_this_week = (start_day..end_day).map
 
-    days_from_this_week.each do |day|
-      xaxis << day.strftime("%A")
-    end
-    @xaxis = xaxis.to_json
-  end
+  #   days_from_this_week.each do |day|
+  #     xaxis << day.strftime("%A")
+  #   end
+  #   @xaxis = xaxis.to_json
+  # end
 
   protected
 
-  # Default start time
-  def bike_index_start
-    Time.zone.parse("2007-01-01 1:00")
-  end
+  # # Default start time
+  # def bike_index_start
+  #   Time.zone.parse("2007-01-01 1:00")
+  # end
 
   def set_variable_graph_kind
     @graph_kinds = %w[general users payments bikes recoveries]
@@ -127,56 +127,55 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graphing_timing
-    @start_at = params[:start_at].present? ? TimeParser.parse(params[:start_at], @timezone) : bike_index_start
-    @end_at = params[:end_at].present? ? TimeParser.parse(params[:end_at], @timezone) : Time.current
-    @group_period = calculated_group_period(@start_at, @end_at)
+    @group_period = helpers.group_by_method(@time_range)
+    # @group_period = calculated_group_period(@start_time, @end_at)
   end
 
-  def calculated_group_period(start_at, end_at)
-    difference_in_seconds = (end_at - start_at).to_i
-    if difference_in_seconds < 2.days.to_i
-      "hour"
-    elsif difference_in_seconds < 1.month.to_i
-      "day"
-    elsif difference_in_seconds < 1.year.to_i
-      "week"
-    else
-      "month"
-    end
-  end
+  # def calculated_group_period(start_time, end_at)
+  #   difference_in_seconds = (end_at - start_time).to_i
+  #   if difference_in_seconds < 2.days.to_i
+  #     "hour"
+  #   elsif difference_in_seconds < 1.month.to_i
+  #     "day"
+  #   elsif difference_in_seconds < 1.year.to_i
+  #     "week"
+  #   else
+  #     "month"
+  #   end
+  # end
 
-  def date_range(start_date)
-    date_from = Date.parse(start_date)
-    date_to = Date.today
-    date_range = date_from..date_to
-    date_range.map { |d| Date.new(d.year, d.month, 1) }.uniq
-  end
+  # def date_range(start_date)
+  #   date_from = Date.parse(start_date)
+  #   date_to = Date.today
+  #   date_range = date_from..date_to
+  #   date_range.map { |d| Date.new(d.year, d.month, 1) }.uniq
+  # end
 
-  def month_list(range)
-    range.map { |d| d.strftime "%B" }
-  end
+  # def month_list(range)
+  #   range.map { |d| d.strftime "%B" }
+  # end
 
-  def range_values(range, type)
-    values = []
-    range.each do |date|
-      values << send(type, date)
-    end
-    values
-  end
+  # def range_values(range, type)
+  #   values = []
+  #   range.each do |date|
+  #     values << send(type, date)
+  #   end
+  #   values
+  # end
 
-  def bikes_value(date)
-    Ownership.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  end
+  # def bikes_value(date)
+  #   Ownership.where(["created_at < ?", date.end_of_month.end_of_day]).count
+  # end
 
-  def stolen_bike_value(date)
-    Bike.where(["created_at < ?", date.end_of_month.end_of_day]).stolen.count
-  end
+  # def stolen_bike_value(date)
+  #   Bike.where(["created_at < ?", date.end_of_month.end_of_day]).stolen.count
+  # end
 
-  def users_value(date)
-    User.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  end
+  # def users_value(date)
+  #   User.where(["created_at < ?", date.end_of_month.end_of_day]).count
+  # end
 
-  def organizations_value(date)
-    Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  end
+  # def organizations_value(date)
+  #   Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
+  # end
 end

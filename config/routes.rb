@@ -217,7 +217,6 @@ Rails.application.routes.draw do
         get :tables
         get :bikes
         get :users
-        get :stolen_locations
         get :variable
       end
     end

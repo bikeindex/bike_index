@@ -19,32 +19,31 @@
 
   = line_chart bikes_admin_graphs_path
 
-- elsif @kind == "users"
-  = column_chart User.where(created_at: @time_range).send(group_by_method(@time_range), :created_at, time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count, thousands: ",", defer: true
-  %h3.mt-4.mb-4
-    Users #{humanized_time_range(@time_range)}
-  = render partial: "/shared/period_select"
+  / # - elsif @kind == "users"
+  / = column_chart User.where(created_at: @time_range).send(group_by_method(@time_range), :created_at, time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count, thousands: ",", defer: true
+  / = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
+  / %h3.mt-4.mb-4
+  /   Users #{humanized_time_range(@time_range)}
 - else
-  = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
-    = hidden_field_tag :kind, @kind
-    = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
-    .row
-      .col-md-4
-        %section.graph_time_select.fancy-select.unfancy
-          = label_tag :selection, "Graph time slice"
-          - time_opts = [["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]]
-          = select_tag :graph_date_option, options_for_select(time_opts, params[:graph_date_option]), class: "form-control"
-      .col-md-4
-        .form-group.calendar-box{style: "display: none"}
-          = label_tag :start_at, "Start at", class: "control-label"
-          = datetime_local_field_tag :start_at, @start_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-      .col-md-4
-        .form-group.calendar-box{style: "display: none"}
-          = label_tag :end_at, "End at", class: "control-label"
-          = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-      .control-group{ style: "padding-top: 19px" }
-    .row
-      .col-md-auto
-        = submit_tag "Update chart", class: "btn btn-success mb-4"
-    - query_params = params.except(:controller, :action).permit!.to_h
-    = line_chart variable_admin_graphs_path(query_params)
+  / = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
+  /   = hidden_field_tag :kind, @kind
+  /   = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
+  /   .row
+  /     .col-md-4
+  /       %section.graph_time_select.fancy-select.unfancy
+  /         = label_tag :selection, "Graph time slice"
+  /         - time_opts = [["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]]
+  /         = select_tag :graph_date_option, options_for_select(time_opts, params[:graph_date_option]), class: "form-control"
+  /     .col-md-4
+  /       .form-group.calendar-box{style: "display: none"}
+  /         = label_tag :start_at, "Start at", class: "control-label"
+  /         = datetime_local_field_tag :start_at, @start_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+  /     .col-md-4
+  /       .form-group.calendar-box{style: "display: none"}
+  /         = label_tag :end_at, "End at", class: "control-label"
+  /         = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+  /     .control-group{ style: "padding-top: 19px" }
+  /   .row
+  /     .col-md-auto
+  /       = submit_tag "Update chart", class: "btn btn-success mb-4"
+  = column_chart variable_admin_graphs_path(params.except(:controller, :action).as_json), stacked: true, thousands: ",", defer: true
