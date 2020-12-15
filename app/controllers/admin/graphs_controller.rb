@@ -1,62 +1,33 @@
 class Admin::GraphsController < Admin::BaseController
   before_action :set_period
+  before_action :set_variable_graph_kind
 
   def index
-    set_variable_graph_kind
-    # We're not setting the time for specific types now
-    set_variable_graphing_timing unless %w[users general].include?(@kind)
   end
 
   def variable
-    set_variable_graph_kind
-    set_variable_graphing_timing
-
     if @kind == "users"
       chart_data = helpers.time_range_counts(collection: User.where(created_at: @time_range))
-        # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-        # .count
     elsif @kind == "payments"
       chart_data = [
         {
           name: "All",
           data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range))
-            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            # .count
         },
         {
           name: "Payments",
           data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).payment)
-            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            # .count
         },
         {
           name: "Donations",
           data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).donation)
-            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            # .count
         }
       ]
     elsif @kind == "bikes"
-      bikes = Bike.unscoped
-      chart_data = [
-        {
-          name: "Registered",
-          data: helpers.time_range_counts(collection: bikes.where(created_at: @time_range))
-            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            # .count
-        },
-        {
-          name: "Stolen bikes",
-          data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
-            # .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            # .count
-        }
-      ]
+      chart_data = bike_chart_data
     elsif @kind == "recoveries"
       recoveries = StolenRecord.unscoped
       chart_data = helpers.time_range_counts(collection: recoveries.where(recovered_at: @time_range))
-        # .group_by_period(@group_period, :recovered_at, time_zone: @timezone)
-        # .count
     end
     if chart_data.present?
       render json: chart_data.chart_json
@@ -66,116 +37,52 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def tables
-    set_variable_graph_kind
     @kind = ""
   end
 
-  def users
-    render json: User.group_by_month(:created_at).count
-  end
-
-  def bikes
-    bikes = Bike.unscoped
-    case params[:start_time]
-    when "past_year"
-      range = 1.year.ago.midnight..Time.current
-    else
-      range ||= bike_index_start..Time.current
-    end
-    bgraph = [
-      {name: "Registrations", data: bikes.group_by_month(:created_at, range: range).count},
-      {name: "Stolen", data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count}
-    ]
-    render json: bgraph.chart_json
-  end
-
-  # def show
-  #   @graph_type = params[:id]
-  #   range = date_range("2013-01-18 21:03:08")
-  #   @xaxis = month_list(range).to_json
-  #   @values1 = range_values(range, "#{params[:id]}_value").to_json
-  #   if params[:id] == "bikes"
-  #     @values2 = range_values(range, "stolen_bike_value").to_json
-  #   end
-  # end
-
-  # def stolen_locations
-  # end
-
-  # def review
-  #   start_day = (1.week.ago - 1.day).to_date
-  #   end_day = 1.day.ago.to_date
-  #   xaxis = []
-  #   days_from_this_week = (start_day..end_day).map
-
-  #   days_from_this_week.each do |day|
-  #     xaxis << day.strftime("%A")
-  #   end
-  #   @xaxis = xaxis.to_json
-  # end
+  helper_method :bike_graph_kinds
 
   protected
 
-  # # Default start time
-  # def bike_index_start
-  #   Time.zone.parse("2007-01-01 1:00")
-  # end
-
   def set_variable_graph_kind
     @graph_kinds = %w[general users payments bikes recoveries]
-    @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
+    @kind = @graph_kinds.include?(params[:search_kind]) ? params[:search_kind] : @graph_kinds.first
   end
 
-  def set_variable_graphing_timing
-    @group_period = helpers.group_by_method(@time_range)
-    # @group_period = calculated_group_period(@start_time, @end_at)
+  def bike_graph_kinds
+    %w[stolen origin pos]
   end
 
-  # def calculated_group_period(start_time, end_at)
-  #   difference_in_seconds = (end_at - start_time).to_i
-  #   if difference_in_seconds < 2.days.to_i
-  #     "hour"
-  #   elsif difference_in_seconds < 1.month.to_i
-  #     "day"
-  #   elsif difference_in_seconds < 1.year.to_i
-  #     "week"
-  #   else
-  #     "month"
-  #   end
-  # end
+  def pos_search_kinds
+    %w[lightspeed_pos ascend_pos any_pos no_pos]
+  end
 
-  # def date_range(start_date)
-  #   date_from = Date.parse(start_date)
-  #   date_to = Date.today
-  #   date_range = date_from..date_to
-  #   date_range.map { |d| Date.new(d.year, d.month, 1) }.uniq
-  # end
-
-  # def month_list(range)
-  #   range.map { |d| d.strftime "%B" }
-  # end
-
-  # def range_values(range, type)
-  #   values = []
-  #   range.each do |date|
-  #     values << send(type, date)
-  #   end
-  #   values
-  # end
-
-  # def bikes_value(date)
-  #   Ownership.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  # end
-
-  # def stolen_bike_value(date)
-  #   Bike.where(["created_at < ?", date.end_of_month.end_of_day]).stolen.count
-  # end
-
-  # def users_value(date)
-  #   User.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  # end
-
-  # def organizations_value(date)
-  #   Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
-  # end
+  def bike_chart_data
+    bikes = Bike.unscoped.where(created_at: @time_range)
+    @bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
+    if @bike_graph_kind == "stolen"
+      [{
+        name: "Registered",
+        data: helpers.time_range_counts(collection: bikes)
+      },
+      {
+        name: "Stolen bikes",
+        data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
+      }]
+    elsif @bike_graph_kind == "origin"
+      CreationState.origins.map do |origin|
+        {
+          name: origin.humanize,
+          data: helpers.time_range_counts(collection: bikes.includes(:creation_states).where(creation_states: {origin: origin}))
+        }
+      end
+    elsif @bike_graph_kind == "pos"
+      pos_search_kinds.map do |pos_kind|
+        {
+          name: pos_kind.humanize,
+          data: helpers.time_range_counts(collection: bikes.send(pos_kind))
+        }
+      end
+    end
+  end
 end

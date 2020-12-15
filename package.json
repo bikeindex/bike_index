@@ -20,7 +20,7 @@
     "@uppy/tus": "^1.2.0",
     "@uppy/xhr-upload": "^1.1.0",
     "bootstrap": "~>4.3.1",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "chartkick": "^3.0.2",
     "core-js": "^3.6.3",
     "es6-promise": "^4.2.8",

@@ -10,14 +10,23 @@ RSpec.describe Admin::GraphsController, type: :controller do
         expect(response).to render_template(:index)
       end
     end
-    context "kind" do
+    context "users" do
       it "renders" do
-        get :index, params: {kind: "users"}
+        get :index, params: {search_kind: "users"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
+    end
+    context "payments" do
       it "renders" do
-        get :index, params: {kind: "payments"}
+        get :index, params: {search_kind: "payments"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
+    context "bikes" do
+      it "renders" do
+        get :index, params: {search_kind: "bikes"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
@@ -41,7 +50,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "users" do
       it "returns json" do
-        get :variable, params: {kind: "users", timezone: "America/Los_Angeles"}
+        get :variable, params: {search_kind: "users", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
         expect(assigns(:start_time)).to be_within(1.day).of earliest_time
@@ -51,7 +60,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
         let(:end_time) { "2019-01-22T13:48" }
         let(:start_time) { "2019-01-15T14:48" }
         it "returns json" do
-          get :variable, params: {kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
+          get :variable, params: {search_kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
           expect(json_result.is_a?(Array)).to be_truthy
           Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
@@ -62,7 +71,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
       context "payments" do
         let!(:payment) { FactoryBot.create(:payment) }
         it "returns json" do
-          get :variable, params: {kind: "payments", timezone: "America/Los_Angeles"}
+          get :variable, params: {search_kind: "payments", timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
           json_result.each do |data_group|
             expect(data_group.keys.count).to be > 0
@@ -77,7 +86,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
           let(:end_time) { "2019-01-22T13:48" }
           let(:start_time) { "2019-01-15T14:48" }
           it "returns json" do
-            get :variable, params: {kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
+            get :variable, params: {search_kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
             expect(response.status).to eq(200)
             expect(json_result.is_a?(Array)).to be_truthy
             Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
@@ -87,39 +96,22 @@ RSpec.describe Admin::GraphsController, type: :controller do
         end
       end
     end
+    context "bikes" do
+      it "returns json" do
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles"}
+        expect(response.status).to eq(200)
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:start_time)).to be_within(1.day).of earliest_time
+        expect(assigns(:end_time)).to be_within(1.minute).of Time.current
+        expect(assigns(:bike_graph_kind)).to eq "stolen"
+        # And it gets the other kinds too
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "origin"}
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:bike_graph_kind)).to eq "origin"
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "pos"}
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:bike_graph_kind)).to eq "pos"
+      end
+    end
   end
-
-  # describe "users" do
-  #   it "returns json" do
-  #     get :users
-  #     expect(response.status).to eq(200)
-  #     result = JSON.parse(response.body)
-  #     expect(result.keys.count).to be > 0
-  #   end
-  # end
-
-  # describe "bikes" do
-  #   context "no params" do
-  #     it "returns JSON array" do
-  #       get :bikes
-  #       expect(response.status).to eq(200)
-  #       result = JSON.parse(response.body)
-  #       expect(result.is_a?(Array)).to be_truthy
-  #       names = result.map { |r| r["name"] }
-  #       expect(names.include?("Registrations")).to be_truthy
-  #       expect(names.include?("Stolen")).to be_truthy
-  #     end
-  #   end
-  #   context "start_time passed" do
-  #     it "returns JSON array" do
-  #       get :bikes, params: {start_time: "past_year"}
-  #       expect(response.status).to eq(200)
-  #       result = JSON.parse(response.body)
-  #       expect(result.is_a?(Array)).to be_truthy
-  #       names = result.map { |r| r["name"] }
-  #       expect(names.include?("Registrations")).to be_truthy
-  #       expect(names.include?("Stolen")).to be_truthy
-  #     end
-  #   end
-  # end
 end

@@ -147,7 +147,7 @@ module ControllerHelpers
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
     # Either starting with our URL or /
-    return target if target.match(/\A#{ENV["BASE_URL"]}/) || target.match(%r{\A/})
+    return target if target.start_with?(/#{ENV["BASE_URL"]}/) || target.start_with?("/")
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
