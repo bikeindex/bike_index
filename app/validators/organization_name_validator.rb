@@ -1,6 +1,6 @@
 class OrganizationNameValidator < ActiveModel::Validator
   # These were pulled from the top level of routes
-  INVALID_NAMES = %w[400 401 404 422 500 about accept_terms accept_vendor_terms admin ambassadors none ambassadors_current
+  INVALID_NAMES = %w[400 401 404 422 500 about accept_terms accept_vendor_terms admin ambassadors ambassadors_current
     ambassadors_how_to api ascend auth bike_creation_graph bike_shop_packages bike_stickers bikes
     blogs campus_packages choose_registration cities_packages dev_and_design discourse_authentication
     discuss documentation edit_my_account feedbacks for_bike_shops for_cities for_community_groups
@@ -9,7 +9,8 @@ class OrganizationNameValidator < ActiveModel::Validator
     my_account news o oauth organizations ownerships pages payments privacy protect_your_bike
     public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
     stolen stolen_notifications store donate why_donate support_bike_index support_the_bike_index support_the_index terms
-    theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where].freeze
+    theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where
+    none false].freeze
 
   def self.valid?(str)
     slugged = Slugifyer.slugify(str).tr("-", "_")

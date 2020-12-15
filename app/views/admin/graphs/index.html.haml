@@ -28,8 +28,6 @@
         .mt-4
         = column_chart variable_admin_graphs_path(sortable_search_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ",", defer: true
 
-    - bikes = Bike.unscoped.where(created_at: @time_range)
-    - organization_ids = bikes.distinct.pluck(:creation_organization_id)
     .col-sm-6.offset-sm-3.mt-4
       .full-screen-table
         %table.table.table-striped.table-bordered.table-sm.text-center
@@ -37,17 +35,18 @@
             %th Organization
             %th Bikes
           %tbody
+            - bikes = Bike.unscoped.where(created_at: @time_range)
+            - organization_ids = bikes.distinct.pluck(:creation_organization_id)
             - organization_bikes = organization_ids.map {|org_id| [org_id, bikes.where(creation_organization_id: org_id).count]}
-            - organization_bikes.each do |org_id, bike_count|
+
+            - organization_bikes.sort { |a, b| b[1] <=> a[1] }.each do |org_id, bike_count|
               - organization = Organization.unscoped.find_by_id(org_id)
               %tr
                 %td.text-left
                   - if organization.present?
                     = link_to organization.short_name, admin_bikes_path(sortable_search_params.merge(organization_id: org_id, render_chart: true))
                   - else
-                    %a.gray-link{href: admin_bikes_path(sortable_search_params.merge(organization_id: org_id, render_chart: true))}
-                      = link_to organization.short_name,
-                    %span{title: "(id: #{org_id})"}
+                    %a.gray-link{href: admin_bikes_path(sortable_search_params.merge(organization_id: "false", render_chart: true)), title: "(id: #{org_id})"}
                       no organization
                 %td.text-right
                   = number_with_delimiter(bike_count)
