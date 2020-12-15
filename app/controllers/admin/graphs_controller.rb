@@ -3,31 +3,23 @@ class Admin::GraphsController < Admin::BaseController
   before_action :set_variable_graph_kind
 
   def index
+    @total_count = if @kind == "users"
+      matching_users.count
+    elsif @kind == "recoveries"
+      matching_recoveries.where(recovered_at: @time_range).count
+    elsif @kind == "bikes"
+      matching_bikes.count
+    end
+
   end
 
   def variable
     if @kind == "users"
       chart_data = helpers.time_range_counts(collection: User.where(created_at: @time_range))
-    elsif @kind == "payments"
-      chart_data = [
-        {
-          name: "All",
-          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range))
-        },
-        {
-          name: "Payments",
-          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).payment)
-        },
-        {
-          name: "Donations",
-          data: helpers.time_range_counts(collection: Payment.where(created_at: @time_range).donation)
-        }
-      ]
     elsif @kind == "bikes"
       chart_data = bike_chart_data
     elsif @kind == "recoveries"
-      recoveries = StolenRecord.unscoped
-      chart_data = helpers.time_range_counts(collection: recoveries.where(recovered_at: @time_range))
+      chart_data = helpers.time_range_counts(collection: matching_recoveries)
     end
     if chart_data.present?
       render json: chart_data.chart_json
@@ -45,8 +37,22 @@ class Admin::GraphsController < Admin::BaseController
   protected
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users payments bikes recoveries]
+    @graph_kinds = %w[general users bikes recoveries]
     @kind = @graph_kinds.include?(params[:search_kind]) ? params[:search_kind] : @graph_kinds.first
+  end
+
+  def matching_users
+    User.where(created_at: @time_range)
+  end
+
+  def matching_recoveries
+    StolenRecord.unscoped.where(recovered_at: @time_range)
+  end
+
+  def matching_bikes
+    bikes = Bike.unscoped.where(created_at: @time_range)
+    bikes = bikes.where(deleted_at: nil) if !ParamsNormalizer.boolean(params[:search_deleted])
+    bikes
   end
 
   def bike_graph_kinds
@@ -58,7 +64,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def bike_chart_data
-    bikes = Bike.unscoped.where(created_at: @time_range)
+    bikes = matching_bikes
     @bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
     if @bike_graph_kind == "stolen"
       [{

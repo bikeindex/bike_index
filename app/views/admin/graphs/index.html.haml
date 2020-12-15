@@ -14,6 +14,20 @@
   = column_chart variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true, thousands: ",", defer: true
 
 - else
+  - if @kind == "bikes"
+    .mt-4.text-right
+      - if ParamsNormalizer.boolean(params[:search_deleted])
+        = link_to "Don't include deleted bikes", admin_graphs_path(sortable_search_params.merge(search_deleted: false)), class: "less-strong"
+      - else
+        = link_to "Include deleted bikes", admin_graphs_path(sortable_search_params.merge(search_deleted: true)), class: "less-strong"
+
+  - if @total_count.present?
+    %p.mt-4
+      #{number_with_delimiter(@total_count)} matching #{@kind}
+      %em
+        = humanized_time_range(@time_range)
+
+  .mt-4
   = column_chart variable_admin_graphs_path(sortable_search_params), stacked: true, thousands: ",", defer: true
 
   -# Don't render all the extra stuff if looking at a period that is longer than 1 year
