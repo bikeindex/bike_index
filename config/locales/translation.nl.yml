@@ -2305,11 +2305,11 @@ nl:
         cannot_delete: Whoops! Hoe heb je dat gedaan? Kan afbeeldingen van e-mailfragmenten
           niet verwijderen.
         image_deleted: Afbeelding is succesvol verwijderd
-      find_image_if_owned:
-        no_permission_to_edit: Sorry! U hebt geen toestemming om die afbeelding te
-          bewerken.
       update:
         image_updated: Afbeelding is succesvol bijgewerkt.
+      ensure_authorized_to_update!:
+        no_permission_to_edit: Sorry! U hebt geen toestemming om die afbeelding te
+          bewerken.
     sessions:
       create:
         invalid_email_or_password: Ongeldig e-mailadres / wachtwoord
