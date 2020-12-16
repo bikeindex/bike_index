@@ -216,9 +216,6 @@ Rails.application.routes.draw do
     resources :graphs, only: [:index] do
       collection do
         get :tables
-        get :bikes
-        get :users
-        get :stolen_locations
         get :variable
       end
     end

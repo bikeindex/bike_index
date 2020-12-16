@@ -10,14 +10,23 @@ RSpec.describe Admin::GraphsController, type: :controller do
         expect(response).to render_template(:index)
       end
     end
-    context "kind" do
+    context "users" do
       it "renders" do
-        get :index, params: {kind: "users"}
+        get :index, params: {search_kind: "users"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
+    end
+    context "recoveries" do
       it "renders" do
-        get :index, params: {kind: "payments"}
+        get :index, params: {search_kind: "recoveries"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
+    context "bikes" do
+      it "renders" do
+        get :index, params: {search_kind: "bikes"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
@@ -33,6 +42,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
   end
 
   describe "variable" do
+    let(:earliest_time) { Time.at(1134972000) } # earliest_period_date
     it "returns json" do
       get :variable
       expect(response.status).to eq(200)
@@ -40,88 +50,62 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "users" do
       it "returns json" do
-        get :variable, params: {kind: "users", timezone: "America/Los_Angeles"}
+        get :variable, params: {search_kind: "users", timezone: "America/Los_Angeles", period: "all"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
-        expect(assigns(:end_at)).to be_within(1.minute).of Time.current
-        expect(assigns(:group_period)).to eq "month"
+        expect(assigns(:start_time)).to be_within(1.day).of earliest_time
+        expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end
       context "passed date and time" do
-        let(:end_at) { "2019-01-22T13:48" }
-        let(:start_at) { "2019-01-15T14:48" }
+        let(:end_time) { "2019-01-22T13:48" }
+        let(:start_time) { "2019-01-15T14:48" }
         it "returns json" do
-          get :variable, params: {kind: "users", start_at: start_at, end_at: end_at, timezone: "America/Los_Angeles"}
+          get :variable, params: {search_kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
-          expect(json_result.keys.count).to be > 0
+          expect(json_result.is_a?(Array)).to be_truthy
           Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
-          expect(assigns(:start_at).strftime("%Y-%m-%dT%H:%M")).to eq start_at
-          expect(assigns(:end_at).strftime("%Y-%m-%dT%H:%M")).to eq end_at
-          expect(assigns(:group_period)).to eq "day"
+          expect(assigns(:start_time).strftime("%Y-%m-%dT%H:%M")).to eq start_time
+          expect(assigns(:end_time).strftime("%Y-%m-%dT%H:%M")).to eq end_time
         end
       end
-      context "payments" do
-        let!(:payment) { FactoryBot.create(:payment) }
+    end
+    context "recoveries" do
+      let!(:payment) { FactoryBot.create(:payment) }
+      it "returns json" do
+        get :variable, params: {search_kind: "recoveries", timezone: "America/Los_Angeles"}
+        expect(response.status).to eq(200)
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
+        expect(assigns(:end_time)).to be_within(1.minute).of Time.current
+      end
+      context "passed date and time" do
+        let(:end_time) { "2019-01-22T13:48" }
+        let(:start_time) { "2019-01-15T14:48" }
         it "returns json" do
-          get :variable, params: {kind: "payments", timezone: "America/Los_Angeles"}
+          get :variable, params: {search_kind: "recoveries", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
-          json_result.each do |data_group|
-            expect(data_group.keys.count).to be > 0
-            expect(data_group.keys.first.class).to eq(String)
-            expect(data_group.values.first.class).to eq(String)
-            expect(data_group["error"]).to_not be_present
-          end
-          expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
-          expect(assigns(:end_at)).to be_within(1.minute).of Time.current
-          expect(assigns(:group_period)).to eq "month"
-        end
-        context "passed date and time" do
-          let(:end_at) { "2019-01-22T13:48" }
-          let(:start_at) { "2019-01-15T14:48" }
-          it "returns json" do
-            get :variable, params: {kind: "users", start_at: start_at, end_at: end_at, timezone: "America/Los_Angeles"}
-            expect(response.status).to eq(200)
-            expect(json_result.keys.count).to be > 0
-            Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
-            expect(assigns(:start_at).strftime("%Y-%m-%dT%H:%M")).to eq start_at
-            expect(assigns(:end_at).strftime("%Y-%m-%dT%H:%M")).to eq end_at
-            expect(assigns(:group_period)).to eq "day"
-          end
+          expect(json_result.is_a?(Array)).to be_truthy
+          Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
+          expect(assigns(:start_time).strftime("%Y-%m-%dT%H:%M")).to eq start_time
+          expect(assigns(:end_time).strftime("%Y-%m-%dT%H:%M")).to eq end_time
         end
       end
     end
-  end
-
-  describe "users" do
-    it "returns json" do
-      get :users
-      expect(response.status).to eq(200)
-      result = JSON.parse(response.body)
-      expect(result.keys.count).to be > 0
-    end
-  end
-
-  describe "bikes" do
-    context "no params" do
-      it "returns JSON array" do
-        get :bikes
+    context "bikes" do
+      it "returns json" do
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
-        result = JSON.parse(response.body)
-        expect(result.is_a?(Array)).to be_truthy
-        names = result.map { |r| r["name"] }
-        expect(names.include?("Registrations")).to be_truthy
-        expect(names.include?("Stolen")).to be_truthy
-      end
-    end
-    context "start_at passed" do
-      it "returns JSON array" do
-        get :bikes, params: {start_at: "past_year"}
-        expect(response.status).to eq(200)
-        result = JSON.parse(response.body)
-        expect(result.is_a?(Array)).to be_truthy
-        names = result.map { |r| r["name"] }
-        expect(names.include?("Registrations")).to be_truthy
-        expect(names.include?("Stolen")).to be_truthy
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
+        expect(assigns(:end_time)).to be_within(1.minute).of Time.current
+        expect(assigns(:bike_graph_kind)).to eq "stolen"
+        # And it gets the other kinds too
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "origin"}
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:bike_graph_kind)).to eq "origin"
+        get :variable, params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "pos"}
+        expect(json_result.is_a?(Array)).to be_truthy
+        expect(assigns(:bike_graph_kind)).to eq "pos"
       end
     end
   end

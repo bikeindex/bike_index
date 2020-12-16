@@ -72,7 +72,7 @@ class Bike < ApplicationRecord
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
 
-  attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
+  attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS

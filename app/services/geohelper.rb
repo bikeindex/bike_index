@@ -33,12 +33,20 @@ class Geohelper
       address.match(/\A\d{5}\z/).present? ? "zipcode: #{address}" : address
     end
 
+    def ignored_coordinates?(latitude, longitude)
+      [
+        [71.53880, -66.88542], # Google general can't find
+        [37.09024, -95.71289] # USA can't find
+      ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
+    end
+
     # TODO: location refactor - make this return the updated location attrs
     # Given a string, return a address hash for that location
     def formatted_address_hash(addy)
       result = Geocoder.search(formatted_address(addy))
-      return {} unless result&.first&.formatted_address.present?
+      return {} if result&.first&.formatted_address.blank?
       coordinates = coordinates_for(addy, result: result)
+      return {} if ignored_coordinates?(coordinates[:latitude], coordinates[:longitude])
       address_hash_from_geocoder_string(result&.first&.formatted_address)
         .merge(coordinates.present? ? coordinates : {})
     end
@@ -47,6 +55,7 @@ class Geohelper
       address_array = addy.split(",").map(&:strip)
       country = address_array.pop # Don't care about this rn
       code_and_state = address_array.pop
+      return {} if code_and_state.blank?
       state, code = code_and_state.split(" ") # In case it's a full zipcode with a dash
       city = address_array.pop
       {

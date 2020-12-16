@@ -1,9 +1,8 @@
-
 version: "3.0"
 services:
   app:
     build: .
-    command: bundle exec foreman start -f Procfile_docker
+    command: bundle exec foreman start -f Procfile_development
     depends_on:
       - postgres
       - redis

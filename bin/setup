@@ -20,10 +20,10 @@ chdir APP_ROOT do
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
   # Install JavaScript dependencies if using Yarn
-  # system('bin/yarn')
+  system('bin/yarn')
 
   puts "\n== Preparing and seeding database =="
-  system "bin/rake db:setup"
+  system "bin/rake db:create db:structure:load"
   system "bin/rake seed_test_users_and_bikes"
   system "bin/rake dev:seed_counts"
 

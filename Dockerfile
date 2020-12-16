@@ -1,4 +1,4 @@
-FROM ruby:2.5.8
+FROM ruby:2.7.2
 WORKDIR /src
 
 RUN apt-get update -yq \
@@ -8,7 +8,7 @@ RUN apt-get update -yq \
     && apt-get install imagemagick \
 
     # node js
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash \
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash \
     && apt-get install nodejs -yq \
 
     # yarn
@@ -25,4 +25,4 @@ COPY ./yarn.lock /src/yarn.lock
 
 RUN gem install bundler --conservative && bundle install
 
-RUN yarn install
+RUN yarn install --check-files
