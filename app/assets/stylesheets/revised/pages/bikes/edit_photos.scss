@@ -4,7 +4,7 @@
 
     .edit-photo-display-wrap {
       padding: (0.5 * $vertical-height) (0.5 * $vertical-height) 0;
-
+      min-height: 100px;
       background: white;
       border: 1px solid $form-well-border-color;
 
@@ -23,6 +23,15 @@
         text-align: center;
         padding: 2rem 2px;
         color: $gray-light;
+      }
+    }
+
+    .kind-select-wrap {
+      margin: 0 0 (0.5 * $vertical-height);
+      select {
+        padding: 0.5 * $vertical-height;
+        font-size: 90%;
+        height: auto;
       }
     }
 

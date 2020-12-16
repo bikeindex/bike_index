@@ -1,6 +1,6 @@
 class PublicImage < ApplicationRecord
   KIND_ENUM = {
-    photo_uncategorized: 0,
+    photo_uncategorized: 0, # If editing these images, also update _public_image template
     photo_stock: 3,
     photo_of_user_with_bike: 4,
     photo_of_serial: 5,
@@ -31,6 +31,11 @@ class PublicImage < ApplicationRecord
     self.name = (name || default_name).truncate(100)
     return true if listing_order && listing_order > 0
     self.listing_order = imageable&.public_images&.length || 0
+  end
+
+  # Method to make create_revised.js easier to handle
+  def bike_type
+    imageable_type == "Bike" && imageable.type
   end
 
   def enqueue_after_commit_jobs

@@ -1,5 +1,15 @@
+- bike_type ||= image.bike_type || "bike"
+
 %li.col-xs-6.col-sm-4.edit-photo-display-list-item{ id: image.id }
   .edit-photo-display-wrap
+    .kind-select-wrap
+      - kind_select_options = { photo_uncategorized: "Photo of your #{bike_type}",
+          photo_stock: "Stock photo",
+          photo_of_user_with_bike: "You with your #{bike_type}",
+          photo_of_serial: "Photo of serial number",
+          photo_of_receipt: "Photo of receipt"}
+      = select_tag(:kind, options_for_select(kind_select_options.map { |k, v| [v, k.to_s] }), class: "form-control")
+
     .processing
       = t(".processing")
     - if image.image?
