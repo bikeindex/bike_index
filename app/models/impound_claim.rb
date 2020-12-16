@@ -55,7 +55,7 @@ class ImpoundClaim < ApplicationRecord
   private
 
   def calculated_status
-    return status
+    status
     # impound_record_updates - can influence this
   end
 
