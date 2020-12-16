@@ -1356,7 +1356,6 @@ CREATE TABLE public.impound_claims (
     stolen_record_id bigint,
     user_id bigint,
     message text,
-    data json,
     status integer,
     submitted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,

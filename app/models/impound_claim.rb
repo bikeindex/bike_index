@@ -37,6 +37,12 @@ class ImpoundClaim < ApplicationRecord
     stolen_record&.bike
   end
 
+  # return private images too
+  def bike_submitting_images
+    return [] unless bike_submitting.present?
+    PublicImage.unscoped.where(imageable_id: bike_submitting.id).bike.order(:listing_order)
+  end
+
   def unsubmitted?
     submitted_at.blank?
   end
@@ -46,8 +52,6 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.data ||= {}
-    self.data[:photos] = photo_data
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"
   end
@@ -57,10 +61,5 @@ class ImpoundClaim < ApplicationRecord
   def calculated_status
     status
     # impound_record_updates - can influence this
-  end
-
-  # Because the photos may be assigned to other things. Or may change to be assigned to other things
-  def photo_data
-    {}
   end
 end

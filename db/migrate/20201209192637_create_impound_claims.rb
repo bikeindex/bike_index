@@ -6,7 +6,6 @@ class CreateImpoundClaims < ActiveRecord::Migration[5.2]
       t.references :user, index: true
 
       t.text :message
-      t.json :data
 
       t.integer :status
       t.datetime :submitted_at

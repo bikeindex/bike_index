@@ -2,7 +2,6 @@
 - render_optional ||= false
 -# Maybe there is a way to calculate this dynamically, skipping for now
 - current_path ||= "/bikes/#{impound_claim.bike_claimed}"
-
 .stolen-checklist-wrap.mt-2
   %ul.stolen-checklist
     - verified_phone_number = current_user.user_phones.confirmed.any?
@@ -41,7 +40,7 @@
             %em.small.less-strong
               optional
     - else
-      - proof_of_purchase_photo = bike_submitting.public_images.photo_of_receipt.any?
+      - proof_of_purchase_photo = impound_claim.bike_submitting_images.photo_of_receipt.any?
       %li{ class: proof_of_purchase_photo ? "completed-item" : "" }
         %span.checklist-checkbox
           = "&#10003;".html_safe if proof_of_purchase_photo
@@ -51,7 +50,7 @@
             %em.small.less-strong
               optional
 
-    - photo_of_you_and_bike = bike_submitting.public_images.photo_of_user_with_bike.any?
+    - photo_of_you_and_bike = impound_claim.bike_submitting_images.photo_of_user_with_bike.any?
     %li{ class: photo_of_you_and_bike ? "completed-item" : "" }
       %span.checklist-checkbox
         = "&#10003;".html_safe if photo_of_you_and_bike
