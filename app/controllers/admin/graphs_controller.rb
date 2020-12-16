@@ -10,7 +10,6 @@ class Admin::GraphsController < Admin::BaseController
     elsif @kind == "bikes"
       matching_bikes.count
     end
-
   end
 
   def variable
@@ -51,7 +50,7 @@ class Admin::GraphsController < Admin::BaseController
 
   def matching_bikes
     bikes = Bike.unscoped.where(created_at: @time_range)
-    bikes = bikes.where(deleted_at: nil) if !ParamsNormalizer.boolean(params[:search_deleted])
+    bikes = bikes.where(deleted_at: nil) unless ParamsNormalizer.boolean(params[:search_deleted])
     bikes
   end
 

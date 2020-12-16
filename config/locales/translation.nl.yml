@@ -5780,15 +5780,14 @@ nl:
         uploaden</em> .
       upload_photos: Foto's uploaden
     public_image:
-      copy_and_paste: Kopieer de bovenstaande tekst en plak deze op de gewenste plek
-      copy_and_paste_in_post: Kopieer de bovenstaande tekst en plak deze op de gewenste
-        plek in het bericht
-      delete_image: Verwijder afbeelding
-      enter_text_here: VOER HIER UW TEKST IN
       processing: "... verwerken"
-    revised_public_image:
-      keep_image_private: houd afbeelding privé
-      processing: "... verwerken"
+      keep_image_private: privéafbeelding
+      missing_image: afbeelding gebroken
+      photo_of_receipt: Foto van ontvangst
+      photo_of_serial: Foto van serienummer
+      photo_of_user_with_bike: Jij met je %{bike_type}
+      photo_stock: Stock foto
+      photo_uncategorized: Foto van uw %{bike_type}
     show:
       are_you_sure: Weet je het zeker?
       back_to_images: Terug naar openbare afbeeldingen

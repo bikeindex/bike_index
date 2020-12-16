@@ -7,6 +7,8 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
   initializeEventListeners: ->
     $('#public_images').on 'change', '.is_private_check', (e) =>
       @updateImagePrivateness(e)
+    $('#public_images').on 'change', '.kind_select', (e) =>
+      @updateImageKind(e)
 
     $('.saveBikeChanges').click (e) ->
       e.preventDefault()
@@ -65,9 +67,20 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     # Then we post the result of the list comprehension to the url to update
     $.post(url_target, new_item_order)
 
+
   updateImagePrivateness: (e) ->
     $target = $(e.target)
     is_private = $target.prop('checked')
     id = $target.parents('.edit-photo-display-list-item').prop('id')
     url_target = "#{$('#public_images').data('imagesurl')}/#{id}/is_private"
     $.post(url_target, {is_private: is_private})
+
+  updateImageKind: (e) ->
+    $target = $(e.target)
+    kind = $target.val()
+    id = $target.parents('.edit-photo-display-list-item').prop('id')
+    url_target = "#{$('#public_images').data('imagesurl')}/#{id}"
+    $.ajax
+      url: url_target
+      method: "put"
+      data: {kind: kind}
