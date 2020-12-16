@@ -188,132 +188,131 @@ RSpec.describe PublicImagesController, type: :request do
   describe "show" do
     let(:user) { nil }
     it "renders" do
-      image = FactoryBot.create(:public_image)
-      get "#{base_url}/#{image.id}"
+      public_image = FactoryBot.create(:public_image)
+      get "#{base_url}/#{public_image.id}"
       expect(response.code).to eq("200")
       expect(response).to render_template("show")
       expect(flash).to_not be_present
     end
-  end
-
-  describe "edit" do
-    let(:current_user) { FactoryBot.create(:user_confirmed) }
-    it "renders" do
-      bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
-      image = FactoryBot.create(:public_image, imageable: bike)
-      get "#{base_url}/#{image.id}/edit"
-      expect(response.code).to eq("200")
-      expect(response).to render_template("edit")
-      expect(flash).to_not be_present
-    end
-    context "not owner" do
+    context "private" do
+      let(:public_image) { FactoryBot.create(:public_image, is_private: true) }
       it "redirects" do
-        bike = FactoryBot.create(:bike, :with_ownership_claimed)
-        image = FactoryBot.create(:public_image, imageable: bike)
-        expect(image.bike?).to be_truthy
-        expect(bike.authorized?(current_user)).to be_falsey
-        get "#{base_url}/#{image.id}/edit"
-        expect(response).to redirect_to bike_path(bike)
+        expect {
+          get "#{base_url}/#{public_image.id}"
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
 
-  # describe "update" do
-  #   context "normal update" do
-  #     context "with owner" do
-  #       it "updates things and go back to editing the bike" do
-  #         user = FactoryBot.create(:user_confirmed)
-  #         bike = FactoryBot.create(:bike)
-  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-  #         public_image = FactoryBot.create(:public_image, imageable: bike)
-  #         expect(bike.reload.owner).to eq(user)
-  #         set_current_user(user)
-  #         put :update, params: {id: public_image.id, public_image: {name: "Food"}}
-  #         expect(response).to redirect_to(edit_bike_url(bike))
-  #         expect(public_image.reload.name).to eq("Food")
-  #         # ensure enqueueing after this
-  #       end
-  #     end
-  #     context "not owner" do
-  #       it "does not update" do
-  #         user = FactoryBot.create(:user_confirmed)
-  #         bike = FactoryBot.create(:bike)
-  #         FactoryBot.create(:ownership, bike: bike)
-  #         public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
-  #         set_current_user(user)
-  #         put :update, params: {id: public_image.id, public_image: {name: "Food"}}
-  #         expect(public_image.reload.name).to eq("party")
-  #       end
-  #     end
-  #   end
-  # end
+  context "with bike" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
 
-  # describe "is_private" do
-  #   let(:user) { FactoryBot.create(:user_confirmed) }
-  #   let(:bike) { FactoryBot.create(:bike) }
-  #   context "with owner" do
-  #     context "is_private true" do
-  #       it "marks image private" do
-  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-  #         public_image = FactoryBot.create(:public_image, imageable: bike)
-  #         expect(bike.reload.owner).to eq(user)
-  #         set_current_user(user)
-  #         post :is_private, params: {id: public_image.id, is_private: "true"}
-  #         public_image.reload
-  #         expect(public_image.is_private).to be_truthy
-  #         expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
-  #       end
-  #     end
-  #     context "is_private false" do
-  #       it "marks bike not private" do
-  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-  #         public_image = FactoryBot.create(:public_image, imageable: bike, is_private: true)
-  #         expect(bike.reload.owner).to eq(user)
-  #         set_current_user(user)
-  #         post :is_private, params: {id: public_image.id, is_private: false}
-  #         public_image.reload
-  #         expect(public_image.is_private).to be_falsey
-  #         expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
-  #       end
-  #     end
-  #   end
-  #   context "non owner" do
-  #     it "does not update" do
-  #       FactoryBot.create(:ownership, bike: bike)
-  #       public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
-  #       set_current_user(user)
-  #       post :is_private, params: {id: public_image.id, is_private: "true"}
-  #       expect(public_image.is_private).to be_falsey
-  #     end
-  #   end
-  # end
+    describe "edit" do
+      it "renders" do
+        expect(bike.authorized?(current_user)).to be_truthy
+        get "#{base_url}/#{public_image.id}/edit"
+        expect(response.code).to eq("200")
+        expect(response).to render_template("edit")
+        expect(flash).to_not be_present
+      end
+      context "not owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        it "redirects" do
+          expect(bike.authorized?(current_user)).to be_falsey
+          get "#{base_url}/#{public_image.id}/edit"
+          expect(response).to redirect_to bike_path(bike)
+        end
+      end
+    end
 
-  # describe "order" do
-  #   let(:bike) { FactoryBot.create(:bike) }
-  #   let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
-  #   let(:user) { ownership.creator }
-  #   let(:other_ownership) { FactoryBot.create(:ownership) }
-  #   let(:public_image_1) { FactoryBot.create(:public_image, imageable: bike) }
-  #   let(:public_image_2) { FactoryBot.create(:public_image, imageable: bike, listing_order: 2) }
-  #   let(:public_image_3) { FactoryBot.create(:public_image, imageable: bike, listing_order: 3) }
-  #   let(:public_image_other) { FactoryBot.create(:public_image, imageable: other_ownership.bike, listing_order: 0) }
+    describe "update" do
+      it "updates things and go back to editing the bike" do
+        expect(bike.reload.owner).to eq(current_user)
+        expect {
+          put "#{base_url}/#{public_image.id}", params: { public_image: {name: "Food"}}
+        }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
+        expect(response).to redirect_to(edit_bike_url(bike))
+        expect(public_image.reload.name).to eq("Food")
+      end
+      context "not owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        it "does not update" do
+          og_name = public_image.name
+          expect(bike.authorized?(current_user)).to be_falsey
+          expect {
+            put "#{base_url}/#{public_image.id}", params: { public_image: {name: "Food"}}
+          }.to change(AfterBikeSaveWorker.jobs, :count).by(0)
+          expect(public_image.reload.name).to eq(og_name)
+        end
+      end
+      context "kind" do
+        it "updates" do
+          expect(public_image.kind).to eq "photo_uncategorized"
+          expect {
+            patch "#{base_url}/#{public_image.id}", params: { kind: "photo_of_user_with_bike"}
+          }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
+          expect(public_image.reload.kind).to eq("photo_of_user_with_bike")
+          # And changing from a non-default kind
+          put "#{base_url}/#{public_image.id}", params: { kind: "photo_of_serial"}
+          expect(public_image.reload.kind).to eq("photo_of_serial")
+        end
+      end
+    end
 
-  #   it "updates the listing order" do
-  #     expect([public_image_1, public_image_2, public_image_3, public_image_other]).to be_present
-  #     expect(public_image_other.listing_order).to eq 0
-  #     expect(public_image_3.listing_order).to eq 3
-  #     expect(public_image_2.listing_order).to eq 2
-  #     expect(public_image_1.listing_order).to be < 2
-  #     list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
-  #     set_current_user(user)
+    describe "is_private" do
+      context "is_private true" do
+        it "marks image private" do
+          expect(bike.reload.owner).to eq(current_user)
+          post "#{base_url}/#{public_image.id}/is_private", params: {is_private: "true"}
+          public_image.reload
+          expect(public_image.is_private).to be_truthy
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        end
+      end
+      context "is_private false" do
+        let(:public_image) { FactoryBot.create(:public_image, imageable: bike, is_private: true) }
+        it "marks bike not private" do
+          expect(bike.reload.owner).to eq(current_user)
+          post "#{base_url}/#{public_image.id}/is_private", params: {is_private: false}
+          public_image.reload
+          expect(public_image.is_private).to be_falsey
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        end
+      end
+      context "non owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        it "does not update" do
+          post "#{base_url}/#{public_image.id}/is_private", params: {is_private: "true"}
+          expect(public_image.is_private).to be_falsey
+        end
+      end
+    end
 
-  #     post :order, params: {list_of_photos: list_order.map(&:to_s)}
+    describe "order" do
+      let(:other_ownership) { FactoryBot.create(:ownership) }
+      let(:public_image_1) { FactoryBot.create(:public_image, imageable: bike) }
+      let(:public_image_2) { FactoryBot.create(:public_image, imageable: bike, listing_order: 2) }
+      let(:public_image_3) { FactoryBot.create(:public_image, imageable: bike, listing_order: 3) }
+      let(:public_image_other) { FactoryBot.create(:public_image, imageable: other_ownership.bike, listing_order: 0) }
 
-  #     expect(public_image_3.reload.listing_order).to eq 1
-  #     expect(public_image_2.reload.listing_order).to eq 4
-  #     expect(public_image_1.reload.listing_order).to eq 2
-  #     expect(public_image_other.reload.listing_order).to eq 0
-  #     expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
-  #   end
-  # end
+      it "updates the listing order" do
+        expect([public_image_1, public_image_2, public_image_3, public_image_other]).to be_present
+        expect(public_image_other.listing_order).to eq 0
+        expect(public_image_3.listing_order).to eq 3
+        expect(public_image_2.listing_order).to eq 2
+        expect(public_image_1.listing_order).to be < 2
+        list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
+
+        post "#{base_url}/order", params: {list_of_photos: list_order.map(&:to_s)}
+
+        expect(public_image_3.reload.listing_order).to eq 1
+        expect(public_image_2.reload.listing_order).to eq 4
+        expect(public_image_1.reload.listing_order).to eq 2
+        expect(public_image_other.reload.listing_order).to eq 0
+        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+      end
+    end
+  end
 end

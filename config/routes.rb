@@ -134,10 +134,7 @@ Rails.application.routes.draw do
     collection do
       post :order
     end
-    member do
-      post :is_private
-      post :update_kind
-    end
+    member { post :is_private }
   end
 
   resources :registrations, only: [:new, :create] do

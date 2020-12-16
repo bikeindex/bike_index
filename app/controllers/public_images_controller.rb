@@ -45,7 +45,10 @@ class PublicImagesController < ApplicationController
   end
 
   def update
-    if @public_image.update_attributes(permitted_parameters)
+    if params[:kind].present? # We're only updating kind
+      @public_image.update_attributes(kind: params[:kind])
+      redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
+    elsif @public_image.update_attributes(permitted_parameters)
       redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
     else
       render :edit
@@ -53,7 +56,6 @@ class PublicImagesController < ApplicationController
   end
 
   def destroy
-    pp "shouldn't see this"
     @imageable = @public_image.imageable
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
@@ -112,11 +114,10 @@ class PublicImagesController < ApplicationController
 
   def ensure_authorized_to_update!
     @public_image = PublicImage.unscoped.find(params[:id])
-    pp "authorized? #{current_user_image_authorized?(@public_image)}"
     unless current_user_image_authorized?(@public_image)
       flash[:error] = translation(:no_permission_to_edit)
       redirecting_path = @public_image.bike? ? bike_path(@public_image.imageable) : user_root_url
-      redirect_to redirecting_path && return
+      redirect_to(redirecting_path) && return
     end
   end
 end
