@@ -14,8 +14,8 @@
             = t(".drag_the_uploaded_photos")
 
         %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
-          = render partial: 'public_images/revised_public_image', collection: @bike.public_images, as: :image
-          = render partial: 'public_images/revised_public_image', collection: @private_images, as: :image
+          = render partial: 'public_images/public_image', collection: @bike.public_images, as: :image
+          = render partial: 'public_images/public_image', collection: @private_images, as: :image
 
         %hr
 
@@ -28,7 +28,6 @@
               %label.file
                 = f.file_field :image, multiple: true, name: "public_image[image]"
                 %span.file-custom
-
         = render "shared/form_well_footer_save"
 
 -# Mustache template for rendering post upload

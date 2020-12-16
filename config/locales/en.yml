@@ -4828,14 +4828,8 @@ en:
         button.
       upload_photos: Upload photos
     public_image:
-      copy_and_paste: Copy the above text and paste it where you'd like it to appear
-      copy_and_paste_in_post: Copy the above text and paste it where you'd like it
-        to appear in the post
-      delete_image: Delete image
-      enter_text_here: ENTER YOUR TEXT HERE
-      processing: "... processing"
-    revised_public_image:
-      keep_image_private: keep image private
+      keep_image_private: private image
+      missing_image: image broken
       processing: "... processing"
     show:
       are_you_sure: Are you sure?
