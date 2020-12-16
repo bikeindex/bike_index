@@ -55,10 +55,11 @@
                     = f.text_area :message, class: "form-control"
                   = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
                 - else
-                  %em
-                    This claim was submitted
-                    %span.convertTime.withPreposition
-                      = l impound_claim.created_at, format: :convert_time
+                  %h3.mt-4.uncap
+                    %em
+                      This claim was submitted
+                      %span.convertTime.withPreposition
+                        = l impound_claim.created_at, format: :convert_time
               .col-lg-4
                 %p
                   Prove to

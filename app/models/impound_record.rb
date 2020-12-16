@@ -44,12 +44,12 @@ class ImpoundRecord < ApplicationRecord
     ImpoundRecordUpdate.kinds_humanized_short
   end
 
-  # Using class here to make it easier to update/translate the specific word later
+  # Using method here to make it easier to update/translate the specific word later
   def self.impounded_kind
     "impounded"
   end
 
-  # Using class here to make it easier to update/translate the specific word later
+  # Using method here to make it easier to update/translate the specific word later
   def self.found_kind
     "found"
   end
