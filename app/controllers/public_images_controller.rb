@@ -47,7 +47,7 @@ class PublicImagesController < ApplicationController
   def update
     if params[:kind].present? # We're only updating kind
       @public_image.update_attributes(kind: params[:kind])
-      redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
+      head :ok
     elsif @public_image.update_attributes(permitted_parameters)
       redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
     else

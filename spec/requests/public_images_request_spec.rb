@@ -262,6 +262,8 @@ RSpec.describe PublicImagesController, type: :request do
     end
 
     describe "is_private" do
+      # This is a legacy endpoint. Should be moved into update, but I'm not sure if there are other places where it's used
+      # ... and it's currently working, so leaving it 2020-12
       context "is_private true" do
         it "marks image private" do
           expect(bike.reload.owner).to eq(current_user)

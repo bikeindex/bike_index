@@ -78,7 +78,9 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
   updateImageKind: (e) ->
     $target = $(e.target)
     kind = $target.val()
-    console.log(kind)
     id = $target.parents('.edit-photo-display-list-item').prop('id')
-    url_target = "#{$('#public_images').data('imagesurl')}/#{id}/is_private"
-    console.log $.post(url_target, {kind: kind})
+    url_target = "#{$('#public_images').data('imagesurl')}/#{id}"
+    $.ajax
+      url: url_target
+      method: "put"
+      data: {kind: kind}
