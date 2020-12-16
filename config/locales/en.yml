@@ -4830,6 +4830,11 @@ en:
     public_image:
       keep_image_private: private image
       missing_image: image broken
+      photo_of_receipt: Photo of receipt
+      photo_of_serial: Photo of serial number
+      photo_of_user_with_bike: You with your %{bike_type}
+      photo_stock: Stock photo
+      photo_uncategorized: Photo of your %{bike_type}
       processing: "... processing"
     show:
       are_you_sure: Are you sure?
