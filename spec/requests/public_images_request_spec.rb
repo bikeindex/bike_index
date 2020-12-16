@@ -1,0 +1,319 @@
+require "rails_helper"
+
+RSpec.describe PublicImagesController, type: :request do
+  include_context :request_spec_logged_in_as_user_if_present
+  let(:base_url) { "/public_images" }
+
+  describe "create" do
+    let(:current_user) { FactoryBot.create(:admin) }
+    context "bike" do
+      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:bike) { ownership.bike }
+      let!(:current_user) { ownership.creator }
+      context "valid owner" do
+        it "creates an image" do
+          post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+          bike.reload
+          expect(bike.public_images.first.name).to eq "cool name"
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        end
+      end
+      context "org authorized" do
+        let(:current_organization) { FactoryBot.create(:organization) }
+        let!(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: current_organization) }
+        it "creates an image" do
+          bike.reload
+          expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([current_organization.id])
+          expect(bike.authorized?(current_user)).to be_truthy
+          expect {
+            post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+          }.to change(PublicImage, :count).by 1
+          bike.reload
+          expect(bike.public_images.first.name).to eq "cool name"
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        end
+      end
+      context "no user" do
+        let(:current_user) { nil }
+        it "does not create an image" do
+          expect {
+            post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+            expect(response.code).to eq("401")
+          }.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context "blog" do
+      let(:blog) { FactoryBot.create(:blog) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
+      context "admin authorized" do
+        it "creates an image" do
+          post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
+          expect(JSON.parse(response.body)).to be_present
+          blog.reload
+          expect(blog.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            post base_url, params: {blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js}
+            public_image = PublicImage.last
+            expect(JSON.parse(response.body)).to be_present
+            blog.reload
+            expect(blog.public_images).not_to be_empty
+            expect(blog.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(blog)
+          end
+        end
+        context "blog_id not given" do
+          it "creates an image" do
+            expect {
+              post base_url, params: {blog_id: "", public_image: {name: "cool name", image: file}, format: :js}
+            }.to change(PublicImage, :count).by 1
+            expect(JSON.parse(response.body)).to be_present
+          end
+        end
+      end
+      context "not admin" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "does not create an image" do
+          expect {
+            post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
+            expect(response.code).to eq("401")
+          }.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context "organization" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+      context "admin authorized" do
+        it "creates an image" do
+          post base_url, params: {organization_id: current_organization.to_param, public_image: {name: "cool name"}, format: :js}
+          current_organization.reload
+          expect(current_organization.public_images.first.name).to eq "cool name"
+        end
+      end
+      context "not admin" do
+        let(:current_user) { FactoryBot.create(:organization_admin, organization: current_organization) }
+        it "does not create an image" do
+          expect {
+            post base_url, params: {organization_id: current_organization.to_param, public_image: {name: "cool name"}, format: :js}
+            expect(response.code).to eq("401")
+          }.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context "mail_snippet" do
+      let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
+      context "admin authorized" do
+        it "creates an image" do
+          post base_url, params: {mail_snippet_id: mail_snippet.to_param, public_image: {name: "cool name", image: file}, format: :js}
+          mail_snippet.reload
+          expect(mail_snippet.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            post base_url, params: {mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js}
+            public_image = PublicImage.last
+            expect(JSON.parse(response.body)).to be_present
+            mail_snippet.reload
+            expect(mail_snippet.public_images).not_to be_empty
+            expect(mail_snippet.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(mail_snippet)
+          end
+        end
+      end
+      context "not admin" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "does not create an image" do
+          expect {
+            post base_url, params: {organization_id: mail_snippet.to_param, public_image: {name: "cool name"}, format: :js}
+            expect(response.code).to eq("401")
+          }.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+  end
+
+  describe "destroy" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+    context "mail_snippet" do
+      it "rejects the destroy" do
+        public_image = FactoryBot.create(:public_image,
+          imageable_type: "MailSnippet",
+          imageable: mail_snippet)
+        public_image.reload
+        expect {
+          delete "#{base_url}/#{public_image.id}"
+        }.not_to change(PublicImage, :count)
+        expect(flash).to be_present
+      end
+    end
+    context "with owner" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "allows the destroy of public_image" do
+        bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
+        public_image = FactoryBot.create(:public_image, imageable: bike)
+        bike.reload
+        expect(bike.authorized?(current_user)).to be_truthy
+        expect {
+          delete "#{base_url}/#{public_image.id}"
+        }.to change(PublicImage, :count).by(-1)
+      end
+      context "non owner" do
+        it "rejects the destroy" do
+          bike = FactoryBot.create(:bike, :with_ownership)
+          public_image = FactoryBot.create(:public_image, imageable: bike)
+          expect(bike.authorized?(current_user)).to be_falsey
+          expect {
+            delete "#{base_url}/#{public_image.id}"
+          }.not_to change(PublicImage, :count)
+        end
+      end
+      context "owner and hidden bike" do
+        it "allows the destroy" do
+          bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
+          public_image = FactoryBot.create(:public_image, imageable: bike)
+          expect(bike.authorized?(current_user)).to be_truthy
+          expect {
+            delete "#{base_url}/#{public_image.id}?page=redirect_page"
+          }.to change(PublicImage, :count).by(-1)
+          expect(response).to redirect_to(edit_bike_path(bike, page: "redirect_page"))
+        end
+      end
+    end
+  end
+
+  describe "show" do
+    let(:user) { nil }
+    it "renders" do
+      image = FactoryBot.create(:public_image)
+      get "#{base_url}/#{image.id}"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("show")
+      expect(flash).to_not be_present
+    end
+  end
+
+  describe "edit" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    it "renders" do
+      bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
+      image = FactoryBot.create(:public_image, imageable: bike)
+      get "#{base_url}/#{image.id}/edit"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("edit")
+      expect(flash).to_not be_present
+    end
+    context "not owner" do
+      it "redirects" do
+        bike = FactoryBot.create(:bike, :with_ownership_claimed)
+        image = FactoryBot.create(:public_image, imageable: bike)
+        expect(image.bike?).to be_truthy
+        expect(bike.authorized?(current_user)).to be_falsey
+        get "#{base_url}/#{image.id}/edit"
+        expect(response).to redirect_to bike_path(bike)
+      end
+    end
+  end
+
+  # describe "update" do
+  #   context "normal update" do
+  #     context "with owner" do
+  #       it "updates things and go back to editing the bike" do
+  #         user = FactoryBot.create(:user_confirmed)
+  #         bike = FactoryBot.create(:bike)
+  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+  #         public_image = FactoryBot.create(:public_image, imageable: bike)
+  #         expect(bike.reload.owner).to eq(user)
+  #         set_current_user(user)
+  #         put :update, params: {id: public_image.id, public_image: {name: "Food"}}
+  #         expect(response).to redirect_to(edit_bike_url(bike))
+  #         expect(public_image.reload.name).to eq("Food")
+  #         # ensure enqueueing after this
+  #       end
+  #     end
+  #     context "not owner" do
+  #       it "does not update" do
+  #         user = FactoryBot.create(:user_confirmed)
+  #         bike = FactoryBot.create(:bike)
+  #         FactoryBot.create(:ownership, bike: bike)
+  #         public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
+  #         set_current_user(user)
+  #         put :update, params: {id: public_image.id, public_image: {name: "Food"}}
+  #         expect(public_image.reload.name).to eq("party")
+  #       end
+  #     end
+  #   end
+  # end
+
+  # describe "is_private" do
+  #   let(:user) { FactoryBot.create(:user_confirmed) }
+  #   let(:bike) { FactoryBot.create(:bike) }
+  #   context "with owner" do
+  #     context "is_private true" do
+  #       it "marks image private" do
+  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+  #         public_image = FactoryBot.create(:public_image, imageable: bike)
+  #         expect(bike.reload.owner).to eq(user)
+  #         set_current_user(user)
+  #         post :is_private, params: {id: public_image.id, is_private: "true"}
+  #         public_image.reload
+  #         expect(public_image.is_private).to be_truthy
+  #         expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+  #       end
+  #     end
+  #     context "is_private false" do
+  #       it "marks bike not private" do
+  #         FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+  #         public_image = FactoryBot.create(:public_image, imageable: bike, is_private: true)
+  #         expect(bike.reload.owner).to eq(user)
+  #         set_current_user(user)
+  #         post :is_private, params: {id: public_image.id, is_private: false}
+  #         public_image.reload
+  #         expect(public_image.is_private).to be_falsey
+  #         expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+  #       end
+  #     end
+  #   end
+  #   context "non owner" do
+  #     it "does not update" do
+  #       FactoryBot.create(:ownership, bike: bike)
+  #       public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
+  #       set_current_user(user)
+  #       post :is_private, params: {id: public_image.id, is_private: "true"}
+  #       expect(public_image.is_private).to be_falsey
+  #     end
+  #   end
+  # end
+
+  # describe "order" do
+  #   let(:bike) { FactoryBot.create(:bike) }
+  #   let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+  #   let(:user) { ownership.creator }
+  #   let(:other_ownership) { FactoryBot.create(:ownership) }
+  #   let(:public_image_1) { FactoryBot.create(:public_image, imageable: bike) }
+  #   let(:public_image_2) { FactoryBot.create(:public_image, imageable: bike, listing_order: 2) }
+  #   let(:public_image_3) { FactoryBot.create(:public_image, imageable: bike, listing_order: 3) }
+  #   let(:public_image_other) { FactoryBot.create(:public_image, imageable: other_ownership.bike, listing_order: 0) }
+
+  #   it "updates the listing order" do
+  #     expect([public_image_1, public_image_2, public_image_3, public_image_other]).to be_present
+  #     expect(public_image_other.listing_order).to eq 0
+  #     expect(public_image_3.listing_order).to eq 3
+  #     expect(public_image_2.listing_order).to eq 2
+  #     expect(public_image_1.listing_order).to be < 2
+  #     list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
+  #     set_current_user(user)
+
+  #     post :order, params: {list_of_photos: list_order.map(&:to_s)}
+
+  #     expect(public_image_3.reload.listing_order).to eq 1
+  #     expect(public_image_2.reload.listing_order).to eq 4
+  #     expect(public_image_1.reload.listing_order).to eq 2
+  #     expect(public_image_other.reload.listing_order).to eq 0
+  #     expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+  #   end
+  # end
+end

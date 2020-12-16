@@ -1776,7 +1776,7 @@ en:
       destroy:
         cannot_delete: Whoops! How'd you do that? Can't delete mail snippet images.
         image_deleted: Image was successfully deleted
-      find_image_if_owned:
+      ensure_authorized_to_update!:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.

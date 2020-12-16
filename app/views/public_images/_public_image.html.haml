@@ -8,7 +8,8 @@
           photo_of_user_with_bike: t(".photo_of_user_with_bike", bike_type: bike_type),
           photo_of_serial: t(".photo_of_serial"),
           photo_of_receipt: t(".photo_of_receipt")}
-      = select_tag(:kind, options_for_select(kind_select_options.map { |k, v| [v, k.to_s] }, selected: image.kind), class: "form-control")
+      -# Give the select tag an ID so browsers aren't sad
+      = select_tag("kind_#{image.id}", options_for_select(kind_select_options.map { |k, v| [v, k.to_s] }, selected: image.kind), class: "form-control kind_select")
 
     .processing
       = t(".processing")

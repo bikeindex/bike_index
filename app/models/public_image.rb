@@ -11,7 +11,7 @@ class PublicImage < ApplicationRecord
   belongs_to :imageable, polymorphic: true
 
   default_scope { where(is_private: false).order(:listing_order) }
-  scope :bikes, -> { where(imageable_type: "Bike") }
+  scope :bike, -> { where(imageable_type: "Bike") }
 
   before_save :set_calculated_attributes
   after_commit :enqueue_after_commit_jobs
@@ -19,7 +19,7 @@ class PublicImage < ApplicationRecord
   enum kind: KIND_ENUM
 
   def default_name
-    if imageable_type == "Bike"
+    if bike?
       self.name = "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}"
     elsif image
       self.name ||= File.basename(image.filename, ".*").titleize
@@ -33,9 +33,13 @@ class PublicImage < ApplicationRecord
     self.listing_order = imageable&.public_images&.length || 0
   end
 
+  def bike?
+    imageable_type == "Bike"
+  end
+
   # Method to make create_revised.js easier to handle
   def bike_type
-    imageable_type == "Bike" && imageable.type
+    bike? && imageable.type
   end
 
   def enqueue_after_commit_jobs
@@ -43,7 +47,7 @@ class PublicImage < ApplicationRecord
       return ExternalImageUrlStoreWorker.perform_async(id)
     end
     imageable&.update_attributes(updated_at: Time.current)
-    return true unless imageable_type == "Bike"
+    return true unless bike?
     AfterBikeSaveWorker.perform_async(imageable_id)
   end
 end
