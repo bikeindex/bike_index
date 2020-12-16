@@ -1776,7 +1776,7 @@ en:
       destroy:
         cannot_delete: Whoops! How'd you do that? Can't delete mail snippet images.
         image_deleted: Image was successfully deleted
-      find_image_if_owned:
+      ensure_authorized_to_update!:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
@@ -4828,14 +4828,13 @@ en:
         button.
       upload_photos: Upload photos
     public_image:
-      copy_and_paste: Copy the above text and paste it where you'd like it to appear
-      copy_and_paste_in_post: Copy the above text and paste it where you'd like it
-        to appear in the post
-      delete_image: Delete image
-      enter_text_here: ENTER YOUR TEXT HERE
-      processing: "... processing"
-    revised_public_image:
-      keep_image_private: keep image private
+      keep_image_private: private image
+      missing_image: image broken
+      photo_of_receipt: Photo of receipt
+      photo_of_serial: Photo of serial number
+      photo_of_user_with_bike: You with your %{bike_type}
+      photo_stock: Stock photo
+      photo_uncategorized: Photo of your %{bike_type}
       processing: "... processing"
     show:
       are_you_sure: Are you sure?

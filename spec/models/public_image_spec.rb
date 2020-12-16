@@ -8,15 +8,15 @@ RSpec.describe PublicImage, type: :model do
       allow(public_image).to receive(:name).and_return("Boop")
       public_image.default_name
       expect(public_image.name).to eq("Boop")
+      expect(public_image.bike_type).to be_blank
     end
 
     it "returns the name of the manufacturer if it isn't other" do
-      public_image = PublicImage.new
-      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo")
-      allow(public_image).to receive(:imageable_type).and_return("Bike")
-      allow(public_image).to receive(:imageable).and_return(bike)
+      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo", cycle_type: "tandem")
+      public_image = PublicImage.new(imageable: bike)
       public_image.default_name
       expect(public_image.name).to eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
+      expect(public_image.bike_type).to eq "tandem"
     end
   end
 
