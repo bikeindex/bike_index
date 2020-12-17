@@ -28,7 +28,7 @@ module Organized
       end
     end
 
-    helper_method :available_impound_records
+    helper_method :available_impound_records, :available_statuses
 
     private
 
@@ -38,6 +38,10 @@ module Organized
 
     def sortable_columns
       %w[display_id created_at updated_at user_id resolved_at location_id]
+    end
+
+    def available_statuses
+      %w[resolved all] + ImpoundRecord.statuses
     end
 
     def bike_search_params_present?
@@ -50,6 +54,12 @@ module Organized
         @search_status = "all"
         a_impound_records = impound_records
       else
+        @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
+        if ImpoundRecord.statuses.include?(@search_status)
+          a_impound_records = impound_records.where(status: @search_status)
+        else
+          a_impound_records = impound_records.send(@search_status)
+        end
         @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
         a_impound_records = impound_records.where(status: @search_status)
       end
