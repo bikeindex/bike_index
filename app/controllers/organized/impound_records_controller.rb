@@ -41,7 +41,7 @@ module Organized
     end
 
     def available_statuses
-      %w[resolved all] + ImpoundRecord.statuses
+      %w[current resolved all] + (ImpoundRecord.statuses - ["current"]) # current ordered the way we want to display
     end
 
     def bike_search_params_present?
@@ -60,8 +60,6 @@ module Organized
         else
           a_impound_records = impound_records.send(@search_status)
         end
-        @search_status = ImpoundRecord.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
-        a_impound_records = impound_records.where(status: @search_status)
       end
 
       if bike_search_params_present?
