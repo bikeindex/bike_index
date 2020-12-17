@@ -11,9 +11,13 @@ class Admin::ImpoundRecordsController < Admin::BaseController
       .page(page).per(per_page)
   end
 
-  helper_method :matching_impound_records
+  helper_method :matching_impound_records, :available_statuses
 
   protected
+
+  def available_statuses
+    %w[all current resolved] + (ImpoundRecord.statuses - ["current"]) # current ordered the way we want to display
+  end
 
   def sortable_columns
     %w[created_at organization_id location_id updated_at status user_id resolved_at]
@@ -24,16 +28,20 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   end
 
   def matching_impound_records
-    return @matching_impound_records if defined?(@matching_impound_records)
     impound_records = ImpoundRecord
-    impound_records.resolved if sort_column == "resolved_at"
-    if ImpoundRecord.statuses.include?(params[:search_status])
-      @search_status = params[:search_status]
-      impound_records = impound_records.where(status: @search_status)
-    else
+
+    if params[:search_status] == "all"
       @search_status = "all"
+    else
+      @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
+      if ImpoundRecord.statuses.include?(@search_status)
+        impound_records = impound_records.where(status: @search_status)
+      else
+        impound_records = impound_records.send(@search_status)
+      end
     end
+
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
-    @matching_impound_records = impound_records.where(created_at: @time_range)
+    impound_records.where(created_at: @time_range)
   end
 end

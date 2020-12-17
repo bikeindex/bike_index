@@ -1,7 +1,7 @@
 -# TODO: add translations
 
 .organized-page-header
-  %h1
+  %h1.uncap
     Impound Records
 
 - if @render_chart
@@ -47,19 +47,32 @@
   .col-sm-6.offset-lg-3.col-lg-3
     .dropdown
       %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-        = ImpoundRecord.statuses_humanized[@search_status.to_sym] || "All statuses"
+        - if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status)
+          = ImpoundRecord.statuses_humanized[@search_status.to_sym]
+        - elsif @search_status == "all"
+          All statuses
+        - else
+          #{@search_status.titleize} records
+
       .dropdown-menu
-        - (ImpoundRecord.statuses + ["all"]).each do |kind|
-          - if kind == "all" # Add a divider before all
+        - available_statuses.each do |status|
+          - if status != "current" && ImpoundRecord.statuses.include?(status)
+            - display_status = ImpoundRecord.statuses_humanized[status.to_sym]
+          - elsif status == "all"
+            - display_status = "All statuses"
+          - else
+            - display_status = "#{status.titleize} records"
+          - status_active = @search_status == status
+          - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
+          = link_to display_status, organization_impound_records_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}"
+
+          - if status == "all" # Add a divider before all
             .dropdown-divider
-          - kind_active = @search_status == kind
-          - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (kind_active ? nil : kind))
-          - display_status = ImpoundRecord.statuses_humanized[kind.to_sym] || "All statuses"
-          = link_to display_status, organization_impound_records_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
 
 .full-screen-table
   - skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)
-  = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: @search_status != "all" }
+  - render_status = %w[all resolved].include?(@search_status)
+  = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status }
 
 .paginate-container.paginate-container-bottom
   = paginate @impound_records
