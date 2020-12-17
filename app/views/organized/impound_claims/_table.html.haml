@@ -1,0 +1,73 @@
+- impound_claims ||= @impound_claims
+- skip_impound_record ||= false
+- skip_bike ||= false
+- render_sortable ||= false
+- render_resolved_at ||= false
+- skip_status ||= false
+
+- # TODO: add translations
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    - unless skip_impound_record
+      %th
+        - if render_sortable
+          = sortable "impound_record_id", "Impound Record"
+        - else
+          Impound Record
+    %th
+      - if render_sortable
+        = sortable "created_at"
+      - else
+        Created
+    %th
+      - if render_sortable
+        = sortable "updated_at"
+      - else
+        Updated
+    - unless skip_bike
+      %th Bike
+    - unless skip_status
+      %th
+        Status
+    %th
+      - if render_sortable
+        = sortable "user_id", "last updator"
+      - else
+        last updator
+
+    - if render_resolved_at
+      %th
+        - if render_sortable
+          = sortable "resolved_at"
+        - else
+          Resolved
+  %tbody
+    - impound_claims.each do |impound_claim|
+      - impound_record = impound_claim.impound_record
+      %tr
+        - unless skip_impound_record
+          %td
+            - if impound_claim.impound_record.present?
+              = link_to impound_claim.impound_record.display_id, organization_impound_claim_path(impound_claim.impound_record.display_id, organization_id: impound_claim.organization_id)
+        %td
+          %a.convertTime.preciseTime{ href: organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) }
+            = l(impound_claim.created_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(impound_claim.updated_at, format: :convert_time)
+        - unless skip_bike
+          %td
+            - if impound_claim.bike.present?
+              = link_to organized_bike_text(impound_claim.bike), bike_path(impound_claim.bike, organization_id: current_organization.id)
+        - unless skip_status
+          %td
+            %em
+              = status_display(impound_claim.status)
+        %td
+          = impound_claim.user&.display_name&.truncate(20)
+        - if render_resolved_at
+          %td
+            - if impound_claim.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_claim.resolved_at, format: :convert_time)
