@@ -6,7 +6,6 @@ class ImpoundRecord < ApplicationRecord
 
   has_one :parking_notification
   has_many :impound_record_updates
-  has_many :impound_claims
 
   validates_presence_of :bike_id, :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
