@@ -1,7 +1,4 @@
 class ImpoundRecord < ApplicationRecord
-  # These statuses overlap with impound_record_updates
-  STATUS_ENUM = {current: 0, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred_to_new_owner: 4}.freeze
-
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
@@ -16,7 +13,7 @@ class ImpoundRecord < ApplicationRecord
   before_save :set_calculated_attributes
   after_commit :update_associations
 
-  enum status: STATUS_ENUM
+  enum status: ImpoundRecordUpdate::KIND_ENUM
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -24,7 +21,7 @@ class ImpoundRecord < ApplicationRecord
   attr_accessor :skip_update
 
   def self.statuses
-    STATUS_ENUM.keys.map(&:to_s)
+    ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
   end
 
   def self.active_statuses
@@ -43,9 +40,24 @@ class ImpoundRecord < ApplicationRecord
     ImpoundRecordUpdate.kinds_humanized_short
   end
 
+  # Using method here to make it easier to update/translate the specific word later
+  def self.impounded_kind
+    "impounded"
+  end
+
+  # Using method here to make it easier to update/translate the specific word later
+  def self.found_kind
+    "found"
+  end
+
   def self.bikes
     Bike.unscoped.includes(:impound_records)
       .where(impound_records: {id: pluck(:id)})
+  end
+
+  # Non-organizations don't "impound" bikes, they "find" them
+  def kind
+    organization.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
   # Get it unscoped, because unregistered_bike notifications
@@ -55,6 +67,11 @@ class ImpoundRecord < ApplicationRecord
 
   def creator
     parking_notification&.user
+  end
+
+  # When there are non-organized impounds, extra logic will be necessary here
+  def creator_public_display_name
+    organization.name
   end
 
   def active?
