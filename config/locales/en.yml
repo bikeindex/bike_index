@@ -1713,11 +1713,13 @@ en:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
             %{org_name}.
           deleted_org: Deleted %{org_name}.
+        impounding:
+          can_not_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
-        impounding:
-          can_not_access: Your organization doesn't have access to that, please contact Bike Index support.
       messages:
         create:
           message_sent: "%{message_kind} message sent"
@@ -3761,6 +3763,7 @@ en:
       graduated_notifications: Graduated notifications
       help: Help
       impounded_bikes: Impounded Bikes
+      impounded_claims: Impounded claims
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       log_in: log in
@@ -4499,6 +4502,9 @@ en:
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email
     manages:
+      impounding:
+        impound_settings_html: "<em>%{org_name}</em> impound settings"
+        save: Save
       location_fields:
         address: Address
         choose_country: Choose country
@@ -4516,9 +4522,6 @@ en:
         display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
         location_settings_html: "<em>%{org_name}</em> location settings"
         save: Save
-      impounding:
-        impound_settings_html: "<em>%{org_name}</em> impound settings"
-        save: Save
       show:
         abbreviation: Abbreviation
         choose_file: Choose file...
@@ -4532,10 +4535,10 @@ en:
         organization_logo: Organization logo
         organization_type: Organization type
         registration_email: Registration email
-        square_image: Use a square image for best results
         removal_confirmation: Are you positive you want to remove %{org_name} from
           Bike Index?
         select_email: Select email
+        square_image: Use a square image for best results
         update: Update
     parking_notifications:
       index:
@@ -5163,6 +5166,7 @@ en:
       graduated_notifications: Graduated notifications
       how_integration_works: how the integration works
       impounded_bikes: Impounded
+      impounded_claims: Impounded claims
       incomplete_registrations: Incomplete registrations
       integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
       integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed

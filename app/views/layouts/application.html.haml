@@ -105,6 +105,9 @@
                   - additional_divider = true
                   %li
                     = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.public_impound_bikes?
+                  %li
+                    = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passive_organization.to_param), class: "nav-link"
                 - if current_user.admin_of?(passive_organization) || current_user.superuser?
                   - if additional_divider
                     %li.divider-nav-item

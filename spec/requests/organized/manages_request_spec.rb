@@ -82,6 +82,7 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "with impound_bike" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
         it "renders" do
+          expect(current_organization.public_impound_bikes?).to be_falsey
           get "#{base_url}/impounding"
           expect(response.status).to eq(200)
           expect(response).to render_template :impounding
@@ -143,6 +144,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id, :kind]).each do |key|
             expect(current_organization.send(key)).to eq(update_attributes[key])
           end
+          expect(current_organization.public_impound_bikes?).to be_falsey
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user_2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")

@@ -9,6 +9,7 @@ class CreateImpoundClaims < ActiveRecord::Migration[5.2]
 
       t.integer :status
       t.datetime :submitted_at
+      t.datetime :resolved_at
 
       t.timestamps
     end

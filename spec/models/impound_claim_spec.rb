@@ -8,12 +8,26 @@ RSpec.describe ImpoundClaim, type: :model do
       expect(impound_claim.bike_claimed).to be_present
     end
     context "with_stolen_record" do
-      let(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, organization: organization) }
       it "is valid" do
         expect(impound_claim).to be_valid
         expect(impound_claim.bike_claimed).to be_present
         expect(impound_claim.bike_submitting.user).to eq impound_claim.user
         expect(impound_claim.stolen_record.user).to eq impound_claim.user
+        expect(impound_claim.impound_record.organization&.id).to eq organization.id
+        expect(organization.public_impound_bikes?).to be_falsey # There can be claims on records, even if organization isn't enabled
+      end
+    end
+    describe "impound_claim_retrieved" do
+      let(:impound_claim) { FactoryBot.create(:impound_claim_retrieved) }
+      it "is valid" do
+        impound_claim.reload
+        expect(impound_claim.status).to eq "retrieved"
+        expect(impound_claim.impound_record.status).to eq "retrieved_by_owner"
+        expect(impound_claim.send(:calculated_status)).to eq "retrieved"
+        expect(impound_claim.resolved?).to be_truthy
+        expect(impound_claim.resolved_at).to be_within(1).of Time.current
       end
     end
   end

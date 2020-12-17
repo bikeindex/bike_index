@@ -2,16 +2,17 @@
 # t.references :stolen_record, index: true
 # t.references :user, index: true
 # t.text :message
-# t.json :data
 # t.integer :status
 # t.datetime :submitted_at
+
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
     submitting: 1,
     approved: 2,
     rejected: 3,
-    canceled: 4
+    canceled: 4,
+    retrieved: 5 # After submitted, updated by impound_record_updates
   }.freeze
 
   belongs_to :impound_record
@@ -28,6 +29,28 @@ class ImpoundClaim < ApplicationRecord
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
+  scope :active, -> { where(status: active_statuses) }
+  scope :resolved, -> { where(status: inactive_statuses) }
+
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
+
+  def self.resolved_statuses
+    %w[rejected canceled retrieved]
+  end
+
+  def self.active_statuses
+    statuses - inactive_statuses - ["pending"]
+  end
+
+  def resolved?
+    self.class.resolved_statuses.include?(status)
+  end
+
+  def active?
+    self.class.active_statuses.include?(status)
+  end
 
   def bike_claimed
     impound_record&.bike
@@ -54,12 +77,14 @@ class ImpoundClaim < ApplicationRecord
   def set_calculated_attributes
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"
+    self.resolved_at ||= Time.current if resolved?
   end
 
   private
 
   def calculated_status
     status
-    # impound_record_updates - can influence this
+    # impound_record_updates - maybe can influence this
+    # but - impound_record&.retrieved_by_owner? doesn't solve this because we don't know if this was the owner who retrieved
   end
 end

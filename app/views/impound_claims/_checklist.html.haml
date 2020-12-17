@@ -2,6 +2,9 @@
 - render_optional ||= false
 -# Maybe there is a way to calculate this dynamically, skipping for now
 - current_path ||= "/bikes/#{impound_claim.bike_claimed}"
+
+- # TODO: add translations
+
 .stolen-checklist-wrap.mt-2
   %ul.stolen-checklist
     - verified_phone_number = current_user.user_phones.confirmed.any?

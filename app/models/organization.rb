@@ -45,6 +45,7 @@ class Organization < ApplicationRecord
   has_many :mail_snippets
   has_many :parking_notifications
   has_many :impound_records
+  has_many :impound_claims
   has_many :b_params
   has_many :invoices
   has_many :payments
@@ -202,6 +203,10 @@ class Organization < ApplicationRecord
 
   def show_multi_serial?
     enabled?("show_multi_serial") || %w[law_enforcement].include?(kind)
+  end
+
+  def public_impound_bikes?
+    enabled?("impound_bikes") && public_impound_bikes
   end
 
   def broken_pos?
