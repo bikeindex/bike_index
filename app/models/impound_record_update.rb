@@ -1,6 +1,13 @@
 class ImpoundRecordUpdate < ApplicationRecord
-  # These statuses overlap with impound_records! The resolved statuses need to match up
-  KIND_ENUM = {current: 0, note: 5, move_location: 1, retrieved_by_owner: 2, removed_from_bike_index: 3, transferred_to_new_owner: 4}.freeze
+  # These statuses are used by impound_records!
+  KIND_ENUM = {
+    current: 0,
+    move_location: 1,
+    retrieved_by_owner: 2,
+    removed_from_bike_index: 3,
+    transferred_to_new_owner: 4,
+    note: 5
+  }.freeze
 
   belongs_to :impound_record
   belongs_to :user
