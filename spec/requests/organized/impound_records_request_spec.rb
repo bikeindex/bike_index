@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Organized::ParkingNotificationsController, type: :request do
+RSpec.describe Organized::ImpoundRecordsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/impound_records" }
   include_context :request_spec_logged_in_as_organization_member
 

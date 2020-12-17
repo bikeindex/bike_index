@@ -1,5 +1,5 @@
 .mb-4
-  %h1= t(".location_settings_html", org_name: @organization.name)
+  %h1.uncap= t(".location_settings_html", org_name: @organization.name)
 
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   = hidden_field_tag :locations_page, true

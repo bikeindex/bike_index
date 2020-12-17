@@ -10,6 +10,13 @@ module Organized
     def locations
     end
 
+    def impounding
+      unless @organization.enabled?("impound_bikes")
+        flash[:error] = translation(:can_not_access, org_name: current_organization.name)
+        redirect_to(current_root_path) && return
+      end
+    end
+
     def update
       if @organization.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)

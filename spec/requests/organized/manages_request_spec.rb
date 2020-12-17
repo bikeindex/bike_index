@@ -74,6 +74,22 @@ RSpec.describe Organized::ManagesController, type: :request do
       end
     end
 
+    describe "impounding" do
+      it "redirects" do
+        get "#{base_url}/impounding"
+        expect(response).to redirect_to(organization_manage_path)
+      end
+      context "with impound_bike" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+        it "renders" do
+          get "#{base_url}/impounding"
+          expect(response.status).to eq(200)
+          expect(response).to render_template :impounding
+          expect(assigns(:current_organization)).to eq current_organization
+        end
+      end
+    end
+
     describe "update" do
       context "dissallowed attributes" do
         let(:org_attributes) do

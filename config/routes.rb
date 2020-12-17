@@ -336,6 +336,7 @@ Rails.application.routes.draw do
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
     resources :impound_records, only: %i[index show update]
+    resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
     resources :lines, only: %i[index show update]
     resources :appointments, only: %i[create update]
@@ -352,6 +353,7 @@ Rails.application.routes.draw do
     resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
+        get :impounding
       end
     end
     resources :appointment_configurations, only: %i[index edit update]
