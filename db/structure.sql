@@ -1353,6 +1353,7 @@ ALTER SEQUENCE public.hot_sheets_id_seq OWNED BY public.hot_sheets.id;
 CREATE TABLE public.impound_claims (
     id bigint NOT NULL,
     impound_record_id bigint,
+    organization_id bigint,
     stolen_record_id bigint,
     user_id bigint,
     message text,
@@ -4495,6 +4496,13 @@ CREATE INDEX index_hot_sheets_on_organization_id ON public.hot_sheets USING btre
 --
 
 CREATE INDEX index_impound_claims_on_impound_record_id ON public.impound_claims USING btree (impound_record_id);
+
+
+--
+-- Name: index_impound_claims_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_organization_id ON public.impound_claims USING btree (organization_id);
 
 
 --

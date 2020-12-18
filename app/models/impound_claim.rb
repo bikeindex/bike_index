@@ -18,6 +18,7 @@ class ImpoundClaim < ApplicationRecord
   belongs_to :impound_record
   belongs_to :stolen_record
   belongs_to :user
+  belongs_to :organization
 
   has_many :public_images, as: :imageable, dependent: :destroy
 
@@ -30,7 +31,7 @@ class ImpoundClaim < ApplicationRecord
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
   scope :active, -> { where(status: active_statuses) }
-  scope :resolved, -> { where(status: inactive_statuses) }
+  scope :resolved, -> { where(status: resolved_statuses) }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
@@ -41,7 +42,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def self.active_statuses
-    statuses - inactive_statuses - ["pending"]
+    statuses - resolved_statuses - ["pending"]
   end
 
   def resolved?
@@ -78,6 +79,7 @@ class ImpoundClaim < ApplicationRecord
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"
     self.resolved_at ||= Time.current if resolved?
+    self.organization_id ||= impound_record&.organization_id
   end
 
   private

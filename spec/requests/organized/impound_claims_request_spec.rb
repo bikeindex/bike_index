@@ -23,7 +23,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
       let!(:impound_claim2) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike2) }
       let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, organization: current_organization, status: "approved") }
-      let!(:impound_claim_retrieved) { FactoryBot.create(:impound_claim_retrieved, organization: current_organization) }
+      let!(:impound_claim_resolved) { FactoryBot.create(:impound_claim_resolved, organization: current_organization) }
       let!(:impound_claim_unorganized) { FactoryBot.create(:impound_claim) }
       it "finds by bike searches and also by impound scoping" do
         impound_claim.reload
@@ -45,7 +45,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         get "#{base_url}?search_email=someemail%40things&search_status=all"
         expect(response.status).to eq(200)
         expect(assigns(:search_status)).to eq "all"
-        expect(assigns(:impound_claims).pluck(:id)).to match_array([impound_claim.id, impound_claim_retrieved.id])
+        expect(assigns(:impound_claims).pluck(:id)).to match_array([impound_claim.id, impound_claim_resolved.id])
 
         get "#{base_url}?search_impound_record_id=#{impound_record.display_id}"
         expect(response.status).to eq(200)

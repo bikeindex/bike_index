@@ -53,7 +53,7 @@ module Organized
         a_impound_claims = a_impound_claims.where(impound_record_id: params[:search_impound_record_id])
       end
 
-      @available_impound_claims = a_impound_claims.where(created_at: @time_range)
+      a_impound_claims.where(created_at: @time_range)
     end
 
     def find_impound_claim

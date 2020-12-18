@@ -23,16 +23,18 @@ class StolenRecord < ApplicationRecord
   end
 
   belongs_to :bike
-  has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
-  has_one :recovery_display
   belongs_to :country
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
+
+  has_many :impound_claims
   has_many :theft_alerts
   has_one :alert_image
+  has_one :recovery_display
+  has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
-  validates_presence_of :bike
+  validates_presence_of :bike_id
   validates_presence_of :date_stolen
 
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM

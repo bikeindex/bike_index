@@ -254,7 +254,7 @@
           - else
             = t(".share_it")
         = render 'shared/share_this'
-      - if @bike.display_contact_owner?(current_user)
+      - if BikeDisplayer.display_contact_owner?(@bike, current_user)
         .contact-the-owner
           %p.preface
             %em
@@ -285,7 +285,8 @@
               %strong
                 = t(".owners_phone_number")
               = phone_link(@stolen_record.phone)
-      - if @bike.display_create_impounded_claim?(current_user) && !@contact_owner_open
+
+      - if @bike.owner != current_user && BikeDisplayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
         - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
 
         .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }

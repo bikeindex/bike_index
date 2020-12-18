@@ -759,49 +759,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "display_contact_owner?" do
-    let(:bike) { Bike.new }
-    let(:admin) { User.new(superuser: true) }
-    let(:owner) { User.new }
-    before { allow(bike).to receive(:owner) { owner } }
-    it "is falsey if bike doesn't have stolen record" do
-      expect(bike.contact_owner?).to be_falsey
-      expect(bike.contact_owner?(User.new)).to be_falsey
-      expect(bike.contact_owner?(admin)).to be_truthy
-      expect(bike.display_contact_owner?).to be_falsey
-    end
-    context "stolen bike" do
-      let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
-      it "is truthy" do
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(User.new)).to be_truthy
-        expect(bike.display_contact_owner?).to be_truthy
-        expect(bike.display_contact_owner?(admin)).to be_truthy
-        expect(bike.display_contact_owner?(owner)).to be_truthy
-      end
-    end
-  end
-
-  describe "display_create_impounded_claim?" do
-    let(:bike) { Bike.new }
-    let(:admin) { User.new(superuser: true) }
-    let(:owner) { User.new }
-    before { allow(bike).to receive(:owner) { owner } }
-    it "is falsey if bike doesn't have impounded" do
-      expect(bike.display_create_impounded_claim?).to be_falsey
-    end
-    context "impound bike" do
-      let(:impound_record) { ImpoundRecord.new(bike: bike) }
-      before { allow(bike).to receive(:current_impound_record) { impound_record } }
-      it "is truthy" do
-        expect(bike.display_create_impounded_claim?).to be_truthy
-        expect(bike.display_create_impounded_claim?(User.new)).to be_truthy
-        expect(bike.display_create_impounded_claim?(admin)).to be_truthy
-        expect(bike.display_create_impounded_claim?(owner)).to be_truthy
-      end
-    end
-  end
-
   describe "contact_owner_user?" do
     let(:owner_email) { "party@party.com" }
     let(:creator) { FactoryBot.create(:user, email: "notparty@party.com") }
@@ -841,19 +798,19 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(user)).to be_falsey
         expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(bike.display_contact_owner?(user)).to be_falsey
+        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
         # Add user to the unstolen org
         FactoryBot.create(:membership, user: user, organization: organization_unstolen)
         user.reload
         expect(bike.contact_owner?(user)).to be_truthy
         expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
-        expect(bike.display_contact_owner?(user)).to be_falsey
+        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
         # But still false if passing old organization
         expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(bike.display_contact_owner?(user)).to be_falsey
+        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
         # Passing the organization doesn't permit the user to do something unpermitted
         expect(bike.contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
-        expect(bike.display_contact_owner?(user_unorganized)).to be_falsey
+        expect(BikeDisplayer.display_contact_owner?(bike, user_unorganized)).to be_falsey
         # And if the owner has set notification_unstolen to false, block organization access
         owner.notification_unstolen = false
         expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
@@ -866,7 +823,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(User.new)).to be_falsey
         expect(bike.contact_owner?(admin)).to be_falsey
-        expect(bike.display_contact_owner?(admin)).to be_falsey
+        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be_falsey
       end
     end
   end

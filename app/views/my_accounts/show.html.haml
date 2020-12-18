@@ -50,11 +50,15 @@
                         = bike.attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
-                      %li
-                        -# Hide printable PDF because it isn't working right now :(
-                        -# - if bike.stolen
-                        -#   = link_to t(".printable_pdf"), pdf_bike_path(bike)
-                        - unless bike.stolen
+                      - if bike.stolen
+                        -# %li
+                        -#   # Hide printable PDF because it isn't working right now :(
+                        -#     = link_to t(".printable_pdf"), pdf_bike_path(bike)
+                        - if @bike.impound_claims_submitting.any?
+                          %li
+                            You have submitted an impound claim with this bike!
+                      - else
+                        %li
                           = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 
             .paginate-container.paginate-container-bottom

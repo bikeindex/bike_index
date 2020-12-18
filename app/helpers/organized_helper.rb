@@ -51,7 +51,8 @@ module OrganizedHelper
   end
 
   def organized_container
-    return "container-fluid" if %w[parking_notifications impound_records graduated_notifications lines].include?(controller_name)
+    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines]
+    return "container-fluid" if fluid.include?(controller_name)
     controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
   end
 

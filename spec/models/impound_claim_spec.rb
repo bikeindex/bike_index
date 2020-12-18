@@ -19,8 +19,8 @@ RSpec.describe ImpoundClaim, type: :model do
         expect(organization.public_impound_bikes?).to be_falsey # There can be claims on records, even if organization isn't enabled
       end
     end
-    describe "impound_claim_retrieved" do
-      let(:impound_claim) { FactoryBot.create(:impound_claim_retrieved) }
+    describe "impound_claim_resolved" do
+      let(:impound_claim) { FactoryBot.create(:impound_claim_resolved) }
       it "is valid" do
         impound_claim.reload
         expect(impound_claim.status).to eq "retrieved"
@@ -40,6 +40,7 @@ RSpec.describe ImpoundClaim, type: :model do
     it "returns private and non-private" do
       bike.reload
       expect(bike.public_images.pluck(:id)).to eq([public_image.id])
+      expect(bike.impound_claims_submitting.pluck(:id)).to eq([impound_claim.id])
       impound_claim.reload
       expect(impound_claim.bike_submitting&.id).to eq bike.id
       expect(impound_claim.bike_submitting_images.pluck(:id)).to eq([public_image_private.id, public_image.id])
