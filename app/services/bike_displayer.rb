@@ -10,8 +10,8 @@ class BikeDisplayer
     def display_impound_claim?(bike, user = nil)
       return true if bike.current_impound_record.present?
       return false if user.blank?
-      bike.impound_claims_submitting.where(user_id: user.id).any? ||
-        bike.impound_claims_claimed.where(user_id: user.id).any?
+      bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
+        bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
   end
 end

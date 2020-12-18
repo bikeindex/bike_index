@@ -10,7 +10,7 @@ module Organized
 
       @impound_claims = available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")
         .page(@page).per(@per_page)
-        .includes(:user, :bike, :location)
+        .includes(:user, :stolen_record, :impound_record)
     end
 
     def show
@@ -25,7 +25,8 @@ module Organized
     private
 
     def impound_claims
-      current_organization.impound_claims
+      # We never want to display pending claims to the organization
+      current_organization.impound_claims.where.not(status: "pending")
     end
 
     def sortable_columns
@@ -50,7 +51,8 @@ module Organized
       end
 
       if params[:search_impound_record_id].present?
-        a_impound_claims = a_impound_claims.where(impound_record_id: params[:search_impound_record_id])
+        @impound_record = current_organization.impound_records.find_by_id(params[:search_impound_record_id])
+        a_impound_claims = a_impound_claims.where(impound_record_id: @impound_record&.id)
       end
 
       a_impound_claims.where(created_at: @time_range)

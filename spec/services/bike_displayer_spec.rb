@@ -58,13 +58,13 @@ RSpec.describe BikeDisplayer do
           expect(BikeDisplayer.display_impound_claim?(bike)).to be_falsey
           expect(BikeDisplayer.display_impound_claim?(bike, User.new)).to be_falsey
           expect(BikeDisplayer.display_impound_claim?(bike, admin)).to be_falsey
-          expect(BikeDisplayer.display_impound_claim?(bike, owner)).to be_truthy
+          expect(BikeDisplayer.display_impound_claim?(bike, owner)).to be_falsey
 
           expect(impound_claim.bike_submitting.id).to eq bike_claimed.id
           expect(BikeDisplayer.display_impound_claim?(bike_claimed)).to be_falsey
           expect(BikeDisplayer.display_impound_claim?(bike_claimed, User.new)).to be_falsey
           expect(BikeDisplayer.display_impound_claim?(bike_claimed, admin)).to be_falsey
-          expect(BikeDisplayer.display_impound_claim?(bike_claimed, owner)).to be_truthy
+          expect(BikeDisplayer.display_impound_claim?(bike_claimed, owner)).to be_falsey
         end
       end
     end

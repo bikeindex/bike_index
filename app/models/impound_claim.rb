@@ -42,7 +42,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def self.active_statuses
-    statuses - resolved_statuses - ["pending"]
+    statuses - resolved_statuses
   end
 
   def resolved?
@@ -59,6 +59,11 @@ class ImpoundClaim < ApplicationRecord
 
   def bike_submitting
     stolen_record&.bike
+  end
+
+  def status_humanized
+    # It doesn't make sense to display "submitting"
+    submitting? ? "submitted" : status.gsub("_", " ")
   end
 
   # return private images too

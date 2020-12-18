@@ -9,12 +9,19 @@
     Render chart
 = render partial: "/shared/period_select"
 
-.row.mt-4.mb-4
-  .col-sm-6
+.row.mb-4
+  .col-md-7.col-lg-9.mt-4
     = pluralize(number_with_delimiter(@impound_claims.total_count), "matching impound claims")
     %em
       = humanized_time_range(@time_range)
-  .col-sm-6.offset-lg-3.col-lg-3
+    - if @impound_record.present?
+      for
+      %strong
+        = link_to "Impound Record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+      %em.small.less-strong
+        view for
+        = link_to "all impound records", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: nil))
+  .col-md-5.col-lg-3.mt-4.text-right
     .dropdown
       %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
         #{@search_status.titleize} Claims
@@ -31,7 +38,7 @@
 .full-screen-table
   - skip_resolved = (ImpoundClaim.active_statuses + ["active"]).include?(@search_status)
   - render_status = !ImpoundClaim.statuses.include?(@search_status) # Don't render status if we're looking at a single status
-  = render partial: "/organized/impound_claims/table", locals: { impound_claims: @impound_claims, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status }
+  = render partial: "/organized/impound_claims/table", locals: { impound_claims: @impound_claims, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, skip_impound_record: @impound_record.present? }
 
 .paginate-container.paginate-container-bottom
   = paginate @impound_claims

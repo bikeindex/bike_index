@@ -54,9 +54,13 @@
                         -# %li
                         -#   # Hide printable PDF because it isn't working right now :(
                         -#     = link_to t(".printable_pdf"), pdf_bike_path(bike)
-                        - if @bike.impound_claims_submitting.any?
+                        - if bike.impound_claims_submitting.active.any?
+                          - impound_claim = bike.impound_claims_submitting.active.last
                           %li
-                            You have submitted an impound claim with this bike!
+                            %span.text-warning
+                              %em= impound_claim.status_humanized.titleize
+                              claim to
+                            = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type}", bike_path(impound_claim.bike_claimed)
                       - else
                         %li
                           = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"

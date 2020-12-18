@@ -1,6 +1,8 @@
 FactoryBot.define do
   factory :impound_claim do
-    organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+    transient do
+      organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+    end
     impound_record { FactoryBot.create(:impound_record, organization: organization) }
     user { FactoryBot.create(:user) }
     status { "pending" }
