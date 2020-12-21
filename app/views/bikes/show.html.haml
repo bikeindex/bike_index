@@ -190,7 +190,7 @@
             = t(".theft_details", bike_abandoned: @bike.abandoned ? 'Abandoned' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
-              = render 'stolen_map'
+              = render partial: "stolen_map"
             .col-md-4
               %ul.attr-list.separate-lines
                 = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))

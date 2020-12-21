@@ -566,6 +566,23 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "latitude_public" do
+    let(:latitude) { -122.2824933 }
+    let(:longitude) { 37.837112 }
+    let(:stolen_record) { StolenRecord.new(latitude: latitude, longitude: longitude, show_address: true) }
+    it "is the same as latitude" do
+      expect(stolen_record.latitude_public).to eq latitude
+      expect(stolen_record.longitude_public).to eq longitude
+    end
+    context "show_address false" do
+      it "is rounded" do
+        stolen_record.show_address = false
+        expect(stolen_record.latitude_public).to eq(-122.282)
+        expect(stolen_record.longitude_public).to eq longitude.round(3)
+      end
+    end
+  end
+
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
