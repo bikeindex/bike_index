@@ -1,3 +1,4 @@
+<% stolen_record = @bike.current_stolen_record %>
 <div class="map-holder col-md-8">
   <div id="map_canvas"></div>
 </div>
@@ -7,7 +8,7 @@
 
 <script>
   mapboxgl.accessToken = "<%= ENV['MAPBOX_MAPPING'] %>";
-  var stolenBikeLngLat = [<%= @bike.current_stolen_record.longitude_public %>, <%= @bike.current_stolen_record.latitude_public %>];
+  var stolenBikeLngLat = [<%= stolen_record.longitude_public %>, <%= stolen_record.latitude_public %>];
 
   var map = new mapboxgl.Map({
     container: "map_canvas",
@@ -42,7 +43,7 @@
             [5, 5],
             [16, 240]
           ],
-          base: 2
+          base: <%= stolen_record.show_address ? 2 : 1.15 %>
         },
         "circle-color": "red",
         "circle-opacity": 0.4

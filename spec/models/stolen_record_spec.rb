@@ -577,8 +577,8 @@ RSpec.describe StolenRecord, type: :model do
     context "show_address false" do
       it "is rounded" do
         stolen_record.show_address = false
-        expect(stolen_record.latitude_public).to eq(-122.282)
-        expect(stolen_record.longitude_public).to eq longitude.round(3)
+        expect(stolen_record.latitude_public).to eq(-122.28)
+        expect(stolen_record.longitude_public).to eq longitude.round(2)
       end
     end
   end

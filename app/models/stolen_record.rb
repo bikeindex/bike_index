@@ -133,11 +133,11 @@ class StolenRecord < ApplicationRecord
   end
 
   def latitude_public
-    show_address ? latitude : latitude.round(3)
+    show_address ? latitude : latitude.round(2)
   end
 
   def longitude_public
-    show_address ? longitude : longitude.round(3)
+    show_address ? longitude : longitude.round(2)
   end
 
   LOCKING_DESCRIPTIONS = [
