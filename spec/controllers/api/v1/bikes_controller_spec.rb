@@ -10,12 +10,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
     context "stolen bike" do
       let!(:bike) { FactoryBot.create(:bike, :with_stolen_record) }
       it "returns with public latitude" do
+        bike.reload
         expect(bike.fetch_current_stolen_record.latitude_public).to eq(40.71)
         get :index, params: {format: :json}
         expect(json_result["bikes"].count).to eq 1
-        stolen_response = json_result["bikes"].first
-        expect(stolen_response["stolen_record"]["latitude"]).to eq 40.71
-        expect(stolen_response["stolen_record"]["longitude"]).to eq bike.current_stolen_record.longitude_public
+        pp json_result["bikes"]
+        bike_response = json_result["bikes"].first
+        expect(bike_response["stolen_record"]["latitude"]).to eq 40.71
+        expect(bike_response["stolen_record"]["longitude"]).to eq bike.current_stolen_record.longitude_public
       end
     end
   end
