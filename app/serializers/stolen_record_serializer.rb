@@ -12,6 +12,14 @@ class StolenRecordSerializer < ApplicationSerializer
     :create_open311,
     :id
 
+  def latitude
+    object.latitude_public
+  end
+
+  def longitude
+    object.longitude_public
+  end
+
   def location
     a = [object.city]
     a << object.state.abbreviation if object.state.present?
