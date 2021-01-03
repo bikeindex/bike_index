@@ -15,13 +15,6 @@ class ApplicationDecorator < Draper::Decorator
     [assoc.name, extra].reject(&:blank?).join(" ")
   end
 
-  def attr_list_item(desc, title, with_colon: false)
-    return nil unless desc.present?
-    title = "#{title}:" if with_colon
-    html = h.content_tag(:span, title, class: "attr-title")
-    h.content_tag(:li, html + desc)
-  end
-
   def dl_list_item(dd, dt)
     return nil unless dd.present?
     html = h.content_tag(:dt, dt)

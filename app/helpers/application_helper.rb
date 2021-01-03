@@ -13,6 +13,15 @@ module ApplicationHelper
     "&#x274C;".html_safe
   end
 
+  def attr_list_item(desc, title, with_colon: false)
+    return nil unless desc.present?
+    title = "#{title}:" if with_colon
+    content_tag(:li) do
+      content_tag(:strong, "#{title} ", class: "attr-title") +
+      content_tag(:span, desc)
+    end
+  end
+
   def active_link(link_text, link_path, html_options = {})
     match_controller = html_options.delete(:match_controller)
     html_options[:class] ||= ""

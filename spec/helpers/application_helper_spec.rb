@@ -63,6 +63,21 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe "attr_list_item" do
+    let(:bike) { Bike.new(serial_number: "adasdfasdf") }
+    it "returns nil if not there" do
+      expect(attr_list_item(bike.mnfg_name, "Manufacturer")).to be_blank
+    end
+    context "with matching element" do
+      let(:target) { "<li><strong class=\"attr-title\">Serial </strong><span>adasdfasdf</span></li>" }
+      let(:target_with_colon) { "<li><strong class=\"attr-title\">Serial: </strong><span>adasdfasdf</span></li>" }
+      it "returns with the values" do
+        expect(attr_list_item(bike.serial_display, "Serial")).to eq target
+        expect(attr_list_item(bike.serial_display, "Serial", with_colon: true)).to eq target_with_colon
+      end
+    end
+  end
+
   describe "active_link" do
     context "without a class" do
       it "returns the link active if it ought to be" do

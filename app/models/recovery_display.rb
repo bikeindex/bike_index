@@ -48,6 +48,10 @@ class RecoveryDisplay < ActiveRecord::Base
     image.present? && image.file.exists?
   end
 
+  def image_alt
+    "Photo of recovered bike"
+  end
+
   def bike
     return nil unless stolen_record_id.present?
     StolenRecord.unscoped.find(stolen_record_id).bike

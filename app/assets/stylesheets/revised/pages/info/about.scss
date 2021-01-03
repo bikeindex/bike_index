@@ -1,4 +1,4 @@
-$initial-about-social-color: $gray-light;
+$initial-about-social-color: $less-strong-font-color;
 $hover-about-social-color: lighten($gray-light, 15%);
 
 #info_about {
@@ -98,6 +98,5 @@ $hover-about-social-color: lighten($gray-light, 15%);
       margin: 0;
       margin-right: 5px;
     }
-
   }
 }
