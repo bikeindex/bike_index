@@ -25,6 +25,8 @@ class BikeIndex.NavHeader extends BikeIndex
       $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 102}px")
 
   initializeHamburgler: ->
+    # Add character for displaying the hamburger - doing it here so it isn't rendered for lynx :/
+    $("#primary_nav_hamburgler").html("&#9776;")
     # toggleMenu = @toggleMenu
     $('.hamburgler').click (e) =>
       e.preventDefault()
