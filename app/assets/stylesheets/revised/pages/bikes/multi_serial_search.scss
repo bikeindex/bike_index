@@ -114,7 +114,7 @@ $multserial-textheight: 8em;
 
       .serial-text {
         font-size: 0.9em;
-        color: $gray-light;
+        color: $less-strong-font-color;
       }
 
       li .serial-text {
@@ -125,7 +125,7 @@ $multserial-textheight: 8em;
         margin-right: 0;
 
         h3 {
-          color: $gray-light;
+          color: $less-strong-font-color;
 
           .serial-text {
             color: $gray-lighter;

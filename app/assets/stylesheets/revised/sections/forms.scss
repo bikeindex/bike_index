@@ -24,7 +24,7 @@
   display: block;
   line-height: 1.5em;
   padding-bottom: 0.5em;
-  color: $gray-light;
+  color: $less-strong-font-color;
 }
 
 a.optional-form-block {
@@ -86,7 +86,7 @@ a.optional-form-block {
 
   .file-custom {
     .file-upload-text {
-      color: $gray-light;
+      color: $less-strong-font-color;
     }
 
     &::after {
