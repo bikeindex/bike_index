@@ -42,12 +42,12 @@
                         = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
                       #{bike.frame_model}
                     %ul.attr-list
-                      = bike.attr_list_item(bike.serial_display, t(".serial"))
-                      = bike.attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
+                      = attr_list_item(bike.serial_display, t(".serial"))
+                      = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
                         - abandoned_or_stolen =  bike.abandoned? ? t(".date_abandoned") : t('.date_stolen')
-                        = bike.attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
-                        = bike.attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
+                        = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
+                        = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
                       %li
