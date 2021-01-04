@@ -49,8 +49,8 @@ module GraphingHelper
     return_value_for_all = true if @render_chart # Because otherwise it's confusing
     return nil unless return_value_for_all || !(@period == "all")
     humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
-    return humanized_text.gsub("start", "started") if time_range_column&.match?("start_at")
-    return humanized_text.gsub("end", "ended") if time_range_column&.match?("end_at")
+    return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
+    return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
     humanized_text
   end
 
