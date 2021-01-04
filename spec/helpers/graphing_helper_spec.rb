@@ -108,10 +108,22 @@ RSpec.describe GraphingHelper, type: :helper do
         @period = "week"
         expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
       end
-      context "week" do
+      context "all" do
         it "returns period" do
           @period = "all"
           expect(humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
+        end
+      end
+      context "next_week" do
+        it "returns period" do
+          @period = "next_week"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next week"
+        end
+      end
+      context "next_month" do
+        it "returns period" do
+          @period = "next_month"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next month"
         end
       end
     end
