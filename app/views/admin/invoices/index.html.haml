@@ -46,7 +46,9 @@
 %p
   = @invoices.total_count
   = "matching invoice".pluralize(@invoices.total_count)
-  = @period == "all" ? "" : "where"
+  -# show where if sorting by certain columns, makes more sense
+  - if @period != "all" && %w[subscription_end_at subscription_start_at].include?(@time_range_column)
+    where
   %em
     %strong
       = humanized_time_range_column(@time_range_column)

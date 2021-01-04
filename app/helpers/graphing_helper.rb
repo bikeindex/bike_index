@@ -51,6 +51,7 @@ module GraphingHelper
     humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
     return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
     return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
+    return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
     humanized_text
   end
 

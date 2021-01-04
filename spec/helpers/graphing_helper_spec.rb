@@ -96,7 +96,7 @@ RSpec.describe GraphingHelper, type: :helper do
       expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
     end
     it "humanizes needs_renewal_at" do
-      expect(humanized_time_range_column("needs_renewal_at")).to eq "needs renewal" # good enough
+      expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
     end
   end
 
