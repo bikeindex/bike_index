@@ -6,7 +6,7 @@
           %span{ "aria-hidden" => "true" }
             &times;
         = image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home"
-        %h2.modal-title
+        %h2.modal-title.uncap
           = t(".donation_header")
         %hr
         = render partial: "/shared/donation_form", locals: {kind: "modal"}
