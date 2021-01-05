@@ -5257,9 +5257,9 @@ nl:
       other_amount: Ander bedrag (USD)
       payment_to_bike_index: Betaling aan fietsindex
       skip: Overslaan
-      subheader_one: Doneer aan onze inzamelingsactie voor het einde van het jaar.
-      subheader_two_html: "<strong>U</strong> kunt fietsdiefstal bestrijden."
       what_does_your_donation_do: Wat doet uw schenking?
+      subheader_1: Als non-profitorganisatie rekenen we op uw steun
+      subheader_2: Selecteer een bedrag (in USD)
     donation_modal:
       donation_header: Red een fiets in 2021
   users:
