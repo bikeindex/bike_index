@@ -596,7 +596,8 @@ CREATE TABLE public.blogs (
     index_image_lg character varying(255),
     language integer DEFAULT 0 NOT NULL,
     canonical_url character varying,
-    is_info boolean DEFAULT false
+    is_info boolean DEFAULT false,
+    secondary_title text
 );
 
 
@@ -5446,6 +5447,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201013204925'),
 ('20201019200213'),
 ('20201103001935'),
-('20201208002014');
+('20201208002014'),
+('20210111220950');
 
 
