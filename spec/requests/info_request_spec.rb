@@ -27,6 +27,18 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "get_your_stolen_bike_back" do
+    let!(:blog) { FactoryBot.create(:blog, title: "How to get your stolen bike back", is_info: true) }
+    it "renders" do
+      get "/get-your-stolen-bike-back"
+      expect(response.status).to eq(200)
+      expect(assigns(:blog)&.id).to eq blog.id
+      get "/info/how-to-get-your-stolen-bike-back"
+      expect(assigns(:blog)&.id).to eq blog.id
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe "static pages" do
     pages = %w[about protect_your_bike where serials image_resources resources security
       dev_and_design donate terms vendor_terms privacy lightspeed]

@@ -20,6 +20,7 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
+    @page_title = "Edit: #{@blog.title}"
   end
 
   def update

@@ -51,7 +51,10 @@
           %h3= t(".other_pages")
           %ul
             %li
-              = active_link t(".bike_index_news"), news_index_path
+              = active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path
+            - unless content_page_type == "news"
+              %li
+                = active_link t(".bike_index_news"), news_index_path
             %li
               = active_link t(".protect_your_bike"), protect_your_bike_path
             %li
