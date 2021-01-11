@@ -33,6 +33,7 @@ export default class TimeParser {
     this.todayStart = moment().startOf("day");
     this.todayEnd = moment().endOf("day");
     this.tomorrowEnd = moment().add(1, "day").endOf("day");
+    this.todayYear = moment().year();
   }
 
   // If we're display time with the hour, we have different formats based on whether we include seconds
@@ -75,22 +76,22 @@ export default class TimeParser {
         includeSeconds,
         includePreposition
       );
-      // Include the year if it isn't the current year
-      if (time.year() === moment().year()) {
-        return prefix + time.format("MMM Do[,] ") + hourStr;
-      } else {
+      // Only show the year if it isn't this year
+      if (time.year() - this.todayYear !== 0) {
         return prefix + time.format("YYYY-MM-DD ") + hourStr;
+      } else {
+        return prefix + time.format("MMM Do[,] ") + hourStr;
       }
     }
     // Otherwise, format in basic format
-    if (time.year() === moment().year()) {
+    if (time.year() - this.todayYear !== 0) {
+      return prefix + time.format("YYYY-MM-DD");
+    } else {
       if (includePreposition) {
         return prefix + time.format("MMM Do");
       } else {
         return prefix + time.format("MMM Do");
       }
-    } else {
-      return prefix + time.format("YYYY-MM-DD");
     }
   }
 

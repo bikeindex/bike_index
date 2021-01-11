@@ -10,13 +10,13 @@
             = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
           = bike.frame_model.to_s
       %ul.attr-list
-        = bike.attr_list_item(bike.serial_display, t(".serial"))
-        = bike.attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
+        = attr_list_item(bike.serial_display, t(".serial"))
+        = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
       - if bike.current_stolen_record.present?
         %ul.attr-list
           %li
-            %span.attr-title.text-danger
+            %strong.attr-title.text-danger
               = bike.abandoned ? t(".abandoned") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time
-          = bike.attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
+          = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))

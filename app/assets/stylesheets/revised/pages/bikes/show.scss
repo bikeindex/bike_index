@@ -60,7 +60,7 @@
     }
 
     p {
-      color: $gray-light;
+      color: $less-strong-font-color;
       margin-bottom: $vertical-height;
     }
 
@@ -197,7 +197,7 @@
   .secondary-bike-title {
     @extend .uncap;
     margin: 0;
-    color: $gray-light;
+    color: $less-strong-font-color;
   }
   .superuser-bike-button {
     @extend .uncap;

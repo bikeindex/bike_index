@@ -4,10 +4,9 @@
 
 - unless is_payment
   %p
-    = t(".subheader_one")
+    %strong= t(".subheader_1")
     %br
-    = t(".subheader_two_html")
-    %br
+    = t(".subheader_2")
 %form#bikeindex-stripe-initial-form
   %ul.row.amount-list
     - if is_payment # If payment, have one non-arbitrary button

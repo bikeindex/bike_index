@@ -16,7 +16,7 @@ module Api
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
         CycleType::NAMES.values.each { |name| tags << name }
-        respond_with tags, root: "tags"
+        render json: tags, root: "tags"
       end
 
       def index
@@ -29,9 +29,9 @@ module Api
         end
         if params[:ip_test]
           info = {ip: params[:proximity], location: Geocoder.search(params[:proximity])}
-          respond_with(info) && return
+          render json:(info) && return
         end
-        respond_with BikeSearcher.new(params).find_bikes.limit(20)
+        render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
       end
 
       def stolen_ids
@@ -52,7 +52,7 @@ module Api
       def close_serials
         response = {bikes: []}
         response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
-        respond_with response
+        render json: response, each_serializer: BikeSerializer
       end
 
       def show

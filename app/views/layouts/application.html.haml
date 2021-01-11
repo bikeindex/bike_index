@@ -1,5 +1,5 @@
 !!!
-%html
+%html{ lang: I18n.locale }
   %head
     = header_tags
     = stylesheet_link_tag 'revised', media: 'all'
@@ -134,14 +134,13 @@
           .center-navbar-signup-link-container
             = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
         - bike_search_active = controller_name == "bikes" && action_name == "index"
-        %a#menu-opened-backdrop
-        .hamburgler
+        %a#menu-opened-backdrop{ "aria-hidden" => "true" }
+        .hamburgler{ "aria-hidden" => "true" }
           %a#primary_nav_hamburgler
-            &#9776;
         %ul.primary-main-menu
           %li.primary-nav-item.d-lg-none
             = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
-          %li.divider-nav-item.d-lg-none
+          %li.divider-nav-item.d-lg-none{ "aria-hidden" => "true" }
           - if current_user_or_unconfirmed_user.present?
             %li.primary-nav-item
               %a.nav-link.settings-link.primary-nav-link-with-submenu#setting_submenu{ href: "#", "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }

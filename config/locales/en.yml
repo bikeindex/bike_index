@@ -3959,7 +3959,7 @@ en:
     manufacturers_index: Bike Manufacturers
     news_index: Bike Index news
     payments_create: Thanks for your support!
-    payments_new: Support the Index!
+    payments_new: Support Bike Index!
     sessions_create: Log in
     sessions_new: Log in
     stolen_howworks: How it works
@@ -4779,7 +4779,7 @@ en:
       xoxo: XOXO,
       your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
     form:
-      donation_header: Save a bike in 2021
+      donation_header: Help support our efforts!
       pay_bike_index: Pay Bike Index
   plan_features:
     automatic_registration_through_pos: Automatic registration through your POS
@@ -4947,11 +4947,11 @@ en:
       other_amount: Other amount (USD)
       payment_to_bike_index: Payment to Bike Index
       skip: No donation
-      subheader_one: Donate to our end of the year fundraising campaign.
-      subheader_two_html: "<strong>You</strong> can fight bike theft."
+      subheader_1: As a non-profit, we rely on your support
+      subheader_2: Select an amount (in USD)
       what_does_your_donation_do: What does your donation do?
     donation_modal:
-      donation_header: Save a bike in 2021
+      donation_header: Help support our efforts!
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit

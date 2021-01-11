@@ -90,15 +90,13 @@ RSpec.describe GraphingHelper, type: :helper do
       expect(humanized_time_range_column("created_at", return_value_for_all: true)).to eq "created"
     end
     it "humanizes start_at and end_at" do
-      expect(humanized_time_range_column("start_at")).to eq "started"
-      expect(humanized_time_range_column("end_at")).to eq "ended"
+      expect(humanized_time_range_column("start_at")).to eq "starts"
+      expect(humanized_time_range_column("end_at")).to eq "ends"
+      expect(humanized_time_range_column("subscription_start_at")).to eq "subscription starts"
+      expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
     end
     it "humanizes needs_renewal_at" do
-      expect(humanized_time_range_column("needs_renewal_at")).to eq "needs renewal" # good enough
-    end
-    it "humanizes subscription_start_at and subscription_end_at" do
-      expect(humanized_time_range_column("subscription_start_at")).to eq "subscription started"
-      expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ended"
+      expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
     end
   end
 
@@ -108,10 +106,22 @@ RSpec.describe GraphingHelper, type: :helper do
         @period = "week"
         expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
       end
-      context "week" do
+      context "all" do
         it "returns period" do
           @period = "all"
           expect(humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
+        end
+      end
+      context "next_week" do
+        it "returns period" do
+          @period = "next_week"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next week"
+        end
+      end
+      context "next_month" do
+        it "returns period" do
+          @period = "next_month"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next month"
         end
       end
     end

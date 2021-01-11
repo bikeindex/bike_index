@@ -44,13 +44,16 @@
         %nav.col-md-2.social-nav
           %ul
             %li
-              = link_to "https://facebook.com/bikeindex", alt: 'Bike Index Facebook' do
+              = link_to "https://facebook.com/bikeindex" do
+                %span.sr-only Bike Index Facebook
                 %i.fab.fa-facebook-square.fa-3x
             %li
-              = link_to "https://twitter.com/BikeIndex", alt: 'Bike Index Twitter'  do
+              = link_to "https://twitter.com/BikeIndex" do
+                %span.sr-only Bike Index Twitter
                 %i.fab.fa-twitter.fa-3x
             %li
-              = link_to "https://instagram.com/bikeindex", alt: 'Bike Index Instagram'  do
+              = link_to "https://instagram.com/bikeindex" do
+                %span.sr-only Bike Index Instagram
                 %i.fab.fa-instagram.fa-3x
 
   %nav.terms-and-stuff
@@ -68,6 +71,7 @@
                 - if current_user.present? && current_user.preferred_language != I18n.locale
                   %em.below-input-help.text-right
                     = link_to t(".change_preferred_language"), edit_my_account_path
+                = submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only"
         .col-md-6.text-right
           %p
             = [link_to(t(".privacy_policy"), privacy_url),
@@ -88,4 +92,4 @@
 
   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-K88RMWC');
 
-<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K88RMWC" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K88RMWC" height="0" width="0" style="display:none;visibility:hidden" title="Google tag manager"></iframe>

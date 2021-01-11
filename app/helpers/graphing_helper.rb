@@ -49,14 +49,18 @@ module GraphingHelper
     return_value_for_all = true if @render_chart # Because otherwise it's confusing
     return nil unless return_value_for_all || !(@period == "all")
     humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
-    return humanized_text.gsub("start", "started") if time_range_column&.match?("start_at")
-    return humanized_text.gsub("end", "ended") if time_range_column&.match?("end_at")
+    return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
+    return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
+    return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
     humanized_text
   end
 
   def humanized_time_range(time_range)
     return nil if @period == "all"
-    return "in the past #{@period}" unless @period == "custom"
+    unless @period == "custom"
+      period_display = @period.match?("next_") ? @period.gsub("_", " ") : "past #{@period}"
+      return "in the #{period_display}"
+    end
     group_period = group_by_method(time_range)
     precision_class = if group_period == :group_by_minute
       "preciseTimeSeconds"

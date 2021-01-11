@@ -441,7 +441,10 @@
     }
 
     p {
-      color: $gray-light;
+      color: darken(
+        $less-strong-font-color,
+        1%
+      ); // darkened for accessibility contrast
       font-size: 18px;
       margin-bottom: 0;
     }
