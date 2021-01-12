@@ -18,6 +18,11 @@ task sm_import_manufacturers: :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
 
+desc "Load counts" # This is a rake task so it can be loaded from bin/update
+task load_counts: :environment do
+  UpdateCountsWorker.new.perform
+end
+
 desc "Prepare translations for committing to main"
 task prepare_translations: :environment do
   require "i18n/tasks/cli"
