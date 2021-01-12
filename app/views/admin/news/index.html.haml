@@ -1,48 +1,60 @@
 .admin-subnav
-  .col-md-6
+  .col-sm-4
     %h1
       News/Blogs/Info
-  .col-md-6
-    = link_to 'New Post', new_admin_news_url, class: "btn btn-success float-right"
+  .col-sm-8
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == 'all' ? '' : 'active') }
+          - if @search_kind == "all"
+            All kinds
+          - else
+            #{@search_kind.humanize} only
+        .dropdown-menu
+          = link_to "All kinds", admin_news_index_path(sortable_search_params.merge(search_kind: "all")), class: "dropdown-item #{@search_kind == 'all' ? 'active' : ''}"
+          .dropdown-divider
+          - Blog.kinds.each do |kind|
+            = link_to "#{kind.humanize} only", admin_news_index_path(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@search_kind == kind ? 'active' : ''}"
+      %li.nav-item
+        = link_to 'New Post', new_admin_news_url, class: "btn btn-success btn-sm"
+
+- show_kind = @search_kind == "all"
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th
-        Date&nbsp;<small class="convertTimezone"></small>
-      %th.d-none.d-lg-table-cell
-        Creator
-      %th
-        Content
-      %th
-        Kind
-      %th
-        Language
-      %th
-        Published
+      %th= sortable "created_at"
+      %th.d-none.d-lg-table-cell= sortable "user_id", "Creator"
+      %th.small.d-none.d-lg-table-cell= sortable "updated_at"
+      %th= sortable "title", "Content"
+      - if show_kind
+        %th Kind
+      %th Language
+      %th= sortable "published_at"
     %tbody
       - @blogs.each do |blog|
         %tr
           %td
-            .less-strong-hold
-              %small.convertTime
-                = l blog.published_at, format: :convert_time
-              - if display_dev_info?
-                %small.less-strong-right.only-dev-visible
-                  = blog.id
+            %small.convertTime
+              = l blog.created_at, format: :convert_time
+            - if display_dev_info?
+              %small.less-strong-right.only-dev-visible
+                = blog.id
           %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email
+          %td
+            %small.convertTime= l blog.updated_at, format: :convert_time
           %td
             %p.blog-index
               = link_to blog.title, edit_admin_news_url(blog)
               %br
               = blog.body_abbr.html_safe if blog.body_abbr
-          %td
-            - if blog.info?
-              %span.text-success Info
-            - elsif blog.is_listicle
-              %span.text-warning Vignettes
+          - if show_kind
+            %td
+              - if !blog.blog?
+                %span.text-info= blog.kind.humanize
           %td
             = t(blog.language, scope: [:locales])
-          %td.table-cell-check
-            = check_mark if blog.published
+          %td
+            - if blog.published? && blog.published_at.present?
+              %small.convertTime= l blog.published_at, format: :convert_time

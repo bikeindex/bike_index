@@ -1,6 +1,7 @@
 class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
   include Localizable
+  KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
 
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -14,16 +15,22 @@ class Blog < ApplicationRecord
   before_save :set_calculated_attributes
   before_create :set_title_slug
 
-  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
+  enum kind: KIND_ENUM
+
+  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 
   scope :published, -> { where(published: true) }
-  scope :listicle_blogs, -> { where(is_listicle: true) }
-  scope :blog, -> { where(is_info: false) }
-  scope :info, -> { where(is_info: true) }
+  # scope :listicle_blogs, -> { where(is_listicle: true) }
+  # scope :blog, -> { where(is_info: false) }
+  # scope :info, -> { where(is_info: true) }
   default_scope { order("published_at desc") }
 
   include PgSearch::Model
   pg_search_scope :text_search, against: {title: "A", body: "B"}
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
 
   def self.slugify_title(str)
     # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
@@ -47,13 +54,13 @@ class Blog < ApplicationRecord
     "end-2020-with-a-donation-to-bike-index"
   end
 
-  def info?
-    is_info
-  end
+  # def info?
+  #   is_info
+  # end
 
-  def blog?
-    !info?
-  end
+  # def blog?
+  #   !info?
+  # end
 
   def to_param
     title_slug
@@ -64,6 +71,9 @@ class Blog < ApplicationRecord
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
     self.published_at = Time.current if is_info
+    unless listicle?
+      self.kind = !ParamsNormalizer.boolean(info_kind) ? "blog" : "info"
+    end
     update_title_save
     create_abbreviation
     set_index_image

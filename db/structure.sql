@@ -597,7 +597,8 @@ CREATE TABLE public.blogs (
     language integer DEFAULT 0 NOT NULL,
     canonical_url character varying,
     is_info boolean DEFAULT false,
-    secondary_title text
+    secondary_title text,
+    kind integer DEFAULT 0
 );
 
 
