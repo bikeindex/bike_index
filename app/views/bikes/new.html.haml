@@ -2,11 +2,17 @@
 - serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link)
 
 .form-well-header.container
-  %h1
-    - if @bike.stolen
-      = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
-    - else
-      = t(".enter_bike_type_details", bike_type: @bike.type)
+  .row
+    .col-sm-8
+      %h1
+        - if @bike.stolen
+          = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
+        - else
+          = t(".enter_bike_type_details", bike_type: @bike.type)
+    .col-sm-4
+      %em
+        %a{ href: "#" }
+          register a stolen bike instead
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
