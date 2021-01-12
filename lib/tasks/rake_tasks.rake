@@ -20,7 +20,6 @@ end
 
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
 task load_counts: :environment do
-  puts "partyyyyy"
   UpdateCountsWorker.new.perform
 end
 
