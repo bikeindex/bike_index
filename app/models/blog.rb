@@ -44,7 +44,7 @@ class Blog < ApplicationRecord
     return find(str) if integer_slug?(str)
     slug = slugify_title(str)
     find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
-      find_by_title_slug(str) || find_by_title(str)
+      find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
   end
 
   def self.why_donate_slug
@@ -63,10 +63,10 @@ class Blog < ApplicationRecord
     self.published_at ||= Time.current # We need to have a published time...
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
-    self.published_at = Time.current if is_info
     unless listicle?
       self.kind = !ParamsNormalizer.boolean(info_kind) ? "blog" : "info"
     end
+    self.published_at = Time.current if info?
     update_title_save
     create_abbreviation
     set_index_image

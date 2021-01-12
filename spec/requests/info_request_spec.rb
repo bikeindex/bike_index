@@ -4,7 +4,7 @@ RSpec.describe InfoController, type: :request do
   let(:base_url) { "/info" }
   describe "show" do
     let(:blog) do
-      FactoryBot.create(:blog, is_info: true, title: "Cool info about bike things", description_abbr: "Special info desc")
+      FactoryBot.create(:blog, info_kind: true, title: "Cool info about bike things", description_abbr: "Special info desc")
     end
     it "renders" do
       get "#{base_url}/#{blog.title_slug}"
@@ -28,7 +28,7 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "get_your_stolen_bike_back" do
-    let!(:blog) { FactoryBot.create(:blog, title: "How to get your stolen bike back", is_info: true) }
+    let!(:blog) { FactoryBot.create(:blog, title: "How to get your stolen bike back", info_kind: true) }
     it "renders" do
       get "/get-your-stolen-bike-back"
       expect(response.status).to eq(200)

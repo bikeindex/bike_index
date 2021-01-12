@@ -396,7 +396,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
       describe "info post" do
         let(:controller_name) { "info" }
         it "returns the info tags" do
-          blog.is_info = true
+          blog.kind = "info"
           blog.created_at = target_time
           allow(blog).to receive(:index_image) { target_url }
           allow(blog).to receive(:index_image_lg) { target_url }

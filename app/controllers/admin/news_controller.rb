@@ -85,6 +85,7 @@ class Admin::NewsController < Admin::BaseController
       :tags,
       :timezone,
       :title,
+      :secondary_title,
       :update_title,
       :user_email,
       :user_id,

@@ -2,6 +2,8 @@
 %html{ lang: I18n.locale }
   %head
     = header_tags
+    - if @blog.present? && @blog.secondary_title.present? # This is gross, but whatever
+      <meta name="title" content="#{@blog.secondary_title}">
     = stylesheet_link_tag 'revised', media: 'all'
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
