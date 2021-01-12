@@ -34,11 +34,11 @@
       - elsif render_get_your_stolen_bike_back
         .next-steps-wrap.donation
           %header
-            Bike Index recovery statistics
+            Bike Index recovery record
           %ul
             %li.mt-3
               %strong
-                $#{number_with_delimiter(Counts.recoveries)} -
+                #{number_with_delimiter(Counts.recoveries)} -
               Stolen bikes recovered
             %li.mt-2
               %strong
