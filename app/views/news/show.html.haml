@@ -1,5 +1,7 @@
 = content_for :header do
   %link{rel: :canonical, href: canonical_url(@blog) }
+  - if @blog.present? && @blog.secondary_title.present? # This is gross, but whatever
+    <meta name="title" content="#{@blog.secondary_title}">
 
 - blogger = @blog.user
 #news_display

@@ -1,3 +1,7 @@
+- if @blog.present?
+  - render_why_donate = @blog.title_slug == Blog.why_donate_slug
+  - render_get_your_stolen_bike_back = @blog.title_slug == Blog.get_your_stolen_bike_back_slug
+
 .container
   .row
     -# Unless one of the permitted pages, wrap it in .legacy-content-wrap
@@ -6,7 +10,7 @@
       = yield
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
-      - if @blog.present? && @blog.title_slug == Blog.why_donate_slug
+      - if render_why_donate
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
@@ -27,6 +31,19 @@
           .next-steps-wrap.donation {
             border-radius: 4px;
           }
+      - elsif render_get_your_stolen_bike_back
+        .next-steps-wrap.donation
+          %header
+            Bike Index recovery statistics
+          %ul
+            %li.mt-3
+              %strong
+                $#{number_with_delimiter(Counts.recoveries)} -
+              Stolen bikes recovered
+            %li.mt-2
+              %strong
+                $#{number_with_delimiter(Counts.recoveries_value)} -
+              Value of bikes recovered with Bike Index
       - else
         %nav.content-nav-group
           %h3= t(".related")
@@ -71,3 +88,16 @@
               = active_link t(".sign_up_your_organization"), new_organization_path
 
         .ad-block#right300x600
+
+  - if render_get_your_stolen_bike_back
+    .root-landing-recovery-stories.mt-4
+      #recovery-stories-container.extras-hidden
+        = render RecoveryDisplay.limit(5)
+        .recovery-block.recovery-see-more
+          = link_to "read more recovery stories",
+            recovery_stories_path,
+            class: "see-more-link"
+
+  - if @blog.present? && current_user&.superuser?
+    .text-center.mt-4.less-strong
+      = link_to "edit post", edit_admin_news_path(@blog), class: "btn btn-outline-primary"
