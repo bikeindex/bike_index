@@ -20,9 +20,6 @@ class Blog < ApplicationRecord
   attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 
   scope :published, -> { where(published: true) }
-  # scope :listicle_blogs, -> { where(is_listicle: true) }
-  # scope :blog, -> { where(is_info: false) }
-  # scope :info, -> { where(is_info: true) }
   default_scope { order("published_at desc") }
 
   include PgSearch::Model
@@ -54,13 +51,9 @@ class Blog < ApplicationRecord
     "end-2020-with-a-donation-to-bike-index"
   end
 
-  # def info?
-  #   is_info
-  # end
-
-  # def blog?
-  #   !info?
-  # end
+  def self.get_your_stolen_bike_back_slug
+    "how-to-get-your-stolen-bike-back" # Also hard coded in routes
+  end
 
   def to_param
     title_slug
