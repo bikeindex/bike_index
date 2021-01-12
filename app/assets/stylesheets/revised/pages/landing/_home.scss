@@ -198,16 +198,16 @@
   .root-landing-header-text {
     h1,
     h2,
+    h3,
     p {
       color: $white;
       display: block;
-      margin: 15px auto;
       text-align: center;
+      margin: 15px auto 0;
     }
 
     p {
       font-size: 28px;
-      margin-bottom: 0;
 
       strong {
         color: $green;
@@ -218,9 +218,11 @@
       text-shadow: 0 2px 5px rgba(17, 46, 78, 0.72);
       font-size: 60px;
       font-weight: 300;
+      margin-bottom: 15px;
     }
 
-    h2 {
+    h2,
+    h3 {
       color: $white;
       font-size: 24px;
       font-weight: 600;
@@ -234,6 +236,11 @@
         color: #ffffff;
         text-decoration: none;
       }
+    }
+
+    h3 {
+      font-weight: $normal-font-weight;
+      opacity: 0.8;
     }
 
     .root-action-btn {
@@ -355,6 +362,9 @@
 
     h2 {
       line-height: 35px;
+    }
+    h3 {
+      display: none; // it gets crowded with the register a stolen bike in there too
     }
   }
 }

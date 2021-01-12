@@ -1219,6 +1219,7 @@ en:
       are_you_certain: Are you certain?
       city: City
       enter_bike_type_details: Enter %{bike_type} details
+      enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
       highly_recommended: highly recommended
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
@@ -3747,7 +3748,6 @@ en:
       year: year
   layouts:
     application:
-      about: About
       add_a_bike: Add a bike
       appointment_configuration: Appointments configuration
       blog: Blog
@@ -3776,6 +3776,7 @@ en:
       resources: Resources
       search_bikes: Search bikes
       sign_up: Sign up
+      stolen_bike: Stolen bike?
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       super_admin_view: Super Admin view %{org_name}
@@ -4924,6 +4925,7 @@ en:
       donate_today: Donate today
       forum: Forum
       help: Help
+      how_to_get_your_stolen_bike_back: How to get your stolen bike back
       make_a_difference: Make a difference in bike theft
       other_pages: Other pages
       protect_your_bike: Protect your bike
@@ -5101,6 +5103,7 @@ en:
       donate: Donate
       faq: FAQ
       help: Help
+      how_to_get_your_stolen_bike_back: Get your stolen bike back
       language: Language
       law_enforcement: Law Enforcement
       privacy_policy: Privacy policy
@@ -5485,11 +5488,13 @@ en:
         Bike Index community and its partners.
       partner_organizations: Partner Organizations
       read_more_recovery_stories: Read more recovery stories
+      recent_recovery_stories: 'Stolen bicycles we helped recover recently:'
       recover_your_bike_for_free: >-
         With the help of the Bike Index community and its partners, you have the information
         necessary to recover your lost or stolen bike at no cost to you. It's what
         we do.
       register_now: Register now!
+      register_stolen_now: register a stolen bike
       register_your_bike: Register Your Bike
       stolen_bikes_recovered: Stolen Bikes Recovered
       stolen_bikes_registered: Stolen Bikes Registered

@@ -1,5 +1,8 @@
+# Note: this is also loaded on info pages - because the recovery slider is included in get_your_stolen_bike_back
 class BikeIndex.WelcomeIndex extends BikeIndex
   constructor: ->
+    # Early exit if no recovery stories, ie on a news page without them
+    return unless $('#recovery-stories-container').length
     @translator = new BikeIndex.GoogleTranslate()
     @container = $('#recovery-stories-container')
     @container.removeClass('extras-hidden')
