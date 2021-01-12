@@ -30,9 +30,6 @@ RSpec.describe InfoController, type: :request do
   describe "get_your_stolen_bike_back" do
     let!(:blog) { FactoryBot.create(:blog, title: "How to get your stolen bike back", info_kind: true) }
     it "renders" do
-      get "/get-your-stolen-bike-back"
-      expect(response.status).to eq(200)
-      expect(assigns(:blog)&.id).to eq blog.id
       get "/info/how-to-get-your-stolen-bike-back"
       expect(assigns(:blog)&.id).to eq blog.id
       expect(response.status).to eq(200)

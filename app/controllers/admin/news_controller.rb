@@ -1,6 +1,5 @@
 class Admin::NewsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
   before_action :find_blog, only: [:show, :edit, :update, :destroy]
   before_action :set_dignified_name
 
@@ -91,10 +90,6 @@ class Admin::NewsController < Admin::BaseController
       :user_id,
       :info_kind
     )
-  end
-
-  def earliest_period_date
-    Time.at(1371495600) # First blog created
   end
 
   def available_blogs
