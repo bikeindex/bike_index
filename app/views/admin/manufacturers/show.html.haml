@@ -32,12 +32,18 @@
             Close Year
           %td
             = @manufacturer.close_year
-        - if @manufacturer.website.present?
-          %tr
-            %td
-              Manufacturer website
-            %td
+        %tr
+          %td
+            Manufacturer website
+          %td
+            - if @manufacturer.website.present?
               = link_to @manufacturer.website, @manufacturer.website
+        %tr
+          %td
+            Twitter
+          %td
+            - if @manufacturer.twitter_name
+              = @manufacturer.website
         %tr
           %td
             Description

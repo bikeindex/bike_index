@@ -1751,7 +1751,8 @@ CREATE TABLE public.manufacturers (
     close_year integer,
     logo character varying(255),
     description text,
-    logo_source character varying(255)
+    logo_source character varying(255),
+    twitter_name character varying
 );
 
 
@@ -5449,6 +5450,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201019200213'),
 ('20201103001935'),
 ('20201208002014'),
-('20210111220950');
+('20210111220950'),
+('20210114030113');
 
 

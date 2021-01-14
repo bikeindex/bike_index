@@ -1,8 +1,9 @@
 require "rails_helper"
 
-RSpec.describe Admin::ManufacturersController, type: :controller do
+RSpec.describe Admin::ManufacturersController, type: :request do
+  let(:base_url) { "/admin/news/" }
   let(:subject) { FactoryBot.create(:manufacturer) }
-  include_context :logged_in_as_super_admin
+  include_context :request_spec_logged_in_as_superuser
 
   let(:permitted_attributes) do
     {
@@ -12,13 +13,14 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
       frame_maker: true,
       open_year: 1992,
       close_year: 89898,
-      description: "new description"
+      description: "new description",
+      twitter_name: "cool-name"
     }
   end
 
   describe "index" do
     it "renders" do
-      get :index
+      get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
@@ -26,7 +28,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, params: {id: subject.slug}
+      get "#{base_url}/#{subject.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
@@ -35,14 +37,14 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
   describe "edit" do
     context "slug" do
       it "renders" do
-        get :edit, params: {id: subject.slug}
+        get "#{base_url}/#{subject.slug}/edit"
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
     end
     context "id" do
       it "renders" do
-        get :edit, params: {id: subject.id}
+        get "#{base_url}/#{subject.id}/edit"
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -51,7 +53,8 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "update" do
     it "updates available attributes" do
-      put :update, params: {id: subject.to_param, manufacturer: permitted_attributes}
+
+      put "#{base_url}/#{subject.to_param}", params: {manufacturer: permitted_attributes}
       subject.reload
       permitted_attributes.each do |attribute, val|
         pp attribute unless subject.send(attribute) == val
@@ -64,7 +67,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
     it "creates with available attributes" do
       expect(Manufacturer.where(name: "new name and things").count).to eq 0
       expect {
-        post :create, params: {manufacturer: permitted_attributes}
+        post base_url, params: {manufacturer: permitted_attributes}
       }.to change(Manufacturer, :count).by 1
       target = Manufacturer.where(name: "new name and things").first
       permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
