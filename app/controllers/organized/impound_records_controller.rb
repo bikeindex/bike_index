@@ -55,10 +55,10 @@ module Organized
         a_impound_records = impound_records
       else
         @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
-        if ImpoundRecord.statuses.include?(@search_status)
-          a_impound_records = impound_records.where(status: @search_status)
+        a_impound_records = if ImpoundRecord.statuses.include?(@search_status)
+          impound_records.where(status: @search_status)
         else
-          a_impound_records = impound_records.send(@search_status)
+          impound_records.send(@search_status)
         end
       end
 
