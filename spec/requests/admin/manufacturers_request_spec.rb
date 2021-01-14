@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::ManufacturersController, type: :request do
-  let(:base_url) { "/admin/news/" }
+  let(:base_url) { "/admin/manufacturers/" }
   let(:subject) { FactoryBot.create(:manufacturer) }
   include_context :request_spec_logged_in_as_superuser
 
@@ -53,7 +53,6 @@ RSpec.describe Admin::ManufacturersController, type: :request do
 
   describe "update" do
     it "updates available attributes" do
-
       put "#{base_url}/#{subject.to_param}", params: {manufacturer: permitted_attributes}
       subject.reload
       permitted_attributes.each do |attribute, val|

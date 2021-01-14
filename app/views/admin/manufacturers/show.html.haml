@@ -42,8 +42,8 @@
           %td
             Twitter
           %td
-            - if @manufacturer.twitter_name
-              = @manufacturer.website
+            - if @manufacturer.twitter_name.present?
+              = link_to "#{@manufacturer.twitter_name}", "https://twitter.com/#{@manufacturer.twitter_name}"
         %tr
           %td
             Description

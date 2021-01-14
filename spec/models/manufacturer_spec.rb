@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
+
   describe "scopes" do
     it "default_scope is alphabetized" do
       expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
@@ -123,28 +124,29 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
-  describe "set_website_and_logo_source" do
-    it "has before_save_callback_method defined for set_website" do
-      expect(Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website_and_logo_source)).to eq(true)
+  describe "set_calculated_attributes" do
+    it "sets twitter_name" do
+      manufacturer = Manufacturer.new(twitter_name: "@cool-thing")
+      manufacturer.set_calculated_attributes
+      expect(manufacturer.twitter_name).to eq "cool-thing"
     end
-
     it "sets logo source" do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:logo).and_return("http://example.com/logo.png")
-      manufacturer.set_website_and_logo_source
+      manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to eq("manual")
     end
 
     it "doesn't overwrite logo source" do
       manufacturer = Manufacturer.new(logo_source: "something cool")
       allow(manufacturer).to receive(:logo).and_return("http://example.com/logo.png")
-      manufacturer.set_website_and_logo_source
+      manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to eq("something cool")
     end
 
     it "empties if no logo" do
       manufacturer = Manufacturer.new(logo_source: "something cool")
-      manufacturer.set_website_and_logo_source
+      manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to be_nil
     end
   end
