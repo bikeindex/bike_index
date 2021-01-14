@@ -8,11 +8,6 @@
           = link_to new_bike_path do
             = t(".register_now")
             %span.chevron &raquo;
-        %h3
-          = link_to new_bike_path(stolen: true) do
-            = t(".register_stolen_now")
-            %span.chevron &raquo;
-
   = render partial: "/landing_pages/for_organizations_photo_list"
 
   -# Expired in admin/recovery_displays_controller
