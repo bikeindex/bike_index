@@ -66,7 +66,8 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker, :total_years_active, :notes, :open_year, :close_year, :logo, :description, :logo_source)
+    params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker, :total_years_active, :notes,
+      :open_year, :close_year, :logo, :description, :logo_source, :twitter_name)
   end
 
   def find_manufacturer
