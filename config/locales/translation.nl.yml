@@ -5453,7 +5453,6 @@ nl:
       value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
       you_get_your_bike_back: U krijgt uw fiets terug
       recent_recovery_stories: 'Gestolen fietsen die we onlangs hebben helpen herstellen:'
-      register_stolen_now: Registreer een gestolen fiets
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:

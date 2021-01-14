@@ -58,7 +58,7 @@ module GraphingHelper
   def humanized_time_range(time_range)
     return nil if @period == "all"
     unless @period == "custom"
-      period_display = @period.match?("next_") ? @period.gsub("_", " ") : "past #{@period}"
+      period_display = @period.match?("next_") ? @period.tr("_", " ") : "past #{@period}"
       return "in the #{period_display}"
     end
     group_period = group_by_method(time_range)

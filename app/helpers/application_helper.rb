@@ -18,7 +18,7 @@ module ApplicationHelper
     title = "#{title}:" if with_colon
     content_tag(:li) do
       content_tag(:strong, "#{title} ", class: "attr-title") +
-      content_tag(:span, desc)
+        content_tag(:span, desc)
     end
   end
 

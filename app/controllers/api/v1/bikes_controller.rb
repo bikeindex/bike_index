@@ -29,7 +29,7 @@ module Api
         end
         if params[:ip_test]
           info = {ip: params[:proximity], location: Geocoder.search(params[:proximity])}
-          render json:(info) && return
+          render json: info && return
         end
         render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
       end
