@@ -56,17 +56,18 @@
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @bikes, as: :bike
-        .paginate-container.paginate-container-bottom
-          = paginate @bikes
-
+        .row.mt-4
+          .col-md-8
+            .paginate-container.paginate-container-bottom
+              = paginate @bikes
+          .col-md-4.ad-col
+            .ad-block#top468x60
       - else
         %h3.no-exact-results
           = t(".no_bikes_matched")
 
   #js-secondary-searches
 
-  .col-md-4.ad-col
-    .ad-block#right300x600
 
 :javascript
   window.interpreted_params = #{@interpreted_params.to_json};
