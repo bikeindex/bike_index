@@ -197,7 +197,7 @@ class Tweet < ApplicationRecord
   # This is hacky, but whatever. Copied from bulk_import
   def open_image
     local_image = image&._storage&.to_s == "CarrierWave::Storage::File"
-    local_image ? File.open(image.path, "r") : URI.open(image.url)
+    local_image ? File.open(image.path, "r") : URI.parse(image.url).open
   end
 
   private
