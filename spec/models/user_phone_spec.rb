@@ -6,6 +6,7 @@ RSpec.describe UserPhone, type: :model do
     let!(:user_phone2) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929292", updated_at: Time.current - 3.hours) }
     let!(:user_phone3) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929291") }
     it "finds only confirmation codes in past 30 minutes" do
+      expect(user_phone1).to be_valid # Ensure working factory
       expect(user_phone1.user.phone_waiting_confirmation?).to be_truthy
       expect(user_phone2.user.phone_waiting_confirmation?).to be_falsey
       expect(UserPhone.find_confirmation_code("2 92  92 92")).to eq user_phone1
@@ -21,10 +22,20 @@ RSpec.describe UserPhone, type: :model do
     end
   end
 
-  describe "factory" do
-    let(:user_phone) { FactoryBot.create(:user_phone) }
-    it "is valid" do
-      expect(user_phone).to be_valid
+  describe "code_display and code_normalize" do
+    it "has spaces for legibility" do
+      expect(UserPhone.code_display("2929292")).to eq "292 9292"
+      expect(UserPhone.code_normalize("292 9292")).to eq "2929292"
+    end
+  end
+
+  # 017654806966
+  describe "confirmation_matches?" do
+    let(:user_phone) { UserPhone.new(confirmation_code: "0505032") }
+    it "is truthy even with spaces" do
+      expect(user_phone.code_display).to eq "050 5032"
+      expect(user_phone.confirmation_matches?("050 5032")).to be_truthy
+      expect(user_phone.confirmation_matches?("05 0 5 0 32\n\n")).to be_truthy
     end
   end
 
@@ -56,7 +67,7 @@ RSpec.describe UserPhone, type: :model do
       expect(user_phone.confirmed?).to be_falsey
       expect(user_phone.confirmation_code).to be_present
       expect(user_phone.confirmation_code.length).to be < 8
-      expect(user_phone.confirmation_message).to eq "Bike Index confirmation code:  #{user_phone.confirmation_display}"
+      expect(user_phone.confirmation_message).to eq "Bike Index confirmation code:  #{user_phone.code_display}"
       expect(user_phone.notifications.count).to eq 1
       og_confirmation_code = user_phone.confirmation_code
 

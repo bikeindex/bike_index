@@ -11,7 +11,7 @@ class UserPhonesController < ApplicationController
         flash[:success] = "Verification code sent!"
       end
     elsif params[:confirmation_code]
-      if @user_phone.confirmation_code == params[:confirmation_code]
+      if @user_phone.confirmation_matches?(params[:confirmation_code])
         if @user_phone.expired?
           flash[:error] = "Verification code expired. We've sent a new code, please verify it in the next 30 minutes"
           @user_phone.resend_confirmation_if_reasonable!
