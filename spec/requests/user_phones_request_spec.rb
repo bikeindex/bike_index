@@ -71,6 +71,23 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "confirm" do
+      it "confirms" do
+        expect(current_user).to be_present
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to eq "6666666"
+        expect(user_phone.resend_confirmation?).to be_falsey
+        patch "#{base_url}/#{user_phone.to_param}", params: {confirmation_code: "666 6666"}
+        expect(flash[:success]).to be_present
+
+        current_user.reload
+        expect(current_user.phone_waiting_confirmation?).to be_falsey
+        expect(current_user.user_phones.count).to eq 1
+        expect(current_user.general_alerts).to eq([])
+
+        user_phone.reload
+        expect(user_phone.confirmed?).to be_truthy
+        expect(user_phone.confirmed_at).to be_within(5).of Time.current
+      end
       context "incorrect confirmation" do
         it "does not confirm" do
           user_phone.reload

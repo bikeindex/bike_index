@@ -18,8 +18,17 @@ class UserPhone < ApplicationRecord
     Time.current - 1.hour
   end
 
+  def self.code_display(str)
+    return nil unless str.present?
+    str[0..2] + " " + str[3..-1]
+  end
+
+  def self.code_normalize(str)
+    str.gsub(/\s/, "")
+  end
+
   def self.find_confirmation_code(str)
-    waiting_confirmation.where(confirmation_code: str.gsub(/\s/, "")).first
+    waiting_confirmation.where(confirmation_code: code_normalize(str)).first
   end
 
   def self.add_phone_for_user_id(user_id, phone_number)
@@ -71,13 +80,16 @@ class UserPhone < ApplicationRecord
     result
   end
 
-  def confirmation_display
-    return nil unless confirmation_code.present?
-    confirmation_code[0..2] + " " + confirmation_code[3..-1]
+  def code_display
+    self.class.code_display(confirmation_code)
+  end
+
+  def confirmation_matches?(str)
+    confirmation_code == self.class.code_normalize(str)
   end
 
   def confirmation_message
-    "Bike Index confirmation code:  #{confirmation_display}"
+    "Bike Index confirmation code:  #{code_display}"
   end
 
   def set_calculated_attributes
