@@ -80,7 +80,6 @@ class Manufacturer < ApplicationRecord
     errors.add(:name, :cannot_match_a_color_name) if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
-
   def set_calculated_attributes
     self.slug = Slugifyer.manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil
