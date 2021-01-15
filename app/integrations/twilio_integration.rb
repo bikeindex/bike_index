@@ -5,12 +5,16 @@ class TwilioIntegration
   AUTH_TOKEN = ENV["TWILIO_TOKEN"]
   OUTGOING_NUMBER = ENV["TWILIO_NUMBER"]
 
+  def self.twilio_formatted(str)
+    str.gsub(/\A0+/, "")
+  end
+
   def client
     @client ||= Twilio::REST::Client.new ACCOUNT_SID, AUTH_TOKEN
   end
 
   def send_message(to:, body:)
-    client.messages.create(body: body, from: OUTGOING_NUMBER, to: to)
+    client.messages.create(body: body, from: OUTGOING_NUMBER, to: self.class.twilio_formatted(to))
   end
 
   def get_message(sid)
