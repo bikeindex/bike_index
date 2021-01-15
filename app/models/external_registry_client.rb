@@ -11,7 +11,7 @@ class ExternalRegistryClient
   # records found that were successfully persisted.
   def self.search_for_bikes_with(query, registries: nil)
     registries ||= [
-      StopHelingClient,
+      # StopHelingClient, # Commented in PR#1868
       VerlorenOfGevondenClient
     ]
 
