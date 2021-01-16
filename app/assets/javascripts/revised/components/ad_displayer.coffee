@@ -2,8 +2,8 @@ class @AdDisplayer
   ads_right = ['right300x600']
   ads_top = ['top468x60']
 
-  max_tracker_300 = "<a href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600.jpg\" alt=\"MaxTracker\"></a>"
-  max_tracker_468 = "<a href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60.jpg\" alt=\"MaxTracker\"></a>"
+  max_tracker_300 = "<a href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
+  max_tracker_468 = "<a href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
 
   constructor: ->
     for el_id in ads_right
