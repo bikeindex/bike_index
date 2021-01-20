@@ -4533,7 +4533,7 @@ en:
         name: Name
         org_email_address_html: Email address <em>%{org_name}</em> bike registrations
           will be sent from
-        org_settings: "%{org_name} settings"
+        org_settings: "%{org_name} profile settings"
         organization_logo: Organization logo
         organization_type: Organization type
         registration_email: Registration email

@@ -108,13 +108,13 @@
       %li.divider-nav-item
     %li
       = active_link t(".manage_users"), organization_users_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
+    - if passed_organization.enabled?("impound_features_2021")
+      %li
+        = active_link t(".manage_impounding", org_name: passed_organization.short_name), impounding_organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
     %li
       = active_link t(".org_profile", org_name: passed_organization.short_name), organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
     %li
       = active_link t(".org_locations", org_name: passed_organization.short_name), locations_organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
-    - if passed_organization.enabled?("impound_features_2021")
-      %li
-        = active_link t(".manage_impounding", org_name: passed_organization.short_name), impounding_organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
     - if passed_organization.enabled?("customize_emails")
       %li
         = active_link t(".custom_emails"), organization_emails_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
