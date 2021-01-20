@@ -34,10 +34,10 @@ class Admin::ImpoundRecordsController < Admin::BaseController
       @search_status = "all"
     else
       @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
-      if ImpoundRecord.statuses.include?(@search_status)
-        impound_records = impound_records.where(status: @search_status)
+      impound_records = if ImpoundRecord.statuses.include?(@search_status)
+        impound_records.where(status: @search_status)
       else
-        impound_records = impound_records.send(@search_status)
+        impound_records.send(@search_status)
       end
     end
 

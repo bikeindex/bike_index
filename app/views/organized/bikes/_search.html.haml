@@ -252,4 +252,4 @@
     .col-sm-6.mb-2
       = paginate @bikes
     .col-sm-6.text-right
-      = select_tag :per_page_select, options_for_select([10, 25, 50].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }
+      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }

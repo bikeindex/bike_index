@@ -303,6 +303,7 @@ Rails.application.routes.draw do
   get "why-donate", to: "info#why_donate", as: "why_donate"
   get "why_donate", to: redirect("/why-donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
+  get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: [:show]
 
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }

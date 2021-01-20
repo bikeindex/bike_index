@@ -39,13 +39,14 @@ RSpec.describe Admin::NewsController, type: :request do
       blog.reload
       expect(blog.title).to eq blog_attrs[:title]
       expect(blog.body).to eq blog_attrs[:body]
+      expect(blog.kind).to eq "blog"
     end
     describe "update info" do
-      let(:blog_attrs) { {is_info: true} }
+      let(:blog_attrs) { {info_kind: true} }
       it "switches to be info" do
         put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
         blog.reload
-        expect(blog.info?).to be_truthy
+        expect(blog.kind).to eq "info"
       end
     end
   end

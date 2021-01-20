@@ -60,7 +60,7 @@ RSpec.describe Blog, type: :model do
     it "updates the published_at" do
       blog.update(updated_at: Time.current)
       expect(blog.published_at).to be < Time.current - 1.day
-      blog.update(is_info: true)
+      blog.update(info_kind: true)
       expect(blog.published_at).to be_within(2).of Time.current
     end
   end

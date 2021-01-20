@@ -1,5 +1,9 @@
 .root-landing-recovery-stories {
   padding-top: (4 * $vertical-height);
+  h3 {
+    font-style: italic;
+    text-align: center;
+  }
 }
 
 #recovery-stories-listing {

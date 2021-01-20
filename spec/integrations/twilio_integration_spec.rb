@@ -3,6 +3,12 @@ require "rails_helper"
 RSpec.describe TwilioIntegration do
   let(:instance) { described_class.new }
 
+  describe "twilio_formatted" do
+    it "strips leading zeros" do
+      expect(TwilioIntegration.twilio_formatted("00100000000")).to eq "100000000"
+    end
+  end
+
   describe "send_message" do
     it "sends a message" do
       VCR.use_cassette("twilio_integration-send_message", match_requests_on: [:path]) do
@@ -19,7 +25,7 @@ RSpec.describe TwilioIntegration do
     it "sends a message, stores the sid" do
       VCR.use_cassette("twilio_integration-send_notification", match_requests_on: [:path]) do
         expect(notification.twilio_sid).to be_blank
-        instance.send_notification(notification, to: "5102224444", body: "This is a test message")
+        instance.send_notification(notification, to: "05102224444", body: "This is a test message")
         notification.reload
         expect(notification.twilio_sid).to be_present
         notification.twilio_sid

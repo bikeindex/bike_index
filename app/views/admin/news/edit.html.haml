@@ -47,14 +47,15 @@
                   = f.label :published, "Published", class: "form-check-label"
                 %div{ class: infoOnlyClass }
                   %small.less-strong info posts are published at the most recent edit time
-            .col-sm-6
-              .form-group
-                .form-check.form-check-inline#infoCheck
-                  = f.check_box :is_info, class: "form-check-input"
-                  = f.label :is_info, class: "form-check-label" do
-                    Info post
-                    %small.less-strong
-                      static content that's updated
+            - unless @blog.listicle?
+              .col-sm-6
+                .form-group
+                  .form-check.form-check-inline#infoCheck
+                    = f.label :info_kind, class: "form-check-label" do
+                      = f.check_box :info_kind, checked: @blog.info?, class: "form-check-input"
+                      Info post
+                      %small.less-strong
+                        static content that's updated
             .col-sm-6{ class: blogOnlyClass }
               .form-group
                 %span.less-strong
@@ -119,12 +120,17 @@
             = f.text_field :title, placeholder: "Blog title", class: "form-control"
         .col-md-6
           .form-group
-            = f.label :description_abbr, "Abbreviated description", class: "control-label"
-            = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
-            .mt-0
-              Default:
-              %em.less-strong
-                = @blog.body_abbr
+            = f.label :secondary_title, class: "control-label" do
+              Secondary title
+              %small.less-strong optional
+            = f.text_field :secondary_title, placeholder: "", class: "form-control"
+      .form-group.mb-4
+        = f.label :description_abbr, "Abbreviated description", class: "control-label"
+        = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
+        .mt-0
+          Default:
+          %em.less-strong
+            = @blog.body_abbr
 
       .row.mt-2
         .col-sm-3

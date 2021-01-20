@@ -1,9 +1,10 @@
 class Admin::NewsController < Admin::BaseController
+  include SortableTable
   before_action :find_blog, only: [:show, :edit, :update, :destroy]
   before_action :set_dignified_name
 
   def index
-    @blogs = Blog.order("created_at asc")
+    @blogs = available_blogs.reorder(sort_column + " " + sort_direction)
   end
 
   def new
@@ -20,6 +21,7 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
+    @page_title = "Edit: #{@blog.title}"
   end
 
   def update
@@ -61,6 +63,10 @@ class Admin::NewsController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w[created_at published_at user_id updated_at title]
+  end
+
   def permitted_parameters
     params.require(:blog).permit(
       :body,
@@ -68,7 +74,6 @@ class Admin::NewsController < Admin::BaseController
       :description_abbr,
       :index_image,
       :index_image_id,
-      :is_listicle,
       :language,
       :listicles_attributes,
       :old_title_slug,
@@ -79,11 +84,24 @@ class Admin::NewsController < Admin::BaseController
       :tags,
       :timezone,
       :title,
+      :secondary_title,
       :update_title,
       :user_email,
       :user_id,
-      :is_info
+      :info_kind
     )
+  end
+
+  def available_blogs
+    blogs = Blog
+    if %w[blog info listicle].include?(params[:search_kind])
+      @search_kind = params[:search_kind]
+      blogs = blogs.where(kind: @search_kind)
+    else
+      @search_kind = "all"
+    end
+    blogs = blogs.published if sort_column == "published_at"
+    blogs
   end
 
   def set_dignified_name

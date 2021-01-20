@@ -285,6 +285,7 @@
               %strong
                 = t(".owners_phone_number")
               = phone_link(@stolen_record.phone)
+<<<<<<< HEAD
 
       - if @bike.owner != current_user && BikeDisplayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
         - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
@@ -302,3 +303,5 @@
             Open claim
 
       .ad-block#right300x600
+=======
+>>>>>>> main

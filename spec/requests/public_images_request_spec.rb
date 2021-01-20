@@ -231,7 +231,7 @@ RSpec.describe PublicImagesController, type: :request do
       it "updates things and go back to editing the bike" do
         expect(bike.reload.owner).to eq(current_user)
         expect {
-          put "#{base_url}/#{public_image.id}", params: { public_image: {name: "Food"}}
+          put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
         }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
         expect(response).to redirect_to(edit_bike_url(bike))
         expect(public_image.reload.name).to eq("Food")
@@ -242,7 +242,7 @@ RSpec.describe PublicImagesController, type: :request do
           og_name = public_image.name
           expect(bike.authorized?(current_user)).to be_falsey
           expect {
-            put "#{base_url}/#{public_image.id}", params: { public_image: {name: "Food"}}
+            put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
           }.to change(AfterBikeSaveWorker.jobs, :count).by(0)
           expect(public_image.reload.name).to eq(og_name)
         end
@@ -251,11 +251,11 @@ RSpec.describe PublicImagesController, type: :request do
         it "updates" do
           expect(public_image.kind).to eq "photo_uncategorized"
           expect {
-            patch "#{base_url}/#{public_image.id}", params: { kind: "photo_of_user_with_bike"}
+            patch "#{base_url}/#{public_image.id}", params: {kind: "photo_of_user_with_bike"}
           }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
           expect(public_image.reload.kind).to eq("photo_of_user_with_bike")
           # And changing from a non-default kind
-          put "#{base_url}/#{public_image.id}", params: { kind: "photo_of_serial"}
+          put "#{base_url}/#{public_image.id}", params: {kind: "photo_of_serial"}
           expect(public_image.reload.kind).to eq("photo_of_serial")
         end
       end

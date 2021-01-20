@@ -13,7 +13,7 @@ RSpec.describe NewsController, type: :request do
 
     describe "show" do
       let(:user) { FactoryBot.create(:user) }
-      let(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title") }
+      let(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title", secondary_title: "yeah-that-title") }
       context "title slug" do
         it "renders" do
           get "#{base_url}/#{blog.title_slug}"
@@ -31,6 +31,13 @@ RSpec.describe NewsController, type: :request do
       context "id" do
         it "renders" do
           get "#{base_url}/#{blog.id}"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("show")
+        end
+      end
+      context "secondary title" do
+        it "renders" do
+          get "#{base_url}/#{blog.secondary_title}"
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
         end
@@ -85,7 +92,7 @@ RSpec.describe NewsController, type: :request do
         expect(response).to render_template("show")
       end
       context "is info" do
-        let(:blog) { FactoryBot.create(:blog, is_info: true) }
+        let!(:blog) { FactoryBot.create(:blog, info_kind: true) }
         it "redirects to info" do
           get "#{base_url}/#{blog.title_slug}"
           expect(response).to redirect_to(info_path(blog.to_param))

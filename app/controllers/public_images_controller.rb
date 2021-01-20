@@ -100,7 +100,7 @@ class PublicImagesController < ApplicationController
       Bike.unscoped.find_by_id(public_image.imageable_id)&.authorized?(current_user) || false
     else
       # if public_image.imageable_type == "Blog" || public_image.imageable_type == "MailSnippet"
-      current_user && current_user.superuser? || false
+      current_user&.superuser? || false
     end
   end
 
