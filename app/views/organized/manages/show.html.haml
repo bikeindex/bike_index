@@ -1,5 +1,5 @@
 %h1.mb-4.uncap
-  = t(".org_settings")
+  = t(".org_settings", org_name: @organization.short_name)
 
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 

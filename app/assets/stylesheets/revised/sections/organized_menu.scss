@@ -84,20 +84,22 @@ $organized-menu-bg: $gray-lighter;
         }
       }
 
-      .menu-item {
+      .nav-link,
+      .disabled-menu-item {
         width: 100%;
         display: block;
         padding: (0.5 * $vertical-height) $vertical-height;
-        color: $header-font-nocolor;
         text-decoration: none;
         font-size: 14px;
         line-height: 1.5;
+      }
 
+      .nav-link {
+        color: $header-font-nocolor;
         &:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
           padding-right: 0;
-
           // Because otherwise the shift to bold can break line
         }
 
@@ -117,11 +119,6 @@ $organized-menu-bg: $gray-lighter;
 
       .disabled-menu-item {
         color: $less-strong-font-color;
-        display: block;
-
-        &:hover {
-          font-weight: normal;
-        }
       }
 
       .active {

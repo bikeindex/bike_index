@@ -32,104 +32,8 @@
               = passive_organization.short_name
               %i.fas.fa-chevron-down.caret-down
             %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
-              - if passive_organization.ambassador?
-                %li
-                  = active_link t(".org_dashboard", org_name: passive_organization.short_name), organization_ambassador_dashboard_path(organization_id: passive_organization.to_param), class: "nav-link"
-                %li
-                  = active_link t(".resources"), resources_organization_ambassador_dashboard_path(organization_id: passive_organization.to_param), class: "nav-link"
-                %li
-                  = active_link t(".getting_started"), getting_started_organization_ambassador_dashboard_path(organization_id: passive_organization.to_param), class: "nav-link"
-                %li
-                  = active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
-                %li
-                  = active_link t(".discuss"), "https://discuss.bikeindex.org", class: "nav-link"
-              - else
-                - if passive_organization.overview_dashboard?
-                  %li
-                    = active_link "#{passive_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
-                  %li.divider-nav-item
-                - if passive_organization.appointment_functionality_enabled?
-                  = active_link t(".virtual_line"), organization_lines_path(organization_id: passive_organization.to_param), class: "nav-link", match_controller: true
-                  %li.divider-nav-item
-                - on_bikes_path = controller_name == "bikes" && action_name == "index" && params[:organization_id].present? # Because we want to ignore queries and stuff
-                %li
-                  = link_to t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}"
-                - if passive_organization.enabled?("impound_bikes")
-                  %li
-                    = active_link t(".impounded_bikes"), organization_impound_records_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link secondary-item"
-                - if passive_organization.enabled?("show_partial_registrations")
-                  %li
-                    = active_link t(".incomplete_registrations"), incompletes_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
-                - if passive_organization.show_multi_serial?
-                  %li
-                    = active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
-                - if passive_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this
-                  %li
-                    = active_link t(".recoveries"), recoveries_organization_bikes_path(passive_organization.to_param), class: "nav-link secondary-item"
+              = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization }
 
-                - divider_below_add_bike = passive_organization.show_bulk_import? || passive_organization.lightspeed_pos? || passive_organization.enabled?("parking_notifications")
-                - new_bike_with_parking_notification = controller_name == "bikes" && action_name == "new" && @unregistered_parking_notification
-                - new_bike_active = "bikes" && action_name == "new" && !new_bike_with_parking_notification
-                %li
-                  = link_to t(".add_a_bike"), new_organization_bike_path(passive_organization.to_param), class: "nav-link #{new_bike_active ? "active" : ""}"
-                - if divider_below_add_bike
-                  %li.divider-nav-item
-
-                - if passive_organization.show_bulk_import?
-                  %li
-                    - bulk_link_name = passive_organization.ascend_pos? ? "Ascend Imports" : "Bulk Imports"
-                    = active_link bulk_link_name, organization_bulk_imports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                - if passive_organization.lightspeed_pos?
-                  = active_link t(".lightspeed_integration_panel"), lightspeed_interface_path(organization_id: passive_organization&.id), class: "nav-link"
-                - if passive_organization.enabled?("parking_notifications")
-                  %li
-                    = active_link t(".parking_notifications"), organization_parking_notifications_path(organization_id: passive_organization.to_param), class: "nav-link"
-                  %li
-                    = link_to t(".parking_notification_unregistered"), new_organization_bike_path(passive_organization.to_param, parking_notification: true), class: "nav-link #{new_bike_with_parking_notification ? 'active' : ''} secondary-item"
-
-                %li.divider-nav-item
-                - additional_divider = false
-                - if passive_organization.enabled?("bike_stickers")
-                  - additional_divider = true
-                  %li
-                    = active_link t(".registration_stickers"), organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                - if passive_organization.enabled?("hot_sheet")
-                  - additional_divider = true
-                  %li
-                    = active_link t(".stolen_hot_sheet"), organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
-                - if passive_organization.enabled?("csv_exports")
-                  - additional_divider = true
-                  %li
-                    = active_link t(".exports"), organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                - if passive_organization.deliver_graduated_notifications?
-                  - additional_divider = true
-                  %li
-                    = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                - if passive_organization.public_impound_bikes?
-                  %li
-                    = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passive_organization.to_param), class: "nav-link"
-                - if current_user.admin_of?(passive_organization) || current_user.superuser?
-                  - if additional_divider
-                    %li.divider-nav-item
-                  %li
-                    = active_link t(".users"), organization_users_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                  %li
-                    = active_link t(".org_profile", org_name: passive_organization.short_name), organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
-                  %li
-                    = active_link t(".org_locations", org_name: passive_organization.short_name), locations_organization_manage_path(organization_id: passive_organization.to_param), class: "nav-link"
-                  - if passive_organization.enabled?("customize_emails")
-                    %li
-                      = active_link t(".customize_emails"), organization_emails_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                  - if passive_organization.enabled?("hot_sheet")
-                    %li
-                      = active_link t(".stolen_hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passive_organization.to_param), class: "nav-link"
-                  - if passive_organization.appointment_functionality_enabled?
-                    %li
-                      = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-              - if current_user&.superuser?
-                %li.divider-nav-item
-                %li
-                  = link_to t(".super_admin_view", org_name: passive_organization.short_name), admin_organization_path(passive_organization)
         - elsif current_user.blank?
           .center-navbar-signup-link-container
             = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
@@ -183,8 +87,8 @@
             = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
     = render 'layouts/revised_messages'
 
-    - if current_page_skeleton
-      = render "/shared/#{current_page_skeleton}"
+    - if current_page_skeleton.present?
+      = render partial: "/shared/#{current_page_skeleton}"
     - else
       = yield
 

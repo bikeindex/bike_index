@@ -3755,7 +3755,7 @@ en:
       add_a_bike: Add a bike
       appointment_configuration: Appointments configuration
       blog: Blog
-      customize_emails: Customize emails
+      custom_emails: Custom emails
       discuss: Discuss
       donate: Donate
       exports: Exports
@@ -3772,6 +3772,7 @@ en:
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"
+      impound_settings: Impound bikes
       org_profile: "%{org_name} profile"
       parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
@@ -4504,7 +4505,7 @@ en:
         search_owner_email: Search owner email
     manages:
       impounding:
-        impound_settings_html: "<em>%{org_name}</em> impound settings"
+        impound_settings_html: "Manage <em>%{org_name}</em> impound settings"
         save: Save
       location_fields:
         address: Address
@@ -4532,7 +4533,7 @@ en:
         name: Name
         org_email_address_html: Email address <em>%{org_name}</em> bike registrations
           will be sent from
-        org_settings: Settings
+        org_settings: "%{org_name} settings"
         organization_logo: Organization logo
         organization_type: Organization type
         registration_email: Registration email
@@ -5162,7 +5163,8 @@ en:
       ascend_imports: Ascend Imports
       bikes: Bikes
       bulk_imports: Bulk Imports
-      customize_emails: Customize emails
+      custom_emails: Custom emails
+      impound_settings: Impound settings
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
@@ -5195,11 +5197,53 @@ en:
         page
       use_ascend: Use Ascend?
       use_lightspeed_retail_pos: Use Lightspeed Retail POS?
-      users: Users
+      manage_users: Manage users
       viewing_our_streamlined_page: >-
         You're currently viewing our streamlined Bike Shop registration page, which
         is what we recommend using
       virtual_line: Virtual line
+    organized_menu_items:
+      add_a_bike: Add a bike
+      appointment_configuration: Appointments configuration
+      blog: Blog
+      custom_emails: Custom emails
+      discuss: Discuss
+      donate: Donate
+      exports: Exports
+      getting_started: Getting started
+      graduated_notifications: Graduated notifications
+      help: Help
+      impounded_bikes: Impounded Bikes
+      impounded_claims: Impounded claims
+      incomplete_registrations: Incomplete registrations
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      log_in: log in
+      logout: Logout
+      multi_serial_search: Multi serial search
+      org_bikes: "%{org_name} Bikes"
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locations"
+      impound_settings: Impound bikes
+      org_profile: "%{org_name} profile"
+      parking_notification_unregistered: New unregistered notification
+      parking_notifications: Parking notifications
+      recoveries: Recoveries
+      register_a_new_bike: Register a new bike
+      registration_stickers: Registration stickers
+      resources: Resources
+      search_bikes: Search bikes
+      sign_up: Sign up
+      stolen_bike: Stolen bike?
+      stolen_hot_sheet: Stolen Bike Hot Sheet
+      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
+      super_admin_view: Super Admin for %{org_name}
+      the_nonprofit_bike_registry: the non-profit bike registry
+      user_settings: "%{user_email} settings"
+      manage_users: Manage users
+      manage_impounding: Manage impounding
+      view_org: View %{org_name}
+      virtual_line: Virtual line
+      your_bikes: Your bikes
     period_select:
       all: All
       custom: custom
