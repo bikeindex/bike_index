@@ -1400,7 +1400,8 @@ CREATE TABLE public.impound_record_updates (
     transfer_email character varying,
     resolved boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    impound_claim_id bigint
 );
 
 
@@ -4520,6 +4521,13 @@ CREATE INDEX index_impound_claims_on_stolen_record_id ON public.impound_claims U
 --
 
 CREATE INDEX index_impound_claims_on_user_id ON public.impound_claims USING btree (user_id);
+
+
+--
+-- Name: index_impound_record_updates_on_impound_claim_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_record_updates_on_impound_claim_id ON public.impound_record_updates USING btree (impound_claim_id);
 
 
 --

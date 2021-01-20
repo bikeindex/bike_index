@@ -66,6 +66,13 @@ class ImpoundRecord < ApplicationRecord
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  def notification_notes_and_messages
+    return nil unless parking_notification.present?
+    msgs = parking_notification.associated_notifications_including_self
+      .map { |pn| [pn.internal_notes, pn.message] }.flatten.reject(&:blank?)
+    msgs.any? ? msgs : nil
+  end
+
   def creator
     parking_notification&.user
   end

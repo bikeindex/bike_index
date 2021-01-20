@@ -209,6 +209,11 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes") && public_impound_bikes
   end
 
+  # Stub for now. Might actually just be public_impound_bikes?
+  def impound_claims?
+    enabled?("impound_features_2021")
+  end
+
   def broken_pos?
     self.class.broken_pos_kinds.include?(pos_kind)
   end

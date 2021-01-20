@@ -60,6 +60,8 @@ module Organized
 
     def find_impound_claim
       @impound_claim = impound_claims.find(params[:id])
+      @impound_record = @impound_claim.impound_record
+      @parking_notification = @impound_record.parking_notification
     end
 
     def permitted_parameters

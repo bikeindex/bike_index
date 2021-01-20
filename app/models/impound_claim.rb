@@ -1,10 +1,3 @@
-# t.references :impound_record, index: true
-# t.references :stolen_record, index: true
-# t.references :user, index: true
-# t.text :message
-# t.integer :status
-# t.datetime :submitted_at
-
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,

@@ -103,4 +103,33 @@ RSpec.describe ImpoundRecord, type: :model do
       }.to_not change(ImpoundUpdateBikeWorker.jobs, :count)
     end
   end
+
+  describe "notification_notes_and_messages" do
+    # This method is relevant because PSU puts serials into the notes from the parking notifications
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:impound_record) { FactoryBot.create(:impound_record, organization: organization) }
+    let(:bike) { impound_record.bike }
+    it "returns serial number" do
+      expect(impound_record.parking_notification&.id).to be_blank
+      expect(impound_record.notification_notes_and_messages).to be_blank
+    end
+    context "note and message" do
+      let(:parking_notification1) do
+        FactoryBot.create(:parking_notification, bike: bike, organization: organization, kind: "parked_incorrectly_notification",
+          internal_notes: "Internal note 1", created_at: Time.current - 1.month)
+      end
+      let!(:parking_notification2) do
+        FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
+          initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
+      end
+      it "returns note and message" do
+        impound_record.reload
+        organization.reload
+        expect(impound_record.parking_notification&.id).to eq parking_notification2.id
+        parking_notification2.reload
+        expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
+        expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
+      end
+    end
+  end
 end

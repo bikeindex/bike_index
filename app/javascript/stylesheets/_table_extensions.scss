@@ -51,6 +51,12 @@
       width: 70%;
     }
   }
+  .inline-images img {
+    display: inline-block;
+    width: 31%;
+    max-width: 150px;
+    margin-right: 3%;
+  }
 }
 
 table {

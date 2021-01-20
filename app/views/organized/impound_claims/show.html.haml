@@ -1,3 +1,146 @@
+- bike_claimed = @impound_claim.bike_claimed
+- bike_submitting = @impound_claim.bike_submitting
 .organized-page-header
   %h1.uncap
     Impound Claim
+
+%h3.uncap.mb-0 Impounded bike:
+.row
+  .col-md-6.mt-2
+    %table.table-list
+      %tbody
+        %tr
+          %td Impound ID
+          %td
+            %strong
+              = link_to @impound_record.display_id, organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+            - if display_dev_info?
+              %small.only-dev-visible.ml-2
+                %em.less-strong real id:
+                %code
+                  = @impound_record.id
+
+        - unless @parking_notification.present?
+          %tr
+            %td Created
+            %td
+              %span.convertTime.preciseTime
+                = l(@impound_record.created_at, format: :convert_time)
+          %tr
+            %td Impounded by
+            %td= @impound_record.creator&.display_name
+
+        - unless @impound_record.current?
+          %tr
+            %td Status
+            %td
+              %strong
+                = status_display(@impound_record.status_humanized)
+        %tr
+          %td Bike
+          %td
+            - if bike_claimed.present?
+              = link_to organized_bike_text(bike_claimed), bike_path(bike_claimed, organization_id: current_organization.to_param)
+        %tr
+          %td Notification Notes
+          %td
+            - if @impound_record.notification_notes_and_messages.present?
+              %ul
+                - @impound_record.notification_notes_and_messages.each do |note|
+                  %li= note
+
+  - if bike_claimed.present?
+    .col-md-6
+      .bike-boxes.mt-0
+        = render partial: "/bikes/bike", locals: { bike: bike_claimed.decorate }
+
+%h3.uncap.mb-0.mt-4 Claiming bike:
+.row
+  .col-md-6.mt-2
+    %table.table-list
+      %tbody
+        %tr
+          %td Claim Created
+          %td
+            %span.convertTime.preciseTime
+              = l(@impound_claim.created_at, format: :convert_time)
+        %tr
+          %td Status
+          %td
+            %strong
+              = status_display(@impound_claim.status_humanized)
+            - if @impound_claim.resolved?
+              %span.convertTime.preciseTime
+                = l(@impound_claim.resolved_at, format: :convert_time)
+            - elsif @impound_claim.submitted_at.present?
+              %small.less-strong
+                submitted:
+                %span.convertTime.preciseTime
+                  = l(@impound_claim.submitted_at, format: :convert_time)
+        %tr
+          %td User
+          %td
+            = @impound_claim.user.display_name
+        %tr
+          %td Verified phone?
+          %td
+            = check_mark if @impound_claim.user.user_phones.confirmed.any?
+        - if bike_submitting.present?
+          %tr
+            %td Bike
+            %td
+              - if bike_submitting.present?
+                = link_to organized_bike_text(bike_submitting), bike_path(bike_submitting, organization_id: current_organization.to_param)
+        %tr
+          %td Bike registered
+          %td
+            - if bike_submitting.present?
+              %span.convertTime.preciseTime
+                = l(bike_submitting.created_at, format: :convert_time)
+        %tr
+          %td Photos with bike
+          %td.inline-images
+            - @impound_claim.bike_submitting_images.photo_of_user_with_bike.each do |image|
+              = link_to image_tag(image.image_url(:small), class: "d-inline-block"), image.image_url
+        %tr
+          %td Proof of purchase
+          %td.inline-images
+            - @impound_claim.bike_submitting_images.photo_of_receipt.each do |image|
+              = link_to image_tag(image.image_url(:small), class: "d-inline-block"), image.image_url
+
+
+  .col-md-6
+    - if bike_submitting.present?
+      .bike-boxes.mt-0
+        = render partial: "/bikes/bike", locals: { bike: bike_submitting.decorate }
+    %p.mt-4
+      %strong.d-block Message from the user about claiming this bike:
+      %em= @impound_claim.message
+
+  - if @impound_claim.submitting?
+    .col-sm-6.offset-sm-3
+      .card.mt-4
+        .card-block
+          .card-title
+            %h3.uncap Respond to this claim
+          .card-body
+            .row
+              .col-xs-6.text-center
+                %a.btn.btn-lg.btn-success{ href:"#" }
+                  Approve
+              .col-xs-6.text-center
+                %a.btn.btn-lg.btn-danger{ href:"#" }
+                  Deny
+            %p.mt-4.mb-0
+              %em.less-strong
+                Clicking one these buttons will send an email to the user, letting them know the response to their claim.
+                %strong They will still need to arrange to pick up the bike.
+
+- if @parking_notification.present?
+  %hr.mt-4
+  %h2.uncap
+    Impounded by
+    %em
+      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+
+  = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }

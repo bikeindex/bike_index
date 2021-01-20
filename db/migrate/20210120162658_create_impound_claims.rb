@@ -14,5 +14,7 @@ class CreateImpoundClaims < ActiveRecord::Migration[5.2]
 
       t.timestamps
     end
+
+    add_reference :impound_record_updates, :impound_claim, index: true
   end
 end

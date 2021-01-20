@@ -98,10 +98,9 @@
     %li
       = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
-  - if passed_organization.enabled?("impound_features_2021")
-    -# we may only want to show this if passed_organization.public_impound_bikes?
+  - if passed_organization.impound_claims?
     %li
-      = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passed_organization.to_param), class: "nav-link"
+      = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
   - if current_user.admin_of?(passed_organization) || current_user.superuser?
     - if additional_divider

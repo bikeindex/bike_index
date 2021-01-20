@@ -9,12 +9,6 @@
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
   %thead.small-header.hidden-md-down
-    - unless skip_impound_record
-      %th
-        - if render_sortable
-          = sortable "impound_record_id", "Impound Record"
-        - else
-          Impound Record
     %th
       - if render_sortable
         = sortable "created_at"
@@ -26,7 +20,13 @@
       - else
         Updated
     - unless skip_bike
-      %th Bike
+      %th Claiming Bike
+    - unless skip_impound_record
+      %th.small
+        - if render_sortable
+          = sortable "impound_record_id", "Impound ID"
+        - else
+          Impound ID
     - unless skip_status
       %th
         Status
@@ -46,12 +46,6 @@
     - impound_claims.each do |impound_claim|
       - impound_record = impound_claim.impound_record
       %tr
-        - unless skip_impound_record
-          %td
-            - if impound_claim.impound_record.present?
-              = link_to impound_claim.impound_record.display_id, organization_impound_record_path(impound_claim.impound_record.display_id, organization_id: impound_claim.organization_id)
-              %em.less-strong
-                = link_to "view claims", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: impound_record.id)), class: "small gray-link"
         %td
           %a.convertTime.preciseTime{ href: organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) }
             = l(impound_claim.created_at, format: :convert_time)
@@ -62,10 +56,16 @@
           %td
             - if impound_claim.bike_submitting.present?
               = link_to organized_bike_text(impound_claim.bike_submitting), bike_path(impound_claim.bike_submitting, organization_id: current_organization.id)
+        - unless skip_impound_record
+          %td
+            - if impound_claim.impound_record.present?
+              = link_to impound_claim.impound_record.display_id, organization_impound_record_path(impound_claim.impound_record.display_id, organization_id: impound_claim.organization_id)
+              %em.less-strong
+                = link_to "view claims", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: impound_record.id)), class: "small gray-link"
         - unless skip_status
           %td
             %em
-              = status_display(impound_claim.status)
+              = status_display(impound_claim.status_humanized)
         %td
           = impound_claim.user&.display_name&.truncate(20)
         - if render_resolved_at
