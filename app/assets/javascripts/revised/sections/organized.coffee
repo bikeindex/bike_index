@@ -1,5 +1,6 @@
 class BikeIndex.Organized extends BikeIndex
   constructor: ->
+    console.log("organizeeeeed")
     @setOrganizedWrapHeight()
 
     # Only on the edit organization page, but no real reason to create another

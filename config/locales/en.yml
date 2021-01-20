@@ -3752,45 +3752,18 @@ en:
       year: year
   layouts:
     application:
-      add_a_bike: Add a bike
-      appointment_configuration: Appointments configuration
       blog: Blog
-      custom_emails: Custom emails
-      discuss: Discuss
       donate: Donate
-      exports: Exports
-      getting_started: Getting started
-      graduated_notifications: Graduated notifications
       help: Help
-      impounded_bikes: Impounded Bikes
-      impounded_claims: Impounded claims
-      incomplete_registrations: Incomplete registrations
-      lightspeed_integration_panel: Lightspeed Integration Panel
       log_in: log in
       logout: Logout
-      multi_serial_search: Multi serial search
-      org_bikes: "%{org_name} Bikes"
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} locations"
-      impound_settings: Impound bikes
-      org_profile: "%{org_name} profile"
-      parking_notification_unregistered: New unregistered notification
-      parking_notifications: Parking notifications
-      recoveries: Recoveries
       register_a_new_bike: Register a new bike
-      registration_stickers: Registration stickers
-      resources: Resources
       search_bikes: Search bikes
       sign_up: Sign up
       stolen_bike: Stolen bike?
-      stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
-      super_admin_view: Super Admin view %{org_name}
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
-      users: Users
       view_org: View %{org_name}
-      virtual_line: Virtual line
       your_bikes: Your bikes
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
@@ -4505,7 +4478,7 @@ en:
         search_owner_email: Search owner email
     manages:
       impounding:
-        impound_settings_html: "Manage <em>%{org_name}</em> impound settings"
+        impound_settings_html: Manage <em>%{org_name}</em> impound settings
         save: Save
       location_fields:
         address: Address
@@ -5153,97 +5126,57 @@ en:
       multiple_serial_search_pane: Multiple serial search pane
       thank_you: Thank you so much for using Bike Index!
       thanks_for_using_bike_index: Thanks for using Bike Index!
-    organized_skeleton:
-      add_a_bike: Add a bike
-      additional_features_html: >-
-        Bike Index provides additional features for verified Law Enforcement organizations.
-        Please contact %{email_link} to get them enabled.
-      admin_panel: Admin Panel
-      appointment_configuration: Appointments config
-      ascend_imports: Ascend Imports
-      bikes: Bikes
-      bulk_imports: Bulk Imports
-      custom_emails: Custom emails
-      impound_settings: Impound settings
-      discuss: Discuss
-      exports: Exports
-      getting_started: Getting started
-      graduated_notifications: Graduated notifications
-      how_integration_works: how the integration works
-      impounded_bikes: Impounded
-      impounded_claims: Impounded claims
-      incomplete_registrations: Incomplete registrations
-      integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
-      integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
-      lightspeed_integration_panel: Lightspeed Integration Panel
-      link_to_register_html: >-
-        <strong>%{link}</strong> to automatically register the bikes you sell to your
-        customers.
-      multi_serial_search: Multi serial search
-      organization_locations: "%{org_name} locations"
-      organization_profile: "%{org_name} profile"
-      other_point_of_sale_system: Other Point of Sale system?
-      overview_dashboard: Dashboard
-      parking_notification_unregistered: New unregistered notification
-      parking_notifications: Parking notifications
-      read_a_full_explanation_html: Read a full explanation of %{link}.
-      recoveries: Recoveries
-      register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
-      registration_stickers: Registration stickers
-      resources: Resources
-      stolen_hot_sheet: Stolen Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Hot Sheet config
-      streamlined_bike_shop_registration_page: streamlined Bike Shop registration
-        page
-      use_ascend: Use Ascend?
-      use_lightspeed_retail_pos: Use Lightspeed Retail POS?
-      manage_users: Manage users
-      viewing_our_streamlined_page: >-
-        You're currently viewing our streamlined Bike Shop registration page, which
-        is what we recommend using
-      virtual_line: Virtual line
     organized_menu_items:
       add_a_bike: Add a bike
       appointment_configuration: Appointments configuration
-      blog: Blog
+      ascend_imports: Ascend Imports
+      bulk_imports: Bulk Imports
       custom_emails: Custom emails
       discuss: Discuss
-      donate: Donate
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      help: Help
       impounded_bikes: Impounded Bikes
       impounded_claims: Impounded claims
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
-      log_in: log in
-      logout: Logout
+      manage_impounding: Manage impounding
+      manage_users: Manage users
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"
-      impound_settings: Impound bikes
       org_profile: "%{org_name} profile"
       parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
       recoveries: Recoveries
-      register_a_new_bike: Register a new bike
       registration_stickers: Registration stickers
       resources: Resources
-      search_bikes: Search bikes
-      sign_up: Sign up
-      stolen_bike: Stolen bike?
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       super_admin_view: Super Admin for %{org_name}
-      the_nonprofit_bike_registry: the non-profit bike registry
-      user_settings: "%{user_email} settings"
-      manage_users: Manage users
-      manage_impounding: Manage impounding
-      view_org: View %{org_name}
       virtual_line: Virtual line
-      your_bikes: Your bikes
+    organized_skeleton:
+      additional_features_html: >-
+        Bike Index provides additional features for verified Law Enforcement organizations.
+        Please contact %{email_link} to get them enabled.
+      admin_panel: Admin Panel
+      how_integration_works: how the integration works
+      integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
+      integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
+      link_to_register_html: >-
+        <strong>%{link}</strong> to automatically register the bikes you sell to your
+        customers.
+      other_point_of_sale_system: Other Point of Sale system?
+      read_a_full_explanation_html: Read a full explanation of %{link}.
+      register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
+      streamlined_bike_shop_registration_page: streamlined Bike Shop registration
+        page
+      use_ascend: Use Ascend?
+      use_lightspeed_retail_pos: Use Lightspeed Retail POS?
+      viewing_our_streamlined_page: >-
+        You're currently viewing our streamlined Bike Shop registration page, which
+        is what we recommend using
     period_select:
       all: All
       custom: custom
