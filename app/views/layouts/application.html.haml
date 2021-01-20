@@ -32,7 +32,7 @@
               = passive_organization.short_name
               %i.fas.fa-chevron-down.caret-down
             %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
-              = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization }
+              = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization, is_dropdown: true }
 
         - elsif current_user.blank?
           .center-navbar-signup-link-container

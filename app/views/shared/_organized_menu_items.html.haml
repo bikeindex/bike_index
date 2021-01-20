@@ -1,6 +1,7 @@
 -# Really should pass organization
 - passed_organization ||= passive_organization
-- render_disabled ||= false
+- is_dropdown ||= false
+- render_disabled = !is_dropdown # Don't render disabled in dropdown
 - show_overview_dashboard = current_organization.overview_dashboard?
 - show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
 
@@ -97,7 +98,7 @@
     %li
       = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
-  - if passed_organization.enabled?("new_impound_features")
+  - if passed_organization.enabled?("impound_features_2021")
     -# we may only want to show this if current_organization.public_impound_bikes?
     %li
       = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passed_organization.to_param), class: "nav-link"
@@ -111,7 +112,7 @@
       = active_link t(".org_profile", org_name: passed_organization.short_name), organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
     %li
       = active_link t(".org_locations", org_name: passed_organization.short_name), locations_organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
-    - if passed_organization.enabled?("new_impound_features")
+    - if passed_organization.enabled?("impound_features_2021")
       %li
         = active_link t(".manage_impounding", org_name: passed_organization.short_name), impounding_organization_manage_path(organization_id: passed_organization.to_param), class: "nav-link"
     - if passed_organization.enabled?("customize_emails")
@@ -123,6 +124,9 @@
     - if passed_organization.appointment_functionality_enabled?
       %li
         = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
+
+  - if !is_dropdown || current_user&.superuser? # Don't include last divider if in dropdown - unless superuser
+    %li.divider-nav-item
 
 - if current_user&.superuser?
   %li.less-strong.mt-4
