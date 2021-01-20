@@ -17,7 +17,8 @@ module Organized
     end
 
     def update
-      # TODO: make it work
+      flash[:success] = params[:update_status]
+      redirect_back(fallback_location: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id))
     end
 
     helper_method :available_impound_claims, :available_statuses

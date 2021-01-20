@@ -3,7 +3,7 @@ class ImpoundClaim < ApplicationRecord
     pending: 0,
     submitting: 1,
     approved: 2,
-    rejected: 3,
+    denied: 3,
     canceled: 4,
     retrieved: 5 # After submitted, updated by impound_record_updates
   }.freeze
@@ -31,7 +31,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def self.resolved_statuses
-    %w[rejected canceled retrieved]
+    %w[denied canceled retrieved]
   end
 
   def self.active_statuses

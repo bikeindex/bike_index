@@ -53,12 +53,14 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def self.kinds_humanized
     {
+      current: "Current",
       note: "Add internal note",
       move_location: "Update location",
       retrieved_by_owner: "Owner retrieved bike",
       removed_from_bike_index: "Removed from Bike Index",
       transferred_to_new_owner: "Transferred to new owner",
-      current: "Current"
+      claim_approved: "Claim approved",
+      claim_denied: "Claim denied"
     }
   end
 
@@ -69,7 +71,9 @@ class ImpoundRecordUpdate < ApplicationRecord
       move_location: "Moved",
       retrieved_by_owner: "Retrieved",
       removed_from_bike_index: "Trashed",
-      transferred_to_new_owner: "Transferred"
+      transferred_to_new_owner: "Transferred",
+      claim_approved: "Claim approved",
+      claim_denied: "Claim denied"
     }
   end
 
@@ -88,5 +92,6 @@ class ImpoundRecordUpdate < ApplicationRecord
   def update_associations
     return true if skip_update
     impound_record&.update(updated_at: Time.current)
+    impound_claim&.update(updated_at: Time.current)
   end
 end

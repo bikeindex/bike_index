@@ -70,6 +70,51 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
   end
 
   describe "update" do
-    it "updates"
+    context "approved" do
+      it "updates" do
+        impound_record.reload
+        expect(impound_record.impound_record_updates.count).to eq 0
+        expect(impound_record.status).to eq "current"
+        expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
+        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
+        expect(response.status).to eq(200)
+        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id))
+        expect(assigns(:impound_claim)).to eq impound_claim
+        impound_record.reload
+        expect(impound_record.status).to eq "current"
+        expect(impound_record.impound_record_updates.count).to eq 1
+        impound_record_update = impound_record.impound_record_updates.last
+        expect(impound_record_update.user&.id).to eq current_user.id
+        expect(impound_record_update.impound_claim&.id).to eq impound_claim.id
+        expect(impound_record_update.status).to eq "claim_approved"
+
+        impound_claim.reload
+        expect(impound_claim.status).to eq "approved"
+        expect(impound_claim.impound_record_updates.pluck(:id)).to eq([impound_record_update.id])
+      end
+    end
+    context "denied" do
+      it "updates" do
+        impound_record.reload
+        expect(impound_record.impound_record_updates.count).to eq 0
+        expect(impound_record.status).to eq "current"
+        expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
+        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "denied"}
+        expect(response.status).to eq(200)
+        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id))
+        expect(assigns(:impound_claim)).to eq impound_claim
+        impound_record.reload
+        expect(impound_record.status).to eq "current"
+        expect(impound_record.impound_record_updates.count).to eq 1
+        impound_record_update = impound_record.impound_record_updates.last
+        expect(impound_record_update.user&.id).to eq current_user.id
+        expect(impound_record_update.impound_claim&.id).to eq impound_claim.id
+        expect(impound_record_update.status).to eq "claim_denied"
+
+        impound_claim.reload
+        expect(impound_claim.status).to eq "denied"
+        expect(impound_claim.impound_record_updates.pluck(:id)).to eq([impound_record_update.id])
+      end
+    end
   end
 end
