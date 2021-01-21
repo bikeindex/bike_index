@@ -13,11 +13,14 @@ class ImpoundClaim < ApplicationRecord
   belongs_to :user
   belongs_to :organization
 
+  has_many :impound_record_updates
   has_many :public_images, as: :imageable, dependent: :destroy
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :impound_record_id, :user_id
 
   before_validation :set_calculated_attributes
+  after_commit :send_triggered_notifications
 
   enum status: STATUS_ENUM
 
@@ -56,7 +59,7 @@ class ImpoundClaim < ApplicationRecord
 
   def status_humanized
     # It doesn't make sense to display "submitting"
-    submitting? ? "submitted" : status.gsub("_", " ")
+    submitting? ? "submitted" : status.tr("_", " ")
   end
 
   # return private images too
@@ -80,11 +83,21 @@ class ImpoundClaim < ApplicationRecord
     self.organization_id ||= impound_record&.organization_id
   end
 
+  def send_triggered_notifications
+
+  end
+
   private
 
   def calculated_status
-    status
-    # impound_record_updates - maybe can influence this
-    # but - impound_record&.retrieved_by_owner? doesn't solve this because we don't know if this was the owner who retrieved
+    return status if impound_record_updates.none?
+    last_update = impound_record_updates.reorder(:id).last
+    if last_update.claim_approved?
+      "approved"
+    elsif last_update.claim_denied?
+      "denied"
+    else # Don't know, so just return the thing as is
+      status
+    end
   end
 end

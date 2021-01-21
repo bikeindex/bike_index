@@ -10,7 +10,8 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user: user_claiming) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
   let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
-  let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, stolen_record: bike.current_stolen_record, status: "submitting") }
+  let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, stolen_record: bike.current_stolen_record, status: status) }
+  let(:status) { "submitting" }
 
   describe "index" do
     it "renders" do
@@ -46,7 +47,6 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(assigns(:search_status)).to eq "active"
         expect(assigns(:impound_claims).pluck(:id)).to match_array(active_ids)
 
-
         get "#{base_url}?search_status=all"
         expect(response.status).to eq(200)
         expect(assigns(:search_status)).to eq "all"
@@ -70,15 +70,28 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
   end
 
   describe "update" do
+    before { impound_claim.reload }
+    it "flash errors if unknown update" do
+      impound_record.reload
+      expect(impound_record.impound_record_updates.count).to eq 0
+      expect(impound_record.status).to eq "current"
+      expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
+      patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
+      expect(flash[:error]).to be_present
+      expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
+      impound_record.reload
+      expect(impound_record.status).to eq "current"
+      expect(impound_record.impound_record_updates.count).to eq 0
+      expect(impound_claim.status).to eq "submitting"
+    end
     context "approved" do
       it "updates" do
         impound_record.reload
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
-        expect(response.status).to eq(200)
-        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id))
+        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_approved"}
+        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"
@@ -86,7 +99,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         impound_record_update = impound_record.impound_record_updates.last
         expect(impound_record_update.user&.id).to eq current_user.id
         expect(impound_record_update.impound_claim&.id).to eq impound_claim.id
-        expect(impound_record_update.status).to eq "claim_approved"
+        expect(impound_record_update.kind).to eq "claim_approved"
 
         impound_claim.reload
         expect(impound_claim.status).to eq "approved"
@@ -99,9 +112,8 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "denied"}
-        expect(response.status).to eq(200)
-        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id))
+        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_denied"}
+        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"
@@ -109,7 +121,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         impound_record_update = impound_record.impound_record_updates.last
         expect(impound_record_update.user&.id).to eq current_user.id
         expect(impound_record_update.impound_claim&.id).to eq impound_claim.id
-        expect(impound_record_update.status).to eq "claim_denied"
+        expect(impound_record_update.kind).to eq "claim_denied"
 
         impound_claim.reload
         expect(impound_claim.status).to eq "denied"

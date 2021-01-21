@@ -75,9 +75,9 @@ module OrganizedHelper
     case status.downcase
     when "current", "paging", "being_helped"
       content_tag(:span, status_str, class: "text-success")
-    when /retrieved/, "resolved_otherwise", "on_deck"
+    when /retrieved/, "resolved_otherwise", "on_deck", /accepted/
       content_tag(:span, status_str.gsub("otherwise", ""), class: "text-info")
-    when /removed/, "impounded", "trashed", "failed_to_find"
+    when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       content_tag(:span, status_str, class: "text-danger")
     else
       content_tag(:span, status_str, class: "less-strong")

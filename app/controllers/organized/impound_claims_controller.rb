@@ -17,7 +17,18 @@ module Organized
     end
 
     def update
-      flash[:success] = params[:update_status]
+      if %w[claim_approved claim_denied].include?(params[:update_status])
+        impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
+          kind: params[:update_status],
+          impound_claim: @impound_claim)
+        if impound_record_update.save
+          flash[:success] = impound_record_update.kind_humanized
+        else
+          flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
+        end
+      else
+        flash[:error] = "Unknown update action"
+      end
       redirect_back(fallback_location: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id))
     end
 
@@ -44,10 +55,10 @@ module Organized
         a_impound_claims = impound_claims
       else
         @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
-        if ImpoundClaim.statuses.include?(@search_status)
-          a_impound_claims = impound_claims.where(status: @search_status)
+        a_impound_claims = if ImpoundClaim.statuses.include?(@search_status)
+          impound_claims.where(status: @search_status)
         else
-          a_impound_claims = impound_claims.send(@search_status)
+          impound_claims.send(@search_status)
         end
       end
 

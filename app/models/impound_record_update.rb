@@ -8,7 +8,7 @@ class ImpoundRecordUpdate < ApplicationRecord
     transferred_to_new_owner: 4,
     note: 5,
     claim_approved: 6,
-    claim_denied: 7,
+    claim_denied: 7
   }.freeze
 
   belongs_to :impound_record

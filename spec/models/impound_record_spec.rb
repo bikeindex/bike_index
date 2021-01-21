@@ -116,11 +116,11 @@ RSpec.describe ImpoundRecord, type: :model do
     context "note and message" do
       let(:parking_notification1) do
         FactoryBot.create(:parking_notification, bike: bike, organization: organization, kind: "parked_incorrectly_notification",
-          internal_notes: "Internal note 1", created_at: Time.current - 1.month)
+                                                 internal_notes: "Internal note 1", created_at: Time.current - 1.month)
       end
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
-          initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
+                                                 initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
       end
       it "returns note and message" do
         impound_record.reload

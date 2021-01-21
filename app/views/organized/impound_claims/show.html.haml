@@ -126,9 +126,9 @@
           .card-body
             .row
               .col-xs-6.text-center
-                = link_to "Approve", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "approved"), method: :patch, action: "update", class: "btn btn-lg btn-success"
+                = link_to "Approve", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_approved"), method: :patch, action: "update", class: "btn btn-lg btn-success"
               .col-xs-6.text-center
-                = link_to "Deny", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "denied"), method: :patch, action: "update", class: "btn btn-lg btn-danger"
+                = link_to "Deny", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_denied"), method: :patch, action: "update", class: "btn btn-lg btn-danger"
             %p.mt-4.mb-0
               %em.less-strong
                 Clicking one these buttons will send an email to the user, letting them know the response to their claim.

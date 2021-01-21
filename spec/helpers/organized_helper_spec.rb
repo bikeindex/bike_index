@@ -71,6 +71,14 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(status_display("impounded")).to eq "<span class=\"text-danger\">impounded</span>"
       end
     end
+    context "impound_claim" do
+      it "info for accepted, red for denied" do
+        expect(status_display("accepted")).to eq "<span class=\"text-info\">accepted</span>"
+        expect(status_display("claim_accepted")).to eq "<span class=\"text-info\">claim accepted</span>"
+        expect(status_display("denied")).to eq "<span class=\"text-danger\">denied</span>"
+        expect(status_display("claim_denied")).to eq "<span class=\"text-danger\">claim denied</span>"
+      end
+    end
   end
 
   describe "organized_container" do
