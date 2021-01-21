@@ -17,7 +17,7 @@ class EmailImpoundClaimWorker < ApplicationWorker
 
   def calculated_email_to_send(impound_claim)
     if %w[submitting approved denied].include?(impound_claim.status) &&
-      impound_claim.notifications.where(kind: "impound_claim_#{impound_claim.status}").none?
+        impound_claim.notifications.where(kind: "impound_claim_#{impound_claim.status}").none?
       impound_claim.status
     end
   end

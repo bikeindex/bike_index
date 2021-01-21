@@ -19,8 +19,8 @@ module Organized
     def update
       if %w[claim_approved claim_denied].include?(params[:update_status])
         impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
-          kind: params[:update_status],
-          impound_claim: @impound_claim)
+                                                                             kind: params[:update_status],
+                                                                             impound_claim: @impound_claim)
         if impound_record_update.save
           flash[:success] = impound_record_update.kind_humanized
         else
