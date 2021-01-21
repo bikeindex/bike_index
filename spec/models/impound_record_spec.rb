@@ -172,7 +172,6 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.resolved_at).to be_within(1).of Time.current
             expect(impound_record.user_id).to eq user2.id
             expect(impound_record.impound_claim_retrieved?).to be_truthy
-            expect(impound_record.bike&.id).to eq bike_submitting.id
 
             bike.reload
             expect(bike.created_by_parking_notification?).to be_truthy
