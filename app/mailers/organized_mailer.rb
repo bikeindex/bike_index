@@ -108,7 +108,7 @@ class OrganizedMailer < ApplicationMailer
     @impound_claim = impound_claim
     set_impound_claim_ivars
     # TODO: make this better
-    organized_recipient = @impound_claim.organization.auto_user.email
+    organized_recipient = @impound_claim.organization&.auto_user&.email || "contact@bikeindex.org"
     mail(reply_to: "contact@bikeindex.org",
          to: organized_recipient,
          subject: "New impound claim submitted")

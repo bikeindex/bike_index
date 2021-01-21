@@ -143,7 +143,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect {
           patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
         }.to change(ImpoundRecordUpdate, :count).by 1
-        expect(flash).to be_blank
+        expect(flash[:success]).to be_present
         expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
         expect(ActionMailer::Base.deliveries.count).to eq 0
         impound_record.reload
@@ -170,7 +170,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect {
           patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params_with_email}
         }.to change(ImpoundRecordUpdate, :count).by 1
-        expect(flash).to be_blank
+        expect(flash[:success]).to be_present
         expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
         expect(ActionMailer::Base.deliveries.count).to eq 1
         impound_record.reload
@@ -283,7 +283,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect {
             put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params_with_email}
           }.to change(ImpoundRecordUpdate, :count).by 1
-          expect(flash).to be_blank
+          expect(flash[:success]).to be_present
           expect(response).to redirect_to "#{base_url}/#{impound_record.display_id}"
           expect(ActionMailer::Base.deliveries.count).to eq 1
           impound_record.reload
@@ -342,36 +342,34 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             expect(impound_record_update_approved).to be_valid
             impound_claim.reload
             expect(impound_claim.impound_record_updates.pluck(:id)).to eq([impound_record_update_approved.id])
-            expect(impound_claim.status).to eq "claim_approved"
-            expect(impound_record.update_kinds).to eq(%w[note move_location retrieved_by_owner removed_from_bike_index transferred_to_new_owner])
-            Sidekiq::Worker.clear_all
+            expect(impound_claim.status).to eq "approved"
+            expect(impound_record.update_kinds).to match_array(%w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note])
             expect {
               put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
             }.to change(ImpoundRecordUpdate, :count).by 1
             expect(flash[:success]).to be_present
-            expect(ImpoundUpdateBikeWorker.jobs.count).to eq 1
-            ImpoundUpdateBikeWorker.drain
-            expect(impound_record_update.reload.resolved?).to be_truthy
-            expect(impound_record_update.impound_claim_id).to eq impound_claim.id
             impound_claim.reload
             expect(impound_claim.status).to eq "retrieved"
-            expect(impound_claim.bike_submitting_id).to eq bike_submitting.id
             expect(impound_claim.bike_claimed_id).to eq bike.id
-            expect(impound_claim.stolen_record&.id).to eq stolen_record.id
+            expect(impound_claim.bike_submitting.stolen?).to be_falsey
+            expect(impound_claim.impound_record_updates.count).to eq 2
 
-            impound_record.reload
+            og_id = impound_record.id
+            impound_record = ImpoundRecord.find(og_id) # Fully trash the memoized bike method
             expect(impound_record.resolved?).to be_truthy
             expect(impound_record.resolved_at).to be_within(1).of Time.current
             expect(impound_record.user_id).to eq current_user.id
             expect(impound_record.impound_claim_retrieved?).to be_truthy
-            expect(impound_record.bike&.id).to eq bike_submitting.id
+            expect(impound_record.bike&.id).to eq impound_claim.bike_submitting.id
+            expect(impound_record.impound_record_updates.count).to eq 2
+
+            impound_record_update = impound_record.impound_record_updates.last
+            expect(impound_record_update.reload.resolved?).to be_truthy
+            expect(impound_record_update.impound_claim_id).to eq impound_claim.id
 
             bike.reload
             expect(bike.created_by_parking_notification?).to be_truthy
             expect(bike.deleted?).to be_truthy
-
-            bike_submitting.reload
-            expect(bike_submitting.stolen?).to be_falsey
           end
         end
       end

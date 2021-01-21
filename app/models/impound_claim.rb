@@ -105,7 +105,7 @@ class ImpoundClaim < ApplicationRecord
       "denied"
     elsif last_update.retrieved_by_owner?
       "retrieved"
-    else # Don't know, so just return the thing as is
+    else # Don't know, so just return existing status
       status
     end
   end

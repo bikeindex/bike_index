@@ -23,12 +23,13 @@ module Organized
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
       is_valid_kind = @impound_record.update_kinds.include?(@impound_record_update.kind)
       if @impound_record.update_kinds.include?(@impound_record_update.kind) && @impound_record_update.save
+        flash[:success] = "Recorded #{@impound_record_update.kind_humanized}"
         redirect_to organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.to_param)
       else
         flash[:error] = if is_valid_kind
           @impound_record_update.errors.full_messages
         else
-          "Sorry, you can't update this impound record with #{@impound_record.kind_humanized}"
+          "Sorry, you can't update this impound record with #{@impound_record_update.kind_humanized}"
         end
         render :show
       end

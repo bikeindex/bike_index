@@ -66,11 +66,10 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def bike
-    if impound_claim_retrieved?
-      impound_claims.retrieved.first&.bike_submitting
-    else # Get it unscoped, because unregistered_bike notifications
-      @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
-    end
+    # Use retrieved impound claim, if possible - otherwise
+    @bike ||= impound_claims.retrieved.first&.bike_submitting
+    # Get it unscoped, because unregistered_bike notifications
+    @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
   def notification_notes_and_messages

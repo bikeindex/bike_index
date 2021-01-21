@@ -28,7 +28,8 @@ class ImpoundClaimsController < ApplicationController
       end
     end
     flash[:error] = errors.to_sentence if errors.any?
-    redirect_to bike_path(@impound_claim.bike_claimed, contact_owner: 1)
+    # Avoid issues with bike_claimed assignment by accessing through impound_record
+    redirect_to bike_path(@impound_claim.impound_record.bike, contact_owner: 1)
   end
 
   def update
