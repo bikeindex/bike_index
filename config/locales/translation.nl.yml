@@ -2546,6 +2546,9 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
+        impounding:
+          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
+            op met Bike Index support.
       graduated_notifications:
         ensure_access_to_graduated_notifications!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
@@ -4192,43 +4195,18 @@ nl:
       error: Fout
       please_fix_the_following: Corrigeer het volgende %{errors}
     application:
-      add_a_bike: Voeg een fiets toe
       blog: Blog
-      discuss: Bespreken
       donate: Schenken
-      exports: Uitvoer
-      getting_started: Ermee beginnen
       help: Helpen
-      incomplete_registrations: Onvolledige registraties
-      lightspeed_integration_panel: Lightspeed-integratiepaneel
       log_in: Log in
       logout: Afmelden
-      multi_serial_search: Multi-serieel zoeken
-      org_bikes: "%{org_name} Fietsen"
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} locaties"
-      org_profile: "%{org_name} profiel"
-      recoveries: terugvorderingen
       register_a_new_bike: Registreer een nieuwe fiets
-      registration_stickers: Registratie stickers
-      resources: Middelen
       search_bikes: Zoek fietsen
       sign_up: Registreren
-      super_admin_view: Super beheerdersweergave %{org_name}
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
-      users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
-      parking_notifications: Verlaten records
-      parking_notification_unregistered: Niet-geregistreerde fietsmelding
-      impounded_bikes: In beslag genomen fietsen
-      customize_emails: Pas e-mails aan
-      graduated_notifications: Gegradueerde meldingen
-      stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
-      appointment_configuration: Afspraak configuratie
-      virtual_line: Virtuele lijn
       stolen_bike: Fiets gestolen?
     application_bikehub:
       contact: contact
@@ -4757,6 +4735,10 @@ nl:
         select_email: Selecteer e-mail
         update: Bijwerken
         org_settings: Instellingen
+        square_image: Gebruik een vierkante afbeelding voor het beste resultaat
+      impounding:
+        impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
+        save: Opslaan
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
@@ -5138,50 +5120,24 @@ nl:
       stolen: Gestolen
       view_bike: Bekijk %{bike_type}
     organized_skeleton:
-      add_a_bike: Voeg een fiets toe
       additional_features_html: Bike Index biedt extra functies voor geverifieerde
         wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
         te krijgen.
       admin_panel: Admin panel
-      ascend_imports: Opvoer importeren
-      bikes: Bikes
-      bulk_imports: Bulkinvoer
-      discuss: Bespreken
-      exports: Uitvoer
-      getting_started: Ermee beginnen
       how_integration_works: hoe de integratie werkt
-      impounded_bikes: In beslag genomen fietsen
-      incomplete_registrations: Onvolledige registraties
       integrate_bike_index_with_ascend: Integreer Bike Index met Ascend
       integrate_bike_index_with_lightspeed: Integreer Bike Index met Lightspeed
-      lightspeed_integration_panel: Lightspeed-integratiepaneel
       link_to_register_html: "<strong>%{link}</strong> om de fietsen die u aan uw
         klanten verkoopt automatisch te registreren."
-      multi_serial_search: Multi-serieel zoeken
-      organization_locations: "%{org_name} locaties"
-      organization_profile: "%{org_name} profiel"
       other_point_of_sale_system: Ander Point of Sale-systeem?
       read_a_full_explanation_html: Lees een volledige uitleg van %{link}.
-      recoveries: terugvorderingen
       register_bikes_with_link_html: Registreer fietsen met onze <strong>%{link}</strong>
-      registration_stickers: Registratie stickers
-      resources: Middelen
       streamlined_bike_shop_registration_page: gestroomlijnde registratiepagina voor
         Bike Shop
       use_ascend: Ascend gebruiken?
       use_lightspeed_retail_pos: Lightspeed Retail POS gebruiken?
-      users: Gebruikers
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
-      overview_dashboard: Dashboard
-      parking_notifications: Verlaten records
-      parking_notification_unregistered: Niet-geregistreerde fietsmelding
-      customize_emails: Pas e-mails aan
-      graduated_notifications: Gegradueerde meldingen
-      stolen_hot_sheet: Gestolen Hot Sheet
-      stolen_hot_sheet_configuration: Gestolen Hot Sheet-configuratie
-      appointment_configuration: Afspraken configuratie
-      virtual_line: Virtuele lijn
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
@@ -5266,6 +5222,36 @@ nl:
       subheader_2: Selecteer een bedrag (in USD)
     donation_modal:
       donation_header: Red een fiets in 2021
+    organized_menu_items:
+      add_a_bike: Voeg een fiets toe
+      appointment_configuration: Afspraak configuratie
+      ascend_imports: Opvoer importeren
+      bulk_imports: Bulkinvoer
+      custom_emails: Aangepaste e-mails
+      discuss: Bespreken
+      exports: Uitvoer
+      getting_started: Ermee beginnen
+      graduated_notifications: Gegradueerde meldingen
+      impounded_bikes: In beslag genomen fietsen
+      impounded_claims: In beslag genomen vorderingen
+      incomplete_registrations: Onvolledige registraties
+      lightspeed_integration_panel: Lightspeed-integratiepaneel
+      manage_impounding: Beheer inbeslagname
+      manage_users: Gebruikers beheren
+      multi_serial_search: Multi-serieel zoeken
+      org_bikes: "%{org_name} Fietsen"
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locaties"
+      org_profile: "%{org_name} profiel"
+      parking_notification_unregistered: Niet-geregistreerde fietsmelding
+      parking_notifications: Verlaten records
+      recoveries: terugvorderingen
+      registration_stickers: Registratie stickers
+      resources: Middelen
+      stolen_hot_sheet: Stolen Bike Hot Sheet
+      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
+      super_admin_view: Superbeheerder voor %{org_name}
+      virtual_line: Virtuele lijn
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
