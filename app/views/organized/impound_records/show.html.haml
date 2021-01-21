@@ -79,18 +79,29 @@
                 %span.convertTime.preciseTime
                   = l(@impound_record.resolved_at, format: :convert_time)
 
-
-- if @impound_record.active?
-  .row
-    .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
+.row.mt-4.mb-4
+  - if @impound_record.active?
+    .col-md-8.offset-md-2.col-xl-6.offset-xl-0
       .card
         - @impound_record_update ||= ImpoundRecordUpdate.new
         = form_for @impound_record_update, url: organization_impound_record_path(@impound_record.display_id, organization_id: current_organization), action: "update", method: :patch do |f|
+          -# can't update with current, don't include it as an option
+          - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(:current)
+          - kinds_for_select = kinds_for_select.except(:move_location) unless locations_enabled
+          -# Don't include claim options if there aren't any submitted claims
+          - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied) unless @impound_record.impound_claims.submitting.any?
+
           .card-block
             .card-title
               %h3.uncap
                 Update impound record
-              - if @parking_notification.present? && @parking_notification.unregistered_bike?
+              - if @approved_impound_claim
+                - @impound_record_update.kind ||= "retrieved_by_owner"
+                - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied)
+              - elsif @parking_notification.present? && @parking_notification.unregistered_bike?
+                -# If this is for an unregistered bike, we don't want to show "retrieved by owner"
+                - kinds_for_select = kinds_for_select.except(:retrieved_by_owner)
+
                 %p{ style: "margin: -12px 0 24px; line-height: 1.5;" }
                   %span.text-warning Unregistered bikes
                   cannot be updated with
@@ -102,12 +113,9 @@
 
             .card-body#impoundRecordUpdateForm
               .row
-                .col-sm-6
-                  - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(locations_enabled ? nil : :move_location)
-                  -# If this is for an unregistered bike, we don't want to show "retrieved by owner"
-                  - kinds_for_select = kinds_for_select.except(:retrieved_by_owner) if @parking_notification.present? && @parking_notification.unregistered_bike?
+                .col-sm-6#kindUpdate
                   = f.select :kind,
-                    options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }),
+                    options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, @impound_record_update.kind),
                     {},
                     class: "form-control"
                 - if locations_enabled
@@ -117,6 +125,11 @@
                       options_for_select(current_organization.locations.impound_locations.map { |l| [l.name, l.id] }),
                       {},
                       class: "form-control"
+                - if @approved_impound_claim
+                  .col-sm-6.collapse.collapseKind.kind_retrieved_by_owner
+                    %p.mt-0.mb-0{ style: "line-height: 1.25em;" }
+                      %em
+                        Mark retrieved by the #{link_to "approved claim", organization_impound_claim_path(@approved_impound_claim.id, organization_id: current_organization.id)}
                 .col-sm-6.collapse.collapseKind.kind_transferred_to_new_owner
                   = f.email_field :transfer_email, placeholder: "New owner email", class: "form-control"
 
@@ -125,55 +138,24 @@
                   = f.text_area :notes, placeholder: "Internal note", class: "form-control"
                 .col-xs-12.mt-2
                   = submit_tag "Update impound record", class: "btn btn-success btn-md-lg"
-  - if current_organization.impound_claims?
-    %h3.uncap.mt-4
-      Active claims for this #{@impound_record.bike.type}
-      %small
-        = link_to "view all claims (#{@impound_record.impound_claims.count})", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: @impound_record.id, search_status: "all")), class: "gray-link"
-    - if @impound_record.impound_claims.any?
-      .full-screen-table
-        - impound_claims = @impound_record.impound_claims.reorder(created_at: :desc)
-        = render partial: "/organized/impound_claims/table", locals: { impound_claims: impound_claims, render_resolved_at: true, skip_impound_record: true }
-    - else
-      %p.less-strong
-        No impound claims yet
 
-- if impound_record_updates.any?
-  .mt-4
-    %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
-      %thead.small-header.hidden-md-down
-        %th
-          Updated
-        %th
-          By
-        %th
-          Kind
-        %th
-          Info
-      %tbody
-        - impound_record_updates.each do |impound_record_update|
-          %tr
-            %td
-              %span.convertTime.preciseTime
-                = l(impound_record_update.created_at, format: :convert_time)
-            %td
-              = impound_record_update.user&.display_name
-            %td
-              %em
-                = impound_record_update.kind_humanized
-            %td
-              - if impound_record_update.move_location?
-                Moved to #{impound_record_update.location.name}
-              - elsif impound_record_update.transferred_to_new_owner?
-                Sent to
-                %strong
-                  = impound_record_update.transfer_email
+  - if impound_record_updates.any?
+    %div{class: (@impound_record.active? ? "col-xl-6" : "col-xl-10")}
+      %h3.uncap.mt-2.mb-2 Updates to this record
+      = render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates: impound_record_updates}
 
-              - if !impound_record_update.note? && impound_record_update.notes.present?
-                %br
-              %small
-                = impound_record_update.notes
-
+- if current_organization.impound_claims?
+  %h3.uncap.mt-4.pt-4
+    Active claims for this #{@impound_record.bike.type}
+    %small
+      = link_to "view all claims (#{@impound_record.impound_claims.count})", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: @impound_record.id, search_status: "all")), class: "gray-link"
+  - if @impound_record.impound_claims.any?
+    .full-screen-table
+      - impound_claims = @impound_record.impound_claims.reorder(created_at: :desc)
+      = render partial: "/organized/impound_claims/table", locals: { impound_claims: impound_claims, render_resolved_at: true, skip_impound_record: true }
+  - else
+    %p.less-strong
+      No impound claims yet
 
 - if @parking_notification.present?
   %hr.mt-4

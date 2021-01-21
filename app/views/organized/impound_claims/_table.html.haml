@@ -24,7 +24,7 @@
     - unless skip_impound_record
       %th.small
         - if render_sortable
-          = sortable "impound_record_id", "Impound ID"
+          = sortable "impound_record_id", "Impound record"
         - else
           Impound ID
     - unless skip_status
@@ -32,9 +32,9 @@
         Status
     %th
       - if render_sortable
-        = sortable "user_id", "last updator"
+        = sortable "user_id", "Claimant"
       - else
-        last updator
+        Claimant
 
     - if render_resolved_at
       %th

@@ -1,0 +1,35 @@
+-# Must pass in impound_record_updates
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.mt-0
+  %thead.small-header.hidden-md-down
+    %th
+      Updated
+    %th
+      By
+    %th
+      Kind
+    %th
+      Info
+  %tbody
+    - impound_record_updates.each do |impound_record_update|
+      %tr
+        %td
+          %span.convertTime.preciseTime
+            = l(impound_record_update.created_at, format: :convert_time)
+        %td
+          = impound_record_update.user&.display_name
+        %td
+          %em
+            = impound_record_update.kind_humanized
+        %td
+          - if impound_record_update.move_location?
+            Moved to #{impound_record_update.location.name}
+          - elsif impound_record_update.transferred_to_new_owner?
+            Sent to
+            %strong
+              = impound_record_update.transfer_email
+
+          - if !impound_record_update.note? && impound_record_update.notes.present?
+            %br
+          %small
+            = impound_record_update.notes

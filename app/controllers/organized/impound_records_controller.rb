@@ -16,6 +16,7 @@ module Organized
     end
 
     def show
+      @approved_impound_claim = @impound_record.impound_claims.approved.first
     end
 
     def update
