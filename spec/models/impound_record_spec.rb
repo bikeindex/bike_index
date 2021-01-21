@@ -117,10 +117,11 @@ RSpec.describe ImpoundRecord, type: :model do
               created_at: Time.current - 1.hour,
               impound_record: impound_record)
           end
+          let(:stolen_record) { impound_claim.stolen_record }
           let(:bike_submitting) { impound_claim.bike_submitting }
           let(:impound_record_update_approved) do
             impound_record.impound_record_updates.create(user: user2,
-              kind: "claim_approved", impound_claim: impound_claim)
+                                                         kind: "claim_approved", impound_claim: impound_claim)
           end
           it "associates with the approved claim" do
             expect(impound_claim.reload.status).to eq "submitting"
@@ -128,8 +129,10 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location retrieved_by_owner])
             expect(impound_record_update_approved).to be_valid
             impound_claim.reload
-            expect(impound_claim.bike_claimed&.id).to eq bike.id
+            expect(impound_claim.bike_claimed_id).to eq bike.id
             expect(impound_claim.status).to eq "approved"
+            expect(stolen_record.reload.recovered?).to be_falsey
+            expect(impound_claim.stolen_record&.id).to eq stolen_record.id
 
             impound_record.reload
             expect(impound_record.unregistered_bike?).to be_truthy
@@ -146,20 +149,29 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.creator&.id).to eq user2.id
             expect(impound_record.location).to be_blank
             expect(impound_record.status).to eq "current"
+            expect(impound_record.impound_claim_retrieved?).to be_falsey
 
             impound_record_update.save
             expect(impound_record_update).to be_valid
-            expect(impound_record_update)
+            expect(impound_record_update.impound_claim_id).to be_blank
             Sidekiq::Worker.clear_all
             expect {
               impound_record_update.save
             }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
             ImpoundUpdateBikeWorker.drain
-            expect(impound_record_update.resolved?).to be_truthy
+            expect(impound_record_update.reload.resolved?).to be_truthy
+            expect(impound_record_update.impound_claim_id).to eq impound_claim.id
+            impound_claim.reload
+            expect(impound_claim.status).to eq "retrieved"
+            expect(impound_claim.bike_submitting_id).to eq bike_submitting.id
+            expect(impound_claim.bike_claimed_id).to eq bike.id
+            expect(impound_claim.stolen_record&.id).to eq stolen_record.id
+
             impound_record.reload
             expect(impound_record.resolved?).to be_truthy
             expect(impound_record.resolved_at).to be_within(1).of Time.current
             expect(impound_record.user_id).to eq user2.id
+            expect(impound_record.impound_claim_retrieved?).to be_truthy
             expect(impound_record.bike&.id).to eq bike_submitting.id
 
             bike.reload
@@ -168,10 +180,8 @@ RSpec.describe ImpoundRecord, type: :model do
 
             bike_submitting.reload
             expect(bike_submitting.stolen?).to be_falsey
-
-            impound_claim.reload
-            expect(impound_claim.status).to eq "retrieved"
-            expect(impound_claim.bike)
+            stolen_record.reload
+            expect(stolen_record.recovered?).to be_truthy
           end
         end
       end

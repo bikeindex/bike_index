@@ -49,7 +49,12 @@
           %td
             - if @bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
-
+            - if display_dev_info? && @impound_record.impound_claim_retrieved?
+              - og_bike = Bike.unscoped.find_by_id(@impound_record.bike_id)
+              .only-dev-visible
+                %em.small.less-strong Retrieved by impound claim, original bike:
+                %br
+                = link_to organized_bike_text(og_bike), bike_path(og_bike, organization_id: current_organization.to_param)
   .col-md-6
     %table.table-list
       %tbody
@@ -86,17 +91,10 @@
         - @impound_record_update ||= ImpoundRecordUpdate.new
         = form_for @impound_record_update, url: organization_impound_record_path(@impound_record.display_id, organization_id: current_organization), action: "update", method: :patch do |f|
           -# This gets us the correct kinds for the current impound_record - e.g. no retrieved_by_owner for unregistered_parking_notification
-          - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.slice(*impound_record.update_kinds.map(&:to_sym))
+          - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.slice(*@impound_record.update_kinds.map(&:to_sym))
           -# Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims
           -# Also - never display "current" because it can't be updated that way
           - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied, :current)
-
-          -# I THINK WE CAN REMOVE THIS
-          -# can't update with current, don't include it as an option
-          - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(:current)
-          - kinds_for_select = kinds_for_select.except(:move_location) unless locations_enabled
-          -# Don't include claim options if there aren't any submitted claims
-          - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied) unless @impound_record.impound_claims.submitting.any?
 
           .card-block
             .card-title
@@ -104,10 +102,8 @@
                 Update impound record
               - if @approved_impound_claim
                 - @impound_record_update.kind ||= "retrieved_by_owner"
-                - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied)
               - elsif @parking_notification.present? && @parking_notification.unregistered_bike?
-                -# If this is for an unregistered bike, we don't want to show "retrieved by owner"
-                - kinds_for_select = kinds_for_select.except(:retrieved_by_owner)
+                / -# If this is for an unregistered bike, we don't want to show "retrieved by owner"
 
                 %p{ style: "margin: -12px 0 24px; line-height: 1.5;" }
                   %span.text-warning Unregistered bikes
@@ -119,28 +115,26 @@
                     Use either <em>transferred to a new owner</em> or <em>removed from Bike Index</em>.
 
             .card-body#impoundRecordUpdateForm
+              - if @approved_impound_claim
+                .collapse.collapseKind.kind_retrieved_by_owner
+                  %p.mb-4{ style: "line-height: 1.25em;" }
+                    Click <em>Update</em> to record this retrieved by the #{link_to "approved claim", organization_impound_claim_path(@approved_impound_claim.id, organization_id: current_organization.id)}
               .row
-                .col-sm-6#kindUpdate
+                .col-sm-6#kindUpdate.mb-2
                   = f.select :kind,
                     options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, @impound_record_update.kind),
                     {},
                     class: "form-control"
                 - if locations_enabled
-                  .col-sm-6.collapse.collapseKind.kind_move_location
+                  .col-sm-6.collapse.collapseKind.kind_move_location.mb-2
                     - @impound_record_update.location_id ||= current_organization.default_impound_location&.id
                     = f.select :location_id,
                       options_for_select(current_organization.locations.impound_locations.map { |l| [l.name, l.id] }),
                       {},
                       class: "form-control"
-                - if @approved_impound_claim
-                  .col-sm-6.collapse.collapseKind.kind_retrieved_by_owner
-                    %p.mt-0.mb-0{ style: "line-height: 1.25em;" }
-                      %em
-                        Mark retrieved by the #{link_to "approved claim", organization_impound_claim_path(@approved_impound_claim.id, organization_id: current_organization.id)}
-                .col-sm-6.collapse.collapseKind.kind_transferred_to_new_owner
+                .col-sm-6.collapse.collapseKind.kind_transferred_to_new_owner.mb-2
                   = f.email_field :transfer_email, placeholder: "New owner email", class: "form-control"
-
-              .row.mt-2
+              .row
                 .col-xs-12
                   = f.text_area :notes, placeholder: "Internal note", class: "form-control"
                 .col-xs-12.mt-2

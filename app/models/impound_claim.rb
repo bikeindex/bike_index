@@ -10,6 +10,8 @@ class ImpoundClaim < ApplicationRecord
 
   belongs_to :impound_record
   belongs_to :stolen_record
+  belongs_to :bike_submitting, class_name: "Bike"
+  belongs_to :bike_claimed, class_name: "Bike"
   belongs_to :user
   belongs_to :organization
 
@@ -49,12 +51,14 @@ class ImpoundClaim < ApplicationRecord
     self.class.active_statuses.include?(status)
   end
 
-  def bike_claimed
-    impound_record&.bike
+  # Get it unscoped, because retrieved notifications
+  def stolen_record
+    @stolen_record ||= stolen_record_id.present? ? StolenRecord.unscoped.find_by_id(stolen_record_id) : nil
   end
 
-  def bike_submitting
-    stolen_record&.bike
+  # Get it unscoped, because unregistered_bike notifications
+  def bike_claimed
+    @bike_claimed ||= bike_claimed_id.present? ? Bike.unscoped.find_by_id(bike_claimed_id) : nil
   end
 
   def status_humanized
@@ -81,6 +85,9 @@ class ImpoundClaim < ApplicationRecord
     self.submitted_at ||= Time.current if status == "submitting"
     self.resolved_at ||= Time.current if resolved?
     self.organization_id ||= impound_record&.organization_id
+    # Until the claim is submitted, allow these values to change
+    self.bike_submitting = stolen_record&.bike if unsubmitted? || bike_submitting.blank?
+    self.bike_claimed = impound_record&.bike if unsubmitted? || bike_claimed.blank?
   end
 
   def send_triggered_notifications
@@ -96,6 +103,8 @@ class ImpoundClaim < ApplicationRecord
       "approved"
     elsif last_update.claim_denied?
       "denied"
+    elsif last_update.retrieved_by_owner?
+      "retrieved"
     else # Don't know, so just return the thing as is
       status
     end

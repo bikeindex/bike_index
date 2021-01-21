@@ -1357,6 +1357,8 @@ CREATE TABLE public.impound_claims (
     impound_record_id bigint,
     organization_id bigint,
     stolen_record_id bigint,
+    bike_submitting_id bigint,
+    bike_claimed_id bigint,
     user_id bigint,
     message text,
     status integer,
@@ -4493,6 +4495,20 @@ CREATE INDEX index_hot_sheet_configurations_on_organization_id ON public.hot_she
 --
 
 CREATE INDEX index_hot_sheets_on_organization_id ON public.hot_sheets USING btree (organization_id);
+
+
+--
+-- Name: index_impound_claims_on_bike_claimed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_bike_claimed_id ON public.impound_claims USING btree (bike_claimed_id);
+
+
+--
+-- Name: index_impound_claims_on_bike_submitting_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_claims_on_bike_submitting_id ON public.impound_claims USING btree (bike_submitting_id);
 
 
 --

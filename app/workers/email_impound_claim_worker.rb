@@ -7,7 +7,7 @@ class EmailImpoundClaimWorker < ApplicationWorker
     email_to_send = calculated_email_to_send(impound_claim)
     return nil if email_to_send.blank?
     notification = Notification.create(kind: "impound_claim_#{email_to_send}", notifiable: impound_claim)
-    if email_to_send == "submitted"
+    if email_to_send == "submitting"
       OrganizedMailer.impound_claim_submitted(impound_claim).deliver_now
     else
       OrganizedMailer.impound_claim_approved_or_denied(impound_claim).deliver_now

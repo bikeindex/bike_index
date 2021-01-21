@@ -11,6 +11,7 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
         irecord.update_attributes(display_id: nil, skip_update: true)
       end
     end
+    claim_retrieved = nil
     # Run each impound_record_updates that hasn't been run
     impound_record.impound_record_updates.unresolved.each do |impound_record_update|
       if impound_record_update.kind == "transferred_to_new_owner"
@@ -26,23 +27,38 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
         bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
-      elsif impound_record_update.kind == "retrieved_by_owner"
-        && impound_record.impound_claims.approved.any?
-        merge_impound_claim(impound_record, impound_record_update)
+      elsif impound_record_update.kind == "retrieved_by_owner" &&
+          impound_record.impound_claims.approved.any?
+        impound_record_update.impound_claim = impound_record.impound_claims.approved.first
+        claim_retrieved = impound_record_update.impound_claim
       end
       impound_record_update.update(resolved: true, skip_update: true)
     end
     impound_record.update_attributes(skip_update: true)
-    # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
-    impound_record.reload
-    if impound_record.unregistered_bike?
-      impound_record.bike.marked_user_unhidden = true
+    if claim_retrieved.present?
+      merge_impound_claim(impound_record, claim_retrieved)
+    else
+      # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
+      impound_record.reload
+      if impound_record.unregistered_bike?
+        impound_record.bike.marked_user_unhidden = true
+      end
+      impound_record.bike&.update(updated_at: Time.current)
+      impound_record.bike&.reload
     end
-    impound_record.bike&.update(updated_at: Time.current)
-    impound_record.bike&.reload
   end
 
-  def merge_impound_claim(impound_record, impound_record_update)
-    pp "fasdfasdfa"
+  def merge_impound_claim(impound_record, impound_claim)
+    # Manually update, because it isn't updated
+    impound_claim.update(updated_at: Time.current)
+    # Mark the stolen record as recovered
+    unless impound_claim.stolen_record.recovered?
+      impound_claim.stolen_record.add_recovery_information(recovering_user_id: impound_record.user_id,
+                                                           recovered_description: "Recovered from impounding",
+                                                           index_helped_recovery: true,
+                                                           can_share_recovery: true)
+    end
+    # TODO: make this actually merge attributes in from the bike, rather than just delete it?
+    impound_record.parking_notification.bike&.delete
   end
 end

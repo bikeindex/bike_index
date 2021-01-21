@@ -4,6 +4,8 @@ class CreateImpoundClaims < ActiveRecord::Migration[5.2]
       t.references :impound_record, index: true
       t.references :organization, index: true
       t.references :stolen_record, index: true
+      t.references :bike_submitting, index: true
+      t.references :bike_claimed, index: true
       t.references :user, index: true
 
       t.text :message

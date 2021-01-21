@@ -247,7 +247,7 @@
                       = t(".componentyear", componentyear: component.year) if component.year.present?
                       = "(#{component.manufacturer_name})"
     .col-md-4
-      .social-share-bike
+      .social-share-bike.mb-4.mt-4
         %h4
           - if @bike.stolen
             = t(".spread_the_word")

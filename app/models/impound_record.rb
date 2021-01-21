@@ -61,9 +61,16 @@ class ImpoundRecord < ApplicationRecord
     organization.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
-  # Get it unscoped, because unregistered_bike notifications
+  def impound_claim_retrieved?
+    impound_claims.retrieved.any?
+  end
+
   def bike
-    @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+    if impound_claim_retrieved?
+      impound_claims.retrieved.first&.bike_submitting
+    else # Get it unscoped, because unregistered_bike notifications
+      @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+    end
   end
 
   def notification_notes_and_messages
@@ -109,13 +116,13 @@ class ImpoundRecord < ApplicationRecord
   def update_kinds
     return ["note"] if resolved?
     u_kinds = ImpoundRecordUpdate.kinds
-    u_kinds = u_kinds - %w[move_location] unless organization&.enabled?("impound_bikes_locations")
+    u_kinds -= %w[move_location] unless organization&.enabled?("impound_bikes_locations")
     if impound_claims.approved.any? || impound_claims.active.none?
-      u_kinds = u_kinds - %w[claim_approved claim_denied]
+      u_kinds -= %w[claim_approved claim_denied]
     end
     # Unregistered bikes can't be retrieved by their owner - unless there is an impound_claim
     if unregistered_bike? && impound_claims.approved.none?
-      u_kinds = u_kinds - %w[retrieved_by_owner]
+      u_kinds -= %w[retrieved_by_owner]
     end
     u_kinds
   end

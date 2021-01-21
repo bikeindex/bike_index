@@ -88,10 +88,12 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
     end
     context "approved" do
       it "updates" do
+        expect(impound_claim.status).to eq "submitting"
         impound_record.reload
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
+        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location])
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_approved"}
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
@@ -99,6 +101,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"
+        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied])
         expect(impound_record.impound_record_updates.count).to eq 1
         impound_record_update = impound_record.impound_record_updates.last
         expect(impound_record_update.user&.id).to eq current_user.id
