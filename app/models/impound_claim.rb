@@ -84,7 +84,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def send_triggered_notifications
-
+    EmailImpoundClaimWorker.perform_async(id)
   end
 
   private

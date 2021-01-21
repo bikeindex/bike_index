@@ -1,5 +1,6 @@
-- bike_claimed = @impound_claim.bike_claimed
-- bike_submitting = @impound_claim.bike_submitting
+- @bike_claimed = @impound_claim.bike_claimed
+- @bike_submitting = @impound_claim.bike_submitting
+
 .organized-page-header
   %h1.uncap
     Impound Claim
@@ -39,8 +40,8 @@
         %tr
           %td Bike
           %td
-            - if bike_claimed.present?
-              = link_to organized_bike_text(bike_claimed), bike_path(bike_claimed, organization_id: current_organization.to_param)
+            - if @bike_claimed.present?
+              = link_to organized_bike_text(@bike_claimed), bike_path(@bike_claimed, organization_id: current_organization.to_param)
         %tr
           %td Notification Notes
           %td
@@ -49,10 +50,10 @@
                 - @impound_record.notification_notes_and_messages.each do |note|
                   %li= note
 
-  - if bike_claimed.present?
+  - if @bike_claimed.present?
     .col-md-6
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: bike_claimed.decorate }
+        = render partial: "/bikes/bike", locals: { bike: @bike_claimed.decorate }
 
 %h3.uncap.mb-0.mt-4 Claiming bike:
 .row
@@ -85,18 +86,18 @@
           %td Verified phone?
           %td
             = check_mark if @impound_claim.user.user_phones.confirmed.any?
-        - if bike_submitting.present?
+        - if @bike_submitting.present?
           %tr
             %td Bike
             %td
-              - if bike_submitting.present?
-                = link_to organized_bike_text(bike_submitting), bike_path(bike_submitting, organization_id: current_organization.to_param)
+              - if @bike_submitting.present?
+                = link_to organized_bike_text(@bike_submitting), bike_path(@bike_submitting, organization_id: current_organization.to_param)
         %tr
           %td Bike registered
           %td
-            - if bike_submitting.present?
+            - if @bike_submitting.present?
               %span.convertTime.preciseTime
-                = l(bike_submitting.created_at, format: :convert_time)
+                = l(@bike_submitting.created_at, format: :convert_time)
         %tr
           %td Photos with bike
           %td.inline-images
@@ -110,9 +111,9 @@
 
 
   .col-md-6
-    - if bike_submitting.present?
+    - if @bike_submitting.present?
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: bike_submitting.decorate }
+        = render partial: "/bikes/bike", locals: { bike: @bike_submitting.decorate }
     %p.mt-4
       %strong.d-block Message from the user about claiming this bike:
       %em= @impound_claim.message

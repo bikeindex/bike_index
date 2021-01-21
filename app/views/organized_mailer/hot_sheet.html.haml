@@ -35,15 +35,7 @@
                 %td
                   %span.stolen-color Stolen at
                 %td
-                  -# Render the hour
-                  = stolen_record.date_stolen.strftime("%l%P")
-                  - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
-                    %strong Today
-                  - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
-                    %strong Yesterday
-                  - else
-                    = l stolen_record.date_stolen, format: :standard_display
-
+                  = email_time_display(stolen_record.date_stolen)
               %tr
                 %td From
                 %td

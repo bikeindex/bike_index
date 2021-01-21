@@ -39,6 +39,15 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.hot_sheet(HotSheet.last)
   end
 
+  def impound_claim_submitted
+    OrganizedMailer.impound_claim_submitted(ImpoundClaim.submitted.last)
+  end
+
+  def impound_claim_approved_or_denied
+    impound_claim = ImpoundClaim.where(status: %w[approved denied]).last
+    OrganizedMailer.impound_claim_submitted(impound_claim)
+  end
+
   private
 
   def render_finished_registration(bikes, bike = nil)

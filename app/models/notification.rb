@@ -10,8 +10,8 @@ class Notification < ApplicationRecord
     donation_stolen: 13,
     donation_recovered: 14,
     donation_theft_alert: 15,
-    impound_claim_submitted: 16,
-    impound_claim_accepted: 17,
+    impound_claim_submitting: 16,
+    impound_claim_approved: 17,
     impound_claim_denied: 18
   }.freeze
 

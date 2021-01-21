@@ -76,7 +76,9 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
       expect(impound_record.impound_record_updates.count).to eq 0
       expect(impound_record.status).to eq "current"
       expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-      patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
+      expect {
+        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
+      }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
       impound_record.reload
@@ -90,7 +92,9 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_approved"}
+        expect {
+          patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_approved"}
+        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
@@ -112,7 +116,9 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_denied"}
+        expect {
+          patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "claim_denied"}
+        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload

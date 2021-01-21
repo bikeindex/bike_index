@@ -242,4 +242,26 @@ RSpec.describe OrganizedMailer, type: :mailer do
       end
     end
   end
+
+  describe "impound_claim_submitted" do
+    let(:impound_claim) { FactoryBot.create(:impound_claim, status: "submitting", organization: organization) }
+    let(:mail) { OrganizedMailer.impound_claim_submitted(impound_claim) }
+    it "renders" do
+      expect(mail.to).to eq([organization.auto_user.email])
+      expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+      expect(mail.bcc).to be_blank
+      expect(mail.subject).to eq "Impound claim submitted"
+    end
+  end
+
+  describe "impound_claim_approved_or_denied" do
+    let(:impound_claim) { FactoryBot.create(:impound_claim, status: "approved") }
+    let(:mail) { OrganizedMailer.impound_claim_approved_or_denied(impound_claim) }
+    it "renders" do
+      expect(mail.to).to eq([organization.auto_user.email])
+      expect(mail.reply_to).to eq([organization.auto_user.email])
+      expect(mail.bcc).to be_blank
+      expect(mail.subject).to eq "Impound claim submitted"
+    end
+  end
 end

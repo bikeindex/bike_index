@@ -83,4 +83,17 @@ module OrganizedHelper
       content_tag(:span, status_str, class: "less-strong")
     end
   end
+
+  def email_time_display(datetime)
+    return "" unless datetime.present?
+    datetime.strftime("%l%P")
+    # HANDLE THIS!!!
+    # = stolen_record.date_stolen.strftime("%l%P")
+    # - if stolen_record.date_stolen.to_date == @hot_sheet.sheet_date
+    #   %strong Today
+    # - elsif stolen_record.date_stolen.to_date == @hot_sheet.sheet_date.yesterday
+    #   %strong Yesterday
+    # - else
+    #   = l stolen_record.date_stolen, format: :standard_display
+  end
 end
