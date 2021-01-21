@@ -26,6 +26,9 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
         bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
+      elsif impound_record_update.kind == "retrieved_by_owner"
+        && impound_record.impound_claims.approved.any?
+        merge_impound_claim(impound_record, impound_record_update)
       end
       impound_record_update.update(resolved: true, skip_update: true)
     end
@@ -37,5 +40,9 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
     end
     impound_record.bike&.update(updated_at: Time.current)
     impound_record.bike&.reload
+  end
+
+  def merge_impound_claim(impound_record, impound_record_update)
+    pp "fasdfasdfa"
   end
 end

@@ -20,10 +20,10 @@ export default class BinxAppOrgImpoundRecords {
   }
 
   updateKind() {
-    log.debug("updateKind");
     const updatedKind = $(
       "#impoundRecordUpdateForm #impound_record_update_kind"
     ).val();
+
     $("#impoundRecordUpdateForm .collapseKind").each(function (index, field) {
       const $field = $(field);
       if ($field.hasClass(`kind_${updatedKind}`)) {
@@ -35,7 +35,6 @@ export default class BinxAppOrgImpoundRecords {
   }
 
   initializeShow() {
-    log.debug("asdfasdf");
     this.updateKind();
     $("#impoundRecordUpdateForm #kindUpdate select").on("change", (event) =>
       this.updateKind()

@@ -43,10 +43,6 @@ class ImpoundRecordUpdate < ApplicationRecord
     kinds - active_kinds
   end
 
-  def self.kinds_without_location
-    kinds - ["move_location"]
-  end
-
   def self.update_only_kinds
     %w[move_location note claim_approved claim_denied]
   end

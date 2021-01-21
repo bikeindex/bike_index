@@ -85,6 +85,13 @@
       .card
         - @impound_record_update ||= ImpoundRecordUpdate.new
         = form_for @impound_record_update, url: organization_impound_record_path(@impound_record.display_id, organization_id: current_organization), action: "update", method: :patch do |f|
+          -# This gets us the correct kinds for the current impound_record - e.g. no retrieved_by_owner for unregistered_parking_notification
+          - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.slice(*impound_record.update_kinds.map(&:to_sym))
+          -# Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims
+          -# Also - never display "current" because it can't be updated that way
+          - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied, :current)
+
+          -# I THINK WE CAN REMOVE THIS
           -# can't update with current, don't include it as an option
           - kinds_for_select = ImpoundRecordUpdate.kinds_humanized.except(:current)
           - kinds_for_select = kinds_for_select.except(:move_location) unless locations_enabled

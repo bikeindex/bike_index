@@ -107,7 +107,17 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_kinds
-    organization.enabled?("impound_bikes_locations") ? ImpoundRecordUpdate.kinds : ImpoundRecordUpdate.kinds_without_location
+    return ["note"] if resolved?
+    u_kinds = ImpoundRecordUpdate.kinds
+    u_kinds = u_kinds - %w[move_location] unless organization&.enabled?("impound_bikes_locations")
+    if impound_claims.approved.any? || impound_claims.active.none?
+      u_kinds = u_kinds - %w[claim_approved claim_denied]
+    end
+    # Unregistered bikes can't be retrieved by their owner - unless there is an impound_claim
+    if unregistered_bike? && impound_claims.approved.none?
+      u_kinds = u_kinds - %w[retrieved_by_owner]
+    end
+    u_kinds
   end
 
   def update_associations
