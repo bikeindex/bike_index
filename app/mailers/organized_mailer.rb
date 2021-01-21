@@ -117,9 +117,10 @@ class OrganizedMailer < ApplicationMailer
   def impound_claim_approved_or_denied(impound_claim)
     @impound_claim = impound_claim
     set_impound_claim_ivars
-    mail(reply_to: "contact@bikeindex.org",
+    @reply_to = reply_to
+    mail(reply_to: @reply_to,
          to: @impound_claim.user.email,
-         subject: "Impound claim #{@impound_claim.status_humanized}")
+         subject: "Your impound claim was #{@impound_claim.status_humanized}")
   end
 
   private

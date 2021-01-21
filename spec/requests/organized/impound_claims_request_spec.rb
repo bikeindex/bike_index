@@ -78,7 +78,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
       expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
       expect {
         patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
-      }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
+      }.to_not change(EmailImpoundClaimWorker.jobs, :count)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
       impound_record.reload

@@ -45,7 +45,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
 
   def impound_claim_approved_or_denied
     impound_claim = ImpoundClaim.where(status: %w[approved denied]).last
-    OrganizedMailer.impound_claim_submitted(impound_claim)
+    OrganizedMailer.impound_claim_approved_or_denied(impound_claim)
   end
 
   private

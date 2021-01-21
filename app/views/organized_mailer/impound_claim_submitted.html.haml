@@ -1,21 +1,8 @@
-%h3.uncap Impounded bike:
-.row
-  .col-md-6.mt-2
-    %table.table-list
-      %tbody
-        %tr
-          %td Impound ID
-          %td
-            %strong
-              = link_to @impound_record.display_id, organization_impound_record_url(@impound_record.display_id, organization_id: @organization.id)
-        %tr
-          %td Bike
-          %td
-            - if @bike_claimed.present?
-              = link_to organized_bike_text(@bike_claimed), bike_url(@bike_claimed, organization_id: @organization.to_param)
+%h2.uncap
+  Impounded claim submitted!
 
-%h3.uncap.mt-4
-  Claim <small>#{link_to "view impound claim", organization_impound_claim_url(@impound_claim.id, organization_id: @organization.id)}</small>:
+%strong.mt-4
+  = link_to "View the claim", organization_impound_claim_url(@impound_claim.id, organization_id: @organization.id)
 
 %table.table-list
   %tbody
@@ -42,3 +29,23 @@
       %td
         - if @bike_submitting.present?
           = email_time_display(@bike_submitting.created_at)
+
+%h3.uncap.mt-4 Impounded bike:
+.row
+  .col-md-6.mt-2
+    %table.table-list
+      %tbody
+        %tr
+          %td Impound ID
+          %td
+            %strong
+              = link_to @impound_record.display_id, organization_impound_record_url(@impound_record.display_id, organization_id: @organization.id)
+        %tr
+          %td Bike
+          %td
+            - if @bike_claimed.present?
+              = link_to organized_bike_text(@bike_claimed), bike_url(@bike_claimed, organization_id: @organization.to_param)
+        %tr
+          %td Impounded
+          %td
+            = email_time_display(@impound_record.created_at)

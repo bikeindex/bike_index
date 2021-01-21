@@ -1,6 +1,12 @@
 @import "revised/mixins/colors";
 @import "revised/vars";
 
+// variables and mixins required for bootstrap utilities (e.g. mt-2)
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+// Backport of future bootstrap utilities
+@import "revised/mixins/bootstrap_utilities";
+
 $font-size: 16px;
 $header-height: 82px;
 $email-light-bg: #dddddd;
