@@ -1,0 +1,35 @@
+.mb-4
+  %h1.uncap
+    = t(".impound_settings_html", org_name: @organization.name)
+
+= form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+  = hidden_field_tag :impounding_page, true
+
+  .form-group.row
+    %label.org-form-label
+      Public search
+    .col-sm-4
+      .checkbox
+        %label{ style: "line-height: 1.5em;" }
+          = f.check_box :public_impound_bikes
+          Publicly accessible impound page
+          %small.less-strong
+            if checked, #{link_to organization_impounded_bikes_path(organization_id: current_organization.to_param), organization_impounded_bikes_path(organization_id: current_organization.to_param)} will be accessible by everyone.
+            %em Serials are never displayed for impounded bikes, so they can be used for verification of ownership
+  .form-group.row
+    %label.org-form-label Impound location
+    .col-sm-4
+      - if @organization.default_impound_location.present?
+        Bikes are impounded with locations
+        %br
+        The default location is
+        %strong
+          = @organization.default_impound_location.name
+        %small
+          = link_to "update location here", locations_organization_manage_path(organization_id: @organization.to_param)
+      - else
+        = link_to "Set impound locations", locations_organization_manage_path(organization_id: @organization.to_param)
+
+  .form-group.row.mt-4
+    .form-submit-button
+      = f.submit t(".save"), class: "btn btn-success btn-lg"

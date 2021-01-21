@@ -1,0 +1,44 @@
+.organized-page-header
+  %h1.uncap
+    Impound Claims
+
+- if @render_chart
+  = column_chart time_range_counts(collection: available_impound_claims), stacked: true, thousands: ",", defer: true
+.text-right.mb-2
+  %a.btn.btn-sm.less-strong.btn-outline-secondary{ href: organization_impound_claims_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)), class: (@render_chart ? "active" : "") }
+    Render chart
+= render partial: "/shared/period_select"
+
+.row.mb-4
+  .col-md-7.col-lg-9.mt-4
+    = pluralize(number_with_delimiter(@impound_claims.total_count), "matching impound claim")
+    %em
+      = humanized_time_range(@time_range)
+    - if @impound_record.present?
+      for
+      %strong
+        = link_to "Impound Record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+      %em.small.less-strong
+        view for
+        = link_to "all impound records", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: nil))
+  .col-md-5.col-lg-3.mt-4.text-right
+    .dropdown
+      %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+        #{@search_status.titleize} Claims
+      .dropdown-menu
+        - available_statuses.each do |status|
+          - display_status = "#{status.titleize} claims"
+          - status_active = @search_status == status
+          - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
+          = link_to display_status, organization_impound_claims_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}"
+
+          - if status == "all" # Add a divider before all
+            .dropdown-divider
+
+.full-screen-table
+  - skip_resolved = (ImpoundClaim.active_statuses + ["active"]).include?(@search_status)
+  - render_status = !ImpoundClaim.statuses.include?(@search_status) # Don't render status if we're looking at a single status
+  = render partial: "/organized/impound_claims/table", locals: { impound_claims: @impound_claims, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, skip_impound_record: @impound_record.present? }
+
+.paginate-container.paginate-container-bottom
+  = paginate @impound_claims

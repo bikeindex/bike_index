@@ -6,6 +6,7 @@ class ImpoundRecord < ApplicationRecord
 
   has_one :parking_notification
   has_many :impound_record_updates
+  has_many :impound_claims
 
   validates_presence_of :bike_id, :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
@@ -60,9 +61,22 @@ class ImpoundRecord < ApplicationRecord
     organization.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
-  # Get it unscoped, because unregistered_bike notifications
+  def impound_claim_retrieved?
+    impound_claims.retrieved.any?
+  end
+
   def bike
+    # Use retrieved impound claim, if possible - otherwise
+    @bike ||= impound_claims.retrieved.first&.bike_submitting
+    # Get it unscoped, because unregistered_bike notifications
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
+
+  def notification_notes_and_messages
+    return nil unless parking_notification.present?
+    msgs = parking_notification.associated_notifications_including_self
+      .map { |pn| [pn.internal_notes, pn.message] }.flatten.reject(&:blank?)
+    msgs.any? ? msgs : nil
   end
 
   def creator
@@ -99,7 +113,17 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_kinds
-    organization.enabled?("impound_bikes_locations") ? ImpoundRecordUpdate.kinds : ImpoundRecordUpdate.kinds_without_location
+    return ["note"] if resolved?
+    u_kinds = ImpoundRecordUpdate.kinds
+    u_kinds -= %w[move_location] unless organization&.enabled?("impound_bikes_locations")
+    if impound_claims.approved.any? || impound_claims.active.none?
+      u_kinds -= %w[claim_approved claim_denied]
+    end
+    # Unregistered bikes can't be retrieved by their owner - unless there is an impound_claim
+    if unregistered_bike? && impound_claims.approved.none?
+      u_kinds -= %w[retrieved_by_owner]
+    end
+    u_kinds
   end
 
   def update_associations

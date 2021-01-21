@@ -1,0 +1,8 @@
+Your impound claim has been
+%strong= @impound_claim.status_humanized
+
+- if @impound_claim.approved?
+  %p
+    Please reply to this message or contact
+    = link_to @reply_to, "mailto:#{@reply_to}"
+    to arrange to pick up your #{@bike_submitting&.type || "bike"}

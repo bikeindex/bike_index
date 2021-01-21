@@ -104,6 +104,25 @@ class OrganizedMailer < ApplicationMailer
          subject: @hot_sheet.subject)
   end
 
+  def impound_claim_submitted(impound_claim)
+    @impound_claim = impound_claim
+    set_impound_claim_ivars
+    # TODO: make this better
+    organized_recipient = @impound_claim.organization&.auto_user&.email || "contact@bikeindex.org"
+    mail(reply_to: "contact@bikeindex.org",
+         to: organized_recipient,
+         subject: "New impound claim submitted")
+  end
+
+  def impound_claim_approved_or_denied(impound_claim)
+    @impound_claim = impound_claim
+    set_impound_claim_ivars
+    @reply_to = reply_to
+    mail(reply_to: @reply_to,
+         to: @impound_claim.user.email,
+         subject: "Your impound claim was #{@impound_claim.status_humanized}")
+  end
+
   private
 
   def finished_registration_type
@@ -116,6 +135,13 @@ class OrganizedMailer < ApplicationMailer
       organization_name: @organization && "#{@organization.short_name} ",
       bike_type: @bike && "#{@bike.type} "
     }
+  end
+
+  def set_impound_claim_ivars
+    @impound_record = @impound_claim.impound_record
+    @organization = @impound_claim.organization
+    @bike_claimed = @impound_claim.bike_claimed
+    @bike_submitting = @impound_claim.bike_submitting
   end
 
   def reply_to

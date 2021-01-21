@@ -68,10 +68,10 @@ RSpec.describe OrganizedMailer, type: :mailer do
       let(:user) { FactoryBot.create(:user) }
       let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
       context "non-stolen, multi-ownership" do
-        let(:ownership_1) { FactoryBot.create(:ownership, user: user, bike: bike) }
+        let(:ownership1) { FactoryBot.create(:ownership, user: user, bike: bike) }
         let(:bike) { FactoryBot.create(:bike, owner_email: "someotheremail@stuff.com", creator_id: user.id) }
         it "renders email" do
-          expect(ownership_1).to be_present
+          expect(ownership1).to be_present
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
         end
@@ -239,6 +239,45 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.reply_to).to eq([organization.auto_user.email])
         expect(mail.bcc).to eq([])
         expect(mail.subject).to eq hot_sheet.subject
+      end
+    end
+  end
+
+  describe "impound_claim" do
+    let(:impound_claim) { FactoryBot.create(:impound_claim, status: status, organization: organization) }
+    let(:status) { "submitting" }
+    describe "impound_claim_submitted" do
+      let(:mail) { OrganizedMailer.impound_claim_submitted(impound_claim) }
+      it "renders" do
+        expect(impound_claim.reload.status).to eq status
+        expect(mail.to).to eq([organization.auto_user.email])
+        expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+        expect(mail.bcc).to be_blank
+        expect(mail.subject).to eq "New impound claim submitted"
+      end
+    end
+
+    describe "impound_claim_approved_or_denied" do
+      let(:mail) { OrganizedMailer.impound_claim_approved_or_denied(impound_claim) }
+      let(:status) { "approved" }
+      it "renders" do
+        expect(impound_claim.reload.status).to eq status
+        organization.reload
+        expect(mail.to).to eq([impound_claim.user.email])
+        expect(mail.reply_to).to eq([organization.auto_user.email])
+        expect(mail.bcc).to be_blank
+        expect(mail.subject).to eq "Your impound claim was approved"
+      end
+      context "denied" do
+        let(:status) { "denied" }
+        it "renders" do
+          expect(impound_claim.reload.status).to eq status
+          organization.reload
+          expect(mail.to).to eq([impound_claim.user.email])
+          expect(mail.reply_to).to eq([organization.auto_user.email])
+          expect(mail.bcc).to be_blank
+          expect(mail.subject).to eq "Your impound claim was denied"
+        end
       end
     end
   end

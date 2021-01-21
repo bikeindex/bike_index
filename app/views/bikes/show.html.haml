@@ -71,6 +71,11 @@
           = t(".from")
           = @bike.current_impound_record.parking_notification.address
 
+  - if @impound_claim.present?
+    -# This is open if passed there is an existing impound_claim
+    - @contact_owner_open = true if @impound_claim.id.present? && !@contact_owner_open
+    = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, start_open: @contact_owner_open }
+
   .row
     .col-md-8
       %h1.bike-title
@@ -242,14 +247,14 @@
                       = t(".componentyear", componentyear: component.year) if component.year.present?
                       = "(#{component.manufacturer_name})"
     .col-md-4
-      .social-share-bike
+      .social-share-bike.mb-4.mt-4
         %h4
           - if @bike.stolen
             = t(".spread_the_word")
           - else
             = t(".share_it")
         = render 'shared/share_this'
-      - if @bike.display_contact_owner?(current_user)
+      - if BikeDisplayer.display_contact_owner?(@bike, current_user)
         .contact-the-owner
           %p.preface
             %em
@@ -280,3 +285,20 @@
               %strong
                 = t(".owners_phone_number")
               = phone_link(@stolen_record.phone)
+
+      - if @bike.owner != current_user && BikeDisplayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
+        - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+
+        .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+          %p.preface
+            %em
+              Does this look like your #{@bike.type}?
+          %h3
+            Claim
+            = @bike.current_impound_record.kind
+            #{@bike.type}
+
+          %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
+            Open claim
+
+      .ad-block#right300x600

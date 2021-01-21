@@ -83,10 +83,6 @@
       }
     }
 
-    #write_them_a_message .btn {
-      display: block;
-    }
-
     .phoneable-by {
       em {
         display: block;
@@ -98,6 +94,9 @@
         color: white;
       }
     }
+  }
+  #write_them_a_message .btn {
+    display: block;
   }
 
   .claim-message-org-avatar {
@@ -181,6 +180,13 @@
     }
     .btn {
       @extend .uncap;
+    }
+  }
+
+  .impound-claim-panel {
+    border-radius: 2px;
+    label {
+      line-height: 1.5;
     }
   }
 

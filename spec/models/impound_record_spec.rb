@@ -22,6 +22,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.current?).to be_truthy
       expect(Bike.impounded.pluck(:id)).to eq([bike.id])
       expect(organization.impound_records.bikes.pluck(:id)).to eq([bike.id])
+      expect(impound_record.kind).to eq "impounded"
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
@@ -42,6 +43,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike, organization: organization) }
       let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
+      let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied] }
       it "updates the record and the user" do
         ImpoundUpdateBikeWorker.new.perform(impound_record.id)
         bike.reload
@@ -50,7 +52,7 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record.user).to eq user
         expect(impound_record.location).to be_blank
         # Doesn't include move update kind, because there is no location
-        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - ["move_location"])
+        expect(impound_record.update_kinds).to eq valid_update_kinds
 
         impound_record_update.save
         expect(impound_record_update.resolved?).to be_truthy
@@ -58,6 +60,129 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record.resolved?).to be_truthy
         expect(impound_record.resolved_at).to be_within(1).of Time.current
         expect(impound_record.user_id).to eq user2.id
+      end
+      context "unregistered_parking_notification" do
+        let(:parking_notification) do
+          pn = FactoryBot.create(:unregistered_parking_notification,
+            created_at: Time.current - 1.hour,
+            organization: organization,
+            user: user2,
+            kind: "impound_notification")
+          # Process parking_notification in the actual code path that creates the impound record
+          ProcessParkingNotificationWorker.new.perform(pn.id)
+          pn.reload
+          pn
+        end
+        let(:bike) { parking_notification.bike }
+        let!(:impound_record) { parking_notification.impound_record }
+        # NOTE: This is permitted, but blocked in the controller.
+        # Testing here to document and because maybe someday might want to error
+        it "does not error" do
+          bike.update(updated_at: Time.current)
+          expect(bike.reload.impounded?).to be_truthy
+          expect(bike.status_impounded?).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
+          expect(impound_record.unregistered_bike?).to be_truthy
+          expect(impound_record.creator&.id).to eq user2.id
+          expect(impound_record.location).to be_blank
+          expect(impound_record.status).to eq "current"
+          # Doesn't include move update kind, because there is no location
+          expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
+          Sidekiq::Worker.clear_all
+          expect {
+            impound_record_update.save
+          }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+          ImpoundUpdateBikeWorker.drain
+          expect(impound_record_update).to be_valid
+          expect(impound_record_update)
+
+          impound_record_update.save
+          expect(impound_record_update.resolved?).to be_truthy
+          impound_record.reload
+          expect(impound_record.resolved?).to be_truthy
+          expect(impound_record.resolved_at).to be_within(1).of Time.current
+          expect(impound_record.user_id).to eq user2.id
+          expect(impound_record.bike_id).to eq bike.id
+
+          bike.reload
+          expect(bike.deleted?).to be_falsey
+          # It's still unregistered, nothing changed
+          expect(bike.created_by_parking_notification?).to be_truthy
+        end
+        context "approved_claim" do
+          let!(:impound_claim) do
+            FactoryBot.create(:impound_claim_with_stolen_record,
+              status: "submitting",
+              organization: organization,
+              created_at: Time.current - 1.hour,
+              impound_record: impound_record)
+          end
+          let(:stolen_record) { impound_claim.stolen_record }
+          let(:bike_submitting) { impound_claim.bike_submitting }
+          let(:impound_record_update_approved) do
+            impound_record.impound_record_updates.create(user: user2,
+                                                         kind: "claim_approved", impound_claim: impound_claim)
+          end
+          it "associates with the approved claim" do
+            expect(impound_claim.reload.status).to eq "submitting"
+            expect(impound_claim.submitted?).to be_truthy
+            expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location retrieved_by_owner])
+            expect(impound_record_update_approved).to be_valid
+            impound_claim.reload
+            expect(impound_claim.bike_claimed_id).to eq bike.id
+            expect(impound_claim.status).to eq "approved"
+            expect(stolen_record.reload.recovered?).to be_falsey
+            expect(impound_claim.stolen_record&.id).to eq stolen_record.id
+
+            impound_record.reload
+            expect(impound_record.unregistered_bike?).to be_truthy
+            expect(impound_record.impound_claims.approved.pluck(:id)).to eq([impound_claim.id])
+            # And now, can't be approved or denied, because already approved
+            expect(impound_record.update_kinds).to eq valid_update_kinds
+
+            bike_submitting.reload
+            expect(bike_submitting.stolen?).to be_truthy
+            bike.reload
+            expect(bike.impounded?).to be_truthy
+            expect(bike.status_impounded?).to be_truthy
+            expect(bike.created_by_parking_notification?).to be_truthy
+            expect(impound_record.creator&.id).to eq user2.id
+            expect(impound_record.location).to be_blank
+            expect(impound_record.status).to eq "current"
+            expect(impound_record.impound_claim_retrieved?).to be_falsey
+
+            impound_record_update.save
+            expect(impound_record_update).to be_valid
+            expect(impound_record_update.impound_claim_id).to be_blank
+            Sidekiq::Worker.clear_all
+            expect {
+              impound_record_update.save
+            }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+            ImpoundUpdateBikeWorker.drain
+            expect(impound_record_update.reload.resolved?).to be_truthy
+            expect(impound_record_update.impound_claim_id).to eq impound_claim.id
+            impound_claim.reload
+            expect(impound_claim.status).to eq "retrieved"
+            expect(impound_claim.bike_submitting_id).to eq bike_submitting.id
+            expect(impound_claim.bike_claimed_id).to eq bike.id
+            expect(impound_claim.stolen_record&.id).to eq stolen_record.id
+
+            impound_record.reload
+            expect(impound_record.resolved?).to be_truthy
+            expect(impound_record.resolved_at).to be_within(1).of Time.current
+            expect(impound_record.user_id).to eq user2.id
+            expect(impound_record.impound_claim_retrieved?).to be_truthy
+
+            bike.reload
+            expect(bike.created_by_parking_notification?).to be_truthy
+            expect(bike.deleted?).to be_truthy
+
+            bike_submitting.reload
+            expect(bike_submitting.stolen?).to be_falsey
+            stolen_record.reload
+            expect(stolen_record.recovered?).to be_truthy
+          end
+        end
       end
     end
   end
@@ -69,6 +194,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.status).to eq "removed_from_bike_index"
       expect(impound_record.impound_record_updates.count).to eq 1
       expect(impound_record.resolving_update.kind).to eq "removed_from_bike_index"
+      expect(impound_record.update_kinds).to eq(["note"])
     end
   end
 
@@ -100,6 +226,35 @@ RSpec.describe ImpoundRecord, type: :model do
       expect {
         impound_record.destroy
       }.to_not change(ImpoundUpdateBikeWorker.jobs, :count)
+    end
+  end
+
+  describe "notification_notes_and_messages" do
+    # This method is relevant because PSU puts serials into the notes from the parking notifications
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:impound_record) { FactoryBot.create(:impound_record, organization: organization) }
+    let(:bike) { impound_record.bike }
+    it "returns serial number" do
+      expect(impound_record.parking_notification&.id).to be_blank
+      expect(impound_record.notification_notes_and_messages).to be_blank
+    end
+    context "note and message" do
+      let(:parking_notification1) do
+        FactoryBot.create(:parking_notification, bike: bike, organization: organization, kind: "parked_incorrectly_notification",
+                                                 internal_notes: "Internal note 1", created_at: Time.current - 1.month)
+      end
+      let!(:parking_notification2) do
+        FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
+                                                 initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
+      end
+      it "returns note and message" do
+        impound_record.reload
+        organization.reload
+        expect(impound_record.parking_notification&.id).to eq parking_notification2.id
+        parking_notification2.reload
+        expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
+        expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
+      end
     end
   end
 end

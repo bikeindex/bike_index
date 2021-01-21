@@ -42,6 +42,7 @@ class Bike < ApplicationRecord
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications
   has_many :stolen_records
+  has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
   has_many :other_listings, dependent: :destroy
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
@@ -53,6 +54,7 @@ class Bike < ApplicationRecord
   has_many :duplicate_bikes, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
+  has_many :impound_claims_claimed, through: :impound_records, source: :impound_claims
   has_many :parking_notifications
   has_many :graduated_notifications, foreign_key: :bike_id
 
@@ -467,10 +469,6 @@ class Bike < ApplicationRecord
   # This method only accepts numerical org ids
   def bike_sticker?(organization_id = nil)
     bike_stickers.where(organization_id.present? ? {organization_id: organization_id} : {}).any?
-  end
-
-  def display_contact_owner?(u = nil)
-    stolen? && current_stolen_record.present?
   end
 
   def contact_owner?(u = nil, organization = nil)

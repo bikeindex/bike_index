@@ -70,7 +70,7 @@
             .dropdown-divider
 
 .full-screen-table
-  - skip_resolved = (ImpoundRecord.active_statuses + ["active"]).include?(@search_status)
+  - skip_resolved = ImpoundRecord.active_statuses.include?(@search_status)
   - render_status = %w[all resolved].include?(@search_status)
   = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status }
 

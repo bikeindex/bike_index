@@ -27,6 +27,8 @@ class BikeIndex.BikesShow extends BikeIndex
       @showBikeOverlay()
     if $(".organized-access-panel").length > 0
       @showOrganizedAccessPanel()
+    if $("#impound_claim").length > 0
+      @initializeImpoundClaimPanel()
 
     # Show the "claim bike" modal (or recovery modal) if present
     if document.getElementById('initial-open-modal')
@@ -103,6 +105,12 @@ class BikeIndex.BikesShow extends BikeIndex
       $("#openNewParkingNotification").collapse("hide")
       $("#newParkingNotificationFields").collapse("show")
       @renderParkingNotificationForm()
+
+  initializeImpoundClaimPanel: ->
+    $("#submitClaimButton").on "click", (e) =>
+      e.preventDefault()
+      $("#impound_claim #impound_claim_status").val("submitting")
+      $("#impound_claim form").submit()
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos

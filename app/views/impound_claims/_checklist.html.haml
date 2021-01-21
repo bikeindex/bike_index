@@ -1,0 +1,75 @@
+- bike_submitting ||= impound_claim.bike_submitting
+- render_optional ||= false
+-# Maybe there is a way to calculate this dynamically, skipping for now
+- current_path ||= "/bikes/#{impound_claim.bike_claimed}"
+
+- # TODO: add translations
+
+.stolen-checklist-wrap.mt-2
+  %ul.stolen-checklist
+    - verified_phone_number = current_user.user_phones.confirmed.any?
+    %li{ class: verified_phone_number ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if verified_phone_number
+      %span.checklist-text
+        Verified phone number
+
+    - theft_information = bike_submitting.current_stolen_record.street.present? && bike_submitting.current_stolen_record.date_stolen.present?
+    %li{ class: theft_information ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if theft_information
+      %span.checklist-text
+        Loss/theft location and time
+
+    - serial_known = !bike_submitting.serial_unknown?
+    %li{ class: serial_known ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if serial_known
+      %span.checklist-text
+        #{bike_submitting.type.titleize} has serial number
+        - unless serial_known
+          = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, page: "bike_details", return_to: current_path), class: "small"
+        - if render_optional
+          %em.small.less-strong
+            optional
+
+    - if bike_submitting.creation_state&.is_pos
+      %li.completed-item
+        %span.checklist-checkbox
+          &#10003;
+        %span.checklist-text
+          Verified purchase (registered at Point Of Sale by #{bike_submitting.creation_state.organization.display_name})
+          - if render_optional
+            %em.small.less-strong
+              optional
+    - else
+      - proof_of_purchase_photo = impound_claim.bike_submitting_images.photo_of_receipt.any?
+      %li{ class: proof_of_purchase_photo ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = "&#10003;".html_safe if proof_of_purchase_photo
+        %span.checklist-text
+          = link_to "Photo of the receipt", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+          - if render_optional
+            %em.small.less-strong
+              optional
+
+    - photo_of_you_and_bike = impound_claim.bike_submitting_images.photo_of_user_with_bike.any?
+    %li{ class: photo_of_you_and_bike ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if photo_of_you_and_bike
+      %span.checklist-text
+        = link_to "Photo of you with the #{bike_submitting.type}", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+        - if render_optional
+          %em.small.less-strong
+            optional
+
+    - message_present = impound_claim.message.present?
+    %li{ class: message_present ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if message_present
+      %span.checklist-text
+        Message to
+        %em= impound_claim.impound_record.creator_public_display_name
+        verifying your ownership
+
+

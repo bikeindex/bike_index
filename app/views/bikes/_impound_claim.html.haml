@@ -1,0 +1,94 @@
+-# You really should pass bike and impound_claim
+- bike ||= @bike
+- impound_claim ||= @impound_claim
+- impound_record ||= impound_claim.impound_record
+- viewing_bike_submitting = impound_claim.bike_submitting == bike
+- bike_claimed = impound_claim.bike_claimed
+- start_open ||= false
+
+- # TODO: add translations
+
+#impound_claim.collapse{ class: ("in" if start_open) }
+  .card.impound-claim-panel.mt-4.mb-4
+    .card-block
+      .card-title
+        %h3.header-font-alt
+          - if viewing_bike_submitting
+            You have a
+            %strong= impound_claim.status_humanized
+            claim with this #{bike.type}
+            %em.small.less-strong
+              = link_to "view claimed #{impound_record.kind} #{bike_claimed.type}", bike_path(bike_claimed)
+          - else
+            - if impound_claim.id.present?
+              Your claim for this
+            - else
+              File a claim for this
+            = impound_record.kind
+            = bike.type
+
+      .card-body
+        - bike_submitting = impound_claim.bike_submitting&.decorate
+        - if impound_claim.id.blank? || bike_submitting.blank? # bike_submitting.blank? should only occur in testing
+          - bikes = current_user.rough_approx_bikes.stolen.reorder(created_at: :desc).limit(10)
+          - if bikes.none?
+            %p
+              You have to have a stolen bike registered to file a claim for this #{impound_record.kind} #{impound_record.bike.type}.
+              %br
+              %strong
+                Add #{link_to "a stolen bike here", new_bike_url(stolen: true)}.
+          - else
+            = form_for impound_claim do |f|
+              = f.hidden_field :impound_record_id, value: impound_record.id
+              -# TODO: include a way to create the bike right here
+              .form-group
+                = f.label :stolen_record_id do
+                  Select the stolen bike you own which matches this #{impound_record.kind} #{impound_record.bike&.type}
+                  %small.less-strong
+                    not registered yet? #{link_to "add it here", new_bike_url(stolen: true)}.
+                .row
+                  .col-lg-8.mb-2
+                    - stolen_select_opts = bikes.map { |b| [b.title_string, b.current_stolen_record&.id] }
+                    = f.select(:stolen_record_id, stolen_select_opts, {prompt: "Choose stolen bike"}, {required: true, class: "form-control"})
+                  .col-lg-4.text-right
+                    = submit_tag "Open claim", class: "btn btn-success"
+        - else
+          = form_for impound_claim do |f|
+            = f.hidden_field :status
+            .row
+              .col-lg-8.mb-4
+                - unless viewing_bike_submitting
+                  .bike-boxes
+                    = render partial: "/bikes/bike", locals: { bike: bike_submitting }
+                - if impound_claim.unsubmitted?
+                  .form-group.mt-4
+                    = f.label :message do
+                      Message
+                      %small.less-strong
+                        verify your ownership - add additional details that prove this #{bike_submitting.type} is yours
+                    = f.text_area :message, class: "form-control"
+                  = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
+                - else
+                  %h3.mt-4.uncap
+                    %em
+                      This claim was submitted
+                      %span.convertTime.withPreposition
+                        = l impound_claim.created_at, format: :convert_time
+              - unless impound_claim.submitted?
+                .col-lg-4
+                  %p
+                    Prove to
+                    %em= impound_record.creator_public_display_name
+                    that the #{impound_record.bike.type} is yours by providing details that only the owner would have.
+
+                  -# Here are recommended things to add:
+                  = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(bike.to_param, contact_owner: true), render_optional: true }
+                  - if impound_claim.unsubmitted?
+                    .mt-4
+                      %a.btn.btn-success#submitClaimButton{ href: "#" }
+                        Submit claim
+                      %em.small.less-strong.d-lg-block
+                        after submitting you will no longer be able to edit the claim!
+
+
+

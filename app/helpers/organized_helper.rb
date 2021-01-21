@@ -51,7 +51,8 @@ module OrganizedHelper
   end
 
   def organized_container
-    return "container-fluid" if %w[parking_notifications impound_records graduated_notifications lines].include?(controller_name)
+    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines]
+    return "container-fluid" if fluid.include?(controller_name)
     controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
   end
 
@@ -74,12 +75,18 @@ module OrganizedHelper
     case status.downcase
     when "current", "paging", "being_helped"
       content_tag(:span, status_str, class: "text-success")
-    when /retrieved/, "resolved_otherwise", "on_deck"
+    when /retrieved/, "resolved_otherwise", "on_deck", /approved/
       content_tag(:span, status_str.gsub("otherwise", ""), class: "text-info")
-    when /removed/, "impounded", "trashed", "failed_to_find"
+    when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       content_tag(:span, status_str, class: "text-danger")
     else
       content_tag(:span, status_str, class: "less-strong")
     end
+  end
+
+  # Might make this more fancy sometime, but... for now, good enough
+  def email_time_display(datetime)
+    return "" unless datetime.present?
+    l datetime, format: :dotted
   end
 end

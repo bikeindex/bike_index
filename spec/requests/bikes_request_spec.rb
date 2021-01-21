@@ -442,6 +442,40 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+    context "with impound_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      it "includes an impound_claim" do
+        expect(impound_record).to be_present
+        expect(bike.current_impound_record).to be_present
+        get "#{base_url}/#{bike.id}"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:impound_claim)).to be_present
+        expect(assigns(:impound_claim)&.id).to be_blank
+      end
+      context "current_user has impound_claim" do
+        let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
+        it "uses impound_claim" do
+          expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+        end
+      end
+      context "current_user has submitting_impound_claim" do
+        let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, bike: bike, user: current_user) }
+        it "uses impound_claim" do
+          bike.reload
+          expect(bike.impound_claims_submitting.pluck(:id)).to eq([impound_claim.id])
+          expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+        end
+      end
+    end
   end
 
   describe "update token" do
