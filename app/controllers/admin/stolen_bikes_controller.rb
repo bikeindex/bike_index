@@ -89,7 +89,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
-    @unapproved_only = !ParamsNormalizer.boolean(params[:unapproved])
+    @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
     if @unapproved_only
       # maintain previous functionality, by gross query (see PR#1545)
       stolen_record_ids = Bike.stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
