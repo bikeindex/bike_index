@@ -89,30 +89,12 @@ RSpec.describe "organizations routing", type: :routing do
   end
 
   describe "org_public module" do # At least for now...
-    it "routes to walkrightup" do
-      expect(get: "/bike_shop/walkrightup").to route_to(
-        controller: "org_public/walkrightup",
+    it "routes to impounded_bikes" do
+      expect(get: "/hogwarts/impounded_bikes").to route_to(
+        controller: "org_public/impounded_bikes",
         action: "show",
-        organization_id: "bike_shop"
+        organization_id: "hogwarts"
       )
-    end
-    context "capitals" do
-      it "routes to walkrightup" do
-        expect(get: "/bike_shop/WalkRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-        # TODO: ideally, these would work too - but I don't know how :(
-        # expect(get: "/bike_shop/WALKRightUp").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-        # expect(get: "/bike_shop/WALK-Right-Up").to route_to(controller: "org_public/walkrightup", action: "show", organization_id: "bike_shop")
-      end
-    end
-    describe "appointment" do
-      it "routes to appointment" do
-        expect(get: "/california-bikes/customer_appointments/12").to route_to(
-          controller: "org_public/customer_appointments",
-          action: "show",
-          organization_id: "california-bikes",
-          id: "12"
-        )
-      end
     end
   end
 end

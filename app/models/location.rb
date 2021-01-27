@@ -8,8 +8,7 @@ class Location < ApplicationRecord
   belongs_to :state
 
   has_many :bikes
-  has_one :appointment_configuration
-  has_many :appointments
+  has_many :impound_records
 
   validates :name, :city, :country, :organization, presence: true
 
@@ -47,13 +46,9 @@ class Location < ApplicationRecord
     !not_publicly_visible
   end
 
-  def virtual_line_on?
-    appointment_configuration.present? && appointment_configuration.virtual_line_on?
-  end
-
   # may also block if it's had appointments
   def destroy_forbidden?
-    virtual_line_on?
+    default_impound_location? || impound_records.any?
   end
 
   def publicly_visible=(val)
@@ -76,8 +71,6 @@ class Location < ApplicationRecord
     # Because we need to update the organization and make sure it is shown on
     # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update(updated_at: Time.current)
-    # Just in case this changed something here
-    LocationAppointmentsQueueWorker.perform_async(id)
   end
 
   def display_name
@@ -88,7 +81,7 @@ class Location < ApplicationRecord
   # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
-    raise StandardError, "Can't destroy a location with appointments enabled"
+    raise StandardError, "Can't destroy a location with impounded bikes"
   end
 
   private

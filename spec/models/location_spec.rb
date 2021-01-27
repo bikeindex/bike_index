@@ -55,6 +55,7 @@ RSpec.describe Location, type: :model do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"]) }
     let!(:location) { FactoryBot.create(:location, organization: organization) }
     let!(:location2) { FactoryBot.create(:location, organization: organization) }
+    let(:impound_record) { FactoryBot.create(:impound_record, location: location) }
     it "sets the impound_bikes_locations on organization setting" do
       expect(organization.default_impound_location).to be_blank
       expect(organization.enabled_feature_slugs).to eq(["impound_bikes"])
@@ -73,8 +74,10 @@ RSpec.describe Location, type: :model do
       expect(organization.default_impound_location).to eq location2
       location.reload
       expect(location.default_impound_location).to be_falsey
-      # It also enqueues the location appointment worker
-      expect(LocationAppointmentsQueueWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([location2.id])
+      # Also test that it blocks destroying if impound_record is present
+      expect(impound_record.reload.location&.id).to eq location.id
+      expect { location2.destroy }.to raise_error(/impound/i) # because it's default impound
+      expect { location.destroy }.to raise_error(/impound/i) # Because it has impound records
     end
   end
 end
