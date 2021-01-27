@@ -1617,15 +1617,6 @@ en:
       applications:
         ensure_app_owner!:
           not_your_application: That isn't your application
-    org_public:
-      base:
-        ensure_access_to_virtual_line!:
-          location_does_not_have_access: >-
-            %{location_name} doesn't have virtual line turned on, please contact %{org_name}.
-          org_does_not_have_access: "%{org_name} doesn't have access to that, please
-            contact Bike Index support."
-          unable_to_find_location: Unable to find the location "%{location_id}" for
-            %{org_name}
     organizations:
       create:
         organization_created: Organization Created successfully!
@@ -1650,10 +1641,6 @@ en:
           could_not_update: Could not update activity status. Please try again later.
           status_updated: Activity status updated.
       base:
-        ensure_access_to_appointments!:
-          must_be_an_admin: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         ensure_admin!:
           must_be_org_admin: You have to be an organization administrator to do that!
         ensure_ambassador_authorized!:
@@ -5128,7 +5115,6 @@ en:
       thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_menu_items:
       add_a_bike: Add a bike
-      appointment_configuration: Appointments configuration
       ascend_imports: Ascend Imports
       bulk_imports: Bulk Imports
       custom_emails: Custom emails
@@ -5155,7 +5141,6 @@ en:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       super_admin_view: Super Admin for %{org_name}
-      virtual_line: Virtual line
     organized_skeleton:
       additional_features_html: >-
         Bike Index provides additional features for verified Law Enforcement organizations.

@@ -339,8 +339,6 @@ Rails.application.routes.draw do
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
-    resources :lines, only: %i[index show update]
-    resources :appointments, only: %i[create update]
     resource :hot_sheet, only: %i[show edit update]
     resource :ambassador_dashboard, only: %i[show] do
       collection do
@@ -357,20 +355,12 @@ Rails.application.routes.draw do
         get :impounding
       end
     end
-    resources :appointment_configurations, only: %i[index edit update]
     resources :users, except: [:show]
   end
 
   # This is the public organizations section
   resources :organization, only: [], path: "", module: "org_public" do
     resources :impounded_bikes, only: %i[index]
-    resource :walkrightup, only: %i[show], controller: "walkrightup" # walkrightups is stupid
-    get "WalkRightUp", to: "walkrightup#show"
-    resources :customer_appointments, only: %i[show update create] do
-      collection do
-        post :set_current
-      end
-    end
   end
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge

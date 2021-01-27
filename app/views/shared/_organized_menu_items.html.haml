@@ -21,9 +21,6 @@
     %li
       = active_link "#{passed_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passed_organization.to_param), class: "nav-link"
     %li.divider-nav-item
-  - if passed_organization.appointment_functionality_enabled?
-    = active_link t(".virtual_line"), organization_lines_path(organization_id: passed_organization.to_param), class: "nav-link", match_controller: true
-    %li.divider-nav-item
   - on_bikes_path = controller_name == "bikes" && action_name == "index" && params[:organization_id].present? # Because we want to ignore queries and stuff
   %li
     = link_to t(".org_bikes", org_name: passed_organization.short_name), organization_bikes_path(organization_id: passed_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}"
@@ -120,9 +117,6 @@
     - if passed_organization.enabled?("hot_sheet")
       %li
         = active_link t(".stolen_hot_sheet_configuration"), edit_organization_hot_sheet_path(organization_id: passed_organization.to_param), class: "nav-link"
-    - if passed_organization.appointment_functionality_enabled?
-      %li
-        = active_link t(".appointment_configuration"), organization_appointment_configurations_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
   - if !is_dropdown || current_user&.superuser? # Don't include last divider if in dropdown - unless superuser
     %li.divider-nav-item

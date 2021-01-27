@@ -37,7 +37,7 @@
             - if f.object.destroy_forbidden?
               .text-right
                 %em.small.less-strong
-                  required for appointments
+                  required for impounded bikes
             - else
               = f.check_box :_destroy, class: "removeFieldsCheck"
               = f.label :_destroy, t(".remove"), class: 'remove_fields'
