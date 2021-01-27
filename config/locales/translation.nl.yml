@@ -2462,9 +2462,6 @@ nl:
             dat te zien!
         ensure_not_ambassador_organization!:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
-        ensure_access_to_appointments!:
-          must_be_an_admin: Uw organisatie heeft hier geen toegang toe, neem contact
-            op met Bike Index support.
       bikes:
         update:
           unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
@@ -2564,15 +2561,6 @@ nl:
       update:
         cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
           als u denkt dat dit mogelijk zou moeten zijn.
-    org_public:
-      base:
-        ensure_access_to_virtual_line!:
-          location_does_not_have_access: "%{location_name} heeft geen virtuele lijn
-            ingeschakeld, neem contact op met %{org_name}."
-          org_does_not_have_access: "%{org_name} heeft daar geen toegang toe, neem
-            contact op met Bike Index-ondersteuning."
-          unable_to_find_location: Kan de locatie "%{location_id}" voor %{org_name}
-            niet vinden
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5224,7 +5212,6 @@ nl:
       donation_header: Red een fiets in 2021
     organized_menu_items:
       add_a_bike: Voeg een fiets toe
-      appointment_configuration: Afspraak configuratie
       ascend_imports: Opvoer importeren
       bulk_imports: Bulkinvoer
       custom_emails: Aangepaste e-mails
@@ -5251,7 +5238,6 @@ nl:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
       super_admin_view: Superbeheerder voor %{org_name}
-      virtual_line: Virtuele lijn
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

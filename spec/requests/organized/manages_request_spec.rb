@@ -107,7 +107,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             is_paid: false
           }
         end
-        let(:user_2) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
         let(:update_attributes) do
           {
             # slug: 'short_name',
@@ -115,7 +115,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             available_invitation_count: "20",
             is_suspended: true,
             auto_user_id: current_user.id,
-            embedable_user_email: user_2.email,
+            embedable_user_email: user2.email,
             api_access_approved: true,
             approved: true,
             access_token: "things7",
@@ -132,7 +132,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         # Website is also permitted, but we're manually setting it
         let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website] }
         before do
-          expect(user_2).to be_present
+          expect(user2).to be_present
           current_organization.update_attributes(org_attributes)
         end
         it "updates, sends message about maps" do
@@ -146,7 +146,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           end
           expect(current_organization.public_impound_bikes?).to be_falsey
           # Test that the website and auto_user_id are set correctly
-          expect(current_organization.auto_user_id).to eq user_2.id
+          expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
           # Ensure we're protecting the correct attributes
           org_attributes.except(*permitted_update_keys).each do |key, value|
@@ -291,25 +291,36 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.to_coordinates).to eq location.to_coordinates
           end
           context "location is default impound location" do
-            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+            let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
             let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name", impound_location: true) }
+            let(:blocked_destroy_params) do
+              # Only pass one location, and keep it default impound location
+              update_attributes.merge(kind: "bike_shop",
+                                      short_name: "cool other name",
+                                      locations_attributes: {
+                                        "0" => update_attributes[:locations_attributes]["0"].merge(default_impound_location: "1")
+                                      })
+            end
             it "does not remove" do
+              UpdateOrganizationAssociationsWorker.new.perform(location1.organization_id)
               location1.reload
-              expect(location1).to be_present
               expect(location1.default_impound_location?).to be_truthy
               expect(location1.destroy_forbidden?).to be_truthy
-              expect(current_organization.locations.count).to eq 1
+              expect(current_organization.reload.locations.count).to eq 1
+              expect(current_organization.default_impound_location&.id).to eq location1.id
 
               expect {
                 put base_url,
                   params: {
                     organization_id: current_organization.to_param,
                     id: current_organization.to_param,
-                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                    organization: blocked_destroy_params
                   }
+                current_organization.reload
               }.to raise_error(/impound/i)
 
               current_organization.reload
+              expect(current_organization.default_impound_location&.id).to eq location1.id
               expect(Location.where(id: location1.id).count).to eq 1
             end
           end

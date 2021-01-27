@@ -92,7 +92,7 @@ RSpec.describe "organizations routing", type: :routing do
     it "routes to impounded_bikes" do
       expect(get: "/hogwarts/impounded_bikes").to route_to(
         controller: "org_public/impounded_bikes",
-        action: "show",
+        action: "index",
         organization_id: "hogwarts"
       )
     end
