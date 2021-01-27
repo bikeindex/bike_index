@@ -1650,10 +1650,6 @@ en:
           could_not_update: Could not update activity status. Please try again later.
           status_updated: Activity status updated.
       base:
-        ensure_access_to_appointments!:
-          must_be_an_admin: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         ensure_admin!:
           must_be_org_admin: You have to be an organization administrator to do that!
         ensure_ambassador_authorized!:
@@ -5128,7 +5124,6 @@ en:
       thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_menu_items:
       add_a_bike: Add a bike
-      appointment_configuration: Appointments configuration
       ascend_imports: Ascend Imports
       bulk_imports: Bulk Imports
       custom_emails: Custom emails

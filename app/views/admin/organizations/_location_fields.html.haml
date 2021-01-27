@@ -33,7 +33,7 @@
             .form-group.text-center
               - if f.object.destroy_forbidden?
                 %small.less-strong
-                  can't remove, has appointments
+                  can't remove, has impounded bikes
               - else
                 = f.check_box :_destroy, class: "d-none"
                 = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"

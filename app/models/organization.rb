@@ -236,10 +236,6 @@ class Organization < ApplicationRecord
     is_suspended?
   end
 
-  def appointment_functionality_enabled?
-    any_enabled?(OrganizationFeature::APPOINTMENT_FEATURES)
-  end
-
   def hot_sheet_on?
     hot_sheet_configuration.present? && hot_sheet_configuration.on?
   end

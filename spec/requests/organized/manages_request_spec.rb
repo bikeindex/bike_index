@@ -290,12 +290,13 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location.longitude).to be_within(0.1).of(-74.0)
             expect(current_organization.to_coordinates).to eq location.to_coordinates
           end
-          context "location has appointment_configuration" do
-            let!(:appointment_configuration) { FactoryBot.create(:appointment_configuration, location: location1, organization: current_organization, virtual_line_on: true) }
+          context "location is default impound location" do
+            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+            let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name", impound_location: true) }
             it "does not remove" do
               location1.reload
               expect(location1).to be_present
-              expect(location1.virtual_line_on?).to be_truthy
+              expect(location1.default_impound_location?).to be_truthy
               expect(location1.destroy_forbidden?).to be_truthy
               expect(current_organization.locations.count).to eq 1
 
@@ -306,7 +307,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                     id: current_organization.to_param,
                     organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
                   }
-              }.to raise_error(/appointment/)
+              }.to raise_error(/impound/i)
 
               current_organization.reload
               expect(Location.where(id: location1.id).count).to eq 1

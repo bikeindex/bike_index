@@ -46,7 +46,7 @@ class Location < ApplicationRecord
     !not_publicly_visible
   end
 
-  # may also block if it's had appointments
+  # may block if it has impound records
   def destroy_forbidden?
     default_impound_location? || impound_records.any?
   end
