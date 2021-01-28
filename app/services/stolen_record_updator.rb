@@ -27,11 +27,7 @@ class StolenRecordUpdator
   end
 
   def create_new_record
-    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.current)
-    new_stolen_record.phone = @bike.phone
-    new_stolen_record.country_id = Country.united_states&.id
-    stolen_record = update_with_params(new_stolen_record)
-    stolen_record.creation_organization_id = @bike.creation_organization_id
+    stolen_record = update_with_params(@bike.build_new_stolen_record)
     if stolen_record.save
       @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
       return true

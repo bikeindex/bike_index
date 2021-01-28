@@ -525,6 +525,19 @@ class Bike < ApplicationRecord
     false
   end
 
+  def build_new_stolen_record(new_attrs = {})
+    new_stolen_record = stolen_records.build({
+      country_id: Country.united_states&.id,
+      date_stolen: Time.current,
+      phone: phone,
+      current: true,
+    }.merge(new_attrs))
+    if created_at.blank? || created_at > Time.current - 1.day
+      new_stolen_record.creation_organization_id = creation_organization_id
+    end
+    new_stolen_record
+  end
+
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
