@@ -9,17 +9,6 @@ class StolenRecordUpdator
     @b_param = creation_params[:b_param]
   end
 
-  def mark_records_not_current
-    stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
-    if stolen_records.any?
-      stolen_records.each do |s|
-        s.current = false
-        s.save
-      end
-    end
-    @bike.reload.update_attribute :current_stolen_record_id, nil
-  end
-
   def update_records
     if @bike.stolen
       if @bike.fetch_current_stolen_record.blank?
@@ -37,6 +26,35 @@ class StolenRecordUpdator
       mark_records_not_current
     end
   end
+
+  def create_new_record
+    mark_records_not_current
+    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.current)
+    new_stolen_record.phone = @bike.phone
+    new_stolen_record.country_id = Country.united_states&.id
+    stolen_record = update_with_params(new_stolen_record)
+    stolen_record.creation_organization_id = @bike.creation_organization_id
+    if stolen_record.save
+      @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
+      return true
+    end
+    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
+  end
+
+  private
+
+  def mark_records_not_current
+    stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
+    if stolen_records.any?
+      stolen_records.each do |s|
+        s.current = false
+        s.save
+      end
+    end
+    @bike.reload.update_attribute :current_stolen_record_id, nil
+  end
+
+
 
   def update_with_params(stolen_record)
     return stolen_record unless @b_param.present?
@@ -63,20 +81,6 @@ class StolenRecordUpdator
       }
     end
     stolen_record
-  end
-
-  def create_new_record
-    mark_records_not_current
-    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.current)
-    new_stolen_record.phone = @bike.phone
-    new_stolen_record.country_id = Country.united_states&.id
-    stolen_record = update_with_params(new_stolen_record)
-    stolen_record.creation_organization_id = @bike.creation_organization_id
-    if stolen_record.save
-      @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
-      return true
-    end
-    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
   end
 
   def permitted_attributes(params)
