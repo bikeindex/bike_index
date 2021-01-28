@@ -76,6 +76,32 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "build_new_stolen_record" do
+    let(:bike) { FactoryBot.create(:bike_organized) }
+    let(:organization) { bike.creation_organization }
+    let(:us_id) { Country.united_states.id }
+    it "builds a new record" do
+      stolen_record = bike.build_new_stolen_record
+      expect(stolen_record.country_id).to eq us_id
+      expect(stolen_record.phone).to be_blank
+      expect(stolen_record.date_stolen).to be > Time.current - 1.second
+      expect(stolen_record.creation_organization_id).to eq organization.id
+    end
+    context "older record" do
+      let(:country) { FactoryBot.create(:country) }
+      it "builds new record without creation_organization" do
+        bike.update(created_at: Time.current - 2.days)
+        allow(bike).to receive(:phone) { "1112223333" }
+        # Accepts properties
+        stolen_record = bike.build_new_stolen_record(country_id: country.id)
+        expect(stolen_record.country_id).to eq country.id
+        expect(stolen_record.phone).to eq "1112223333"
+        expect(stolen_record.date_stolen).to be > Time.current - 1.second
+        expect(stolen_record.creation_organization_id).to be_blank
+      end
+    end
+  end
+
   context "unknown, absent serials" do
     let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
     let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
@@ -367,6 +393,8 @@ RSpec.describe Bike, type: :model do
     let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
     let(:bike2) { stolen_record3.bike }
     it "finds by stolen_record" do
+      expect(stolen_record1.reload.current?).to be_falsey
+      stolen_record1.update_column :current, true
       bike1.reload
       expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
       # Ideally this would keep the scope, but it doesn't. So document that behavior here

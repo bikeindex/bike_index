@@ -6,26 +6,13 @@ RSpec.describe StolenRecordUpdator do
       bike = FactoryBot.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
+      bike.reload
       expect(bike.stolen_records.count).to eq(1)
       expect(bike.current_stolen_record).to eq(bike.stolen_records.last)
-    end
-
-    it "calls mark_records_not_current" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:mark_records_not_current)
-      update_stolen_record.create_new_record
     end
   end
 
   describe "update_records" do
-    it "sets the current stolen record as not current if the bike isn't stolen" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:mark_records_not_current)
-      update_stolen_record.update_records
-    end
-
     it "calls create if a stolen record doesn't exist" do
       bike = FactoryBot.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
@@ -41,36 +28,12 @@ RSpec.describe StolenRecordUpdator do
       StolenRecordUpdator.new(bike: bike, date_stolen: time.to_i).update_records
       expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
     end
-
-    it "marks all stolen records false and mark the bike unrecovered if the bike isn't stolen" do
-      bike = FactoryBot.create(:bike, stolen: false, abandoned: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:mark_records_not_current)
-      update_stolen_record.update_records
-      expect(bike.abandoned).to be_falsey
-    end
-  end
-
-  describe "mark_records_not_current" do
-    it "marks all the records not current" do
-      bike = FactoryBot.create(:bike)
-      stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
-      bike.reload
-      expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
-      stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
-      stolen_record1.update_attributes(current: true)
-      stolen_record2.update_attributes(current: true)
-      StolenRecordUpdator.new(bike: bike).mark_records_not_current
-      expect(stolen_record1.reload.current).to be_falsey
-      expect(stolen_record2.reload.current).to be_falsey
-      expect(bike.reload.current_stolen_record_id).to be_nil
-    end
   end
 
   describe "update_with_params" do
     it "returns the stolen record if no stolen record is associated" do
       stolen_record = StolenRecord.new
-      updator = StolenRecordUpdator.new.update_with_params(stolen_record)
+      updator = StolenRecordUpdator.new.send("update_with_params", stolen_record)
       expect(updator).to eq(stolen_record)
     end
 
@@ -92,7 +55,7 @@ RSpec.describe StolenRecordUpdator do
       allow(b_param).to receive(:params).and_return({stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
-      stolen_record = updator.update_with_params(stolen_record)
+      stolen_record = updator.send("update_with_params", stolen_record)
       expect(stolen_record.police_report_number).to eq(sr[:police_report_number])
       expect(stolen_record.police_report_department).to eq(sr[:police_report_department])
       expect(stolen_record.theft_description).to eq(sr[:theft_description])
@@ -113,7 +76,7 @@ RSpec.describe StolenRecordUpdator do
       allow(b_param).to receive(:params).and_return({stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
-      stolen_record = updator.update_with_params(stolen_record)
+      stolen_record = updator.send("update_with_params", stolen_record)
       expect(stolen_record.country).to eq(country)
       expect(stolen_record.state).to eq(state)
     end

@@ -21,7 +21,7 @@ class Manufacturer < ApplicationRecord
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 
-  def self.old_attr_accessible
+  def self.export_columns
     %w[name slug website frame_maker open_year close_year logo remote_logo_url
       logo_cache logo_source description].map(&:to_sym).freeze
   end
@@ -53,7 +53,7 @@ class Manufacturer < ApplicationRecord
   def self.import(file)
     CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
       mnfg = find_by_name(row[:name]) || new
-      mnfg.attributes = row.to_h.slice(*old_attr_accessible)
+      mnfg.attributes = row.to_h.slice(*export_columns)
       next if mnfg.save
       puts "\n#{row} \n"
       fail mnfg.errors.full_messages.to_sentence
