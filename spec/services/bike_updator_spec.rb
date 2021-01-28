@@ -86,7 +86,7 @@ RSpec.describe BikeUpdator do
 
     it "marks a bike stolen with the date_stolen" do
       FactoryBot.create(:country, iso: "US")
-      bike = FactoryBot.create(:bike, stolen: true)
+      bike = FactoryBot.create(:bike)
       updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
       updator.update_available_attributes
       bike.reload
@@ -137,12 +137,11 @@ RSpec.describe BikeUpdator do
 
   it "enque listing order working" do
     Sidekiq::Testing.fake!
-    bike = FactoryBot.create(:bike, stolen: true)
+    bike = FactoryBot.create(:bike)
     ownership = FactoryBot.create(:ownership, bike: bike)
     user = ownership.creator
     FactoryBot.create(:user)
-    bike_params = {stolen: false}
-    update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json)
+    update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: {}}.as_json)
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes

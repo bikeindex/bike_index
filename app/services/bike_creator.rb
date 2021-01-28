@@ -88,6 +88,8 @@ class BikeCreator
     bike.ownerships.destroy_all
     bike.creation_states.destroy_all
     bike.destroy
+    # override the validated bike status with the status from b_param
+    @bike.status = @b_param.status if @b_param.present?
     @bike
   end
 

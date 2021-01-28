@@ -43,7 +43,7 @@ class OrganizationsController < ApplicationController
     @stolen_record = built_stolen_record
     if params[:non_stolen]
       @non_stolen = true
-    elsif @bike.stolen || params[:stolen_first]
+    elsif @bike.status_stolen? || params[:stolen_first]
       @stolen = true
     end
     render layout: "embed_layout"
@@ -75,12 +75,11 @@ class OrganizationsController < ApplicationController
     if params[:b_param_id_token].present?
       @b_param = BParam.find_or_new_from_token(params[:b_param_id_token])
     else
-      hash = {
+      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: {stolen: params[:stolen]}
-      }
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: hash)
+        bike: {status: (ParamsNormalizer.boolean(params[:stolen]) ? "status_stolen" : "status_with_owner")}
+      })
     end
   end
 

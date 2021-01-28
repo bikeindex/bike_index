@@ -165,8 +165,7 @@ RSpec.describe Admin::BikesController, type: :request do
     let(:recovered_description) { "something cool and party and things and stuff and it came back!!! XOXO" }
     before do
       stolen_record.add_recovery_information(recovered_description: recovered_description)
-      bike.reload
-      expect(bike.stolen).to be_falsey
+      expect(bike.reload.status).to eq "status_with_owner"
     end
 
     it "marks unrecovered, without deleting the information about the recovery" do
@@ -186,9 +185,7 @@ RSpec.describe Admin::BikesController, type: :request do
         put "#{base_url}/unrecover?bike_id=#{bike.id + 10}&stolen_record_id=#{stolen_record.id}"
         expect(flash[:error]).to match(/contact/i)
         expect(response).to redirect_to admin_bike_path(bike.id + 10)
-
-        bike.reload
-        expect(bike.stolen).to be_falsey
+        expect(bike.reload.status).to eq "status_with_owner"
       end
     end
   end

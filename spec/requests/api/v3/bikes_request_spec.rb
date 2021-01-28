@@ -535,7 +535,6 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.creation_organization).to eq(organization)
       expect(bike.creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
       expect(bike.creation_state.organization).to eq organization
-      expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")

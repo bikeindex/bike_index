@@ -15,7 +15,7 @@ RSpec.describe ScheduleBikePossiblyFoundNotificationWorker, type: :job do
 
   context "given bikes with matches" do
     it "enqueues a notification job for each match" do
-      FactoryBot.create(:stolen_bike_in_amsterdam, abandoned: false, serial_number: "hello")
+      FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "hello")
       abandoned_bike = FactoryBot.create(:bike, serial_number: "hel1o")
       FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification", bike: abandoned_bike)
       FactoryBot.create(:external_registry_bike, serial_number: "he1l0")

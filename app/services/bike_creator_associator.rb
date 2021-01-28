@@ -67,7 +67,7 @@ class BikeCreatorAssociator
       create_components(bike)
       create_normalized_serial_segments(bike)
       assign_user_attributes(bike, ownership&.user)
-      StolenRecordUpdator.new(bike: bike, b_param: @b_param.params).update_records
+      StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
       create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
       attach_photo(bike)
       attach_photos(bike)

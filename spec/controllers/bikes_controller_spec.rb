@@ -651,17 +651,18 @@ RSpec.describe BikesController, type: :controller do
             target_path = embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
 
             expect {
-              post :create, params: {bike: bike_params.merge(stolen: "1", serial_number: nil), stolen_record: stolen_params}
+              post :create, params: {bike: bike_params.merge(serial_number: nil), stolen_record: stolen_params}
 
               expect(assigns(:bike).errors&.full_messages).to be_present
             }.to change(Ownership, :count).by(0)
 
             expect(response).to redirect_to target_path
+            expect(b_param.reload.status).to eq "status_stolen"
             bike = assigns(:bike)
             testable_bike_params
               .except(:serial_number)
               .each { |k, v| expect(bike.send(k).to_s).to eq(v.to_s) }
-            expect(bike.status).to eq "status_stolen"
+            expect(b_param.status).to eq "status_stolen"
             # we retain the stolen record attrs, it would be great to test that they are
             # assigned correctly, but I don't know how - it needs to completely
             # render the new action
@@ -875,7 +876,7 @@ RSpec.describe BikesController, type: :controller do
             tertiary_frame_color_id: "",
             owner_email: "something@stuff.com",
             phone: "312.379.9513",
-            stolen: true
+            date_stolen: Time.current.to_i
           }
         end
         before { expect(BParam.all.count).to eq 0 }
@@ -896,7 +897,7 @@ RSpec.describe BikesController, type: :controller do
               expect(flash[:success]).to be_present
               expect(BParam.all.count).to eq 0
               bike = Bike.last
-              bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              bike_params.except(:manufacturer_id, :phone, :date_stolen).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               expect(bike.manufacturer).to eq manufacturer
               expect(bike.status).to eq "status_stolen"
               bike_user.reload
@@ -913,13 +914,11 @@ RSpec.describe BikesController, type: :controller do
         context "failure" do
           it "assigns a bike and a stolen record with the attrs passed" do
             expect {
-              post :create, params: {stolen: true, bike: bike_params.as_json, stolen_record: chicago_stolen_params}
+              post :create, params: {bike: bike_params.as_json, stolen_record: chicago_stolen_params}
             }.to change(Bike, :count).by(0)
             expect(BParam.all.count).to eq 1
             bike = assigns(:bike)
-            bike_params.delete(:manufacturer_id)
-            bike_params.delete(:phone)
-            bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             expect(bike.status).to eq "status_stolen"
             # we retain the stolen record attrs, it would be great to test that they are
             # assigned correctly, but I don't know how - it needs to completely
@@ -1220,7 +1219,7 @@ RSpec.describe BikesController, type: :controller do
             # render all of them Both to ensure we get all of them and because we
             # can't use the let block
             bc = BikesController.new
-            bc.instance_variable_set(:@bike, Bike.new(stolen: true))
+            bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
             bc.edit_templates.keys + ["alert_purchase", "alert_purchase_confirmation"]
           end
           let(:no_global_alert_templates) { %w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation] }

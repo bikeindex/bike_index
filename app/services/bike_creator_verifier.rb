@@ -19,40 +19,8 @@ class BikeCreatorVerifier
     @bike
   end
 
-  def add_phone
-    @bike.phone ||= @b_param.phone if @b_param.params && @b_param.params["stolen_record"].present?
-    if @bike.creation_organization.present? && @bike.creation_organization.locations.any?
-      @bike.phone ||= @bike.creation_organization.locations.first.phone
-    elsif @bike.creator && @bike.creator.phone.present?
-      @bike.phone ||= @bike.creator.phone
-    end
-  end
-
-  def stolenize
-    @bike.stolen = true
-    add_phone unless @bike.phone.present?
-  end
-
-  def recoverize
-    @bike.abandoned = true
-    stolenize
-  end
-
-  def check_stolen_and_abandoned
-    if @b_param.params["stolen"]
-      stolenize
-    elsif @b_param.params["bike"].present? && @b_param.params["bike"]["stolen"]
-      stolenize
-    elsif @b_param.params["abandoned"]
-      recoverize
-    elsif @b_param.params["bike"].present? && @b_param.params["bike"]["abandonded"]
-      recoverize
-    end
-  end
-
   def verify
     check_organization
-    check_stolen_and_abandoned
     check_example
     @bike
   end

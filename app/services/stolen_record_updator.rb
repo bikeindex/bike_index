@@ -1,8 +1,8 @@
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    @b_param = creation_params[:b_param]
-    @stolen_params = isolate_stolen_params(creation_params[:b_param]&.with_indifferent_access)
+    b_param = creation_params[:b_param]
+    @stolen_params = b_param&.stolen_attrs || {}
   end
 
   attr_reader :stolen_params
@@ -19,19 +19,6 @@ class StolenRecordUpdator
   end
 
   private
-
-  def isolate_stolen_params(b_param)
-    return nil if b_param.blank?
-    stolen_params = b_param["stolen_record"] || {}
-    nested_params = b_param.dig("bike", "stolen_records_attributes")
-    if nested_params&.values&.first&.is_a?(Hash)
-      stolen_params = nested_params.values.reject(&:blank?).last
-    end
-    # Set the date_stolen if it was passed, if something else didn't already set date_stolen
-    date_stolen = b_param.dig("bike", "date_stolen")
-    stolen_params["date_stolen"] ||= date_stolen if date_stolen.present?
-    stolen_params.with_indifferent_access
-  end
 
   def update_with_params(stolen_record)
     return stolen_record unless @stolen_params.present?

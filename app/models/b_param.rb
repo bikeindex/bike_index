@@ -34,7 +34,6 @@ class BParam < ApplicationRecord
     %w[test id components].each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
     stolen_attrs = h["bike"].delete "stolen_record"
     if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
-      h["bike"]["stolen"] = true
       h["stolen_record"] = stolen_attrs
       h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
     end
@@ -68,13 +67,15 @@ class BParam < ApplicationRecord
 
   def self.assignable_attrs
     %w[manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-      stolen abandoned serial_number made_without_serial
+      serial_number made_without_serial
       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id]
   end
 
   # Attrs that need to be skipped on bike assignment
   def self.skipped_bike_attrs
+    # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them
     %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
+      stolen abandoned
       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
   end
 
@@ -94,10 +95,6 @@ class BParam < ApplicationRecord
 
   def owner_email=(val)
     params["bike"]["owner_email"] = val
-  end
-
-  def stolen=(val)
-    params["bike"]["stolen"] = ParamsNormalizer.boolean(val)
   end
 
   def primary_frame_color_id=(val)
@@ -125,8 +122,22 @@ class BParam < ApplicationRecord
     (params && params["bike"] || {}).with_indifferent_access
   end
 
+  def stolen_attrs
+    s_attrs = params["stolen_record"] || {}
+    nested_params = params.dig("bike", "stolen_records_attributes")
+    if nested_params&.values&.first&.is_a?(Hash)
+      s_attrs = nested_params.values.reject(&:blank?).last
+    end
+    # Set the date_stolen if it was passed, if something else didn't already set date_stolen
+    date_stolen = params.dig("bike", "date_stolen")
+    s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
+    s_attrs
+  end
+
   def status
-    Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first
+    return "status_stolen" if stolen_attrs.present?
+    return "status_abandoned" if bike["status"] == "status_abandoned" # lol, TODO after #1875
+    "status_with_owner"
   end
 
   def status_abandoned?
@@ -151,10 +162,6 @@ class BParam < ApplicationRecord
 
   def manufacturer_id
     bike["manufacturer_id"]
-  end
-
-  def stolen
-    bike["stolen"]
   end
 
   def is_pos
@@ -262,7 +269,6 @@ class BParam < ApplicationRecord
 
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    bike["stolen"] = true if params["stolen_record"].present?
     set_wheel_size_key
     set_manufacturer_key
     set_color_keys

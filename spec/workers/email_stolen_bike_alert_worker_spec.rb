@@ -24,7 +24,6 @@ RSpec.describe EmailStolenBikeAlertWorker, type: :job do
 
     it "does not send an email if the stolen bike has receive_notifications false" do
       stolen_record = FactoryBot.create(:stolen_record, receive_notifications: false)
-      stolen_record.bike.update_attribute :stolen, true
       customer_contact = FactoryBot.create(:customer_contact, bike: stolen_record.bike)
       ActionMailer::Base.deliveries = []
       EmailStolenBikeAlertWorker.new.perform(customer_contact.id)
