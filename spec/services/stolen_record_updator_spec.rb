@@ -26,13 +26,6 @@ RSpec.describe StolenRecordUpdator do
       update_stolen_record.update_records
     end
 
-    it "calls create if a stolen record doesn't exist" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:create_new_record)
-      update_stolen_record.update_records
-    end
-
     it "sets the date if date_stolen is present" do
       stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike

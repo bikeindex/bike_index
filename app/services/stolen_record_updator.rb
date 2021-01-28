@@ -22,7 +22,6 @@ class StolenRecordUpdator
   end
 
   def update_records
-    pp @mark_bike_stolen
     if @mark_bike_stolen
       create_new_record
       @bike.reload

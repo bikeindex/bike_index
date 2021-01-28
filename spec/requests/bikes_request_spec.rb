@@ -874,7 +874,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.stolen?).to be_falsey
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
+            patch "#{base_url}/#{bike.id}", params: {mark_bike_stolen: true}
             expect(flash[:success]).to be_present
           end
           bike.reload

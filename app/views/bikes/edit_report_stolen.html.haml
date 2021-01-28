@@ -3,7 +3,7 @@
 = form_for @bike, multipart: true, html: { class: "primary-edit-bike-form stolenEditPage" } do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
-  = hidden_field_tag :mark_bike_stolen
+  = hidden_field_tag :mark_bike_stolen, true
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
