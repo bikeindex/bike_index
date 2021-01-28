@@ -23,6 +23,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.reload
         expect(stolen_record.alert_image).to be_present
         expect(stolen_record.bike.stolen).to be_truthy
+        bike.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
 
         stolen_record.add_recovery_information
@@ -212,13 +213,6 @@ RSpec.describe StolenRecord, type: :model do
       row = stolen_record.tsv_row
       expect(row.split("\t").count).to eq(10)
       expect(row.split("\n").count).to eq(1)
-    end
-
-    it "doesn't show the serial for recovered bikes" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.bike.update_attributes(serial_number: "SERIAL_SERIAL", abandoned: true)
-      row = stolen_record.tsv_row
-      expect(row).not_to match(/serial_serial/i)
     end
   end
 

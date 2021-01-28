@@ -107,18 +107,26 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  # Honestly, I'm not sure this is entirely legitimate
   describe "bike_from_attrs" do
-    it "is stolen if it is stolen (ignore passed parameter)" do
-      b_param = BParam.new
-      b_param.stolen = true
-      bike = b_param.bike_from_attrs(is_stolen: false)
-      expect(bike.status_stolen).to be_truthy
+    it "is stolen if it is stolen" do
+      bike = BParam.new.bike_from_attrs(is_stolen: "1")
+      expect(bike.status).to eq "status_stolen"
+    end
+    it "is not stolen if param is falsey" do
+      bike = BParam.new.bike_from_attrs(is_stolen: "0")
+      expect(bike.status).to eq "status_with_owner"
     end
     context "status passed" do
       it "is stolen if passed stolen" do
-        b_param = BParam.new
-        bike = b_param.bike_from_attrs(status: "status_stolen")
-        expect(bike.status_stolen).to be_truthy
+        bike = BParam.new.bike_from_attrs(status: "status_stolen")
+        expect(bike.status).to eq "status_stolen"
+      end
+      context "status_impounded" do
+        it "is status_impounded, ignores is_stolen" do
+          bike = BParam.new.bike_from_attrs(status: "status_impounded", is_stolen: true)
+          expect(bike.status).to eq "status_impounded"
+        end
       end
     end
   end
@@ -537,36 +545,6 @@ RSpec.describe BParam, type: :model do
         expect(result.is_a?(BParam)).to be_truthy
         expect(result.id).to be_nil
         expect(result.creator_id).to eq user.id
-      end
-    end
-  end
-
-  describe "safe_bike_hash" do
-    context "with creator" do
-      it "returns the hash we pass, ignoring ignored and overriding param_overrides" do
-        bike_attrs = {
-          manufacturer_id: 12,
-          primary_frame_color_id: 8,
-          owner_email: "something@stuff.com",
-          stolen: false,
-          creator_id: 1,
-          cycle_type_slug: "cargo",
-          b_param_id: 79999,
-          creation_organization_id: 888,
-          something_else_cool: "party"
-        }
-        b_param = BParam.new(params: {bike: bike_attrs}, creator_id: 777)
-        b_param.id = 122
-        target = {
-          manufacturer_id: 12,
-          primary_frame_color_id: 8,
-          owner_email: "something@stuff.com",
-          stolen: true,
-          creator_id: 777,
-          b_param_id: 122,
-          creation_organization_id: 888
-        }.with_indifferent_access
-        expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
       end
     end
   end

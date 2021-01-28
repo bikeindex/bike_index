@@ -414,19 +414,14 @@ class BParam < ApplicationRecord
                 use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
   end
 
-  # Below here is revised setup, an attempt to make the process of upgrading rails easier
-  # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
-  # To protect organization registration and other non-user-set options in revised setup,
-  # Set the protected attrs separately from the params hash and merging over the passed params
-  # Now that we're on rails 4, this is just a giant headache.
-  def bike_from_attrs(is_stolen: nil, abandoned: nil)
-    is_stolen = params["bike"]["stolen"] if params["bike"]&.keys&.include?("stolen")
-    Bike.new(safe_bike_attrs({"stolen" => is_stolen, "abandoned" => abandoned}).as_json)
-  end
-
-  def safe_bike_attrs(param_overrides)
-    bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-      .merge("b_param_id" => id,
+  # Below here is revised setup
+  # bike_from_attrs accepts is_stolen as a parameter because of legacy URLs out there with ?stolen=true
+  # updated in #1875
+  def bike_from_attrs(status: nil, is_stolen: nil)
+    status ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
+    status ||= Bike.statuses.first unless Bike.statuses.include?(status)
+    Bike.new("status" => status,
+             "b_param_id" => id,
              "creator_id" => creator_id)
   end
 
