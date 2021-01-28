@@ -327,9 +327,9 @@ class StolenRecord < ApplicationRecord
     return true if skip_update
     remove_outdated_alert_images
     # Bump bike only if it looks like this is bike's current_stolen_record
-    if current
+    if current || bike&.current_stolen_record_id == id
       update_not_current_records
-      bike&.update_attributes(current_stolen_record: self, manual_csr: true)
+      bike&.update_attributes(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     bike&.user&.update_attributes(updated_at: Time.current)
   end

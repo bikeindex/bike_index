@@ -4,10 +4,6 @@ FactoryBot.define do
     date_stolen { Time.current }
     skip_geocoding { true }
 
-    after(:create) do |stolen_record, _evaluator|
-      stolen_record.bike.reload.update(current_stolen_record: stolen_record)
-    end
-
     factory :stolen_record_recovered do
       bike { FactoryBot.create(:bike) }
       recovered_at { Time.current }

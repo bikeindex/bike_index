@@ -131,13 +131,6 @@ FactoryBot.define do
     end
   end
 
-  factory :stolen_notification do
-    sender { FactoryBot.create(:user) }
-    receiver { FactoryBot.create(:user) }
-    bike { FactoryBot.create(:bike) }
-    message { "This is a test email." }
-  end
-
   factory :customer_contact do
     creator { FactoryBot.create(:user) }
     bike { FactoryBot.create(:bike) }

@@ -49,6 +49,11 @@ class BikeUpdator
     ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
   end
 
+  # This is a separate method because it's called in admin
+  def update_stolen_record
+    StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
+  end
+
   def set_protected_attributes
     @bike_params["bike"]["serial_number"] = @bike.serial_number
     @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
@@ -76,7 +81,7 @@ class BikeUpdator
       @bike.address_set_manually = true
     end
     if @bike.update_attributes(update_attrs)
-      StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
+      update_stolen_record
     end
     AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components

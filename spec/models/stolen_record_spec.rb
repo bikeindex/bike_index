@@ -236,6 +236,8 @@ RSpec.describe StolenRecord, type: :model do
       it "is not displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered, can_share_recovery: false)
         expect(stolen_record.recovery_display_status).to eq "not_eligible"
+        bike = stolen_record.bike
+        expect(bike.reload.status).to eq "status_with_owner"
       end
     end
     context "stolen record is recovered, able to share" do
