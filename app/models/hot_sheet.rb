@@ -53,7 +53,7 @@ class HotSheet < ApplicationRecord
 
   def fetch_stolen_records
     if stolen_record_ids.is_a?(Array)
-      stolen_records = StolenRecord.unscoped.where(id: stolen_record_ids)
+      stolen_records = StolenRecord.current_and_not.where(id: stolen_record_ids)
         .reorder(date_stolen: :desc)
     else
       stolen_records = calculated_stolen_records

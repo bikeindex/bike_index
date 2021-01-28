@@ -51,9 +51,9 @@ class ImpoundClaim < ApplicationRecord
     self.class.active_statuses.include?(status)
   end
 
-  # Get it unscoped, because retrieved notifications
+  # Get it not current too, because retrieved notifications
   def stolen_record
-    @stolen_record ||= stolen_record_id.present? ? StolenRecord.unscoped.find_by_id(stolen_record_id) : nil
+    @stolen_record ||= stolen_record_id.present? ? StolenRecord.current_and_not.find_by_id(stolen_record_id) : nil
   end
 
   # Get it unscoped, because unregistered_bike notifications

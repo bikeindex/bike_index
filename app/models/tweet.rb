@@ -99,7 +99,7 @@ class Tweet < ApplicationRecord
   def stolen_record
     return nil unless stolen_record_id.present?
     # Using super because maybe it will benefit from includes?
-    super || StolenRecord.unscoped.find(stolen_record_id)
+    super || StolenRecord.current_and_not.find(stolen_record_id)
   end
 
   def bike

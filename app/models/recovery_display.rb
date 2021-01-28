@@ -26,7 +26,7 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def from_stolen_record(sr_id)
-    sr = StolenRecord.unscoped.where(id: sr_id).first
+    sr = StolenRecord.current_and_not.where(id: sr_id).first
     return true unless sr.present?
     self.stolen_record = sr
     self.recovered_at = sr.recovered_at
@@ -54,11 +54,11 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def bike
     return nil unless stolen_record_id.present?
-    StolenRecord.unscoped.find(stolen_record_id).bike
+    StolenRecord.current_and_not.find(stolen_record_id).bike
   end
 
   def stolen_record
-    stolen_record_id.present? ? StolenRecord.unscoped.find_by_id(stolen_record_id) : nil
+    stolen_record_id.present? ? StolenRecord.current_and_not.find_by_id(stolen_record_id) : nil
   end
 
   def update_associations
