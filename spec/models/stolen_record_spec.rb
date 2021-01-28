@@ -12,6 +12,7 @@ RSpec.describe StolenRecord, type: :model do
 
         stolen_record.update_attribute(:bike, nil)
 
+        stolen_record.reload
         expect(stolen_record.bike).to be_blank
         expect(stolen_record.alert_image).to be_blank
       end

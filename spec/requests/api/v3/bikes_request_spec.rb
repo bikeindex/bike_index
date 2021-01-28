@@ -979,11 +979,10 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "send_stolen_notification" do
-    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creator: user) }
     let(:params) { {message: "Something I'm sending you"} }
     let(:url) { "/api/v3/bikes/#{bike.id}/send_stolen_notification?access_token=#{token.token}" }
     let!(:token) { create_doorkeeper_token(scopes: "read_user") }
-    before { bike.update_attribute :stolen, true }
 
     it "fails to send a stolen notification without read_user" do
       token.update_attribute :scopes, "public"
@@ -995,7 +994,8 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "fails if the bike isn't stolen" do
-      bike.update_attribute :stolen, false
+      bike.current_stolen_record.add_recovery_information
+      expect(bike.reload.status).to eq "status_with_owner"
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("400")
       expect(response.body.match("is not stolen")).to be_present
@@ -1009,6 +1009,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "sends a notification" do
+      expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)

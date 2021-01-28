@@ -5,7 +5,8 @@ RSpec.describe "Bikes API V2", type: :request do
     before :each do
       @bike = FactoryBot.create(:bike)
       FactoryBot.create(:bike)
-      FactoryBot.create(:abandoned_bike)
+      # TODO after #1875: add back in abandoned bikes
+      # FactoryBot.create(:abandoned_bike)
     end
     it "all bikes (root) search works" do
       get "/api/v2/bikes_search?per_page=1", params: {format: :json}
