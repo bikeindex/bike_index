@@ -380,7 +380,7 @@ CREATE TABLE public.bikes (
     creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    stolen boolean DEFAULT false NOT NULL,
+    is_stolen boolean DEFAULT false NOT NULL,
     propulsion_type_other character varying(255),
     manufacturer_other character varying(255),
     zipcode character varying(255),
@@ -406,7 +406,7 @@ CREATE TABLE public.bikes (
     frame_size character varying(255),
     frame_size_unit character varying(255),
     pdf character varying(255),
-    abandoned boolean DEFAULT false NOT NULL,
+    is_abandoned boolean DEFAULT false NOT NULL,
     paint_id integer,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
@@ -5345,6 +5345,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210111220950'),
 ('20210114030113'),
 ('20210120162658'),
-('20210127173741');
+('20210127173741'),
+('20210127191226');
 
 

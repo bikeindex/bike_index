@@ -171,7 +171,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     if params[:search_stolen].present?
       bikes = bikes.stolen if params[:search_stolen] == "stolen_only"
-      bikes = bikes.non_stolen if params[:search_stolen] == "non_stolen_only"
+      bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
     end
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?

@@ -161,7 +161,7 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_location_id
     # Return the existing location_id if the organization doesn't have locations enabled - just to be safe and not lose data
-    return location_id unless organization.enabled?("impound_bikes_locations")
+    return location_id unless organization&.enabled?("impound_bikes_locations")
     # If any impound records have a set location, use that, otherwise, use the default location
     impound_record_updates.with_location.order(:id).last&.location_id || organization.default_impound_location&.id
   end

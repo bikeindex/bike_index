@@ -4,7 +4,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
   let(:instance) { described_class.new }
 
   let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
-  let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+  let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, resolved: false, kind: kind) }
   let(:kind) { "note" }
 

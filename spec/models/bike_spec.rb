@@ -8,18 +8,6 @@ RSpec.describe Bike, type: :model do
     it "default scopes to created_at desc" do
       expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
     end
-    it "scopes to only stolen bikes" do
-      expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
-    end
-    it "non_stolen scopes to only non_stolen bikes" do
-      expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
-    end
-    it "non_abandoned scopes to only non_abandoned bikes" do
-      expect(Bike.non_abandoned.to_sql).to eq(Bike.where(abandoned: false).to_sql)
-    end
-    it "abandoned scopes to only abandoned bikes" do
-      expect(Bike.abandoned.to_sql).to eq(Bike.where(abandoned: true).to_sql)
-    end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
@@ -155,21 +143,22 @@ RSpec.describe Bike, type: :model do
   end
 
   describe ".possibly_found_with_match" do
+    let(:bike1) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
+    let(:bike1b) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
+    let(:bike2) { FactoryBot.create(:stolen_bike, serial_number: "he110") }
+    let(:bike2b) { FactoryBot.create(:abandoned_bike, serial_number: "HEllO") }
+    let(:bike3) { FactoryBot.create(:stolen_bike, serial_number: "1100ll") }
+    let(:bike3b) { FactoryBot.create(:impounded_bike, serial_number: "IIOO11") }
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
-      pair0 = [
-        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
-        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o")
-      ]
+      pair0 = [bike1, bike1b]
+      expect(bike1.reload.status).to eq "status_impounded"
+      expect(bike1b.reload.status).to eq "status_impounded"
 
-      pair1 = [
-        FactoryBot.create(:bike, stolen: true, serial_number: "he110"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO")
-      ]
+      pair1 = [bike2, bike2b]
+      expect(bike2.reload.status).to eq "status_stolen"
+      expect(bike2b.reload.status).to eq "status_impounded"
 
-      pair2 = [
-        FactoryBot.create(:bike, stolen: true, serial_number: "1100ll"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11")
-      ]
+      pair2 = [bike3, bike3b]
 
       results = Bike.possibly_found_with_match
       expect(results.length).to eq(2)
@@ -677,7 +666,7 @@ RSpec.describe Bike, type: :model do
     end
     context "impound record" do
       let(:ownership) { FactoryBot.create(:ownership, user: user) }
-      let(:impound_record) { FactoryBot.build(:impound_record, bike: bike) }
+      let(:impound_record) { FactoryBot.build(:impound_record_with_organization, bike: bike) }
       let(:organization) { impound_record.organization }
       let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns falsey if impound record is current unless user is organization_member" do
@@ -1089,7 +1078,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.owner_name).to eq "some name"
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
-          FactoryBot.create(:impound_record, bike: bike)
+          FactoryBot.create(:impound_record_with_organization, bike: bike, organization: organization)
           bike.reload
           expect(bike.avery_exportable?).to be_falsey
         end

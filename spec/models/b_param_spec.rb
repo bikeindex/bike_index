@@ -112,7 +112,14 @@ RSpec.describe BParam, type: :model do
       b_param = BParam.new
       b_param.stolen = true
       bike = b_param.bike_from_attrs(is_stolen: false)
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen).to be_truthy
+    end
+    context "status passed" do
+      it "is stolen if passed stolen" do
+        b_param = BParam.new
+        bike = b_param.bike_from_attrs(status: "status_stolen")
+        expect(bike.status_stolen).to be_truthy
+      end
     end
   end
 

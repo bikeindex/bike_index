@@ -185,11 +185,11 @@ module BikeSearchable
       when "all"
         all
       when "non"
-        where(stolen: false)
+        not_stolen
       when "proximity"
-        where(stolen: true).within_bounding_box(interpreted_params[:bounding_box])
+        status_stolen.within_bounding_box(interpreted_params[:bounding_box])
       else
-        where(stolen: true)
+        status_stolen
       end
     end
 

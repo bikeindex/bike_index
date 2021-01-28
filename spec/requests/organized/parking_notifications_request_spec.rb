@@ -24,7 +24,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.headers["Vary"]).to eq "Accept"
       end
       context "with an impound_record" do
-        let(:impound_record) { FactoryBot.create(:impound_record) }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
         let!(:parking_notification1) do
           FactoryBot.create(:parking_notification_organized,
             organization: current_organization,

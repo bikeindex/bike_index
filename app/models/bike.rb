@@ -89,9 +89,11 @@ class Bike < ApplicationRecord
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status
-  scope :non_stolen, -> { where.not(status: "status_stolen") }
   scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
-  scope :non_abandoned, -> { where.not(status: "status_abandoned") }
+  scope :not_stolen, -> { where.not(status: "status_stolen") }
+  scope :not_abandoned, -> { where.not(status: "status_abandoned") }
+  scope :abandoned_or_impounded, -> { where(status: %w[status_abandoned status_impounded]) }
+  scope :not_abandoned_or_impounded, -> { where.not(status: %w[status_abandoned status_impounded]) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :unorganized, -> { where(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
@@ -194,8 +196,8 @@ class Bike < ApplicationRecord
       unscoped
         .current
         .stolen
-        .non_abandoned
-        .where(serial_normalized: abandoned.non_stolen.select(:serial_normalized))
+        .not_abandoned_or_impounded
+        .where(serial_normalized: abandoned_or_impounded.select(:serial_normalized))
     end
 
     # Return an array of tuples, each pairing a possibly-found bike with a
@@ -204,8 +206,7 @@ class Bike < ApplicationRecord
       matches_by_serial =
         unscoped
           .current
-          .abandoned
-          .non_stolen
+          .abandoned_or_impounded
           .where.not(serial_normalized: nil)
           .group_by(&:serial_normalized)
 
@@ -233,7 +234,7 @@ class Bike < ApplicationRecord
       unscoped
         .current
         .currently_stolen_in(country: country_iso)
-        .non_abandoned
+        .not_abandoned
         .where(serial_normalized: normalized_serials)
     end
 
@@ -903,6 +904,35 @@ class Bike < ApplicationRecord
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
+  end
+
+
+  # TODO after #1875: - remove the methods between here and private
+  # They are all temporary helper methods to facilitate migrating to just using status enum
+  def stolen
+    status_stolen?
+  end
+
+  def stolen?
+    status_stolen?
+  end
+
+  def stolen=(val)
+    self.status = ParamsNormalizer.boolean(val) ? "status_stolen" : "status_with_owner"
+    self.is_stolen = status_stolen?
+  end
+
+  def abandoned
+    status_abandoned?
+  end
+
+  def abandoned?
+    status_abandoned?
+  end
+
+  def abandoned=(val)
+    self.status = ParamsNormalizer.boolean(val) ? "status_abandoned" : "status_with_owner"
+    self.is_abandoned = status_abandoned?
   end
 
   private

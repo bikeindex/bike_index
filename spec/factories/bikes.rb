@@ -60,6 +60,16 @@ FactoryBot.define do
       is_phone { true }
     end
 
+    trait :impounded do
+      after(:create) do |bike, _evaluator|
+        FactoryBot.create(:impound_record, bike: bike)
+        bike.update(updated_at: Time.current) # bump bike status
+      end
+    end
+
+    factory :abandoned_bike, traits: [:impounded]
+    factory :impounded_bike, traits: [:impounded]
+
     # THIS FACTORY SHOULD NEVER BE USED, except in other factories - there needs to be a stolen record created in addition to this.
     # use with_stolen_record instead
     trait :stolen_trait do
@@ -68,7 +78,6 @@ FactoryBot.define do
         latitude { 40.7143528 }
         longitude { -74.0059731 }
       end
-      stolen { true }
     end
 
     trait :with_stolen_record do
@@ -79,13 +88,13 @@ FactoryBot.define do
       end
     end
 
-    factory :stolen_bike, traits: [:with_stolen_record] do
-      factory :abandoned_bike do
-        abandoned { true }
-      end
+    factory :stolen_bike, traits: [:with_stolen_record]
 
-      factory :recovered_bike do
-        stolen { false }
+    factory :recovered_bike do
+      stolen_trait
+      after(:create) do |bike, evaluator|
+        create(:stolen_record_recovered, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+        bike.reload
       end
     end
 

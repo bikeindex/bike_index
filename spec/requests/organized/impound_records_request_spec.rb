@@ -7,7 +7,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com") }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
+  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
 
   describe "index" do
     it "renders" do
@@ -17,9 +17,9 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
     end
     context "multiple impound_records" do
-      let!(:impound_record2) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike2) }
+      let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
-      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
+      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, :with_organization, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
       let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
         [impound_record2, impound_record_retrieved, impound_record_unorganized].each do |ir|
@@ -136,7 +136,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       end
     end
     context "removed_from_bike_index" do
-      let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, bike: bike) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, bike: bike) }
       let(:kind) { "removed_from_bike_index" }
       it "deletes, updates user on the impound_record" do
         expect(impound_record.user).to_not eq current_user

@@ -40,7 +40,7 @@ RSpec.describe ImpoundRecord, type: :model do
     end
     context "impound_record_update" do
       let!(:location) { FactoryBot.create(:location, organization: organization) }
-      let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike, organization: organization) }
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
       let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied] }
@@ -201,7 +201,7 @@ RSpec.describe ImpoundRecord, type: :model do
   describe "impound_location" do
     let!(:location) { FactoryBot.create(:location, organization: organization, impound_location: true, default_impound_location: true) }
     let!(:location2) { FactoryBot.create(:location, organization: organization, impound_location: true) }
-    let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike, organization: organization) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, location: location2) }
     it "sets the impound location by default" do
       organization.reload
@@ -232,7 +232,7 @@ RSpec.describe ImpoundRecord, type: :model do
   describe "notification_notes_and_messages" do
     # This method is relevant because PSU puts serials into the notes from the parking notifications
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
-    let(:impound_record) { FactoryBot.create(:impound_record, organization: organization) }
+    let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: organization) }
     let(:bike) { impound_record.bike }
     it "returns serial number" do
       expect(impound_record.parking_notification&.id).to be_blank
