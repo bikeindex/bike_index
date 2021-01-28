@@ -10,15 +10,25 @@ class StolenRecord < ApplicationRecord
     not_displayed: 4
   }.freeze
 
-  def self.old_attr_accessible
-    # recovery_tweet, recovery_share # We edit this in the admin panel
-    %w[police_report_number police_report_department locking_description lock_defeat_description
-      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
-      longitude theft_description current phone secondary_phone phone_for_everyone
-      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
-      approved recovered_at recovered_description index_helped_recovery can_share_recovery
-      recovery_posted show_address tsved_at estimated_value].map(&:to_sym).freeze
-  end
+  LOCKING_DESCRIPTIONS = [
+    "U-lock",
+    "Two U-locks",
+    "U-lock and cable",
+    "Chain with padlock",
+    "Cable lock",
+    "Heavy duty bicycle security chain",
+    "Not locked",
+    "Other"
+  ].freeze
+
+  LOCKING_DEFEAT_DESCRIPTIONS = [
+    "Lock was cut, and left at the scene",
+    "Lock was opened, and left unharmed at the scene",
+    "Lock is missing, along with the bike",
+    "Object that bike was locked to was broken, removed, or otherwise compromised",
+    "Other situation, please describe below",
+    "Bike was not locked"
+  ].freeze
 
   belongs_to :bike
   belongs_to :country
@@ -66,11 +76,14 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  def twitter_accounts_in_proximity
-    [
-      TwitterAccount.default_account_for_country(country),
-      TwitterAccount.active.near(self, 50)
-    ].flatten.compact.uniq
+  def self.old_attr_accessible
+    # recovery_tweet, recovery_share # We edit this in the admin panel
+    %w[police_report_number police_report_department locking_description lock_defeat_description
+      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+      longitude theft_description current phone secondary_phone phone_for_everyone
+      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+      approved recovered_at recovered_description index_helped_recovery can_share_recovery
+      recovery_posted show_address tsved_at estimated_value].map(&:to_sym).freeze
   end
 
   def self.recovery_display_statuses
@@ -85,6 +98,41 @@ class StolenRecord < ApplicationRecord
   # Rough time that PR#790 was merged
   def self.recovering_user_recording_start
     Time.at(1558821440)
+  end
+
+  def self.locking_description
+    LOCKING_DESCRIPTIONS
+  end
+
+  def self.locking_description_select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, name.underscore]
+
+    locking_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
+  end
+
+  def self.locking_defeat_description
+    LOCKING_DEFEAT_DESCRIPTIONS
+  end
+
+  def self.locking_defeat_description_select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, name.underscore]
+
+    locking_defeat_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
+  end
+
+  def twitter_accounts_in_proximity
+    [
+      TwitterAccount.default_account_for_country(country),
+      TwitterAccount.active.near(self, 50)
+    ].flatten.compact.uniq
   end
 
   def recovered?
@@ -145,54 +193,6 @@ class StolenRecord < ApplicationRecord
 
   def longitude_public
     show_address ? longitude : longitude.round(2)
-  end
-
-  LOCKING_DESCRIPTIONS = [
-    "U-lock",
-    "Two U-locks",
-    "U-lock and cable",
-    "Chain with padlock",
-    "Cable lock",
-    "Heavy duty bicycle security chain",
-    "Not locked",
-    "Other"
-  ].freeze
-
-  def self.locking_description
-    LOCKING_DESCRIPTIONS
-  end
-
-  def self.locking_description_select_options
-    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, name.underscore]
-
-    locking_description.map do |name|
-      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
-      [localized_name, name]
-    end
-  end
-
-  LOCKING_DEFEAT_DESCRIPTIONS = [
-    "Lock was cut, and left at the scene",
-    "Lock was opened, and left unharmed at the scene",
-    "Lock is missing, along with the bike",
-    "Object that bike was locked to was broken, removed, or otherwise compromised",
-    "Other situation, please describe below",
-    "Bike was not locked"
-  ].freeze
-
-  def self.locking_defeat_description
-    LOCKING_DEFEAT_DESCRIPTIONS
-  end
-
-  def self.locking_defeat_description_select_options
-    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, name.underscore]
-
-    locking_defeat_description.map do |name|
-      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
-      [localized_name, name]
-    end
   end
 
   def set_calculated_attributes

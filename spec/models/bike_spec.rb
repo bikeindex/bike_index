@@ -367,6 +367,8 @@ RSpec.describe Bike, type: :model do
     let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
     let(:bike2) { stolen_record3.bike }
     it "finds by stolen_record" do
+      expect(stolen_record1.reload.current?).to be_falsey
+      stolen_record1.update_column :current, true
       bike1.reload
       expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
       # Ideally this would keep the scope, but it doesn't. So document that behavior here
