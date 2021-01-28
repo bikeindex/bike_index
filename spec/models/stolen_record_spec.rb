@@ -49,6 +49,18 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.alert_image).to be_present
       end
     end
+    describe "update_not_current_records" do
+      it "marks all the records that are not current, not current" do
+        bike = FactoryBot.create(:bike)
+        stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
+        bike.reload
+        expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
+        stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
+        expect(stolen_record1.reload.current).to be_falsey
+        expect(stolen_record2.reload.current).to be_truthy
+        expect(bike.reload.current_stolen_record_id).to eq stolen_record2.id
+      end
+    end
   end
 
   describe "#generate_alert_image" do

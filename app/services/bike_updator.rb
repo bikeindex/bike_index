@@ -51,12 +51,10 @@ class BikeUpdator
 
   def update_stolen_record
     @bike.reload
-    if @bike_params["bike"] && @bike_params["bike"]["date_stolen"]
-      StolenRecordUpdator.new(bike: @bike, date_stolen: @bike_params["bike"]["date_stolen"]).update_records
-    elsif @bike_params["stolen_record"] || @bike_params["bike"]["stolen_records_attributes"]
-      StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
-      @bike.reload
-    end
+    StolenRecordUpdator.new(bike: @bike,
+      date_stolen: @bike_params.dig("bike", "date_stolen"),
+      b_param: @bike_params).update_records
+    @bike.reload
   end
 
   def set_protected_attributes
