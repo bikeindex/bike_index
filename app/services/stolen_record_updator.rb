@@ -1,28 +1,22 @@
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    if creation_params[:date_stolen].present?
-      @date_stolen = TimeParser.parse(creation_params[:date_stolen])
-    end
     @user = creation_params[:user]
     @b_param = creation_params[:b_param]
-    @mark_bike_stolen = creation_params[:mark_bike_stolen]
+    date_stolen = @b_param&.with_indifferent_access&.dig(:bike, :date_stolen)
+    @date_stolen = TimeParser.parse(date_stolen) if date_stolen.present?
   end
 
   def update_records
-    if @mark_bike_stolen
-      create_new_record
-      @bike.reload
-    elsif @bike.stolen
-      if @date_stolen
-        stolen_record = @bike.fetch_current_stolen_record
-        stolen_record.update_attributes(date_stolen: @date_stolen)
-      elsif @b_param && (@b_param["stolen_record"] || @b_param["bike"]["stolen_records_attributes"])
-        stolen_record = @bike.fetch_current_stolen_record
-        update_with_params(stolen_record).save
-      end
-    else
-      @bike.update_attributes(abandoned: false) if @bike.abandoned == true
+    if @bike.fetch_current_stolen_record.blank?
+      # Add stolen record if there is a date_stolen, or nested stolen params
+      create_new_record if @date_stolen.present? || stolen_params(@b_param).present?
+    elsif @date_stolen
+      stolen_record = @bike.fetch_current_stolen_record
+      stolen_record.update_attributes(date_stolen: @date_stolen)
+    elsif @b_param && (@b_param["stolen_record"] || @b_param["bike"]["stolen_records_attributes"])
+      stolen_record = @bike.fetch_current_stolen_record
+      update_with_params(stolen_record).save
     end
   end
 
@@ -35,12 +29,19 @@ class StolenRecordUpdator
 
   private
 
-  def update_with_params(stolen_record)
-    return stolen_record unless @b_param.present?
+  def stolen_params(b_param)
+    return nil if b_param.blank?
+    stolen_params = b_param["stolen_record"]
+    nested_params = b_param.dig("bike", "stolen_records_attributes")
+    if nested_params&.values&.first&.is_a?(Hash)
+      stolen_params = nested_params.values.reject(&:blank?).last
+    end
+    stolen_params
+  end
 
-    sr = @b_param["stolen_record"]
-    nested_params = @b_param.dig("bike", "stolen_records_attributes")
-    sr = nested_params.values.reject(&:blank?).last if nested_params&.values&.first&.is_a?(Hash)
+  def update_with_params(stolen_record)
+    sr = stolen_params(@b_param)
+
     return stolen_record unless sr.present?
     stolen_record.attributes = permitted_attributes(sr)
 

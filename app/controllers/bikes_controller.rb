@@ -209,9 +209,7 @@ class BikesController < ApplicationController
   end
 
   def update
-    if ParamsNormalizer.boolean(params[:mark_bike_stolen]) # This is sort of gross to go in an entirely new codepath, but...
-      StolenRecordUpdator.new(bike: @bike, mark_bike_stolen: true).update_records
-    elsif params[:bike].present?
+    if params[:bike].present?
       begin
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e

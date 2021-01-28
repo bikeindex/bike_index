@@ -846,15 +846,22 @@ RSpec.describe BikesController, type: :request do
         expect(bike.address_set_manually).to be_truthy
       end
     end
-    context "mark bike stolen, the way it's done in the app" do
+    context "mark bike stolen, the way it's done on the web" do
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "marks bike stolen and doesn't set a location in Kansas!" do
         expect(current_user.authorized?(bike)).to be_truthy
         expect(bike.stolen?).to be_falsey
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: {mark_bike_stolen: true}
+          patch "#{base_url}/#{bike.id}", params: {
+            edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
+          }
           expect(flash[:success]).to be_present
+          # Redirects to same page passed
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+          # ... and that page redirects to theft_details
+          get edit_bike_path(bike.to_param, page: "report_stolen")
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
         end
         bike.reload
         expect(bike.status).to eq "status_stolen"
@@ -867,6 +874,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "bike has location" do
         let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
+        let(:time) { Time.current - 10.minutes }
         it "marks the bike stolen, doesn't set a location, blanks bike location" do
           bike.update_attributes(location_attrs)
           bike.reload
@@ -874,8 +882,15 @@ RSpec.describe BikesController, type: :request do
           expect(bike.stolen?).to be_falsey
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: {mark_bike_stolen: true}
+            patch "#{base_url}/#{bike.id}", params: {
+              edit_template: "report_stolen", bike: {date_stolen: time.to_i}
+            }
             expect(flash[:success]).to be_present
+            # Redirects to same page passed
+            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+            # ... and that page redirects to theft_details
+            get edit_bike_path(bike.to_param, page: "report_stolen")
+            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
           end
           bike.reload
           expect(bike.status).to eq "status_stolen"
@@ -885,7 +900,7 @@ RSpec.describe BikesController, type: :request do
           stolen_record = bike.current_stolen_record
           expect(stolen_record).to be_present
           expect(stolen_record.to_coordinates.compact).to eq([])
-          expect(stolen_record.date_stolen).to be_within(5).of Time.current
+          expect(stolen_record.date_stolen).to be_within(2).of time
         end
       end
     end

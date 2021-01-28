@@ -13,26 +13,12 @@ RSpec.describe StolenRecordUpdator do
   end
 
   describe "update_records" do
-<<<<<<< HEAD
-    it "sets the current stolen record as not current if the bike isn't stolen" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:mark_records_not_current)
-=======
-    it "calls create if a stolen record doesn't exist" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:create_new_record)
->>>>>>> main
-      update_stolen_record.update_records
-    end
-
     it "sets the date if date_stolen is present" do
       stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike
-      bike.update_attributes(stolen: true)
+      # bike.update_attributes(stolen: true)
       time = DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H").end_of_day
-      StolenRecordUpdator.new(bike: bike, date_stolen: time.to_i).update_records
+      StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: time.to_i}}).update_records
       expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
     end
   end

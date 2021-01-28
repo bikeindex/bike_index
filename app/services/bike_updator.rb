@@ -51,9 +51,7 @@ class BikeUpdator
 
   def update_stolen_record
     @bike.reload
-    StolenRecordUpdator.new(bike: @bike,
-      date_stolen: @bike_params.dig("bike", "date_stolen"),
-      b_param: @bike_params).update_records
+    StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
     @bike.reload
   end
 
