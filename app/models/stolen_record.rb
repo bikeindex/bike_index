@@ -348,7 +348,6 @@ class StolenRecord < ApplicationRecord
     no_longer_around = bike.blank? || !bike.stolen? || recovered?
     return true unless no_longer_around || @alert_location_changed
     alert_image&.destroy
-    reload
   end
 
   def fix_date

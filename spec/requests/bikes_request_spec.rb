@@ -820,7 +820,7 @@ RSpec.describe BikesController, type: :request do
     end
     context "setting address for bike" do
       let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
-      let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }
+      let(:ownership) { FactoryBot.create(:ownership, creator: current_user, owner_email: current_user.email) }
       let(:update_attributes) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "sets the address for the bike" do
@@ -849,8 +849,10 @@ RSpec.describe BikesController, type: :request do
     context "mark bike stolen, the way it's done on the web" do
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "marks bike stolen and doesn't set a location in Kansas!" do
-        expect(current_user.authorized?(bike)).to be_truthy
+        bike.reload
         expect(bike.stolen?).to be_falsey
+        expect(bike.claimed?).to be_falsey
+        expect(bike.user&.id).to eq current_user.id
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
@@ -866,20 +868,31 @@ RSpec.describe BikesController, type: :request do
         bike.reload
         expect(bike.status).to eq "status_stolen"
         expect(bike.to_coordinates.compact).to eq([])
+        expect(bike.claimed?).to be_truthy
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
         expect(stolen_record.to_coordinates.compact).to eq([])
         expect(stolen_record.date_stolen).to be_within(5).of Time.current
+        expect(stolen_record.phone).to be_blank
+        expect(stolen_record.country_id).to eq Country.united_states.id
       end
       context "bike has location" do
         let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
         let(:time) { Time.current - 10.minutes }
+        let(:phone) { "2221114444" }
+        let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }
+        let(:ownership) { FactoryBot.create(:ownership, owner_email: current_user.email) }
+        # If the phone isn't already confirmed, it sends a confirmation message
+        let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
         it "marks the bike stolen, doesn't set a location, blanks bike location" do
+          expect(current_user.reload.phone).to eq "2221114444"
           bike.update_attributes(location_attrs)
           bike.reload
           expect(bike.address_set_manually).to be_truthy
           expect(bike.stolen?).to be_falsey
+          expect(bike.claimed?).to be_falsey
+          expect(bike.user&.id).to eq current_user.id
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{bike.id}", params: {
@@ -895,12 +908,15 @@ RSpec.describe BikesController, type: :request do
           bike.reload
           expect(bike.status).to eq "status_stolen"
           expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.user&.id).to eq current_user.id
           expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
 
           stolen_record = bike.current_stolen_record
           expect(stolen_record).to be_present
           expect(stolen_record.to_coordinates.compact).to eq([])
           expect(stolen_record.date_stolen).to be_within(2).of time
+          expect(stolen_record.phone).to eq "2221114444"
+          expect(stolen_record.country_id).to eq Country.united_states.id
         end
       end
     end
