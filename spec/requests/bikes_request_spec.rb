@@ -892,6 +892,32 @@ RSpec.describe BikesController, type: :request do
         expect(stolen_record.phone).to be_blank
         expect(stolen_record.country_id).to eq Country.united_states.id
       end
+      context "no sidekiq" do
+        it "redirects correctly" do
+          bike.reload
+          patch "#{base_url}/#{bike.id}", params: {
+            edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
+          }
+          expect(flash[:success]).to be_present
+          expect(assigns(:edit_templates)).to be_nil
+          # Redirects to same page passed
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+          # ... and that page redirects to theft_details
+          get edit_bike_path(bike.to_param, page: "report_stolen")
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
+          bike.reload
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.claimed?).to be_falsey # Still controlled by creator
+
+          stolen_record = bike.current_stolen_record
+          expect(stolen_record).to be_present
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.current
+          expect(stolen_record.phone).to be_blank
+          expect(stolen_record.country_id).to eq Country.united_states.id
+        end
+      end
       context "bike has location" do
         let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
         let(:time) { Time.current - 10.minutes }

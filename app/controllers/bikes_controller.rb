@@ -220,9 +220,10 @@ class BikesController < ApplicationController
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
-    @bike = @bike.decorate
+    @bike = @bike.reload.decorate
 
     if @bike.errors.any? || flash[:error].present?
+      @edit_templates = nil # So when we render edit it includes templates if the bike state has changed
       edit && return
     else
       flash[:success] ||= translation(:bike_was_updated)
@@ -232,7 +233,7 @@ class BikesController < ApplicationController
   end
 
   def edit_templates
-    return @edit_templates if defined?(@edit_templates)
+    return @edit_templates if @edit_templates.present?
     @theft_templates = @bike.stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)

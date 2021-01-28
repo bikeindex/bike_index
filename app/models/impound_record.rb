@@ -2,7 +2,7 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
-  belongs_to :location
+  belongs_to :location # organization location
 
   has_one :parking_notification
   has_many :impound_record_updates
