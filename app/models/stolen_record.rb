@@ -105,6 +105,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def self.locking_description_select_options
+    # TODO: normalize with slugifyer, not this random thing
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
     translation_scope = [:activerecord, :select_options, name.underscore]
 
@@ -119,6 +120,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def self.locking_defeat_description_select_options
+    # TODO: normalize with slugifyer, not this random thing
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
     translation_scope = [:activerecord, :select_options, name.underscore]
 
