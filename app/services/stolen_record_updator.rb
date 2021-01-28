@@ -4,7 +4,9 @@ end
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    @date_stolen = TimeParser.parse(creation_params[:date_stolen])
+    if creation_params[:date_stolen].present?
+      @date_stolen = TimeParser.parse(creation_params[:date_stolen])
+    end
     @user = creation_params[:user]
     @b_param = creation_params[:b_param]
   end
@@ -27,7 +29,7 @@ class StolenRecordUpdator
   end
 
   def create_new_record
-    stolen_record = update_with_params(@bike.build_new_stolen_record)
+    stolen_record = update_with_params(@bike.build_new_stolen_record(date_stolen: @date_stolen))
     if stolen_record.save
       @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
       return true
@@ -46,7 +48,9 @@ class StolenRecordUpdator
     return stolen_record unless sr.present?
     stolen_record.attributes = permitted_attributes(sr)
 
-    stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.current unless @date_stolen.present?
+    if sr["date_stolen"].present?
+      stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"])
+    end
 
     if sr["country"].present?
       stolen_record.country = Country.fuzzy_find(sr["country"])
@@ -65,15 +69,9 @@ class StolenRecordUpdator
   end
 
   def permitted_attributes(params)
-    ActionController::Parameters.new(params).permit(*permitted_params)
-  end
-
-  private
-
-  def permitted_params
-    %w[phone secondary_phone street city zipcode country_id state_id
-      police_report_number police_report_department estimated_value
-      theft_description locking_description lock_defeat_description
-      proof_of_ownership receive_notifications show_address]
+    ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :zipcode,
+      :country_id, :state_id, :police_report_number, :police_report_department, :estimated_value,
+      :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
+      :receive_notifications, :show_address)
   end
 end

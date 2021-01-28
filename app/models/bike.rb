@@ -528,10 +528,10 @@ class Bike < ApplicationRecord
   def build_new_stolen_record(new_attrs = {})
     new_stolen_record = stolen_records.build({
       country_id: Country.united_states&.id,
-      date_stolen: Time.current,
       phone: phone,
       current: true,
     }.merge(new_attrs))
+    new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
     end
