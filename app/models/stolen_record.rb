@@ -54,7 +54,7 @@ class StolenRecord < ApplicationRecord
   default_scope { current }
   scope :current, -> { where(current: true) }
   scope :approveds, -> { where(approved: true) }
-  scope :current_and_not, -> { unscoped }
+  scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }

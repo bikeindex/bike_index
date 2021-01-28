@@ -34,7 +34,9 @@ class StolenRecordUpdator
     if nested_params&.values&.first&.is_a?(Hash)
       stolen_params = nested_params.values.reject(&:blank?).last
     end
-    stolen_params["date_stolen"] ||= b_param.dig("bike", "date_stolen")
+    # Set the date_stolen if it was passed, if something else didn't already set date_stolen
+    date_stolen = b_param.dig("bike", "date_stolen")
+    stolen_params["date_stolen"] ||= date_stolen if date_stolen.present?
     stolen_params.with_indifferent_access
   end
 
