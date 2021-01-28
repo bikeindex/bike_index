@@ -530,7 +530,7 @@ class Bike < ApplicationRecord
     new_stolen_record = stolen_records.build({
       country_id: Country.united_states&.id,
       phone: phone,
-      current: true,
+      current: true
     }.merge(new_attrs))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
@@ -918,7 +918,6 @@ class Bike < ApplicationRecord
 
     "status_with_owner"
   end
-
 
   # TODO after #1875: - remove the methods between here and private
   # They are all temporary helper methods to facilitate migrating to just using status enum

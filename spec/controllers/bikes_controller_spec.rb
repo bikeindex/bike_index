@@ -659,7 +659,7 @@ RSpec.describe BikesController, type: :controller do
             testable_bike_params
               .except(:serial_number)
               .each { |k, v| expect(bike.send(k).to_s).to eq(v.to_s) }
-            expect(bike.stolen).to be_truthy
+            expect(bike.status).to eq "status_stolen"
             # we retain the stolen record attrs, it would be great to test that they are
             # assigned correctly, but I don't know how - it needs to completely
             # render the new action
@@ -896,7 +896,7 @@ RSpec.describe BikesController, type: :controller do
               bike = Bike.last
               bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               expect(bike.manufacturer).to eq manufacturer
-              expect(bike.stolen).to be_truthy
+              expect(bike.status).to eq "status_stolen"
               bike_user.reload
               expect(bike.current_stolen_record.phone).to eq "3123799513"
               expect(bike_user.phone).to eq "3123799513"
@@ -918,7 +918,7 @@ RSpec.describe BikesController, type: :controller do
             bike_params.delete(:manufacturer_id)
             bike_params.delete(:phone)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-            expect(bike.stolen).to be_truthy
+            expect(bike.status).to eq "status_stolen"
             # we retain the stolen record attrs, it would be great to test that they are
             # assigned correctly, but I don't know how - it needs to completely
             # render the new action
@@ -1547,7 +1547,7 @@ RSpec.describe BikesController, type: :controller do
           end
           let(:bike_attrs) do
             {
-              stolen: true,
+              date_stolen: Time.current.to_i,
               stolen_records_attributes: {
                 "0" => stolen_attrs
               }
@@ -1564,13 +1564,13 @@ RSpec.describe BikesController, type: :controller do
 
               bike.reload
               expect(bike.current_stolen_record).to eq stolen_record
-              expect(bike.stolen).to be_truthy
+              expect(bike.status).to eq "status_stolen"
 
               put :update, params: {id: bike.id, bike: bike_attrs, edit_template: "fancy_template"}
               expect(flash[:error]).to_not be_present
               expect(response).to redirect_to edit_bike_url(page: "fancy_template")
               bike.reload
-              expect(bike.stolen).to be_truthy
+              expect(bike.status).to eq "status_stolen"
 
               # Stupid cheat because we're creating an extra record here for fuck all reason
               current_stolen_record = bike.fetch_current_stolen_record
@@ -1621,7 +1621,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(flash[:error]).to_not be_present
                 expect(response).to redirect_to edit_bike_url(page: "fancy_template")
                 bike.reload
-                expect(bike.stolen).to be_truthy
+                expect(bike.status).to eq "status_stolen"
                 # Stupid cheat because we're creating an extra record here for fuck all reason
                 current_stolen_record = bike.fetch_current_stolen_record
                 expect(bike.stolen_records.count).to eq 1

@@ -115,18 +115,6 @@ RSpec.describe BikeUpdator do
       expect(bike.user_hidden).to be_truthy
     end
 
-    it "Actually, for now, we let anyone mark anything not stolen" do
-      bike = FactoryBot.create(:bike, stolen: true)
-      ownership = FactoryBot.create(:ownership, bike: bike)
-      user = ownership.creator
-      FactoryBot.create(:user)
-      bike_params = {stolen: false}
-      update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json)
-      expect(update_bike).to receive(:update_ownership).and_return(true)
-      update_bike.update_available_attributes
-      expect(bike.reload.stolen).not_to be_truthy
-    end
-
     it "updates the bike and set year to nothing if year nil" do
       bike = FactoryBot.create(:bike, year: 2014)
       ownership = FactoryBot.create(:ownership, bike: bike)

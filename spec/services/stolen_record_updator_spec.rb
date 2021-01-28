@@ -18,7 +18,9 @@ RSpec.describe StolenRecordUpdator do
       bike = stolen_record.bike
       # bike.update_attributes(stolen: true)
       time = DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H").end_of_day
-      StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: time.to_i}}).update_records
+      stolen_record_updator = StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: time.to_i}})
+      expect(stolen_record_updator.stolen_params).to eq({"date_stolen" => time.to_i})
+      stolen_record_updator.update_records
       expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
     end
   end

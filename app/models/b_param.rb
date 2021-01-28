@@ -415,15 +415,6 @@ class BParam < ApplicationRecord
   end
 
   # Below here is revised setup
-  # bike_from_attrs accepts is_stolen as a parameter because of legacy URLs out there with ?stolen=true
-  # updated in #1875
-  def bike_from_attrs(status: nil, is_stolen: nil)
-    status ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
-    status ||= Bike.statuses.first unless Bike.statuses.include?(status)
-    Bike.new("status" => status,
-             "b_param_id" => id,
-             "creator_id" => creator_id)
-  end
 
   def fetch_formatted_address
     return {} unless bike["street"].present? || bike["address"].present?
@@ -441,7 +432,20 @@ class BParam < ApplicationRecord
     formatted_address
   end
 
+  # updated in #1875
+  def bike_from_attrs(status: nil, is_stolen: nil)
+    # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
+    status ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
+    status ||= Bike.statuses.first unless Bike.statuses.include?(status)
+    Bike.new(safe_bike_attrs("status" => status, "b_param_id" => id, "creator_id" => creator_id).as_json)
+  end
+
   private
+
+  def safe_bike_attrs(param_overrides)
+    # existing bike attrs, overridden with passed attributes
+    bike.select { |k, v| self.class.assignable_attrs.include?(k.to_s) }.merge(param_overrides)
+  end
 
   def process_image_if_required
     return true if image_processed || image.blank?
