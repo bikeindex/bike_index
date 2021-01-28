@@ -23,12 +23,10 @@ class StolenRecordUpdator
       end
     else
       @bike.update_attributes(abandoned: false) if @bike.abandoned == true
-      mark_records_not_current
     end
   end
 
   def create_new_record
-    mark_records_not_current
     new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.current)
     new_stolen_record.phone = @bike.phone
     new_stolen_record.country_id = Country.united_states&.id
@@ -42,19 +40,6 @@ class StolenRecordUpdator
   end
 
   private
-
-  def mark_records_not_current
-    stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
-    if stolen_records.any?
-      stolen_records.each do |s|
-        s.current = false
-        s.save
-      end
-    end
-    @bike.reload.update_attribute :current_stolen_record_id, nil
-  end
-
-
 
   def update_with_params(stolen_record)
     return stolen_record unless @b_param.present?

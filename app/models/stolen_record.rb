@@ -10,8 +10,6 @@ class StolenRecord < ApplicationRecord
     not_displayed: 4
   }.freeze
 
-  attr_accessor :timezone # Just to provide a backup and permit assignment
-
   def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
     %w[police_report_number police_report_department locking_description lock_defeat_description
@@ -39,6 +37,10 @@ class StolenRecord < ApplicationRecord
 
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
 
+  before_save :set_calculated_attributes
+  after_validation :reverse_geocode, unless: :skip_geocoding?
+  after_commit :update_associations
+
   default_scope { current }
   scope :current, -> { where(current: true) }
   scope :approveds, -> { where(approved: true) }
@@ -53,9 +55,7 @@ class StolenRecord < ApplicationRecord
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
   scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity
 
-  before_save :set_calculated_attributes
-  after_validation :reverse_geocode, unless: :skip_geocoding?
-  after_commit :update_associations
+  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
     if (geo = results.first)
@@ -321,13 +321,23 @@ class StolenRecord < ApplicationRecord
   end
 
   def update_associations
+    return true if skip_update
     remove_outdated_alert_images
-    return true unless bike.present?
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current
-      bike.update_attributes(current_stolen_record: self, manual_csr: true)
+      update_not_current_records
+      bike&.update_attributes(current_stolen_record: self, manual_csr: true)
     end
-    bike.user&.update_attributes(updated_at: Time.current)
+    bike&.user&.update_attributes(updated_at: Time.current)
+  end
+
+  private
+
+  def notify_of_promoted_alert_recovery
+    return unless recovered? && theft_alerts.any?
+
+    EmailTheftAlertNotificationWorker
+      .perform_async(theft_alerts.last.id, :recovered)
   end
 
   # If the bike has been recovered, remove the alert_image
@@ -337,15 +347,6 @@ class StolenRecord < ApplicationRecord
     alert_image&.destroy
     reload
   end
-
-  def notify_of_promoted_alert_recovery
-    return unless recovered? && theft_alerts.any?
-
-    EmailTheftAlertNotificationWorker
-      .perform_async(theft_alerts.last.id, :recovered)
-  end
-
-  private
 
   def fix_date
     self.date_stolen ||= Time.current
@@ -359,5 +360,10 @@ class StolenRecord < ApplicationRecord
       corrected = date_stolen.change(year: Time.current.year - 1)
       self.date_stolen = corrected
     end
+  end
+
+  def update_not_current_records
+    StolenRecord.unscoped.where(bike_id: bike_id).where.not(id: id)
+      .each { |s| s.update(current: false, skip_update: true) }
   end
 end
