@@ -733,6 +733,21 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
     end
+    context "stolen bike" do
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+      let(:ownership) { bike.current_ownership }
+      it "renders" do
+        get "#{base_url}/#{bike.id}/edit"
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_theft_details)
+        expect(assigns(:bike).id).to eq bike.id
+        bike.current_stolen_record.add_recovery_information
+        # And if the bike is recovered, it redirects without page
+        get "#{base_url}/#{bike.id}/edit?page=theft_details"
+        expect(flash).to be_blank
+        expect(response).to redirect_to(edit_bike_path(bike.id, page: "bike_details"))
+      end
+    end
     context "with impound_record" do
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
       before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
