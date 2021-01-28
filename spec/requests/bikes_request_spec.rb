@@ -852,7 +852,7 @@ RSpec.describe BikesController, type: :request do
         bike.reload
         expect(bike.stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
-        expect(bike.user&.id).to eq current_user.id
+        expect(bike.authorized?(current_user)).to be_truthy
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
@@ -868,7 +868,7 @@ RSpec.describe BikesController, type: :request do
         bike.reload
         expect(bike.status).to eq "status_stolen"
         expect(bike.to_coordinates.compact).to eq([])
-        expect(bike.claimed?).to be_truthy
+        expect(bike.claimed?).to be_falsey # Still controlled by creator
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
