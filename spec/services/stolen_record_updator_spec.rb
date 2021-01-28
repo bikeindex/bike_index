@@ -1,27 +1,37 @@
 require "rails_helper"
 
 RSpec.describe StolenRecordUpdator do
-  describe "create_new_record" do
-    it "creates a new stolen record" do
-      bike = FactoryBot.create(:bike)
-      update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
-      bike.reload
-      expect(bike.stolen_records.count).to eq(1)
-      expect(bike.current_stolen_record).to eq(bike.stolen_records.last)
-    end
-  end
-
   describe "update_records" do
-    it "sets the date if date_stolen is present" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      bike = stolen_record.bike
-      # bike.update_attributes(stolen: true)
-      time = DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H").end_of_day
-      stolen_record_updator = StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: time.to_i}})
-      expect(stolen_record_updator.stolen_params).to eq({"date_stolen" => time.to_i})
-      stolen_record_updator.update_records
-      expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
+    let(:bike) { FactoryBot.create(:bike) }
+    it "does nothing" do
+      expect(bike.reload.status).to eq "status_with_owner"
+      stolen_record_updator = StolenRecordUpdator.new(bike: bike, b_param: {bike: {frame_material: "organic"}})
+      expect { stolen_record_updator.update_records }.to_not change(StolenRecord, :count)
+      expect(bike.reload.status).to eq "status_with_owner"
+    end
+    context "date_stolen passed" do
+      it "creates a stolen_record if passed date_stolen" do
+        expect(bike.reload.status).to eq "status_with_owner"
+        t = Time.current.to_s
+        stolen_record_updator = StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: t}})
+        expect(stolen_record_updator.stolen_params).to eq({"date_stolen" => t})
+        # update_records creates a stolen record, because date_stolen is present
+        expect { stolen_record_updator.update_records }.to change(StolenRecord, :count).by(1)
+        expect(bike.reload.status).to eq "status_stolen"
+      end
+      context "existing stolen_record" do
+        let(:stolen_record) { FactoryBot.create(:stolen_record) }
+        let(:bike) { stolen_record.bike }
+        it "sets the date" do
+          expect(bike.reload.status).to eq "status_stolen"
+          time = DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H").end_of_day
+          stolen_record_updator = StolenRecordUpdator.new(bike: bike, b_param: {bike: {date_stolen: time.to_i}})
+          expect(stolen_record_updator.stolen_params).to eq({"date_stolen" => time.to_i})
+          expect { stolen_record_updator.update_records }.to_not change(StolenRecord, :count)
+          expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
+          expect(bike.current_stolen_record&.id).to eq stolen_record.id
+        end
+      end
     end
   end
 

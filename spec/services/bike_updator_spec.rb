@@ -28,24 +28,6 @@ RSpec.describe BikeUpdator do
     end
   end
 
-  describe "update_stolen_record" do
-    it "calls update_stolen_record with the date_stolen if it exists" do
-      FactoryBot.create(:country, iso: "US")
-      bike = FactoryBot.create(:bike, stolen: true)
-      updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
-      updator.update_stolen_record
-      bike.reload
-      csr = bike.fetch_current_stolen_record
-      expect(csr.date_stolen.to_i).to be_within(1).of 963205199
-    end
-    it "creates a stolen record if one doesn't exist" do
-      FactoryBot.create(:country, iso: "US")
-      bike = FactoryBot.create(:bike)
-      BikeUpdator.new(b_params: {id: bike.id, bike: {stolen: true}}.as_json).update_stolen_record
-      expect(bike.stolen_records.count).not_to be_nil
-    end
-  end
-
   describe "update_ownership" do
     it "calls create_ownership if the email has changed" do
       bike = FactoryBot.create(:bike)
@@ -87,7 +69,6 @@ RSpec.describe BikeUpdator do
         creation_organization_id: 69,
         example: false,
         hidden: true,
-        stolen: true,
         owner_email: " "
       }
       BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
@@ -100,6 +81,18 @@ RSpec.describe BikeUpdator do
       expect(bike.hidden).to be_falsey
       expect(bike.description).to eq("something long")
       expect(bike.owner_email).to eq("foo@bar.com")
+      expect(bike.status).to eq "status_with_owner"
+    end
+
+    it "marks a bike stolen with the date_stolen" do
+      FactoryBot.create(:country, iso: "US")
+      bike = FactoryBot.create(:bike, stolen: true)
+      updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
+      updator.update_available_attributes
+      bike.reload
+      expect(bike.status).to eq "status_stolen"
+      csr = bike.fetch_current_stolen_record
+      expect(csr.date_stolen.to_i).to be_within(1).of 963205199
     end
 
     it "marks a bike user hidden" do

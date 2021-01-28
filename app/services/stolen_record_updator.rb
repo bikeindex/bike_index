@@ -1,7 +1,6 @@
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    @user = creation_params[:user]
     @b_param = creation_params[:b_param]
     @stolen_params = isolate_stolen_params(creation_params[:b_param]&.with_indifferent_access)
   end
@@ -9,19 +8,13 @@ class StolenRecordUpdator
   attr_reader :stolen_params
 
   def update_records
-    if @bike.fetch_current_stolen_record.blank?
-      create_new_record if @stolen_params.present?
-    elsif @stolen_params.present?
-      stolen_record = @bike.fetch_current_stolen_record
-      stolen_record = update_with_params(stolen_record)
-      stolen_record.save
-    end
-  end
-
-  def create_new_record
-    stolen_record = @bike.build_new_stolen_record
+    return if @stolen_params.blank?
+    @bike.reload
+    stolen_record = @bike.fetch_current_stolen_record
+    stolen_record ||= @bike.build_new_stolen_record
     stolen_record = update_with_params(stolen_record)
     stolen_record.save
+    @bike.reload
     stolen_record
   end
 

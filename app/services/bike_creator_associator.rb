@@ -17,11 +17,6 @@ class BikeCreatorAssociator
     ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
   end
 
-  def create_stolen_record(bike)
-    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
-    bike.save
-  end
-
   def create_parking_notification(b_param, bike)
     parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
@@ -72,7 +67,7 @@ class BikeCreatorAssociator
       create_components(bike)
       create_normalized_serial_segments(bike)
       assign_user_attributes(bike, ownership&.user)
-      create_stolen_record(bike) if bike.stolen
+      StolenRecordUpdator.new(bike: bike, b_param: @b_param.params).update_records
       create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
       attach_photo(bike)
       attach_photos(bike)

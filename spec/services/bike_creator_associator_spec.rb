@@ -96,19 +96,6 @@ RSpec.describe BikeCreatorAssociator do
   end
 
   describe "associate" do
-    it "calls the required methods" do
-      bike = Bike.new(stolen: true)
-      creator = subject.new
-      expect(creator).to receive(:create_ownership).and_return(bike)
-      expect(creator).to receive(:create_stolen_record).and_return(bike)
-      expect(creator).to receive(:create_components).and_return(bike)
-      expect(creator).to receive(:create_normalized_serial_segments).and_return(bike)
-      expect(creator).to receive(:assign_user_attributes)
-      expect(creator).to receive(:attach_photo)
-      expect(creator).to receive(:attach_photos)
-      expect(creator).to receive(:add_other_listings)
-      creator.associate(bike)
-    end
     it "rescues from the error and add the message to the bike" do
       expect(StolenRecordUpdator).to be_present # Load the error
       bike = Bike.new

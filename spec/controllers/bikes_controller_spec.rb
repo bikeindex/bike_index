@@ -607,7 +607,7 @@ RSpec.describe BikesController, type: :controller do
             it "creates a new ownership and bike from an organization" do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
-                  post :create, params: {bike: bike_params.merge(stolen: true), stolen_record: stolen_params}
+                  post :create, params: {bike: bike_params, stolen_record: stolen_params}
                   expect(assigns(:bike).errors&.full_messages).to_not be_present
                 }.to change(Ownership, :count).by 1
                 bike = Bike.last
@@ -615,6 +615,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(bike.creation_state.origin).to eq "embed"
                 expect(bike.creation_state.organization).to eq organization
                 expect(bike.creation_state.creator).to eq bike.creator
+                expect(bike.status).to eq "status_stolen"
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -629,13 +630,14 @@ RSpec.describe BikesController, type: :controller do
             it "creates a new ownership and bike from an organization" do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
-                  post :create, params: {bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params}
+                  post :create, params: {bike: bike_params, stolen_record: alt_stolen_params}
                 }.to change(Ownership, :count).by 1
                 bike = Bike.last
                 expect(bike).to be_present
                 expect(bike.creation_state.origin).to eq "embed"
                 expect(bike.creation_state.organization).to eq organization
                 expect(bike.creation_state.creator).to eq bike.creator
+                expect(bike.status).to eq "status_stolen"
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -837,7 +839,7 @@ RSpec.describe BikesController, type: :controller do
           let(:b_param) { FactoryBot.create(:b_param, creator: user) }
           it "creates a new stolen bike and assigns the user phone" do
             expect {
-              post :create, params: {stolen: "true", bike: bike_params.merge(phone: "312.379.9513")}
+              post :create, params: {bike: bike_params.merge(phone: "312.379.9513", date_stolen: Time.current.to_s)}
             }.to change(StolenRecord, :count).by(1)
             expect(b_param.reload.created_bike_id).not_to be_nil
             expect(b_param.reload.bike_errors).to be_nil
