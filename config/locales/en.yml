@@ -1533,8 +1533,7 @@ en:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
-        bike_impounded: >-
-          That %{bike_type} was impounded.
+        bike_impounded: That %{bike_type} was impounded.
         bike_impounded_by_organization: >-
           %{org_name} has impounded that %{bike_type}. Please speak with them to access
           this %{bike_type}.
