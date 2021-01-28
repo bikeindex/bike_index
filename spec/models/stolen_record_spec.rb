@@ -4,7 +4,7 @@ RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
 
   describe "after_save hooks" do
-    let(:bike) { FactoryBot.create(:bike, stolen: true) }
+    let(:bike) { FactoryBot.create(:bike) }
     context "if bike no longer exists" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
@@ -115,7 +115,7 @@ RSpec.describe StolenRecord, type: :model do
 
     context "given multiple bike images" do
       it "uses the first bike image for the alert image" do
-        bike = FactoryBot.create(:bike, stolen: true)
+        bike = FactoryBot.create(:bike)
         stolen_record = FactoryBot.create(:stolen_record, bike: bike)
 
         image1 = FactoryBot.create(:public_image, imageable: bike)

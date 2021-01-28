@@ -2440,7 +2440,6 @@ CREATE TABLE public.stolen_records (
     zipcode character varying(255),
     city character varying(255),
     theft_description text,
-    "time" text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,

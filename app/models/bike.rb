@@ -278,7 +278,7 @@ class Bike < ApplicationRecord
   end
 
   def calculated_listing_order
-    return current_stolen_record.date_stolen.to_i.abs if stolen && current_stolen_record.present?
+    return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     t = (updated_at || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
@@ -825,7 +825,6 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
-    self.stolen = true if current_stolen_record.present? && !current_stolen_record.recovered? # Only assign if present
     set_location_info
     self.listing_order = calculated_listing_order
     # Quick hack to store the fact that it was creation for parking notification
@@ -837,7 +836,6 @@ class Bike < ApplicationRecord
       end
     end
     self.status = calculated_status unless skip_status_update
-    self.abandoned = true if status_abandoned? # Quick hack to manage prior to status update
     clean_frame_size
     set_mnfg_name
     set_user_hidden
@@ -929,22 +927,12 @@ class Bike < ApplicationRecord
     status_stolen?
   end
 
-  def stolen=(val)
-    self.status = ParamsNormalizer.boolean(val) ? "status_stolen" : "status_with_owner"
-    self.is_stolen = status_stolen?
-  end
-
   def abandoned
     status_abandoned?
   end
 
   def abandoned?
     status_abandoned?
-  end
-
-  def abandoned=(val)
-    self.status = ParamsNormalizer.boolean(val) ? "status_abandoned" : "status_with_owner"
-    self.is_abandoned = status_abandoned?
   end
 
   private
