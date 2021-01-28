@@ -6,6 +6,7 @@ RSpec.describe StolenRecordUpdator do
       bike = FactoryBot.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
+      bike.reload
       expect(bike.stolen_records.count).to eq(1)
       expect(bike.current_stolen_record).to eq(bike.stolen_records.last)
     end

@@ -1,6 +1,3 @@
-class StolenRecordError < StandardError
-end
-
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
@@ -29,12 +26,10 @@ class StolenRecordUpdator
   end
 
   def create_new_record
-    stolen_record = update_with_params(@bike.build_new_stolen_record(date_stolen: @date_stolen))
-    if stolen_record.save
-      @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
-      return true
-    end
-    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
+    stolen_record = @bike.build_new_stolen_record(date_stolen: @date_stolen)
+    stolen_record = update_with_params(stolen_record)
+    stolen_record.save
+    stolen_record
   end
 
   private
