@@ -209,7 +209,9 @@ class BikesController < ApplicationController
   end
 
   def update
-    if params[:bike].present?
+    if ParamsNormalizer.boolean(params[:mark_bike_stolen]) # This is sort of gross to go in an entirely new codepath, but...
+      StolenRecordUpdator.new(bike: @bike, mark_bike_stolen: true).update_records
+    elsif params[:bike].present?
       begin
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e
@@ -371,7 +373,11 @@ class BikesController < ApplicationController
     return true if @bike.authorize_and_claim_for_user(current_user)
 
     if @bike.current_impound_record.present?
-      error = translation(:bike_impounded, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+      error = if @bike.current_impound_record.organized?
+        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+      else
+        translation(:bike_impounded, bike_type: type)
+      end
     elsif current_user.present?
       error = translation(:you_dont_own_that, bike_type: type)
     else

@@ -734,7 +734,7 @@ RSpec.describe BikesController, type: :request do
       expect(assigns(:bike).id).to eq bike.id
     end
     context "with impound_record" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
       before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
       it "redirects with flash error" do
         bike.reload
@@ -853,11 +853,11 @@ RSpec.describe BikesController, type: :request do
         expect(bike.stolen?).to be_falsey
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
+          patch "#{base_url}/#{bike.id}", params: {mark_bike_stolen: true}
           expect(flash[:success]).to be_present
         end
         bike.reload
-        expect(bike.stolen?).to be_truthy
+        expect(bike.status).to eq "status_stolen"
         expect(bike.to_coordinates.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
@@ -878,7 +878,7 @@ RSpec.describe BikesController, type: :request do
             expect(flash[:success]).to be_present
           end
           bike.reload
-          expect(bike.stolen?).to be_truthy
+          expect(bike.status).to eq "status_stolen"
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
 

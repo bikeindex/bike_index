@@ -419,13 +419,6 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns(:bike).stolen).to be_truthy
         end
       end
-      context "passed recovered param" do
-        it "renders a new recovered bike" do
-          get :new, params: {abandoned: true}
-          expect(response.code).to eq("200")
-          expect(assigns(:bike).abandoned).to be_truthy
-        end
-      end
       context "with organization id" do
         it "renders and assigns creation organization" do
           get :new, params: {organization_id: organization.to_param}

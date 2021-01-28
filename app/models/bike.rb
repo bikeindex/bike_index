@@ -124,7 +124,7 @@ class Bike < ApplicationRecord
     def old_attr_accessible
       (%w[manufacturer_id manufacturer_other serial_number
         serial_normalized made_without_serial extra_registration_number
-        creation_organization_id manufacturer year thumb_path name stolen
+        creation_organization_id manufacturer year thumb_path name
         current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
         handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow

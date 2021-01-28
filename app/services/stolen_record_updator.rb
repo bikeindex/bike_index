@@ -7,6 +7,7 @@ class StolenRecordUpdator
     @date_stolen = TimeParser.parse(creation_params[:date_stolen])
     @user = creation_params[:user]
     @b_param = creation_params[:b_param]
+    @mark_bike_stolen = creation_params[:mark_bike_stolen]
   end
 
   def mark_records_not_current
@@ -21,11 +22,12 @@ class StolenRecordUpdator
   end
 
   def update_records
-    if @bike.stolen
-      if @bike.fetch_current_stolen_record.blank?
-        create_new_record
-        @bike.reload
-      elsif @date_stolen
+    pp @mark_bike_stolen
+    if @mark_bike_stolen
+      create_new_record
+      @bike.reload
+    elsif @bike.stolen
+      if @date_stolen
         stolen_record = @bike.fetch_current_stolen_record
         stolen_record.update_attributes(date_stolen: @date_stolen)
       elsif @b_param && (@b_param["stolen_record"] || @b_param["bike"]["stolen_records_attributes"])

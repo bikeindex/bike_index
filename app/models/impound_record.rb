@@ -61,6 +61,10 @@ class ImpoundRecord < ApplicationRecord
     organization.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
+  def organized?
+    organization_id.present?
+  end
+
   def impound_claim_retrieved?
     impound_claims.retrieved.any?
   end

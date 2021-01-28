@@ -10,7 +10,7 @@ class BikeUpdator
     @bike_params = creation_params[:b_params]
     @bike = creation_params[:bike] || find_bike
     @current_ownership = creation_params[:current_ownership]
-    @currently_stolen = @bike.stolen
+    @currently_stolen = @bike.status_stolen?
   end
 
   def find_bike
@@ -56,8 +56,6 @@ class BikeUpdator
     elsif @bike_params["stolen_record"] || @bike_params["bike"]["stolen_records_attributes"]
       StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
       @bike.reload
-    elsif @currently_stolen != @bike.stolen
-      StolenRecordUpdator.new(bike: @bike).update_records
     end
   end
 

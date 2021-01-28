@@ -1534,6 +1534,8 @@ en:
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
         bike_impounded: >-
+          That %{bike_type} was impounded.
+        bike_impounded_by_organization: >-
           %{org_name} has impounded that %{bike_type}. Please speak with them to access
           this %{bike_type}.
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
