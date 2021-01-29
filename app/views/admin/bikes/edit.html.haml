@@ -163,6 +163,8 @@
             .col-6.form-group
               = s.label :estimated_value, "Estimated value"
               = s.number_field :estimated_value, class: "form-control"
+            -# Note: this is no longer an attribute on bikes (PR#1875) - but unchecking this expands the recovery fields
+            -# ... and filling in the recovery fields recovers the bike
             .col-6.form-group#stolenCheckBox
               = f.label :stolen do
                 = f.check_box :stolen

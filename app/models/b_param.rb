@@ -149,10 +149,8 @@ class BParam < ApplicationRecord
       # Don't override status with status_with_owner,
       return bike["status"] unless bike["status"] == "status_with_owner"
     end
-    return "status_stolen" if stolen_attrs.present?
-    # TEMPORARY - enable before shipping
     # Support bike: {stolen: true} legacy setup
-    # return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
+    return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
     "status_with_owner"
   end
 
