@@ -917,24 +917,6 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
-  # TODO after #1875: - remove the methods between here and private
-  # They are all temporary helper methods to facilitate migrating to just using status enum
-  def stolen
-    status_stolen?
-  end
-
-  def stolen?
-    status_stolen?
-  end
-
-  def abandoned
-    status_abandoned?
-  end
-
-  def abandoned?
-    status_abandoned?
-  end
-
   private
 
   # Select the source from which to derive location data, in the following order
