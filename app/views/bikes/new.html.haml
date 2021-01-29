@@ -5,6 +5,8 @@
   %h1.uncap
     - if @bike.status_stolen?
       = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
+    - elsif @bike.status_impounded?
+      = t(".enter_found_bike_type_details", bike_type: @bike.type)
     - else
       = t(".enter_bike_type_details", bike_type: @bike.type)
     %span.text-warning= @bike.status_humanized
