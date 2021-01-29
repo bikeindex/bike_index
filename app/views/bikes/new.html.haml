@@ -80,7 +80,7 @@
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
+          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user)
             .form-group.row.unnested-field
               = f.label :phone,
                 @organization&.registration_field_label("reg_phone") || t(".phone"),
@@ -88,7 +88,7 @@
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
-          - if @bike.stolen
+          - if @bike.status_stolen?
             = fields_for @stolen_record do |srecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 

@@ -47,7 +47,7 @@
             .mt-1
               = t(".please_email_organization_with_questions_html", email_link: link_to(organization_email, "mailto:#{organization_email}"))
 
-- if modal_title.blank? || @bike.stolen && session[:recovery_link_token].present?
+- if modal_title.blank? || @bike.status_stolen? && session[:recovery_link_token].present?
   -# Delete token so modal doesn't keep rendering
   - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token))
 
@@ -114,7 +114,7 @@
               - if @bike.user?
                 - if @bike.abandoned
                   = t(".thank_you_for_recovering_this_bike_type", bike_type: @bike.type)
-                - elsif @bike.stolen
+                - elsif @bike.status_stolen?
                   = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
                 - else
                   = t(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
@@ -122,7 +122,7 @@
                 - if @bike.public_images.any?
                   = t(".add_some_more_information_about_it")
                 - else
-                  - if @bike.stolen
+                  - if @bike.status_stolen?
                     = t(".add_a_picture_so_people_know_what_to_look")
                   - else
                     = t(".add_a_picture_of_it")

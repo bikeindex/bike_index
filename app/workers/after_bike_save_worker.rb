@@ -16,7 +16,7 @@ class AfterBikeSaveWorker < ApplicationWorker
     if bike.present? && bike.listing_order != bike.calculated_listing_order
       bike.update_attribute :listing_order, bike.calculated_listing_order
     end
-    return true unless bike.stolen # For now, only hooking on stolen bikes
+    return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end
 

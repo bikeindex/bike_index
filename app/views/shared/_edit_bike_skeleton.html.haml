@@ -3,7 +3,7 @@
   = render partial: "owner_bike_status_alerts"
   .edit-bike-header
     %h1
-      - if @bike.stolen && @bike.fetch_current_stolen_record.present?
+      - if @bike.fetch_current_stolen_record.present?
         %span.text-danger
           = @bike.abandoned ? t(".abandoned") : t(".stolen")
       - else

@@ -892,7 +892,8 @@ RSpec.describe BikesController, type: :controller do
               # This is also where we're testing bikebook assignment
               expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
               expect {
-                post :create, params: {stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)}
+                post :create, params: {bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)}
+                pp flash
               }.to change(Bike, :count).by(1)
               expect(flash[:success]).to be_present
               expect(BParam.all.count).to eq 0

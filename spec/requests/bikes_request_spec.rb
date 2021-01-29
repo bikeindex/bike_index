@@ -865,7 +865,7 @@ RSpec.describe BikesController, type: :request do
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "marks bike stolen and doesn't set a location in Kansas!" do
         bike.reload
-        expect(bike.stolen?).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.authorized?(current_user)).to be_truthy
         Sidekiq::Worker.clear_all
@@ -931,7 +931,7 @@ RSpec.describe BikesController, type: :request do
           bike.update_attributes(location_attrs)
           bike.reload
           expect(bike.address_set_manually).to be_truthy
-          expect(bike.stolen?).to be_falsey
+          expect(bike.status_stolen?).to be_falsey
           expect(bike.claimed?).to be_falsey
           expect(bike.user&.id).to eq current_user.id
           Sidekiq::Worker.clear_all

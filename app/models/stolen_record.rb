@@ -42,7 +42,6 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
-  validates_presence_of :bike_id
   validates_presence_of :date_stolen
 
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
@@ -344,7 +343,7 @@ class StolenRecord < ApplicationRecord
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_images
-    no_longer_around = bike.blank? || !bike.stolen? || recovered?
+    no_longer_around = bike.blank? || !bike.status_stolen? || recovered?
     return true unless no_longer_around || @alert_location_changed
     alert_image&.destroy
   end

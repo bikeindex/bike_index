@@ -13,7 +13,7 @@
   -# used to be logic in here, but the @ownership.claim_message should mostly take this over
   - if @bike.abandoned?
     %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
-  - elsif @bike.stolen?
+  - elsif @bike.status_stolen?
     %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
     %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
   - else
@@ -26,9 +26,9 @@
   %p
     - org_name = @creation_org&.name || @ownership&.creator&.display_name
 
-    - bike_type = if @bike.stolen? && @bike.abandoned?
+    - bike_type = if @bike.status_abandoned?
       - t(".html.recovered_biketype", biketype: @bike.type)
-    - elsif @bike.stolen?
+    - elsif @bike.status_stolen?
       - t(".html.stolen_biketype", biketype: @bike.type)
     - else
       - @bike.type
@@ -45,7 +45,7 @@
 
 = render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike, t: @ownership.token, email: @vars[:email]) }
 
-- if @bike.stolen
+- if @bike.status_stolen?
   %p
     - if @bike.abandoned
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
@@ -71,7 +71,7 @@
   - else
     = link_to t(".html.confirm_this_biketype", biketype: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), class: 'binx-button'
 
-  - if @bike.stolen?
+  - if @bike.status_stolen?
     %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)
   - else
     %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)

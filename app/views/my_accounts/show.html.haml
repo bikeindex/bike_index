@@ -30,7 +30,7 @@
                     = bike.thumb_image
                   .bike-information.multi-attr-lists
                     %h5.title-link
-                      - if bike.stolen
+                      - if bike.status_stolen?
                         %strong.stolen-color
                           - if bike.abandoned
                             = t(".abandoned")
@@ -50,7 +50,7 @@
                         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
-                      - if bike.stolen
+                      - if bike.status_stolen?
                         -# %li
                         -#   # Hide printable PDF because it isn't working right now :(
                         -#     = link_to t(".printable_pdf"), pdf_bike_path(bike)

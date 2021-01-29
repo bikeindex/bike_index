@@ -25,7 +25,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
       before { stolen_record.add_recovery_information }
       it "redirects" do
         bike.reload
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         get :edit, params: {bike_id: bike.id, token: recovery_link_token}
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:info]).to match(/already/)
@@ -57,7 +57,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
         }.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.current).to be_falsey
         expect(bike.current_stolen_record).not_to be_present
@@ -77,7 +77,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
           stolen_record.reload
           bike.reload
 
-          expect(bike.stolen).to be_falsey
+          expect(bike.status_stolen?).to be_falsey
           expect(stolen_record.recovered?).to be_truthy
           expect(stolen_record.current).to be_falsey
           expect(bike.current_stolen_record).not_to be_present
@@ -100,7 +100,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
 
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:error]).to be_present
-        expect(bike.stolen).to be_truthy
+        expect(bike.status_stolen?).to be_truthy
         expect(stolen_record.recovered?).to be_falsey
         expect(stolen_record.current).to be_truthy
         expect(bike.current_stolen_record).to be_present

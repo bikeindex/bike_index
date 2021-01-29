@@ -794,7 +794,7 @@ RSpec.describe Bike, type: :model do
       context "registered as stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
         it "is truthy" do
-          expect(bike.stolen?).to be_truthy
+          expect(bike.status_stolen?).to be_truthy
           expect(bike.contact_owner_user?).to be_truthy
           expect(bike.contact_owner_email).to eq owner_email
         end

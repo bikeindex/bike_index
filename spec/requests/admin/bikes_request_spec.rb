@@ -102,7 +102,7 @@ RSpec.describe Admin::BikesController, type: :request do
           }
         end
         bike.reload
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         stolen_record.reload
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.recovered_description).to eq "some reason"
@@ -175,7 +175,7 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to redirect_to admin_bike_path(bike)
 
       bike.reload
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen?).to be_truthy
       stolen_record.reload
       expect(stolen_record.recovered_description).to eq recovered_description
       expect(stolen_record.recovery_link_token).to_not eq og_recover_link_token

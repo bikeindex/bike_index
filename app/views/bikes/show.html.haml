@@ -79,13 +79,13 @@
   .row
     .col-md-8
       %h1.bike-title
-        - if @bike.stolen
+        - if @bike.status_stolen?
           %strong.stolen
             = t(".abandoned") if @bike.abandoned
             = t(".stolen")
         %span.uncap
           = @bike.title_u
-      - if @bike.stolen && @stolen_record.present?
+      - if @bike.status_stolen? && @stolen_record.present?
         %p
           %strong
             - if @bike.abandoned
@@ -190,7 +190,7 @@
             = t(".distinguishing_features")
           %p
             = @bike.description
-        - if @bike.stolen && @stolen_record.present?
+        - if @bike.status_stolen? && @stolen_record.present?
           %h3
             = t(".theft_details", bike_abandoned: @bike.abandoned ? 'Abandoned' : 'Theft')
           .row
@@ -249,7 +249,7 @@
     .col-md-4
       .social-share-bike.mb-4.mt-4
         %h4
-          - if @bike.stolen
+          - if @bike.status_stolen?
             = t(".spread_the_word")
           - else
             = t(".share_it")

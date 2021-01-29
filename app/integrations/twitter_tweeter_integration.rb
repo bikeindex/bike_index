@@ -74,7 +74,7 @@ class TwitterTweeterIntegration
   end
 
   def stolen_slug
-    if !bike.stolen? || bike.status_abandoned?
+    if !bike.status_stolen? || bike.status_abandoned?
       "FOUND -"
     else
       "STOLEN -"

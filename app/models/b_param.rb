@@ -69,7 +69,7 @@ class BParam < ApplicationRecord
   def self.skipped_bike_attrs
     # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
     %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
-      stolen abandoned
+      stolen abandoned revised_new
       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
   end
 
@@ -433,6 +433,7 @@ class BParam < ApplicationRecord
   end
 
   # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
+  # We probably want to switch to any override params instead of these two weird things, but 1 step at a time
   def build_bike(status_override: nil, is_stolen: nil)
     bike = Bike.new(safe_bike_attrs(status_override, is_stolen))
     # Add a stolen record if there are stolen attrs

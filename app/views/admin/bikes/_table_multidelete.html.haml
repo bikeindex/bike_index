@@ -54,7 +54,7 @@
             %br
             %small
               = bike.description
-            - if bike.stolen
+            - if bike.status_stolen?
               %span.less-strong-right
                 stolen
 

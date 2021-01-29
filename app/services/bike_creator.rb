@@ -23,7 +23,7 @@ class BikeCreator
     # bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     # bike = add_required_attributes(bike)
     bike = @b_param.build_bike
-    bike = BikeCreatorVerifier.new(@b_param, bike).verify
+    bike = verify(bike)
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
     add_front_wheel_size(bike)
@@ -172,5 +172,27 @@ class BikeCreator
     end
     attrs[:serial_number] = "unknown" unless bike.serial_number.present?
     attrs
+  end
+
+  # Previously in BikeCreatorVerifier - but that was trashed, so now it's just here
+  def check_organization(bike)
+    bike = BikeCreatorOrganizer.new(@b_param, bike).organized_bike
+  end
+
+  def check_example(bike)
+    example_org = Organization.example
+    bike.creation_organization_id = example_org.id if @b_param.params && @b_param.params["test"]
+    if bike.creation_organization_id.present? && example_org.present?
+      bike.example = true if bike.creation_organization_id == example_org.id
+    else
+      bike.example = false
+    end
+    bike
+  end
+
+  def verify(bike)
+    bike = check_organization(bike)
+    bike = check_example(bike)
+    bike
   end
 end

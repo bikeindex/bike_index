@@ -23,7 +23,7 @@ RSpec.describe StolenRecord, type: :model do
       it "removes alert_image" do
         stolen_record.reload
         expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.bike.stolen).to be_truthy
+        expect(stolen_record.bike.status_stolen?).to be_truthy
         bike.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
 
@@ -31,11 +31,11 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.reload
         bike.reload
 
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         expect(bike.current_stolen_record_id).to be_blank
 
         expect(stolen_record.recovered?).to be_truthy
-        expect(stolen_record.bike.stolen).to be_falsey
+        expect(stolen_record.bike.status_stolen?).to be_falsey
         expect(stolen_record.alert_image).to be_blank
       end
     end
@@ -412,14 +412,14 @@ RSpec.describe StolenRecord, type: :model do
       }
     end
     before do
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen?).to be_truthy
       bike.reload
       expect(bike.status).to eq "status_stolen"
       stolen_record.add_recovery_information(recovery_request.as_json)
       bike.reload
       stolen_record.reload
 
-      expect(bike.stolen).to be_falsey
+      expect(bike.status_stolen?).to be_falsey
       expect(bike.status).to eq "status_with_owner"
       expect(stolen_record.recovered?).to be_truthy
       expect(stolen_record.current).to be_falsey

@@ -41,7 +41,7 @@
                 = bike.title_string
                 %span.less-strong
                   = bike.frame_colors.to_sentence
-                - if bike.stolen?
+                - if bike.status_stolen?
                   %span.less-strong-right
                     stolen
             %td.admin-bike-table-serial-cell

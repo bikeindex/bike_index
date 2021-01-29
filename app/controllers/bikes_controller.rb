@@ -27,7 +27,7 @@ class BikesController < ApplicationController
 
   def show
     @components = @bike.components
-    if @bike.stolen && @bike.current_stolen_record.present?
+    if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
@@ -53,7 +53,7 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    if @bike.stolen && @bike.current_stolen_record.present?
+    if @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
@@ -110,7 +110,7 @@ class BikesController < ApplicationController
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
-    if @bike.stolen
+    if @bike.status_stolen?
       @stolen_record = @bike.stolen_records.build(@b_param.params["stolen_record"])
       @stolen_record.country_id ||= Country.united_states.id
     end
@@ -234,7 +234,7 @@ class BikesController < ApplicationController
 
   def edit_templates
     return @edit_templates if @edit_templates.present?
-    @theft_templates = @bike.stolen? ? theft_templates : {}
+    @theft_templates = @bike.status_stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)
   end
@@ -280,7 +280,7 @@ class BikesController < ApplicationController
   def target_edit_template(requested_page:)
     result = {}
     valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
-    default_page = @bike.stolen? ? :theft_details : :bike_details
+    default_page = @bike.status_stolen? ? :theft_details : :bike_details
 
     if requested_page.blank?
       result[:is_valid] = true
@@ -321,7 +321,7 @@ class BikesController < ApplicationController
       h[:ownership] = translation(:ownership, controller_method: :edit)
       h[:groups] = translation(:groups, controller_method: :edit)
       h[:remove] = translation(:remove, controller_method: :edit)
-      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.stolen?
+      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.status_stolen?
     end
   end
 

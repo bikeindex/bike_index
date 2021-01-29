@@ -98,7 +98,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_falsey
         bike = assigns(:bike)
-        expect(bike.stolen).to be_falsey
+        expect(bike.status)).to_not eq "status_stolen"
       end
     end
     context "stolen" do
@@ -133,7 +133,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:persist_email)).to be_truthy
         bike = assigns(:bike)
-        expect(bike.stolen).to be_falsey
+        expect(bike.status)).to_not eq "status_stolen"
       end
     end
     context "crazy b_param data" do

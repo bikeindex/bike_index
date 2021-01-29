@@ -120,7 +120,7 @@
     .col-12.text-center
       = submit_tag "Update the bike", class: "btn btn-success btn-lg"
 
-  - if @bike.stolen and @bike.current_stolen_record.present?
+  - if @bike.current_stolen_record.present?
     %h4.mt-4#edit-stolen-record
       Edit Stolen Record
     = f.fields_for :stolen_records do |s|

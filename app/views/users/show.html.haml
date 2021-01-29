@@ -37,7 +37,7 @@
                 .card
                   %a.bike-list-image{ href: bike_url(bike) }
                     = bike.thumb_image
-                    - if bike.stolen
+                    - if bike.status_stolen?
                       %span.personal-page-stolen-tag
                         - if bike.abandoned?
                           = t(".abandoned")
