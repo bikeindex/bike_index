@@ -1491,7 +1491,7 @@ RSpec.describe Bike, type: :model do
     end
 
     it "is the current stolen record date stolen * 1000" do
-      allow(bike).to receive(:stolen).and_return(true)
+      allow(bike).to receive(:status).and_return("status_stolen")
       stolen_record = StolenRecord.new
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)

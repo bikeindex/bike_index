@@ -1,6 +1,9 @@
 require "rails_helper"
 
 RSpec.describe BikeCreator do
+  let(:subject) { BikeCreator }
+  let(:instance) { subject.new }
+
   context "legacy BikeCreatorBuilder methods" do
     describe "building" do
       it "returns a new bike object from the params with the b_param_id" do
@@ -188,7 +191,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new(origin: "api_v1")
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
           :creation_organization_id => organization.id,
@@ -214,7 +217,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
         bike = FactoryBot.create(:bike)
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         expect {
           creator.send(:save_bike, bike)
@@ -388,6 +391,79 @@ RSpec.describe BikeCreator do
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
       end
+    end
+  end
+
+  # Old BikeCreatorAssociator specs
+  describe "create_ownership" do
+    it "calls create ownership" do
+      b_param = BParam.new
+      bike = Bike.new
+      allow(b_param).to receive(:params).and_return({bike: bike}.as_json)
+      allow(b_param).to receive(:creator).and_return("creator")
+      expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
+      subject.new(b_param).send("create_ownership", bike)
+    end
+    it "calls create ownership with send_email false if b_param has that" do
+      b_param = BParam.new
+      bike = Bike.new
+      allow(b_param).to receive(:params).and_return({bike: {send_email: false}}.as_json)
+      allow(b_param).to receive(:creator).and_return("creator")
+      expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
+      subject.new(b_param).send("create_ownership", bike)
+    end
+  end
+
+  describe "add_other_listings" do
+    it "calls create stolen record" do
+      b_param = BParam.new
+      bike = FactoryBot.create(:bike)
+      urls = ["http://some_blog.com", "http://some_thing.com"]
+      allow(b_param).to receive(:params).and_return({bike: {other_listing_urls: urls}}.as_json)
+      subject.new(b_param).send("add_other_listings", bike)
+      expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
+    end
+  end
+
+  describe "attach_photo" do
+    it "creates public images for the attached image" do
+      bike = FactoryBot.create(:bike)
+      b_param = FactoryBot.create(:b_param)
+      test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
+      b_param.image = test_photo
+      b_param.save
+      expect(b_param.image).to be_present
+      b_param.params = p
+      subject.new(b_param).attach_photo(bike)
+      expect(bike.public_images.count).to eq(1)
+    end
+  end
+
+  describe "updated_phone" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike) { Bike.new(phone: "699.999.9999") }
+    before { allow(bike).to receive(:user) { user } }
+    it "sets the owner's phone if one is passed in" do
+      instance.send("assign_user_attributes", bike)
+      user.reload
+      expect(user.phone).to eq("6999999999")
+    end
+    context "user already has a phone" do
+      let(:user) { FactoryBot.create(:user, phone: "0000000000") }
+      it "does not set the phone if the user already has a phone" do
+        instance.send("assign_user_attributes", bike)
+        user.reload
+        expect(user.phone).to eq("0000000000")
+      end
+    end
+  end
+
+  describe "associate" do
+    it "rescues from the error and add the message to the bike" do
+      expect(StolenRecordUpdator).to be_present # Load the error
+      bike = Bike.new(status: "status_stolen")
+      instance.send("associate", bike)
+      expect(bike.errors.messages[:association_error]).not_to be_nil
     end
   end
 end

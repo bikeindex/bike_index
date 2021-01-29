@@ -214,6 +214,9 @@ class BikesController < ApplicationController
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
+        # Sometimes, weird things error. In production, Don't show a 500 page to the user
+        # ... but in testing ordevelopment re-raise error to make stack tracing better
+        raise e unless Rails.env.production?
       end
     end
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
@@ -301,11 +304,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.abandoned?
-      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.abandoned?
+      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.status_abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.status_abandoned?
       h[:publicize] = translation(:publicize, controller_method: :edit)
       h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.abandoned?
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.status_abandoned?
     end
   end
 
@@ -442,7 +445,7 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(Bike.old_attr_accessible)}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

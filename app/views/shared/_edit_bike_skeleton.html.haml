@@ -5,7 +5,7 @@
     %h1
       - if @bike.fetch_current_stolen_record.present?
         %span.text-danger
-          = @bike.abandoned ? t(".abandoned") : t(".stolen")
+          = @bike.status_abandoned? ? t(".abandoned") : t(".stolen")
       - else
         = t(".edit")
       = @bike.year

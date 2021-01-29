@@ -1,4 +1,15 @@
 class StolenRecordUpdator
+  # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
+  def self.old_attr_accessible
+    # recovery_tweet, recovery_share # We edit this in the admin panel
+    %w[police_report_number police_report_department locking_description lock_defeat_description
+      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+      longitude theft_description current phone secondary_phone phone_for_everyone
+      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+      approved recovered_at recovered_description index_helped_recovery can_share_recovery
+      recovery_posted show_address tsved_at estimated_value].map(&:to_sym).freeze
+  end
+
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
     b_param = creation_params[:b_param]

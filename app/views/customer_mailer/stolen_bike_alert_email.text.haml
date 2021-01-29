@@ -3,7 +3,7 @@
 
 \--------------------------------
 
-- if @bike.abandoned?
+- if @bike.status_abandoned?
   = t(".text.were_spreading_the_word_about_your_found", bike_type: @bike_type)
 - else
   = t(".text.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)

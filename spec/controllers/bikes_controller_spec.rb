@@ -1177,7 +1177,7 @@ RSpec.describe BikesController, type: :controller do
           context "stolen bike" do
             let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
             it "renders with stolen as first template, different description" do
-              expect(bike.reload.stolen).to eq(true)
+              expect(bike.reload.status).to eq "status_stolen"
               expect(bike.current_stolen_record.without_location?).to be_truthy
               get :edit, params: {id: bike.id}
 
