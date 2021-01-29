@@ -1,24 +1,3 @@
-# :id
-# :bike_id
-# :user_id
-# :organization_id
-# :resolved_at
-# :created_at
-# :updated_at
-# :display_id
-# :status
-# :location_id
-# t.datetime :impounded_at
-# # Location fields
-# t.float :latitude
-# t.float :longitude
-# t.text :street
-# t.text :zipcode
-# t.text :city
-# t.text :neighborhood
-# t.references :country, index: true
-# t.references :state, index: true
-
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
 
@@ -33,10 +12,10 @@ class ImpoundRecord < ApplicationRecord
   has_many :impound_record_updates
   has_many :impound_claims
 
-  validates_presence_of :bike_id, :user_id
+  validates_presence_of :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
   after_commit :update_associations
 
   enum status: ImpoundRecordUpdate::KIND_ENUM
@@ -44,7 +23,7 @@ class ImpoundRecord < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
 
-  attr_accessor :skip_update
+  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   def self.statuses
     ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
@@ -84,6 +63,11 @@ class ImpoundRecord < ApplicationRecord
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
+  end
+
+  # geocoding is managed by set_calculated_attributes
+  def should_be_geocoded?
+    false
   end
 
   def organized?
@@ -171,6 +155,19 @@ class ImpoundRecord < ApplicationRecord
     if without_location? && parking_notification.present?
       self.attributes = parking_notification.attributes.slice(*Geocodeable.location_attrs)
     end
+    # TODO: Make this work
+    # if !use_entered_address && latitude.present? && longitude.present?
+    #   addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
+    #   self.street = addy_hash["street"]
+    #   self.city = addy_hash["city"]
+    #   self.zipcode = addy_hash["zipcode"]
+    #   self.country = Country.fuzzy_find(addy_hash["country"])
+    #   self.state = State.fuzzy_find(addy_hash["state"])
+    # else
+    #   coordinates = Geohelper.coordinates_for(address)
+    #   self.attributes = coordinates if coordinates.present?
+    #   self.location_from_address = true
+    # end
   end
 
   def last_display_id
@@ -200,10 +197,9 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def calculated_user_id
-    return user_id unless impound_record_updates.where.not(user_id: nil).any?
+    if impound_record_updates.where.not(user_id: nil).none?
+      return user_id.present? ? user_id : bike&.creator_id?
+    end
     impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
-  end
-
-  def assign_location_from_parking_notification
   end
 end

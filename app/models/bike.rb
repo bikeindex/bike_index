@@ -59,6 +59,7 @@ class Bike < ApplicationRecord
   has_many :graduated_notifications, foreign_key: :bike_id
 
   accepts_nested_attributes_for :stolen_records
+  accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
