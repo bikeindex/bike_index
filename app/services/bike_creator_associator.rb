@@ -81,5 +81,4 @@ class BikeCreatorAssociator
     urls = @b_param.params["bike"]["other_listing_urls"]
     urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
-
 end

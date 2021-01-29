@@ -157,7 +157,7 @@ class BikeCreator
 
   # Previously in BikeCreatorVerifier - but that was trashed, so now it's just here
   def check_organization(bike)
-    bike = BikeCreatorOrganizer.new(@b_param, bike).organized_bike
+    BikeCreatorOrganizer.new(@b_param, bike).organized_bike
   end
 
   def check_example(bike)
@@ -173,7 +173,6 @@ class BikeCreator
 
   def verify(bike)
     bike = check_organization(bike)
-    bike = check_example(bike)
-    bike
+    check_example(bike)
   end
 end

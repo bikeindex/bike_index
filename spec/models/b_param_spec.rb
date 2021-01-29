@@ -623,7 +623,8 @@ RSpec.describe BParam, type: :model do
         expect(bike.creator).to eq b_param.creator
       end
       context "stolen" do
-        let(:b_param_params) { {stolen_record: {phone: "7183839292"}} }
+        # Even though status_with_owner passed - since it has stolen attrs
+        let(:b_param_params) { {bike: {status: "status_with_owner"}, stolen_record: {phone: "7183839292"}} }
         it "is stolen" do
           expect(b_param).to be_valid
           expect(b_param.status).to eq "status_stolen"
@@ -636,6 +637,21 @@ RSpec.describe BParam, type: :model do
           stolen_record = bike.stolen_records.first
           expect(stolen_record).to be_present
           expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
+        end
+      end
+      context "legacy_stolen" do
+        let(:b_param_params) { {bike: {stolen: true}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.b_param_id).to eq b_param.id
+          expect(bike.b_param_id_token).to eq b_param.id_token
+          expect(bike.creator).to eq b_param.creator
+          stolen_record = bike.stolen_records.first
+          expect(stolen_record).to be_present
         end
       end
     end

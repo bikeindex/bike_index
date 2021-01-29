@@ -70,10 +70,10 @@ class OrganizationsController < ApplicationController
       flash[:error] = translation(:no_user)
       redirect_to(root_url) && return
     end
-    if params[:b_param_id_token].present?
-      @b_param = BParam.find_or_new_from_token(params[:b_param_id_token])
+    @b_param = if params[:b_param_id_token].present?
+      BParam.find_or_new_from_token(params[:b_param_id_token])
     else
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {
+      BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
         bike: BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)

@@ -39,7 +39,7 @@ RSpec.describe RegistrationsController, type: :controller do
           set_current_user(user)
           get :embed
           expect_it_to_render_correctly
-          expect(assigns(:stolen)).to eq 0
+          expect(assigns(:stolen)).to be_falsey
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq user.email
         end
@@ -50,7 +50,7 @@ RSpec.describe RegistrationsController, type: :controller do
         it "renders" do
           get :embed, params: {organization_id: organization.to_param, simple_header: true, select_child_organization: true}
           expect_it_to_render_correctly
-          expect(assigns(:stolen)).to eq 0
+          expect(assigns(:stolen)).to be_falsey
           expect(assigns(:organization)).to eq organization
           expect(assigns(:selectable_child_organizations)).to eq []
           expect(assigns(:creator)).to be_nil
@@ -69,7 +69,7 @@ RSpec.describe RegistrationsController, type: :controller do
           set_current_user(user)
           expect(organization.save).to eq(true)
 
-          get :embed, params: {organization_id: organization.id, stolen: true, select_child_organization: true}
+          get :embed, params: {organization_id: organization.id, status: "status_stolen", select_child_organization: true}
 
           expect_it_to_render_correctly
           # Since we're creating these in line, actually test the rendered body
@@ -98,7 +98,7 @@ RSpec.describe RegistrationsController, type: :controller do
         it "does not create a bparam, rerenders new with all assigned values" do
           attrs = {
             manufacturer_id: manufacturer.id,
-            stolen: true,
+            status: "status_stolen",
             creator_id: 21,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: 12,

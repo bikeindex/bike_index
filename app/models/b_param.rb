@@ -115,6 +115,10 @@ class BParam < ApplicationRecord
     params["bike"]["tertiary_frame_color_id"] = val
   end
 
+  def status=(val)
+    params["bike"]["status"] = val
+  end
+
   def with_bike?
     created_bike_id.present?
   end
@@ -141,8 +145,19 @@ class BParam < ApplicationRecord
   end
 
   def status
-    return bike["status"] if Bike.statuses.include?(bike["status"])
-    stolen_attrs.present? ? "status_stolen" : "status_with_owner"
+    if Bike.statuses.include?(bike["status"])
+      # Don't override status with status_with_owner,
+      return bike["status"] unless bike["status"] == "status_with_owner"
+    end
+    return "status_stolen" if stolen_attrs.present?
+    # TEMPORARY - enable before shipping
+    # Support bike: {stolen: true} legacy setup
+    # return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
+    "status_with_owner"
+  end
+
+  def status_stolen?
+    status == "status_stolen"
   end
 
   def status_abandoned?
@@ -445,8 +460,7 @@ class BParam < ApplicationRecord
 
   def build_bike(new_attrs = {})
     bike = Bike.new(safe_bike_attrs(new_attrs))
-    # Add a stolen record if there are stolen attrs
-    bike.build_new_stolen_record(stolen_attrs) if stolen_attrs.present?
+    bike.build_new_stolen_record(stolen_attrs) if status_stolen?
     bike
   end
 
@@ -455,13 +469,13 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     bike.merge(status: status).merge(new_attrs.as_json)
-        .select { |k, v| v.present? }
-        .except(*BParam.skipped_bike_attrs)
-        .merge("b_param_id" => id,
-               "b_param_id_token" => id_token,
-               "creator_id" => creator_id,
-               "updator_id" => creator_id)
-        .merge(address_hash)
+      .select { |k, v| v.present? }
+      .except(*BParam.skipped_bike_attrs)
+      .merge("b_param_id" => id,
+             "b_param_id_token" => id_token,
+             "creator_id" => creator_id,
+             "updator_id" => creator_id)
+      .merge(address_hash)
   end
 
   def process_image_if_required
