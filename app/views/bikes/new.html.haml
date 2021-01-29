@@ -93,7 +93,11 @@
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
           - if @bike.status_stolen?
-            = fields_for @bike.stolen_records.first do |srecord|
+            = fields_for @bike.stolen_records.last do |srecord|
+              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+
+          - if @bike.status_impounded?
+            = fields_for @bike.impound_records.last do |srecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
           - if @organization&.include_field_reg_address?(current_user)

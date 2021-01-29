@@ -1,8 +1,33 @@
+# :id
+# :bike_id
+# :user_id
+# :organization_id
+# :resolved_at
+# :created_at
+# :updated_at
+# :display_id
+# :status
+# :location_id
+# t.datetime :impounded_at
+# # Location fields
+# t.float :latitude
+# t.float :longitude
+# t.text :street
+# t.text :zipcode
+# t.text :city
+# t.text :neighborhood
+# t.references :country, index: true
+# t.references :state, index: true
+
 class ImpoundRecord < ApplicationRecord
+  include Geocodeable
+
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
   belongs_to :location # organization location
+  belongs_to :country
+  belongs_to :state
 
   has_one :parking_notification
   has_many :impound_record_updates
@@ -58,7 +83,7 @@ class ImpoundRecord < ApplicationRecord
 
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
-    organization.present? ? self.class.impounded_kind : self.class.found_kind
+    organization_id.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
   def organized?
@@ -142,6 +167,10 @@ class ImpoundRecord < ApplicationRecord
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
+    self.impounded_at ||= created_at || Time.current
+    if without_location? && parking_notification.present?
+      self.attributes = parking_notification.attributes.slice(*Geocodeable.location_attrs)
+    end
   end
 
   def last_display_id
@@ -173,5 +202,8 @@ class ImpoundRecord < ApplicationRecord
   def calculated_user_id
     return user_id unless impound_record_updates.where.not(user_id: nil).any?
     impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
+  end
+
+  def assign_location_from_parking_notification
   end
 end

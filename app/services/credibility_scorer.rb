@@ -114,7 +114,7 @@ class CredibilityScorer
     badges += [:user_supporter] if user.payments.any?
     badges += [:long_time_user] if user.created_at < Time.current - 2.years
     badges += [:user_connected_to_strava] if user.integrations.strava.any?
-    badges += [:user_verified_phone] if user.user_phones.confirmed.any?
+    badges += [:user_verified_phone] if user.phone_confirmed?
     # Don't mark suspicious if we trust them
     unless (badges & %i[user_trusted_organization_member]).any?
       badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }

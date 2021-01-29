@@ -619,6 +619,29 @@ RSpec.describe BParam, type: :model do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.id).to be_blank
     end
+    context "status abandoned" do
+      let(:b_param_params) { {bike: {status: "status_abandoned"}} }
+      it "is stolen" do
+        expect(b_param.status).to eq "status_abandoned"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(bike.id).to be_blank
+        impound_record = bike.impound_records.last
+        expect(impound_record).to be_present
+        expect(impound_record.kind).to eq "found"
+        expect(bike.status_humanized).to eq "found"
+      end
+    end
+    context "legacy_stolen" do
+      let(:b_param_params) { {bike: {stolen: true}} }
+      it "is stolen" do
+        expect(b_param).to be_valid
+        expect(b_param.status).to eq "status_stolen"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.id).to be_blank
+        expect(bike.stolen_records.last).to be_present
+      end
+    end
     context "with id" do
       let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
       it "includes ID" do
@@ -641,24 +664,9 @@ RSpec.describe BParam, type: :model do
           expect(bike.b_param_id).to eq b_param.id
           expect(bike.b_param_id_token).to eq b_param.id_token
           expect(bike.creator).to eq b_param.creator
-          stolen_record = bike.stolen_records.first
+          stolen_record = bike.stolen_records.last
           expect(stolen_record).to be_present
           expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
-        end
-      end
-      context "legacy_stolen" do
-        let(:b_param_params) { {bike: {stolen: true}} }
-        it "is stolen" do
-          expect(b_param).to be_valid
-          expect(b_param.status).to eq "status_stolen"
-          expect(b_param.stolen_attrs).to be_blank
-          expect(bike.status).to eq "status_stolen"
-          expect(bike.id).to be_blank
-          expect(bike.b_param_id).to eq b_param.id
-          expect(bike.b_param_id_token).to eq b_param.id_token
-          expect(bike.creator).to eq b_param.creator
-          stolen_record = bike.stolen_records.first
-          expect(stolen_record).to be_present
         end
       end
     end

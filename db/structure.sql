@@ -1329,7 +1329,16 @@ CREATE TABLE public.impound_records (
     updated_at timestamp without time zone NOT NULL,
     display_id bigint,
     status integer DEFAULT 0,
-    location_id bigint
+    location_id bigint,
+    impounded_at timestamp without time zone,
+    latitude double precision,
+    longitude double precision,
+    street text,
+    zipcode text,
+    city text,
+    neighborhood text,
+    country_id bigint,
+    state_id bigint
 );
 
 
@@ -4363,6 +4372,13 @@ CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING bt
 
 
 --
+-- Name: index_impound_records_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_country_id ON public.impound_records USING btree (country_id);
+
+
+--
 -- Name: index_impound_records_on_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4374,6 +4390,13 @@ CREATE INDEX index_impound_records_on_location_id ON public.impound_records USIN
 --
 
 CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
+
+
+--
+-- Name: index_impound_records_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_state_id ON public.impound_records USING btree (state_id);
 
 
 --
@@ -5347,6 +5370,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210114030113'),
 ('20210120162658'),
 ('20210127173741'),
-('20210127191226');
+('20210127191226'),
+('20210129214432');
 
 

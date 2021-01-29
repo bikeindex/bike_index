@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
+  it_behaves_like "geocodeable"
   let!(:bike) { FactoryBot.create(:bike) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
@@ -23,10 +24,12 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(Bike.impounded.pluck(:id)).to eq([bike.id])
       expect(organization.impound_records.bikes.pluck(:id)).to eq([bike.id])
       expect(impound_record.kind).to eq "impounded"
+      expect(impound_record.impounded_at).to be_within(1).of impound_record.created_at
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
       it "errors" do
+        expect(impound_record.to_coordinates).to eq([nil, nil])
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.impound_records.count).to eq 1
@@ -86,6 +89,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
+          expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
           Sidekiq::Worker.clear_all

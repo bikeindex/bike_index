@@ -486,8 +486,8 @@ RSpec.describe BikesController, type: :request do
         expect(assigns(:b_param).revised_new?).to be_truthy
         bike = assigns(:bike)
         expect(bike.status).to eq "status_stolen"
-        expect(bike.stolen_records.first).to be_present
-        expect(bike.stolen_records.first.country_id).to eq Country.united_states.id
+        expect(bike.stolen_records.last).to be_present
+        expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
         expect(response).to render_template(:new)
       end
       it "renders a new stolen bike from status" do
@@ -497,8 +497,8 @@ RSpec.describe BikesController, type: :request do
         expect(response.code).to eq("200")
         bike = assigns(:bike)
         expect(bike.status_humanized).to eq "stolen"
-        expect(bike.stolen_records.first).to be_present
-        expect(bike.stolen_records.first.country_id).to eq country.id
+        expect(bike.stolen_records.last).to be_present
+        expect(bike.stolen_records.last.country_id).to eq country.id
         expect(response).to render_template(:new)
       end
     end

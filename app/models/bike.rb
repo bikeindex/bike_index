@@ -343,7 +343,11 @@ class Bike < ApplicationRecord
   end
 
   def status_humanized
-    self.class.status_humanized(status)
+    shuman = self.class.status_humanized(status)
+    if shuman == "abandoned"
+      found_override = id.present? ? current_impound_record&.kind : impound_records.last&.kind
+    end
+    found_override || shuman
   end
 
   # Small helper because we call this a lot
@@ -523,6 +527,17 @@ class Bike < ApplicationRecord
   end
 
   def build_new_stolen_record(new_attrs = {})
+    country_id = creator&.country_id || Country.united_states&.id
+    new_stolen_record = stolen_records
+      .build({country_id: country_id, phone: phone, current: true}.merge(new_attrs))
+    new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
+    if created_at.blank? || created_at > Time.current - 1.day
+      new_stolen_record.creation_organization_id = creation_organization_id
+    end
+    new_stolen_record
+  end
+
+  def build_new_impound_record(new_attrs = {})
     country_id = creator&.country_id || Country.united_states&.id
     new_stolen_record = stolen_records
       .build({country_id: country_id, phone: phone, current: true}.merge(new_attrs))
