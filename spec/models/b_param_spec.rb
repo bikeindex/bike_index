@@ -593,12 +593,12 @@ RSpec.describe BParam, type: :model do
       end
       context "status passed" do
         it "is stolen if passed stolen" do
-          bike = BParam.new.build_bike(status_override: "status_stolen")
+          bike = BParam.new.build_bike(status: "status_stolen")
           expect(bike.status).to eq "status_stolen"
         end
         context "status_impounded" do
           it "is status_impounded, ignores is_stolen" do
-            bike = BParam.new.build_bike(status_override: "status_impounded", is_stolen: true)
+            bike = BParam.new.build_bike(status: "status_impounded", is_stolen: true)
             expect(bike.status).to eq "status_impounded"
           end
         end

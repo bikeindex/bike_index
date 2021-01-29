@@ -125,7 +125,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    s_attrs
+    s_attrs.except("phone_no_show")
   end
 
   def status
@@ -433,9 +433,8 @@ class BParam < ApplicationRecord
   end
 
   # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
-  # We probably want to switch to any override params instead of these two weird things, but 1 step at a time
-  def build_bike(status_override: nil, is_stolen: nil)
-    bike = Bike.new(safe_bike_attrs(status_override, is_stolen))
+  def build_bike(new_attrs = {})
+    bike = Bike.new(safe_bike_attrs(new_attrs))
     # Add a stolen record if there are stolen attrs
     bike.build_new_stolen_record(stolen_attrs) if stolen_attrs.present?
     bike
@@ -443,17 +442,18 @@ class BParam < ApplicationRecord
 
   private
 
-  def safe_bike_attrs(status_override, is_stolen)
-    status_override ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
-    status_override = nil unless Bike.statuses.include?(status)
+  # Two things are expected to be passed in here that aren't status_override: nil, is_stolen: nil
+  def safe_bike_attrs(new_attrs)
+    new_attrs["status"] ||= "status_stolen" if ParamsNormalizer.boolean(new_attrs["is_stolen"])
+    new_attrs.delete("status") unless Bike.statuses.include?(new_attrs["status"])
     # existing bike attrs, overridden with passed attributes
-    bike.select { |k, v| v.present? }
+    bike.merge(new_attrs.except("is_stolen").as_json)
+        .select { |k, v| v.present? }
         .except(*BParam.skipped_bike_attrs)
         .merge("b_param_id" => id,
                "b_param_id_token" => id_token,
                "creator_id" => creator_id,
-               "updator_id" => creator_id,
-               "status" => status_override || status)
+               "updator_id" => creator_id)
         .merge(address_hash)
   end
 

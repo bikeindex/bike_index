@@ -152,11 +152,13 @@ RSpec.describe OrganizationsController, type: :controller do
       let(:b_param) { FactoryBot.create(:b_param, params: b_param_attrs) }
       it "renders" do
         expect(b_param).to be_present
+        b_param.reload
+        expect(b_param.status).to eq "status_stolen"
         get :embed, params: {id: organization.slug, b_param_id_token: b_param.id_token}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
-        pp b_param.bike
+        expect(b_param.status).to eq "status_stolen"
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
         expect(bike.status).to eq "status_stolen"

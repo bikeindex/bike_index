@@ -41,10 +41,12 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@b_param).build_bike
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
-    if params[:non_stolen]
-      @non_stolen = true
-    elsif @bike.status_stolen? || params[:stolen_first]
+
+    if params[:stolen] || params[:stolen_first] || @bike.status_stolen? || @b_param.status == "stolen_stolen"
       @stolen = true
+    else
+      @stolen = false
+      @non_stolen = true if params[:non_stolen]
     end
     render layout: "embed_layout"
   end
@@ -84,8 +86,7 @@ class OrganizationsController < ApplicationController
   end
 
   def built_stolen_record
-    stolen_attrs = @b_param.stolen_attrs.present? ? @b_param.stolen_attrs.except("phone_no_show") : {}
-    @bike.build_new_stolen_record(stolen_attrs)
+    @bike.stolen_records.first || @bike.build_new_stolen_record(@b_param.stolen_attrs)
   end
 
   def built_stolen_record_date(str)
