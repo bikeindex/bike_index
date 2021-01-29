@@ -5437,7 +5437,7 @@ en:
     choose_registration:
       add_a_bike_through: Add a bike through
       add_a_stolen_bike: Add a stolen bike
-      add_a_stolenfound_bike: Add a stolen/found bike you've recovered
+      add_abandoned_bike_you_found: Add an abandoned bike you found
       add_your_own_bike: Add your own bike
       register_bike: Register bike
     goodbye:
