@@ -341,6 +341,10 @@ class User < ApplicationRecord
     user_phones.where(phone: phone).last
   end
 
+  def phone_confirmed?
+    user_phones.confirmed.any?
+  end
+
   def set_calculated_attributes
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)

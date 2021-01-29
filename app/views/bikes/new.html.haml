@@ -84,7 +84,9 @@
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @bike.stolen_or_impounded? || @organization&.include_field_reg_phone?(current_user)
+          -# Show the phone if the bike is stolen, the organization requires phone
+          -# only show the phone for impounded records if the current user doesn't have a confirmed phone
+          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
             .form-group.row.unnested-field
               = f.label :phone,
                 @organization&.registration_field_label("reg_phone") || t(".phone"),
@@ -98,7 +100,7 @@
 
           - if @bike.status_impounded?
             = fields_for @bike.impound_records.last do |srecord|
-              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: srecord.object.kind }
 
           - if @organization&.include_field_reg_address?(current_user)
             .related-fields
