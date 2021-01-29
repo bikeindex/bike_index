@@ -15,7 +15,8 @@
   - if @bike.status_stolen?
     = f.hidden_field :date_stolen, value: Time.current.to_i
 
-  - if @bike.status_abandoned? # TODO after #1875 - probably,
+  -# TODO after #1875 - probably
+  - if @bike.status_abandoned?
     = f.hidden_field :status, value: "status_abandoned"
 
   .form-well-container.container

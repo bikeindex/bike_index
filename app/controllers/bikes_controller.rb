@@ -214,6 +214,9 @@ class BikesController < ApplicationController
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
+        # Sometimes, weird things error. In production, Don't show a 500 page to the user
+        # ... but in testing ordevelopment re-raise error to make stack tracing better
+        raise e unless Rails.env.production?
       end
     end
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
