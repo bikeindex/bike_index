@@ -244,8 +244,8 @@ class BikeCreator
   end
 
   def create_ownership(bike)
-    passed_send_email = @b_param.params.dig("bike", "send_email")
-    send_email = passed_send_email.present? ? ParamsNormalizer.boolean(passed_send_email) : true
+    passed_send_email = @b_param.params.dig("bike", "send_email")&.to_s
+    send_email = passed_send_email.to_s.present? ? ParamsNormalizer.boolean(passed_send_email) : true
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
   end
 

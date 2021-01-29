@@ -414,15 +414,6 @@ RSpec.describe BikeCreator do
     end
   end
 
-  describe "create_normalized_serial_segments" do
-    it "calls create components" do
-      b_param = BParam.new
-      bike = Bike.new
-      expect_any_instance_of(SerialNormalizer).to receive(:save_segments).and_return(true)
-      subject.new(b_param).send("create_normalized_serial_segments", bike)
-    end
-  end
-
   describe "add_other_listings" do
     it "calls create stolen record" do
       b_param = BParam.new
