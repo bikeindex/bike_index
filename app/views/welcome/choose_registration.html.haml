@@ -19,12 +19,12 @@
               = t(".add_your_own_bike")
 
           %li
-            %a.choose-type{data: {target: new_bike_url(stolen: true)}}
+            %a.choose-type{data: {target: new_bike_url(status: "stolen")}}
               %span.add-selected
                 &#10004
               = t(".add_a_stolen_bike")
           %li
-            %a.choose-type{data: {target: new_bike_url(abandoned: true)}}
+            %a.choose-type{data: {target: new_bike_url(status: "impounded")}}
               %span.add-selected
                 &#10004
               = t(".add_abandoned_bike_you_found")

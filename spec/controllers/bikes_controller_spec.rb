@@ -412,13 +412,6 @@ RSpec.describe BikesController, type: :controller do
     context "signed in" do
       include_context :logged_in_as_user
       let(:organization) { FactoryBot.create(:organization) }
-      context "passed stolen param" do
-        it "renders a new stolen bike" do
-          get :new, params: {stolen: true}
-          expect(response.code).to eq("200")
-          expect(assigns(:bike).status).to eq "status_stolen"
-        end
-      end
       context "with organization id" do
         it "renders and assigns creation organization" do
           get :new, params: {organization_id: organization.to_param}
@@ -434,16 +427,6 @@ RSpec.describe BikesController, type: :controller do
           expect(response.code).to eq("200")
           expect(assigns(:bike).creation_organization).to eq organization
           expect(assigns[:passive_organization]).to eq organization
-        end
-      end
-      context "stolen from params" do
-        it "renders a new stolen bike" do
-          get :new, params: {stolen: true}
-          expect(response.code).to eq("200")
-          expect(assigns(:bike).status).to eq "status_stolen"
-          b_param = assigns(:b_param)
-          expect(b_param.revised_new?).to be_truthy
-          expect(response).to render_template(:new)
         end
       end
       context "bike through b_param" do

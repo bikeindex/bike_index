@@ -92,6 +92,7 @@ class Bike < ApplicationRecord
   scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
   scope :not_stolen, -> { where.not(status: "status_stolen") }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
+  scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
   scope :abandoned_or_impounded, -> { where(status: %w[status_abandoned status_impounded]) }
   scope :not_abandoned_or_impounded, -> { where.not(status: %w[status_abandoned status_impounded]) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
@@ -123,6 +124,10 @@ class Bike < ApplicationRecord
   class << self
     def statuses
       STATUS_ENUM.keys.map(&:to_s)
+    end
+
+    def status_humanized(str)
+      str.to_s&.gsub("status_", "").tr("_", " ")
     end
 
     def text_search(query)
@@ -333,6 +338,14 @@ class Bike < ApplicationRecord
     parking_notifications.current.first
   end
 
+  def stolen_or_impounded?
+    %w[status_stolen status_impounded].include?(status)
+  end
+
+  def status_humanized
+    self.class.status_humanized(status)
+  end
+
   # Small helper because we call this a lot
   def type
     cycle_type && cycle_type_name.downcase
@@ -510,11 +523,9 @@ class Bike < ApplicationRecord
   end
 
   def build_new_stolen_record(new_attrs = {})
-    new_stolen_record = stolen_records.build({
-      country_id: Country.united_states&.id,
-      phone: phone,
-      current: true
-    }.merge(new_attrs))
+    country_id = creator&.country_id || Country.united_states&.id
+    new_stolen_record = stolen_records
+      .build({country_id: country_id, phone: phone, current: true}.merge(new_attrs))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id

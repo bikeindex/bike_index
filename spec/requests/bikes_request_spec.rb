@@ -478,7 +478,47 @@ RSpec.describe BikesController, type: :request do
     end
   end
 
-  describe "update token" do
+  describe "new" do
+    context "stolen from params" do
+      it "renders a new stolen bike" do
+        get "#{base_url}/new?stolen=true"
+        expect(response.code).to eq("200")
+        expect(assigns(:b_param).revised_new?).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.stolen_records.first).to be_present
+        expect(bike.stolen_records.first.country_id).to eq Country.united_states.id
+        expect(response).to render_template(:new)
+      end
+      it "renders a new stolen bike from status" do
+        country = FactoryBot.create(:country_canada)
+        current_user.update(country_id: country.id)
+        get "#{base_url}/new?status=stolen"
+        expect(response.code).to eq("200")
+        bike = assigns(:bike)
+        expect(bike.status_humanized).to eq "stolen"
+        expect(bike.stolen_records.first).to be_present
+        expect(bike.stolen_records.first.country_id).to eq country.id
+        expect(response).to render_template(:new)
+      end
+    end
+    context "impounded from params" do
+      it "renders with status" do
+        get "#{base_url}/new?status=impounded"
+        expect(response.code).to eq("200")
+        expect(assigns(:bike).status).to eq "status_impounded"
+        expect(response).to render_template(:new)
+      end
+      it "found is impounded" do
+        get "#{base_url}/new?status=found"
+        expect(response.code).to eq("200")
+        expect(assigns(:bike).status).to eq "status_impounded"
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
+  describe "resolve_token" do
     context "graduated_notification" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
       let!(:bike) { graduated_notification.bike }

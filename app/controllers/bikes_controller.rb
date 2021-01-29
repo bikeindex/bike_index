@@ -110,10 +110,6 @@ class BikesController < ApplicationController
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
-    if @bike.status_stolen?
-      @stolen_record = @bike.stolen_records.build(@b_param.params["stolen_record"])
-      @stolen_record.country_id ||= Country.united_states.id
-    end
     @page_errors = @b_param.bike_errors
   end
 

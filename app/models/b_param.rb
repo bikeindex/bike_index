@@ -84,6 +84,7 @@ class BParam < ApplicationRecord
     status = url_params[:status]
     if status.present?
       status = "status_#{status}" unless status.start_with?("status_")
+      status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
       return {status: status} if Bike.statuses.include?(status)
     end
     return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
@@ -458,7 +459,8 @@ class BParam < ApplicationRecord
 
   def build_bike(new_attrs = {})
     bike = Bike.new(safe_bike_attrs(new_attrs))
-    bike.build_new_stolen_record(stolen_attrs) if status_stolen?
+    # Use bike status because it takes into account new_attrs
+    bike.build_new_stolen_record(stolen_attrs) if bike.status_stolen?
     bike
   end
 

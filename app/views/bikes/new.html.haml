@@ -2,11 +2,12 @@
 - serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link)
 
 .form-well-header.container
-  %h1
+  %h1.uncap
     - if @bike.status_stolen?
       = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
     - else
       = t(".enter_bike_type_details", bike_type: @bike.type)
+    %span.text-warning= @bike.status_humanized
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
@@ -81,7 +82,7 @@
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user)
+          - if @bike.stolen_or_impounded? || @organization&.include_field_reg_phone?(current_user)
             .form-group.row.unnested-field
               = f.label :phone,
                 @organization&.registration_field_label("reg_phone") || t(".phone"),
@@ -90,7 +91,7 @@
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
           - if @bike.status_stolen?
-            = fields_for @stolen_record do |srecord|
+            = fields_for @bike.stolen_records.first do |srecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
           - if @organization&.include_field_reg_address?(current_user)
@@ -160,14 +161,18 @@
                   @organization.organization_affiliation_options,
                   class: "form-control"
 
-          .form-group.row.unnested-field.no-divider-row
-            = f.label :owner_email, class: 'form-well-label'
-            .form-well-input
-              = f.email_field :owner_email,
-                value: @bike.owner_email || current_user&.email,
-                required: true,
-                placeholder: 'required',
-                class: 'form-control'
+          -# With impounded and found bikes, including owner_email is confusing
+          - if @bike.status_impounded?
+            = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email
+          - else
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :owner_email, class: 'form-well-label'
+              .form-well-input
+                = f.email_field :owner_email,
+                  value: @bike.owner_email || current_user&.email,
+                  required: true,
+                  placeholder: 'required',
+                  class: 'form-control'
 
       .new-bike-submit-wrapper
         = submit_tag t(".register"), class: 'btn btn-lg btn-primary'

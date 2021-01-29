@@ -601,6 +601,13 @@ RSpec.describe BParam, type: :model do
           expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
         end
       end
+      context "found" do
+        let(:url_params) { ActionController::Parameters.new({status: "found"}) }
+        it "returns impounded" do
+          expect(BParam.bike_attrs_from_url_params(status: "found")).to eq({status: "status_impounded"})
+          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
+        end
+      end
     end
   end
 
