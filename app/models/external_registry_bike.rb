@@ -10,7 +10,9 @@ class ExternalRegistryBike < ApplicationRecord
 
   validates :external_id, uniqueness: {scope: :type}
 
-  before_validation :normalize_serial_number
+  before_validation :set_calculated_attributes
+
+  enum status: Bike::STATUS_ENUM
 
   class << self
     def find_or_search_registry_for(serial_number:)
@@ -25,6 +27,17 @@ class ExternalRegistryBike < ApplicationRecord
       return exact_matches if exact_matches.any?
 
       matches
+    end
+
+    # These are the currently known statuses
+    def status_converter(status)
+      case status.downcase
+      when "stolen" then "status_stolen"
+      when "abandoned" then "status_abandoned"
+      when "transferred", "registered", "pending transfer" then "status_with_owner"
+      else # There is a new status! Fail, we need to figure out what to do with it
+        raise "Uknown external registry status: #{status}"
+      end
     end
 
     private
@@ -48,8 +61,10 @@ class ExternalRegistryBike < ApplicationRecord
     self[:frame_colors]&.split(/\s*,\s*/) || []
   end
 
-  def stolen?
-    status&.downcase == "stolen"
+  # Statuses that come in are: transferred, abandoned, registered, pending transfer, stolen
+  # TODO: make them align with the bike statuses
+  def status_stolen?
+    status&.downcase.match?("stolen")
   end
 
   def title_string
@@ -75,7 +90,8 @@ class ExternalRegistryBike < ApplicationRecord
 
   private
 
-  def normalize_serial_number
+  def set_calculated_attributes
+    self.status ||= "status_with_owner"
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
   end
 end

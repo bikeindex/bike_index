@@ -34,7 +34,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
       )
 
       bike.cycle_type = "bike"
-      bike.status = "abandoned"
+      bike.status = "status_abandoned"
       bike.country = Country.netherlands
       bike.description = description
       bike.frame_model = attrs["SubCategory"].presence

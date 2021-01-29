@@ -21,7 +21,7 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
       expect(bike.type).to eq(described_class.to_s)
       expect(bike.external_id).to eq(bike_json["id"].to_s)
       expect(bike.serial_number).to eq(bike_json["serial_number"].to_s)
-      expect(bike.status).to eq(bike_json["status"].downcase)
+      expect(bike.status).to eq "status_stolen"
       expect(bike.frame_model).to eq(bike_json["model_string"])
       expect(bike.date_stolen).to eq(bike_json.dig("active_incident", "last_seen"))
       expect(bike.location_found).to eq(bike_json.dig("active_incident", "location_address"))

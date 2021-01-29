@@ -23,7 +23,7 @@ class ExternalRegistryBike::StopHelingBike < ExternalRegistryBike
       )
 
       bike.cycle_type = "bike"
-      bike.status = "stolen"
+      bike.status = "status_stolen" # No need for converter, they all come in as stolen
       bike.country = Country.netherlands
 
       bike.frame_colors = colors(attrs[:color])

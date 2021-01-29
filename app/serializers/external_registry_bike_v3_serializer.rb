@@ -9,8 +9,8 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
     to: :object,
     allow_nil: true
 
-  def stolen
-    object.status_stolen?
+  def status
+    object.status.gsub(/status_/, "")
   end
 
   def serial

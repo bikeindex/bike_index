@@ -176,9 +176,27 @@ class BikeCreator
     attrs
   end
 
-  # Previously in BikeCreatorVerifier - but that was trashed, so now it's just here
+  def verify(bike)
+    bike = check_organization(bike)
+    check_example(bike)
+  end
+
+  # Previously in BikeCreatorOrganizer - but that was trashed, so now it's just here
   def check_organization(bike)
-    BikeCreatorOrganizer.new(@b_param, bike).organized_bike
+    organization_id = @b_param.params.dig("creation_organization_id").presence ||
+      @b_param.params.dig("bike", "creation_organization_id")
+    organization = Organization.friendly_find(organization_id)
+    if organization.present? && !organization.suspended?
+      bike.creation_organization_id = organization.id
+      bike.creator_id ||= organization.auto_user_id
+    else
+      if organization&.suspended?
+        bike.errors.add(:creation_organization, "Oh no! #{organization.name} is currently suspended. Contact us if this is a surprise.")
+      end
+      # Since there wasn't a valid organization, blank the organization
+      bike.creation_organization_id = nil
+    end
+    bike
   end
 
   def check_example(bike)
@@ -190,10 +208,5 @@ class BikeCreator
       bike.example = false
     end
     bike
-  end
-
-  def verify(bike)
-    check_organization(bike)
-    check_example(bike)
   end
 end

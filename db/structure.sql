@@ -925,10 +925,11 @@ CREATE TABLE public.external_registry_bikes (
     frame_model character varying,
     location_found character varying,
     mnfg_name character varying,
-    status character varying,
+    old_status character varying,
     info_hash jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    status integer
 );
 
 
