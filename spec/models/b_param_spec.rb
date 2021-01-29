@@ -107,30 +107,6 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  # Honestly, I'm not sure this is entirely legitimate
-  describe "bike_from_attrs" do
-    it "is stolen if it is stolen" do
-      bike = BParam.new.bike_from_attrs(is_stolen: "1")
-      expect(bike.status).to eq "status_stolen"
-    end
-    it "is not stolen if param is falsey" do
-      bike = BParam.new.bike_from_attrs(is_stolen: "0")
-      expect(bike.status).to eq "status_with_owner"
-    end
-    context "status passed" do
-      it "is stolen if passed stolen" do
-        bike = BParam.new.bike_from_attrs(status: "status_stolen")
-        expect(bike.status).to eq "status_stolen"
-      end
-      context "status_impounded" do
-        it "is status_impounded, ignores is_stolen" do
-          bike = BParam.new.bike_from_attrs(status: "status_impounded", is_stolen: true)
-          expect(bike.status).to eq "status_impounded"
-        end
-      end
-    end
-  end
-
   describe "set_foreign_keys" do
     it "calls set_foreign_keys" do
       bike = {
@@ -568,6 +544,64 @@ RSpec.describe BParam, type: :model do
           bike: {owner_email: "something@stuff.com"}.with_indifferent_access
         }, bike_errors: ["Some error"])
         expect(b_param.display_email?).to be_truthy
+      end
+    end
+  end
+
+  describe "build_bike" do
+    let(:b_param_params) { {} }
+    let(:b_param) { BParam.new(params: b_param_params) }
+    let(:bike) { b_param.build_bike }
+    it "builds it" do
+      expect(bike.status).to eq "status_with_owner"
+      expect(bike.id).to be_blank
+    end
+    context "with id" do
+      let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
+      it "includes ID" do
+        expect(b_param).to be_valid
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.id).to be_blank
+        expect(bike.b_param_id).to eq b_param.id
+        expect(bike.b_param_id_token).to eq b_param.id_token
+        expect(bike.creator).to eq b_param.creator
+      end
+      context "stolen" do
+        let(:b_param_params) { {stolen_record: {phone: "7183839292"}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.b_param_id).to eq b_param.id
+          expect(bike.b_param_id_token).to eq b_param.id_token
+          expect(bike.creator).to eq b_param.creator
+          stolen_record = bike.stolen_records.first
+          expect(stolen_record).to be_present
+          expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
+        end
+      end
+    end
+    context "status overrides" do
+      it "is stolen if it is stolen" do
+        bike = BParam.new.build_bike(is_stolen: "1")
+        expect(bike.status).to eq "status_stolen"
+      end
+      it "is not stolen if param is falsey" do
+        bike = BParam.new.build_bike(is_stolen: "0")
+        expect(bike.status).to eq "status_with_owner"
+      end
+      context "status passed" do
+        it "is stolen if passed stolen" do
+          bike = BParam.new.build_bike(status_override: "status_stolen")
+          expect(bike.status).to eq "status_stolen"
+        end
+        context "status_impounded" do
+          it "is status_impounded, ignores is_stolen" do
+            bike = BParam.new.build_bike(status_override: "status_impounded", is_stolen: true)
+            expect(bike.status).to eq "status_impounded"
+          end
+        end
       end
     end
   end

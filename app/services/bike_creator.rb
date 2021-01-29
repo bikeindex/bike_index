@@ -6,18 +6,23 @@ class BikeCreator
   end
 
   def build_bike
-    bike_attrs =
-      @b_param
-        .bike
-        .map { |k, v| [k, v.presence] }
-        .to_h
-        .except(*BParam.skipped_bike_attrs)
-    bike = Bike.new(bike_attrs)
-    bike.attributes = @b_param.address_hash
-    bike.b_param_id = @b_param.id
-    bike.b_param_id_token = @b_param.id_token
-    bike.creator_id = @b_param.creator_id
-    bike.updator_id = bike.creator_id
+    # TODO after #1875 remove, I don't think it's necessary
+    # bike_attrs =
+    #   @b_param
+    #     .bike
+    #     .map { |k, v| [k, v.presence] }
+    #     .to_h
+    #     .except(*BParam.skipped_bike_attrs)
+    # bike = Bike.new(bike_attrs)
+    # bike.attributes = @b_param.address_hash
+    # bike.b_param_id = @b_param.id
+    # bike.b_param_id_token = @b_param.id_token
+    # bike.creator_id = @b_param.creator_id
+    # bike.updator_id = bike.creator_id
+    # bike = BikeCreatorVerifier.new(@b_param, bike).verify
+    # bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
+    # bike = add_required_attributes(bike)
+    bike = @b_param.build_bike
     bike = BikeCreatorVerifier.new(@b_param, bike).verify
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
@@ -88,8 +93,9 @@ class BikeCreator
     bike.ownerships.destroy_all
     bike.creation_states.destroy_all
     bike.destroy
+    # TODO after #1875 remove, I don't think it's necessary
     # override the validated bike status with the status from b_param
-    @bike.status = @b_param.status if @b_param.present?
+    # @bike.status = @b_param.status if @b_param.present?
     @bike
   end
 

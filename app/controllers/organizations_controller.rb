@@ -84,12 +84,8 @@ class OrganizationsController < ApplicationController
   end
 
   def built_stolen_record
-    stolen_attrs = if @b_param.params && @b_param.params["stolen_record"].present?
-      @b_param.params["stolen_record"].except("phone_no_show")
-    else
-      {country_id: Country.united_states.id, date_stolen: Time.current}
-    end
-    @bike.stolen_records.build(stolen_attrs)
+    stolen_attrs = @b_param.stolen_attrs.present? ? @b_param.stolen_attrs.except("phone_no_show") : {}
+    @bike.build_new_stolen_record(stolen_attrs)
   end
 
   def built_stolen_record_date(str)

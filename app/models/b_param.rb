@@ -65,15 +65,9 @@ class BParam < ApplicationRecord
       .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
   end
 
-  def self.assignable_attrs
-    %w[manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-      serial_number made_without_serial
-      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id]
-  end
-
   # Attrs that need to be skipped on bike assignment
   def self.skipped_bike_attrs
-    # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them
+    # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
     %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
       stolen abandoned
       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
@@ -438,19 +432,28 @@ class BParam < ApplicationRecord
     formatted_address
   end
 
-  # updated in #1875
-  def bike_from_attrs(status: nil, is_stolen: nil)
-    # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
-    status ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
-    status ||= Bike.statuses.first unless Bike.statuses.include?(status)
-    Bike.new(safe_bike_attrs("status" => status, "b_param_id" => id, "creator_id" => creator_id).as_json)
+  # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
+  def build_bike(status_override: nil, is_stolen: nil)
+    bike = Bike.new(safe_bike_attrs(status_override, is_stolen))
+    # Add a stolen record if there are stolen attrs
+    bike.build_new_stolen_record(stolen_attrs) if stolen_attrs.present?
+    bike
   end
 
   private
 
-  def safe_bike_attrs(param_overrides)
+  def safe_bike_attrs(status_override, is_stolen)
+    status_override ||= "status_stolen" if ParamsNormalizer.boolean(is_stolen)
+    status_override = nil unless Bike.statuses.include?(status)
     # existing bike attrs, overridden with passed attributes
-    bike.select { |k, v| self.class.assignable_attrs.include?(k.to_s) }.merge(param_overrides)
+    bike.select { |k, v| v.present? }
+        .except(*BParam.skipped_bike_attrs)
+        .merge("b_param_id" => id,
+               "b_param_id_token" => id_token,
+               "creator_id" => creator_id,
+               "updator_id" => creator_id,
+               "status" => status_override || status)
+        .merge(address_hash)
   end
 
   def process_image_if_required

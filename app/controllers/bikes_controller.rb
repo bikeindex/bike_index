@@ -106,7 +106,7 @@ class BikesController < ApplicationController
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.bike_from_attrs(status: params[:status], is_stolen: params[:stolen])
+    @bike ||= @b_param.build_bike(status_override: params[:status], is_stolen: params[:stolen])
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
