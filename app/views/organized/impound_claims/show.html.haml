@@ -36,7 +36,7 @@
         %tr
           %td Verified phone?
           %td
-            = check_mark if @impound_claim.user.phones_confirmed?
+            = check_mark if @impound_claim.user.phone_confirmed?
         - if @bike_submitting.present?
           %tr
             %td Bike

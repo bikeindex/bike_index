@@ -619,20 +619,34 @@ RSpec.describe BParam, type: :model do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.id).to be_blank
     end
-    context "status abandoned" do
-      let(:b_param_params) { {bike: {status: "status_abandoned"}} }
-      it "is stolen" do
-        expect(b_param.status).to eq "status_abandoned"
-        expect(b_param.stolen_attrs).to be_blank
+    context "status impounded" do
+      let(:b_param_params) { {bike: {status: "status_impounded"}} }
+      it "is abandoned" do
+        expect(b_param.status).to eq "status_impounded"
+        expect(b_param.impound_attrs).to be_blank
         expect(bike.id).to be_blank
         impound_record = bike.impound_records.last
         expect(impound_record).to be_present
         expect(impound_record.kind).to eq "found"
         expect(bike.status_humanized).to eq "found"
       end
+      context "with impound attrs" do
+        let(:time) { Time.current - 12.hours }
+        let(:b_param_params) { {bike: {status: "status_with_owner"}, impound_record: {impounded_at: time}} }
+        it "is abandoned" do
+          expect(b_param.status).to eq "status_impounded"
+          expect(b_param.impound_attrs).to be_present
+          expect(bike.id).to be_blank
+          impound_record = bike.impound_records.last
+          expect(impound_record).to be_present
+          expect(impound_record.kind).to eq "found"
+          expect(impound_record.impounded_at).to be_within(1).of time
+          expect(bike.status_humanized).to eq "found"
+        end
+      end
     end
-    context "legacy_stolen" do
-      let(:b_param_params) { {bike: {stolen: true}} }
+    context "status stolen" do
+      let(:b_param_params) { {bike: {status: "status_stolen"}} }
       it "is stolen" do
         expect(b_param).to be_valid
         expect(b_param.status).to eq "status_stolen"
@@ -640,6 +654,17 @@ RSpec.describe BParam, type: :model do
         expect(bike.status).to eq "status_stolen"
         expect(bike.id).to be_blank
         expect(bike.stolen_records.last).to be_present
+      end
+      context "legacy_stolen" do
+        let(:b_param_params) { {bike: {stolen: true}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.stolen_records.last).to be_present
+        end
       end
     end
     context "with id" do
