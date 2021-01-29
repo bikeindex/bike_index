@@ -416,7 +416,7 @@ RSpec.describe BikesController, type: :controller do
         it "renders a new stolen bike" do
           get :new, params: {stolen: true}
           expect(response.code).to eq("200")
-          expect(assigns(:bike).stolen).to be_truthy
+          expect(assigns(:bike).status).to eq "status_stolen"
         end
       end
       context "with organization id" do
@@ -440,7 +440,7 @@ RSpec.describe BikesController, type: :controller do
         it "renders a new stolen bike" do
           get :new, params: {stolen: true}
           expect(response.code).to eq("200")
-          expect(assigns(:bike).stolen).to be_truthy
+          expect(assigns(:bike).status).to eq "status_stolen"
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_truthy
           expect(response).to render_template(:new)

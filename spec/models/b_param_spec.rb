@@ -548,6 +548,62 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "bike_attrs_from_url_params" do
+    it "returns empty" do
+      expect(BParam.bike_attrs_from_url_params).to eq({})
+      expect(BParam.bike_attrs_from_url_params(status: "asdfasdfasdfasdf")).to eq({})
+      expect(BParam.bike_attrs_from_url_params(status: "status_party")).to eq({})
+    end
+    context "url_params" do
+      let(:url_params) { ActionController::Parameters.new({status: nil}) }
+      it "returns status_stolen" do
+        expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({})
+        expect(BParam.bike_attrs_from_url_params(url_params.permit(:stolen).to_h)).to eq({})
+      end
+    end
+    context "stolen falsey" do
+      it "returns empty" do
+        expect(BParam.bike_attrs_from_url_params(stolen: nil)).to eq({})
+        expect(BParam.bike_attrs_from_url_params(stolen: "false")).to eq({})
+        expect(BParam.bike_attrs_from_url_params(stolen: 0)).to eq({})
+      end
+    end
+    context "stolen truthy" do
+      it "returns stolen" do
+        expect(BParam.bike_attrs_from_url_params(stolen: true)).to eq({status: "status_stolen"})
+        expect(BParam.bike_attrs_from_url_params(stolen: "true")).to eq({status: "status_stolen"})
+        expect(BParam.bike_attrs_from_url_params(stolen: 1)).to eq({status: "status_stolen"})
+      end
+    end
+    context "status_stolen" do
+      it "returns stolen" do
+        expect(BParam.bike_attrs_from_url_params(status: "status_stolen")).to eq({status: "status_stolen"})
+        expect(BParam.bike_attrs_from_url_params(status: "stolen")).to eq({status: "status_stolen"})
+        expect(BParam.bike_attrs_from_url_params(status: "stolen", stolen: nil)).to eq({status: "status_stolen"})
+      end
+      context "url_params" do
+        let(:url_params) { ActionController::Parameters.new({status: nil, stolen: true}) }
+        it "returns status_stolen" do
+          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_stolen"})
+        end
+      end
+    end
+    context "status_impounded" do
+      it "returns impounded" do
+        expect(BParam.bike_attrs_from_url_params(status: "status_impounded")).to eq({status: "status_impounded"})
+        expect(BParam.bike_attrs_from_url_params(status: "impounded")).to eq({status: "status_impounded"})
+        expect(BParam.bike_attrs_from_url_params(status: "impounded", stolen: "1")).to eq({status: "status_impounded"})
+      end
+      context "url_params" do
+        let(:url_params) { ActionController::Parameters.new({status: "impounded", stolen: "1"}) }
+        it "returns impounded" do
+          # Make sure slice works
+          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
+        end
+      end
+    end
+  end
+
   describe "build_bike" do
     let(:b_param_params) { {} }
     let(:b_param) { BParam.new(params: b_param_params) }
@@ -571,6 +627,7 @@ RSpec.describe BParam, type: :model do
         it "is stolen" do
           expect(b_param).to be_valid
           expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to eq b_param_params[:stolen_record].as_json
           expect(bike.status).to eq "status_stolen"
           expect(bike.id).to be_blank
           expect(bike.b_param_id).to eq b_param.id
@@ -584,24 +641,12 @@ RSpec.describe BParam, type: :model do
     end
     context "status overrides" do
       it "is stolen if it is stolen" do
-        bike = BParam.new.build_bike(is_stolen: "1")
+        bike = BParam.new.build_bike(status: "status_stolen")
         expect(bike.status).to eq "status_stolen"
       end
-      it "is not stolen if param is falsey" do
-        bike = BParam.new.build_bike(is_stolen: "0")
-        expect(bike.status).to eq "status_with_owner"
-      end
-      context "status passed" do
-        it "is stolen if passed stolen" do
-          bike = BParam.new.build_bike(status: "status_stolen")
-          expect(bike.status).to eq "status_stolen"
-        end
-        context "status_impounded" do
-          it "is status_impounded, ignores is_stolen" do
-            bike = BParam.new.build_bike(status: "status_impounded", is_stolen: true)
-            expect(bike.status).to eq "status_impounded"
-          end
-        end
+      it "impounded if status_impounded" do
+        bike = BParam.new.build_bike(status: "status_impounded")
+        expect(bike.status).to eq "status_impounded"
       end
     end
   end

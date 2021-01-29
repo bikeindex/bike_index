@@ -37,17 +37,13 @@ class OrganizationsController < ApplicationController
     end
   end
 
+  # previously accepted stolen_first=true as a parameter.
+  # Stopped accepting in PR#1875, because consistency, use stolen=true instead
   def embed
     @bike = BikeCreator.new(@b_param).build_bike
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
-
-    if params[:stolen] || params[:stolen_first] || @bike.status_stolen? || @b_param.status == "stolen_stolen"
-      @stolen = true
-    else
-      @stolen = false
-      @non_stolen = true if params[:non_stolen]
-    end
+    @stolen = @bike.status_stolen?
     render layout: "embed_layout"
   end
 
@@ -80,7 +76,7 @@ class OrganizationsController < ApplicationController
       @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: {status: (ParamsNormalizer.boolean(params[:stolen]) ? "status_stolen" : "status_with_owner")}
+        bike: BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)
       })
     end
   end

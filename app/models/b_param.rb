@@ -78,6 +78,18 @@ class BParam < ApplicationRecord
     where("email ilike ?", "%#{str.strip}%")
   end
 
+  # There are URLs out there with stolen=true, and will be forever - so lean in
+  # Keywords are - :status, :stolen
+  def self.bike_attrs_from_url_params(url_params = {})
+    status = url_params[:status]
+    if status.present?
+      status = "status_#{status}" unless status.start_with?("status_")
+      return {status: status} if Bike.statuses.include?(status)
+    end
+    return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
+    {}
+  end
+
   # Crazy new shit
   def manufacturer_id=(val)
     params["bike"]["manufacturer_id"] = val
@@ -129,9 +141,8 @@ class BParam < ApplicationRecord
   end
 
   def status
-    return "status_stolen" if stolen_attrs.present?
-    return "status_abandoned" if bike["status"] == "status_abandoned" # lol, TODO after #1875
-    "status_with_owner"
+    return bike["status"] if Bike.statuses.include?(bike["status"])
+    stolen_attrs.present? ? "status_stolen" : "status_with_owner"
   end
 
   def status_abandoned?
@@ -432,7 +443,6 @@ class BParam < ApplicationRecord
     formatted_address
   end
 
-  # No longer using is_stolen, but still support it because there are URLs out there with stolen=true
   def build_bike(new_attrs = {})
     bike = Bike.new(safe_bike_attrs(new_attrs))
     # Add a stolen record if there are stolen attrs
@@ -442,12 +452,9 @@ class BParam < ApplicationRecord
 
   private
 
-  # Two things are expected to be passed in here that aren't status_override: nil, is_stolen: nil
   def safe_bike_attrs(new_attrs)
-    new_attrs["status"] ||= "status_stolen" if ParamsNormalizer.boolean(new_attrs["is_stolen"])
-    new_attrs.delete("status") unless Bike.statuses.include?(new_attrs["status"])
     # existing bike attrs, overridden with passed attributes
-    bike.merge(new_attrs.except("is_stolen").as_json)
+    bike.merge(status: status).merge(new_attrs.as_json)
         .select { |k, v| v.present? }
         .except(*BParam.skipped_bike_attrs)
         .merge("b_param_id" => id,

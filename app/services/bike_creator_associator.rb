@@ -3,6 +3,36 @@ class BikeCreatorAssociator
     @b_param = b_param
   end
 
+  def associate(bike)
+    begin
+      ownership = create_ownership(bike)
+      create_components(bike)
+      create_normalized_serial_segments(bike)
+      assign_user_attributes(bike, ownership&.user)
+      StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
+      create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
+      attach_photo(bike)
+      attach_photos(bike)
+      add_other_listings(bike)
+      bike.reload.save
+    rescue => e
+      bike.errors.add(:association_error, e.message)
+    end
+    bike
+  end
+
+  # Called from ImageAssociatorWorker
+  def attach_photo(bike)
+    return true unless @b_param.image.present?
+    public_image = PublicImage.new(image: @b_param.image)
+    public_image.imageable = bike
+    public_image.save
+    @b_param.update_attributes(image_processed: true)
+    bike.reload
+  end
+
+  private
+
   def create_ownership(bike)
     passed_send_email = @b_param.params.dig("bike", "send_email")
     send_email = if passed_send_email == false || passed_send_email.present? && passed_send_email.to_s[/false/i]
@@ -40,15 +70,6 @@ class BikeCreatorAssociator
     bike.create_normalized_serial_segments
   end
 
-  def attach_photo(bike)
-    return true unless @b_param.image.present?
-    public_image = PublicImage.new(image: @b_param.image)
-    public_image.imageable = bike
-    public_image.save
-    @b_param.update_attributes(image_processed: true)
-    bike.reload
-  end
-
   def attach_photos(bike)
     return nil unless @b_param.params["photos"].present?
     photos = @b_param.params["photos"].uniq.take(7)
@@ -61,21 +82,4 @@ class BikeCreatorAssociator
     urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 
-  def associate(bike)
-    begin
-      ownership = create_ownership(bike)
-      create_components(bike)
-      create_normalized_serial_segments(bike)
-      assign_user_attributes(bike, ownership&.user)
-      StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
-      create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
-      attach_photo(bike)
-      attach_photos(bike)
-      add_other_listings(bike)
-      bike.reload.save
-    rescue => e
-      bike.errors.add(:association_error, e.message)
-    end
-    bike
-  end
 end

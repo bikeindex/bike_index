@@ -10,7 +10,7 @@ RSpec.describe BikeCreatorAssociator do
       allow(b_param).to receive(:params).and_return({bike: bike}.as_json)
       allow(b_param).to receive(:creator).and_return("creator")
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      subject.new(b_param).create_ownership(bike)
+      subject.new(b_param).send("create_ownership", bike)
     end
     it "calls create ownership with send_email false if b_param has that" do
       b_param = BParam.new
@@ -18,16 +18,7 @@ RSpec.describe BikeCreatorAssociator do
       allow(b_param).to receive(:params).and_return({bike: {send_email: false}}.as_json)
       allow(b_param).to receive(:creator).and_return("creator")
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      subject.new(b_param).create_ownership(bike)
-    end
-  end
-
-  describe "create_components" do
-    it "calls create components" do
-      b_param = BParam.new
-      bike = Bike.new
-      expect_any_instance_of(ComponentCreator).to receive(:create_components_from_params).and_return(true)
-      subject.new(b_param).create_components(bike)
+      subject.new(b_param).send("create_ownership", bike)
     end
   end
 
@@ -36,7 +27,7 @@ RSpec.describe BikeCreatorAssociator do
       b_param = BParam.new
       bike = Bike.new
       expect_any_instance_of(SerialNormalizer).to receive(:save_segments).and_return(true)
-      subject.new(b_param).create_normalized_serial_segments(bike)
+      subject.new(b_param).send("create_normalized_serial_segments", bike)
     end
   end
 
@@ -46,7 +37,7 @@ RSpec.describe BikeCreatorAssociator do
       bike = FactoryBot.create(:bike)
       urls = ["http://some_blog.com", "http://some_thing.com"]
       allow(b_param).to receive(:params).and_return({bike: {other_listing_urls: urls}}.as_json)
-      subject.new(b_param).add_other_listings(bike)
+      subject.new(b_param).send("add_other_listings", bike)
       expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
     end
   end
@@ -81,14 +72,14 @@ RSpec.describe BikeCreatorAssociator do
     let(:bike) { Bike.new(phone: "699.999.9999") }
     before { allow(bike).to receive(:user) { user } }
     it "sets the owner's phone if one is passed in" do
-      instance.assign_user_attributes(bike)
+      instance.send("assign_user_attributes", bike)
       user.reload
       expect(user.phone).to eq("6999999999")
     end
     context "user already has a phone" do
       let(:user) { FactoryBot.create(:user, phone: "0000000000") }
       it "does not set the phone if the user already has a phone" do
-        instance.assign_user_attributes(bike)
+        instance.send("assign_user_attributes", bike)
         user.reload
         expect(user.phone).to eq("0000000000")
       end
