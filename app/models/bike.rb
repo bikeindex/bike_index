@@ -121,23 +121,6 @@ class Bike < ApplicationRecord
     using: {tsearch: {dictionary: "english", prefix: true}}
 
   class << self
-    def old_attr_accessible
-      (%w[manufacturer_id manufacturer_other serial_number
-        serial_normalized made_without_serial extra_registration_number
-        creation_organization_id manufacturer year thumb_path name
-        current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-        handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
-        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type street zipcode country_id state_id city belt_drive
-        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-        timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
-        stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
-        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids].map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
-                                                                                                                     components_attributes: Component.old_attr_accessible]).freeze
-    end
-
     def statuses
       STATUS_ENUM.keys.map(&:to_s)
     end
@@ -364,7 +347,7 @@ class Bike < ApplicationRecord
   end
 
   def serial_display
-    return "Hidden" if abandoned || status_impounded?
+    return "Hidden" if status_abandoned? || status_impounded?
     return serial_number.humanize if no_serial?
     serial_number
   end
@@ -474,14 +457,14 @@ class Bike < ApplicationRecord
 
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
-    return true if stolen? && current_stolen_record.present?
+    return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?
-    user? || stolen?
+    user? || status_stolen?
   end
 
   def contact_owner_email
@@ -556,7 +539,7 @@ class Bike < ApplicationRecord
   end
 
   def stolen_string
-    return nil unless stolen && current_stolen_record.present?
+    return nil unless status_stolen? && current_stolen_record.present?
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
@@ -911,7 +894,7 @@ class Bike < ApplicationRecord
   def calculated_status
     return "status_impounded" if current_impound_record.present?
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
-    return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
+    return "status_abandoned" if status_abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"

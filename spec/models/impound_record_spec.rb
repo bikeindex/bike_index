@@ -141,7 +141,7 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.update_kinds).to eq valid_update_kinds
 
             bike_submitting.reload
-            expect(bike_submitting.stolen?).to be_truthy
+            expect(bike_submitting.status_stolen?).to be_truthy
             bike.reload
             expect(bike.impounded?).to be_truthy
             expect(bike.status_impounded?).to be_truthy
@@ -178,7 +178,7 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(bike.deleted?).to be_truthy
 
             bike_submitting.reload
-            expect(bike_submitting.stolen?).to be_falsey
+            expect(bike_submitting.status_stolen?).to be_falsey
             stolen_record.reload
             expect(stolen_record.recovered?).to be_truthy
           end

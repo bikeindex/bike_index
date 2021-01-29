@@ -10,7 +10,7 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
     allow_nil: true
 
   def stolen
-    object.stolen?
+    object.status_stolen?
   end
 
   def serial

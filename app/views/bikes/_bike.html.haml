@@ -16,7 +16,7 @@
         %ul.attr-list
           %li
             %strong.attr-title.text-danger
-              = bike.abandoned ? t(".abandoned") : t(".stolen")
+              = bike.status_abandoned? ? t(".abandoned") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time
           = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))

@@ -351,7 +351,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             impound_claim.reload
             expect(impound_claim.status).to eq "retrieved"
             expect(impound_claim.bike_claimed_id).to eq bike.id
-            expect(impound_claim.bike_submitting.stolen?).to be_falsey
+            expect(impound_claim.bike_submitting.status_stolen?).to be_falsey
             expect(impound_claim.impound_record_updates.count).to eq 2
 
             og_id = impound_record.id

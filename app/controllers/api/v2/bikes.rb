@@ -320,7 +320,7 @@ module API
         end
         post ":id/send_stolen_notification", serializer: StolenNotificationSerializer do
           find_bike
-          error!("Bike is not stolen", 400) unless @bike.present? && @bike.stolen
+          error!("Bike is not stolen", 400) unless @bike.present? && @bike.status_stolen?
           # Unless application is authorized....
           authorize_bike_for_user(" (this application is not approved to send notifications)")
           StolenNotification.create(bike_id: params[:id],

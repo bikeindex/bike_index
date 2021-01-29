@@ -301,11 +301,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.abandoned?
-      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.abandoned?
+      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.status_abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.status_abandoned?
       h[:publicize] = translation(:publicize, controller_method: :edit)
       h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.abandoned?
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.status_abandoned?
     end
   end
 
@@ -442,7 +442,7 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(Bike.old_attr_accessible)}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

@@ -89,11 +89,8 @@ RSpec.describe BikeCreatorAssociator do
   describe "associate" do
     it "rescues from the error and add the message to the bike" do
       expect(StolenRecordUpdator).to be_present # Load the error
-      bike = Bike.new
+      bike = Bike.new(status: "status_stolen")
       creator = subject.new
-      allow(bike).to receive(:stolen).and_return(true)
-      # TODO: Bike does not implement #create_stolen_record
-      # allow(bike).to receive(:create_stolen_record).and_raise(StolenRecordError, "Gobledy gook")
       creator.associate(bike)
       expect(bike.errors.messages[:association_error]).not_to be_nil
     end

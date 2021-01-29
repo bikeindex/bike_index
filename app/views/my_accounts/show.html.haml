@@ -32,7 +32,7 @@
                     %h5.title-link
                       - if bike.status_stolen?
                         %strong.stolen-color
-                          - if bike.abandoned
+                          - if bike.status_abandoned?
                             = t(".abandoned")
                           - else
                             = t(".stolen")
@@ -45,7 +45,7 @@
                       = attr_list_item(bike.serial_display, t(".serial"))
                       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
-                        - abandoned_or_stolen =  bike.abandoned? ? t(".date_abandoned") : t('.date_stolen')
+                        - abandoned_or_stolen =  bike.status_abandoned? ? t(".date_abandoned") : t('.date_stolen')
                         = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
                         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
                     %ul.attr-list
@@ -101,14 +101,14 @@
           - if @bikes.present?
             .lock-group
               .image-column
-                - if @bikes.last.stolen
+                - if @bikes.last.status_stolen?
                   = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
                 - else
                   = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
               .col-xs-10
                 %p
                   - if @bikes.count > 0
-                    - if @bikes.last.stolen
+                    - if @bikes.last.status_stolen?
                       = t(".sorry_your_bike_was_stolen", bikes_last_type: @bikes.last.type)
                     - else
                       = t(".thanks_for_adding_your_bike", bikes_last_type: @bikes.last.type)
