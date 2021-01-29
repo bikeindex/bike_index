@@ -130,7 +130,7 @@ class BikeCreator
     bike.set_location_info
     bike.attributes = Geohelper.address_hash_from_geocoder_result(@location) unless bike.latitude.present?
     bike.save
-    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
+    @bike = associate(bike)
     validate_record(@bike)
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation

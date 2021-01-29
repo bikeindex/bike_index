@@ -191,7 +191,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new(origin: "api_v1")
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
           :creation_organization_id => organization.id,
@@ -217,7 +217,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
         bike = FactoryBot.create(:bike)
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         expect {
           creator.send(:save_bike, bike)
