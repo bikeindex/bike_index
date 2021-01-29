@@ -3,18 +3,18 @@ class BikeCreator
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
     (%i[manufacturer_id manufacturer_other serial_number
-        serial_normalized made_without_serial extra_registration_number
-        creation_organization_id manufacturer year thumb_path name
-        current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-        handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
-        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type street zipcode country_id state_id city belt_drive
-        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-        timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
-        stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
-        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
+      serial_normalized made_without_serial extra_registration_number
+      creation_organization_id manufacturer year thumb_path name
+      current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
+      handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
+      rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
+      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
+      propulsion_type street zipcode country_id state_id city belt_drive
+      coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
+      timezone date_stolen receive_notifications phone creator creator_id image
+      components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
+      stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
+      marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
        components_attributes: Component.old_attr_accessible]
     ).freeze

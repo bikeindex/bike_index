@@ -61,12 +61,6 @@ class ExternalRegistryBike < ApplicationRecord
     self[:frame_colors]&.split(/\s*,\s*/) || []
   end
 
-  # Statuses that come in are: transferred, abandoned, registered, pending transfer, stolen
-  # TODO: make them align with the bike statuses
-  def status_stolen?
-    status&.downcase.match?("stolen")
-  end
-
   def title_string
     "#{mnfg_name} #{frame_model}"
   end
