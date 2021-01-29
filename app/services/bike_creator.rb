@@ -229,7 +229,7 @@ class BikeCreator
     begin
       ownership = create_ownership(bike)
       ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
-      create_normalized_serial_segments(bike)
+      bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
       StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
       create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
@@ -266,10 +266,6 @@ class BikeCreator
     end
     user.save if user.changed? # Because we're also going to set the address and the name here
     bike
-  end
-
-  def create_normalized_serial_segments(bike)
-    bike.create_normalized_serial_segments
   end
 
   def attach_photos(bike)
