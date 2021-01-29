@@ -15,8 +15,11 @@ class BikeCreator
       components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
       stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
-      [stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
-       components_attributes: Component.old_attr_accessible]
+      [
+        stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
+        components_attributes: %i[id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
+          manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
+      ]
     ).freeze
   end
 
