@@ -197,9 +197,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def calculated_user_id
-    if impound_record_updates.where.not(user_id: nil).none?
-      return user_id.present? ? user_id : bike&.creator_id?
-    end
+    return user_id if impound_record_updates.where.not(user_id: nil).none?
     impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
   end
 end

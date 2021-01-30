@@ -541,7 +541,7 @@ class Bike < ApplicationRecord
   def build_new_impound_record(new_attrs = {})
     new_country_id = country_id || creator&.country_id || Country.united_states&.id
     new_impound_record = impound_records
-      .build({country_id: new_country_id, status: "current"}.merge(new_attrs))
+      .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
     new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
     new_impound_record
   end
