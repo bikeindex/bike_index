@@ -1219,8 +1219,8 @@ en:
       are_you_certain: Are you certain?
       city: City
       enter_bike_type_details: Enter %{bike_type} details
-      enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
       enter_found_bike_type_details: Enter Found %{bike_type} details
+      enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
       highly_recommended: highly recommended
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
