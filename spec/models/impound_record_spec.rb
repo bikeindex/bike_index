@@ -261,4 +261,50 @@ RSpec.describe ImpoundRecord, type: :model do
       end
     end
   end
+
+  describe "geocoding" do
+    context "real geocoding" do
+      include_context :geocoder_real
+      let!(:state) { FactoryBot.create(:state_illinois) }
+      let(:latitude) { 41.9202384 }
+      let(:longitude) { -87.7158185 }
+      let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
+      it "geocodes if no address and if address changes" do
+        VCR.use_cassette("impound_record-address_lookup") do
+          impound_record.save
+          impound_record.reload
+          expect(impound_record.street).to eq "3554 W Shakespeare Ave"
+          expect(impound_record.address).to eq "Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true)).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.latitude).to eq latitude
+          expect(impound_record.longitude).to eq longitude
+          expect(impound_record.valid?).to be_truthy
+          expect(impound_record.id).to be_present
+          expect(impound_record.state_id).to eq state.id
+          expect(impound_record.country_id).to eq Country.united_states.id
+          # It changes, so regeocodes
+          impound_record.update(street: "2554 W Shakespeare ave")
+          impound_record.reload
+          expect(impound_record.address(force_show_address: true)).to eq "2554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.latitude).to_not eq latitude
+          expect(impound_record.longitude).to_not eq longitude
+          # It does not change, no re-geocoding
+          expect(Geohelper).to_not receive(:assignable_address_hash)
+          impound_record.update(status: "retrieved_by_owner")
+        end
+      end
+    end
+    context "updating address" do
+      # it "geocodes" do
+      #   fail
+      # end
+    end
+    context "no location" do
+      let(:impound_record) { FactoryBot.create(:impound_record) }
+      it "does not geocode" do
+        impound_record.reload
+        expect(impound_record.to_coordinates).to eq([nil, nil])
+      end
+    end
+  end
 end

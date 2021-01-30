@@ -65,9 +65,23 @@ class ImpoundRecord < ApplicationRecord
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
+  # For now at least, we don't want to show exact address
+  def show_address
+    false
+  end
+
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?
     false
+  end
+
+  # force_show_address, just like stolen_record & parking_notification
+  def address(force_show_address: false)
+    Geocodeable.address(
+      self,
+      street: (force_show_address || show_address),
+      country: %i[skip_default optional]
+    ).presence
   end
 
   def organized?
@@ -152,22 +166,13 @@ class ImpoundRecord < ApplicationRecord
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
-    if without_location? && parking_notification.present?
-      self.attributes = parking_notification.attributes.slice(*Geocodeable.location_attrs)
+    # Don't geocode if location is present and address hasn't changed
+    return if !address_changed? && with_location?
+    self.attributes = if parking_notification.present?
+      parking_notification.attributes.slice(*Geocodeable.location_attrs)
+    else
+      Geohelper.assignable_address_hash(address(force_show_address: true))
     end
-    # TODO: Make this work
-    # if !use_entered_address && latitude.present? && longitude.present?
-    #   addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
-    #   self.street = addy_hash["street"]
-    #   self.city = addy_hash["city"]
-    #   self.zipcode = addy_hash["zipcode"]
-    #   self.country = Country.fuzzy_find(addy_hash["country"])
-    #   self.state = State.fuzzy_find(addy_hash["state"])
-    # else
-    #   coordinates = Geohelper.coordinates_for(address)
-    #   self.attributes = coordinates if coordinates.present?
-    #   self.location_from_address = true
-    # end
   end
 
   def last_display_id
