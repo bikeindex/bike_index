@@ -1091,11 +1091,13 @@ RSpec.describe BikesController, type: :request do
   end
 
   describe "edit" do
+    let(:default_edit_templates) { %w[bike_details photos drivetrain accessories ownership groups remove report_stolen] }
     it "renders" do
       get "#{base_url}/#{bike.id}/edit"
       expect(flash).to be_blank
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
+      expect(assigns(:edit_templates).keys).to match_array(default_edit_templates)
     end
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
@@ -1113,48 +1115,67 @@ RSpec.describe BikesController, type: :request do
       end
     end
     context "with impound_record" do
-      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
-      it "redirects with flash error" do
-        bike.reload
-        expect(bike.status).to eq "status_impounded"
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      it "renders" do
+        target_edit_templates = default_edit_templates - ["report_stolen"] + ["found_details"]
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(bike.owner&.id).to eq current_user.id
+        expect(bike.authorized?(current_user)).to be_truthy
         get "#{base_url}/#{bike.id}/edit"
-        expect(flash[:error]).to match(/impounded/i)
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_bike_details)
+        expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
+        # it also renders the found bike page
+        get "#{base_url}/#{bike.id}/edit?page=found_details"
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_found_details)
+        expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
       end
-      context "unclaimed" do
-        let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
-        let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
-        it "claims, but then redirects with flash error" do
-          expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check
-          bike.reload
-          expect(bike.current_ownership.claimed?).to be_falsey
-          expect(bike.claimable_by?(current_user)).to be_truthy
-          expect(bike.authorized?(current_user)).to be_falsey
-          expect(bike.status).to eq "status_impounded"
+      context "organized impound_record" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+        before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
+        it "redirects with flash error" do
+          expect(bike.reload.status).to eq "status_impounded"
           get "#{base_url}/#{bike.id}/edit"
           expect(flash[:error]).to match(/impounded/i)
           expect(response).to redirect_to(bike_path(bike.id))
-          bike.reload
-          expect(bike.current_ownership.claimed?).to be_truthy
-          expect(bike.user.id).to eq current_user.id
-          expect(bike.authorized?(current_user)).to be_falsey
         end
-      end
-      context "organization member" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
-        it "renders" do
-          bike.reload
-          expect(bike.claimed?).to be_truthy
-          expect(bike.status).to eq "status_impounded"
-          expect(bike.created_by_parking_notification).to be_falsey
-          expect(bike.bike_organizations.map(&:organization_id)).to eq([])
-          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
-          get "#{base_url}/#{bike.id}/edit"
-          expect(flash).to be_blank
-          expect(response).to render_template(:edit_bike_details)
-          expect(assigns(:bike).id).to eq bike.id
+        context "unclaimed" do
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
+          let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
+          it "claims, but then redirects with flash error" do
+            expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check
+            bike.reload
+            expect(bike.current_ownership.claimed?).to be_falsey
+            expect(bike.claimable_by?(current_user)).to be_truthy
+            expect(bike.authorized?(current_user)).to be_falsey
+            expect(bike.status).to eq "status_impounded"
+            get "#{base_url}/#{bike.id}/edit"
+            expect(flash[:error]).to match(/impounded/i)
+            expect(response).to redirect_to(bike_path(bike.id))
+            bike.reload
+            expect(bike.current_ownership.claimed?).to be_truthy
+            expect(bike.user.id).to eq current_user.id
+            expect(bike.authorized?(current_user)).to be_falsey
+          end
+        end
+        context "organization member" do
+          let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+          let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
+          it "renders" do
+            bike.reload
+            expect(bike.claimed?).to be_truthy
+            expect(bike.status).to eq "status_impounded"
+            expect(bike.created_by_parking_notification).to be_falsey
+            expect(bike.bike_organizations.map(&:organization_id)).to eq([])
+            expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+            get "#{base_url}/#{bike.id}/edit"
+            expect(flash).to be_blank
+            expect(response).to render_template(:edit_bike_details)
+            expect(assigns(:bike).id).to eq bike.id
+            expect(response).to render_template(:edit_bike_details)
+            expect(assigns(:edit_templates).keys).to match_array(default_edit_templates - ["report_stolen"])
+          end
         end
       end
     end
@@ -1466,6 +1487,36 @@ RSpec.describe BikesController, type: :request do
 
         expect(stolen_record.alert_image).to be_present
         expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+      end
+    end
+    context "updating impound_record" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike) }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+      let(:impound_params) do
+        {
+          timezone: "America/Los_Angeles",
+          impounded_at: "2020-04-28T11:00",
+          country_id: Country.united_states.id,
+          street: "278 Broadway",
+          city: "New York",
+          zipcode: "10007",
+          state_id: state.id,
+        }
+      end
+      it "updates the impound_record" do
+        bike.reload
+        expect(bike.current_impound_record_id).to eq impound_record.id
+        expect(bike.authorized?(current_user)).to be_truthy
+        impound_record.reload
+        expect(impound_record.latitude).to be_blank
+        patch "#{base_url}/#{bike.id}", params: {
+          bike: {impound_records_attributes: {"0" => impound_params}},
+          page: "found_details"
+        }
+        expect(flash[:success]).to be_present
+        expect(response).to render_template(:edit_found_details)
+        expect(impound_record.impounded_at).to be_within(5).of Time.at(1588096800)
+        expect_attrs_to_match_hash(impound_record, impound_params.except(:timezone, :impounded_at))
       end
     end
   end

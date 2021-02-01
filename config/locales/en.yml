@@ -1056,6 +1056,7 @@ en:
       state: State
       street: Street
       submit_manufacturer_correction: Submit Manufacturer Correction
+      made_without_serial: Made without serial
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
       tell_us_about_your_bike: Tell us about your bike!
@@ -1527,10 +1528,10 @@ en:
         ownership: Transfer Ownership
         photos: Photos
         publicize: Share on Social Media
-        recovery_details: Recovery details
         remove: Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
+        found_details: Information about finding
         theft_details: Theft details
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-

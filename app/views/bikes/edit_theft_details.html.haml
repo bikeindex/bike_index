@@ -22,7 +22,7 @@
           -# Helper text display
           - stolen_type = @bike.status_abandoned? ? t(".abandoned") : t(".stolen")
           = f.fields_for :stolen_records do |srecord|
-            - next unless srecord.object.current # Because they may have multiple stolen records
+            - next unless srecord.object.current? # Because they may have multiple stolen records
 
             %h3
             .form-group.row.unnested-field

@@ -298,11 +298,10 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.status_abandoned?
-      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.status_abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit)
       h[:publicize] = translation(:publicize, controller_method: :edit)
       h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.status_abandoned?
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
     end
   end
 
@@ -312,13 +311,16 @@ class BikesController < ApplicationController
   def bike_templates
     {}.with_indifferent_access.tap do |h|
       h[:bike_details] = translation(:bike_details, controller_method: :edit)
+      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.impounded_found?
       h[:photos] = translation(:photos, controller_method: :edit)
       h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
       h[:accessories] = translation(:accessories, controller_method: :edit)
       h[:ownership] = translation(:ownership, controller_method: :edit)
       h[:groups] = translation(:groups, controller_method: :edit)
       h[:remove] = translation(:remove, controller_method: :edit)
-      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.status_stolen?
+      unless @bike.status_stolen? || @bike.status_impounded?
+        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
+      end
     end
   end
 
