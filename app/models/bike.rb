@@ -326,6 +326,10 @@ class Bike < ApplicationRecord
     current_impound_record.present?
   end
 
+  def impounded_found?
+    current_impound_record&.kind == "found"
+  end
+
   def avery_exportable?
     !impounded? && owner_name.present? && valid_registration_address_present?
   end

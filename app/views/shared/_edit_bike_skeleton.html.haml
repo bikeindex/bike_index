@@ -4,8 +4,12 @@
   .edit-bike-header
     %h1.uncap
       - if @bike.fetch_current_stolen_record.present?
-        %span.text-danger
-          = @bike.status_abandoned? ? t(".abandoned") : t(".stolen")
+        %span.uppercase.stolen-color= t(".stolen")
+      - elsif @bike.current_impound_record.present?
+        - if @bike.impounded_found?
+          %span.uppercase.found-color= t(".found")
+        - else
+          %span.uppercase.impounded-color= t(".impounded")
       - else
         = t(".edit")
       = @bike.year

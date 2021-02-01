@@ -17,6 +17,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(bike.impound_records.count).to eq 1
       bike.update(updated_at: Time.current)
       expect(bike.reload.impounded?).to be_truthy
+      expect(bike.impounded_found?).to be_falsey
       expect(bike.impound_records.count).to eq 1
       impound_record = bike.current_impound_record
       expect(impound_record.organization).to eq organization
@@ -85,6 +86,7 @@ RSpec.describe ImpoundRecord, type: :model do
           bike.update(updated_at: Time.current)
           expect(bike.reload.impounded?).to be_truthy
           expect(bike.status_impounded?).to be_truthy
+          expect(bike.impounded_found?).to be_falsey
           expect(bike.created_by_parking_notification?).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
           expect(impound_record.creator&.id).to eq user2.id
@@ -294,11 +296,6 @@ RSpec.describe ImpoundRecord, type: :model do
           impound_record.update(status: "retrieved_by_owner")
         end
       end
-    end
-    context "updating address" do
-      # it "geocodes" do
-      #   fail
-      # end
     end
     context "no location" do
       let(:impound_record) { FactoryBot.create(:impound_record) }

@@ -589,6 +589,7 @@ RSpec.describe BikesController, type: :request do
           expect(new_bike.serial_unknown?).to be_falsey
           expect(new_bike.serial_number).to eq "made_without_serial"
           expect(new_bike.normalized_serial_segments).to eq([])
+          expect(new_bike.current_ownership.impound_record_id).to be_blank
         end
       end
     end
@@ -678,16 +679,18 @@ RSpec.describe BikesController, type: :request do
             expect(new_bike.status).to eq "status_impounded"
             expect(new_bike.status_humanized).to eq "found"
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
-            ownership = new_bike.current_ownership
-            expect(ownership.claimed?).to be_truthy
-            expect(ownership.send_email?).to be_falsey
-            expect(ownership.self_made?).to be_truthy
             expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
             expect(new_bike.current_impound_record&.id).to eq impound_record.id
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+
+            ownership = new_bike.current_ownership
+            expect(ownership.claimed?).to be_truthy
+            expect(ownership.send_email?).to be_falsey
+            expect(ownership.self_made?).to be_truthy
+            expect(ownership.impound_record_id).to eq impound_record.id
           end
         end
         context "failure" do

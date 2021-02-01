@@ -38,6 +38,17 @@ $white: #ffffff;
 $primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;
 
+$stolen-color: $red;
 .stolen-color {
-  color: $red;
+  color: $stolen-color;
+}
+
+$found-color: $green;
+.found-color {
+  color: $found-color;
+}
+
+$impounded-color: $stolen-color;
+.impounded-color {
+  color: $impounded-color;
 }

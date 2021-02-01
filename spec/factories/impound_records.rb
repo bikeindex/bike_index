@@ -21,6 +21,8 @@ FactoryBot.define do
         FactoryBot.create(:impound_record_update,
           impound_record: impound_record,
           kind: evaluator.status)
+
+        impound_record.bike&.update(updated_at: Time.current)
       end
     end
   end

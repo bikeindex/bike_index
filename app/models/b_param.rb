@@ -476,16 +476,6 @@ class BParam < ApplicationRecord
     formatted_address
   end
 
-  def build_bike(new_attrs = {})
-    bike = Bike.new(safe_bike_attrs(new_attrs))
-    # Use bike status because it takes into account new_attrs
-    bike.build_new_stolen_record(stolen_attrs) if bike.status_stolen?
-    bike.build_new_impound_record(impound_attrs) if bike.status_impounded?
-    bike
-  end
-
-  private
-
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     bike.merge(status: status).merge(new_attrs.as_json)
@@ -497,6 +487,8 @@ class BParam < ApplicationRecord
              "updator_id" => creator_id)
       .merge(address_hash)
   end
+
+  private
 
   def process_image_if_required
     return true if image_processed || image.blank?

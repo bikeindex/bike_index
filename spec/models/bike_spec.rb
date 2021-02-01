@@ -723,13 +723,11 @@ RSpec.describe Bike, type: :model do
         expect(impound_record.bike_id).to eq bike.id
         expect(bike.reload.claimed?).to be_truthy
         expect(bike.impound_records.pluck(:id)).to eq([impound_record.id])
-        expect(bike.current_impound_record_id).to be_blank
-        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+        expect(bike.current_impound_record_id).to eq impound_record.id
         expect(impound_record.reload.active?).to be_truthy
         expect(impound_record.user_id).to eq user.id
         expect(ownership.reload.claimed?).to be_truthy
         expect(ownership.owner&.id).to eq user.id
-        expect(bike.reload.current_impound_record_id).to eq impound_record.id
         expect(bike.status).to eq "status_impounded"
         expect(bike.authorized?(user)).to be_truthy
       end

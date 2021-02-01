@@ -52,6 +52,7 @@ RSpec.describe BikeDisplayer do
           impound_claim.reload
           expect(impound_claim.resolved?).to be_truthy
           expect(bike.authorized?(owner)).to be_truthy
+          expect(bike.current_impound_record_id).to be_blank
           expect(impound_claim.user_id).to eq owner.id
           expect(impound_claim.bike_submitting&.id).to eq bike.id
           expect(bike.impound_claims_submitting.pluck(:id)).to eq([impound_claim.id])

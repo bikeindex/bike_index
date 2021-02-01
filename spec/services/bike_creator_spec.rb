@@ -408,8 +408,6 @@ RSpec.describe BikeCreator do
       expect_attrs_to_match_hash(bike, bike_params)
       expect(bike.status).to eq "status_impounded"
       expect(bike.status_humanized).to eq "found"
-      ownership = bike.current_ownership
-      expect(ownership.send_email).to be_falsey
       expect(bike.impound_records.count).to eq 1
       impound_record = bike.impound_records.last
       expect_attrs_to_match_hash(bike, bike_params)
@@ -419,6 +417,9 @@ RSpec.describe BikeCreator do
       expect(impound_record.user).to eq user
       expect(impound_record.display_id).to be_blank
       expect(impound_record.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+      ownership = bike.current_ownership
+      expect(ownership.send_email).to be_falsey
+      expect(ownership.impound_record_id).to eq impound_record.id
     end
     context "failing" do
       let(:bike_params) { {serial_number: "fassdfasdf"} }
@@ -428,6 +429,102 @@ RSpec.describe BikeCreator do
         expect(b_param.bike_errors).to be_present
         expect(bike.id).to be_blank
         expect(ImpoundRecord.count).to eq 0
+      end
+    end
+  end
+
+  describe "build_bike" do
+    let(:b_param_params) { {} }
+    let(:b_param) { BParam.new(params: b_param_params) }
+    let(:bike) { instance.build_bike }
+    it "builds it" do
+      expect(bike.status).to eq "status_with_owner"
+      expect(bike.id).to be_blank
+    end
+    context "status impounded" do
+      let(:b_param_params) { {bike: {status: "status_impounded"}} }
+      it "is abandoned" do
+        expect(b_param.status).to eq "status_impounded"
+        expect(b_param.impound_attrs).to be_blank
+        expect(bike.id).to be_blank
+        impound_record = bike.impound_records.last
+        expect(impound_record).to be_present
+        expect(impound_record.kind).to eq "found"
+        expect(bike.status_humanized).to eq "found"
+      end
+      context "with impound attrs" do
+        let(:time) { Time.current - 12.hours }
+        let(:b_param_params) { {bike: {status: "status_with_owner"}, impound_record: {impounded_at: time}} }
+        it "is abandoned" do
+          expect(b_param.status).to eq "status_impounded"
+          expect(b_param.impound_attrs).to be_present
+          expect(bike.id).to be_blank
+          impound_record = bike.impound_records.last
+          expect(impound_record).to be_present
+          expect(impound_record.kind).to eq "found"
+          expect(impound_record.impounded_at).to be_within(1).of time
+          expect(bike.status_humanized).to eq "found"
+        end
+      end
+    end
+    context "status stolen" do
+      let(:b_param_params) { {bike: {status: "status_stolen"}} }
+      it "is stolen" do
+        expect(b_param).to be_valid
+        expect(b_param.status).to eq "status_stolen"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.id).to be_blank
+        expect(bike.stolen_records.last).to be_present
+      end
+      context "legacy_stolen" do
+        let(:b_param_params) { {bike: {stolen: true}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.stolen_records.last).to be_present
+        end
+      end
+    end
+    context "with id" do
+      let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
+      it "includes ID" do
+        expect(b_param).to be_valid
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.id).to be_blank
+        expect(bike.b_param_id).to eq b_param.id
+        expect(bike.b_param_id_token).to eq b_param.id_token
+        expect(bike.creator).to eq b_param.creator
+      end
+      context "stolen" do
+        # Even though status_with_owner passed - since it has stolen attrs
+        let(:b_param_params) { {bike: {status: "status_with_owner"}, stolen_record: {phone: "7183839292"}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to eq b_param_params[:stolen_record].as_json
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.b_param_id).to eq b_param.id
+          expect(bike.b_param_id_token).to eq b_param.id_token
+          expect(bike.creator).to eq b_param.creator
+          stolen_record = bike.stolen_records.last
+          expect(stolen_record).to be_present
+          expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
+        end
+      end
+    end
+    context "status overrides" do
+      it "is stolen if it is stolen" do
+        bike = instance.build_bike(status: "status_stolen")
+        expect(bike.status).to eq "status_stolen"
+      end
+      it "impounded if status_impounded" do
+        bike = instance.build_bike(status: "status_impounded")
+        expect(bike.status).to eq "status_impounded"
       end
     end
   end

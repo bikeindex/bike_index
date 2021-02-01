@@ -984,7 +984,7 @@ en:
         you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
-      thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
+      thank_you_for_registering_this_found_bike_type: Thank you for registering this found %{bike_type}!
       this_bike_type_is_hidden: This %{bike_type} is hidden.
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
         Index.
@@ -1391,6 +1391,8 @@ en:
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
+      found: Found
+      impounded: Impounded
       created_to_record_parking_notification: "%{bike_type} created by %{organization}
         to record a Parking Notification"
       cycle_type: Cycle type
@@ -4918,13 +4920,14 @@ en:
     donation_modal:
       donation_header: Help support our efforts!
     edit_bike_skeleton:
-      abandoned: abandoned
+      found: Found
+      impounded: Impounded
       edit: Edit
       owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
         been claimed yet
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
         has permission to edit
-      stolen: stolen
+      stolen: Stolen
       view_bike: View %{bike_type}
     email_bike_box:
       color: Color

@@ -80,9 +80,12 @@
     .col-md-8
       %h1.bike-title
         - if @bike.status_stolen?
-          %strong.stolen
-            = t(".abandoned") if @bike.status_abandoned?
-            = t(".stolen")
+          %strong.status-display.stolen-color= t(".stolen")
+        - elsif @bike.status_impounded?
+          - if @bike.impounded_found?
+            %strong.status-display.found-color= t(".found")
+          - else
+            %strong.status-display.impounded-color= t(".impounded")
         %span.uncap
           = @bike.title_u
       - if @bike.status_stolen? && @stolen_record.present?

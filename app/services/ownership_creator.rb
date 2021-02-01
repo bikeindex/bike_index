@@ -38,7 +38,8 @@ class OwnershipCreator
       current: true,
       is_phone: @bike.phone_registration?,
       send_email: @send_email,
-      user_hidden: @user_hidden
+      user_hidden: @user_hidden,
+      impound_record_id: @bike.impound_records.current.last&.id # Calculate current_impound_record
     }
   end
 
