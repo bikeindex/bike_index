@@ -446,7 +446,7 @@ RSpec.describe BikesController, type: :request do
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
       it "includes an impound_claim" do
         expect(impound_record).to be_present
-        expect(bike.current_impound_record).to be_present
+        expect(bike.reload.current_impound_record).to be_present
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
@@ -680,8 +680,8 @@ RSpec.describe BikesController, type: :request do
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
             ownership = new_bike.current_ownership
             expect(ownership.claimed?).to be_truthy
-            expect(ownership.send_email).to be_falsey
-            expect(ownership.self_made).to be_truthy
+            expect(ownership.send_email?).to be_falsey
+            expect(ownership.self_made?).to be_truthy
             expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
             expect(new_bike.current_impound_record&.id).to eq impound_record.id
@@ -1121,7 +1121,6 @@ RSpec.describe BikesController, type: :request do
       end
       context "unclaimed" do
         let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
-        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
         let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
         it "claims, but then redirects with flash error" do
           expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check

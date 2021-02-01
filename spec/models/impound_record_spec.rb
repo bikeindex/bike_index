@@ -14,8 +14,9 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(organization.enabled?("impound_bikes")).to be_truthy
       expect(bike.impounded?).to be_falsey
       bike.impound_records.create(user: user, bike: bike, organization: organization)
-      bike.reload
-      expect(bike.impounded?).to be_truthy
+      expect(bike.impound_records.count).to eq 1
+      bike.update(updated_at: Time.current)
+      expect(bike.reload.impounded?).to be_truthy
       expect(bike.impound_records.count).to eq 1
       impound_record = bike.current_impound_record
       expect(impound_record.organization).to eq organization

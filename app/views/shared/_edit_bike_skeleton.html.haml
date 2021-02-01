@@ -2,7 +2,7 @@
   -# Show alerts if bike is impounded or has current notifications
   = render partial: "owner_bike_status_alerts"
   .edit-bike-header
-    %h1
+    %h1.uncap
       - if @bike.fetch_current_stolen_record.present?
         %span.text-danger
           = @bike.status_abandoned? ? t(".abandoned") : t(".stolen")

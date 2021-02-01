@@ -10,6 +10,11 @@ FactoryBot.define do
 
     factory :impound_record_with_organization, traits: [:with_organization]
 
+    # Bump the bike to make impound_record the current_impound_record, if it should be
+    after(:create) do |impound_record, _evaluator|
+      impound_record.bike&.update(updated_at: Time.current)
+    end
+
     factory :impound_record_resolved do
       status { "retrieved_by_owner" }
       after(:create) do |impound_record, evaluator|
