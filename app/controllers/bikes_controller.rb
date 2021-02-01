@@ -126,7 +126,6 @@ class BikesController < ApplicationController
                                  origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
           redirect_to(embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
@@ -147,7 +146,6 @@ class BikesController < ApplicationController
       @b_param.clean_params(permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
         flash[:success] = translation(:bike_was_added)
@@ -360,7 +358,7 @@ class BikesController < ApplicationController
 
   def find_or_new_b_param
     token = params[:b_param_token]
-    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    token ||= params.dig(:bike, :b_param_id_token)
     @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id)
   end
 

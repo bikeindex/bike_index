@@ -163,7 +163,11 @@ class ImpoundRecord < ApplicationRecord
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
-    self.impounded_at ||= created_at || Time.current
+    if timezone.present?
+      self.impounded_at = TimeParser.parse(impounded_at, timezone)
+    else
+      self.impounded_at ||= created_at || Time.current
+    end
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
     self.attributes = if parking_notification.present?
@@ -182,6 +186,7 @@ class ImpoundRecord < ApplicationRecord
   private
 
   def calculated_display_id
+    return nil if organization_id.blank?
     default_display_id = last_display_id + 1
     return default_display_id unless ImpoundRecord.where(organization_id: organization_id, display_id: default_display_id)
     ImpoundRecord.where(organization_id: organization_id).maximum(:display_id).to_i + 1

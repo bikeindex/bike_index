@@ -126,7 +126,7 @@ class Bike < ApplicationRecord
     end
 
     def status_humanized(str)
-      str.to_s&.gsub("status_", "").tr("_", " ")
+      str.to_s&.gsub("status_", "")&.tr("_", " ")
     end
 
     def text_search(query)

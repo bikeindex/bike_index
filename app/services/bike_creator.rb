@@ -40,11 +40,14 @@ class BikeCreator
   def create_bike
     add_bike_book_data
     @bike = find_or_build_bike
-    return @bike if @bike.errors.present?
-    save_bike(@bike)
+    # There could be errors during the build - or during the save
+    save_bike(@bike) if @bike.errors.none?
+    return @bike if @bike.errors.none?
+    @b_param&.update_attributes(bike_errors: @bike.cleaned_error_messages)
+    @bike
   end
 
-  # Called from ImageAssociatorWorker
+  # Called from ImageAssociatorWorker, so can't be private
   def attach_photo(bike)
     return true unless @b_param.image.present?
     public_image = PublicImage.new(image: @b_param.image)
@@ -110,6 +113,8 @@ class BikeCreator
     end
     bike.ownerships.destroy_all
     bike.creation_states.destroy_all
+    bike.impound_records.destroy_all
+    bike.parking_notifications.destroy_all
     bike.destroy
     @bike
   end
@@ -227,12 +232,17 @@ class BikeCreator
   # Previously BikeCreatorAssociator
   def associate(bike)
     begin
+      # Create parking_notification and impound_record first
+      if @b_param&.status_abandoned?
+        create_parking_notification(@b_param, bike)
+      elsif @b_param&.status_impounded?
+        create_impound_record(@b_param, bike)
+      end
       ownership = create_ownership(bike)
       ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
       StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
-      create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)
@@ -244,9 +254,8 @@ class BikeCreator
   end
 
   def create_ownership(bike)
-    passed_send_email = @b_param.params.dig("bike", "send_email")
-    send_email = passed_send_email.to_s.present? ? ParamsNormalizer.boolean(passed_send_email) : true
-    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
+    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
+      .create_ownership
   end
 
   def create_parking_notification(b_param, bike)
@@ -256,6 +265,11 @@ class BikeCreator
                                       user_id: bike.creator.id,
                                       organization_id: b_param.creation_organization_id)
     ParkingNotification.create(parking_notification_attrs)
+  end
+
+  def create_impound_record(b_param, bike)
+    impound_attrs = b_param.impound_attrs.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "impounded_at")
+    bike.build_new_impound_record(impound_attrs).save
   end
 
   def assign_user_attributes(bike, user = nil)

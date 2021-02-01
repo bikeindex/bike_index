@@ -172,6 +172,10 @@ class BParam < ApplicationRecord
     status == "status_abandoned"
   end
 
+  def status_impounded?
+    status == "status_impounded"
+  end
+
   def unregistered_parking_notification?
     parking_notification_params.present?
   end
@@ -246,6 +250,12 @@ class BParam < ApplicationRecord
 
   def owner_email
     bike && bike["owner_email"]
+  end
+
+  def skip_owner_email?
+    return true if status_impounded? || unregistered_parking_notification?
+    send_email = params.dig("bike", "send_email").to_s
+    send_email.present? && !ParamsNormalizer.boolean(send_email)
   end
 
   def organization_affiliation

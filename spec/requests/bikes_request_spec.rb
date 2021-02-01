@@ -539,6 +539,15 @@ RSpec.describe BikesController, type: :request do
         owner_email: current_user.email
       }
     end
+    let(:chicago_stolen_params) do
+      {
+        country_id: country.id,
+        street: "2459 W Division St",
+        city: "Chicago",
+        zipcode: "60622",
+        state_id: state.id
+      }
+    end
     context "unverified authenticity token" do
       include_context :test_csrf_token
       it "fails" do
@@ -591,6 +600,7 @@ RSpec.describe BikesController, type: :request do
           b_param_id_token: "",
           cycle_type: "tall-bike",
           serial_number: "example serial",
+          manufacturer_id: manufacturer.slug,
           manufacturer_other: "",
           year: "2016",
           frame_model: extra_long_string,
@@ -602,29 +612,19 @@ RSpec.describe BikesController, type: :request do
           date_stolen: Time.current.to_i
         }
       end
-      let(:chicago_stolen_params) do
-        {
-          country_id: country.id,
-          street: "2459 W Division St",
-          city: "Chicago",
-          zipcode: "60622",
-          state_id: state.id
-        }
-      end
       before { expect(BParam.all.count).to eq 0 }
       context "successful creation" do
         include_context :geocoder_real
         it "creates a bike and doesn't create a b_param" do
           bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
           VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
-            success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
             bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             expect {
-              post base_url, params: {bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)}
+              post base_url, params: {bike: bike_params, stolen_record: chicago_stolen_params.merge(show_address: true)}
             }.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             expect(BParam.all.count).to eq 0
@@ -646,11 +646,12 @@ RSpec.describe BikesController, type: :request do
       context "failure" do
         it "assigns a bike and a stolen record with the attrs passed" do
           expect {
-            post base_url, params: {bike: bike_params.as_json, stolen_record: chicago_stolen_params}
+            post base_url, params: {bike: bike_params.except(:manufacturer_id), stolen_record: chicago_stolen_params}
           }.to change(Bike, :count).by(0)
           expect(BParam.all.count).to eq 1
+          expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
           bike = assigns(:bike)
-          bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+          expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
           expect(bike.status).to eq "status_stolen"
           # we retain the stolen record attrs, test that they are assigned correctly too
           expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
@@ -661,18 +662,7 @@ RSpec.describe BikesController, type: :request do
       let(:bike_params) { basic_bike_params }
       context "impound_record" do
         include_context :geocoder_real
-        let(:impound_params) do
-          {
-            country_id: country.id,
-            street: "2459 W Division St",
-            city: "Chicago",
-            zipcode: "60622",
-            state_id: state.id,
-            impounded_at: (Time.current - 1.day).utc,
-            timezone: "UTC"
-          }
-        end
-
+        let(:impound_params) { chicago_stolen_params.merge(impounded_at: (Time.current - 1.day).utc, timezone: "UTC") }
         it "creates a new ownership and impound_record" do
           VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
             expect {
@@ -692,6 +682,20 @@ RSpec.describe BikesController, type: :request do
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+          end
+        end
+        context "failure" do
+          it "assigns a bike and a impound record with the attrs passed" do
+            expect {
+              post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
+            }.to change(Bike, :count).by(0)
+            expect(BParam.all.count).to eq 1
+            expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
+            bike = assigns(:bike)
+            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+            expect(bike.status).to eq "status_impounded"
+            # we retain the stolen record attrs, test that they are assigned correctly too
+            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at, :timezone))
           end
         end
       end

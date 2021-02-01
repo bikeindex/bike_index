@@ -199,6 +199,7 @@ RSpec.describe BikeCreator do
         expect {
           instance.send(:save_bike, new_bike)
         }.to change(Bike, :count).by(1)
+        expect(b_param.skip_owner_email?).to be_falsey
       end
     end
 
@@ -236,7 +237,7 @@ RSpec.describe BikeCreator do
   end
 
   describe "creating parking_notification bike" do
-    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Bikes") }
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
     let(:color) { FactoryBot.create(:color) }
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:auto_user) { organization.auto_user }
@@ -280,6 +281,7 @@ RSpec.describe BikeCreator do
         expect(bike.errors).to_not be_present
         b_param.reload
         expect(b_param.created_bike_id).to eq bike.id
+        expect(b_param.skip_owner_email?).to be_truthy
 
         bike.reload
         expect(bike.creation_organization_id).to eq organization.id
@@ -377,28 +379,58 @@ RSpec.describe BikeCreator do
     end
   end
 
-  # describe "create impounded bike" do
-  #   let(:bike_params) do
-  #     {
-
-  #     }
-  #   end
-  #   let(:impound_record_params) do
-  #     {
-
-  #     }
-  #   end
-  #   # This the same way b_param is treated in bikes_controller
-  #   let(:b_param) { BParam.new(clean_params({bike: bike_params, impound_record: impound_record_params)) }
-  #   it "creates impounded bike" do
-  #     pp b_param.params
-  #     expect(b_param.stolen_attrs).to be_blank
-  #     expect(b_param.impound_attrs).to eq impound_record_params
-  #     expect(b_param.status).to eq "status_impounded"
-  #     expect { instance.create_bike }
-  #     fail
-  #   end
-  # end
+  describe "create impounded bike" do
+    let!(:state) { FactoryBot.create(:state_new_york) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
+    let(:color) { FactoryBot.create(:color) }
+    let(:bike_params) do
+      {
+        serial_number: "s0s0s0s11111 4321212",
+        primary_frame_color_id: color.id,
+        secondary_frame_color_id: color.id,
+        manufacturer_id: manufacturer.id,
+        owner_email: user.email
+      }
+    end
+    let(:impound_record_params) { {street: "278 Broadway", city: "New York", zipcode: "10007", state_id: state.id.to_s, country_id: Country.united_states.id} }
+    # This the same way b_param is treated in bikes_controller
+    let(:b_param) { BParam.new(creator: user) }
+    before { b_param.clean_params({bike: bike_params, impound_record: impound_record_params}) }
+    it "creates impounded bike" do
+      expect(b_param.stolen_attrs).to be_blank
+      expect(b_param.impound_attrs).to eq impound_record_params.as_json
+      expect(b_param.status).to eq "status_impounded"
+      bike = instance.create_bike
+      expect(b_param.bike_errors).to be_blank
+      expect(b_param.skip_owner_email?).to be_truthy
+      expect(bike.id).to be_present
+      expect_attrs_to_match_hash(bike, bike_params)
+      expect(bike.status).to eq "status_impounded"
+      expect(bike.status_humanized).to eq "found"
+      ownership = bike.current_ownership
+      expect(ownership.send_email).to be_falsey
+      expect(bike.impound_records.count).to eq 1
+      impound_record = bike.impound_records.last
+      expect_attrs_to_match_hash(bike, bike_params)
+      expect(impound_record.id).to eq bike.current_impound_record&.id
+      expect(impound_record.status).to eq "current"
+      expect(impound_record.organized?).to be_falsey
+      expect(impound_record.user).to eq user
+      expect(impound_record.display_id).to be_blank
+      expect(impound_record.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+    end
+    context "failing" do
+      let(:bike_params) { {serial_number: "fassdfasdf"} }
+      it "deletes the record" do
+        expect(ImpoundRecord.count).to eq 0
+        bike = instance.create_bike
+        expect(b_param.bike_errors).to be_present
+        expect(bike.id).to be_blank
+        expect(ImpoundRecord.count).to eq 0
+      end
+    end
+  end
 
   # Old BikeCreatorAssociator specs
   describe "create_ownership" do
@@ -408,6 +440,7 @@ RSpec.describe BikeCreator do
       allow(b_param).to receive(:creator).and_return("creator")
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       subject.new(b_param).send("create_ownership", bike)
+      expect(b_param.skip_owner_email?).to be_falsey
     end
     it "calls create ownership with send_email false if b_param has that" do
       bike = Bike.new
@@ -415,6 +448,7 @@ RSpec.describe BikeCreator do
       allow(b_param).to receive(:creator).and_return("creator")
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       subject.new(b_param).send("create_ownership", bike)
+      expect(b_param.skip_owner_email?).to be_truthy
     end
   end
 
