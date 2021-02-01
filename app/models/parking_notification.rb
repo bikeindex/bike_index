@@ -16,8 +16,6 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
-  belongs_to :country
-  belongs_to :state
 
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
 

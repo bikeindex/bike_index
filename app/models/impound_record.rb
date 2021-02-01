@@ -5,8 +5,6 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :location # organization location
-  belongs_to :country
-  belongs_to :state
 
   has_one :parking_notification
   has_many :impound_record_updates

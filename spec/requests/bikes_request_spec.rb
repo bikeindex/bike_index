@@ -539,6 +539,16 @@ RSpec.describe BikesController, type: :request do
         owner_email: current_user.email
       }
     end
+    context "unverified authenticity token" do
+      include_context :test_csrf_token
+      it "fails" do
+        expect(current_user).to be_present
+        expect {
+          post base_url, params: {bike: basic_bike_params}
+        }.to_not change(Ownership, :count)
+        expect(flash[:error]).to match(/verify/i)
+      end
+    end
     context "blank serials" do
       let(:bike_params) { basic_bike_params.except(:year, :frame_model).merge(serial_number: "unknown", made_without_serial: "0") }
       it "creates" do
@@ -556,16 +566,6 @@ RSpec.describe BikesController, type: :request do
         expect(new_bike.serial_number).to eq "unknown"
         expect(new_bike.normalized_serial_segments).to eq([])
       end
-      context "unverified authenticity token" do
-        include_context :test_csrf_token
-        it "fails" do
-          expect(current_user).to be_present
-          expect {
-            post base_url, params: {bike: bike_params}
-          }.to_not change(Ownership, :count)
-          expect(flash[:error]).to match(/verify/i)
-        end
-      end
       context "made_without_serial" do
         it "creates, is made_without_serial" do
           expect(current_user.bikes.count).to eq 0
@@ -580,6 +580,80 @@ RSpec.describe BikesController, type: :request do
           expect(new_bike.serial_unknown?).to be_falsey
           expect(new_bike.serial_number).to eq "made_without_serial"
           expect(new_bike.normalized_serial_segments).to eq([])
+        end
+      end
+    end
+    context "no existing b_param and stolen" do
+      let(:wheel_size) { FactoryBot.create(:wheel_size) }
+      let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
+      let(:bike_params) do
+        {
+          b_param_id_token: "",
+          cycle_type: "tall-bike",
+          serial_number: "example serial",
+          manufacturer_other: "",
+          year: "2016",
+          frame_model: extra_long_string,
+          primary_frame_color_id: color.id.to_s,
+          secondary_frame_color_id: "",
+          tertiary_frame_color_id: "",
+          owner_email: "something@stuff.com",
+          phone: "312.379.9513",
+          date_stolen: Time.current.to_i
+        }
+      end
+      let(:chicago_stolen_params) do
+        {
+          country_id: country.id,
+          street: "2459 W Division St",
+          city: "Chicago",
+          zipcode: "60622",
+          state_id: state.id
+        }
+      end
+      before { expect(BParam.all.count).to eq 0 }
+      context "successful creation" do
+        include_context :geocoder_real
+        it "creates a bike and doesn't create a b_param" do
+          bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
+          VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+            success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
+            bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
+            # We need to call clean_params on the BParam after bikebook update, so that
+            # the foreign keys are assigned correctly. This is how we test that we're
+            # This is also where we're testing bikebook assignment
+            expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+            expect {
+              post base_url, params: {bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)}
+            }.to change(Bike, :count).by(1)
+            expect(flash[:success]).to be_present
+            expect(BParam.all.count).to eq 0
+            bike = Bike.last
+            bike_params.except(:manufacturer_id, :phone, :date_stolen).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            expect(bike.manufacturer).to eq manufacturer
+            expect(bike.status).to eq "status_stolen"
+            bike_user.reload
+            expect(bike.current_stolen_record.phone).to eq "3123799513"
+            expect(bike_user.phone).to eq "3123799513"
+            expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
+            expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
+            stolen_record = bike.current_stolen_record
+            chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+            expect(stolen_record.show_address).to be_truthy
+          end
+        end
+      end
+      context "failure" do
+        it "assigns a bike and a stolen record with the attrs passed" do
+          expect {
+            post base_url, params: {bike: bike_params.as_json, stolen_record: chicago_stolen_params}
+          }.to change(Bike, :count).by(0)
+          expect(BParam.all.count).to eq 1
+          bike = assigns(:bike)
+          bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+          expect(bike.status).to eq "status_stolen"
+          # we retain the stolen record attrs, test that they are assigned correctly too
+          expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
         end
       end
     end
@@ -615,6 +689,7 @@ RSpec.describe BikesController, type: :request do
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
             impound_record = new_bike.current_impound_record
             expect(impound_record).to be_present
+            expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
           end

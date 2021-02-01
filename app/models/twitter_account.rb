@@ -3,8 +3,6 @@
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 
-  belongs_to :state
-  belongs_to :country
   has_many :tweets, dependent: :destroy
 
   validates \

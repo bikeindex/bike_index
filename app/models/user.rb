@@ -41,9 +41,6 @@ class User < ApplicationRecord
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :theft_alerts
 
-  belongs_to :state
-  belongs_to :country
-
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }

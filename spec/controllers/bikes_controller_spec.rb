@@ -493,15 +493,6 @@ RSpec.describe BikesController, type: :controller do
     # This is the create action for bikes controller
     let(:cycle_type) { "tandem" }
     let(:handlebar_type) { "bmx" }
-    let(:chicago_stolen_params) do
-      {
-        country_id: country.id,
-        street: "2459 W Division St",
-        city: "Chicago",
-        zipcode: "60622",
-        state_id: state.id
-      }
-    end
 
     describe "embedded" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
@@ -583,7 +574,17 @@ RSpec.describe BikesController, type: :controller do
       end
       context "stolen" do
         let(:target_time) { Time.current.to_i }
-        let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.current - 1.day).utc, timezone: "UTC") }
+        let(:stolen_params) do
+          {
+            country_id: country.id,
+            street: "2459 W Division St",
+            city: "Chicago",
+            zipcode: "60622",
+            state_id: state.id,
+            date_stolen: (Time.current - 1.day).utc,
+            timezone: "UTC"
+          }
+        end
         context "valid" do
           include_context :geocoder_real
           context "with old style date input" do

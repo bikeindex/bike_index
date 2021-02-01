@@ -15,9 +15,6 @@ class MailSnippet < ApplicationRecord
     graduated_notification: 10
   }.freeze
 
-  belongs_to :state
-  belongs_to :country
-
   belongs_to :organization
   validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
   has_many :public_images, as: :imageable, dependent: :destroy

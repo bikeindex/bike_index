@@ -4,6 +4,9 @@ module Geocodeable
   extend ActiveSupport::Concern
 
   included do
+    belongs_to :state
+    belongs_to :country
+
     geocoded_by :address
     before_validation :clean_state_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
