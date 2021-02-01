@@ -271,7 +271,7 @@ class BikeCreator
   end
 
   def create_impound_record(b_param, bike)
-    impound_attrs = b_param.impound_attrs.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "impounded_at")
+    impound_attrs = b_param.impound_attrs.slice("street", "city", "state_id", "zipcode", "country_id", "impounded_at")
     bike.build_new_impound_record(impound_attrs).save
   end
 

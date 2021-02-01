@@ -39,12 +39,6 @@ class BikeUpdator
     @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
   end
 
-  def ensure_ownership!
-    return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
-    return true if @bike.authorized?(@user)
-    raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
-  end
-
   def update_api_components
     ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
   end
@@ -64,6 +58,32 @@ class BikeUpdator
     @bike_params["bike"]["hidden"] = @bike.hidden
   end
 
+  def update_available_attributes
+    ensure_ownership!
+    set_protected_attributes
+    update_ownership
+    update_api_components if @bike_params["components"].present?
+    update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes")
+    if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
+      @bike.address_set_manually = true
+    end
+    if @bike.update_attributes(update_attrs)
+      update_stolen_record
+      update_impound_record
+    end
+    AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
+    remove_blank_components
+    @bike
+  end
+
+  private
+
+  def ensure_ownership!
+    return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
+    return true if @bike.authorized?(@user)
+    raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
+  end
+
   def remove_blank_components
     return false unless @bike.components.any?
     @bike.components.each do |c|
@@ -71,20 +91,15 @@ class BikeUpdator
     end
   end
 
-  def update_available_attributes
-    ensure_ownership!
-    set_protected_attributes
-    update_ownership
-    update_api_components if @bike_params["components"].present?
-    update_attrs = @bike_params["bike"].except("stolen_records_attributes")
-    if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
-      @bike.address_set_manually = true
-    end
-    if @bike.update_attributes(update_attrs)
-      update_stolen_record
-    end
-    AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
-    remove_blank_components
-    @bike
+  # This is very hacky, but it's something. Improve sometime
+  def update_impound_record
+    # These are sanitized - because they're actually permitted in the bikes controller action
+    impound_params = @bike_params.dig("bike", "impound_records_attributes")&.values&.reject(&:blank?)&.first
+    impound_record = @bike.current_impound_record
+    return unless impound_params.present? && impound_record.present?
+    # This is a gross hack
+    time = impound_params.slice("impounded_at", "timezone")
+    impound_record.impounded_at_with_timezone(time["impounded_at"], time["timezone"])
+    impound_record.update(impound_params.except("impounded_at", "timezone"))
   end
 end

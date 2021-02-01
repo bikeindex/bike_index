@@ -1511,11 +1511,13 @@ RSpec.describe BikesController, type: :request do
         expect(impound_record.latitude).to be_blank
         patch "#{base_url}/#{bike.id}", params: {
           bike: {impound_records_attributes: {"0" => impound_params}},
-          page: "found_details"
+          edit_template: "found_details"
         }
         expect(flash[:success]).to be_present
-        expect(response).to render_template(:edit_found_details)
-        expect(impound_record.impounded_at).to be_within(5).of Time.at(1588096800)
+        expect(response).to redirect_to(edit_bike_path(bike, page: "found_details"))
+        impound_record.reload
+        expect(impound_record.latitude).to be_present
+        expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
         expect_attrs_to_match_hash(impound_record, impound_params.except(:timezone, :impounded_at))
       end
     end

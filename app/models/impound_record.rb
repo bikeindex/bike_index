@@ -58,6 +58,11 @@ class ImpoundRecord < ApplicationRecord
       .where(impound_records: {id: pluck(:id)})
   end
 
+  def impounded_at_with_timezone(passed_impounded_at, passed_timezone)
+    return unless passed_impounded_at.present?
+    self.impounded_at = TimeParser.parse(passed_impounded_at, passed_timezone)
+  end
+
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
@@ -167,11 +172,7 @@ class ImpoundRecord < ApplicationRecord
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
-    if timezone.present?
-      self.impounded_at = TimeParser.parse(impounded_at, timezone)
-    else
-      self.impounded_at ||= created_at || Time.current
-    end
+    self.impounded_at ||= created_at || Time.current
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
     self.attributes = if parking_notification.present?
