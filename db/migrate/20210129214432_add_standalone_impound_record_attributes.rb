@@ -13,5 +13,7 @@ class AddStandaloneImpoundRecordAttributes < ActiveRecord::Migration[5.2]
       t.references :country, index: true
       t.references :state, index: true
     end
+
+    add_reference :bikes, :current_impound_record
   end
 end

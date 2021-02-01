@@ -82,6 +82,10 @@ class ImpoundRecord < ApplicationRecord
     ).presence
   end
 
+  def unorganized?
+    !organized?
+  end
+
   def organized?
     organization_id.present?
   end

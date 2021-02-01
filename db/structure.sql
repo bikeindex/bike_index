@@ -437,7 +437,8 @@ CREATE TABLE public.bikes (
     address_set_manually boolean DEFAULT false,
     created_by_parking_notification boolean DEFAULT false,
     is_phone boolean DEFAULT false,
-    conditional_information jsonb DEFAULT '{}'::jsonb
+    conditional_information jsonb DEFAULT '{}'::jsonb,
+    current_impound_record_id bigint
 );
 
 
@@ -4047,6 +4048,13 @@ CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_sti
 --
 
 CREATE INDEX index_bikes_on_creation_state_id ON public.bikes USING btree (creation_state_id);
+
+
+--
+-- Name: index_bikes_on_current_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btree (current_impound_record_id);
 
 
 --

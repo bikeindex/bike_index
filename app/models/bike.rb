@@ -28,6 +28,7 @@ class Bike < ApplicationRecord
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :current_impound_record, class_name: "ImpoundRecord"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
@@ -321,10 +322,6 @@ class Bike < ApplicationRecord
     recovered_records.any?
   end
 
-  def current_impound_record
-    impound_records.current.last
-  end
-
   def impounded?
     current_impound_record.present?
   end
@@ -451,8 +448,12 @@ class Bike < ApplicationRecord
   end
 
   def authorized?(u)
-    return true unless current_impound_record.present? || !(u == owner || claimable_by?(u))
     return false if u.blank?
+    # If there isn't a current impound record - or if it's impound by a user, not an organization
+    # Authorization is based on whether the user is the owner of the bike
+    if current_impound_record.blank? || current_impound_record.unorganized?
+      return true if u == owner || claimable_by?(u)
+    end
     authorized_by_organization?(u: u)
   end
 
@@ -830,6 +831,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
+    fetch_current_impound_record # Used by a bunch of things, but this method is private
     set_location_info
     self.listing_order = calculated_listing_order
     # Quick hack to store the fact that it was creation for parking notification
@@ -947,5 +949,9 @@ class Bike < ApplicationRecord
       break if bp_address.present?
     end
     bp_address
+  end
+
+  def fetch_current_impound_record
+    self.current_impound_record = impound_records.current.last
   end
 end

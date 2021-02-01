@@ -716,7 +716,25 @@ RSpec.describe Bike, type: :model do
         end
       end
     end
-    context "impound record" do
+    context "impound_record" do
+      let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+      let(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user) }
+      it "returns truthy if impound_record is current unless user is organization_member" do
+        expect(impound_record.bike_id).to eq bike.id
+        expect(bike.reload.claimed?).to be_truthy
+        expect(bike.impound_records.pluck(:id)).to eq([impound_record.id])
+        expect(bike.current_impound_record_id).to be_blank
+        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+        expect(impound_record.reload.active?).to be_truthy
+        expect(impound_record.user_id).to eq user.id
+        expect(ownership.reload.claimed?).to be_truthy
+        expect(ownership.owner&.id).to eq user.id
+        expect(bike.reload.current_impound_record_id).to eq impound_record.id
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.authorized?(user)).to be_truthy
+      end
+    end
+    context "impound_record with organization" do
       let(:ownership) { FactoryBot.create(:ownership, user: user) }
       let(:impound_record) { FactoryBot.build(:impound_record_with_organization, bike: bike) }
       let(:organization) { impound_record.organization }
@@ -736,6 +754,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorized?(organization_member)).to be_truthy
+          expect(bike.current_impound_record_id).to eq impound_record.id
           impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
         end
         impound_record.reload
@@ -1132,7 +1151,8 @@ RSpec.describe Bike, type: :model do
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
           FactoryBot.create(:impound_record_with_organization, bike: bike, organization: organization)
-          bike.reload
+          bike.update(updated_at: Time.current) # Bump current_impound_record
+          expect(bike.reload.current_impound_record_id).to be_present
           expect(bike.avery_exportable?).to be_falsey
         end
       end

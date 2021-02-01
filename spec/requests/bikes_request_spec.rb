@@ -671,14 +671,20 @@ RSpec.describe BikesController, type: :request do
             }.to change(Ownership, :count).by 1
             new_bike = Bike.last
             expect(new_bike).to be_present
+            expect(new_bike.authorized?(current_user)).to be_truthy
             expect(new_bike.creation_state.origin).to eq "web"
             expect(new_bike.creation_state.organization&.id).to be_blank
             expect(new_bike.creation_state.creator&.id).to eq current_user.id
             expect(new_bike.status).to eq "status_impounded"
             expect(new_bike.status_humanized).to eq "found"
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
-            impound_record = new_bike.current_impound_record
-            expect(impound_record).to be_present
+            ownership = new_bike.current_ownership
+            expect(ownership.claimed?).to be_truthy
+            expect(ownership.send_email).to be_falsey
+            expect(ownership.self_made).to be_truthy
+            expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
+            impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
+            expect(new_bike.current_impound_record&.id).to eq impound_record.id
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
