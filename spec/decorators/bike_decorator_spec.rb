@@ -51,4 +51,18 @@ RSpec.describe BikeDecorator do
       end
     end
   end
+
+  describe "title_html" do
+    let(:bike) { Bike.new }
+    let(:decorator) { BikeDecorator.new(bike) }
+    it "returns expected thing" do
+      expect(decorator.title_html).to eq("<span><strong></strong></span>")
+    end
+    context "html frame_model" do
+      let(:bike) { Bike.new(frame_model: "escape tags?</p>") }
+      it "escapes the HTML" do
+        expect(decorator.title_html).to eq("<span><strong></strong> escape tags?&amp;lt;&amp;#x2F;p&amp;gt;</span>")
+      end
+    end
+  end
 end

@@ -363,8 +363,13 @@ class Bike < ApplicationRecord
     organizations.include?(org)
   end
 
+  # Might be more sophisticated someday...
+  def serial_hidden?
+    status_abandoned? || status_impounded?
+  end
+
   def serial_display
-    return "Hidden" if status_abandoned? || status_impounded?
+    return "Hidden" if serial_hidden?
     return serial_number.humanize if no_serial?
     serial_number
   end

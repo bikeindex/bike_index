@@ -15,14 +15,6 @@ class BikeDecorator < ApplicationDecorator
     h.content_tag(:span, t) + h.content_tag(:strong, object.mnfg_name)
   end
 
-  def title_u
-    t = ""
-    t += "#{object.year} " if object.year.present?
-    t += h.content_tag(:strong, object.mnfg_name)
-    t += Rack::Utils.escape_html(" #{object.frame_model_truncated}") if object.frame_model.present?
-    t.html_safe
-  end
-
   def list_link_url(target = nil)
     if target == "edit"
       "/bikes/#{object.id}/edit"
@@ -40,6 +32,15 @@ class BikeDecorator < ApplicationDecorator
       h.image_tag(small.join("/") + ext, alt: title_string)
     else
       h.image_tag("revised/bike_photo_placeholder.svg", alt: title_string, title: "No image", class: "no-image")
+    end
+  end
+
+  def title_html
+    h.content_tag(:span) do
+      h.concat("#{object.year} ") if object.year.present?
+      h.concat(h.content_tag(:strong, object.mnfg_name))
+      h.concat(Rack::Utils.escape_html(" #{object.frame_model_truncated}")) if object.frame_model.present?
+      h.concat(" #{object.type}") if object.type != "bike"
     end
   end
 end

@@ -10,7 +10,7 @@
           - if current_user.superuser
             = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
           - if passive_organization.present?
-            %h3.secondary-bike-title.mb-2= @bike.title_u
+            %h3.secondary-bike-title.mb-2= @bike.title_html
         - if passive_organization&.enabled?("credibility_badges")
           .col-md-5.text-right
             = render partial: "/bikes/credibility_score", locals: { bike: @bike }
@@ -86,8 +86,7 @@
             %strong.status-display.found-color= t(".found")
           - else
             %strong.status-display.impounded-color= t(".impounded")
-        %span.uncap
-          = @bike.title_u
+        %span.uncap= @bike.title_html
       - if @bike.status_stolen? && @stolen_record.present?
         %p
           %strong
@@ -147,7 +146,13 @@
 
       .show-bike-details
         %ul.attr-list.split-sm
-          = attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
+          %li
+            %strong.attr-title #{t(".serial")}:
+            = @bike.serial_display
+            - if @bike.serial_hidden?
+              %small.less-strong
+                because #{@bike.type} is
+                %em= @bike.status_humanized
 
           - unless @bike.status_abandoned?
             = attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
@@ -198,7 +203,7 @@
             = t(".theft_details", bike_abandoned: @bike.status_abandoned? ? 'Abandoned' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
-              = render partial: "stolen_map"
+              = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
             .col-md-4
               %ul.attr-list.separate-lines
                 = attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
@@ -209,11 +214,21 @@
                 = attr_list_item(@stolen_record.police_report_number, t(".police_report"))
                 = attr_list_item(@stolen_record.police_report_department, t(".department_city"))
           - if @stolen_record.theft_description.present?
-            %h3
-              = t(".description_of_incident")
-            %p
-              = @stolen_record.theft_description
-
+            %h3= t(".description_of_incident")
+            %p= @stolen_record.theft_description
+        - elsif @bike.current_impound_record.present?
+          - impound_record = @bike.current_impound_record
+          %h3
+            This is an abandoned #{@bike.type} that was #{impound_record.kind}
+          .row
+            - if impound_record.latitude.present?
+              = render partial: "stolen_map", locals: { mapping_record: impound_record }
+            .col-md-4
+              %ul.attr-list.separate-lines
+                = attr_list_item(impound_record.address(skip_default_country: true), t(".location"))
+                %li
+                  %strong.attr-title #{impound_record.kind.titleize}
+                  %span.convertTime= l impound_record.impounded_at, format: :convert_time
 
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?
@@ -252,7 +267,7 @@
     .col-md-4
       .social-share-bike.mb-4.mt-4
         %h4
-          - if @bike.status_stolen?
+          - if @bike.status_stolen? || @bike.status_impounded?
             = t(".spread_the_word")
           - else
             = t(".share_it")

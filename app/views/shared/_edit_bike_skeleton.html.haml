@@ -12,10 +12,7 @@
           %span.uppercase.impounded-color= t(".impounded")
       - else
         = t(".edit")
-      = @bike.year
-      = @bike.mnfg_name
-      = @bike.frame_model
-      = @bike.type unless @bike.type == 'bike'
+      = BikeDecorator.new(@bike).title_html
       - if @bike.deleted?
         %em.text-danger.uncap
           This #{@bike.type} was deleted

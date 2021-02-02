@@ -906,21 +906,6 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to render_template "edit_theft_details"
             end
           end
-          # TODO after #1875: fix this recovered bike creation
-          # context "recovered bike" do
-          #   it "renders with recovered as first template, different description" do
-          #     bike.update_attributes(stolen: true, abandoned: true)
-          #     bike.reload
-          #     expect(bike.abandoned).to be_truthy
-
-          #     get :edit, params: {id: bike.id}
-
-          #     expect(response).to be_ok
-          #     expect(assigns(:edit_template)).to eq "theft_details"
-          #     expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
-          #     expect(response).to render_template "edit_theft_details"
-          #   end
-          # end
           context "unknown template" do
             it "renders the bike_details template" do
               get :edit, params: {id: bike.id, page: "root_party"}

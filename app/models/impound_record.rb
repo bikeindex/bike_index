@@ -73,13 +73,21 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
+  def latitude_public
+    latitude.round(2)
+  end
+
+  def longitude_public
+    longitude.round(2)
+  end
+
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?
     false
   end
 
   # force_show_address, just like stolen_record & parking_notification
-  def address(force_show_address: false)
+  def address(skip_default_country: false, force_show_address: false)
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),

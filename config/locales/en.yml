@@ -984,7 +984,8 @@ en:
         you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
-      thank_you_for_registering_this_found_bike_type: Thank you for registering this found %{bike_type}!
+      thank_you_for_registering_this_found_bike_type: Thank you for registering this
+        found %{bike_type}!
       this_bike_type_is_hidden: This %{bike_type} is hidden.
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
         Index.
@@ -1044,6 +1045,7 @@ en:
       existing_stickers: Existing stickers
       frame_size: Frame size
       general_description: General description
+      made_without_serial: Made without serial
       main_frame_material: Main frame material
       manufacturer: Manufacturer
       model_year: Model year
@@ -1056,7 +1058,6 @@ en:
       state: State
       street: Street
       submit_manufacturer_correction: Submit Manufacturer Correction
-      made_without_serial: Made without serial
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
       tell_us_about_your_bike: Tell us about your bike!
@@ -1392,8 +1393,6 @@ en:
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
-      found: Found
-      impounded: Impounded
       created_to_record_parking_notification: "%{bike_type} created by %{organization}
         to record a Parking Notification"
       cycle_type: Cycle type
@@ -1401,6 +1400,7 @@ en:
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
+      found: Found
       frame_material: Frame Material
       frame_size: Frame size
       from: from
@@ -1409,6 +1409,7 @@ en:
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
+      impounded: Impounded
       impounded_at: Impounded
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
@@ -1524,6 +1525,7 @@ en:
         alert: Activate Promoted Alert
         bike_details: Bike Details
         drivetrain: Wheels and Drivetrain
+        found_details: Information about finding
         groups: Groups and Organizations
         ownership: Transfer Ownership
         photos: Photos
@@ -1531,7 +1533,6 @@ en:
         remove: Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
-        found_details: Information about finding
         theft_details: Theft details
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-
@@ -4921,9 +4922,9 @@ en:
     donation_modal:
       donation_header: Help support our efforts!
     edit_bike_skeleton:
+      edit: Edit
       found: Found
       impounded: Impounded
-      edit: Edit
       owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
         been claimed yet
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
