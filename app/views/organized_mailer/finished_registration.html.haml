@@ -11,7 +11,7 @@
       = t(".html.welcome_to_bike_index")
 
   -# used to be logic in here, but the @ownership.claim_message should mostly take this over
-  - if @bike.status_abandoned?
+  - if @bike.status_impounded?
     %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
   - elsif @bike.status_stolen?
     %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
@@ -26,7 +26,7 @@
   %p
     - org_name = @creation_org&.name || @ownership&.creator&.display_name
 
-    - bike_type = if @bike.status_abandoned?
+    - bike_type = if @bike.status_impounded?
       - t(".html.recovered_biketype", biketype: @bike.type)
     - elsif @bike.status_stolen?
       - t(".html.stolen_biketype", biketype: @bike.type)
@@ -45,9 +45,9 @@
 
 = render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike, t: @ownership.token, email: @vars[:email]) }
 
-- if @bike.status_stolen?
+- if @bike.status_stolen_or_impounded?
   %p
-    - if @bike.status_abandoned?
+    - if @bike.status_impounded?
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
       = t(".html.hopefully_you_find_the_owner_html", edit_bike_link: edit_bike_link)
     - else
@@ -79,7 +79,7 @@
 - if @organization && @organization.mail_snippet_body("security").present?
   = @organization.mail_snippet_body("security").html_safe
 - else
-  - unless @bike.status_abandoned?
+  - unless @bike.status_impounded?
     -# Just to keep things wrapped up
     %div
       - unless @vars[:donation_message]

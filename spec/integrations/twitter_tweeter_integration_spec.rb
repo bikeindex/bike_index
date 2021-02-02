@@ -75,8 +75,8 @@ RSpec.describe TwitterTweeterIntegration do
 
     # TODO after #1875: - Fix this abandoned bike tweet
     # context "recovered bike" do
-    #   let(:bike) { FactoryBot.create(:recovered_bike, :green_novara_torero) }
-    #   let(:stolen_record) { StolenRecord.unscoped.where(bike_id: bike.id).last }
+    #   let(:bike) { FactoryBot.create(:bike, :green_novara_torero) }
+    #   let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
 
     #   it "creates correct string without append block if string is too long" do
     #     expect(current_stolen_record.neighborhood).to eq("Tribeca")

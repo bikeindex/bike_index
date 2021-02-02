@@ -601,68 +601,12 @@ RSpec.describe BParam, type: :model do
           expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
         end
       end
-    end
-  end
-
-  describe "build_bike" do
-    let(:b_param_params) { {} }
-    let(:b_param) { BParam.new(params: b_param_params) }
-    let(:bike) { b_param.build_bike }
-    it "builds it" do
-      expect(bike.status).to eq "status_with_owner"
-      expect(bike.id).to be_blank
-    end
-    context "with id" do
-      let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
-      it "includes ID" do
-        expect(b_param).to be_valid
-        expect(bike.status).to eq "status_with_owner"
-        expect(bike.id).to be_blank
-        expect(bike.b_param_id).to eq b_param.id
-        expect(bike.b_param_id_token).to eq b_param.id_token
-        expect(bike.creator).to eq b_param.creator
-      end
-      context "stolen" do
-        # Even though status_with_owner passed - since it has stolen attrs
-        let(:b_param_params) { {bike: {status: "status_with_owner"}, stolen_record: {phone: "7183839292"}} }
-        it "is stolen" do
-          expect(b_param).to be_valid
-          expect(b_param.status).to eq "status_stolen"
-          expect(b_param.stolen_attrs).to eq b_param_params[:stolen_record].as_json
-          expect(bike.status).to eq "status_stolen"
-          expect(bike.id).to be_blank
-          expect(bike.b_param_id).to eq b_param.id
-          expect(bike.b_param_id_token).to eq b_param.id_token
-          expect(bike.creator).to eq b_param.creator
-          stolen_record = bike.stolen_records.first
-          expect(stolen_record).to be_present
-          expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
+      context "found" do
+        let(:url_params) { ActionController::Parameters.new({status: "found"}) }
+        it "returns impounded" do
+          expect(BParam.bike_attrs_from_url_params(status: "found")).to eq({status: "status_impounded"})
+          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
         end
-      end
-      context "legacy_stolen" do
-        let(:b_param_params) { {bike: {stolen: true}} }
-        it "is stolen" do
-          expect(b_param).to be_valid
-          expect(b_param.status).to eq "status_stolen"
-          expect(b_param.stolen_attrs).to be_blank
-          expect(bike.status).to eq "status_stolen"
-          expect(bike.id).to be_blank
-          expect(bike.b_param_id).to eq b_param.id
-          expect(bike.b_param_id_token).to eq b_param.id_token
-          expect(bike.creator).to eq b_param.creator
-          stolen_record = bike.stolen_records.first
-          expect(stolen_record).to be_present
-        end
-      end
-    end
-    context "status overrides" do
-      it "is stolen if it is stolen" do
-        bike = BParam.new.build_bike(status: "status_stolen")
-        expect(bike.status).to eq "status_stolen"
-      end
-      it "impounded if status_impounded" do
-        bike = BParam.new.build_bike(status: "status_impounded")
-        expect(bike.status).to eq "status_impounded"
       end
     end
   end

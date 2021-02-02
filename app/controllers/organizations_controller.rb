@@ -82,7 +82,7 @@ class OrganizationsController < ApplicationController
   end
 
   def built_stolen_record
-    @bike.stolen_records.first || @bike.build_new_stolen_record(@b_param.stolen_attrs)
+    @bike.stolen_records.last || @bike.build_new_stolen_record(@b_param.stolen_attrs)
   end
 
   def built_stolen_record_date(str)

@@ -4,14 +4,15 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
   let(:instance) { described_class.new }
 
   let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
-  let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, resolved: false, kind: kind) }
   let(:kind) { "note" }
 
   it "resolves the impound_record_update" do
-    bike.reload
-    expect(bike.status_impounded?).to be_falsey
-    expect(bike.updated_at).to be < Time.current - 1.minute
+    impound_record.reload
+    # The factory force updates bike, so force un-update
+    bike.update_columns(status: "status_with_owner", current_impound_record_id: nil)
+    expect(bike.reload.status).to eq "status_with_owner"
 
     impound_record_update.save
     Sidekiq::Worker.clear_all
@@ -21,8 +22,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     impound_record_update.reload
     expect(impound_record_update.resolved).to be_truthy
 
-    bike.reload
-    expect(bike.status_impounded?).to be_truthy
+    expect(bike.reload.status).to eq "status_impounded"
     expect(bike.updated_at).to be_within(1).of Time.current
   end
 
@@ -69,8 +69,8 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
   context "retrieved by owner" do
     let(:kind) { "retrieved_by_owner" }
     it "marks the impound_record resolved" do
-      bike.update(updated_at: Time.current)
-      expect(bike.status_impounded?).to be_truthy
+      impound_record.reload
+      expect(bike.reload.status).to eq "status_impounded"
 
       impound_record_update.save
       Sidekiq::Worker.clear_all
@@ -85,7 +85,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(impound_record.status).to eq kind
 
       bike.reload
-      expect(bike.status_impounded?).to be_falsey
+      expect(bike.reload.status).to eq "status_with_owner"
       expect(bike.updated_at).to be_within(1).of Time.current
     end
   end
@@ -114,8 +114,9 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     let(:kind) { "transferred_to_new_owner" }
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike, claimed: false) }
     it "creates 2 new ownerships, transfers it to the user, then to the new email, only sends one email" do
+      impound_record.reload
       impound_record_update.update(transfer_email: "something@party.com")
-      expect(bike.ownerships.count).to eq 1
+      expect(bike.reload.ownerships.count).to eq 1
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
       expect {
@@ -129,6 +130,10 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(ownership.current?).to be_falsey
 
       bike.reload
+      expect(bike.status).to eq "status_with_owner"
+      expect(bike.current_impound_record_id).to be_blank
+      expect(bike.owner_email).to eq "something@party.com"
+
       new_ownership = bike.current_ownership
       expect(new_ownership.impound_record).to eq impound_record
       expect(new_ownership.organization).to eq impound_record.organization
@@ -141,7 +146,6 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       impound_record.reload
       expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at
       expect(impound_record.status).to eq kind
-      expect(impound_record.bike.owner_email).to eq "something@party.com"
     end
   end
 end

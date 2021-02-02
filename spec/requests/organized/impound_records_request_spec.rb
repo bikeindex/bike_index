@@ -157,8 +157,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
         expect(impound_record_update.resolved).to be_truthy
-
-        expect(impound_record.bike.deleted?).to be_truthy
+        expect(bike.reload.deleted?).to be_truthy
       end
     end
     context "transferred_to_new_owner" do

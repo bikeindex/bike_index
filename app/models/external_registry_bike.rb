@@ -29,11 +29,15 @@ class ExternalRegistryBike < ApplicationRecord
       matches
     end
 
+    def impounded_kind
+      ImpoundRecord.found_kind
+    end
+
     # These are the currently known statuses
     def status_converter(status)
       case status.downcase
       when "stolen" then "status_stolen"
-      when "abandoned" then "status_abandoned"
+      when "abandoned" then "status_impounded"
       when "new", "transferred", "registered", "pending transfer" then "status_with_owner"
       else # There is a new status! Fail, we need to figure out what to do with it
         raise "Unknown external registry status: #{status}"
@@ -55,6 +59,16 @@ class ExternalRegistryBike < ApplicationRecord
     def absent?(value)
       value.presence.blank? || /geen|onbekend/i.match?(value)
     end
+  end
+
+  def status_humanized
+    shuman = Bike.status_humanized(status)
+    return self.class.impounded_kind if shuman == "impounded"
+    shuman
+  end
+
+  def status_humanized_translated
+    Bike.status_humanized_translated(status_humanized)
   end
 
   def frame_colors

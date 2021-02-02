@@ -16,8 +16,6 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
-  belongs_to :country
-  belongs_to :state
 
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
 
@@ -256,12 +254,8 @@ class ParkingNotification < ActiveRecord::Base
     # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
-      addy_hash = Geohelper.formatted_address_hash(Geohelper.reverse_geocode(latitude, longitude))
-      self.street = addy_hash["street"]
-      self.city = addy_hash["city"]
-      self.zipcode = addy_hash["zipcode"]
-      self.country = Country.fuzzy_find(addy_hash["country"])
-      self.state = State.fuzzy_find(addy_hash["state"])
+      self.attributes = Geohelper.assignable_address_hash(Geohelper.reverse_geocode(latitude, longitude))
+        .except(:latitude, :longitude) # Don't re-overwrite coordinates
     else
       coordinates = Geohelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?

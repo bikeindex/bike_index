@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
+  it_behaves_like "geocodeable"
   let!(:bike) { FactoryBot.create(:bike) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
@@ -13,8 +14,10 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(organization.enabled?("impound_bikes")).to be_truthy
       expect(bike.impounded?).to be_falsey
       bike.impound_records.create(user: user, bike: bike, organization: organization)
-      bike.reload
-      expect(bike.impounded?).to be_truthy
+      expect(bike.impound_records.count).to eq 1
+      bike.update(updated_at: Time.current)
+      expect(bike.reload.impounded?).to be_truthy
+      expect(bike.status_found?).to be_falsey
       expect(bike.impound_records.count).to eq 1
       impound_record = bike.current_impound_record
       expect(impound_record.organization).to eq organization
@@ -23,10 +26,12 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(Bike.impounded.pluck(:id)).to eq([bike.id])
       expect(organization.impound_records.bikes.pluck(:id)).to eq([bike.id])
       expect(impound_record.kind).to eq "impounded"
+      expect(impound_record.impounded_at).to be_within(1).of impound_record.created_at
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
       it "errors" do
+        expect(impound_record.to_coordinates).to eq([nil, nil])
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.impound_records.count).to eq 1
@@ -81,11 +86,13 @@ RSpec.describe ImpoundRecord, type: :model do
           bike.update(updated_at: Time.current)
           expect(bike.reload.impounded?).to be_truthy
           expect(bike.status_impounded?).to be_truthy
+          expect(bike.status_found?).to be_falsey
           expect(bike.created_by_parking_notification?).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
+          expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
           Sidekiq::Worker.clear_all
@@ -254,6 +261,47 @@ RSpec.describe ImpoundRecord, type: :model do
         parking_notification2.reload
         expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
         expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
+      end
+    end
+  end
+
+  describe "geocoding" do
+    context "real geocoding" do
+      include_context :geocoder_real
+      let!(:state) { FactoryBot.create(:state_illinois) }
+      let(:latitude) { 41.9202384 }
+      let(:longitude) { -87.7158185 }
+      let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
+      it "geocodes if no address and if address changes" do
+        VCR.use_cassette("impound_record-address_lookup") do
+          impound_record.save
+          impound_record.reload
+          expect(impound_record.street).to eq "3554 W Shakespeare Ave"
+          expect(impound_record.address).to eq "Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true)).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.latitude).to eq latitude
+          expect(impound_record.longitude).to eq longitude
+          expect(impound_record.valid?).to be_truthy
+          expect(impound_record.id).to be_present
+          expect(impound_record.state_id).to eq state.id
+          expect(impound_record.country_id).to eq Country.united_states.id
+          # It changes, so regeocodes
+          impound_record.update(street: "2554 W Shakespeare ave")
+          impound_record.reload
+          expect(impound_record.address(force_show_address: true)).to eq "2554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.latitude).to_not eq latitude
+          expect(impound_record.longitude).to_not eq longitude
+          # It does not change, no re-geocoding
+          expect(Geohelper).to_not receive(:assignable_address_hash)
+          impound_record.update(status: "retrieved_by_owner")
+        end
+      end
+    end
+    context "no location" do
+      let(:impound_record) { FactoryBot.create(:impound_record) }
+      it "does not geocode" do
+        impound_record.reload
+        expect(impound_record.to_coordinates).to eq([nil, nil])
       end
     end
   end

@@ -106,14 +106,10 @@ class BikesController < ApplicationController
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.build_bike(BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
+    @bike ||= BikeCreator.new(@b_param).build_bike(BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
-    if @bike.status_stolen?
-      @stolen_record = @bike.stolen_records.build(@b_param.params["stolen_record"])
-      @stolen_record.country_id ||= Country.united_states.id
-    end
     @page_errors = @b_param.bike_errors
   end
 
@@ -130,7 +126,6 @@ class BikesController < ApplicationController
                                  origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
           redirect_to(embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
@@ -151,7 +146,6 @@ class BikesController < ApplicationController
       @b_param.clean_params(permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
         flash[:success] = translation(:bike_was_added)
@@ -304,11 +298,10 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.status_abandoned?
-      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.status_abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit)
       h[:publicize] = translation(:publicize, controller_method: :edit)
       h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.status_abandoned?
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
     end
   end
 
@@ -318,13 +311,16 @@ class BikesController < ApplicationController
   def bike_templates
     {}.with_indifferent_access.tap do |h|
       h[:bike_details] = translation(:bike_details, controller_method: :edit)
+      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
       h[:photos] = translation(:photos, controller_method: :edit)
       h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
       h[:accessories] = translation(:accessories, controller_method: :edit)
       h[:ownership] = translation(:ownership, controller_method: :edit)
       h[:groups] = translation(:groups, controller_method: :edit)
       h[:remove] = translation(:remove, controller_method: :edit)
-      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.status_stolen?
+      unless @bike.status_stolen? || @bike.status_impounded?
+        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
+      end
     end
   end
 
@@ -364,7 +360,7 @@ class BikesController < ApplicationController
 
   def find_or_new_b_param
     token = params[:b_param_token]
-    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    token ||= params.dig(:bike, :b_param_id_token)
     @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id)
   end
 
@@ -445,7 +441,8 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible,
+      impound_records_attributes: %i[timezone impounded_at street country_id street city zipcode state_id])}
   end
 
   # still manually managing permission of params, so skip it

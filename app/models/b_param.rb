@@ -84,6 +84,7 @@ class BParam < ApplicationRecord
     status = url_params[:status]
     if status.present?
       status = "status_#{status}" unless status.start_with?("status_")
+      status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
       return {status: status} if Bike.statuses.include?(status)
     end
     return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
@@ -135,7 +136,7 @@ class BParam < ApplicationRecord
   def stolen_attrs
     s_attrs = params["stolen_record"] || {}
     nested_params = params.dig("bike", "stolen_records_attributes")
-    if nested_params&.values&.first&.is_a?(Hash)
+    if nested_params&.values&.first.is_a?(Hash)
       s_attrs = nested_params.values.reject(&:blank?).last
     end
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
@@ -144,12 +145,21 @@ class BParam < ApplicationRecord
     s_attrs.except("phone_no_show")
   end
 
+  def impound_attrs
+    s_attrs = params["impound_record"] || {}
+    nested_params = params.dig("bike", "impound_records_attributes")
+    if nested_params&.values&.first.is_a?(Hash)
+      s_attrs = nested_params.values.reject(&:blank?).last
+    end
+    s_attrs
+  end
+
   def status
     if Bike.statuses.include?(bike["status"])
-      # Don't override status with status_with_owner,
+      # Don't override status with status_with_owner
       return bike["status"] unless bike["status"] == "status_with_owner"
     end
-    # Support bike: {stolen: true} legacy setup
+    return "status_impounded" if impound_attrs.present?
     return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
     "status_with_owner"
   end
@@ -159,7 +169,11 @@ class BParam < ApplicationRecord
   end
 
   def status_abandoned?
-    bike["status"] == "status_abandoned"
+    status == "status_abandoned"
+  end
+
+  def status_impounded?
+    status == "status_impounded"
   end
 
   def unregistered_parking_notification?
@@ -236,6 +250,12 @@ class BParam < ApplicationRecord
 
   def owner_email
     bike && bike["owner_email"]
+  end
+
+  def skip_owner_email?
+    return true if status_impounded? || unregistered_parking_notification?
+    send_email = params.dig("bike", "send_email").to_s
+    send_email.present? && !ParamsNormalizer.boolean(send_email)
   end
 
   def organization_affiliation
@@ -456,18 +476,10 @@ class BParam < ApplicationRecord
     formatted_address
   end
 
-  def build_bike(new_attrs = {})
-    bike = Bike.new(safe_bike_attrs(new_attrs))
-    bike.build_new_stolen_record(stolen_attrs) if status_stolen?
-    bike
-  end
-
-  private
-
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     bike.merge(status: status).merge(new_attrs.as_json)
-      .select { |k, v| v.present? }
+      .select { |_k, v| v.present? }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
              "b_param_id_token" => id_token,
@@ -475,6 +487,8 @@ class BParam < ApplicationRecord
              "updator_id" => creator_id)
       .merge(address_hash)
   end
+
+  private
 
   def process_image_if_required
     return true if image_processed || image.blank?

@@ -17,14 +17,14 @@ RSpec.describe BikeUpdator do
       ownership = FactoryBot.create(:ownership)
       user = FactoryBot.create(:user)
       bike = ownership.bike
-      expect { BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).ensure_ownership! }.to raise_error(BikeUpdatorError)
+      expect { BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send("ensure_ownership!") }.to raise_error(BikeUpdatorError)
     end
 
     it "returns true if the bike is owned by the user" do
       ownership = FactoryBot.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
-      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).ensure_ownership!).to be_truthy
+      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send("ensure_ownership!")).to be_truthy
     end
   end
 
@@ -86,8 +86,8 @@ RSpec.describe BikeUpdator do
 
     it "marks a bike stolen with the date_stolen" do
       FactoryBot.create(:country, iso: "US")
-      bike = FactoryBot.create(:bike)
-      updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
+      bike = FactoryBot.create(:bike, :with_ownership)
+      updator = BikeUpdator.new(user: bike.creator, b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
       updator.update_available_attributes
       bike.reload
       expect(bike.status).to eq "status_stolen"

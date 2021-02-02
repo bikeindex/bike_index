@@ -30,12 +30,7 @@
                     = bike.thumb_image
                   .bike-information.multi-attr-lists
                     %h5.title-link
-                      - if bike.status_stolen?
-                        %strong.stolen-color
-                          - if bike.status_abandoned?
-                            = t(".abandoned")
-                          - else
-                            = t(".stolen")
+                      = bike.status_html
                       %strong
                         - unless bike.type == 'bike'
                           = bike.type
@@ -45,9 +40,11 @@
                       = attr_list_item(bike.serial_display, t(".serial"))
                       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
-                        - abandoned_or_stolen =  bike.status_abandoned? ? t(".date_abandoned") : t('.date_stolen')
-                        = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
+                        = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), t('.date_stolen'))
                         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
+                      - elsif bike.current_impound_record.present?
+                        = attr_list_item(l(bike.current_impound_record.impounded_at, format: :dotted), t('.date_found'))
+                        = attr_list_item(bike.current_impound_record.address, t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
                       - if bike.status_stolen?
@@ -61,7 +58,7 @@
                               %em= impound_claim.status_humanized.titleize
                               claim to
                             = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type}", bike_path(impound_claim.bike_claimed)
-                      - else
+                      - elsif bike.status_with_owner?
                         %li
                           = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 

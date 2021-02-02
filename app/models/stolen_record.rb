@@ -31,8 +31,6 @@ class StolenRecord < ApplicationRecord
   ].freeze
 
   belongs_to :bike
-  belongs_to :country
-  belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
 

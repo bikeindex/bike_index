@@ -41,9 +41,6 @@ class User < ApplicationRecord
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :theft_alerts
 
-  belongs_to :state
-  belongs_to :country
-
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
@@ -339,6 +336,10 @@ class User < ApplicationRecord
 
   def current_user_phone
     user_phones.where(phone: phone).last
+  end
+
+  def phone_confirmed?
+    user_phones.confirmed.any?
   end
 
   def set_calculated_attributes

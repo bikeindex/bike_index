@@ -1,8 +1,5 @@
 %h1{style: "font-weight: 400; font-size: 30px;"}
-  - if @bike.status_abandoned?
-    = t(".html.were_spreading_the_word_about_your_found", bike_type: @bike_type)
-  - else
-    = t(".html.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
+  = t(".html.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
 
 %p{style: ""}
   = t(".html.we_sent_out_this_tweet_from")
@@ -48,9 +45,6 @@
 
 %p{style: "margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;"}
   - date = @bike.created_at.strftime("%m.%d.%y")
-  - if @bike.status_abandoned?
-    = t(".html.this_email_is_about_the_found_bike", bike_type: @bike_type, date: date)
-  - else
-    = t(".html.this_email_is_about_the_stolen_bike", bike_type: @bike_type, date: date)
+  = t(".html.this_email_is_about_the_stolen_bike", bike_type: @bike_type, date: date)
 
 = render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike) }

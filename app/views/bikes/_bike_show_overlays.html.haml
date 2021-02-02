@@ -112,8 +112,8 @@
                 = t(".no_one_can_see_it_but_you")
 
               - if @bike.user?
-                - if @bike.status_abandoned?
-                  = t(".thank_you_for_recovering_this_bike_type", bike_type: @bike.type)
+                - if @bike.status_impounded?
+                  = t(".thank_you_for_registering_this_found_bike_type", bike_type: @bike.type)
                 - elsif @bike.status_stolen?
                   = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
                 - else
@@ -122,10 +122,10 @@
                 - if @bike.public_images.any?
                   = t(".add_some_more_information_about_it")
                 - else
-                  - if @bike.status_stolen?
-                    = t(".add_a_picture_so_people_know_what_to_look")
-                  - else
+                  - if @bike.status_with_owner?
                     = t(".add_a_picture_of_it")
+                  - else
+                    = t(".add_a_picture_so_people_know_what_to_look")
             - else
               -# The bike has been sent to someone other than the current_user
               = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)

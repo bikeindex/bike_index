@@ -51,4 +51,40 @@ RSpec.describe BikeDecorator do
       end
     end
   end
+
+  describe "title_html" do
+    let(:bike) { Bike.new }
+    let(:decorator) { BikeDecorator.new(bike) }
+    it "returns expected thing" do
+      expect(decorator.title_html).to eq("<span><strong></strong></span>")
+    end
+    context "html frame_model" do
+      let(:bike) { Bike.new(frame_model: "escape tags?</p>") }
+      it "escapes the HTML" do
+        expect(decorator.title_html).to eq("<span><strong></strong> escape tags?&amp;lt;&amp;#x2F;p&amp;gt;</span>")
+      end
+    end
+  end
+
+  describe "status_html" do
+    let(:decorator) { BikeDecorator.new(Bike.new(status: status)) }
+    let(:status) { "status_with_owner" }
+    it "responds with nil" do
+      expect(decorator.status_html).to be_blank
+    end
+    context "stolen" do
+      let(:status) { "status_stolen" }
+      let(:target) { "<strong class=\"stolen-color uppercase bike-status-html\">stolen</strong>" }
+      it "responds with strong" do
+        expect(decorator.status_html).to eq target
+      end
+    end
+    context "impounded" do
+      let(:status) { "status_impounded" }
+      let(:target) { "<strong class=\"impounded-color uppercase bike-status-html\">impounded</strong>" }
+      it "responds with strong" do
+        expect(decorator.status_html).to eq target
+      end
+    end
+  end
 end
