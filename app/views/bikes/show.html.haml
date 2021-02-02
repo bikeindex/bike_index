@@ -61,9 +61,9 @@
         = t(".this_was_impounded", bike_type: @bike.type.titleize)
       - if @bike.current_impound_record.present?
         = t(".impounded_at")
-        %em.convertTime
+        %em.convertTime.preciseTime
           = l @bike.current_impound_record.created_at, format: :convert_time
-        %em.small.convertTimezone
+        %em.small
         = t(".by")
         %strong
           = @bike.current_impound_record.organization&.name
@@ -84,7 +84,7 @@
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
           %strong= @bike.status_humanized_translated
-          %span.convertTime
+          %span.convertTime.preciseTime
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time
           %small.convertTimezone

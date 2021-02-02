@@ -1500,7 +1500,7 @@ RSpec.describe BikesController, type: :request do
           street: "278 Broadway",
           city: "New York",
           zipcode: "10007",
-          state_id: state.id,
+          state_id: state.id
         }
       end
       it "updates the impound_record" do

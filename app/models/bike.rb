@@ -132,7 +132,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
-      I18n.t(str.gsub(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
     end
 
     def text_search(query)
@@ -345,7 +345,7 @@ class Bike < ApplicationRecord
 
   def status_found?
     return false unless status_impounded?
-    id.present? ? current_impound_record&.kind : impound_records.last&.kind
+    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
   end
 
   def status_humanized

@@ -17,8 +17,8 @@ class BikeDecorator < ApplicationDecorator
   def status_html
     return "" if object.status_with_owner?
     h.content_tag(:strong,
-                  object.status_humanized_translated,
-                  class: "#{object.status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
+      object.status_humanized_translated,
+      class: "#{object.status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
   end
 
   def list_link_url(target = nil)

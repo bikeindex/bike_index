@@ -1,8 +1,6 @@
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
 
 .d-none{ data: { url: ENV['BASE_URL'] } }
-  -# Only rendering this here so that the i18n tasks can tell it's rendered
-  = (Bike.statuses + ["found"]).collect { |k| Bike.status_humanized_translated(Bike.status_humanized(k)) }.to_sentence
 
 - if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
   %h4.mt-2
