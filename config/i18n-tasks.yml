@@ -26,13 +26,12 @@ data:
     - config/locales/en.yml
     - config/locales/nl.yml
 
-
   # Locale files to write new keys to, based on a list of key pattern => file
   # rules. Matched from top to bottom:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
   write:
     ## For example, write devise and simple form keys to their respective files:
-    - ['{doorkeeper}.*', 'config/locales/\1.%{locale}.yml']
+    - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
     - config/locales/%{locale}.yml
 
   # External locale data (e.g. gems).
@@ -80,10 +79,8 @@ search:
   ## Alternatively, the only files or `File.fnmatch patterns` to search in `paths`:
   ## If specified, this settings takes priority over `exclude`, but `exclude` still applies.
   # only: ["*.rb", "*.html.slim"]
-
   ## If `strict` is `false`, guess usages such as t("categories.#{category}.title"). The default is `true`.
   # strict: true
-
   ## Multiple scanners can be used. Their results are merged.
   ## The options specified above are passed down to each scanner. Per-scanner options can be specified as well.
   ## See this example of a custom scanner: https://github.com/glebm/i18n-tasks/wiki/A-custom-scanner-example
@@ -94,42 +91,41 @@ translation:
   # Get an API key and set billing info at https://code.google.com/apis/console
   # to use Google Translate
   # google_translate_api_key: "AbC-dEf5"
-
   # DeepL Pro Translate
   # Get an API key and subscription at https://www.deepl.com/pro to use DeepL Pro
   # deepl_api_key: "48E92789-57A3-466A-9959-1A1A1A1A1A1A"
 
 ## Do not consider these keys missing:
 ignore_missing:
-- 'errors.messages.{accepted,blank,invalid,too_short,too_long}'
-- '{devise,simple_form}.*'
+  - "errors.messages.{accepted,blank,invalid,too_short,too_long}"
+  - "{devise,simple_form}.*"
 
 ## Consider these keys used:
 ignore_unused:
-- 'activerecord.attributes.*'
-- 'activerecord.enums.*'
-- 'activerecord.select_options.*'
-- '{devise,kaminari,will_paginate,doorkeeper,gflash}.*'
-- 'simple_form.{yes,no}'
-- 'simple_form.{placeholders,hints,labels}.*'
-- 'simple_form.{error_notification,required}.:'
-- 'activerecord.errors.*'
-- 'activerecord.models.*'
-- 'controllers.*'
-- '*_mailer.*'
-- 'date.*'
-- 'datetime.*'
-- 'errors.*'
-- 'support.*'
-- 'time.*'
-- 'number.*'
-- 'meta_titles.*'
-- 'meta_descriptions.*'
-- 'helpers.page_entries_info.*'
-- 'locales.*'
-- 'money.*'
-- 'javascript.*'
-
+  - "activerecord.attributes.*"
+  - "activerecord.enums.*"
+  - "activerecord.select_options.*"
+  - "activerecord.status_humanized.*"
+  - "{devise,kaminari,will_paginate,doorkeeper,gflash}.*"
+  - "simple_form.{yes,no}"
+  - "simple_form.{placeholders,hints,labels}.*"
+  - "simple_form.{error_notification,required}.:"
+  - "activerecord.errors.*"
+  - "activerecord.models.*"
+  - "controllers.*"
+  - "*_mailer.*"
+  - "date.*"
+  - "datetime.*"
+  - "errors.*"
+  - "support.*"
+  - "time.*"
+  - "number.*"
+  - "meta_titles.*"
+  - "meta_descriptions.*"
+  - "helpers.page_entries_info.*"
+  - "locales.*"
+  - "money.*"
+  - "javascript.*"
 ## Exclude these keys from the `i18n-tasks eq-base' report:
 # ignore_eq_base:
 #   all:

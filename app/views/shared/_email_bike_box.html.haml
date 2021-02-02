@@ -30,11 +30,11 @@
             - else
               = @bike.frame_colors.to_sentence
 
-          - if @bike.stolen && @bike.current_stolen_record.present?
+          - if @bike.current_stolen_record.present?
             - stolen_record = @bike.current_stolen_record
             %li
               %strong
-                = @bike.abandoned ? t(".found") : t(".stolen_from")
+                = @bike.status_impounded? ? t(".found") : t(".stolen_from")
               = stolen_record.address(skip_default_country: true)
             %li
               %strong

@@ -24,7 +24,7 @@ class TsvCreator
   def org_count_row(bike)
     row = bike.created_at.strftime("%m.%d.%Y")
     row << "\t"
-    row << "true" if bike.stolen
+    row << "true" if bike.status_stolen?
     row << "\t"
     row << bike.first_ownership.user&.name if bike.first_ownership.user
     row << "\t#{bike.first_owner_email}"

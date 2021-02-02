@@ -98,7 +98,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_falsey
         bike = assigns(:bike)
-        expect(bike.stolen).to be_falsey
+        expect(bike.status).to_not eq "status_stolen"
       end
     end
     context "stolen" do
@@ -109,7 +109,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
-        expect(bike.stolen).to be_truthy
+        expect(bike.status).to eq "status_stolen"
       end
     end
     context "with all the organization features possible" do
@@ -122,7 +122,7 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
-        expect(bike.stolen).to be_truthy
+        expect(bike.status).to eq "status_stolen"
       end
     end
     context "embed_extended" do
@@ -133,14 +133,13 @@ RSpec.describe OrganizationsController, type: :controller do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:persist_email)).to be_truthy
         bike = assigns(:bike)
-        expect(bike.stolen).to be_falsey
+        expect(bike.status).to_not eq "status_stolen"
       end
     end
     context "crazy b_param data" do
       let(:b_param_attrs) do
         {
           bike: {
-            stolen: "true",
             owner_email: "someemail@stuff.com",
             creation_organization_id: organization.id.to_s
           },
@@ -153,13 +152,16 @@ RSpec.describe OrganizationsController, type: :controller do
       let(:b_param) { FactoryBot.create(:b_param, params: b_param_attrs) }
       it "renders" do
         expect(b_param).to be_present
+        b_param.reload
+        expect(b_param.status).to eq "status_stolen"
         get :embed, params: {id: organization.slug, b_param_id_token: b_param.id_token}
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(b_param.status).to eq "status_stolen"
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
-        expect(bike.stolen).to be_truthy
+        expect(bike.status).to eq "status_stolen"
         expect(bike.owner_email).to eq(b_param_attrs[:bike][:owner_email])
       end
     end

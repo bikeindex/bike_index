@@ -20,7 +20,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def unstolen_blocked?
-    !bike.stolen? && !bike.contact_owner?(sender)
+    !bike.status_stolen? && !bike.contact_owner?(sender)
   end
 
   # Required for compatibility with rails 3 & 4

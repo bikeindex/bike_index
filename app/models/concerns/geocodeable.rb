@@ -4,6 +4,9 @@ module Geocodeable
   extend ActiveSupport::Concern
 
   included do
+    belongs_to :state
+    belongs_to :country
+
     geocoded_by :address
     before_validation :clean_state_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
@@ -17,6 +20,10 @@ module Geocodeable
     def skip_geocoding?
       skip_geocoding.present?
     end
+  end
+
+  def self.location_attrs
+    %w[country_id state_id street city zipcode latitude longitude neighborhood].freeze
   end
 
   # Build an address string from the given object's location data.
@@ -117,7 +124,8 @@ module Geocodeable
 
   # default address hash. Probably could be used more often/better
   def address_hash
-    attributes.slice("street", "city", "zipcode", "latitude", "longitude")
+    address_attrs = Geocodeable.location_attrs - %w[country_id state_id neighborhood]
+    attributes.slice(*address_attrs)
       .merge(state: state&.abbreviation, country: country&.iso)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
       .with_indifferent_access

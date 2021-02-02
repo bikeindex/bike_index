@@ -17,7 +17,7 @@
       .col-lg-5.col-9.mt-auto.mb-2
         %p.strong.mb-0
           = link_to edit_admin_bike_path(bike.to_param) do
-            - if bike.stolen
+            - if bike.status_stolen?
               %span.text-danger
                 Stolen
             = bike.title_string

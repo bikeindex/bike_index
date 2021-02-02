@@ -110,6 +110,10 @@ h5 {
   text-transform: none !important;
 }
 
+.uppercase {
+  text-transform: uppercase !important;
+}
+
 .header-font-uncap {
   @extend .header-font;
   @extend .uncap;

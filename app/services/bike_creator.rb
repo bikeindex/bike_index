@@ -1,26 +1,40 @@
 class BikeCreator
+  # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
+  # ... and have separate permitted params in bikeupdator
+  def self.old_attr_accessible
+    (%i[manufacturer_id manufacturer_other serial_number
+      serial_normalized made_without_serial extra_registration_number
+      creation_organization_id manufacturer year thumb_path name
+      current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
+      handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
+      rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
+      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
+      propulsion_type street zipcode country_id state_id city belt_drive
+      coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
+      timezone date_stolen receive_notifications phone creator creator_id image
+      components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
+      stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
+      marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
+      [
+        stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
+        components_attributes: %i[id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
+          manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
+      ]
+    ).freeze
+  end
+
   def initialize(b_param = nil, location: nil)
     @b_param = b_param
     @bike = nil
     @location = location
   end
 
-  def build_bike
-    bike_attrs =
-      @b_param
-        .bike
-        .map { |k, v| [k, v.presence] }
-        .to_h
-        .except(*BParam.skipped_bike_attrs)
-    bike = Bike.new(bike_attrs)
-    # we're getting a null value in stolen - add this to holdover until we switchover to status
-    bike.stolen = !!bike.stolen
-    bike.attributes = @b_param.address_hash
-    bike.b_param_id = @b_param.id
-    bike.b_param_id_token = @b_param.id_token
-    bike.creator_id = @b_param.creator_id
-    bike.updator_id = bike.creator_id
-    bike = BikeCreatorVerifier.new(@b_param, bike).verify
+  def build_bike(new_attrs = {})
+    bike = Bike.new(@b_param.safe_bike_attrs(new_attrs))
+    # Use bike status because it takes into account new_attrs
+    bike.build_new_stolen_record(@b_param.stolen_attrs) if bike.status_stolen?
+    bike.build_new_impound_record(@b_param.impound_attrs) if bike.status_impounded?
+    bike = verify(bike)
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
     add_front_wheel_size(bike)
@@ -29,8 +43,21 @@ class BikeCreator
   def create_bike
     add_bike_book_data
     @bike = find_or_build_bike
-    return @bike if @bike.errors.present?
-    save_bike(@bike)
+    # There could be errors during the build - or during the save
+    save_bike(@bike) if @bike.errors.none?
+    return @bike if @bike.errors.none?
+    @b_param&.update_attributes(bike_errors: @bike.cleaned_error_messages)
+    @bike
+  end
+
+  # Called from ImageAssociatorWorker, so can't be private
+  def attach_photo(bike)
+    return true unless @b_param.image.present?
+    public_image = PublicImage.new(image: @b_param.image)
+    public_image.imageable = bike
+    public_image.save
+    @b_param.update_attributes(image_processed: true)
+    bike.reload
   end
 
   private
@@ -89,6 +116,8 @@ class BikeCreator
     end
     bike.ownerships.destroy_all
     bike.creation_states.destroy_all
+    bike.impound_records.destroy_all
+    bike.parking_notifications.destroy_all
     bike.destroy
     @bike
   end
@@ -109,7 +138,7 @@ class BikeCreator
     bike.set_location_info
     bike.attributes = Geohelper.address_hash_from_geocoder_result(@location) unless bike.latitude.present?
     bike.save
-    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
+    @bike = associate(bike)
     validate_record(@bike)
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
@@ -166,5 +195,105 @@ class BikeCreator
     end
     attrs[:serial_number] = "unknown" unless bike.serial_number.present?
     attrs
+  end
+
+  # Previous BikeCreatorVerifier
+  def verify(bike)
+    bike = check_organization(bike)
+    check_example(bike)
+  end
+
+  # previously BikeCreatorOrganizer
+  def check_organization(bike)
+    organization_id = @b_param.params.dig("creation_organization_id").presence ||
+      @b_param.params.dig("bike", "creation_organization_id")
+    organization = Organization.friendly_find(organization_id)
+    if organization.present? && !organization.suspended?
+      bike.creation_organization_id = organization.id
+      bike.creator_id ||= organization.auto_user_id
+    else
+      if organization&.suspended?
+        bike.errors.add(:creation_organization, "Oh no! #{organization.name} is currently suspended. Contact us if this is a surprise.")
+      end
+      # Since there wasn't a valid organization, blank the organization
+      bike.creation_organization_id = nil
+    end
+    bike
+  end
+
+  def check_example(bike)
+    example_org = Organization.example
+    bike.creation_organization_id = example_org.id if @b_param.params && @b_param.params["test"]
+    if bike.creation_organization_id.present? && example_org.present?
+      bike.example = true if bike.creation_organization_id == example_org.id
+    else
+      bike.example = false
+    end
+    bike
+  end
+
+  # Previously BikeCreatorAssociator
+  def associate(bike)
+    begin
+      # Create parking_notification and impound_record first
+      if @b_param&.status_abandoned?
+        create_parking_notification(@b_param, bike)
+      elsif @b_param&.status_impounded?
+        create_impound_record(@b_param, bike)
+      end
+      ownership = create_ownership(bike)
+      ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
+      bike.create_normalized_serial_segments
+      assign_user_attributes(bike, ownership&.user)
+      StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
+      attach_photo(bike)
+      attach_photos(bike)
+      add_other_listings(bike)
+      bike.reload.save
+    rescue => e
+      bike.errors.add(:association_error, e.message)
+    end
+    bike
+  end
+
+  def create_ownership(bike)
+    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
+      .create_ownership
+  end
+
+  def create_parking_notification(b_param, bike)
+    parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
+    parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
+                                      bike_id: bike.id,
+                                      user_id: bike.creator.id,
+                                      organization_id: b_param.creation_organization_id)
+    ParkingNotification.create(parking_notification_attrs)
+  end
+
+  def create_impound_record(b_param, bike)
+    impound_attrs = b_param.impound_attrs.slice("street", "city", "state_id", "zipcode", "country_id", "impounded_at")
+    bike.build_new_impound_record(impound_attrs).save
+  end
+
+  def assign_user_attributes(bike, user = nil)
+    user ||= bike.user
+    return true unless user.present?
+    if bike.phone.present?
+      user.phone = bike.phone if user.phone.blank?
+    end
+    user.save if user.changed? # Because we're also going to set the address and the name here
+    bike
+  end
+
+  def attach_photos(bike)
+    return nil unless @b_param.params["photos"].present?
+    photos = @b_param.params["photos"].uniq.take(7)
+    photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
+  end
+
+  def add_other_listings(bike)
+    return nil unless @b_param.params["bike"]["other_listing_urls"].present?
+    urls = @b_param.params["bike"]["other_listing_urls"]
+    urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 end

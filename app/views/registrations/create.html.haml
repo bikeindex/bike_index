@@ -1,5 +1,5 @@
 %h2
-  - if @b_param.stolen
+  - if @b_param.status_stolen?
     = t(".we_got_this")
   - else
     = t(".radicool")
@@ -10,6 +10,6 @@
 %p
   = t(".in_it_youll_find_instructions")
 
-- if @b_param.stolen
+- if @b_param.status_stolen?
   %p
     = t(".well_do_our_best_to_help_you_recover_it")

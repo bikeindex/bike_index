@@ -4,7 +4,7 @@ RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
 
   describe "after_save hooks" do
-    let(:bike) { FactoryBot.create(:bike, stolen: true) }
+    let(:bike) { FactoryBot.create(:bike) }
     context "if bike no longer exists" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
@@ -12,6 +12,7 @@ RSpec.describe StolenRecord, type: :model do
 
         stolen_record.update_attribute(:bike, nil)
 
+        stolen_record.reload
         expect(stolen_record.bike).to be_blank
         expect(stolen_record.alert_image).to be_blank
       end
@@ -22,18 +23,19 @@ RSpec.describe StolenRecord, type: :model do
       it "removes alert_image" do
         stolen_record.reload
         expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.bike.stolen).to be_truthy
+        expect(stolen_record.bike.status_stolen?).to be_truthy
+        bike.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
 
         stolen_record.add_recovery_information
         stolen_record.reload
         bike.reload
 
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         expect(bike.current_stolen_record_id).to be_blank
 
         expect(stolen_record.recovered?).to be_truthy
-        expect(stolen_record.bike.stolen).to be_falsey
+        expect(stolen_record.bike.status_stolen?).to be_falsey
         expect(stolen_record.alert_image).to be_blank
       end
     end
@@ -113,7 +115,7 @@ RSpec.describe StolenRecord, type: :model do
 
     context "given multiple bike images" do
       it "uses the first bike image for the alert image" do
-        bike = FactoryBot.create(:bike, stolen: true)
+        bike = FactoryBot.create(:bike)
         stolen_record = FactoryBot.create(:stolen_record, bike: bike)
 
         image1 = FactoryBot.create(:public_image, imageable: bike)
@@ -225,13 +227,6 @@ RSpec.describe StolenRecord, type: :model do
       expect(row.split("\t").count).to eq(10)
       expect(row.split("\n").count).to eq(1)
     end
-
-    it "doesn't show the serial for recovered bikes" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.bike.update_attributes(serial_number: "SERIAL_SERIAL", abandoned: true)
-      row = stolen_record.tsv_row
-      expect(row).not_to match(/serial_serial/i)
-    end
   end
 
   describe "recovery display status" do
@@ -242,6 +237,8 @@ RSpec.describe StolenRecord, type: :model do
       it "is not displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered, can_share_recovery: false)
         expect(stolen_record.recovery_display_status).to eq "not_eligible"
+        bike = stolen_record.bike
+        expect(bike.reload.status).to eq "status_with_owner"
       end
     end
     context "stolen record is recovered, able to share" do
@@ -415,14 +412,14 @@ RSpec.describe StolenRecord, type: :model do
       }
     end
     before do
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen?).to be_truthy
       bike.reload
       expect(bike.status).to eq "status_stolen"
       stolen_record.add_recovery_information(recovery_request.as_json)
       bike.reload
       stolen_record.reload
 
-      expect(bike.stolen).to be_falsey
+      expect(bike.status_stolen?).to be_falsey
       expect(bike.status).to eq "status_with_owner"
       expect(stolen_record.recovered?).to be_truthy
       expect(stolen_record.current).to be_falsey

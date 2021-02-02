@@ -99,10 +99,8 @@ class Admin::BikesController < Admin::BaseController
     stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
                                                 id: params[:stolen_record_id]).first
     if stolen_record.present?
-      bike = Bike.unscoped.find(params[:bike_id])
       flash[:success] = "Marked unrecovered!"
       stolen_record.update_attributes(recovered_at: nil, current: true, recovery_link_token: nil)
-      bike.update_attribute :stolen, true
     else
       flash[:error] = "Stolen record not found! Contact a developer"
     end
@@ -118,7 +116,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(Bike.old_attr_accessible + [bike_organization_ids: []])
+    params.require(:bike).permit(BikeCreator.old_attr_accessible + [bike_organization_ids: []])
   end
 
   def destroy_bike
@@ -171,7 +169,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     if params[:search_stolen].present?
       bikes = bikes.stolen if params[:search_stolen] == "stolen_only"
-      bikes = bikes.non_stolen if params[:search_stolen] == "non_stolen_only"
+      bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
     end
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?

@@ -1,17 +1,19 @@
 class ImpoundRecord < ApplicationRecord
+  include Geocodeable
+
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
-  belongs_to :location
+  belongs_to :location # organization location
 
   has_one :parking_notification
   has_many :impound_record_updates
   has_many :impound_claims
 
-  validates_presence_of :bike_id, :user_id
+  validates_presence_of :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
   after_commit :update_associations
 
   enum status: ImpoundRecordUpdate::KIND_ENUM
@@ -19,7 +21,7 @@ class ImpoundRecord < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
 
-  attr_accessor :skip_update
+  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   def self.statuses
     ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
@@ -56,9 +58,49 @@ class ImpoundRecord < ApplicationRecord
       .where(impound_records: {id: pluck(:id)})
   end
 
+  def impounded_at_with_timezone(passed_impounded_at, passed_timezone)
+    return unless passed_impounded_at.present?
+    self.impounded_at = TimeParser.parse(passed_impounded_at, passed_timezone)
+  end
+
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
-    organization.present? ? self.class.impounded_kind : self.class.found_kind
+    organization_id.present? ? self.class.impounded_kind : self.class.found_kind
+  end
+
+  # For now at least, we don't want to show exact address
+  def show_address
+    false
+  end
+
+  def latitude_public
+    latitude.round(2)
+  end
+
+  def longitude_public
+    longitude.round(2)
+  end
+
+  # geocoding is managed by set_calculated_attributes
+  def should_be_geocoded?
+    false
+  end
+
+  # force_show_address, just like stolen_record & parking_notification
+  def address(skip_default_country: false, force_show_address: false)
+    Geocodeable.address(
+      self,
+      street: (force_show_address || show_address),
+      country: %i[skip_default optional]
+    ).presence
+  end
+
+  def unorganized?
+    !organized?
+  end
+
+  def organized?
+    organization_id.present?
   end
 
   def impound_claim_retrieved?
@@ -138,6 +180,14 @@ class ImpoundRecord < ApplicationRecord
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
+    self.impounded_at ||= created_at || Time.current
+    # Don't geocode if location is present and address hasn't changed
+    return if !address_changed? && with_location?
+    self.attributes = if parking_notification.present?
+      parking_notification.attributes.slice(*Geocodeable.location_attrs)
+    else
+      Geohelper.assignable_address_hash(address(force_show_address: true))
+    end
   end
 
   def last_display_id
@@ -149,6 +199,7 @@ class ImpoundRecord < ApplicationRecord
   private
 
   def calculated_display_id
+    return nil if organization_id.blank?
     default_display_id = last_display_id + 1
     return default_display_id unless ImpoundRecord.where(organization_id: organization_id, display_id: default_display_id)
     ImpoundRecord.where(organization_id: organization_id).maximum(:display_id).to_i + 1
@@ -161,13 +212,13 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_location_id
     # Return the existing location_id if the organization doesn't have locations enabled - just to be safe and not lose data
-    return location_id unless organization.enabled?("impound_bikes_locations")
-    # If any impound records have a set location, use that, otherwise, use the default location
-    impound_record_updates.with_location.order(:id).last&.location_id || organization.default_impound_location&.id
+    return location_id unless organization&.enabled?("impound_bikes_locations")
+    # If any impound records have a set location, use that, otherwise, use the existing. Fall back to the default location
+    impound_record_updates.with_location.order(:id).last&.location_id || location_id.presence || organization.default_impound_location&.id
   end
 
   def calculated_user_id
-    return user_id unless impound_record_updates.where.not(user_id: nil).any?
+    return user_id if impound_record_updates.where.not(user_id: nil).none?
     impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
   end
 end

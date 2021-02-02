@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :stolen_record do
-    bike { FactoryBot.create(:bike, stolen: true) }
+    bike { FactoryBot.create(:bike) }
     date_stolen { Time.current }
     skip_geocoding { true }
 

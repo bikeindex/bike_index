@@ -63,6 +63,10 @@ class BikeSerializer < ApplicationSerializer
     object.updated_at
   end
 
+  def stolen
+    object.status_stolen?
+  end
+
   def stolen_record
     object.current_stolen_record if object.current_stolen_record.present?
   end

@@ -4,7 +4,7 @@ class BikeSearcher
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params
     @params = creation_params.merge(reverse_geocode: reverse_geocode)
-    @bikes = params[:api_search] ? Bike.non_abandoned : Bike.all
+    @bikes = params[:api_search] ? Bike.not_abandoned : Bike.all
     if @params[:search_type].present?
       if @params[:search_type] == "serial"
         @params[:serial] = @params[:query_typed]
@@ -81,7 +81,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
-    @bikes = stolenness == "stolen" ? bikes.stolen : bikes.non_stolen
+    @bikes = stolenness == "stolen" ? bikes.stolen : bikes.not_stolen
   end
 
   def parsed_attributes
@@ -205,7 +205,7 @@ class BikeSearcher
     matching_manufacturer(@bikes)
     matching_colors(@bikes)
     matching_query(@bikes)
-    result = {non_stolen: @bikes.non_stolen.count}
+    result = {non_stolen: @bikes.not_stolen.count}
     if @params[:serial].present?
       result[:close_serials] = fuzzy_find_serial.count
     end

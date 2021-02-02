@@ -16,7 +16,10 @@
             .form-group.row
               = f.label :serial_number, class: 'form-well-label'
               %p.form-well-input-static
-                = @bike.serial_number
+                - if @bike.made_without_serial?
+                  = t(".made_without_serial")
+                - else
+                  = @bike.serial_number
               .right-input-help.right-text-help
                 %a{ data: { toggle: 'modal', target: '#serial-correction' } }
                   = t(".submit_serial_correction")

@@ -27,7 +27,7 @@
                 = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
-        - display_unstolen_notification_form = !@bike.stolen? && passive_organization.enabled?("unstolen_notifications")
+        - display_unstolen_notification_form = !@bike.status_stolen? && passive_organization.enabled?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong

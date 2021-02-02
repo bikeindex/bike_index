@@ -7,7 +7,7 @@
 
 .stolen-checklist-wrap.mt-2
   %ul.stolen-checklist
-    - verified_phone_number = current_user.user_phones.confirmed.any?
+    - verified_phone_number = current_user.phone_confirmed?
     %li{ class: verified_phone_number ? "completed-item" : "" }
       %span.checklist-checkbox
         = "&#10003;".html_safe if verified_phone_number

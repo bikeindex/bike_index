@@ -4,8 +4,6 @@ class Location < ApplicationRecord
   acts_as_paranoid
 
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
-  belongs_to :country
-  belongs_to :state
 
   has_many :bikes
   has_many :impound_records

@@ -27,9 +27,8 @@ class Bike < ApplicationRecord
   belongs_to :front_gear_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
-  belongs_to :state
-  belongs_to :country
   belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :current_impound_record, class_name: "ImpoundRecord"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
@@ -41,7 +40,7 @@ class Bike < ApplicationRecord
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications
-  has_many :stolen_records
+  has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
   has_many :other_listings, dependent: :destroy
   has_many :normalized_serial_segments, dependent: :destroy
@@ -59,6 +58,7 @@ class Bike < ApplicationRecord
   has_many :graduated_notifications, foreign_key: :bike_id
 
   accepts_nested_attributes_for :stolen_records
+  accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
@@ -88,14 +88,17 @@ class Bike < ApplicationRecord
       .order("listing_order desc")
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
-  scope :stolen, -> { where(stolen: true) }
-  scope :non_stolen, -> { where(stolen: false) }
-  scope :abandoned, -> { where(abandoned: true) }
+  scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status
+  scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
+  scope :not_stolen, -> { where.not(status: "status_stolen") }
+  scope :not_abandoned, -> { where.not(status: "status_abandoned") }
+  scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
+  scope :abandoned_or_impounded, -> { where(status: %w[status_abandoned status_impounded]) }
+  scope :not_abandoned_or_impounded, -> { where.not(status: %w[status_abandoned status_impounded]) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :unorganized, -> { where(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
-  scope :non_abandoned, -> { where(abandoned: false) }
   scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
@@ -119,25 +122,17 @@ class Bike < ApplicationRecord
     using: {tsearch: {dictionary: "english", prefix: true}}
 
   class << self
-    def old_attr_accessible
-      (%w[manufacturer_id manufacturer_other serial_number
-        serial_normalized made_without_serial extra_registration_number
-        creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-        handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
-        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type street zipcode country_id state_id city belt_drive
-        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-        timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
-        stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
-        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids].map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
-                                                                                                                     components_attributes: Component.old_attr_accessible]).freeze
-    end
-
     def statuses
       STATUS_ENUM.keys.map(&:to_s)
+    end
+
+    def status_humanized(str)
+      str.to_s&.gsub("status_", "")&.tr("_", " ")
+    end
+
+    def status_humanized_translated(str)
+      return "" unless str.present?
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
     end
 
     def text_search(query)
@@ -194,8 +189,8 @@ class Bike < ApplicationRecord
       unscoped
         .current
         .stolen
-        .non_abandoned
-        .where(serial_normalized: abandoned.non_stolen.select(:serial_normalized))
+        .not_abandoned_or_impounded
+        .where(serial_normalized: abandoned_or_impounded.select(:serial_normalized))
     end
 
     # Return an array of tuples, each pairing a possibly-found bike with a
@@ -204,8 +199,7 @@ class Bike < ApplicationRecord
       matches_by_serial =
         unscoped
           .current
-          .abandoned
-          .non_stolen
+          .abandoned_or_impounded
           .where.not(serial_normalized: nil)
           .group_by(&:serial_normalized)
 
@@ -233,7 +227,7 @@ class Bike < ApplicationRecord
       unscoped
         .current
         .currently_stolen_in(country: country_iso)
-        .non_abandoned
+        .not_abandoned
         .where(serial_normalized: normalized_serials)
     end
 
@@ -277,7 +271,7 @@ class Bike < ApplicationRecord
   end
 
   def calculated_listing_order
-    return current_stolen_record.date_stolen.to_i.abs if stolen && current_stolen_record.present?
+    return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     t = (updated_at || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
@@ -333,10 +327,6 @@ class Bike < ApplicationRecord
     recovered_records.any?
   end
 
-  def current_impound_record
-    impound_records.current.last
-  end
-
   def impounded?
     current_impound_record.present?
   end
@@ -347,6 +337,24 @@ class Bike < ApplicationRecord
 
   def current_parking_notification
     parking_notifications.current.first
+  end
+
+  def status_stolen_or_impounded?
+    %w[status_stolen status_impounded].include?(status)
+  end
+
+  def status_found?
+    return false unless status_impounded?
+    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
+  end
+
+  def status_humanized
+    return "found" if status_found?
+    self.class.status_humanized(status)
+  end
+
+  def status_humanized_translated
+    self.class.status_humanized_translated(status_humanized)
   end
 
   # Small helper because we call this a lot
@@ -362,8 +370,13 @@ class Bike < ApplicationRecord
     organizations.include?(org)
   end
 
+  # Might be more sophisticated someday...
+  def serial_hidden?
+    status_abandoned? || status_impounded?
+  end
+
   def serial_display
-    return "Hidden" if abandoned || status_impounded?
+    return "Hidden" if serial_hidden?
     return serial_number.humanize if no_serial?
     serial_number
   end
@@ -451,8 +464,12 @@ class Bike < ApplicationRecord
   end
 
   def authorized?(u)
-    return true unless current_impound_record.present? || !(u == owner || claimable_by?(u))
     return false if u.blank?
+    # If there isn't a current impound record - or if it's impound by a user, not an organization
+    # Authorization is based on whether the user is the owner of the bike
+    if current_impound_record.blank? || current_impound_record.unorganized?
+      return true if u == owner || claimable_by?(u)
+    end
     authorized_by_organization?(u: u)
   end
 
@@ -473,14 +490,14 @@ class Bike < ApplicationRecord
 
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
-    return true if stolen? && current_stolen_record.present?
+    return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?
-    user? || stolen?
+    user? || status_stolen?
   end
 
   def contact_owner_email
@@ -526,16 +543,22 @@ class Bike < ApplicationRecord
   end
 
   def build_new_stolen_record(new_attrs = {})
-    new_stolen_record = stolen_records.build({
-      country_id: Country.united_states&.id,
-      phone: phone,
-      current: true,
-    }.merge(new_attrs))
+    new_country_id = country_id || creator&.country_id || Country.united_states&.id
+    new_stolen_record = stolen_records
+      .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
     end
     new_stolen_record
+  end
+
+  def build_new_impound_record(new_attrs = {})
+    new_country_id = country_id || creator&.country_id || Country.united_states&.id
+    new_impound_record = impound_records
+      .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
+    new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
+    new_impound_record
   end
 
   def fetch_current_stolen_record
@@ -555,7 +578,7 @@ class Bike < ApplicationRecord
   end
 
   def stolen_string
-    return nil unless stolen && current_stolen_record.present?
+    return nil unless status_stolen? && current_stolen_record.present?
     [
       "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
@@ -824,7 +847,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
-    self.stolen = true if current_stolen_record.present? && !current_stolen_record.recovered? # Only assign if present
+    fetch_current_impound_record # Used by a bunch of things, but this method is private
     set_location_info
     self.listing_order = calculated_listing_order
     # Quick hack to store the fact that it was creation for parking notification
@@ -836,7 +859,6 @@ class Bike < ApplicationRecord
       end
     end
     self.status = calculated_status unless skip_status_update
-    self.abandoned = true if status_abandoned? # Quick hack to manage prior to status update
     clean_frame_size
     set_mnfg_name
     set_user_hidden
@@ -912,7 +934,7 @@ class Bike < ApplicationRecord
   def calculated_status
     return "status_impounded" if current_impound_record.present?
     return "unregistered_parking_notification" if status == "unregistered_parking_notification"
-    return "status_abandoned" if abandoned? || parking_notifications.active.appears_abandoned_notification.any?
+    return "status_abandoned" if status_abandoned? || parking_notifications.active.appears_abandoned_notification.any?
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
@@ -943,5 +965,9 @@ class Bike < ApplicationRecord
       break if bp_address.present?
     end
     bp_address
+  end
+
+  def fetch_current_impound_record
+    self.current_impound_record = impound_records.current.last
   end
 end
