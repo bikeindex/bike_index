@@ -57,7 +57,6 @@ RSpec.describe StolenRecordUpdator do
         zipcode: "60666"
       }
       b_param = BParam.new(params: {stolen_record: sr}.as_json)
-      # allow(b_param).to receive(:params).and_return({stolen_rcord: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param)
       stolen_record = updator.send("update_with_params", stolen_record)

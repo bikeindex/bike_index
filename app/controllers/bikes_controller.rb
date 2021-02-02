@@ -209,7 +209,7 @@ class BikesController < ApplicationController
       rescue => e
         flash[:error] = e.message
         # Sometimes, weird things error. In production, Don't show a 500 page to the user
-        # ... but in testing ordevelopment re-raise error to make stack tracing better
+        # ... but in testing or development re-raise error to make stack tracing better
         raise e unless Rails.env.production?
       end
     end
@@ -318,7 +318,7 @@ class BikesController < ApplicationController
       h[:ownership] = translation(:ownership, controller_method: :edit)
       h[:groups] = translation(:groups, controller_method: :edit)
       h[:remove] = translation(:remove, controller_method: :edit)
-      unless @bike.status_stolen? || @bike.status_impounded?
+      unless @bike.status_stolen_or_impounded?
         h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
       end
     end
