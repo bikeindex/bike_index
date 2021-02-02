@@ -74,14 +74,14 @@ RSpec.describe BikeDecorator do
     end
     context "stolen" do
       let(:status) { "status_stolen" }
-      let(:target) { "<strong class=\"stolen-color uppercase\">stolen</strong>" }
+      let(:target) { "<strong class=\"stolen-color uppercase bike-status-html\">stolen</strong>" }
       it "responds with strong" do
         expect(decorator.status_html).to eq target
       end
     end
     context "impounded" do
       let(:status) { "status_impounded" }
-      let(:target) { "<strong class=\"impounded-color uppercase\">impounded</strong>" }
+      let(:target) { "<strong class=\"impounded-color uppercase bike-status-html\">impounded</strong>" }
       it "responds with strong" do
         expect(decorator.status_html).to eq target
       end
