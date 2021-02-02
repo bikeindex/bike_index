@@ -45,7 +45,7 @@
 
 = render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike, t: @ownership.token, email: @vars[:email]) }
 
-- if @bike.status_stolen?
+- if @bike.status_stolen_or_impounded?
   %p
     - if @bike.status_impounded?
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)

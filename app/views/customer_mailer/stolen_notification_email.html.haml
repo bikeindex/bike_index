@@ -38,7 +38,7 @@
     = link_to(@stolen_notification.reference_url, @stolen_notification.reference_url)
 
 - if @stolen_notification.sender.name.present?
-  %p{ style: 'color: #ccc; margin: 2em 0 2em 1em;' }
+  %p{ style: 'color: #ccc; margin: 1em 0 2em 1em;' }
     = @stolen_notification.sender.name
 
 %hr{ style: 'margin: 40px 0;' }
@@ -47,4 +47,9 @@
   - date = l @bike.created_at, format: :dotted
   = t(".html.this_email_is_about_the_biketype_register", biketype: @bike.type, date: date)
 
+
 = render partial: 'shared/email_bike_box'
+
+.less-strong{ style: "line-height: 1.25em; text-align: center;" }
+  %em
+    = t(".html.no_one_should_be_extorted")

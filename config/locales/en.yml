@@ -2036,6 +2036,10 @@ en:
         if_you_believe_this_email_is_illegitimate: If you believe this email is illegitimate,
           please contact support@bikeindex.org
         link: 'link:'
+        no_one_should_be_extorted: >-
+          If you think this person is extorting you or abusing the system, email us
+          and let us know - you should never be forced to 'reward' or 'repay' someone
+          for your stolen bike
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
