@@ -34,7 +34,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
       )
 
       bike.cycle_type = "bike"
-      bike.status = "abandoned"
+      bike.status = "status_impounded" # No need for converter, they all come in as abandoned
       bike.country = Country.netherlands
       bike.description = description
       bike.frame_model = attrs["SubCategory"].presence
@@ -49,6 +49,10 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
       ].select(&:present?).join(" - ")
 
       bike
+    end
+
+    def impounded_kind
+      ImpoundRecord.impounded_kind
     end
 
     private

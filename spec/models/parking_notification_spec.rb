@@ -102,7 +102,7 @@ RSpec.describe ParkingNotification, type: :model do
       end
       context "same organization" do
         let(:initial_organization) { organization }
-        let(:impound_record) { FactoryBot.create(:impound_record, organization: initial_organization, bike: bike) }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: initial_organization, bike: bike) }
         it "can be assigned" do
           expect(parking_notification.potential_initial_record).to eq parking_notification_initial
           expect(parking_notification.likely_repeat?).to be_falsey

@@ -1,58 +1,50 @@
 class StolenRecordUpdator
+  # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
+  def self.old_attr_accessible
+    # recovery_tweet, recovery_share # We edit this in the admin panel
+    %i[police_report_number police_report_department locking_description lock_defeat_description
+      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+      longitude theft_description current phone secondary_phone phone_for_everyone
+      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+      approved recovered_at recovered_description index_helped_recovery can_share_recovery
+      recovery_posted show_address tsved_at estimated_value].freeze
+  end
+
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    if creation_params[:date_stolen].present?
-      @date_stolen = TimeParser.parse(creation_params[:date_stolen])
-    end
-    @user = creation_params[:user]
-    @b_param = creation_params[:b_param]
+    b_param = creation_params[:b_param]
+    @stolen_params = b_param&.stolen_attrs || {}
   end
+
+  attr_reader :stolen_params
 
   def update_records
-    if @bike.stolen
-      if @bike.fetch_current_stolen_record.blank?
-        create_new_record
-        @bike.reload
-      elsif @date_stolen
-        stolen_record = @bike.fetch_current_stolen_record
-        stolen_record.update_attributes(date_stolen: @date_stolen)
-      elsif @b_param && (@b_param["stolen_record"] || @b_param["bike"]["stolen_records_attributes"])
-        stolen_record = @bike.fetch_current_stolen_record
-        update_with_params(stolen_record).save
-      end
-    else
-      @bike.update_attributes(abandoned: false) if @bike.abandoned == true
-    end
-  end
-
-  def create_new_record
-    stolen_record = @bike.build_new_stolen_record(date_stolen: @date_stolen)
+    return if @stolen_params.blank?
+    @bike.reload
+    stolen_record = @bike.fetch_current_stolen_record
+    stolen_record ||= @bike.build_new_stolen_record
     stolen_record = update_with_params(stolen_record)
     stolen_record.save
+    @bike.reload
     stolen_record
   end
 
   private
 
   def update_with_params(stolen_record)
-    return stolen_record unless @b_param.present?
+    return stolen_record unless @stolen_params.present?
+    stolen_record.attributes = permitted_attributes(@stolen_params)
 
-    sr = @b_param["stolen_record"]
-    nested_params = @b_param.dig("bike", "stolen_records_attributes")
-    sr = nested_params.values.reject(&:blank?).last if nested_params&.values&.first&.is_a?(Hash)
-    return stolen_record unless sr.present?
-    stolen_record.attributes = permitted_attributes(sr)
-
-    if sr["date_stolen"].present?
-      stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"])
+    if @stolen_params["date_stolen"].present?
+      stolen_record.date_stolen = TimeParser.parse(@stolen_params["date_stolen"], @stolen_params["timezone"])
     end
 
-    if sr["country"].present?
-      stolen_record.country = Country.fuzzy_find(sr["country"])
+    if @stolen_params["country"].present?
+      stolen_record.country = Country.fuzzy_find(@stolen_params["country"])
     end
 
-    stolen_record.state_id = State.fuzzy_abbr_find(sr["state"])&.id if sr["state"].present?
-    if sr["phone_no_show"]
+    stolen_record.state_id = State.fuzzy_abbr_find(@stolen_params["state"])&.id if @stolen_params["state"].present?
+    if @stolen_params["phone_no_show"]
       stolen_record.attributes = {
         phone_for_everyone: false,
         phone_for_users: false,

@@ -41,7 +41,7 @@ RSpec.describe ImpoundClaimsController, type: :request do
           }
         }.to_not change(ImpoundClaim, :count)
         expect(impound_record.active?).to be_falsey
-        expect(flash[:error]).to eq "That impounded bike record has been marked 'Owner retrieved bike' and cannot be claimed"
+        expect(flash[:error]).to eq "That found bike record has been marked 'Owner retrieved bike' and cannot be claimed"
       end
     end
     context "not users stolen bike" do

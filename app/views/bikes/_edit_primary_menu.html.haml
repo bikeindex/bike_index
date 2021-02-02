@@ -3,7 +3,7 @@
 %nav.primary-edit-form-well-menu
   - if @permitted_return_to.present?
     %span#permittedReturnTo{ "data-path" => @permitted_return_to }
-  - if @bike.stolen?
+  - if @bike.status_stolen?
     %h3.nav-group-header= t(".theft_information")
     %ul
       - @theft_templates.each do |template, description|
@@ -11,7 +11,7 @@
           - is_active = 'active' if @edit_template.match(/#{template}/)
           %a{ href: edit_bike_path(page: template), class: is_active }
             %h4= description
-  - if @bike.stolen?
+  - if @bike.status_stolen?
     %h3.nav-group-header
       = t(".bike_type_information", bike_type: @bike.type)
   %ul

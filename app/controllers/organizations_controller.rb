@@ -37,15 +37,13 @@ class OrganizationsController < ApplicationController
     end
   end
 
+  # previously accepted stolen_first=true as a parameter.
+  # Stopped accepting in PR#1875, because consistency, use stolen=true instead
   def embed
     @bike = BikeCreator.new(@b_param).build_bike
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
-    if params[:non_stolen]
-      @non_stolen = true
-    elsif @bike.stolen || params[:stolen_first]
-      @stolen = true
-    end
+    @stolen = @bike.status_stolen?
     render layout: "embed_layout"
   end
 
@@ -72,25 +70,19 @@ class OrganizationsController < ApplicationController
       flash[:error] = translation(:no_user)
       redirect_to(root_url) && return
     end
-    if params[:b_param_id_token].present?
-      @b_param = BParam.find_or_new_from_token(params[:b_param_id_token])
+    @b_param = if params[:b_param_id_token].present?
+      BParam.find_or_new_from_token(params[:b_param_id_token])
     else
-      hash = {
+      BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: {stolen: params[:stolen]}
-      }
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: hash)
+        bike: BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)
+      })
     end
   end
 
   def built_stolen_record
-    stolen_attrs = if @b_param.params && @b_param.params["stolen_record"].present?
-      @b_param.params["stolen_record"].except("phone_no_show")
-    else
-      {country_id: Country.united_states.id, date_stolen: Time.current}
-    end
-    @bike.stolen_records.build(stolen_attrs)
+    @bike.stolen_records.last || @bike.build_new_stolen_record(@b_param.stolen_attrs)
   end
 
   def built_stolen_record_date(str)

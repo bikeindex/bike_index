@@ -4,7 +4,7 @@ class BikeDisplayer
   # Not sure if I like everything being class methods, but doing that for now anyway
   class << self
     def display_contact_owner?(bike, user = nil)
-      bike.stolen? && bike.current_stolen_record.present?
+      bike.current_stolen_record.present?
     end
 
     def display_impound_claim?(bike, user = nil)

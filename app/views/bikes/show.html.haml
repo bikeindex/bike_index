@@ -10,7 +10,7 @@
           - if current_user.superuser
             = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
           - if passive_organization.present?
-            %h3.secondary-bike-title.mb-2= @bike.title_u
+            %h3.secondary-bike-title.mb-2= @bike.title_html
         - if passive_organization&.enabled?("credibility_badges")
           .col-md-5.text-right
             = render partial: "/bikes/credibility_score", locals: { bike: @bike }
@@ -61,9 +61,9 @@
         = t(".this_was_impounded", bike_type: @bike.type.titleize)
       - if @bike.current_impound_record.present?
         = t(".impounded_at")
-        %em.convertTime
+        %em.convertTime.preciseTime
           = l @bike.current_impound_record.created_at, format: :convert_time
-        %em.small.convertTimezone
+        %em.small
         = t(".by")
         %strong
           = @bike.current_impound_record.organization&.name
@@ -79,27 +79,20 @@
   .row
     .col-md-8
       %h1.bike-title
-        - if @bike.stolen
-          %strong.stolen
-            = t(".abandoned") if @bike.abandoned
-            = t(".stolen")
-        %span.uncap
-          = @bike.title_u
-      - if @bike.stolen && @stolen_record.present?
+        = @bike.status_html
+        %span.uncap= @bike.title_html
+      - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
-          %strong
-            - if @bike.abandoned
-              = t(".abandoned")
-            - else
-              = t(".stolen")
-          %span.convertTime
-            = l @stolen_record.date_stolen, format: :convert_time
+          %strong= @bike.status_humanized_translated
+          %span.convertTime.preciseTime
+            - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
+            = l time, format: :convert_time
           %small.convertTimezone
           %strong
             = t(".at")
-          = @stolen_record.address(skip_default_country: true)
+          = (@stolen_record || @bike.current_impound_record).address(skip_default_country: true)
 
-      - if @bike.should_show_other_bikes
+      - if @bike.show_other_bikes?
         %h4
           = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
       - if @bike.unregistered_parking_notification?
@@ -144,11 +137,17 @@
 
       .show-bike-details
         %ul.attr-list.split-sm
-          = attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
+          %li
+            %strong.attr-title #{t(".serial")}:
+            = @bike.serial_display
+            - if @bike.serial_hidden?
+              %small.less-strong
+                because #{@bike.type} is
+                %em= @bike.status_humanized_translated
 
-          - unless @bike.abandoned
+          - unless @bike.serial_hidden?
             = attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
-          - unless @bike.type == 'bike'
+          - unless @bike.type == "bike"
             = attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
 
           %li
@@ -190,27 +189,39 @@
             = t(".distinguishing_features")
           %p
             = @bike.description
-        - if @bike.stolen && @stolen_record.present?
+
+        - if @bike.status_stolen? && @stolen_record.present?
           %h3
-            = t(".theft_details", bike_abandoned: @bike.abandoned ? 'Abandoned' : 'Theft')
+            = t(".stolen_details")
           .row
             - if @bike.current_stolen_record.latitude.present?
-              = render partial: "stolen_map"
+              = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
             .col-md-4
               %ul.attr-list.separate-lines
                 = attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
                 = attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
-                - stolen_type = @bike.abandoned ? 'abandoned' : 'stolen'
-                = attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type))
+                %li
+                  %strong.attr-title= t(".stolen_at")
+                  %span.convertTime= l @stolen_record.date_stolen, format: :convert_time
                 = attr_list_item(@stolen_record.police_report_number, t(".police_report"))
                 = attr_list_item(@stolen_record.police_report_department, t(".department_city"))
           - if @stolen_record.theft_description.present?
-            %h3
-              = t(".description_of_incident")
-            %p
-              = @stolen_record.theft_description
-
+            %h3= t(".description_of_incident")
+            %p= @stolen_record.theft_description
+        - elsif @bike.current_impound_record.present?
+          - impound_record = @bike.current_impound_record
+          %h3
+            This is an abandoned #{@bike.type} that was #{impound_record.kind}
+          .row
+            - if impound_record.latitude.present?
+              = render partial: "stolen_map", locals: { mapping_record: impound_record }
+            .col-md-4
+              %ul.attr-list.separate-lines
+                = attr_list_item(impound_record.address(skip_default_country: true), t(".location"))
+                %li
+                  %strong.attr-title= t(".found_at")
+                  %span.convertTime= l impound_record.impounded_at, format: :convert_time
 
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?
@@ -249,7 +260,7 @@
     .col-md-4
       .social-share-bike.mb-4.mt-4
         %h4
-          - if @bike.stolen
+          - if @bike.status_stolen_or_impounded?
             = t(".spread_the_word")
           - else
             = t(".share_it")
@@ -261,7 +272,7 @@
               = t(".know_something_about_this_bike_type", bike_type: @bike.type)
           %h3
             = t(".contact_the_owner")
-          - if @bike.abandoned
+          - if @bike.status_impounded?
             %p
               = t(".is_this_your_bike_send_proof_of_ownership")
           - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?

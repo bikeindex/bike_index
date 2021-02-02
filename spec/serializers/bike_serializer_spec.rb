@@ -11,7 +11,7 @@ RSpec.describe BikeSerializer, type: :lib do
     it "is as expected" do
       expect(serializer.manufacturer_name).to eq(bike.mnfg_name)
       expect(serializer.manufacturer_id).to eq(bike.manufacturer_id)
-      expect(serializer.stolen).to eq(bike.stolen)
+      expect(serializer.stolen).to eq(bike.status_stolen?)
       expect(serializer.type_of_cycle).to eq("Bike")
       expect(serializer.name).to eq(bike.name)
       expect(serializer.year).to eq(bike.year)

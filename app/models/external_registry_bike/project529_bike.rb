@@ -30,7 +30,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
       )
 
       bike.cycle_type = "bike"
-      bike.status = attrs["status"]&.downcase
+      bike.status = ExternalRegistryBike.status_converter(attrs["status"])
       bike.frame_model = attrs["model_string"]
       bike.mnfg_name = attrs["manufacturer_string"]
       bike.location_found = attrs.dig("active_incident", "location_address")

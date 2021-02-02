@@ -4,13 +4,11 @@
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
 
-  = f.hidden_field :stolen
-
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
-      - if @bike.stolen? && @bike.fetch_current_stolen_record.present? && !@bike.abandoned?
+      - if @bike.fetch_current_stolen_record.present?
         .col-md-8.form-well#form_well_wrap
           .form-wrap
             .form-well-form-header

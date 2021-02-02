@@ -28,7 +28,7 @@
     - elsif @bike.stock_photo_url.present?
       %img.bike-photo{ src: @bike.stock_photo_url }
     %h1
-      - if @bike.stolen
+      - if @bike.status_stolen?
         %span.stolen-color
           = t(".stolen")
       = @bike.title
@@ -80,7 +80,7 @@
       %p
         %em
           = t(".bike_description")
-        - if @bike.stolen
+        - if @bike.status_stolen?
           = @bike.description.truncate(500)
         - else
           = @bike.description
@@ -114,7 +114,7 @@
                 = t(".model")
               %td
                 = @bike.frame_model
-          - unless @bike.stolen and @stolen_record.present?
+          - unless @bike.status_stolen? and @stolen_record.present?
             - if @bike.frame_size.present?
               %tr
                 %td.td-title
@@ -133,7 +133,7 @@
                 = t(".color").pluralize(@bike.frame_colors.count)
               %td
                 = @bike.frame_colors.to_sentence
-          - unless @bike.stolen and @stolen_record.present?
+          - unless @bike.status_stolen? and @stolen_record.present?
             - if @bike.front_gear_type.present?
               %tr
                 %td.td-title
@@ -158,7 +158,7 @@
 
 
     .bike-details
-      - unless @bike.stolen and @stolen_record.present?
+      - unless @bike.status_stolen? and @stolen_record.present?
         %table.table.table-striped
           %tbody
             %tr
@@ -195,7 +195,7 @@
                   = seat.description
 
 
-      .index-block{ class: ('stolen' if @bike.stolen) }
+      .index-block{ class: ('stolen' if @bike.status_stolen?) }
         .logo-block
           %img{ src: "https://files.bikeindex.org/logo.png" }
         .index-text

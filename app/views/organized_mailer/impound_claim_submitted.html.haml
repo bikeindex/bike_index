@@ -17,7 +17,7 @@
     %tr
       %td Verified phone?
       %td
-        = "true" if @impound_claim.user.user_phones.confirmed.any?
+        = "true" if @impound_claim.user.phone_confirmed?
     - if @bike_submitting.present?
       %tr
         %td Bike

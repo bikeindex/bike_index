@@ -51,6 +51,17 @@ class Geohelper
         .merge(coordinates.present? ? coordinates : {})
     end
 
+    def assignable_address_hash(addy)
+      addy_hash = formatted_address_hash(addy)
+      {street: addy_hash["street"],
+       city: addy_hash["city"],
+       zipcode: addy_hash["zipcode"],
+       country: Country.fuzzy_find(addy_hash["country"]),
+       state: State.fuzzy_find(addy_hash["state"]),
+       latitude: addy_hash["latitude"],
+       longitude: addy_hash["longitude"]}
+    end
+
     def address_hash_from_geocoder_string(addy)
       address_array = addy.split(",").map(&:strip)
       country = address_array.pop # Don't care about this rn

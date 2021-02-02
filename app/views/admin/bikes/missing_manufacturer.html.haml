@@ -79,7 +79,7 @@
                   .less-strong
                     = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
                     = bike.frame_colors.to_sentence
-                - if bike.stolen
+                - if bike.status_stolen?
                   %span.less-strong-right
                     stolen
 

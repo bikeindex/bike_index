@@ -2,9 +2,11 @@
 - serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link)
 
 .form-well-header.container
-  %h1
-    - if @bike.stolen
+  %h1.uncap
+    - if @bike.status_stolen?
       = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
+    - elsif @bike.status_impounded?
+      = t(".enter_found_bike_type_details", bike_type: @bike.type)
     - else
       = t(".enter_bike_type_details", bike_type: @bike.type)
 
@@ -12,12 +14,8 @@
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
   - if @organization.present?
     = f.hidden_field :creation_organization_id, value: @organization.id
-  - if @bike.stolen?
-    = f.hidden_field :stolen, value: true
-    = hidden_field_tag :stolen, value: true
-
-  - if @bike.abandoned
-    = f.hidden_field :abandoned, value: true
+  - if @bike.status_stolen?
+    = f.hidden_field :date_stolen, value: Time.current.to_i
 
   .form-well-container.container
     .row
@@ -81,7 +79,9 @@
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
+          -# Show the phone if the bike is stolen, the organization requires phone
+          -# only show the phone for impounded records if the current user doesn't have a confirmed phone
+          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
             .form-group.row.unnested-field
               = f.label :phone,
                 @organization&.registration_field_label("reg_phone") || t(".phone"),
@@ -89,9 +89,13 @@
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
-          - if @bike.stolen
-            = fields_for @stolen_record do |srecord|
+          - if @bike.status_stolen?
+            = fields_for @bike.stolen_records.last do |srecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+
+          - if @bike.status_impounded?
+            = fields_for @bike.impound_records.last do |irecord|
+              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
 
           - if @organization&.include_field_reg_address?(current_user)
             .related-fields
@@ -160,14 +164,18 @@
                   @organization.organization_affiliation_options,
                   class: "form-control"
 
-          .form-group.row.unnested-field.no-divider-row
-            = f.label :owner_email, class: 'form-well-label'
-            .form-well-input
-              = f.email_field :owner_email,
-                value: @bike.owner_email || current_user&.email,
-                required: true,
-                placeholder: 'required',
-                class: 'form-control'
+          -# With impounded and found bikes, including owner_email is confusing
+          - if @bike.status_impounded?
+            = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email
+          - else
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :owner_email, class: 'form-well-label'
+              .form-well-input
+                = f.email_field :owner_email,
+                  value: @bike.owner_email || current_user&.email,
+                  required: true,
+                  placeholder: 'required',
+                  class: 'form-control'
 
       .new-bike-submit-wrapper
         = submit_tag t(".register"), class: 'btn btn-lg btn-primary'

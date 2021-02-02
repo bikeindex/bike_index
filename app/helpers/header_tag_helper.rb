@@ -101,7 +101,7 @@ module HeaderTagHelper
 
   def bikes_header_tags
     meta_overrides = {}
-    if (action_name == "new" || action_name == "create") && @bike.stolen
+    if (action_name == "new" || action_name == "create") && @bike.status_stolen?
       self.page_title = translation_title(location: "meta_titles.bikes_new_stolen")
       self.page_description = translation_description(location: "meta_descriptions.bikes_new_stolen")
     elsif action_name == "edit" || action_name == "update"
@@ -113,7 +113,7 @@ module HeaderTagHelper
         self.page_title = "Edit #{@bike.title_string}"
       end
     elsif action_name == "show"
-      self.page_title = "#{"Stolen " if @bike.stolen}#{@bike.title_string}"
+      self.page_title = "#{"Stolen " if @bike.status_stolen?}#{@bike.title_string}"
       self.page_description = "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
       if @bike.current_stolen_record.present?
         self.page_image = @bike.alert_image_url(:square)

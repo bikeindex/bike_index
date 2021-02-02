@@ -1,10 +1,9 @@
-# NB: Decorators are deprecated in this project.
-#     Use Helper methods for view logic, consider incrementally refactoring
-#     existing view logic from decorators to view helpers.
+# NB: Decorators are being reconsidered for this project.
+#     Maybe add more and remove view helpers? Or figure something else out
 class BikeDecorator < ApplicationDecorator
   delegate_all
 
-  def should_show_other_bikes
+  def show_other_bikes?
     object.user? && object.user.show_bikes
   end
 
@@ -15,12 +14,11 @@ class BikeDecorator < ApplicationDecorator
     h.content_tag(:span, t) + h.content_tag(:strong, object.mnfg_name)
   end
 
-  def title_u
-    t = ""
-    t += "#{object.year} " if object.year.present?
-    t += h.content_tag(:strong, object.mnfg_name)
-    t += Rack::Utils.escape_html(" #{object.frame_model_truncated}") if object.frame_model.present?
-    t.html_safe
+  def status_html
+    return "" if object.status_with_owner?
+    h.content_tag(:strong,
+      object.status_humanized_translated,
+      class: "#{object.status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
   end
 
   def list_link_url(target = nil)
@@ -40,6 +38,15 @@ class BikeDecorator < ApplicationDecorator
       h.image_tag(small.join("/") + ext, alt: title_string)
     else
       h.image_tag("revised/bike_photo_placeholder.svg", alt: title_string, title: "No image", class: "no-image")
+    end
+  end
+
+  def title_html
+    h.content_tag(:span) do
+      h.concat("#{object.year} ") if object.year.present?
+      h.concat(h.content_tag(:strong, object.mnfg_name))
+      h.concat(Rack::Utils.escape_html(" #{object.frame_model_truncated}")) if object.frame_model.present?
+      h.concat(" #{object.type}") if object.type != "bike"
     end
   end
 end

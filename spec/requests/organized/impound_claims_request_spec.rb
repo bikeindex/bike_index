@@ -9,7 +9,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
   let(:user_claiming) { FactoryBot.create(:user_confirmed, email: user_email) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user: user_claiming) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
+  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
   let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, stolen_record: bike.current_stolen_record, status: status) }
   let(:status) { "submitting" }
 

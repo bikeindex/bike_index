@@ -31,8 +31,6 @@ class StolenRecord < ApplicationRecord
   ].freeze
 
   belongs_to :bike
-  belongs_to :country
-  belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
 
@@ -42,7 +40,6 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
-  validates_presence_of :bike_id
   validates_presence_of :date_stolen
 
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
@@ -54,6 +51,7 @@ class StolenRecord < ApplicationRecord
   default_scope { current }
   scope :current, -> { where(current: true) }
   scope :approveds, -> { where(approved: true) }
+  scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
@@ -74,16 +72,6 @@ class StolenRecord < ApplicationRecord
       stolen_record.state ||= State.find_by(abbreviation: geo.state_code)
       stolen_record.neighborhood ||= geo.neighborhood
     end
-  end
-
-  def self.old_attr_accessible
-    # recovery_tweet, recovery_share # We edit this in the admin panel
-    %w[police_report_number police_report_department locking_description lock_defeat_description
-      timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
-      longitude theft_description current phone secondary_phone phone_for_everyone
-      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
-      approved recovered_at recovered_description index_helped_recovery can_share_recovery
-      recovery_posted show_address tsved_at estimated_value].map(&:to_sym).freeze
   end
 
   def self.recovery_display_statuses
@@ -272,7 +260,6 @@ class StolenRecord < ApplicationRecord
       index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
       can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery])
     )
-    Bike.unscoped.find_by_id(bike_id)&.update_attributes(current_stolen_record: nil, manual_csr: true, stolen: false)
     notify_of_promoted_alert_recovery
     true
   end
@@ -326,9 +313,9 @@ class StolenRecord < ApplicationRecord
     return true if skip_update
     remove_outdated_alert_images
     # Bump bike only if it looks like this is bike's current_stolen_record
-    if current
+    if current || bike&.current_stolen_record_id == id
       update_not_current_records
-      bike&.update_attributes(current_stolen_record: self, manual_csr: true)
+      bike&.update_attributes(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     bike&.user&.update_attributes(updated_at: Time.current)
   end
@@ -344,10 +331,9 @@ class StolenRecord < ApplicationRecord
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_images
-    no_longer_around = bike.blank? || !bike.stolen? || recovered?
+    no_longer_around = bike.blank? || !bike.status_stolen? || recovered?
     return true unless no_longer_around || @alert_location_changed
     alert_image&.destroy
-    reload
   end
 
   def fix_date

@@ -24,7 +24,7 @@ RSpec.describe ExternalRegistryBike::StopHelingBike, type: :model do
         expect(bike).to be_a(ExternalRegistryBike)
         expect(bike).to be_an_instance_of(ExternalRegistryBike::StopHelingBike)
         expect(bike.cycle_type).to eq("bike")
-        expect(bike.status).to eq("stolen")
+        expect(bike.status).to eq("status_stolen")
         expect(bike.url).to eq("https://www.stopheling.nl")
         expect(bike.registry_name).to eq("stopheling.nl")
         expect(bike.mnfg_name).to eq(api_response[:brand])

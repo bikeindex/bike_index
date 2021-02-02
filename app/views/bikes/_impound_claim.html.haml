@@ -36,7 +36,7 @@
               You have to have a stolen bike registered to file a claim for this #{impound_record.kind} #{impound_record.bike.type}.
               %br
               %strong
-                Add #{link_to "a stolen bike here", new_bike_url(stolen: true)}.
+                Add #{link_to "a stolen bike here", new_bike_url(status: "status_stolen")}.
           - else
             = form_for impound_claim do |f|
               = f.hidden_field :impound_record_id, value: impound_record.id
@@ -45,7 +45,7 @@
                 = f.label :stolen_record_id do
                   Select the stolen bike you own which matches this #{impound_record.kind} #{impound_record.bike&.type}
                   %small.less-strong
-                    not registered yet? #{link_to "add it here", new_bike_url(stolen: true)}.
+                    not registered yet? #{link_to "add it here", new_bike_url(status: "status_stolen")}.
                 .row
                   .col-lg-8.mb-2
                     - stolen_select_opts = bikes.map { |b| [b.title_string, b.current_stolen_record&.id] }

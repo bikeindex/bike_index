@@ -5,7 +5,7 @@
 
   %ol
     %li= t(".file_a_police_report")
-    %li= t(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(stolen: true)))
+    %li= t(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(status: "stolen")))
     %li= t(".look_for_local_stolen_bike_groups_on_face")
     %li= t(".tell_everyone_you_know")
 

@@ -195,7 +195,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         stolen_record.reload
         feedback = Feedback.last
 
-        expect(bike.stolen).to be_falsey
+        expect(bike.status_stolen?).to be_falsey
         expect(bike.current_stolen_record_id).to be_blank
         expect(bike.updated_at).to be > og_updated_at
         expect(feedback.body).to eq recovery_request[:request_reason]
@@ -228,7 +228,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           bike.reload
           stolen_record.reload
 
-          expect(bike.stolen).to be_falsey
+          expect(bike.status_stolen?).to be_falsey
           expect(stolen_record.current).to be_falsey
           expect(stolen_record.bike).to eq(bike)
           expect(stolen_record.recovered?).to be_truthy

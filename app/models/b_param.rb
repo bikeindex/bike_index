@@ -34,7 +34,6 @@ class BParam < ApplicationRecord
     %w[test id components].each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
     stolen_attrs = h["bike"].delete "stolen_record"
     if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
-      h["bike"]["stolen"] = true
       h["stolen_record"] = stolen_attrs
       h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
     end
@@ -66,21 +65,30 @@ class BParam < ApplicationRecord
       .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
   end
 
-  def self.assignable_attrs
-    %w[manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-      stolen abandoned serial_number made_without_serial
-      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id]
-  end
-
   # Attrs that need to be skipped on bike assignment
   def self.skipped_bike_attrs
+    # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
     %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
+      stolen abandoned revised_new
       is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
   end
 
   def self.email_search(str)
     return all unless str.present?
     where("email ilike ?", "%#{str.strip}%")
+  end
+
+  # There are URLs out there with stolen=true, and will be forever - so lean in
+  # Keywords are - :status, :stolen
+  def self.bike_attrs_from_url_params(url_params = {})
+    status = url_params[:status]
+    if status.present?
+      status = "status_#{status}" unless status.start_with?("status_")
+      status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
+      return {status: status} if Bike.statuses.include?(status)
+    end
+    return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
+    {}
   end
 
   # Crazy new shit
@@ -96,10 +104,6 @@ class BParam < ApplicationRecord
     params["bike"]["owner_email"] = val
   end
 
-  def stolen=(val)
-    params["bike"]["stolen"] = ParamsNormalizer.boolean(val)
-  end
-
   def primary_frame_color_id=(val)
     params["bike"]["primary_frame_color_id"] = val
   end
@@ -110,6 +114,10 @@ class BParam < ApplicationRecord
 
   def tertiary_frame_color_id=(val)
     params["bike"]["tertiary_frame_color_id"] = val
+  end
+
+  def status=(val)
+    params["bike"]["status"] = val
   end
 
   def with_bike?
@@ -125,12 +133,47 @@ class BParam < ApplicationRecord
     (params && params["bike"] || {}).with_indifferent_access
   end
 
+  def stolen_attrs
+    s_attrs = params["stolen_record"] || {}
+    nested_params = params.dig("bike", "stolen_records_attributes")
+    if nested_params&.values&.first.is_a?(Hash)
+      s_attrs = nested_params.values.reject(&:blank?).last
+    end
+    # Set the date_stolen if it was passed, if something else didn't already set date_stolen
+    date_stolen = params.dig("bike", "date_stolen")
+    s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
+    s_attrs.except("phone_no_show")
+  end
+
+  def impound_attrs
+    s_attrs = params["impound_record"] || {}
+    nested_params = params.dig("bike", "impound_records_attributes")
+    if nested_params&.values&.first.is_a?(Hash)
+      s_attrs = nested_params.values.reject(&:blank?).last
+    end
+    s_attrs
+  end
+
   def status
-    Bike.statuses.include?(bike["status"]) ? bike["status"] : Bike.statuses.first
+    if Bike.statuses.include?(bike["status"])
+      # Don't override status with status_with_owner
+      return bike["status"] unless bike["status"] == "status_with_owner"
+    end
+    return "status_impounded" if impound_attrs.present?
+    return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
+    "status_with_owner"
+  end
+
+  def status_stolen?
+    status == "status_stolen"
   end
 
   def status_abandoned?
-    bike["status"] == "status_abandoned"
+    status == "status_abandoned"
+  end
+
+  def status_impounded?
+    status == "status_impounded"
   end
 
   def unregistered_parking_notification?
@@ -151,10 +194,6 @@ class BParam < ApplicationRecord
 
   def manufacturer_id
     bike["manufacturer_id"]
-  end
-
-  def stolen
-    bike["stolen"]
   end
 
   def is_pos
@@ -213,6 +252,12 @@ class BParam < ApplicationRecord
     bike && bike["owner_email"]
   end
 
+  def skip_owner_email?
+    return true if status_impounded? || unregistered_parking_notification?
+    send_email = params.dig("bike", "send_email").to_s
+    send_email.present? && !ParamsNormalizer.boolean(send_email)
+  end
+
   def organization_affiliation
     bike["organization_affiliation"]
   end
@@ -262,7 +307,6 @@ class BParam < ApplicationRecord
 
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    bike["stolen"] = true if params["stolen_record"].present?
     set_wheel_size_key
     set_manufacturer_key
     set_color_keys
@@ -414,21 +458,7 @@ class BParam < ApplicationRecord
                 use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
   end
 
-  # Below here is revised setup, an attempt to make the process of upgrading rails easier
-  # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
-  # To protect organization registration and other non-user-set options in revised setup,
-  # Set the protected attrs separately from the params hash and merging over the passed params
-  # Now that we're on rails 4, this is just a giant headache.
-  def bike_from_attrs(is_stolen: nil, abandoned: nil)
-    is_stolen = params["bike"]["stolen"] if params["bike"]&.keys&.include?("stolen")
-    Bike.new(safe_bike_attrs({"stolen" => is_stolen, "abandoned" => abandoned}).as_json)
-  end
-
-  def safe_bike_attrs(param_overrides)
-    bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-      .merge("b_param_id" => id,
-             "creator_id" => creator_id)
-  end
+  # Below here is revised setup
 
   def fetch_formatted_address
     return {} unless bike["street"].present? || bike["address"].present?
@@ -444,6 +474,18 @@ class BParam < ApplicationRecord
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)
     formatted_address
+  end
+
+  def safe_bike_attrs(new_attrs)
+    # existing bike attrs, overridden with passed attributes
+    bike.merge(status: status).merge(new_attrs.as_json)
+      .select { |_k, v| v.present? }
+      .except(*BParam.skipped_bike_attrs)
+      .merge("b_param_id" => id,
+             "b_param_id_token" => id_token,
+             "creator_id" => creator_id,
+             "updator_id" => creator_id)
+      .merge(address_hash)
   end
 
   private

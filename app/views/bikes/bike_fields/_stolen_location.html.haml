@@ -1,37 +1,38 @@
-- state_class = (srecord.object.country_id == Country.united_states.id) ? 'unhidden' : ''
-- stolen_type ||= 'stolen'
+- state_class = (srecord.object.country_id == Country.united_states.id) ? "unhidden" : ""
 
 .related-fields
   .form-group.row.fancy-select.unfancy
     %label.form-well-label
-      = t(".where_was_it_stolen_type", stolen_type: stolen_type)
+      = t(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated)
     .form-well-input#us_id_data{ data: { usid: Country.united_states.id } }
       = srecord.select(:country_id, Country.select_options,
         { required: true, prompt: t(".choose_country") },
-        { class: 'country-select-input form-control' } )
+        { class: "country-select-input form-control" } )
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :street, required: true, placeholder: t(".address_or_intersection"), class: 'form-control'
+      = srecord.text_field :street, required: true, placeholder: t(".address_or_intersection"), class: "form-control"
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :city, required: true, placeholder: t(".city"), class: 'form-control'
+      = srecord.text_field :city, required: true, placeholder: t(".city"), class: "form-control"
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :zipcode, placeholder: t(".zipcode"), class: 'form-control'
+      = srecord.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label
     .form-well-input
-      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
+      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
 
-  .form-group.row
-    %label.form-well-label
-    %label.form-well-input
-      = srecord.check_box :show_address
-      = t(".publicly_display_exact_address")
+  -# Impounded bikes never include the exact location found, because it's used as a way to verify claims
+  - if @bike.status_stolen?
+    .form-group.row
+      %label.form-well-label
+      %label.form-well-input
+        = srecord.check_box :show_address
+        = t(".publicly_display_exact_address")
