@@ -65,4 +65,26 @@ RSpec.describe BikeDecorator do
       end
     end
   end
+
+  describe "status_html" do
+    let(:decorator) { BikeDecorator.new(Bike.new(status: status)) }
+    let(:status) { "status_with_owner" }
+    it "responds with nil" do
+      expect(decorator.status_html).to be_blank
+    end
+    context "stolen" do
+      let(:status) { "status_stolen" }
+      let(:target) { "<strong class=\"stolen-color uppercase\">stolen</strong>" }
+      it "responds with strong" do
+        expect(decorator.status_html).to eq target
+      end
+    end
+    context "impounded" do
+      let(:status) { "status_impounded" }
+      let(:target) { "<strong class=\"impounded-color uppercase\">impounded</strong>" }
+      it "responds with strong" do
+        expect(decorator.status_html).to eq target
+      end
+    end
+  end
 end

@@ -38,6 +38,7 @@ $white: #ffffff;
 $primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;
 
+// Duplicated in _packs_colors.scss
 $stolen-color: $red;
 .stolen-color {
   color: $stolen-color;

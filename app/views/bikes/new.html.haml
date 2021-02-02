@@ -95,7 +95,7 @@
 
           - if @bike.status_impounded?
             = fields_for @bike.impound_records.last do |irecord|
-              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord, stolen_type: irecord.object.kind }
+              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
 
           - if @organization&.include_field_reg_address?(current_user)
             .related-fields

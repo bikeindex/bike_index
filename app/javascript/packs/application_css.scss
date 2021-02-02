@@ -1,5 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 @import "~selectize/dist/css/selectize.bootstrap3";
+@import "../stylesheets/packs_colors"; // Our colors!
+
 // For some reason, selectize is making the cursor a text selector - which is annoying
 .selectize-dropdown .option {
   cursor: pointer;
@@ -24,10 +26,6 @@ body {
   font-family: $body-font-family;
   font-weight: $normal-font-weight;
 }
-
-// Revised/Legacy Nav colors
-$primary-nav-background: #111111;
-$primary-nav-text-color: #a4a4a4;
 
 // General styles
 @import "../stylesheets/utils";

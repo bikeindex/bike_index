@@ -3,15 +3,10 @@
   = render partial: "owner_bike_status_alerts"
   .edit-bike-header
     %h1.uncap
-      - if @bike.fetch_current_stolen_record.present?
-        %span.uppercase.stolen-color= t(".stolen")
-      - elsif @bike.current_impound_record.present?
-        - if @bike.impounded_found?
-          %span.uppercase.found-color= t(".found")
-        - else
-          %span.uppercase.impounded-color= t(".impounded")
-      - else
+      - if @bike.status_with_owner?
         = t(".edit")
+      - else
+        = BikeDecorator.new(@bike).status_html
       = BikeDecorator.new(@bike).title_html
       - if @bike.deleted?
         %em.text-danger.uncap

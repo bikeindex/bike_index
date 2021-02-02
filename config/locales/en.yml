@@ -921,13 +921,19 @@ en:
         two_u_locks: Two U-locks
         u_lock: U-lock
         u_lock_and_cable: U-lock and cable
+    status_humanized:
+      bike:
+        abandoned: abandoned
+        found: found
+        impounded: impounded
+        stolen: stolen
+        unregistered_parking_notification: unregistered parking notification
+        with_owner: with owner
   bikes:
     bike:
-      abandoned: Abandoned
       location: Location
       primary_colors: Primary colors
       serial: Serial
-      stolen: Stolen
     bike_fields:
       revised_colors:
         add_a_color: Add a color
@@ -1167,7 +1173,6 @@ en:
     edit_report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     edit_theft_details:
-      abandoned: Abandoned
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
       click_to_see_promoted_alert_blog_post_html: >-
@@ -1181,7 +1186,6 @@ en:
       eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
         for its serial number
       here: here
-      how_did_you_recover: How did you recovered the %{bike_type}
       if_this_bike_type_was_added: >-
         If this %{bike_type} was added to the Index by a bike shop, that counts as
         proof of ownership
@@ -1192,12 +1196,11 @@ en:
       promoted_theft_alerts: Promoted Theft Alerts
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
-      stolen: Stolen
       try_one_now: Try one now!
       we_can_create_fb_ads_for_you: >-
         Did you know we can create targeted Facebook ads to spread the word about
         your stolen bike for you?
-      when_was_it_stolen: When was it %{stolen_type}
+      when_was_it_stolen_at: When was it stolen
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
@@ -1396,7 +1399,8 @@ en:
       created_to_record_parking_notification: "%{bike_type} created by %{organization}
         to record a Parking Notification"
       cycle_type: Cycle type
-      date_stolen_type: Date %{stolen_type}
+      stolen_at: Stolen at
+      found_at: Found at
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
@@ -1442,7 +1446,7 @@ en:
       stock_photo: Stock photo of a %{year} %{model}
       stolen: Stolen
       switch_to_new_bike_id: Switch to a new bike ID
-      theft_details: "%{bike_abandoned} Details"
+      stolen_details: "Theft Details"
       this_was_impounded: This %{bike_type} was impounded
       update: Update
       view_users_other_registrations: View user's other registrations
@@ -2146,7 +2150,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2172,7 +2176,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3951,13 +3955,12 @@ en:
       nl: EUR
   my_accounts:
     show:
-      abandoned: ABANDONED
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
       bikes: bikes
       combination: Combination
-      date_abandoned: Date abandoned
+      date_found: Date found
       date_stolen: Date stolen
       edit: Edit
       edit_bike: Edit Bike

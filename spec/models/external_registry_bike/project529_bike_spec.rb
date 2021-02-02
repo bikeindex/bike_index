@@ -13,6 +13,21 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
       expect(bike).to an_instance_of(described_class)
       expect(bike).to_not be_persisted
       expect(bike.valid?).to eq(true), bike.errors.full_messages.to_sentence
+      expect(bike.status).to eq "status_stolen"
+      expect(bike.status_humanized).to eq "stolen"
+    end
+
+    context "abandoned" do
+      let(:found_bike_json) { bike_json.merge("status" => "Abandoned") }
+      it "returns a found bike" do
+        bike = described_class.build_from_api_response(found_bike_json)
+
+        expect(bike).to an_instance_of(described_class)
+        expect(bike).to_not be_persisted
+        expect(bike.valid?).to eq(true), bike.errors.full_messages.to_sentence
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "found"
+      end
     end
 
     it "sources attribute values correctly" do

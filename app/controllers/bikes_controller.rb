@@ -311,7 +311,7 @@ class BikesController < ApplicationController
   def bike_templates
     {}.with_indifferent_access.tap do |h|
       h[:bike_details] = translation(:bike_details, controller_method: :edit)
-      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.impounded_found?
+      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
       h[:photos] = translation(:photos, controller_method: :edit)
       h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
       h[:accessories] = translation(:accessories, controller_method: :edit)

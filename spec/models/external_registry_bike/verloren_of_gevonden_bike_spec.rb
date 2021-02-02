@@ -19,6 +19,8 @@ RSpec.describe ExternalRegistryBike::VerlorenOfGevondenBike, type: :model do
         expect(bike).to be_an_instance_of(ExternalRegistryBike::VerlorenOfGevondenBike)
         expect(bike).to_not be_persisted
         expect(bike).to be_valid
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "impounded"
       end
 
       it "correctly parses the bike search query url" do

@@ -729,6 +729,8 @@ RSpec.describe Bike, type: :model do
         expect(ownership.reload.claimed?).to be_truthy
         expect(ownership.owner&.id).to eq user.id
         expect(bike.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "found"
+        expect(bike.status_humanized_translated).to eq "found"
         expect(bike.authorized?(user)).to be_truthy
       end
     end

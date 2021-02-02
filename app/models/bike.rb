@@ -130,6 +130,11 @@ class Bike < ApplicationRecord
       str.to_s&.gsub("status_", "")&.tr("_", " ")
     end
 
+    def status_humanized_translated(str)
+      return "" unless str.present?
+      I18n.t(str.gsub(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+    end
+
     def text_search(query)
       query.present? ? pg_search(query) : all
     end
@@ -326,10 +331,6 @@ class Bike < ApplicationRecord
     current_impound_record.present?
   end
 
-  def impounded_found?
-    current_impound_record&.kind == "found"
-  end
-
   def avery_exportable?
     !impounded? && owner_name.present? && valid_registration_address_present?
   end
@@ -338,16 +339,22 @@ class Bike < ApplicationRecord
     parking_notifications.current.first
   end
 
-  def stolen_or_impounded?
+  def status_stolen_or_impounded?
     %w[status_stolen status_impounded].include?(status)
   end
 
+  def status_found?
+    return false unless status_impounded?
+    id.present? ? current_impound_record&.kind : impound_records.last&.kind
+  end
+
   def status_humanized
-    shuman = self.class.status_humanized(status)
-    if shuman == "impounded"
-      found_override = id.present? ? current_impound_record&.kind : impound_records.last&.kind
-    end
-    found_override || shuman
+    return "found" if status_found?
+    self.class.status_humanized(status)
+  end
+
+  def status_humanized_translated
+    self.class.status_humanized_translated(status_humanized)
   end
 
   # Small helper because we call this a lot
