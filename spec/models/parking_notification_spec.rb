@@ -324,6 +324,45 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.associated_retrieved_notification).to eq parking_notification
       end
     end
+    context "mark_retrieved of replaced notification" do
+      let(:parking_notification2) do
+        FactoryBot.create(:parking_notification,
+                          bike: parking_notification.bike,
+                          organization: parking_notification.organization,
+                          user: parking_notification.user,
+                          created_at: Time.current - 1.week,
+                          initial_record: parking_notification,
+                          delivery_status: "email_success")
+      end
+      it "retrieves" do
+        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+        expect(parking_notification.reload.active?).to be_truthy
+        expect(parking_notification.status).to eq "replaced"
+        expect(parking_notification2.reload.active?).to be_truthy
+        expect(parking_notification2.status).to eq "current"
+        Sidekiq::Worker.clear_all
+        expect {
+          parking_notification.mark_retrieved!(retrieved_kind: "organization_recovery", retrieved_by_id: 12)
+        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        ProcessParkingNotificationWorker.drain
+        # It updates the current notification, even though mark_retrieved! was called on a different notification
+        parking_notification2.reload
+        expect(parking_notification2.active?).to be_falsey
+        expect(parking_notification2.status).to eq "retrieved"
+        expect(parking_notification2.retrieved_kind).to eq "organization_recovery"
+        expect(parking_notification2.retrieved_by_id).to eq 12
+        expect(parking_notification2.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification2.associated_retrieved_notification&.id).to eq parking_notification2.id
+        # OG notification is resolved, but doesn't get the retrieved attrs
+        parking_notification.reload
+        expect(parking_notification.active?).to be_falsey
+        expect(parking_notification.status).to eq "replaced"
+        expect(parking_notification.retrieved_kind).to be_blank
+        expect(parking_notification.retrieved_by_id).to be_blank
+        expect(parking_notification.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification.associated_retrieved_notification&.id).to eq parking_notification2.id
+      end
+    end
   end
 
   describe "retrieve_or_repeat_notification!" do

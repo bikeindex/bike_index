@@ -203,6 +203,10 @@ class ParkingNotification < ActiveRecord::Base
   # args are (retrieved_kind:, retrieved_by_id: nil, resolved_at: nil) - using passed args to avoid overriding methods
   def mark_retrieved!(passed_args = {})
     return self if retrieved?
+    # If replaced, mark the current notification retrieved instead, if a current notification exists
+    if replaced? && calculated_later_notifications.current.last.present?
+      return calculated_later_notifications.current.last.mark_retrieved!(passed_args)
+    end
     self.retrieved_kind = passed_args[:retrieved_kind]
     # Assign status here because of calculated_status
     update_attributes!(status: "retrieved",
