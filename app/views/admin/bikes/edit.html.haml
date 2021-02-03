@@ -166,8 +166,8 @@
             -# Note: this is no longer an attribute on bikes (PR#1875) - but unchecking this expands the recovery fields
             -# ... and filling in the recovery fields recovers the bike
             .col-6.form-group#stolenCheckBox
-              = f.label :stolen do
-                = f.check_box :stolen
+              = label_tag :stolen do
+                = check_box_tag :stolen, true, true
                 Bike is stolen
       #adminRecoveryFields.collapse
         %hr
