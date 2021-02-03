@@ -20,6 +20,16 @@ class ProcessParkingNotificationWorker < ApplicationWorker
       pn.update_attributes(updated_at: Time.current, skip_update: true)
     end
 
+    # If there are any notifications from the same period, resolve them - even if they aren't associated
+    if parking_notification.reload.resolved?
+      parking_notification.notifications_from_period.active.each do |notification|
+        # Add a note about it though, to document it
+        notes = [notification.internal_notes, "resolved by parking notification ##{parking_notification.id}"]
+        notification.update_attributes(resolved_at: parking_notification.resolved_at,
+                                       internal_notes: notes.join(", "))
+      end
+    end
+
     return true unless parking_notification.send_email? && parking_notification.delivery_status.blank?
     OrganizedMailer.parking_notification(parking_notification).deliver_now
     parking_notification.update_attribute :delivery_status, "email_success" # I'm not sure how to make this more representative

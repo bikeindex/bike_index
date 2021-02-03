@@ -190,7 +190,7 @@ RSpec.describe ImpoundRecord, type: :model do
             stolen_record.reload
             expect(stolen_record.recovered?).to be_truthy
 
-            expect(parking_notification.reload.status).to eq "impounded_resolved"
+            expect(parking_notification.reload.status).to eq "impounded_retrieved"
             expect(parking_notification.retrieved_kind).to be_blank
             expect(parking_notification.resolved_at).to be_within(5).of Time.current
           end
@@ -274,25 +274,23 @@ RSpec.describe ImpoundRecord, type: :model do
         resolved_at = parking_notification2.resolved_at
         expect(parking_notification2.resolved_at).to be_within(5).of resolved_at
         expect(parking_notification2.retrieved_kind).to be_blank
-        expect(parking_notification2.last_notification?).to be_truthy
 
-        expect(parking_notification1.reload.status).to eq "impounded"
+        expect(parking_notification1.reload.status).to eq "replaced"
         expect(parking_notification1.resolved_at).to be_within(5).of resolved_at
-        expect(parking_notification1.last_notification?).to be_falsey
         # Trigger worker for impound_record_update, also associated pprocessing of parking notifications
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! { impound_record_update.reload }
         expect(bike.reload.status).to eq "status_with_owner"
-        expect(parking_notification1.reload.status).to eq "impounded_resolved"
+        expect(parking_notification1.reload.status).to eq "replaced"
         expect(parking_notification1.resolved_at).to be_within(5).of resolved_at
-        expect(parking_notification1.retrieved_kind).to be_blank # Might want to make this impound_retrieved?
-        expect(parking_notification2.reload.status).to eq "impounded_resolved"
+        expect(parking_notification1.retrieved_kind).to be_blank
+        expect(parking_notification2.reload.status).to eq "impounded_retrieved"
         expect(parking_notification2.resolved_at).to be_within(5).of resolved_at
         expect(parking_notification2.retrieved_kind).to be_blank
 
         # Also test first and last notification here, just in case
         expect(ParkingNotification.first_notification.pluck(:id)).to eq([parking_notification1.id])
-        expect(ParkingNotification.last_notification.pluck(:id)).to eq([parking_notification2.id])
+        expect(ParkingNotification.not_replaced.pluck(:id)).to eq([parking_notification2.id])
       end
     end
   end

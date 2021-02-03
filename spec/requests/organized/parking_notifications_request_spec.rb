@@ -304,7 +304,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.image_processing).to be_falsey
 
           parking_notification_initial.reload
-          expect(parking_notification_initial.status).to eq "impounded"
+          expect(parking_notification_initial.status).to eq "replaced"
           expect(parking_notification_initial.impound_record_id).to eq parking_notification.impound_record_id
           expect(parking_notification_initial.resolved_at).to be_within(5).of parking_notification.impound_record.created_at
 
@@ -552,20 +552,20 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         parking_notification_initial.reload
         parking_notification2.reload
 
-        expect(parking_notification_initial.current?).to be_falsey
-        expect(parking_notification_initial.impounded?).to be_truthy
+        expect(parking_notification_initial.status).to eq "replaced"
         expect(parking_notification_initial.impound_record_id).to be_present
         expect(parking_notification_initial.repeat_records.count).to eq 1
+        expect(parking_notification_initial.resolved_at).to be_present
         initial_impound_notification = parking_notification_initial.repeat_records.impound_notification.first
         expect(initial_impound_notification.delivery_status).to eq "email_success"
         expect(initial_impound_notification.retrieval_link_token).to be_blank
         expect(initial_impound_notification.user).to eq current_user
         expect(parking_notification_initial.to_coordinates).to eq(initial_impound_notification.to_coordinates)
 
-        expect(parking_notification2.current?).to be_falsey
-        expect(parking_notification2.impounded?).to be_truthy
+        expect(parking_notification2.status).to eq "replaced"
         expect(parking_notification2.impound_record_id).to be_present
         expect(parking_notification2.repeat_records.count).to eq 1
+        expect(parking_notification2.resolved_at).to be_present
         impound_notification2 = parking_notification2.repeat_records.impound_notification.first
         expect(impound_notification2.delivery_status).to eq "email_success"
         expect(impound_notification2.retrieval_link_token).to be_blank

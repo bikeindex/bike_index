@@ -1040,8 +1040,9 @@ RSpec.describe BikesController, type: :request do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          expect(parking_notification_abandoned.reload.status).to eq "current"
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
           Sidekiq::Worker.clear_all
@@ -1055,13 +1056,12 @@ RSpec.describe BikesController, type: :request do
           parking_notification.reload
           parking_notification_abandoned.reload
           expect(bike.current_parking_notification).to be_blank
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.retrieved?).to be_truthy
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.retrieved_by).to eq current_user
           expect(parking_notification.resolved_at).to be_within(5).of Time.current
           expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
 
-          expect(parking_notification_abandoned.retrieved?).to be_truthy
+          expect(parking_notification_abandoned.status).to eq "retrieved"
           expect(parking_notification_abandoned.retrieved_by).to be_blank
           expect(parking_notification_abandoned.associated_retrieved_notification).to eq parking_notification
         end
@@ -1071,8 +1071,9 @@ RSpec.describe BikesController, type: :request do
         it "refuses" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.resolved?).to be_truthy
+          expect(parking_notification.status).to eq "replaced"
+          expect(parking_notification.active?).to be_falsey
+          expect(bike.reload.status).to eq "status_impounded"
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
@@ -1080,7 +1081,7 @@ RSpec.describe BikesController, type: :request do
             expect(assigns(:bike)).to eq bike
             expect(flash[:error]).to match(/impound/i)
           end
-          bike.reload
+          expect(bike.reload.status).to eq "status_impounded"
           parking_notification.reload
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.retrieved?).to be_falsey

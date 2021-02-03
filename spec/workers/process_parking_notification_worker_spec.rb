@@ -57,9 +57,11 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         parking_notification2.reload
         expect(initial.impound_record).to eq impound_record
         expect(initial.kind).to eq "appears_abandoned_notification"
-        expect(initial.status).to eq "impounded"
+        expect(initial.status).to eq "replaced"
+        expect(initial.resolved_at).to be_present
         expect(parking_notification2.delivery_status).to eq "email_success"
-        expect(parking_notification2.status).to eq "impounded"
+        expect(parking_notification2.status).to eq "replaced"
+        expect(parking_notification2.resolved_at).to be_present
         expect(parking_notification2.impound_record).to eq impound_record
         expect(parking_notification2.kind).to eq "appears_abandoned_notification"
       end
@@ -83,7 +85,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         initial.reload
         parking_notification2.reload
 
-        expect(initial.status).to eq "retrieved"
+        expect(initial.status).to eq "replaced"
         expect(initial.resolved_at).to be_within(10).of Time.current
         expect(initial.retrieved_by).to eq user
         expect(initial.associated_retrieved_notification).to eq initial
@@ -98,7 +100,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       let(:initial_record_id) { nil }
       let(:parking_notification_other_org) { FactoryBot.create(:parking_notification, bike: bike) }
       it "does nothing to the other notification, closes all on retrieval" do
-        initial.reload
+        initial.update(internal_notes: "something")
         parking_notification2.reload
         expect(initial.associated_notifications).to eq([])
         expect(parking_notification2.associated_notifications).to eq([])
@@ -114,7 +116,9 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification_other_org.current?).to be_truthy
         expect(parking_notification2.status).to eq "current"
         expect(initial.status).to eq "current"
+        expect(initial.resolved_at).to be_blank
         expect(initial.notifications_from_period.pluck(:id)).to match_array([initial.id, parking_notification2.id])
+        expect(initial.internal_notes).to eq "something"
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           parking_notification2.mark_retrieved!(retrieved_kind: "link_token_recovery", resolved_at: Time.current - 5.minutes)
@@ -128,10 +132,13 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification_other_org.current?).to be_truthy
 
         expect(parking_notification2.associated_retrieved_notification).to eq parking_notification2
-        expect(parking_notification2.retrieved?).to be_truthy
-        expect(parking_notification2.current?).to be_falsey
+        expect(parking_notification2.status).to eq "retrieved"
+        expect(parking_notification2.retrieved_kind).to eq "link_token_recovery"
+        expect(parking_notification2.resolved_at).to be_present
+        expect(parking_notification2.internal_notes).to be_blank
 
-        expect(initial.reload.current?).to be_falsey
+        expect(initial.reload.status).to eq "resolved_otherwise"
+        expect(initial.internal_notes).to eq "something, resolved by parking notification ##{parking_notification2.id}"
         expect(initial.associated_retrieved_notification).to be_blank
         expect(initial.resolved_otherwise?).to be_truthy
         expect(initial.resolved_at).to be_within(5).of parking_notification2.resolved_at

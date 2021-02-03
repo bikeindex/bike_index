@@ -172,9 +172,8 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.hidden).to be_falsey
       expect(bike.user_hidden).to be_falsey
 
-      parking_notification1.reload
-      expect(parking_notification1.resolved_at).to be_present
-      expect(parking_notification1.resolved_without_impounding?).to be_falsey
+      expect(parking_notification1.reload.resolved_at).to be_present
+      expect(parking_notification1.retrieved_kind).to be_blank
     end
   end
 
@@ -346,7 +345,6 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.resolved_at).to be_within(1.second).of Time.current
         expect(parking_notification.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification.retrieved_by).to eq user
-        expect(parking_notification.resolved_without_impounding?).to be_truthy
         expect(parking_notification.retrieval_link_token).to eq og_token # Why not leave it around
       end
       context "impounded" do

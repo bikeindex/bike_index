@@ -2187,8 +2187,7 @@ CREATE TABLE public.parking_notifications (
     retrieved_by_id bigint,
     image text,
     image_processing boolean DEFAULT false NOT NULL,
-    repeat_number integer,
-    not_last_notification boolean DEFAULT false
+    repeat_number integer
 );
 
 

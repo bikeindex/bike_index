@@ -106,7 +106,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(impound_record_update.kind).to eq "note"
       expect(impound_record_update.notes).to eq "OK boomer"
       expect(impound_record_update.user).to eq current_user
-      expect(impound_record_update.resolved).to be_truthy
+      expect(impound_record_update.processed?).to be_truthy
     end
     context "retrieved_by_owner" do
       let(:kind) { "retrieved_by_owner" }
@@ -128,7 +128,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "retrieved_by_owner"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.status_with_owner?).to be_truthy
@@ -156,7 +156,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "removed_from_bike_index"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
         expect(bike.reload.deleted?).to be_truthy
       end
     end
@@ -182,7 +182,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "transferred_to_new_owner"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.owner_email).to eq "a@b.c"
@@ -241,7 +241,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.location).to eq location2
         expect(impound_record_update.notes).to be_blank
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.status).to eq "status_impounded"
@@ -295,7 +295,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record_update.kind).to eq "transferred_to_new_owner"
           expect(impound_record_update.notes).to eq "OK boomer"
           expect(impound_record_update.user).to eq current_user
-          expect(impound_record_update.resolved).to be_truthy
+          expect(impound_record_update.processed?).to be_truthy
 
           bike.reload
           expect(bike.owner_email).to eq "example@school.edu"
