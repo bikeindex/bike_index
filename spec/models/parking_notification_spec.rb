@@ -127,9 +127,11 @@ RSpec.describe ParkingNotification, type: :model do
         context "additional parking_notification" do
           let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
           it "can be assigned" do
+            parking_notification2.reload
+            expect(ParkingNotification.where(initial_record_id: parking_notification_initial.id).count).to eq 1
             expect(parking_notification.likely_repeat?).to be_truthy
             expect(parking_notification.can_be_repeat?).to be_truthy
-            expect(parking_notification.save)
+            expect(parking_notification.save).to be_truthy
             expect(parking_notification.repeat_record?).to be_truthy
             expect(parking_notification.initial_record).to eq parking_notification_initial
             expect(parking_notification2.initial_record).to eq parking_notification_initial
@@ -154,13 +156,10 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.user_hidden).to be_truthy
       expect(parking_notification1.unregistered_bike?).to be_truthy
       expect(parking_notification1.resolved_at).to be_blank
-      expect(parking_notification1.calculated_resolved_at).to be_blank
       Sidekiq::Worker.clear_all
       parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
       expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(parking_notification2.resolved_at).to be_blank
-      expect(parking_notification2.calculated_resolved_at).to be_within(1).of parking_notification2.created_at
-      expect(parking_notification1.calculated_resolved_at).to be_within(1).of parking_notification2.created_at
+      expect(parking_notification2.resolved_at).to be_within(1).of Time.current
       Sidekiq::Testing.inline! do
         parking_notification2.process_notification
       end
@@ -175,7 +174,6 @@ RSpec.describe ParkingNotification, type: :model do
 
       parking_notification1.reload
       expect(parking_notification1.resolved_at).to be_present
-      expect(parking_notification1.calculated_resolved_at).to eq parking_notification1.resolved_at
       expect(parking_notification1.resolved_without_impounding?).to be_falsey
     end
   end
@@ -334,10 +332,11 @@ RSpec.describe ParkingNotification, type: :model do
     let(:user) { FactoryBot.create(:user) }
     context "mark_retrieved" do
       it "retrieves" do
+        expect(parking_notification.resolved_at).to be_blank
+        expect(parking_notification.status).to eq "current"
         og_token = parking_notification.retrieval_link_token
         expect(og_token).to be_present
-        expect(parking_notification.current?).to be_truthy
-        expect(parking_notification.retrieved?).to be_falsey
+        expect(parking_notification.retrieved_kind).to be_blank
         expect {
           new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
           expect(new_parking_notification.id).to eq parking_notification.id # Just checking
@@ -384,7 +383,8 @@ RSpec.describe ParkingNotification, type: :model do
         let(:resolved_at) { Time.current - 26.hours }
         let(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, resolved_at: resolved_at) }
         it "does not create" do
-          parking_notification.reload
+          expect(parking_notification.status).to eq "retrieved"
+          expect(parking_notification.reload.retrieved_kind).to eq "organization_recovery"
           expect(parking_notification.retrieved?).to be_truthy
           expect(parking_notification.resolved_at).to be_within(1).of resolved_at # Testing factory functionality
           expect {

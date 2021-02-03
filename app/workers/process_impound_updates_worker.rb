@@ -1,4 +1,4 @@
-class ImpoundUpdateBikeWorker < ApplicationWorker
+class ProcessImpoundUpdatesWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   def perform(impound_record_id)
@@ -15,7 +15,7 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
     end
     claim_retrieved = nil
     # Run each impound_record_updates that hasn't been run
-    impound_record.impound_record_updates.unresolved.each do |impound_record_update|
+    impound_record.impound_record_updates.unprocessed.each do |impound_record_update|
       if impound_record_update.kind == "transferred_to_new_owner"
         bike.update(status: "status_with_owner",
                     owner_email: impound_record_update.transfer_email,
@@ -34,12 +34,11 @@ class ImpoundUpdateBikeWorker < ApplicationWorker
         impound_record_update.impound_claim = impound_record.impound_claims.approved.first
         claim_retrieved = impound_record_update.impound_claim
       end
-      impound_record_update.update(resolved: true, skip_update: true)
+      impound_record_update.update(processed: true, skip_update: true)
     end
     impound_record.update_attributes(skip_update: true)
-    # Bump the parking notification to resolve it, if it hasn't been resolved already
+    # Bump the parking notification to ensure it reflects current state (resolving if relevant)
     impound_record.parking_notification&.update(updated_at: Time.current)
-
     if claim_retrieved.present?
       merge_impound_claim(impound_record, claim_retrieved)
     else

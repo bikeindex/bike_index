@@ -35,6 +35,10 @@
     - unless skip_repeat
       %th
         %small=t(".notification_number")
+        %a{href: "#"}
+          first
+        %a{href: "#"}
+          last
     %th.status-cell Status
     %th.small Message/Notes
     - unless skip_resolved
@@ -118,16 +122,16 @@
 
         - unless skip_resolved
           %td.hidden-sm-cells.status-cell
+            - resolved_at = parking_notification.resolved_at
             - if parking_notification.impound_record_id.present?
-              - resolved_at = parking_notification.calculated_resolved_at
               %a.small{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id), class: (resolved_at.present? ? "convertTime" : "") }
                 - if resolved_at.present?
                   = l(resolved_at, format: :convert_time)
                 - else
                   impounded
-            - elsif parking_notification.resolved_at.present?
+            - elsif resolved_at.present?
               %small.convertTime
-                = l(parking_notification.resolved_at, format: :convert_time)
+                = l(resolved_at, format: :convert_time)
 
         - unless skip_multiselect
           %td.multiselect-cell.table-cell-check.collapse

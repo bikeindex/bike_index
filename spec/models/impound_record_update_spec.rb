@@ -22,6 +22,7 @@ RSpec.describe ImpoundRecordUpdate, type: :model do
       expect(impound_record.status).to eq "retrieved_by_owner"
       expect(impound_record.resolved?).to be_truthy
       expect(impound_record.resolved_at).to be_within(1).of Time.current
+      expect(impound_record_update.unprocessed?).to be_truthy
     end
   end
 end

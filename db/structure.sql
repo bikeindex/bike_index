@@ -1290,7 +1290,7 @@ CREATE TABLE public.impound_record_updates (
     kind integer,
     notes text,
     transfer_email character varying,
-    resolved boolean DEFAULT false,
+    processed boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     impound_claim_id bigint
@@ -2186,7 +2186,9 @@ CREATE TABLE public.parking_notifications (
     retrieval_link_token text,
     retrieved_by_id bigint,
     image text,
-    image_processing boolean DEFAULT false NOT NULL
+    image_processing boolean DEFAULT false NOT NULL,
+    repeat_number integer,
+    not_last_notification boolean DEFAULT false
 );
 
 
@@ -5379,6 +5381,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210120162658'),
 ('20210127173741'),
 ('20210127191226'),
-('20210129214432');
+('20210129214432'),
+('20210203164749');
 
 

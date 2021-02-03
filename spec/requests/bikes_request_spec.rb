@@ -1133,7 +1133,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "organized impound_record" do
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-        before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
+        before { ProcessImpoundUpdatesWorker.new.perform(impound_record.id) }
         it "redirects with flash error" do
           expect(bike.reload.status).to eq "status_impounded"
           get "#{base_url}/#{bike.id}/edit"

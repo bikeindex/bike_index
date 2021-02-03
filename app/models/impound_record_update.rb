@@ -27,7 +27,7 @@ class ImpoundRecordUpdate < ApplicationRecord
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }
   scope :with_location, -> { where.not(location_id: nil) }
-  scope :unresolved, -> { where(resolved: false) } # Means the update worker hasn't taken care of them
+  scope :unprocessed, -> { where(processed: false) } # Means the update worker hasn't taken care of them
 
   attr_accessor :skip_update
 
@@ -79,6 +79,10 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def resolved?
     !active?
+  end
+
+  def unprocessed?
+    !processed
   end
 
   def kind_humanized
