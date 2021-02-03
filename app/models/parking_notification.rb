@@ -196,7 +196,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def notification_number
-    repeat_number + 1
+    (repeat_number || 0) + 1
   end
 
   # Doesn't require a user because email recovery doesn't require a user
