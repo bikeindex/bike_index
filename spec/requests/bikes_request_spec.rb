@@ -1069,13 +1069,13 @@ RSpec.describe BikesController, type: :request do
           parking_notification_abandoned.reload
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.status).to eq "replaced"
-          expect(parking_notification.retrieved_by).to eq current_user
           expect(parking_notification.resolved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
+          expect(parking_notification.retrieved_by&.id).to be_blank
+          expect(parking_notification.retrieved_kind).to be_blank
 
           expect(parking_notification_abandoned.status).to eq "retrieved"
-          expect(parking_notification_abandoned.retrieved_by).to be_blank
-          expect(parking_notification_abandoned.associated_retrieved_notification).to eq parking_notification
+          expect(parking_notification_abandoned.retrieved_by&.id).to eq current_user.id
+          expect(parking_notification_abandoned.retrieved_kind).to eq "link_token_recovery"
         end
       end
       context "impound notification" do

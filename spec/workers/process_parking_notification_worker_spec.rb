@@ -87,12 +87,13 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
 
         expect(initial.status).to eq "replaced"
         expect(initial.resolved_at).to be_within(10).of Time.current
-        expect(initial.retrieved_by).to eq user
-        expect(initial.associated_retrieved_notification).to eq initial
+        expect(initial.retrieved_by_id).to be_blank
+        expect(initial.associated_retrieved_notification&.id).to eq parking_notification2.id
 
         expect(parking_notification2.status).to eq "retrieved"
         expect(parking_notification2.resolved_at).to be_within(1).of initial.resolved_at
-        expect(parking_notification2.associated_retrieved_notification).to eq initial
+        expect(parking_notification2.retrieved_by_id).to eq user.id
+        expect(parking_notification2.associated_retrieved_notification&.id).to eq parking_notification2.id
       end
     end
 
