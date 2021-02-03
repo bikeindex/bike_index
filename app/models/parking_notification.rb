@@ -3,7 +3,7 @@
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
-  STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_resolved: 5, resolved_otherwise: 4}.freeze
+  STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
   MAX_PER_PAGE = 250
 
@@ -246,6 +246,7 @@ class ParkingNotification < ActiveRecord::Base
   def set_calculated_attributes
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
     self.status = calculated_status
+    self.resolved_at ||= Time.current if resolved?
     # Only set unregistered_bike on creation
     self.unregistered_bike = calculated_unregistered_parking_notification if id.blank?
     # generate retrieval token after checking if unregistered_bike
@@ -271,11 +272,11 @@ class ParkingNotification < ActiveRecord::Base
   def subject
     return mail_snippet.subject if mail_snippet&.subject.present?
     if appears_abandoned_notification?
-      "Your #{bike&.type || "Bike"} appears to be abandoned"
+      "Your #{bike&.type || 'Bike'} appears to be abandoned"
     elsif parked_incorrectly_notification?
-      "Your #{bike&.type || "Bike"} is parked incorrectly"
+      "Your #{bike&.type || 'Bike'} is parked incorrectly"
     elsif impounded?
-      "Your #{bike&.type || "Bike"} was impounded"
+      "Your #{bike&.type || 'Bike'} was impounded"
     end
   end
 
@@ -319,7 +320,8 @@ class ParkingNotification < ActiveRecord::Base
 
   def calculated_status
     if impound_notification? || impound_record_id.present?
-      return impound_record&.resolved? ? "impounded_resolved" : "impounded"
+      return "impounded" unless impound_record&.resolved?
+      return impound_record.retrieved_by_owner? ? "retrieved" : "resolved_otherwise"
     end
     if resolved_at.present?
       return associated_retrieved_notification.present? ? "retrieved" : "resolved_otherwise"

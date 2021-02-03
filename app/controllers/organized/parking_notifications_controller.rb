@@ -26,7 +26,8 @@ module Organized
       @search_status = if params[:search_status] == "all"
         "all"
       else
-        ParkingNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+        valid_statuses = ParkingNotification.statuses + ["resolved"]
+        valid_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
       end
       @search_unregistered = %w[only_unregistered not_unregistered].include?(params[:search_unregistered]) ? params[:search_unregistered] : "all"
 

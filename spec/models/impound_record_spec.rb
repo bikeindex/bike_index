@@ -115,6 +115,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.deleted?).to be_falsey
           # It's still unregistered, nothing changed
           expect(bike.created_by_parking_notification?).to be_truthy
+          expect(bike.status).to eq "status_with_owner"
         end
         context "approved_claim" do
           let!(:impound_claim) do
@@ -185,9 +186,12 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(bike.deleted?).to be_truthy
 
             bike_submitting.reload
-            expect(bike_submitting.status_stolen?).to be_falsey
+            expect(bike_submitting.status).to eq "status_with_owner"
             stolen_record.reload
             expect(stolen_record.recovered?).to be_truthy
+
+            expect(parking_notification.reload.status).to eq "retrieved_by_owner"
+            expect(parking_notification.resolved_at).to be_within(5).of Time.current
           end
         end
       end
@@ -265,13 +269,17 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
         expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
         expect(bike.reload.status).to eq "status_impounded"
+        expect(parking_notification2.reload.status).to eq "impounded"
+        expect(parking_notification2.resolved_at).to be_blank
         expect(parking_notification1.reload.status).to eq "replaced"
-        expect(parking_notification2.status).to eq "impounded"
+        expect(parking_notification1.resolved_at).to be_blank
         # Trigger worker after create
         ImpoundUpdateBikeWorker.new.perform(impound_record_update.impound_record_id)
         expect(bike.reload.status).to eq "status_with_owner"
         expect(parking_notification1.reload.status).to eq "replaced"
-        expect(parking_notification2.reload.status).to eq "impounded_resolved"
+        expect(parking_notification2.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification2.reload.status).to eq "retrieved"
+        expect(parking_notification2.resolved_at).to be_within(5).of Time.current
       end
     end
   end
