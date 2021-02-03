@@ -15,7 +15,7 @@ class CreationState < ApplicationRecord
 
   # Probably should be switched to enum at some point
   def self.origins
-    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification].freeze
+    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification impound_import].freeze
   end
 
   def creation_description

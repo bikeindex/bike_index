@@ -23,44 +23,55 @@
         %span.number 0
         total matches
         %em.maxNumberDisplayed.currently-hidden
-          \- first #{@per_page} loaded
+          \- first
+          %span#perPageCount
+          loaded
   .row.mt-2.mb-4
     .col-sm-12
       %ul.nav#parking-notification-nav-links
-        - status_display_hash = { all: { m: "All statuses"}, current: { m: "Current notifications" }, impounded: { m: "Impounded notifications", s: "impound notifications or notifications followed up by impounding" }, resolved: { m: "Resolved notifications", s: "retrieved or otherwise resolved" }, replaced: { m: "Replaced notifications", s: "replaced by follow up notifications" } }
-        %li.nav-item.parking-notification-status-li
-          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            -# Fallback to status, in case there isn't a match (only happens if manually writing in other statuses right now)
-            - current_status = status_display_hash[@search_status.to_sym] || { m: @search_status }
-            = current_status[:m]
-            - if current_status[:s].present?
-              %small.less-strong= current_status[:s]
-
-          .dropdown-menu
-            -# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision
-            - status_display_hash.each do |status, display_hash|
-              - status_active = @search_status == status.to_s
-              - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
-              = link_to organization_parking_notifications_path(status_link_params), class: "dropdown-item linkWithSortableSearchParams #{status_active ? 'active' : ''}", "data-urlparams" => "search_status,#{status}" do
-                = display_hash[:m]
-                - if display_hash[:s].present?
-                  %small.less-strong= display_hash[:s]
-              - if status == :all # Add a divider after all
-                .dropdown-divider
         %li.nav-item
-          - search_kind = ParkingNotification.kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            = search_kind.humanize
-            - if search_kind == "all"
-              types
+            - if @search_kind == "all"
+              All types
+            - else
+              #{@search_kind.humanize}s
           .dropdown-menu
             - (["all"] + ParkingNotification.kinds).each do |kind|
-              - kind_active = params[:search_kind] == kind
+              - kind_active = @search_kind == kind
               - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_kind: (kind_active ? nil : kind))
-              - kind_display = kind == "all" ? "All types" : "#{kind.humanize}"
+              - kind_display = kind == "all" ? "All types" : "#{kind.humanize}s"
               = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item linkWithSortableSearchParams #{kind_active ? 'active' : ''}", "data-urlparams" => "search_kind,#{kind}"
               - if kind == "all" # Add a divider after all
                 .dropdown-divider
+        - unless @skip_status_select
+          %li.nav-item.parking-notification-status-li
+            :ruby
+              status_display_hash = {
+                current: {m: "Current notifications"},
+                resolved: {m: "Resolved notifications", s: "retrieved, impounded or otherwise resolved"},
+                all: {m: "All statuses"},
+                impounded: {m: "Impounded notifications", s: "impound notifications or notifications followed up by impounding"},
+                retrieved: {m: "Retrieved notifications", s: "notifications marked retrieved"},
+                impounded_resolved: {m: "Impounded resolved", s: "impounded notifications which have been resolved"}
+              }
+            %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+              -# Fallback to status, in case there isn't a match (only happens if manually writing in other statuses right now)
+              - current_status = status_display_hash[@search_status.to_sym] || { m: @search_status }
+              = current_status[:m]
+              - if current_status[:s].present?
+                %small.less-strong= current_status[:s]
+
+            .dropdown-menu
+              -# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision
+              - status_display_hash.each do |status, display_hash|
+                - status_active = @search_status == status.to_s
+                - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
+                = link_to organization_parking_notifications_path(status_link_params), class: "dropdown-item linkWithSortableSearchParams #{status_active ? 'active' : ''}", "data-urlparams" => "search_status,#{status}" do
+                  = display_hash[:m]
+                  - if display_hash[:s].present?
+                    %small.less-strong= display_hash[:s]
+                - if status == :all # Add a divider after all
+                  .dropdown-divider
         %li.nav-item
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
             - if @search_unregistered == "not_unregistered"
@@ -78,6 +89,7 @@
             - unregistered_not_active = @search_unregistered == "not_unregistered"
             - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
             = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_not_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
+
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications

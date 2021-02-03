@@ -34,11 +34,11 @@
       =t(".by")
     - unless skip_repeat
       %th
-        %small=t(".notification_number")
-        %a{href: "#"}
-          first
-        %a{href: "#"}
-          last
+        %small
+          - if render_sortable
+            = sortable "repeat_number", t(".notification_number")
+          - else
+            =t(".notification_number")
     %th.status-cell Status
     %th.small Message/Notes
     - unless skip_resolved

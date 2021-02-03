@@ -308,7 +308,7 @@
 
     - resolved_notifications = parking_notifications.resolved.where.not(id: current_impound_notification&.id)
     %p{ style: "margin-top: -12px;" }
-      = pluralize number_with_delimiter(parking_notifications.current.count), "current notifications"
+      = pluralize number_with_delimiter(parking_notifications.current.count), "current notification"
       - if parking_notifications.resolved.count > 0
         \-
         %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }

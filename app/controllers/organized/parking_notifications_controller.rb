@@ -23,11 +23,21 @@ module Organized
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
-      @search_status = if params[:search_status] == "all"
-        "all"
+      if ParkingNotification.kinds.include?(params[:search_kind]).present?
+        @search_kind = params[:search_kind]
+      end
+      if @search_kind == "impound_notification"
+        # If we're searching impound_notifications, you can't search status
+        @search_status = "all"
+        @skip_status_select = true
       else
-        valid_statuses = ParkingNotification.statuses + ["resolved"]
-        valid_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+        @search_kind ||= "all"
+        @search_status = if params[:search_status] == "all"
+          "all"
+        else
+          valid_statuses = ParkingNotification.statuses + ["resolved"]
+          valid_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+        end
       end
       @search_unregistered = %w[only_unregistered not_unregistered].include?(params[:search_unregistered]) ? params[:search_unregistered] : "all"
 
@@ -76,7 +86,7 @@ module Organized
     private
 
     def sortable_columns
-      %w[created_at updated_at user_id kind]
+      %w[created_at updated_at user_id kind repeat_number]
     end
 
     def parking_notifications
@@ -106,9 +116,7 @@ module Organized
       if params[:user_id].present?
         notifications = notifications.where(user_id: params[:user_id])
       end
-      if ParkingNotification.kinds.include?(params[:search_kind]).present?
-        notifications = notifications.where(kind: params[:search_kind])
-      end
+      notifications = notifications.where(kind: @search_kind) unless @search_kind == "all"
       if @search_unregistered == "only_unregistered"
         notifications = notifications.unregistered_bike
       elsif @search_unregistered == "not_unregistered"

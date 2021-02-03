@@ -131,7 +131,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
         expect(parking_notification2.retrieved?).to be_truthy
         expect(parking_notification2.current?).to be_falsey
 
-        expect(initial.current?).to be_falsey
+        expect(initial.reload.current?).to be_falsey
         expect(initial.associated_retrieved_notification).to be_blank
         expect(initial.resolved_otherwise?).to be_truthy
         expect(initial.resolved_at).to be_within(5).of parking_notification2.resolved_at
