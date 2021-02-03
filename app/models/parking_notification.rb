@@ -223,7 +223,6 @@ class ParkingNotification < ActiveRecord::Base
     self.retrieved_kind = passed_args[:retrieved_kind]
     update_attributes!(retrieved_by_id: passed_args[:retrieved_by_id],
                        resolved_at: passed_args[:resolved_at] || Time.current)
-    process_notification
     self
   end
 
