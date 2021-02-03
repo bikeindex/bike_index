@@ -18,13 +18,14 @@ class ProcessParkingNotificationWorker < ApplicationWorker
     parking_notification.associated_notifications.each do |pn|
       pn.impound_record_id = impound_record.id if impound_record.present?
       pn.resolved_at = parking_notification.resolved_at if parking_notification.resolved_at.present?
-      pn.update_attributes(updated_at: Time.current)
+      pn.update_attributes(updated_at: Time.current, skip_update: true)
     end
 
     # If there are any records from the same period and should be resolved, resolve them
     if parking_notification.resolved?
       parking_notification.notifications_from_period.active.each do |notification|
-        notification.update_attributes(resolved_at: parking_notification.resolved_at)
+        notification.update_attributes(resolved_at: parking_notification.resolved_at,
+                                       skip_update: true)
       end
     end
 

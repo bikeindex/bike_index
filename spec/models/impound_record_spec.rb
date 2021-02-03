@@ -254,13 +254,24 @@ RSpec.describe ImpoundRecord, type: :model do
         FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
                                                  initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
       end
+      let(:impound_record_update) { FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "retrieved_by_owner") }
       it "returns note and message" do
+        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
         impound_record.reload
         organization.reload
         expect(impound_record.parking_notification&.id).to eq parking_notification2.id
         parking_notification2.reload
         expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
         expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(parking_notification1.reload.status).to eq "replaced"
+        expect(parking_notification2.status).to eq "impounded"
+        # Trigger worker after create
+        ImpoundUpdateBikeWorker.new.perform(impound_record_update.impound_record_id)
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(parking_notification1.reload.status).to eq "replaced"
+        expect(parking_notification2.reload.status).to eq "impounded_resolved"
       end
     end
   end

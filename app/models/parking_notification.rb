@@ -3,7 +3,7 @@
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
-  STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, resolved_otherwise: 4}.freeze
+  STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_resolved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
   MAX_PER_PAGE = 250
 
@@ -23,13 +23,13 @@ class ParkingNotification < ActiveRecord::Base
   validate :location_present, on: :create
 
   before_validation :set_calculated_attributes
-  after_create :process_notification
+  after_commit :process_notification
 
   enum kind: KIND_ENUM
   enum status: STATUS_ENUM
   enum retrieved_kind: RETRIEVED_KIND_ENUM
 
-  attr_accessor :is_repeat, :use_entered_address, :image_cache
+  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -281,6 +281,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def process_notification
+    return true if skip_update
     # Update the bike immediately, inline
     bike&.update(updated_at: Time.current)
     ProcessParkingNotificationWorker.perform_async(id)
@@ -318,7 +319,9 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def calculated_status
-    return "impounded" if impound_notification? || impound_record_id.present?
+    if impound_notification? || impound_record_id.present?
+      return impound_record&.resolved? ? "impounded_resolved" : "impounded"
+    end
     if resolved_at.present?
       return associated_retrieved_notification.present? ? "retrieved" : "resolved_otherwise"
     end
