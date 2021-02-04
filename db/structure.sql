@@ -705,7 +705,8 @@ CREATE TABLE public.creation_states (
     creator_id integer,
     bulk_import_id integer,
     pos_kind integer DEFAULT 0,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    origin_enum integer
 );
 
 
@@ -5381,6 +5382,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210127173741'),
 ('20210127191226'),
 ('20210129214432'),
-('20210203164749');
+('20210203164749'),
+('20210204184023');
 
 
