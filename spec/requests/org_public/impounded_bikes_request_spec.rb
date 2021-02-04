@@ -14,7 +14,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
     include_context :request_spec_logged_in_as_organization_member
     it "redirects" do
       expect(current_organization.enabled?("impound_bikes")).to be_falsey
-      expect(current_organization.public_impound_bikes).to be_falsey
+      expect(current_organization.public_impound_bikes?).to be_falsey
       get base_url
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_root_url
@@ -24,7 +24,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
       it "renders" do
         current_organization.reload
         current_user.reload
-        expect(current_organization.public_impound_bikes).to be_falsey
+        expect(current_organization.public_impound_bikes?).to be_falsey
         expect(current_user.authorized?(current_organization)).to be_truthy
         expect(current_organization.enabled?("impound_bikes"))
         get base_url
@@ -38,7 +38,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   context "impound_bikes, but not public_impound_bikes_page" do
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
     it "redirects" do
-      expect(current_organization.public_impound_bikes).to be_falsey
+      expect(current_organization.public_impound_bikes?).to be_falsey
       get base_url
       expect(flash[:error]).to be_present
       expect(response).to redirect_to root_url
@@ -46,14 +46,16 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   end
 
   context "organization has impound_bikes" do
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, public_impound_bikes: true, enabled_feature_slugs: "impound_bikes") }
+    let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true) }
+    let(:current_organization) { impound_configuration.organization }
     let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, organization: current_organization) }
     let!(:bike) { parking_notification.bike }
     it "renders, shows impounded bike" do
-      expect(current_organization.public_impound_bikes).to be_truthy
+      expect(current_organization.public_impound_bikes?).to be_truthy
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
-        parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification")
+        i = parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification")
+        expect(i).to be_valid
       end
       bike.reload
       expect(bike.status_impounded?).to be_truthy

@@ -7,7 +7,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com") }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
+  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111) }
 
   describe "index" do
     it "renders" do
@@ -56,7 +56,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   describe "show" do
     it "renders" do
       impound_record.reload
-      expect(impound_record.display_id).to eq 1111
+      expect(impound_record.display_id).to eq "1111"
       get "#{base_url}/1111"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
@@ -65,8 +65,23 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     context "id-" do
       it "renders" do
         impound_record.reload
-        expect(impound_record.display_id).to eq 1111
+        expect(impound_record.display_id).to eq "1111"
         get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_record)).to eq impound_record
+      end
+    end
+    context "with prefix" do
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111, display_id_prefix: "d8sff-") }
+      it "renders" do
+        impound_record.reload
+        expect(impound_record.display_id).to eq "d8sff-1111"
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_record)).to eq impound_record
+        get "#{base_url}/#{impound_record.display_id}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(assigns(:impound_record)).to eq impound_record

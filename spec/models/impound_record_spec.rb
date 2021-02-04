@@ -359,7 +359,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record_existing.display_id_prefix).to eq "asdfasdf"
           expect(impound_record_existing.display_id).to eq "asdfasdf2222"
           expect(impound_configuration.display_id_prefix).to eq nil
-          expect(impound_configuration.display_id_next_integer).to eq 1
+          expect(impound_configuration.calculated_display_id_next_integer).to eq 1
           expect(impound_record.send("set_calculated_display_id")).to eq "1"
           expect(impound_record.display_id).to eq "1" # it's set, but not stored
           # it doesn't respect unstored records
@@ -367,10 +367,6 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record2.display_id).to eq "1"
           # The og record updates!
           expect(impound_record.send("set_calculated_display_id")).to eq "2"
-        end
-        context "with impound_configuration prefix" do
-          it "is the next integer" do
-          end
         end
       end
     end

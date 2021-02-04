@@ -3,6 +3,7 @@ class CreateImpoundConfigurations < ActiveRecord::Migration[5.2]
     create_table :impound_configurations do |t|
       t.references :organization
       t.boolean :public_view, default: false
+      t.boolean :bulk_import_view, default: false
 
       t.integer :display_id_next_integer
       t.string :display_id_prefix

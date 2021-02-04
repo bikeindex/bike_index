@@ -4464,10 +4464,11 @@ en:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email
-    manages:
-      impounding:
+    manage_impoundings:
+      edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
         save: Save
+    manages:
       location_fields:
         address: Address
         choose_country: Choose country

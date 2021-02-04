@@ -1287,6 +1287,7 @@ CREATE TABLE public.impound_configurations (
     id bigint NOT NULL,
     organization_id bigint,
     public_view boolean DEFAULT false,
+    bulk_import_view boolean DEFAULT false,
     display_id_next_integer integer,
     display_id_prefix character varying,
     created_at timestamp without time zone NOT NULL,
