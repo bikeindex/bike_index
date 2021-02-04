@@ -208,8 +208,9 @@ class Organization < ApplicationRecord
   end
 
   # Stub for now. Might actually just be public_impound_bikes?
+  # use a separate model - impound_configuration
   def impound_claims?
-    enabled?("impound_features_2021")
+    enabled?("impound_configuration")
   end
 
   def broken_pos?

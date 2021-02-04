@@ -168,6 +168,18 @@ class ImpoundRecord < ApplicationRecord
     u_kinds
   end
 
+  def update_multi_kinds
+    u_kinds = update_kinds - ["current"]
+    return u_kinds if resolved? || impound_claims.submitted.active.none?
+    # If there are approved claims, you can have the bike retrieved_by_owner, but can't approve other claims
+    u_kinds - if impound_claims.approved.any?
+      %w[removed_from_bike_index transferred_to_new_owner claim_approved]
+    else
+      # If there are any active claims, you can't transfer or remove the bike
+      %w[removed_from_bike_index transferred_to_new_owner retrieved_by_owner]
+    end
+  end
+
   def update_associations
     # We call this job inline in ProcessParkingNotificationWorker
     return true if skip_update || !persisted?

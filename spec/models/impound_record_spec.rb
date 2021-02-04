@@ -58,6 +58,7 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record.location).to be_blank
         # Doesn't include move update kind, because there is no location
         expect(impound_record.update_kinds).to eq valid_update_kinds
+        expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - ["current"])
 
         impound_record_update.save
         expect(impound_record_update.resolved?).to be_truthy
@@ -95,13 +96,14 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
+          expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - ["current"])
           Sidekiq::Worker.clear_all
           expect {
             impound_record_update.save
           }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
           ProcessImpoundUpdatesWorker.drain
           expect(impound_record_update).to be_valid
-          expect(impound_record_update)
+          expect(impound_record.update_multi_kinds).to eq(["note"])
 
           impound_record_update.save
           expect(impound_record_update.resolved?).to be_truthy
@@ -131,10 +133,12 @@ RSpec.describe ImpoundRecord, type: :model do
             impound_record.impound_record_updates.create(user: user2,
                                                          kind: "claim_approved", impound_claim: impound_claim)
           end
+          let(:valid_multi_update_claim_kinds) { %w[note claim_approved claim_denied] }
           it "associates with the approved claim" do
             expect(impound_claim.reload.status).to eq "submitting"
             expect(impound_claim.submitted?).to be_truthy
             expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location retrieved_by_owner])
+            expect(impound_record.update_multi_kinds).to eq valid_multi_update_claim_kinds
             expect(impound_record_update_approved).to be_valid
             impound_claim.reload
             expect(impound_claim.bike_claimed_id).to eq bike.id
@@ -147,6 +151,7 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.impound_claims.approved.pluck(:id)).to eq([impound_claim.id])
             # And now, can't be approved or denied, because already approved
             expect(impound_record.update_kinds).to eq valid_update_kinds
+            expect(impound_record.update_multi_kinds).to eq(%w[retrieved_by_owner note])
 
             bike_submitting.reload
             expect(bike_submitting.status_stolen?).to be_truthy

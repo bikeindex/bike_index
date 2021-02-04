@@ -8,7 +8,8 @@
 = hidden_field_tag :period, params[:period]
 = hidden_field_tag :end_time, params[:end_time]
 = hidden_field_tag :start_time, params[:start_time]
+= hidden_field_tag :organization_id, passive_organization&.to_param
 
+-# Shared bike search fields
 - if kind == "organized_bike_search"
   = hidden_field_tag :stolenness, @stolenness
-  = hidden_field_tag :organization_id, passive_organization&.to_param
