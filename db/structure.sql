@@ -1280,6 +1280,41 @@ ALTER SEQUENCE public.impound_claims_id_seq OWNED BY public.impound_claims.id;
 
 
 --
+-- Name: impound_configurations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.impound_configurations (
+    id bigint NOT NULL,
+    organization_id bigint,
+    public_view boolean DEFAULT false,
+    bulk_import_view boolean DEFAULT false,
+    display_id_next_integer integer,
+    display_id_prefix character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: impound_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.impound_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: impound_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.impound_configurations_id_seq OWNED BY public.impound_configurations.id;
+
+
+--
 -- Name: impound_record_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1329,7 +1364,7 @@ CREATE TABLE public.impound_records (
     resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    display_id bigint,
+    display_id_integer bigint,
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
@@ -1340,7 +1375,9 @@ CREATE TABLE public.impound_records (
     city text,
     neighborhood text,
     country_id bigint,
-    state_id bigint
+    state_id bigint,
+    display_id character varying,
+    display_id_prefix character varying
 );
 
 
@@ -3086,6 +3123,13 @@ ALTER TABLE ONLY public.impound_claims ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: impound_configurations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_configurations ALTER COLUMN id SET DEFAULT nextval('public.impound_configurations_id_seq'::regclass);
+
+
+--
 -- Name: impound_record_updates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3613,6 +3657,14 @@ ALTER TABLE ONLY public.hot_sheets
 
 ALTER TABLE ONLY public.impound_claims
     ADD CONSTRAINT impound_claims_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: impound_configurations impound_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_configurations
+    ADD CONSTRAINT impound_configurations_pkey PRIMARY KEY (id);
 
 
 --
@@ -4344,6 +4396,13 @@ CREATE INDEX index_impound_claims_on_stolen_record_id ON public.impound_claims U
 --
 
 CREATE INDEX index_impound_claims_on_user_id ON public.impound_claims USING btree (user_id);
+
+
+--
+-- Name: index_impound_configurations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_configurations_on_organization_id ON public.impound_configurations USING btree (organization_id);
 
 
 --
@@ -5383,6 +5442,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210127191226'),
 ('20210129214432'),
 ('20210203164749'),
-('20210204184023');
+('20210204184023'),
+('20210204191110');
 
 

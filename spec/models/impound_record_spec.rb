@@ -4,6 +4,7 @@ RSpec.describe ImpoundRecord, type: :model do
   it_behaves_like "geocodeable"
   let!(:bike) { FactoryBot.create(:bike) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
+  let(:impound_configuration) { organization.fetch_impound_configuration }
   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
 
   describe "validations" do
@@ -337,6 +338,36 @@ RSpec.describe ImpoundRecord, type: :model do
       it "does not geocode" do
         impound_record.reload
         expect(impound_record.to_coordinates).to eq([nil, nil])
+      end
+    end
+  end
+
+  describe "set_calculated_display_id" do
+    let(:impound_record) { ImpoundRecord.new }
+    it "is nil for unorganized" do
+      expect(impound_record.send("set_calculated_display_id")).to eq nil
+    end
+    context "organization" do
+      let(:impound_record) { ImpoundRecord.new(organization: organization) }
+      it "is 1" do
+        expect(impound_record.send("set_calculated_display_id")).to eq "1"
+      end
+      context "existing impound_record" do
+        let!(:impound_record_existing) { FactoryBot.create(:impound_record_with_organization, organization: organization, display_id_prefix: "asdfasdf", display_id_integer: 2222) }
+        it "is 1" do
+          expect(impound_record_existing.display_id_integer).to eq 2222
+          expect(impound_record_existing.display_id_prefix).to eq "asdfasdf"
+          expect(impound_record_existing.display_id).to eq "asdfasdf2222"
+          expect(impound_configuration.display_id_prefix).to eq nil
+          expect(impound_configuration.calculated_display_id_next_integer).to eq 1
+          expect(impound_record.send("set_calculated_display_id")).to eq "1"
+          expect(impound_record.display_id).to eq "1" # it's set, but not stored
+          # it doesn't respect unstored records
+          impound_record2 = FactoryBot.create(:impound_record_with_organization, organization: organization)
+          expect(impound_record2.display_id).to eq "1"
+          # The og record updates!
+          expect(impound_record.send("set_calculated_display_id")).to eq "2"
+        end
       end
     end
   end

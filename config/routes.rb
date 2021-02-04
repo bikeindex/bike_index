@@ -352,9 +352,9 @@ Rails.application.routes.draw do
     resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
-        get :impounding
       end
     end
+    resource :manage_impounding
     resources :users, except: [:show]
   end
 

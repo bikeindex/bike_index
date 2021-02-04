@@ -48,9 +48,9 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
 
   context "id collision" do
     let(:organization) { impound_record.organization }
-    let(:og_id) { impound_record.display_id }
-    let!(:impound_record2) { FactoryBot.create(:impound_record, organization: organization, display_id: og_id) }
-    let!(:impound_record3) { FactoryBot.create(:impound_record, organization: organization, display_id: og_id + 1) }
+    let(:og_id_integer) { impound_record.display_id_integer }
+    let!(:impound_record2) { FactoryBot.create(:impound_record, organization: organization, display_id_integer: og_id_integer) }
+    let!(:impound_record3) { FactoryBot.create(:impound_record, organization: organization, display_id_integer: og_id_integer + 1) }
     it "fixes the issue" do
       expect(impound_record.display_id).to eq impound_record2.display_id
       expect(impound_record2.id).to be > impound_record.id
@@ -60,9 +60,45 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
       impound_record.reload
       impound_record2.reload
       impound_record3.reload
-      expect(impound_record.display_id).to eq og_id
-      expect(impound_record2.display_id).to eq og_id + 2
-      expect(impound_record3.display_id).to eq og_id + 1
+      expect(impound_record.display_id).to eq og_id_integer.to_s
+      expect(impound_record2.display_id).to eq (og_id_integer + 2).to_s
+      expect(impound_record3.display_id).to eq (og_id_integer + 1).to_s
+    end
+    context "there is a live prefix" do
+      it "doesn't change the existing records prefixes" do
+        expect(impound_record.display_id).to eq impound_record2.display_id
+        expect(impound_record2.id).to be > impound_record.id
+        organization.fetch_impound_configuration.update(display_id_prefix: "F", display_id_next_integer: 1111)
+        Sidekiq::Worker.clear_all
+        described_class.new.perform(impound_record.id)
+        expect(described_class.jobs.count).to eq 0
+        impound_record.reload
+        impound_record2.reload
+        impound_record3.reload
+        expect(impound_record.display_id).to eq og_id_integer.to_s
+        expect(impound_record2.display_id).to eq (og_id_integer + 2).to_s
+        expect(impound_record3.display_id).to eq (og_id_integer + 1).to_s
+      end
+    end
+  end
+
+  context "display_id_next_integer" do
+    let(:impound_configuration) { FactoryBot.create(:impound_configuration, display_id_prefix: "A", display_id_next_integer: 1212) }
+    let(:organization) { impound_configuration.organization }
+    let!(:impound_record) { FactoryBot.create(:impound_record, organization: organization, display_id_integer: 1212, display_id_prefix: "B") }
+    let!(:impound_record2) { FactoryBot.create(:impound_record, organization: organization, display_id_integer: 1212, display_id_prefix: "A") }
+    it "doesn't break things" do
+      expect(organization.reload.fetch_impound_configuration.display_id_next_integer).to eq 1212
+      expect(organization.fetch_impound_configuration.calculated_display_id_next).to eq "A1212"
+      described_class.new.perform(impound_record.id)
+      expect(impound_record.reload.display_id).to eq "B1212"
+      expect(organization.reload.fetch_impound_configuration.display_id_next_integer).to eq 1212
+      expect(organization.fetch_impound_configuration.calculated_display_id_next).to eq "A1212"
+
+      described_class.new.perform(impound_record2.id)
+      expect(impound_record2.reload.display_id).to eq "A1212"
+      expect(organization.reload.fetch_impound_configuration.display_id_next_integer).to eq nil
+      expect(organization.fetch_impound_configuration.calculated_display_id_next).to eq "A1213"
     end
   end
 

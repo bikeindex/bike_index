@@ -327,12 +327,12 @@ RSpec.describe ParkingNotification, type: :model do
     context "mark_retrieved of replaced notification" do
       let(:parking_notification2) do
         FactoryBot.create(:parking_notification,
-                          bike: parking_notification.bike,
-                          organization: parking_notification.organization,
-                          user: parking_notification.user,
-                          created_at: Time.current - 1.week,
-                          initial_record: parking_notification,
-                          delivery_status: "email_success")
+          bike: parking_notification.bike,
+          organization: parking_notification.organization,
+          user: parking_notification.user,
+          created_at: Time.current - 1.week,
+          initial_record: parking_notification,
+          delivery_status: "email_success")
       end
       it "retrieves" do
         ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
