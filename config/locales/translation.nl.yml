@@ -2549,9 +2549,6 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
-        impounding:
-          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
-            op met Bike Index support.
       graduated_notifications:
         ensure_access_to_graduated_notifications!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
@@ -2560,6 +2557,14 @@ nl:
         ensure_access_to_hot_sheet!:
           org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
             contact op met Bike Index support.
+      manage_impoundings:
+        assign_organization:
+          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
+            op met Bike Index support.
+        update:
+          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
+            van %{org_name}.
+          updated_successfully: "%{org_name} is succesvol bijgewerkt."
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4728,9 +4733,6 @@ nl:
         update: Bijwerken
         org_settings: Instellingen
         square_image: Gebruik een vierkante afbeelding voor het beste resultaat
-      impounding:
-        impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
-        save: Opslaan
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
@@ -4741,6 +4743,10 @@ nl:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
+    manage_impoundings:
+      edit:
+        impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
+        save: Opslaan
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"

@@ -61,8 +61,8 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
       impound_record2.reload
       impound_record3.reload
       expect(impound_record.display_id).to eq og_id_integer.to_s
-      expect(impound_record2.display_id).to eq "#{og_id_integer + 2}"
-      expect(impound_record3.display_id).to eq "#{og_id_integer + 1}"
+      expect(impound_record2.display_id).to eq (og_id_integer + 2).to_s
+      expect(impound_record3.display_id).to eq (og_id_integer + 1).to_s
     end
     context "there is a live prefix" do
       it "doesn't change the existing records prefixes" do
@@ -76,8 +76,8 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
         impound_record2.reload
         impound_record3.reload
         expect(impound_record.display_id).to eq og_id_integer.to_s
-        expect(impound_record2.display_id).to eq "#{og_id_integer + 2}"
-        expect(impound_record3.display_id).to eq "#{og_id_integer + 1}"
+        expect(impound_record2.display_id).to eq (og_id_integer + 2).to_s
+        expect(impound_record3.display_id).to eq (og_id_integer + 1).to_s
       end
     end
   end

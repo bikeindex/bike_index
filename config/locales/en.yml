@@ -1702,15 +1702,19 @@ en:
           org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
+      manage_impoundings:
+        assign_organization:
+          can_not_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        update:
+          could_not_update: We're sorry, we had trouble updating %{org_name}.
+          updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
             %{org_name}.
           deleted_org: Deleted %{org_name}.
-        impounding:
-          can_not_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."

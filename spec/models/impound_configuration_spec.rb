@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe ImpoundConfiguration, type: :model do
   let(:organization) { impound_configuration.organization }
@@ -21,12 +21,12 @@ RSpec.describe ImpoundConfiguration, type: :model do
     it "returns 1" do
       expect(impound_configuration.calculated_display_id_next_integer).to eq 1
       expect(impound_configuration.calculated_display_id_next).to eq "1"
-      impound_record = organization.impound_records.create(display_id_integer: 12)
       impound_record1 = organization.impound_records.create(display_id_integer: 12, bike: FactoryBot.create(:bike))
       expect(impound_record1).to be_valid
       expect(impound_record1.display_id).to eq "12"
       expect(impound_configuration.calculated_display_id_next_integer).to eq 13
       expect(impound_configuration.calculated_display_id_next).to eq "13"
+      expect(impound_configuration.previous_prefixes).to eq([])
     end
     context "with display_id_prefix" do
       let(:impound_configuration) { FactoryBot.create(:impound_configuration, display_id_prefix: "c8s") }
@@ -43,6 +43,7 @@ RSpec.describe ImpoundConfiguration, type: :model do
         expect(impound_record2.display_id).to eq "c8s100"
         expect(impound_configuration.calculated_display_id_next_integer).to eq 101
         expect(impound_configuration.calculated_display_id_next).to eq "c8s101"
+        expect(impound_configuration.previous_prefixes).to eq(["c8s"])
       end
     end
     context "with display_id_next_integer" do
@@ -59,6 +60,7 @@ RSpec.describe ImpoundConfiguration, type: :model do
         expect(impound_configuration.reload.calculated_display_id_next_integer).to eq 1213
         expect(impound_configuration.calculated_display_id_next).to eq "A1213"
         expect(impound_configuration.display_id_next_integer).to eq nil
+        expect(impound_configuration.previous_prefixes).to eq(["A"])
       end
     end
   end

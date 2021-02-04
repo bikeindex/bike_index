@@ -13,53 +13,28 @@ module Organized
     end
 
     def update
-      if @organization.update_attributes(permitted_parameters)
+      if @impound_configuration.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
-        redirect_back(fallback_location: current_root_path)
+        redirect_back(fallback_location: edit_organization_manage_impounding_path(organization_id: current_organization.to_param))
       else
-        @page_errors = @organization.errors
+        @page_errors = @impound_configuration.errors
         flash[:error] = translation(:could_not_update, org_name: current_organization.name)
-        render :show
+        render :edit
       end
-    end
-
-    def landing
-      render "/landing_pages/show"
     end
 
     private
 
     def assign_organization
       @organization = current_organization
-    end
-
-    def current_root_path
-      organization_manage_path(organization_id: current_organization.to_param)
+      @impound_configuration = @organization&.fetch_impound_configuration
+      return true if @organization.enabled?("impound_bikes")
+      flash[:error] = translation(:can_not_access, org_name: current_organization.name)
+      redirect_to(organization_manage_path(organization_id: current_organization.to_param)) && return
     end
 
     def permitted_parameters
-      params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
-        :avatar, :lightspeed_register_with_phone, :public_impound_bikes, show_on_map_if_permitted, permitted_kind,
-        locations_attributes: permitted_locations_params)
-    end
-
-    def permitted_kind
-      return "ambassador" if @organization.ambassador?
-      new_kind = params.dig(:organization, :kind)
-      Organization.user_creatable_kinds.include?(new_kind) ? new_kind : @organization.kind
-    end
-
-    def show_on_map_if_permitted
-      current_organization.lock_show_on_map ? [] : [:show_on_map]
-    end
-
-    def permitted_locations_params
-      %i[name zipcode city state_id country_id street phone email id _destroy publicly_visible
-        impound_location default_impound_location]
-    end
-
-    def notify_admins(type)
-      AdminNotifier.new.for_organization(organization: current_organization, user: current_user, type: type)
+      params.require(:impound_configuration).permit(:display_id_prefix, :public_view)
     end
   end
 end

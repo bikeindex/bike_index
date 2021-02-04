@@ -122,10 +122,8 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
-          # Ensure we can update what we think we can
-          (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id, :kind]).each do |key|
-            expect(current_organization.send(key)).to eq(update_attributes[key])
-          end
+          # Ensure we can update what we think we can (not that much)
+          expect_attrs_to_match_hash(current_organization, update_attributes.slice(:name))
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")

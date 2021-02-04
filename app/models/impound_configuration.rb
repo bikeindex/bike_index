@@ -12,12 +12,18 @@ class ImpoundConfiguration < ApplicationRecord
     public_view?
   end
 
+  # May do something different in the future
+  def previous_prefixes
+    organization.impound_records.distinct.pluck(:display_id_prefix).reject(&:blank?)
+  end
+
   def calculated_display_id_next
     "#{display_id_prefix}#{calculated_display_id_next_integer}"
   end
 
   def calculated_display_id_next_integer
-    # display_id_next_integer input is validated - and in ProcessImpoundUpdatesWorker it's removed if it's been used
+    # TODO: display_id_next_integer input needs to be validated
+    # currently, in ProcessImpoundUpdatesWorker it's removed if it's been used
     return display_id_next_integer if display_id_next_integer.present?
     last_display_id_integer + 1
   end

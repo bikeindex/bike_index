@@ -104,10 +104,10 @@ module Organized
       if selected_records.none?
         flash[:error] = "No impound records selected for update!"
       else
-        successful = selected_records.select do |impound_record|
+        successful = selected_records.select { |impound_record|
           next unless impound_record.update_multi_kinds.include?(permitted_parameters[:kind])
           impound_record.impound_record_updates.create(permitted_parameters)
-        end
+        }
         flash[:success] = "Updated #{successful.count} impound record"
       end
       redirect_back(fallback_location: organization_impound_records_path(organization_id: current_organization.to_param))

@@ -398,7 +398,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect {
           patch "#{base_url}/multi_update", params: {
             ids: "#{impound_record.id}, #{impound_record2.id}",
-            impound_record_update: { kind: "retrieved_by_owner", notes: "some note here" }
+            impound_record_update: {kind: "retrieved_by_owner", notes: "some note here"}
           }
         }.to change(ImpoundRecordUpdate, :count).by 2
         expect(flash[:success]).to be_present
@@ -416,8 +416,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record2.update_multi_kinds).to include("retrieved_by_owner")
           expect {
             patch "#{base_url}/multi_update", params: {
-              ids: { impound_record.id.to_s => impound_record.id.to_s, impound_record2.id.to_s => impound_record2.id.to_s},
-              impound_record_update: { kind: "retrieved_by_owner", notes: "some note here" }
+              ids: {impound_record.id.to_s => impound_record.id.to_s, impound_record2.id.to_s => impound_record2.id.to_s},
+              impound_record_update: {kind: "retrieved_by_owner", notes: "some note here"}
             }
           }.to change(ImpoundRecordUpdate, :count).by 2
           expect(flash[:success]).to be_present
@@ -433,8 +433,9 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         it "flash error" do
           expect {
             patch "#{base_url}/multi_update", params: {
-              impound_record_update: { kind: "retrieved_by_owner" },
-              ids: "fasdf"}
+              impound_record_update: {kind: "retrieved_by_owner"},
+              ids: "fasdf"
+            }
           }.to change(ImpoundRecordUpdate, :count).by 0
           expect(flash[:error]).to be_present
           expect(response).to redirect_to base_url

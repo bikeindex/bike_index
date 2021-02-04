@@ -24,7 +24,7 @@ module Organized
 
       # These are set here because we render them in HTML
       @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
-         params[:search_kind]
+        params[:search_kind]
       else
         "all"
       end
