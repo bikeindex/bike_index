@@ -557,6 +557,22 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "status_humanized_translated" do
+    let(:bike) { Bike.new(status: status) }
+    let(:status) { "unregistered_parking_notification" }
+    it "responds with status" do
+      expect(bike.status_humanized).to eq "unregistered"
+      expect(bike.status_humanized_translated).to eq "unregistered"
+    end
+    context "status_with_owner" do
+      let(:status) { "status_with_owner" }
+      it "responds with status" do
+        expect(bike.status_humanized).to eq "with owner"
+        expect(bike.status_humanized_translated).to eq "with owner"
+      end
+    end
+  end
+
   describe "authorize_and_claim_for_user, authorized?" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }

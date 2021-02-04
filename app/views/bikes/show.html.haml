@@ -81,6 +81,13 @@
       %h1.bike-title
         = @bike.status_html
         %span.uncap= @bike.title_html
+
+      -# TODO: for impound CSV - hide this when it is not impounded anymore, or something
+      - if @bike.created_by_notification_or_impounding?
+        %strong.text-warning= t(".not_registered_by_user")
+        - if @bike.creation_state&.origin == "unregistered_parking_notification"
+          %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
+
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
           %strong= @bike.status_humanized_translated
@@ -95,10 +102,6 @@
       - if @bike.show_other_bikes?
         %h4
           = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
-      - if @bike.unregistered_parking_notification?
-        %p
-          %strong.text-warning= t(".not_registered")
-          %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
 
     .col-md-4.ad-col
       .ad-block#top468x60

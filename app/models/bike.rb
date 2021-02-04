@@ -127,7 +127,8 @@ class Bike < ApplicationRecord
     end
 
     def status_humanized(str)
-      str.to_s&.gsub("status_", "")&.tr("_", " ")
+      status = str.to_s&.gsub("status_", "")&.tr("_", " ")
+      status == "unregistered parking notification" ? "unregistered" : status
     end
 
     def status_humanized_translated(str)
@@ -294,6 +295,11 @@ class Bike < ApplicationRecord
 
   def pos_kind
     creation_state&.pos_kind
+  end
+
+  # TODO: for impound CSV - this is a little bit of a stub, update
+  def created_by_notification_or_impounding?
+    %w[unregistered_parking_notification impound_import].include?(creation_state&.origin)
   end
 
   def pos?

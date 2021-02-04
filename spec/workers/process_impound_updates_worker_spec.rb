@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.describe ImpoundUpdateBikeWorker, type: :job do
+RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
   let(:instance) { described_class.new }
 
   let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-  let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, resolved: false, kind: kind) }
+  let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, processed: false, kind: kind) }
   let(:kind) { "note" }
 
   it "resolves the impound_record_update" do
@@ -20,7 +20,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
     expect(described_class.jobs.count).to eq 0
 
     impound_record_update.reload
-    expect(impound_record_update.resolved).to be_truthy
+    expect(impound_record_update.processed?).to be_truthy
 
     expect(bike.reload.status).to eq "status_impounded"
     expect(bike.updated_at).to be_within(1).of Time.current
@@ -78,7 +78,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(described_class.jobs.count).to eq 0
 
       impound_record_update.reload
-      expect(impound_record_update.resolved).to be_truthy
+      expect(impound_record_update.processed?).to be_truthy
 
       impound_record.reload
       expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at
@@ -99,7 +99,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(described_class.jobs.count).to eq 0
 
       impound_record_update.reload
-      expect(impound_record_update.resolved).to be_truthy
+      expect(impound_record_update.processed?).to be_truthy
 
       impound_record.reload
       expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at
@@ -141,7 +141,7 @@ RSpec.describe ImpoundUpdateBikeWorker, type: :job do
       expect(new_ownership.creator).to eq impound_record_update.user
 
       impound_record_update.reload
-      expect(impound_record_update.resolved).to be_truthy
+      expect(impound_record_update.processed?).to be_truthy
 
       impound_record.reload
       expect(impound_record.resolved_at).to be_within(1).of impound_record_update.created_at

@@ -20,7 +20,7 @@ class BikeUpdator
   end
 
   def update_ownership
-    # Because this is a mess, managed independently in ImpoundUpdateBikeWorker
+    # Because this is a mess, managed independently in ProcessImpoundUpdatesWorker
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email

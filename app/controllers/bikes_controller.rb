@@ -253,9 +253,10 @@ class BikesController < ApplicationController
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
-        elsif matching_notification.impounded?
+        elsif matching_notification.impounded? || matching_notification.impound_record_id.present?
           flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
-        elsif matching_notification.retrieved?
+        else
+          # It's probably marked retrieved - but it could be something else (status: resolved_otherwise)
           flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else

@@ -50,7 +50,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied] }
       it "updates the record and the user" do
-        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.status_impounded?).to be_truthy
@@ -98,8 +98,8 @@ RSpec.describe ImpoundRecord, type: :model do
           Sidekiq::Worker.clear_all
           expect {
             impound_record_update.save
-          }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
-          ImpoundUpdateBikeWorker.drain
+          }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
+          ProcessImpoundUpdatesWorker.drain
           expect(impound_record_update).to be_valid
           expect(impound_record_update)
 
@@ -115,6 +115,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.deleted?).to be_falsey
           # It's still unregistered, nothing changed
           expect(bike.created_by_parking_notification?).to be_truthy
+          expect(bike.status).to eq "status_with_owner"
         end
         context "approved_claim" do
           let!(:impound_claim) do
@@ -164,8 +165,8 @@ RSpec.describe ImpoundRecord, type: :model do
             Sidekiq::Worker.clear_all
             expect {
               impound_record_update.save
-            }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
-            ImpoundUpdateBikeWorker.drain
+            }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
+            ProcessImpoundUpdatesWorker.drain
             expect(impound_record_update.reload.resolved?).to be_truthy
             expect(impound_record_update.impound_claim_id).to eq impound_claim.id
             impound_claim.reload
@@ -185,9 +186,13 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(bike.deleted?).to be_truthy
 
             bike_submitting.reload
-            expect(bike_submitting.status_stolen?).to be_falsey
+            expect(bike_submitting.status).to eq "status_with_owner"
             stolen_record.reload
             expect(stolen_record.recovered?).to be_truthy
+
+            expect(parking_notification.reload.status).to eq "impounded_retrieved"
+            expect(parking_notification.retrieved_kind).to be_blank
+            expect(parking_notification.resolved_at).to be_within(5).of Time.current
           end
         end
       end
@@ -226,13 +231,13 @@ RSpec.describe ImpoundRecord, type: :model do
     it "enqueues for create and update, not destroy" do
       expect {
         impound_record.save
-      }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+      }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
       expect {
         impound_record.update(updated_at: Time.current)
-      }.to change(ImpoundUpdateBikeWorker.jobs, :count).by 1
+      }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
       expect {
         impound_record.destroy
-      }.to_not change(ImpoundUpdateBikeWorker.jobs, :count)
+      }.to_not change(ProcessImpoundUpdatesWorker.jobs, :count)
     end
   end
 
@@ -254,13 +259,38 @@ RSpec.describe ImpoundRecord, type: :model do
         FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
                                                  initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
       end
+      let(:impound_record_update) { FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "retrieved_by_owner") }
       it "returns note and message" do
+        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
         impound_record.reload
         organization.reload
         expect(impound_record.parking_notification&.id).to eq parking_notification2.id
         parking_notification2.reload
         expect(parking_notification2.associated_notifications_including_self.map(&:id)).to match_array([parking_notification2.id, parking_notification1.id])
         expect(impound_record.notification_notes_and_messages).to match_array(["Internal note 1", "Internal note 2", "this is a message"])
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(parking_notification2.reload.status).to eq "impounded"
+        resolved_at = parking_notification2.resolved_at
+        expect(parking_notification2.resolved_at).to be_within(5).of resolved_at
+        expect(parking_notification2.retrieved_kind).to be_blank
+
+        expect(parking_notification1.reload.status).to eq "replaced"
+        expect(parking_notification1.resolved_at).to be_within(5).of resolved_at
+        # Trigger worker for impound_record_update, also associated pprocessing of parking notifications
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! { impound_record_update.reload }
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(parking_notification1.reload.status).to eq "replaced"
+        expect(parking_notification1.resolved_at).to be_within(5).of resolved_at
+        expect(parking_notification1.retrieved_kind).to be_blank
+        expect(parking_notification2.reload.status).to eq "impounded_retrieved"
+        expect(parking_notification2.resolved_at).to be_within(5).of resolved_at
+        expect(parking_notification2.retrieved_kind).to be_blank
+
+        # Also test first and last notification here, just in case
+        expect(ParkingNotification.first_notification.pluck(:id)).to eq([parking_notification1.id])
+        expect(ParkingNotification.not_replaced.pluck(:id)).to eq([parking_notification2.id])
       end
     end
   end

@@ -11,20 +11,22 @@ class ProcessParkingNotificationWorker < ApplicationWorker
                                              skip_update: true)
       parking_notification.resolved_at ||= Time.current
       parking_notification.update_attributes(impound_record_id: impound_record.id)
-      ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+      ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
     end
 
     # Update all of them!
     parking_notification.associated_notifications.each do |pn|
       pn.impound_record_id = impound_record.id if impound_record.present?
-      pn.resolved_at = parking_notification.resolved_at if parking_notification.resolved_at.present?
-      pn.update_attributes(updated_at: Time.current)
+      pn.update_attributes(updated_at: Time.current, skip_update: true)
     end
 
-    # If there are any records from the same period and should be resolved, resolve them
-    if parking_notification.resolved?
+    # If there are any notifications from the same period, resolve them - even if they aren't associated
+    if parking_notification.reload.resolved?
       parking_notification.notifications_from_period.active.each do |notification|
-        notification.update_attributes(resolved_at: parking_notification.resolved_at)
+        # Add a note about it though, to document it
+        notes = [notification.internal_notes, "resolved by parking notification ##{parking_notification.id}"]
+        notification.update_attributes(resolved_at: parking_notification.resolved_at,
+                                       internal_notes: notes.join(", "))
       end
     end
 
