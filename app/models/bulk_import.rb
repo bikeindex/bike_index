@@ -119,7 +119,6 @@ class BulkImport < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.is_ascend = false unless is_ascend # Ensure no null
     self.kind ||= calculated_kind
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
@@ -150,7 +149,6 @@ class BulkImport < ApplicationRecord
   private
 
   def calculated_kind
-    return "ascend" if is_ascend
     return "unorganized" if organization_id.blank?
     "organization_import" # Default
   end
