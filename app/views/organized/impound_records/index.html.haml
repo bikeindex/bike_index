@@ -39,7 +39,7 @@
     = pluralize(number_with_delimiter(@impound_records.total_count), "matching impound record")
     %em
       = humanized_time_range(@time_range)
-  .col-sm-6.offset-lg-3.col-lg-3
+  .col-sm-6.col-lg-3
     .dropdown
       %a.dropdown-toggle.btn.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
         - if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status)
@@ -63,11 +63,59 @@
 
           - if status == "all" # Add a divider before all
             .dropdown-divider
+  -# Hide md-down because the checks don't display on mobile
+  .col-lg-3.hidden-md-down
+    .text-right
+      %a.gray-link#toggleMultiUpdate{ href: "#makeMultiUpdate", data: { toggle: "collapse", target: "#makeMultiUpdate" } }
+        update multiple records
 
-.full-screen-table
-  - skip_resolved = ImpoundRecord.active_statuses.include?(@search_status)
-  - render_status = %w[all resolved].include?(@search_status)
-  = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status }
+- # Form needs to wrap the table too
+- @impound_record_update ||= ImpoundRecordUpdate.new
+= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: current_organization), action: "update", method: :patch do |f|
+  #makeMultiUpdate.collapse
+    -# similar form on parking notification show
+    .row
+      .mt-4.mb-4.col-md-8.offset-md-2.col-xl-6.offset-xl-3
+        .card
+          .card-block
+            .card-title
+              %h3.uncap
+                Update multiple records
+                %br
+                %em.small.less-strong
+                  For table rows with checks
+            .card-body
+              -# This gets us the correct kinds for the current impound_record - e.g. no retrieved_by_owner for unregistered_parking_notification
+              - kinds_for_select = ImpoundRecordUpdate.kinds_humanized
+              -# Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims
+              -# Also - never display "current" because it can't be updated that way
+              - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied, :current)
+              - @impound_record_update.kind ||= "retrieved_by_owner"
+              #impoundRecordUpdateForm
+                .row
+                  .col-sm-6#kindUpdate.mb-2
+                    = f.select :kind,
+                      options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, @impound_record_update.kind),
+                      {},
+                      class: "form-control"
+                  - if current_organization.enabled?("impound_bikes_locations")
+                    .col-sm-6.collapse.collapseKind.kind_move_location.mb-2
+                      - @impound_record_update.location_id ||= current_organization.default_impound_location&.id
+                      = f.select :location_id,
+                        options_for_select(current_organization.locations.impound_locations.map { |l| [l.name, l.id] }),
+                        {},
+                        class: "form-control"
+                  .col-sm-6.collapse.collapseKind.kind_transferred_to_new_owner.mb-2
+                    = f.email_field :transfer_email, placeholder: "New owner email", class: "form-control"
+                .row
+                  .col-xs-12
+                    = f.text_area :notes, placeholder: "Internal note", class: "form-control"
+                  .col-xs-12.mt-2
+                    = submit_tag "Update impound record", class: "btn btn-success btn-md-lg"
+  .full-screen-table
+    - skip_resolved = ImpoundRecord.active_statuses.include?(@search_status)
+    - render_status = %w[all resolved].include?(@search_status)
+    = render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status }
 
 .paginate-container.paginate-container-bottom
   = paginate @impound_records

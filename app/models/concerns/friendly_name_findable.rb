@@ -8,6 +8,10 @@ module FriendlyNameFindable
       where("lower(name) = ?", n.downcase.strip).first
     end
 
+    def friendly_find!(str)
+      friendly_find(str) || (raise ActiveRecord::RecordNotFound)
+    end
+
     def friendly_id_find(n)
       m = friendly_find(n)
       m&.id

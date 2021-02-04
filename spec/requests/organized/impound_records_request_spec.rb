@@ -323,7 +323,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record.current?).to be_truthy
           expect(bike.ownerships.count).to eq 1
           expect {
-            put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
+            patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
           }.to_not change(ImpoundRecordUpdate, :count)
           expect(flash[:error]).to be_present
           impound_record.reload
@@ -344,7 +344,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             expect(impound_claim.status).to eq "approved"
             expect(impound_record.update_kinds).to match_array(%w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note])
             expect {
-              put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
+              patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
             }.to change(ImpoundRecordUpdate, :count).by 1
             expect(flash[:success]).to be_present
             impound_claim.reload
@@ -370,6 +370,59 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             expect(bike.created_by_parking_notification?).to be_truthy
             expect(bike.deleted?).to be_truthy
           end
+        end
+      end
+    end
+
+    describe "update - multi_update" do
+      let(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
+      it "updates two records" do
+        expect(impound_record.reload.status).to eq "current"
+        expect(impound_record2.reload.status).to eq "current"
+        expect(impound_record2.update_multi_kinds).to include("retrieved_by_owner")
+        expect {
+          patch "#{base_url}/multi_update", params: {
+            ids: "#{impound_record.id}, #{impound_record2.id}",
+            impound_record_update: { kind: "retrieved_by_owner", notes: "some note here" }
+          }
+        }.to change(ImpoundRecordUpdate, :count).by 2
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to base_url
+        expect(impound_record.reload.status).to eq "retrieved_by_owner"
+        expect(impound_record2.reload.status).to eq "retrieved_by_owner"
+        expect(ImpoundRecordUpdate.count).to eq 2
+        user_note = [current_user.id, "some note here"]
+        expect(ImpoundRecordUpdate.pluck(:user_id, :notes)).to eq([user_note, user_note])
+      end
+      context "id structure in hash" do
+        it "updates two records" do
+          expect(impound_record.reload.status).to eq "current"
+          expect(impound_record2.reload.status).to eq "current"
+          expect(impound_record2.update_multi_kinds).to include("retrieved_by_owner")
+          expect {
+            patch "#{base_url}/multi_update", params: {
+              ids: { impound_record.id.to_s => impound_record.id.to_s, impound_record2.id.to_s => impound_record2.id.to_s},
+              impound_record_update: { kind: "retrieved_by_owner", notes: "some note here" }
+            }
+          }.to change(ImpoundRecordUpdate, :count).by 2
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to base_url
+          expect(impound_record.reload.status).to eq "retrieved_by_owner"
+          expect(impound_record2.reload.status).to eq "retrieved_by_owner"
+          expect(ImpoundRecordUpdate.count).to eq 2
+          user_note = [current_user.id, "some note here"]
+          expect(ImpoundRecordUpdate.pluck(:user_id, :notes)).to eq([user_note, user_note])
+        end
+      end
+      context "no records updated" do
+        it "flash error" do
+          expect {
+            patch "#{base_url}/multi_update", params: {
+              impound_record_update: { kind: "retrieved_by_owner" },
+              ids: "fasdf"}
+          }.to change(ImpoundRecordUpdate, :count).by 0
+          expect(flash[:error]).to be_present
+          expect(response).to redirect_to base_url
         end
       end
     end

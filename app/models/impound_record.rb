@@ -53,6 +53,18 @@ class ImpoundRecord < ApplicationRecord
     "found"
   end
 
+  def self.friendly_find(str)
+    if str.start_with?("pkey-")
+      find_by_id(str.gsub("pkey-", ""))
+    else
+      find_by_display_id(str)
+    end
+  end
+
+  def self.friendly_find!(str)
+    friendly_find(str) || (raise ActiveRecord::RecordNotFound)
+  end
+
   def self.bikes
     Bike.unscoped.includes(:impound_records)
       .where(impound_records: {id: pluck(:id)})
