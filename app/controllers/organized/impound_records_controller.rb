@@ -20,6 +20,7 @@ module Organized
     end
 
     def update
+      return multi_update_response(params[:ids].as_json) if params[:id] == "multi_update"
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
       is_valid_kind = @impound_record.update_kinds.include?(@impound_record_update.kind)
       if @impound_record.update_kinds.include?(@impound_record_update.kind) && @impound_record_update.save
@@ -81,19 +82,35 @@ module Organized
     end
 
     def find_impound_record
+      return if params[:id] == "multi_update" # Can't find a single impound_record!
       # NOTE: Uses display_id, not normal id, unless id starts with pkey-
-      @impound_record = if params[:id].start_with?("pkey-")
-        impound_records.find_by_id(params[:id].gsub("pkey-", ""))
-      else
-        impound_records.find_by_display_id(params[:id])
-      end
-      raise ActiveRecord::RecordNotFound unless @impound_record.present?
+      @impound_record = impound_records.friendly_find!(params[:id])
     end
 
     def permitted_parameters
       params.require(:impound_record_update)
         .permit(:kind, :notes, :location_id, :transfer_email)
         .merge(user_id: current_user.id)
+    end
+
+    def multi_update_response(ids)
+      # Parse the ids, in the variety of formats they may arrive in (duplicates parking_notifications controller)
+      ids_array = ids if ids.is_a?(Array)
+      ids_array = ids.keys if ids.is_a?(Hash) # parameters submitted look like this ids: { "12" => "12" }
+      ids_array ||= ids.to_s.split(",")
+      ids_array = ids_array.map { |id| id.strip.to_i }.reject(&:blank?)
+
+      selected_records = impound_records.where(id: ids_array)
+      if selected_records.none?
+        flash[:error] = "No impound records selected for update!"
+      else
+        successful = selected_records.select do |impound_record|
+          next unless impound_record.update_multi_kinds.include?(permitted_parameters[:kind])
+          impound_record.impound_record_updates.create(permitted_parameters)
+        end
+        flash[:success] = "Updated #{successful.count} impound record"
+      end
+      redirect_back(fallback_location: organization_impound_records_path(organization_id: current_organization.to_param))
     end
   end
 end
