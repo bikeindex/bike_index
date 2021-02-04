@@ -5,11 +5,18 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
     impound_record = ImpoundRecord.find(impound_record_id)
     bike = impound_record.bike
     if impound_record.organized?
+      impound_configuration = impound_record.impound_configuration
       matching_display_ids = ImpoundRecord.where(organization_id: impound_record.organization_id, display_id: impound_record.display_id)
       if matching_display_ids.where.not(id: impound_record.id).any?
         matching_display_ids.reorder(:id).each_with_index do |irecord, index|
           next if index == 0 # don't change the ID of the first one
-          irecord.update_attributes(display_id: nil, skip_update: true)
+          irecord.update_attributes(display_id: nil, display_id_integer: nil, skip_update: true)
+        end
+      end
+      # If there is a display_id_next_integer, and this record hit it, blow it out
+      if impound_configuration.display_id_next_integer == impound_record.display_id_integer
+        if impound_configuration.display_id_prefix == impound_record.display_id_prefix
+          impound_configuration.update(display_id_next_integer: nil)
         end
       end
     end

@@ -20,6 +20,8 @@ class ImpoundRecord < ApplicationRecord
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
+  scope :unorganized, -> { where(organization_id: nil) }
+  scope :organized, -> { where.not(organization_id: nil) }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
@@ -68,6 +70,10 @@ class ImpoundRecord < ApplicationRecord
   def self.bikes
     Bike.unscoped.includes(:impound_records)
       .where(impound_records: {id: pluck(:id)})
+  end
+
+  def impound_configuration
+    organization&.fetch_impound_configuration
   end
 
   def impounded_at_with_timezone(passed_impounded_at, passed_timezone)
@@ -199,7 +205,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.display_id ||= calculated_display_id
+    set_calculated_display_id if id.blank? || display_id_integer.blank?
     self.status = calculated_status
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
@@ -214,19 +220,16 @@ class ImpoundRecord < ApplicationRecord
     end
   end
 
-  def last_display_id
-    irs = ImpoundRecord.where(organization_id: organization_id).where.not(display_id: nil)
-    irs = irs.where("id < ?", id) if id.present?
-    irs.maximum(:display_id) || 0
-  end
-
   private
 
-  def calculated_display_id
-    return nil if organization_id.blank?
-    default_display_id = last_display_id + 1
-    return default_display_id unless ImpoundRecord.where(organization_id: organization_id, display_id: default_display_id)
-    ImpoundRecord.where(organization_id: organization_id).maximum(:display_id).to_i + 1
+  def set_calculated_display_id
+    return if organization_id.blank?
+    if @display_id_from_calculation || display_id_integer.blank?
+      @display_id_from_calculation = true # So that if we resave, we don't use the stored display_id
+      self.display_id_prefix = impound_configuration.display_id_prefix
+      self.display_id_integer = impound_configuration.calculated_display_id_next_integer
+    end
+    self.display_id = "#{display_id_prefix}#{display_id_integer}"
   end
 
   def calculated_status
@@ -242,7 +245,10 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def calculated_user_id
-    return user_id if impound_record_updates.where.not(user_id: nil).none?
-    impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
+    if impound_record_updates.where.not(user_id: nil).any?
+      impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
+    else
+      user_id.present? ? user_id : organization.auto_user&.id
+    end
   end
 end

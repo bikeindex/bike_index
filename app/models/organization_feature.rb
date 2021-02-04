@@ -29,7 +29,6 @@ class OrganizationFeature < ApplicationRecord
     graduated_notifications
     hot_sheet
     impound_bikes_locations
-    impound_configuration
     passwordless_users
     regional_bike_counts
     claimed_ownerships
