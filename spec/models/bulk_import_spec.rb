@@ -10,6 +10,7 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.file_import_errors_with_lines).to be_nil
         bulk_import.add_file_error "HTTP 404"
         bulk_import.reload
+        expect(bulk_import.kind).to eq "unorganized"
         expect(bulk_import.finished?).to be_truthy
         expect(bulk_import.file_import_errors).to eq(["HTTP 404"])
         expect(bulk_import.starting_line).to eq 1 # If error doesn't have a line, it's still 1
@@ -17,13 +18,14 @@ RSpec.describe BulkImport, type: :model do
     end
     context "existing errors - unlikely, but worth just to make sure" do
       let(:existing_errors) { {line: [2, "Nobody loves you"], file: "Wrong place wrong time", file_lines: [1]} }
-      let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "ongoing", import_errors: existing_errors) }
+      let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "ongoing", import_errors: existing_errors, organization: FactoryBot.create(:organization)) }
       it "adds a new error" do
         expect(bulk_import.starting_line).to eq 2
         bulk_import.reload
         expect(bulk_import.file_import_errors_with_lines).to eq([["Wrong place wrong time", 1]])
         bulk_import.add_file_error "HTTP 404", 101
         bulk_import.reload
+        expect(bulk_import.kind).to eq "organization_import"
         expect(bulk_import.progress).to eq "finished"
         expect(bulk_import.line_import_errors).to eq([2, "Nobody loves you"])
         expect(bulk_import.file_import_errors).to eq(["Wrong place wrong time", "HTTP 404"])
@@ -88,6 +90,7 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.check_ascend_import_processable!).to be_falsey
       }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
       expect(bulk_import.created_at).to be_present # Bulk import is saved
+      expect(bulk_import.kind).to eq "ascend"
       expect(bulk_import.import_errors.to_s).to match(/ascend/)
       expect(bulk_import.import_errors?).to be_truthy
       expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])

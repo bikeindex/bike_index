@@ -55,21 +55,6 @@
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"
-  - elsif @bike.status_impounded? # if the current user is the bike owner, it renders a special impounded message in owner_bike_status_alerts
-    .alert.alert-warning.mt-4.mb-4
-      %h4
-        = t(".this_was_impounded", bike_type: @bike.type.titleize)
-      - if @bike.current_impound_record.present?
-        = t(".impounded_at")
-        %em.convertTime.preciseTime
-          = l @bike.current_impound_record.created_at, format: :convert_time
-        %em.small
-        = t(".by")
-        %strong
-          = @bike.current_impound_record.organization&.name
-        - if @bike.current_impound_record.parking_notification.present?
-          = t(".from")
-          = @bike.current_impound_record.parking_notification.address
 
   - if @impound_claim.present?
     -# This is open if passed there is an existing impound_claim
@@ -90,14 +75,15 @@
 
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
-          %strong= @bike.status_humanized_translated
+          %strong= @bike.status_humanized_translated.titleize
           %span.convertTime.preciseTime
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time
           %small.convertTimezone
-          %strong
-            = t(".at")
-          = (@stolen_record || @bike.current_impound_record).address(skip_default_country: true)
+          - if (@stolen_record || @bike.current_impound_record).address(skip_default_country: true).present?
+            %strong
+              = @bike.status_found? ? t(".in") : t(".from")
+            = (@stolen_record || @bike.current_impound_record).address(skip_default_country: true)
 
       - if @bike.show_other_bikes?
         %h4
@@ -223,8 +209,13 @@
               %ul.attr-list.separate-lines
                 = attr_list_item(impound_record.address(skip_default_country: true), t(".location"))
                 %li
-                  %strong.attr-title= t(".found_at")
-                  %span.convertTime= l impound_record.impounded_at, format: :convert_time
+                  %strong.attr-title
+                    - if @bike.status_found?
+                      = t(".found_at")
+                    - else
+                      = t(".impounded_at")
+                  %span.convertTime.preciseTime= l impound_record.impounded_at, format: :convert_time
+                  %span.convertTimezone
 
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?

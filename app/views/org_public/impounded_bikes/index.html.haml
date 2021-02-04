@@ -71,9 +71,7 @@
                 %small
                   = impound_record.location&.name
             %td
-              - if impound_record.parking_notification.present?
-                = address_formatted(impound_record.parking_notification)
-
+              = impound_record.address(skip_default_country: true)
 
   .paginate-container.paginate-container-bottom
     = paginate @impound_records

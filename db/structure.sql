@@ -525,7 +525,8 @@ CREATE TABLE public.bulk_imports (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_ascend boolean DEFAULT false,
-    file_cleaned boolean DEFAULT false
+    file_cleaned boolean DEFAULT false,
+    kind integer
 );
 
 
@@ -5443,6 +5444,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210129214432'),
 ('20210203164749'),
 ('20210204184023'),
-('20210204191110');
+('20210204191110'),
+('20210204223335');
 
 

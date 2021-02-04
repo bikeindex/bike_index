@@ -160,7 +160,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
               expect(json_result["success"]).to be_present
 
               bulk_import = BulkImport.last
-              expect(bulk_import.is_ascend).to be_falsey
+              expect(bulk_import.kind).to eq "organization_import"
               expect(bulk_import.user).to eq organization.auto_user
               expect(bulk_import.file_url).to be_present
               expect(bulk_import.progress).to eq "pending"
@@ -191,7 +191,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
                 expect(json_result["success"]).to be_present
 
                 bulk_import = BulkImport.last
-                expect(bulk_import.is_ascend).to be_truthy
+                expect(bulk_import.kind).to eq "ascend"
                 expect(bulk_import.import_errors?).to be_blank
                 expect(bulk_import.user).to be_blank
                 expect(bulk_import.user).to be_blank

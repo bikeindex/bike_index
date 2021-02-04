@@ -1387,7 +1387,7 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      at: at
+      in: in
       bike_photo: "%{bike_type} photo"
       by: by
       change_the_bike_sticker_linked_to: Change the bike it links to
@@ -1402,6 +1402,7 @@ en:
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
       found_at: Found at
+      impounded_at: Impounded at
       frame_material: Frame Material
       frame_size: Frame size
       from: from
