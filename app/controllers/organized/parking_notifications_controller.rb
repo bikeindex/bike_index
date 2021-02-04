@@ -23,22 +23,17 @@ module Organized
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
-      if ParkingNotification.kinds.include?(params[:search_kind]).present?
-        @search_kind = params[:search_kind]
-      end
-      if @search_kind == "impound_notification"
-        # If we're searching impound_notifications, you can't search status
-        @search_status = "all"
-        @skip_status_select = true
+      @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
+         params[:search_kind]
       else
-        @search_kind ||= "all"
-        @search_status = if params[:search_status] == "all"
-          "all"
-        else
-          valid_statuses = ParkingNotification.statuses + ["resolved"]
-          valid_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
-        end
+        "all"
       end
+      # If we're searching impound_notifications, you can't search current or replaced
+      @unpermitted_statuses = @search_kind == "impound_notification" ? %w[current replaced] : []
+      permitted_statuses = ParkingNotification.statuses + %w[all resolved]
+      @search_status = permitted_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
+      @search_status = "all" if @unpermitted_statuses.include?(@search_status)
+
       @search_unregistered = %w[only_unregistered not_unregistered].include?(params[:search_unregistered]) ? params[:search_unregistered] : "all"
 
       headers["Vary"] = "Accept" # When hitting back button, tell browser not use the json response
@@ -100,7 +95,12 @@ module Organized
         notifications = notifications.where(bike_id: params[:search_bike_id])
       end
       unless @search_status == "all"
-        notifications = parking_notifications.where(status: @search_status)
+        notifications = if @search_status == "resolved"
+          # Don't include replaced notifications here, they don't matter
+          notifications.resolved.not_replaced
+        else
+          notifications.where(status: @search_status)
+        end
       end
       if params[:search_bike_id].present?
         notifications = notifications.where(bike_id: params[:search_bike_id])
