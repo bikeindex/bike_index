@@ -63,9 +63,15 @@ class BulkImportWorker < ApplicationWorker
     if @bulk_import.impounded?
       row[:owner_email] ||= @bulk_import.user&.email # email isn't required for bulk imports
       impound_attrs = {
-        # impounded_at_with_timezone gets us timeparser, and doesn't need timezone
+        # impounded_at_with_timezone parses with timeparser, and doesn't need timezone
         impounded_at_with_timezone: row[:impounded_at],
-        address: row[:impounded_address]
+        street: row[:impounded_street],
+        city: row[:impounded_city],
+        state: row[:impounded_state],
+        zipcode: row[:impounded_zipcode],
+        country: row[:impounded_country],
+        impounded_description: row[:impounded_description],
+        display_id: row[:impounded_id]
       }
     end
 
@@ -106,7 +112,7 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s/, "_").downcase.to_sym }
+    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s|-/, "_").downcase.to_sym }
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 
@@ -125,7 +131,7 @@ class BulkImportWorker < ApplicationWorker
 
   def validate_headers(attrs)
     required_headers = if @bulk_import.impounded?
-      %i[manufacturer serial_number impounded_address]
+      %i[manufacturer serial_number impounded_at]
     else
       %i[manufacturer owner_email serial_number]
     end

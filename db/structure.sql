@@ -1378,7 +1378,8 @@ CREATE TABLE public.impound_records (
     country_id bigint,
     state_id bigint,
     display_id character varying,
-    display_id_prefix character varying
+    display_id_prefix character varying,
+    impounded_description text
 );
 
 
@@ -5445,6 +5446,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210203164749'),
 ('20210204184023'),
 ('20210204191110'),
-('20210204223335');
+('20210204223335'),
+('20210205191728');
 
 

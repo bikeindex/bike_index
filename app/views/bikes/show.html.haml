@@ -216,6 +216,9 @@
                       = t(".impounded_at")
                   %span.convertTime.preciseTime= l impound_record.impounded_at, format: :convert_time
                   %span.convertTimezone
+          - if impound_record.impounded_description.present?
+            %h3= t(".description_of_incident")
+            %p= @stolen_record.impounded_description
 
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?

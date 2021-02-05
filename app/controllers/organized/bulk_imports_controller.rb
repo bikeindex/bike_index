@@ -12,7 +12,7 @@ module Organized
       per_page = params[:per_page] || 25
       @bulk_imports = available_bulk_imports.includes(:creation_states)
         .reorder("bulk_imports.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
+        .page(page).per(per_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
@@ -114,7 +114,7 @@ module Organized
       else
         permitted_p = params.require(:bulk_import).permit(:file, :kind)
         return permitted_p if calculated_permitted_kinds.include?(permitted_p[:kind])
-         permitted_p.except(:kind) # Remove kind, so it can be calculated independently
+        permitted_p.except(:kind) # Remove kind, so it can be calculated independently
       end.merge(creator_attributes)
     end
 

@@ -16,9 +16,9 @@ RSpec.describe BulkImportWorker, type: :job do
   end
   let(:sample_csv_impounded_lines) do
     [
-      %w[manufacturer model year color serial_number impounded_at impounded_address],
-      ["Thesis", "OB1", "2020", "Pink", "xyz_test", "2021-02-04T22:06:03-06:00", "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US"],
-      ["Salsa", "Warbird", "2021", "Purple", "example", Time.current.to_i, "327 17th St, Oakland, CA 94612"]
+      %w[manufacturer model year color serial_number impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id],
+      ["Thesis", "OB1", "2020", "Pink", "xyz_test", "2021-02-04", "1409 Martin Luther King Jr Way", "Berkeley", "CA", "94710", "US", "ddd33333"],
+      ["Salsa", "Warbird", "2021", "Purple", "example", Time.current.to_i, "327 17th St", "Oakland", "CA", "94612", ""]
     ]
   end
   # Only handling organization_import and impounded for now, Fuck it
@@ -344,8 +344,14 @@ RSpec.describe BulkImportWorker, type: :job do
         end
         let(:target_impound) do
           {
-            impounded_at_with_timezone: "2021-02-04T22:06:03-06:00",
-            address: "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US"
+            impounded_at_with_timezone: "2021-02-04",
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley",
+            state: "CA",
+            zipcode: "94710",
+            country: "US",
+            display_id: "ddd33333",
+            impounded_description: nil
           }
         end
         it "returns impounded kind" do
@@ -422,8 +428,8 @@ RSpec.describe BulkImportWorker, type: :job do
       end
       context "impounded" do
         let(:kind) { "impounded" }
-        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded addreSS, Stuff\n" }
-        let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_address stuff] }
+        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded street, impounded-city, Stuff\n" }
+        let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_street impounded_city stuff] }
         it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey

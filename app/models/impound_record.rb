@@ -76,9 +76,8 @@ class ImpoundRecord < ApplicationRecord
     organization&.fetch_impound_configuration
   end
 
-  def impounded_at_with_timezone(passed_impounded_at, passed_timezone)
-    return unless passed_impounded_at.present?
-    self.impounded_at = TimeParser.parse(passed_impounded_at, passed_timezone)
+  def impounded_at_with_timezone=(val)
+    self.impounded_at = TimeParser.parse(val, timezone)
   end
 
   # Non-organizations don't "impound" bikes, they "find" them
