@@ -219,8 +219,12 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
     end
+    # WHOOOOAH
+    #
+    # TODO: MAKE THIS TEST!!!!!
+    #
     # context "valid file, kind: impounded" do
-    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impound_all_optional_fields.csv" }
+    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
     #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
     #   let(:organization) { impound_configuration.organization }
     #   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
