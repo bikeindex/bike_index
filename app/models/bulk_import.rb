@@ -28,6 +28,10 @@ class BulkImport < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.kind_humanized(str)
+    str&.gsub("_", " ")
+  end
+
   def file_import_errors
     import_errors["file"] || import_errors["ascend"]
   end
@@ -85,6 +89,10 @@ class BulkImport < ApplicationRecord
 
   def creator
     organization&.auto_user || user
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def filename

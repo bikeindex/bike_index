@@ -47,7 +47,7 @@
 
   - divider_below_add_bike = passed_organization.show_bulk_import? || passed_organization.lightspeed_pos? || passed_organization.enabled?("parking_notifications")
   - new_bike_with_parking_notification = controller_name == "bikes" && action_name == "new" && @unregistered_parking_notification
-  - new_bike_active = "bikes" && action_name == "new" && !new_bike_with_parking_notification
+  - new_bike_active = controller_name == "bikes" && action_name == "new" && !new_bike_with_parking_notification
   %li
     = link_to t(".add_a_bike"), new_organization_bike_path(passed_organization.to_param), class: "nav-link #{new_bike_active ? "active" : ""}"
   - if divider_below_add_bike

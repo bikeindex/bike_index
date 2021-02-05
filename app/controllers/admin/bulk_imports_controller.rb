@@ -15,8 +15,7 @@ class Admin::BulkImportsController < Admin::BaseController
   end
 
   def new
-    organization_id = Organization.friendly_find(params[:organization_id])&.id
-    @bulk_import = BulkImport.new(organization_id: organization_id, no_notify: params[:no_notify])
+    @bulk_import = BulkImport.new(organization_id: current_organization.id, no_notify: params[:no_notify])
   end
 
   def update

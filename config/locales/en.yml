@@ -4357,6 +4357,7 @@ en:
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
+        kind: Kind
         unable_to_process: Unable to process
       new:
         choose_file: Choose file...
