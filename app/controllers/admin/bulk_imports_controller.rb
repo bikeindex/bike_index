@@ -15,7 +15,7 @@ class Admin::BulkImportsController < Admin::BaseController
   end
 
   def new
-    @bulk_import = BulkImport.new(organization_id: current_organization.id, no_notify: params[:no_notify])
+    @bulk_import = BulkImport.new(organization_id: current_organization&.id, no_notify: params[:no_notify])
   end
 
   def update

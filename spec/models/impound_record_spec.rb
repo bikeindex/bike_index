@@ -30,9 +30,14 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.impounded_at).to be_within(1).of impound_record.created_at
     end
     context "bike already impounded" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike, display_id: "fasdfasdf1", display_id_prefix: "fasdfasdf", display_id_integer: 1) }
       it "errors" do
-        expect(impound_record.to_coordinates).to eq([nil, nil])
+        expect(impound_record.reload.to_coordinates).to eq([nil, nil])
+        expect(impound_record.organization_id).to be_blank
+        # Blank out the display id for unorganized records
+        expect(impound_record.display_id).to be_blank
+        expect(impound_record.display_id_prefix).to be_blank
+        expect(impound_record.display_id_integer).to be_blank
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.impound_records.count).to eq 1
@@ -46,7 +51,7 @@ RSpec.describe ImpoundRecord, type: :model do
     end
     context "impound_record_update" do
       let!(:location) { FactoryBot.create(:location, organization: organization) }
-      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization, display_id: "v8xcv833") }
       let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied] }
@@ -55,6 +60,7 @@ RSpec.describe ImpoundRecord, type: :model do
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.status_impounded?).to be_truthy
+        expect(impound_record.reload.display_id).to eq "v8xcv833"
         expect(impound_record.user).to eq user
         expect(impound_record.location).to be_blank
         # Doesn't include move update kind, because there is no location
@@ -343,31 +349,25 @@ RSpec.describe ImpoundRecord, type: :model do
   end
 
   describe "set_calculated_display_id" do
-    let(:impound_record) { ImpoundRecord.new }
-    it "is nil for unorganized" do
-      expect(impound_record.send("set_calculated_display_id")).to eq nil
+    let(:impound_record) { ImpoundRecord.new(organization: organization) }
+    it "is 1" do
+      expect(impound_record.send("set_calculated_display_id")).to eq "1"
     end
-    context "organization" do
-      let(:impound_record) { ImpoundRecord.new(organization: organization) }
+    context "existing impound_record" do
+      let!(:impound_record_existing) { FactoryBot.create(:impound_record_with_organization, organization: organization, display_id_prefix: "asdfasdf", display_id_integer: 2222) }
       it "is 1" do
+        expect(impound_record_existing.display_id_integer).to eq 2222
+        expect(impound_record_existing.display_id_prefix).to eq "asdfasdf"
+        expect(impound_record_existing.display_id).to eq "asdfasdf2222"
+        expect(impound_configuration.display_id_prefix).to eq nil
+        expect(impound_configuration.calculated_display_id_next_integer).to eq 1
         expect(impound_record.send("set_calculated_display_id")).to eq "1"
-      end
-      context "existing impound_record" do
-        let!(:impound_record_existing) { FactoryBot.create(:impound_record_with_organization, organization: organization, display_id_prefix: "asdfasdf", display_id_integer: 2222) }
-        it "is 1" do
-          expect(impound_record_existing.display_id_integer).to eq 2222
-          expect(impound_record_existing.display_id_prefix).to eq "asdfasdf"
-          expect(impound_record_existing.display_id).to eq "asdfasdf2222"
-          expect(impound_configuration.display_id_prefix).to eq nil
-          expect(impound_configuration.calculated_display_id_next_integer).to eq 1
-          expect(impound_record.send("set_calculated_display_id")).to eq "1"
-          expect(impound_record.display_id).to eq "1" # it's set, but not stored
-          # it doesn't respect unstored records
-          impound_record2 = FactoryBot.create(:impound_record_with_organization, organization: organization)
-          expect(impound_record2.display_id).to eq "1"
-          # The og record updates!
-          expect(impound_record.send("set_calculated_display_id")).to eq "2"
-        end
+        expect(impound_record.display_id).to eq "1" # it's set, but not stored
+        # it doesn't respect unstored records
+        impound_record2 = FactoryBot.create(:impound_record_with_organization, organization: organization)
+        expect(impound_record2.display_id).to eq "1"
+        # The og record updates!
+        expect(impound_record.send("set_calculated_display_id")).to eq "2"
       end
     end
   end

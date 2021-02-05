@@ -28,8 +28,7 @@ module Organized
     end
 
     def new
-      @permitted_kinds = ["organization_import"]
-      @permitted_kinds = ["impounded"] + @permitted_kinds if current_organization.enabled?("impound_bikes")
+      @permitted_kinds = calculated_permitted_kinds
       @active_kind = @permitted_kinds.include?(params[:kind]) ? params[:kind] : @permitted_kinds.first
       @bulk_import ||= BulkImport.new(kind: @active_kind)
     end
@@ -103,11 +102,19 @@ module Organized
       redirect_to(organization_root_path) && return
     end
 
+    def calculated_permitted_kinds
+      permitted_kinds = ["organization_import"]
+      permitted_kinds = ["impounded"] + permitted_kinds if current_organization&.enabled?("impound_bikes")
+      permitted_kinds
+    end
+
     def permitted_parameters
       if params[:file].present?
         {file: params[:file]}
       else
-        params.require(:bulk_import).permit([:file])
+        permitted_p = params.require(:bulk_import).permit(:file, :kind)
+        return permitted_p if calculated_permitted_kinds.include?(permitted_p[:kind])
+         permitted_p.except(:kind) # Remove kind, so it can be calculated independently
       end.merge(creator_attributes)
     end
 

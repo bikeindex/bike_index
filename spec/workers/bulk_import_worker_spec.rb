@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe BulkImportWorker, type: :job do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
-  let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending") }
+  let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", kind: kind) }
+  let(:kind) { nil }
   let!(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
 
   let(:sample_csv_lines) do
@@ -13,7 +14,15 @@ RSpec.describe BulkImportWorker, type: :job do
       ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"]
     ]
   end
-  let(:csv_lines) { sample_csv_lines }
+  let(:sample_csv_impounded_lines) do
+    [
+      %w[manufacturer model year color serial_number impounded_at impounded_time],
+      ["Thesis", "OB1", "2020", "Pink", "xyz_test", "2021-02-04T22:06:03-06:00", "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US"],
+      ["Salsa", "Warbird", "2021", "Purple", "example", Time.current.to_i, "327 17th St, Oakland, CA 94612"]
+    ]
+  end
+  # Only handling organization_import and impounded for now, Fuck it
+  let(:csv_lines) { kind == "impounded" ? sample_csv_impounded_lines : sample_csv_lines }
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
   let(:tempfile) do
     file = Tempfile.new
@@ -210,6 +219,17 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
     end
+    # context "valid file, kind: impounded" do
+    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impound_all_optional_fields.csv" }
+    #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+    #   let(:organization) { impound_configuration.organization }
+    #   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    #   # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+    #   let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+    #   it "creates the bikes and impound records" do
+    #     fail
+    #   end
+    # end
   end
 
   context "with assigned bulk import" do
@@ -360,6 +380,16 @@ RSpec.describe BulkImportWorker, type: :job do
         let(:target) { %i[manufacturer model year owner_email serial_number stuff] }
         it "leaves things alone" do
           expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.bulk_import.import_errors?).to be_falsey
+        end
+      end
+      context "impounded" do
+        let(:kind) { "impounded" }
+        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded addreSS, Stuff\n" }
+        let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_address stuff] }
+        it "returns the symbol if the symbol exists, without overwriting better terms" do
+          expect(instance.convert_headers(header_string)).to eq target
+          pp instance.bulk_import.import_errors
           expect(instance.bulk_import.import_errors?).to be_falsey
         end
       end

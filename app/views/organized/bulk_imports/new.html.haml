@@ -63,15 +63,22 @@
         %p.mb-2
           %strong
             = t(".must_have_required_headers_html")
-        %p.mb-2
-          The required headers for
-          %strong impounded imports
-          are <code>manufacturer</code>, <code>model</code>, <code>color</code> and <code>serial</code>.
-        %p
           %strong.text-warning.upcase Note:
           These headers
           %em are different from
           importing "bikes with their owner"
+        %p.mb-2
+          The required headers for
+          %strong impounded imports
+          are <code>manufacturer</code>, <code>model</code>, <code>color</code>, <code>serial</code>, <code>impounded_address</code> and <code>impounded_time</code>.
+        %ul
+          %li
+            <code>impounded address</code> should be: <em>street, city, state/province, country</em>
+            %span.less-strong (e.g. "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US")
+          %li
+            <code>impounded time</code> ISO 8601 format
+            %span.less-strong (e.g. "#{Time.current.iso8601}")
+
 
       = form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
         = f.hidden_field :kind

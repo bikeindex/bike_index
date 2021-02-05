@@ -83,7 +83,7 @@ class BulkImportWorker < ApplicationWorker
       },
       # Photo need to be an array - only include if photo has a value
       photos: row[:photo].present? ? [row[:photo]] : nil
-    }
+    }.merge(@bulk_import.impounded? ? impounded_attrs : {})
   end
 
   def rescue_blank_serial(serial)
@@ -114,7 +114,11 @@ class BulkImportWorker < ApplicationWorker
   private
 
   def validate_headers(attrs)
-    required_headers = %i[manufacturer owner_email serial_number]
+    required_headers = if @bulk_import.impounded?
+      %i[manufacturer serial_number impounded_address]
+    else
+      %i[manufacturer owner_email serial_number]
+    end
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers

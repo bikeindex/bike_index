@@ -1387,7 +1387,6 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      in: in
       bike_photo: "%{bike_type} photo"
       by: by
       change_the_bike_sticker_linked_to: Change the bike it links to
@@ -1402,7 +1401,6 @@ en:
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
       found_at: Found at
-      impounded_at: Impounded at
       frame_material: Frame Material
       frame_size: Frame size
       from: from
@@ -1412,6 +1410,7 @@ en:
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
       impounded_at: Impounded
+      in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
@@ -1444,7 +1443,6 @@ en:
       stolen_at: Stolen at
       stolen_details: Theft Details
       switch_to_new_bike_id: Switch to a new bike ID
-      this_was_impounded: This %{bike_type} was impounded
       update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
@@ -4352,12 +4350,12 @@ en:
         exclude_empty_imports: Exclude Empty imports
         file: File!
         include_empty_imports: Include Empty imports
+        kind: Kind
         line: Line
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
-        kind: Kind
         unable_to_process: Unable to process
       new:
         choose_file: Choose file...
@@ -4389,15 +4387,14 @@ en:
         our_example_csv_here: our example CSV here
         register_bikes_from_a_csv: Register bikes from a CSV
         required_headers_are_html: >-
-          The required headers are <code>manufacturer</code>, <code>model</code>, <code>color</code>,
-          <code>email</code> and <code>serial</code>.
+          The required headers are <code>manufacturer</code>, <code>model</code>,
+          <code>color</code>, <code>email</code> and <code>serial</code>.
         spokecard_image_url: >-
           https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
         spokecard_page_url: >-
           https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
         this_will_not_work: this will not work!
         upload_and_begin_import: Upload and begin import
-        view_an_example_csv_html: View an %{link_to_example_csv}.
         we_support_a_few_additional: >-
           We support a few additional, optional columns. You do not have to include
           them unless you want to.
@@ -4438,7 +4435,6 @@ en:
         bikes_exported: Bikes exported
         bikes_registered_after: Bikes Registered after
         bikes_registered_before: Bikes Registered before
-        by: By
         columns_in_csv: Columns in csv
         created: Created
         download_export: Download Export
