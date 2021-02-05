@@ -29,7 +29,7 @@ module Organized
 
     def new
       @permitted_kinds = ["organization_import"]
-      @permitted_kinds += ["impounded"] if current_organization.enabled?("impound_bikes")
+      @permitted_kinds = ["impounded"] + @permitted_kinds if current_organization.enabled?("impound_bikes")
       @active_kind = @permitted_kinds.include?(params[:kind]) ? params[:kind] : @permitted_kinds.first
       @bulk_import ||= BulkImport.new(kind: @active_kind)
     end

@@ -4369,7 +4369,7 @@ en:
           just 1 or 2 rows, and replace the email with your own email - so if the
           bikes don't import correctly, you can make adjustments and delete the bikes,
           without having to delete a large number of bikes.
-        example_csv_link: example CSV with all optional columns here
+        example_csv_with_all_options: example CSV with all optional columns
         for_best_results: For best results, put quotes around all the cells.
         if_only_some_of_your_bikes_html: >-
           If only some of your bikes have values in optional columns, leave the cell
@@ -4381,7 +4381,7 @@ en:
           work</em>. Examples:
         incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>:
           image on webpage'
-        look_at_example_csv_html: Look at %{link_to_example_csv}.
+        look_at_example_csv_and_html: Look at %{link_to_example_csv}, and also our
         must_have_required_headers_html: Your CSV <em>must</em> have our required
           headers.
         notes_on_successfully_importing: 'Notes on successfully importing:'
@@ -4389,7 +4389,7 @@ en:
         our_example_csv_here: our example CSV here
         register_bikes_from_a_csv: Register bikes from a CSV
         required_headers_are_html: >-
-          The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code>
+          The required headers are <code>manufacturer</code>, <code>model</code>, <code>color</code>,
           <code>email</code> and <code>serial</code>.
         spokecard_image_url: >-
           https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
