@@ -50,7 +50,7 @@ RSpec.describe CreationState, type: :model do
         expect(creation_state.creation_description).to eq "Lightspeed"
       end
       context "ascend" do
-        let(:bulk_import) { BulkImport.new(is_ascend: true) }
+        let(:bulk_import) { BulkImport.new(kind: "ascend") }
         let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
         it "returns pos reg" do
           expect(creation_state.creation_description).to eq "Ascend"
@@ -97,7 +97,7 @@ RSpec.describe CreationState, type: :model do
       end
     end
     context "ascend bulk import" do
-      let(:bulk_import) { BulkImport.new(is_ascend: true) }
+      let(:bulk_import) { BulkImport.new(kind: "ascend") }
       let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
       it "returns ascend" do
         expect(bulk_import.ascend?).to be_truthy

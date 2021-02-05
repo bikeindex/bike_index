@@ -1388,7 +1388,6 @@ en:
         number of Bike Codes.
     show:
       bike_photo: "%{bike_type} photo"
-      by: by
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
       componentcmodel_name: "%{componentcmodel_name}"
@@ -4371,7 +4370,7 @@ en:
         for_best_results: For best results, put quotes around all the cells.
         if_only_some_of_your_bikes_html: >-
           If only some of your bikes have values in optional columns, leave the cell
-          blank for the ones that don't have it (rather than putting <em>unknown</em>
+          blank for the ones that don't have it (e.g. rather than putting <em>unknown</em>
           or <em>n/a</em>).
         if_you_are_including_photo_url_html: >-
           If you are including "photo_url" make sure the url is of the image itself.
@@ -4435,6 +4434,7 @@ en:
         bikes_exported: Bikes exported
         bikes_registered_after: Bikes Registered after
         bikes_registered_before: Bikes Registered before
+        by: By
         columns_in_csv: Columns in csv
         created: Created
         download_export: Download Export

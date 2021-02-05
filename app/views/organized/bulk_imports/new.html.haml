@@ -30,7 +30,7 @@
     - tab_classes += " in active" if @active_kind == "organization_import"
     %div{id: "tab-organization_import", role: "tabpanel", class: (render_tabs ? tab_classes : "")}
       .mb-4
-        %p.mb-2
+        %p
           %strong
             = t(".must_have_required_headers_html")
           = t(".required_headers_are_html")
@@ -60,24 +60,26 @@
     - tab_classes += " in active" if @active_kind == "impounded"
     %div{id: "tab-impounded", role: "tabpanel", class: (render_tabs ? tab_classes : "")}
       .mb-4
-        %p.mb-2
+        %p
           %strong
             = t(".must_have_required_headers_html")
-          %strong.text-warning.upcase Note:
-          These headers
-          %em are different from
-          importing "bikes with their owner"
-        %p.mb-2
+          -# only  show this warning if they can see other import kinds
+          - if @permitted_kinds.count > 1
+            %strong.text-warning.upcase Note:
+            These headers
+            %em are different from
+            importing "bikes with their owner"
+        %p
           The required headers for
-          %strong impounded imports
-          are <code>manufacturer</code>, <code>model</code>, <code>color</code>, <code>serial</code>, <code>impounded_address</code> and <code>impounded_time</code>.
-        %ul
-          %li
-            <code>impounded address</code> should be: <em>street, city, state/province, country</em>
-            %span.less-strong (e.g. "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US")
-          %li
-            <code>impounded time</code> ISO 8601 format
-            %span.less-strong (e.g. "#{Time.current.iso8601}")
+          %em impounded imports
+          are <code>manufacturer</code>, <code>model</code>, <code>color</code>, <code>serial</code> and <code>impounded_time</code>.
+        %p
+          <code>impounded time</code> should be formatted <strong>YYYY-MM-DD</strong> - #{link_to "ISO 8601", "https://www.w3.org/QA/Tips/iso-date"}
+          %span.less-strong
+            (e.g. if including time, "#{Time.current.iso8601}")
+
+        %p
+          Look at #{link_to "our example impounded CSV here", "#"} and also our #{link_to "example impounded CSV with all optional columns", "#"}.
 
 
       = form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|

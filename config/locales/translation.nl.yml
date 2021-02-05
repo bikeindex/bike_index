@@ -2164,7 +2164,6 @@ nl:
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
       paint_description: Kleurbeschrijving
-      by: Door
       from: uit
       impounded_at: In beslag genomen fietsen
       found_at: Gevonden bij
@@ -4587,6 +4586,7 @@ nl:
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
         registration_types: Registratietypen
+        by: Door
     stickers:
       edit:
         bike: Fiets
