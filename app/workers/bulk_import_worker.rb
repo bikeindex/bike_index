@@ -60,6 +60,15 @@ class BulkImportWorker < ApplicationWorker
       [k, v.blank? ? nil : v.strip]
     }.to_h
 
+    if @bulk_import.impounded?
+      row[:owner_email] ||= @bulk_import.user&.email # email isn't required for bulk imports
+      impound_attrs = {
+        # impounded_at_with_timezone gets us timeparser, and doesn't need timezone
+        impounded_at_with_timezone: row[:impounded_at],
+        address: row[:impounded_address]
+      }
+    end
+
     {
       bulk_import_id: @bulk_import.id,
       bike: {
@@ -81,9 +90,10 @@ class BulkImportWorker < ApplicationWorker
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
+      impound_record: impound_attrs || {},
       # Photo need to be an array - only include if photo has a value
       photos: row[:photo].present? ? [row[:photo]] : nil
-    }.merge(@bulk_import.impounded? ? impounded_attrs : {})
+    }
   end
 
   def rescue_blank_serial(serial)

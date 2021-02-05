@@ -16,7 +16,7 @@ RSpec.describe BulkImportWorker, type: :job do
   end
   let(:sample_csv_impounded_lines) do
     [
-      %w[manufacturer model year color serial_number impounded_at impounded_time],
+      %w[manufacturer model year color serial_number impounded_at impounded_address],
       ["Thesis", "OB1", "2020", "Pink", "xyz_test", "2021-02-04T22:06:03-06:00", "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US"],
       ["Salsa", "Warbird", "2021", "Purple", "example", Time.current.to_i, "327 17th St, Oakland, CA 94612"]
     ]
@@ -307,7 +307,9 @@ RSpec.describe BulkImportWorker, type: :job do
         context "some extra bits" do
           it "returns the hash we want" do
             row_hash = row.merge(hidden: true, another_thing: "912913")
-            expect(instance.row_to_b_param_hash(row_hash)[:bike]).to eq target
+            result = instance.row_to_b_param_hash(row_hash)
+            expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
+            expect(result[:bike]).to eq target
           end
         end
         context "with organization" do
@@ -316,6 +318,41 @@ RSpec.describe BulkImportWorker, type: :job do
           it "registers with organization" do
             expect(instance.row_to_b_param_hash(row)[:bike]).to eq target.merge(send_email: false, creation_organization_id: organization.id)
           end
+        end
+      end
+      context "impounded" do
+        let(:row) { sample_csv_impounded_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h }
+        let(:kind) { "impounded" }
+        let(:target) do
+          {
+            owner_email: bulk_import.user.email,
+            manufacturer_id: "Thesis",
+            is_bulk: true,
+            color: "Pink",
+            serial_number: row[:serial_number],
+            year: row[:year],
+            frame_model: "OB1",
+            description: nil,
+            frame_size: nil,
+            phone: nil,
+            address: nil,
+            extra_registration_number: nil,
+            user_name: nil,
+            send_email: true,
+            creation_organization_id: nil
+          }
+        end
+        let(:target_impound) do
+          {
+            impounded_at_with_timezone: "2021-02-04T22:06:03-06:00",
+            address: "1409 Martin Luther King Jr Way, Berkeley, CA 94710, US"
+          }
+        end
+        it "returns impounded kind" do
+          result = instance.row_to_b_param_hash(row)
+          expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
+          expect(result[:bike]).to eq target
+          expect(result[:impound_record]).to eq target_impound
         end
       end
     end
@@ -389,7 +426,6 @@ RSpec.describe BulkImportWorker, type: :job do
         let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_address stuff] }
         it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
-          pp instance.bulk_import.import_errors
           expect(instance.bulk_import.import_errors?).to be_falsey
         end
       end
