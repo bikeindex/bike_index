@@ -525,7 +525,8 @@ CREATE TABLE public.bulk_imports (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_ascend boolean DEFAULT false,
-    file_cleaned boolean DEFAULT false
+    file_cleaned boolean DEFAULT false,
+    kind integer
 );
 
 
@@ -1377,7 +1378,8 @@ CREATE TABLE public.impound_records (
     country_id bigint,
     state_id bigint,
     display_id character varying,
-    display_id_prefix character varying
+    display_id_prefix character varying,
+    impounded_description text
 );
 
 
@@ -5443,6 +5445,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210129214432'),
 ('20210203164749'),
 ('20210204184023'),
-('20210204191110');
+('20210204191110'),
+('20210204223335'),
+('20210205191728');
 
 

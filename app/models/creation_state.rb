@@ -10,7 +10,7 @@ class CreationState < ApplicationRecord
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
     impound_import: 9
-  }
+  }.freeze
 
   belongs_to :bike
   belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization

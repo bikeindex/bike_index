@@ -675,7 +675,7 @@ RSpec.describe BikesController, type: :request do
       let(:bike_params) { basic_bike_params }
       context "impound_record" do
         include_context :geocoder_real
-        let(:impound_params) { chicago_stolen_params.merge(impounded_at: (Time.current - 1.day).utc, timezone: "UTC") }
+        let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
         it "creates a new ownership and impound_record" do
           VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
             expect {
@@ -695,7 +695,7 @@ RSpec.describe BikesController, type: :request do
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
             expect(new_bike.current_impound_record&.id).to eq impound_record.id
             expect(impound_record.kind).to eq "found"
-            expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
+            expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
 
             ownership = new_bike.current_ownership
@@ -716,7 +716,7 @@ RSpec.describe BikesController, type: :request do
             expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
             expect(bike.status).to eq "status_impounded"
             # we retain the stolen record attrs, test that they are assigned correctly too
-            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at, :timezone))
+            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
           end
         end
       end
@@ -1508,7 +1508,7 @@ RSpec.describe BikesController, type: :request do
       let(:impound_params) do
         {
           timezone: "America/Los_Angeles",
-          impounded_at: "2020-04-28T11:00",
+          impounded_at_with_timezone: "2020-04-28T11:00",
           country_id: Country.united_states.id,
           street: "278 Broadway",
           city: "New York",
@@ -1531,7 +1531,7 @@ RSpec.describe BikesController, type: :request do
         impound_record.reload
         expect(impound_record.latitude).to be_present
         expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
-        expect_attrs_to_match_hash(impound_record, impound_params.except(:timezone, :impounded_at))
+        expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
       end
     end
   end

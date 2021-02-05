@@ -1,6 +1,8 @@
 module Organized
   class BulkImportsController < Organized::BaseController
+    include SortableTable
     skip_before_action :ensure_member!
+    before_action :set_period, only: [:index]
     skip_before_action :ensure_current_organization!, only: [:create]
     skip_before_action :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
@@ -8,10 +10,10 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-      shown_imports = bulk_imports.includes(:creation_states).order(created_at: :desc)
-      @show_empty = !ParamsNormalizer.boolean(params[:without_empty])
-      shown_imports = shown_imports.with_bikes unless @show_empty
-      @bulk_imports = shown_imports.page(page).per(per_page)
+      @bulk_imports = available_bulk_imports.includes(:creation_states)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}")
+        .page(page).per(per_page)
+      @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
     def show
@@ -26,7 +28,9 @@ module Organized
     end
 
     def new
-      @bulk_import = BulkImport.new
+      @permitted_kinds = calculated_permitted_kinds
+      @active_kind = @permitted_kinds.include?(params[:kind]) ? params[:kind] : @permitted_kinds.first
+      @bulk_import ||= BulkImport.new(kind: @active_kind)
     end
 
     def create
@@ -48,10 +52,23 @@ module Organized
       end
     end
 
+    helper_method :available_bulk_imports
+
     private
 
     def bulk_imports
       BulkImport.where(organization_id: current_organization.id)
+    end
+
+    def sortable_columns
+      %w[created_at kind user_id]
+    end
+
+    def available_bulk_imports
+      a_bulk_imports = bulk_imports.where(created_at: @time_range)
+      @show_empty = !ParamsNormalizer.boolean(params[:without_empty])
+      a_bulk_imports = a_bulk_imports.with_bikes unless @show_empty
+      a_bulk_imports
     end
 
     def ensure_can_create_import!
@@ -85,17 +102,25 @@ module Organized
       redirect_to(organization_root_path) && return
     end
 
+    def calculated_permitted_kinds
+      permitted_kinds = ["organization_import"]
+      permitted_kinds = ["impounded"] + permitted_kinds if current_organization&.enabled?("impound_bikes")
+      permitted_kinds
+    end
+
     def permitted_parameters
       if params[:file].present?
         {file: params[:file]}
       else
-        params.require(:bulk_import).permit([:file])
+        permitted_p = params.require(:bulk_import).permit(:file, :kind)
+        return permitted_p if calculated_permitted_kinds.include?(permitted_p[:kind])
+        permitted_p.except(:kind) # Remove kind, so it can be calculated independently
       end.merge(creator_attributes)
     end
 
     def creator_attributes
       if @ascend_import
-        {is_ascend: true}
+        {kind: "ascend"}
       else
         {user_id: (@current_user || current_user).id, organization_id: current_organization&.id}
       end

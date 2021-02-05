@@ -76,9 +76,8 @@ class ImpoundRecord < ApplicationRecord
     organization&.fetch_impound_configuration
   end
 
-  def impounded_at_with_timezone(passed_impounded_at, passed_timezone)
-    return unless passed_impounded_at.present?
-    self.impounded_at = TimeParser.parse(passed_impounded_at, passed_timezone)
+  def impounded_at_with_timezone=(val)
+    self.impounded_at = TimeParser.parse(val, timezone)
   end
 
   # Non-organizations don't "impound" bikes, they "find" them
@@ -205,7 +204,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def set_calculated_attributes
-    set_calculated_display_id if id.blank? || display_id_integer.blank?
+    set_calculated_display_id if id.blank? || display_id_integer.blank? || organization_id.blank?
     self.status = calculated_status
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
@@ -223,12 +222,21 @@ class ImpoundRecord < ApplicationRecord
   private
 
   def set_calculated_display_id
-    return if organization_id.blank?
-    if @display_id_from_calculation || display_id_integer.blank?
-      @display_id_from_calculation = true # So that if we resave, we don't use the stored display_id
-      self.display_id_prefix = impound_configuration.display_id_prefix
-      self.display_id_integer = impound_configuration.calculated_display_id_next_integer
+    if organization_id.blank?
+      # Force nil display_id for non-organized records
+      return self.attributes = {display_id: nil, display_id_prefix: nil, display_id_integer: nil}
     end
+    if @display_id_from_calculation
+      # Blank the integer if calculated, so it can be reassigned
+      self.display_id_integer = nil
+    elsif display_id.present?
+      return # If display_id was set, and it wasn't set by calculation - let it ride
+    else
+      # So that if we resave, we don't use the stored display_id
+      @display_id_from_calculation = display_id_integer.blank?
+    end
+    self.display_id_prefix ||= impound_configuration.display_id_prefix
+    self.display_id_integer ||= impound_configuration.calculated_display_id_next_integer
     self.display_id = "#{display_id_prefix}#{display_id_integer}"
   end
 

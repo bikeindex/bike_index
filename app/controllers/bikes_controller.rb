@@ -442,8 +442,7 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible,
-      impound_records_attributes: %i[timezone impounded_at street country_id street city zipcode state_id])}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

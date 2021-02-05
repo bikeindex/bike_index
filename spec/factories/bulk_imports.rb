@@ -5,7 +5,7 @@ FactoryBot.define do
     user { FactoryBot.create(:user) }
     factory :bulk_import_ascend do
       file { File.open(Rails.root.join("public", "Bike_Index_Reserve_20190207_-_BIKE_LANE_CHIC.csv")) }
-      is_ascend { true }
+      kind { "ascend" }
       organization { nil }
       user { nil }
     end

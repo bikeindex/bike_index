@@ -17,10 +17,15 @@ class BikeCreator
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
+        impound_records_attributes: permitted_impound_attrs,
         components_attributes: %i[id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
           manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
       ]
     ).freeze
+  end
+
+  def self.permitted_impound_attrs
+    %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
   end
 
   def initialize(b_param = nil, location: nil)
@@ -271,7 +276,7 @@ class BikeCreator
   end
 
   def create_impound_record(b_param, bike)
-    impound_attrs = b_param.impound_attrs.slice("street", "city", "state_id", "zipcode", "country_id", "impounded_at")
+    impound_attrs = b_param.impound_attrs.slice(*self.class.permitted_impound_attrs)
     bike.build_new_impound_record(impound_attrs).save
   end
 

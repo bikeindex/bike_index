@@ -123,7 +123,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       describe "create" do
         let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
         context "valid create" do
-          let(:bulk_import_params) { {file: file, organization_id: 392, no_notify: "1"} }
+          let(:bulk_import_params) { {file: file, organization_id: 392, no_notify: "1", kind: "unorganized"} }
           it "creates" do
             expect {
               post :create, params: {organization_id: organization.to_param, bulk_import: bulk_import_params}
@@ -133,7 +133,8 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
             expect(bulk_import.user).to eq user
             expect(bulk_import.file_url).to be_present
             expect(bulk_import.progress).to eq "pending"
-            expect(bulk_import.organization).to eq organization
+            expect(bulk_import.organization_id).to eq organization.id
+            expect(bulk_import.kind).to eq "organization_import" # Because this isn't a permitted kind
             expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
             expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
           end
@@ -160,7 +161,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
               expect(json_result["success"]).to be_present
 
               bulk_import = BulkImport.last
-              expect(bulk_import.is_ascend).to be_falsey
+              expect(bulk_import.kind).to eq "organization_import"
               expect(bulk_import.user).to eq organization.auto_user
               expect(bulk_import.file_url).to be_present
               expect(bulk_import.progress).to eq "pending"
@@ -191,7 +192,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
                 expect(json_result["success"]).to be_present
 
                 bulk_import = BulkImport.last
-                expect(bulk_import.is_ascend).to be_truthy
+                expect(bulk_import.kind).to eq "ascend"
                 expect(bulk_import.import_errors?).to be_blank
                 expect(bulk_import.user).to be_blank
                 expect(bulk_import.user).to be_blank

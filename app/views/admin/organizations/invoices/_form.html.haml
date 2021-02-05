@@ -24,6 +24,11 @@
 
               %td
                 = link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature)
+                - if display_dev_info? && organization_feature.feature_slugs_string.present?
+                  %code.only-dev-visible
+                    %small
+                      = organization_feature.feature_slugs.join(" ")
+
               %td
                 %small
                   = organization_feature.kind.humanize

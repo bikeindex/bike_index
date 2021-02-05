@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe BulkImportWorker, type: :job do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
-  let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending") }
+  let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", kind: kind) }
+  let(:kind) { nil }
   let!(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
 
   let(:sample_csv_lines) do
@@ -13,7 +14,15 @@ RSpec.describe BulkImportWorker, type: :job do
       ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"]
     ]
   end
-  let(:csv_lines) { sample_csv_lines }
+  let(:sample_csv_impounded_lines) do
+    [
+      %w[manufacturer model year color serial_number impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id],
+      ["Thesis", "OB1", "2020", "Pink", "xyz_test", "2021-02-04", "1409 Martin Luther King Jr Way", "Berkeley", "CA", "94710", "US", "ddd33333"],
+      ["Salsa", "Warbird", "2021", "Purple", "example", Time.current.to_i, "327 17th St", "Oakland", "CA", "94612", ""]
+    ]
+  end
+  # Only handling organization_import and impounded for now, Fuck it
+  let(:csv_lines) { kind == "impounded" ? sample_csv_impounded_lines : sample_csv_lines }
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
   let(:tempfile) do
     file = Tempfile.new
@@ -210,6 +219,21 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
     end
+    # WHOOOOAH
+    #
+    # TODO: MAKE THIS TEST!!!!!
+    #
+    # context "valid file, kind: impounded" do
+    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
+    #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+    #   let(:organization) { impound_configuration.organization }
+    #   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    #   # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+    #   let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+    #   it "creates the bikes and impound records" do
+    #     fail
+    #   end
+    # end
   end
 
   context "with assigned bulk import" do
@@ -287,7 +311,9 @@ RSpec.describe BulkImportWorker, type: :job do
         context "some extra bits" do
           it "returns the hash we want" do
             row_hash = row.merge(hidden: true, another_thing: "912913")
-            expect(instance.row_to_b_param_hash(row_hash)[:bike]).to eq target
+            result = instance.row_to_b_param_hash(row_hash)
+            expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
+            expect(result[:bike]).to eq target
           end
         end
         context "with organization" do
@@ -296,6 +322,47 @@ RSpec.describe BulkImportWorker, type: :job do
           it "registers with organization" do
             expect(instance.row_to_b_param_hash(row)[:bike]).to eq target.merge(send_email: false, creation_organization_id: organization.id)
           end
+        end
+      end
+      context "impounded" do
+        let(:row) { sample_csv_impounded_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h }
+        let(:kind) { "impounded" }
+        let(:target) do
+          {
+            owner_email: bulk_import.user.email,
+            manufacturer_id: "Thesis",
+            is_bulk: true,
+            color: "Pink",
+            serial_number: row[:serial_number],
+            year: row[:year],
+            frame_model: "OB1",
+            description: nil,
+            frame_size: nil,
+            phone: nil,
+            address: nil,
+            extra_registration_number: nil,
+            user_name: nil,
+            send_email: true,
+            creation_organization_id: nil
+          }
+        end
+        let(:target_impound) do
+          {
+            impounded_at_with_timezone: "2021-02-04",
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley",
+            state: "CA",
+            zipcode: "94710",
+            country: "US",
+            display_id: "ddd33333",
+            impounded_description: nil
+          }
+        end
+        it "returns impounded kind" do
+          result = instance.row_to_b_param_hash(row)
+          expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
+          expect(result[:bike]).to eq target
+          expect(result[:impound_record]).to eq target_impound
         end
       end
     end
@@ -359,6 +426,15 @@ RSpec.describe BulkImportWorker, type: :job do
         let(:header_string) { "ManufaCTURER,MODEL, YEAR, owner_email, serial Number, Stuff\n" }
         let(:target) { %i[manufacturer model year owner_email serial_number stuff] }
         it "leaves things alone" do
+          expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.bulk_import.import_errors?).to be_falsey
+        end
+      end
+      context "impounded" do
+        let(:kind) { "impounded" }
+        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded street, impounded-city, Stuff\n" }
+        let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_street impounded_city stuff] }
+        it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey
         end

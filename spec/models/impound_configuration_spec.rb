@@ -35,9 +35,9 @@ RSpec.describe ImpoundConfiguration, type: :model do
         expect(impound_configuration.calculated_display_id_next).to eq "c8s1"
         impound_record1 = organization.impound_records.create(display_id_integer: 12, bike: FactoryBot.create(:bike))
         expect(impound_record1).to be_valid
-        expect(impound_record1.display_id).to eq "12" # Even though there is a prefix, because display_id_integer was set
-        expect(impound_configuration.calculated_display_id_next_integer).to eq 1
-        expect(impound_configuration.calculated_display_id_next).to eq "c8s1"
+        expect(impound_record1.display_id).to eq "c8s12"
+        expect(impound_configuration.calculated_display_id_next_integer).to eq 13
+        expect(impound_configuration.calculated_display_id_next).to eq "c8s13"
         impound_record2 = organization.impound_records.create(display_id_integer: 100, display_id_prefix: "c8s", bike: FactoryBot.create(:bike))
         expect(impound_record2).to be_valid
         expect(impound_record2.display_id).to eq "c8s100"
