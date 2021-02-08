@@ -263,6 +263,10 @@ class ImpoundRecord < ApplicationRecord
   def calculated_unregistered_bike?
     return true if parking_notification&.unregistered_bike?
     b_created_at = bike&.created_at || Time.current
+    if id.blank?
+      return true if bike&.created_at.blank? || bike&.created_at > Time.current - 1.hour
+    end
+    return true if id.blank? && b_created_at > Time.current - 1.hour
     return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
     bike&.creation_state&.status == "status_impounded" || false
   end

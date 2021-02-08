@@ -109,6 +109,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(b_param.origin).to eq "organization_form"
         expect(b_param.image_processed).to be_truthy
         expect(b_param.image).to be_present
+        expect(b_param.status).to eq "unregistered_parking_notification"
 
         bike = b_param.created_bike
         expect(bike.made_without_serial?).to be_falsey

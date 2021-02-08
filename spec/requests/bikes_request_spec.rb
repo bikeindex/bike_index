@@ -658,6 +658,7 @@ RSpec.describe BikesController, type: :request do
             expect(bike_user.phone).to eq "3123799513"
             expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
             expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
+            expect(bike.creation_state.status).to eq "status_stolen"
             stolen_record = bike.current_stolen_record
             chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
             expect(stolen_record.show_address).to be_truthy
@@ -676,7 +677,6 @@ RSpec.describe BikesController, type: :request do
           expect(bike.status).to eq "status_stolen"
           # we retain the stolen record attrs, test that they are assigned correctly too
           expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
-          expect(bike.creation_state.status).to eq "status_stolen"
         end
       end
     end
@@ -707,6 +707,7 @@ RSpec.describe BikesController, type: :request do
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+            expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
             expect(impound_record.unregistered_bike?).to be_truthy
 
             ownership = new_bike.current_ownership
