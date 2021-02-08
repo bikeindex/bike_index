@@ -197,7 +197,7 @@ class Organization < ApplicationRecord
 
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    enabled?("show_bulk_import") || ascend_pos?
+    enabled?("show_bulk_import") || ascend_pos? || enabled?("show_bulk_import_impound_bikes")
   end
 
   def show_multi_serial?

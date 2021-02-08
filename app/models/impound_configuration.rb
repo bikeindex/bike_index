@@ -6,8 +6,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  # Stub for now. Might actually just be public_impound_bikes?
-  # use a separate model - impound_configuration
+  # Stub for now, because it might be more sophisticated later
   def impound_claims?
     public_view?
   end

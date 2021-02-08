@@ -34,6 +34,7 @@ class OrganizationFeature < ApplicationRecord
     claimed_ownerships
     credibility_badges
     show_bulk_import
+    show_bulk_import_impound_bikes
     show_multi_serial
     show_partial_registrations
     show_recoveries
