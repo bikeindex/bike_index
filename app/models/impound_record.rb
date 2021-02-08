@@ -142,9 +142,9 @@ class ImpoundRecord < ApplicationRecord
     parking_notification&.user
   end
 
-  # When there are non-organized impounds, extra logic will be necessary here
   def creator_public_display_name
-    organization.name
+    # Not 100% convinced that "bike finder" is the right thing here, but it's better than nothing
+    organization&.name || "#{bike.type} finder"
   end
 
   def active?
