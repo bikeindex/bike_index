@@ -96,6 +96,8 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.status_impounded?).to be_truthy
           expect(bike.status_found?).to be_falsey
           expect(bike.created_by_parking_notification?).to be_truthy
+          impound_record.reload
+          expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
@@ -368,6 +370,41 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record2.display_id).to eq "1"
         # The og record updates!
         expect(impound_record.send("set_calculated_display_id")).to eq "2"
+      end
+    end
+  end
+
+  describe "calculated_unregistered_bike?" do
+    let(:bike) { FactoryBot.create(:bike, created_at: time, status: "status_impounded") }
+    let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, status: "status_with_owner") }
+    let(:impound_record) { FactoryBot.create(:impound_record, created_at: impounded_time, bike: bike) }
+    let(:time) { Time.current - 1.week }
+    let(:impounded_time) { time + 1.hour }
+    it "is falsey" do
+      expect(CreationState.where(bike_id: bike.id).count).to eq 1
+      expect(bike.creation_state.status).to eq "status_with_owner"
+      expect(bike.created_by_notification_or_impounding?).to be_falsey
+      expect(impound_record.send("calculated_unregistered_bike?")).to be_falsey
+    end
+    context "status_impounded" do
+      let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, status: "status_impounded") }
+      it "is truthy if bike creation state is status_impounded" do
+        expect(CreationState.where(bike_id: bike.id).count).to eq 1
+        expect(bike.creation_state.status).to eq "status_impounded"
+        expect(bike.created_by_notification_or_impounding?).to be_falsey
+        expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+      end
+      context "impound record earlier?" do
+        let(:impounded_time) { time - 1.minute }
+        it "is truthy" do
+          expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+        end
+      end
+      context "impound_record created at a vastly different time" do
+        let(:impounded_time) { time + 1.day }
+        it "is falsey" do
+          expect(impound_record.send("calculated_unregistered_bike?")).to be_falsey
+        end
       end
     end
   end

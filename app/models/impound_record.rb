@@ -22,6 +22,8 @@ class ImpoundRecord < ApplicationRecord
   scope :resolved, -> { where(status: resolved_statuses) }
   scope :unorganized, -> { where(organization_id: nil) }
   scope :organized, -> { where.not(organization_id: nil) }
+  scope :unregistered_bike, -> { where(unregistered_bike: true) }
+  scope :registered_bike, -> { where(unregistered_bike: false) }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
@@ -155,10 +157,6 @@ class ImpoundRecord < ApplicationRecord
     !active?
   end
 
-  def unregistered_bike?
-    parking_notification&.unregistered_bike? || false
-  end
-
   def resolving_update
     impound_record_updates.resolved.order(:id).first
   end
@@ -210,6 +208,7 @@ class ImpoundRecord < ApplicationRecord
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
     self.attributes = if parking_notification.present?
@@ -258,5 +257,12 @@ class ImpoundRecord < ApplicationRecord
     else
       user_id.present? ? user_id : organization.auto_user&.id
     end
+  end
+
+  def calculated_unregistered_bike?
+    return true if parking_notification&.unregistered_bike?
+    b_created_at = bike&.created_at || Time.current
+    return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
+    bike&.creation_state&.status == "status_impounded" || false
   end
 end

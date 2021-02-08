@@ -676,6 +676,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.status).to eq "status_stolen"
           # we retain the stolen record attrs, test that they are assigned correctly too
           expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
+          expect(bike.creation_state.status).to eq "status_stolen"
         end
       end
     end
@@ -698,6 +699,7 @@ RSpec.describe BikesController, type: :request do
             expect(new_bike.creation_state.creator&.id).to eq current_user.id
             expect(new_bike.status).to eq "status_impounded"
             expect(new_bike.status_humanized).to eq "found"
+            expect(new_bike.creation_state.status).to eq "status_impounded" # Make sure this status matches
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
             expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
@@ -705,6 +707,7 @@ RSpec.describe BikesController, type: :request do
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+            expect(impound_record.unregistered_bike?).to be_truthy
 
             ownership = new_bike.current_ownership
             expect(ownership.claimed?).to be_truthy

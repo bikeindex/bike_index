@@ -297,6 +297,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.location_from_address).to be_truthy
           expect(parking_notification.delivery_status).to eq("email_success")
           expect(parking_notification.impound_record).to be_present
+          expect(parking_notification.impound_record.unregistered_bike).to be_falsey
           expect(parking_notification.status).to eq "impounded"
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
