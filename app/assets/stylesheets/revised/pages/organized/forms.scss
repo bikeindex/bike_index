@@ -61,6 +61,17 @@
     }
   }
 
+  // Text heavy organization forms (e.g. manage_impounding/edit) look weird with line-height: 2
+  // So provide a way to reduce the line height
+  // This class should be added to .form-group.row
+  .small-line-height {
+    line-height: 1.5;
+    // To make the labels line up, we have to remove the top margin
+    .org-form-label {
+      margin-top: 0;
+    }
+  }
+
   .locations-fieldset-wrapper {
     @extend .row;
 
