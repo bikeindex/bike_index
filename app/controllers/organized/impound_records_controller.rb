@@ -70,6 +70,16 @@ module Organized
         end
       end
 
+      if %w[only_unregistered only_registered].include?(params[:search_unregisteredness])
+        @search_unregisteredness = params[:search_unregisteredness]
+        a_impound_records = if @search_unregisteredness == "only_registered"
+          a_impound_records.unregistered_bike
+        else
+          a_impound_records.registered_bike
+        end
+      end
+      @search_unregisteredness ||= "all"
+
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?

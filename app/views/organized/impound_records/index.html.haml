@@ -63,6 +63,16 @@
 
           - if status == "all" # Add a divider before all
             .dropdown-divider
+    .dropdown
+      %a.dropdown-toggle.btn.btn-sm.btn-outline-secondary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_unregisteredness == "all" ? "" : "active") }
+        - if @search_unregisteredness == "only_registered"
+          Only user registered bikes
+        - else
+          #{@search_unregisteredness.humanize} bikes
+      .dropdown-menu
+        = link_to "All bikes", admin_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}"
+        = link_to "Only unregistered bikes", admin_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}"
+        = link_to "Only user registered bikes", admin_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}"
   -# Hide md-down because the checks don't display on mobile
   .col-lg-3.hidden-md-down
     .text-right
