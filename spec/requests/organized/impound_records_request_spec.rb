@@ -5,7 +5,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com") }
+  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com", created_at: Time.current - 4.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111) }
 
@@ -390,7 +390,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     end
 
     describe "update - multi_update" do
-      let(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
+      let(:bike2) { FactoryBot.create(:bike, created_at: Time.current - 3.weeks) }
+      let(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, bike: bike2) }
       it "updates two records" do
         expect(impound_record.reload.status).to eq "current"
         expect(impound_record2.reload.status).to eq "current"

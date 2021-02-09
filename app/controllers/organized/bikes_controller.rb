@@ -111,7 +111,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_at owner_email manufacturer_id frame_model stolen]
+      %w[id updated_at owner_email manufacturer_id frame_model]
     end
 
     def organization_bikes

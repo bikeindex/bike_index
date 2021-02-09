@@ -5,7 +5,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike) }
+  let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
