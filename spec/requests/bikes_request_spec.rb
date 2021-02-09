@@ -461,18 +461,26 @@ RSpec.describe BikesController, type: :request do
         expect(bike.reload.current_impound_record).to be_present
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
+        expect(response).to be_ok
         expect(assigns(:bike)).to eq bike
         expect(assigns(:impound_claim)).to be_present
         expect(assigns(:impound_claim)&.id).to be_blank
+        get "#{base_url}/#{bike.id}?contact_owner=true"
+        expect(flash).to be_blank
+        expect(response).to be_ok
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:contact_owner_open)).to be_truthy
       end
       context "current_user has impound_claim" do
         let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
         it "uses impound_claim" do
+          expect(impound_record.creator_public_display_name).to eq "bike finder"
           expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+          expect(assigns(:contact_owner_open)).to be_falsey
         end
       end
       context "current_user has submitting_impound_claim" do
@@ -650,6 +658,7 @@ RSpec.describe BikesController, type: :request do
             expect(bike_user.phone).to eq "3123799513"
             expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
             expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
+            expect(bike.creation_state.status).to eq "status_stolen"
             stolen_record = bike.current_stolen_record
             chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
             expect(stolen_record.show_address).to be_truthy
@@ -690,6 +699,7 @@ RSpec.describe BikesController, type: :request do
             expect(new_bike.creation_state.creator&.id).to eq current_user.id
             expect(new_bike.status).to eq "status_impounded"
             expect(new_bike.status_humanized).to eq "found"
+            expect(new_bike.creation_state.status).to eq "status_impounded" # Make sure this status matches
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
             expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
@@ -697,6 +707,8 @@ RSpec.describe BikesController, type: :request do
             expect(impound_record.kind).to eq "found"
             expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+            expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+            expect(impound_record.unregistered_bike?).to be_truthy
 
             ownership = new_bike.current_ownership
             expect(ownership.claimed?).to be_truthy

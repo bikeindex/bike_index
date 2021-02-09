@@ -45,7 +45,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[display_id created_at updated_at user_id resolved_at location_id]
+      %w[created_at display_id_integer updated_at user_id resolved_at location_id]
     end
 
     def available_statuses
@@ -69,6 +69,16 @@ module Organized
           impound_records.send(@search_status)
         end
       end
+
+      if %w[only_unregistered only_registered].include?(params[:search_unregisteredness])
+        @search_unregisteredness = params[:search_unregisteredness]
+        a_impound_records = if @search_unregisteredness == "only_registered"
+          a_impound_records.registered_bike
+        else
+          a_impound_records.unregistered_bike
+        end
+      end
+      @search_unregisteredness ||= "all"
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)

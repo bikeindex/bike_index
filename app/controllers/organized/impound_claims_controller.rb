@@ -75,9 +75,5 @@ module Organized
       @impound_record = @impound_claim.impound_record
       @parking_notification = @impound_record.parking_notification
     end
-
-    def permitted_parameters
-      # params.require(:impound_claim)
-    end
   end
 end

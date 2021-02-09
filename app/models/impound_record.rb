@@ -22,6 +22,8 @@ class ImpoundRecord < ApplicationRecord
   scope :resolved, -> { where(status: resolved_statuses) }
   scope :unorganized, -> { where(organization_id: nil) }
   scope :organized, -> { where.not(organization_id: nil) }
+  scope :unregistered_bike, -> { where(unregistered_bike: true) }
+  scope :registered_bike, -> { where(unregistered_bike: false) }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
@@ -142,9 +144,9 @@ class ImpoundRecord < ApplicationRecord
     parking_notification&.user
   end
 
-  # When there are non-organized impounds, extra logic will be necessary here
   def creator_public_display_name
-    organization.name
+    # Not 100% convinced that "bike finder" is the right thing here, but it's better than nothing
+    organization&.name || "#{bike.type} finder"
   end
 
   def active?
@@ -153,10 +155,6 @@ class ImpoundRecord < ApplicationRecord
 
   def resolved?
     !active?
-  end
-
-  def unregistered_bike?
-    parking_notification&.unregistered_bike? || false
   end
 
   def resolving_update
@@ -210,6 +208,8 @@ class ImpoundRecord < ApplicationRecord
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    # unregistered_bike means essentially that the bike was created for this impound record
+    self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
     self.attributes = if parking_notification.present?
@@ -258,5 +258,16 @@ class ImpoundRecord < ApplicationRecord
     else
       user_id.present? ? user_id : organization.auto_user&.id
     end
+  end
+
+  def calculated_unregistered_bike?
+    return true if parking_notification&.unregistered_bike?
+    b_created_at = bike&.created_at || Time.current
+    if id.blank? & bike.present?
+      return true if bike.created_at.blank? || bike.created_at > Time.current - 1.hour
+    end
+    return true if id.blank? && b_created_at > Time.current - 1.hour
+    return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
+    bike&.creation_state&.status == "status_impounded" || false
   end
 end

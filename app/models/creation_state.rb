@@ -27,7 +27,8 @@ class CreationState < ApplicationRecord
 
   attr_accessor :can_edit_claimed
 
-  # Probably should be switched to enum at some point
+  # TODO: switch to enum keys (and remove non-enum attribute)
+  # Also need to reconcile bike_status and origin creator_unregistered_parking_notification
   def self.origins
     %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification impound_import].freeze
   end

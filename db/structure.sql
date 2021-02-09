@@ -1379,7 +1379,8 @@ CREATE TABLE public.impound_records (
     state_id bigint,
     display_id character varying,
     display_id_prefix character varying,
-    impounded_description text
+    impounded_description text,
+    unregistered_bike boolean DEFAULT false
 );
 
 
@@ -5447,6 +5448,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210204184023'),
 ('20210204191110'),
 ('20210204223335'),
-('20210205191728');
+('20210205191728'),
+('20210208203928');
 
 

@@ -5,7 +5,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike) }
+  let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
@@ -297,6 +297,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.location_from_address).to be_truthy
           expect(parking_notification.delivery_status).to eq("email_success")
           expect(parking_notification.impound_record).to be_present
+          expect(parking_notification.impound_record.unregistered_bike).to be_falsey
           expect(parking_notification.status).to eq "impounded"
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
