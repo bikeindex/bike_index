@@ -113,8 +113,11 @@ module Organized
         {file: params[:file]}
       else
         permitted_p = params.require(:bulk_import).permit(:file, :kind)
-        return permitted_p if calculated_permitted_kinds.include?(permitted_p[:kind])
-        permitted_p.except(:kind) # Remove kind, so it can be calculated independently
+        if calculated_permitted_kinds.include?(permitted_p[:kind])
+          permitted_p
+        else
+          permitted_p.except(:kind) # Remove kind, so it can be calculated independently
+        end
       end.merge(creator_attributes)
     end
 

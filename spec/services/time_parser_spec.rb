@@ -63,6 +63,13 @@ RSpec.describe TimeParser do
         # expect(subject.parse("03-2017").to_date).to eq target_date
       end
     end
+    context "2019" do
+      let(:target_date) { Date.parse("2019-01-01") }
+      it "returns 2019-01-01" do
+        expect(subject.parse("2019").to_date).to eq target_date
+        expect(subject.parse("1999").to_date).to eq(target_date - 20.years)
+      end
+    end
     context "not a date" do
       it "errors" do
         expect {

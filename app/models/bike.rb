@@ -300,7 +300,9 @@ class Bike < ApplicationRecord
 
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
-    %w[unregistered_parking_notification impound_import].include?(creation_state&.origin)
+    return false if creation_state.blank?
+    %w[unregistered_parking_notification impound_import].include?(creation_state.origin) ||
+      creation_state.status == "status_impounded"
   end
 
   def pos?

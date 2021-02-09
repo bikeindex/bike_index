@@ -202,7 +202,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.owner_name).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
-          expect(bike2.primary_frame_color).to eq white
+          expect(bike2.primary_frame_color).to eq color_white
           expect(bike2.serial_number).to eq "example"
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
@@ -261,20 +261,19 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
             expect(bike1_impound_record).to be_present
-            expect(bike1_impound_record.description).to eq "It was locked to a handicap railing"
+            expect(bike1_impound_record.impounded_description).to eq "It was locked to a handicap railing"
             expect(bike1_impound_record.display_id).to eq "2020-33333"
             expect(bike1_impound_record.unregistered_bike).to be_truthy
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.unregistered_bike).to be_truthy
             expect(bike1_impound_record.street).to eq "1409 Martin Luther King Jr Way"
             expect(bike1_impound_record.city).to eq "Berkeley"
-            expect(bike1_impound_record.zipcode).to eq "94710"
+            expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
             expect(bike1_impound_record.state_id).to eq state.id
-            expect(bike1_impound_record.latitude).to be_within(0.01).of 933
-
+            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
-            expect(bike2.primary_frame_color).to eq white
+            expect(bike2.primary_frame_color).to eq color_white
             expect(bike2.serial_number).to eq "example"
             expect(bike2.owner_email).to eq "test2@bikeindex.org"
             expect(bike2.manufacturer).to eq surly
@@ -292,17 +291,17 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2.owner_name).to eq "Sally"
             expect(bike2.status).to eq "status_impounded"
             expect(bike2.created_by_notification_or_impounding?).to be_truthy
-            bike2_impound_record = bike1.current_impound_record
+            bike2_impound_record = bike2.current_impound_record
             expect(bike2_impound_record).to be_present
-            expect(bike2_impound_record.description).to eq "Appears to be abandoned"
+            expect(bike2_impound_record.impounded_description).to eq "Appears to be abandoned"
             expect(bike2_impound_record.display_id).to eq "1"
             expect(bike2_impound_record.unregistered_bike).to be_truthy
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-            expect(bike1_impound_record.street).to eq "327 17th St"
-            expect(bike1_impound_record.city).to eq "Oakland"
-            expect(bike1_impound_record.zipcode).to eq "94608"
-            expect(bike1_impound_record.state_id).to eq state.id
-            expect(bike1_impound_record.latitude).to be_within(0.01).of 933
+            expect(bike2_impound_record.street).to eq "327 17th St"
+            expect(bike2_impound_record.city).to eq "Oakland"
+            expect(bike2_impound_record.zipcode).to eq "94612"
+            expect(bike2_impound_record.state_id).to eq state.id
+            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
           end
         end
       end
@@ -385,7 +384,7 @@ RSpec.describe BulkImportWorker, type: :job do
           it "returns the hash we want" do
             row_hash = row.merge(hidden: true, another_thing: "912913")
             result = instance.row_to_b_param_hash(row_hash)
-            expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
+            expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
             expect(result[:bike]).to eq target
           end
         end
@@ -428,12 +427,13 @@ RSpec.describe BulkImportWorker, type: :job do
             zipcode: "94710",
             country: "US",
             display_id: "ddd33333",
-            impounded_description: nil
+            impounded_description: nil,
+            organization_id: bulk_import.organization_id
           }
         end
         it "returns impounded kind" do
           result = instance.row_to_b_param_hash(row)
-          expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
+          expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
           expect(result[:bike]).to eq target
           expect(result[:impound_record]).to eq target_impound
         end
