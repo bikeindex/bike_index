@@ -374,6 +374,12 @@ RSpec.describe ApplicationHelper, type: :helper do
         expect(sortable_search_params.to_unsafe_h).to eq({})
       end
     end
+    context "query items" do
+      let(:passed_params) { {query_items: %w[something iiiiii], search_email: "stttt"} }
+      it "includes the query items" do
+        expect(sortable_search_params.to_unsafe_h).to eq passed_params.as_json
+      end
+    end
     context "direction, sort" do
       let(:passed_params) { {direction: "asc", sort: "stolen", party: "long"} }
       let(:target) { {direction: "asc", sort: "stolen"} }
