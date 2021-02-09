@@ -219,21 +219,17 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
     end
-    # WHOOOOAH
-    #
-    # TODO: MAKE THIS TEST!!!!!
-    #
-    # context "valid file, kind: impounded" do
-    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
-    #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
-    #   let(:organization) { impound_configuration.organization }
-    #   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    #   # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-    #   let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
-    #   it "creates the bikes and impound records" do
-    #     fail
-    #   end
-    # end
+    context "valid file, kind: impounded" do
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
+      let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+      let(:organization) { impound_configuration.organization }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+      let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+      it "creates the bikes and impound records" do
+        fail
+      end
+    end
   end
 
   context "with assigned bulk import" do

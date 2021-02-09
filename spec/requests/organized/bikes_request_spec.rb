@@ -90,6 +90,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "creates along with parking_notification and photo" do
         current_organization.reload
         expect(current_organization.auto_user).to eq current_user
+        expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
@@ -122,6 +123,8 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
         expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
+        expect(bike.hidden).to be_truthy
+        expect(bike.user_hidden).to be_truthy
 
         ownership = bike.ownerships.first
         expect(ownership.send_email).to be_falsey
@@ -163,6 +166,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
       context "different auto_user, impound_notification" do
         let!(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let!(:impound_configuration) { FactoryBot.create(:impound_configuration, organization_id: current_organization.id, public_view: true) }
         let(:parking_notification_abandoned) do
           parking_notification.merge(use_entered_address: "1",
                                      kind: "impound_notification",
@@ -176,6 +180,7 @@ RSpec.describe Organized::BikesController, type: :request do
         it "creates a new ownership, parking_notification, impound_record" do
           current_organization.reload
           expect(current_organization.auto_user).to eq auto_user
+          expect(current_organization.public_impound_bikes?).to be_truthy
           expect(parking_notification_abandoned[:state_id]).to be_present # Test that we're blanking the state
           VCR.use_cassette("organized_bikes_controller-create-impound-record-edmonton", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! do
@@ -206,6 +211,8 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.status).to eq "status_impounded"
           expect(bike.created_by_parking_notification).to be_truthy
           expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
+          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey
