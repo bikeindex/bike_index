@@ -134,7 +134,6 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(creation_state.origin).to eq "unregistered_parking_notification"
         expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
 
-
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.parking_notifications.first
         expect(parking_notification.organization).to eq current_organization
