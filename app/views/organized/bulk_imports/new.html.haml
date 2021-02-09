@@ -23,7 +23,16 @@
             Impounded bikes
           - else
             = BulkImport.kind_humanized(kind)
-
+- elsif @permitted_kinds.count == 1
+  - kind = @permitted_kinds.first
+  %h2.uncap.mt-4.mt-4
+    Importing
+    - if kind == "organization_import"
+      Bikes with their owner
+    - elsif kind == "impounded"
+      Impounded bikes
+    - else
+      = BulkImport.kind_humanized(kind)
 %div.mt-4.pb-4{ class: (render_tabs ? "tab-content" : "") }
   - if @permitted_kinds.include?("organization_import")
     - tab_classes = "tab-pane fade"

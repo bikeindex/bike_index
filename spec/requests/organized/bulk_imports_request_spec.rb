@@ -48,6 +48,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq current_organization
+          expect(assigns(:permitted_kinds)).to eq(%w[organization_import impounded])
         end
       end
 
@@ -97,6 +98,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq current_organization
+          expect(assigns(:permitted_kinds)).to eq(["organization_import"])
         end
         context "show_bulk_import_impound_bikes" do
           let!(:current_organization) { impound_organization }
@@ -105,6 +107,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(response.status).to eq(200)
             expect(response).to render_template :index
             expect(assigns(:current_organization)).to eq current_organization
+            expect(assigns(:permitted_kinds)).to eq(["impounded"])
           end
         end
       end
