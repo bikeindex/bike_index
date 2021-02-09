@@ -1574,10 +1574,18 @@ RSpec.describe Bike, type: :model do
       expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
-    context "stolen record date" do
+    context "stolen_record date" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
         expect(bike.reload.listing_order).to be_within(1).of bike.current_stolen_record.date_stolen.to_i
+      end
+    end
+
+    context "impound_record date" do
+      let(:bike) { FactoryBot.create(:impounded_bike) }
+      it "does not get out of integer errors" do
+        expect(bike.reload.current_impound_record.impounded_at.to_i).to be_present
+        expect(bike.listing_order).to be_within(1).of bike.current_impound_record.impounded_at.to_i
       end
     end
   end
