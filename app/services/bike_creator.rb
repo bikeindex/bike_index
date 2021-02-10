@@ -39,7 +39,8 @@ class BikeCreator
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(@b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(@b_param.impound_attrs) if bike.status_impounded?
-    bike = verify(bike)
+    bike = check_organization(bike)
+    bike = check_example(bike)
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
     add_front_wheel_size(bike)
@@ -76,7 +77,7 @@ class BikeCreator
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,
-      can_edit_claimed: @b_param.unregistered_parking_notification?,
+      can_edit_claimed: @bike.creation_organization_id.present?,
       organization_id: @bike.creation_organization_id
     }
   end
@@ -150,7 +151,6 @@ class BikeCreator
     if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
-
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
         bike_sticker&.claim(user: @bike.creator, bike: @bike.id, organization: @bike.creation_organization)
@@ -200,12 +200,6 @@ class BikeCreator
     end
     attrs[:serial_number] = "unknown" unless bike.serial_number.present?
     attrs
-  end
-
-  # Previous BikeCreatorVerifier
-  def verify(bike)
-    bike = check_organization(bike)
-    check_example(bike)
   end
 
   # previously BikeCreatorOrganizer

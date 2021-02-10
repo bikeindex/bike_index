@@ -532,7 +532,12 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(json_result["bike"]["id"])
+      pp bike.b_params.first
       expect(bike.creation_organization).to eq(organization)
+      expect(bike.bike_organizations.count).to eq 1
+      bike_organization = bike.bike_organizations.first
+      expect(bike_organization.organization_id).to eq organization.id
+      expect(bike_organization.can_edit_claimed).to be_truthy
       expect(bike.creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
       expect(bike.creation_state.organization).to eq organization
       expect(bike.current_stolen_record_id).to be_present
@@ -921,9 +926,6 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.from).to eq(["contact@bikeindex.org"])
           expect(mail.to).to eq([new_email])
-          # Ownership claimed - removes the organization can edit
-
-          #
         end
       end
     end

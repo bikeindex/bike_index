@@ -259,6 +259,24 @@
               Address
             %td
               = pretty_print_json(@bike.address_hash)
+    .col-md-6.mt-2
+      %h4 Organizations
+      - @bike.bike_organizations.each do |bike_organization|
+        %table.table-list
+          %tbody
+            %tr
+              %td Organization
+              %td
+                = link_to bike_organization.organization&.short_name, admin_organization_path(bike_organization.organization_id)
+            %tr
+              %td
+                Created
+              %td
+                %span.convertTime
+                  = l bike_organization.created_at, format: :convert_time
+            %tr
+              %td Edit claimed?
+              %td= bike_organization.can_edit_claimed
   .row
     - @bike.creation_states.each do |creation_state|
       .col-md-6.mt-2
