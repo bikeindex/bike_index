@@ -872,6 +872,60 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.external_image_urls).to eq([]) # Because we haven't created another bparam - this could change though
         expect(bike.public_images.count).to eq 1
       end
+      context "updating email address to a new owner without an existing account" do
+        before do
+          bike.reload # Ensure it's established
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline!
+        end
+        after { Sidekiq::Testing.fake! }
+        let(:og_creator) { ownership.creator }
+        let(:new_email) { "newuser@example.com" }
+        let(:bike_organization) { bike.bike_organizations.first }
+        it "creates a new ownership, emails owner, permits organization editing until has been claimed" do
+          expect(og_creator.reload.authorized?(organization)).to be_truthy
+          expect(user.reload.authorized?(organization)).to be_truthy
+          bike.reload
+          expect(bike.bike_organizations.count).to eq 1
+          expect(bike.public_images.count).to eq 0
+          expect(bike.owner).to_not eq(user)
+          expect(bike.authorized_by_organization?(u: user)).to be_truthy
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(og_creator))
+          expect(bike.claimed?).to be_falsey
+          expect(bike.current_ownership.claimed?).to be_falsey
+          expect(bike_organization.can_edit_claimed).to be_truthy
+          expect {
+            put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json, headers: json_headers
+          }.to change(Ownership, :count).by(1)
+          expect(response.code).to eq("200")
+          expect(response.headers["Content-Type"].match("json")).to be_present
+          bike.reload
+          ownership.reload
+          expect(ownership.current?).to be_falsey
+          expect(bike_organization.reload.can_edit_claimed).to be_truthy # Because the ownership hasn't been claimed yet
+          expect(bike.owner_email).to eq new_email
+          expect(bike.user).to be_blank
+          expect(bike.claimed?).to be_falsey
+          expect(bike.current_ownership.id).to_not eq ownership.id
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(og_creator)).to be_truthy
+          expect(bike.authorized_by_organization?(u: og_creator)).to be_truthy
+          current_ownership = bike.current_ownership
+          expect(current_ownership.creator_id).to eq user.id
+          expect(current_ownership.owner_email).to eq new_email
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          mail = ActionMailer::Base.deliveries.last
+          expect(mail.subject).to eq("Confirm your #{organization.name} Bike Index registration")
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.from).to eq(["contact@bikeindex.org"])
+          expect(mail.to).to eq([new_email])
+          # Ownership claimed - removes the organization can edit
+
+          #
+        end
+      end
     end
 
     context "updating email address to a new owner with an existing account" do
@@ -900,7 +954,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(ownership.claimed?).to be_truthy
         expect(ownership.current?).to be_falsey
         expect(bike.owner_email).to eq new_user.email
-        expect(bike.user).to eq new_user # Because the new owner hasn't claimed the ownership yet
+        expect(bike.user).to eq new_user
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.id).to_not eq ownership.id
         current_ownership = bike.current_ownership
