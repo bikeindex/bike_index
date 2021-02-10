@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TimeParser
-  DEFAULT_TIMEZONE = ActiveSupport::TimeZone["Central Time (US & Canada)"].freeze
+  DEFAULT_TIMEZONE = ActiveSupport::TimeZone[Rails.application.class.config.time_zone].freeze
   EARLIEST_YEAR = 1900
   LATEST_YEAR = Time.current.year + 100
 
