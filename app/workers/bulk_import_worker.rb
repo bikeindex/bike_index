@@ -71,7 +71,8 @@ class BulkImportWorker < ApplicationWorker
         zipcode: row[:impounded_zipcode],
         country: row[:impounded_country],
         impounded_description: row[:impounded_description],
-        display_id: row[:impounded_id]
+        display_id: row[:impounded_id],
+        organization_id: @bulk_import.organization_id
       }
     end
 

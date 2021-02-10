@@ -28,7 +28,7 @@ module Organized
     end
 
     def new
-      @permitted_kinds = calculated_permitted_kinds
+      @permitted_kinds = permitted_kinds
       @active_kind = @permitted_kinds.include?(params[:kind]) ? params[:kind] : @permitted_kinds.first
       @bulk_import ||= BulkImport.new(kind: @active_kind)
     end
@@ -52,7 +52,7 @@ module Organized
       end
     end
 
-    helper_method :available_bulk_imports
+    helper_method :available_bulk_imports, :permitted_kinds
 
     private
 
@@ -65,7 +65,7 @@ module Organized
     end
 
     def available_bulk_imports
-      a_bulk_imports = bulk_imports.where(created_at: @time_range)
+      a_bulk_imports = bulk_imports.where(created_at: @time_range, kind: permitted_kinds)
       @show_empty = !ParamsNormalizer.boolean(params[:without_empty])
       a_bulk_imports = a_bulk_imports.with_bikes unless @show_empty
       a_bulk_imports
@@ -102,10 +102,17 @@ module Organized
       redirect_to(organization_root_path) && return
     end
 
-    def calculated_permitted_kinds
-      permitted_kinds = ["organization_import"]
-      permitted_kinds = ["impounded"] + permitted_kinds if current_organization&.enabled?("impound_bikes")
-      permitted_kinds
+    def permitted_kinds
+      return @permitted_kinds if defined?(@permitted_kinds)
+      permitted_kinds = []
+      permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")
+      permitted_kinds += ["impounded"] if current_organization.enabled?("impound_bikes")
+      # Only show both types to superusers if the organization doesn't have any
+      # to more closely resemble the organization interface
+      if permitted_kinds.empty? && current_user.superuser?
+        permitted_kinds = %w[organization_import impounded]
+      end
+      @permitted_kinds = permitted_kinds
     end
 
     def permitted_parameters
@@ -113,8 +120,11 @@ module Organized
         {file: params[:file]}
       else
         permitted_p = params.require(:bulk_import).permit(:file, :kind)
-        return permitted_p if calculated_permitted_kinds.include?(permitted_p[:kind])
-        permitted_p.except(:kind) # Remove kind, so it can be calculated independently
+        if permitted_kinds.include?(permitted_p[:kind])
+          permitted_p
+        else
+          permitted_p.except(:kind) # Remove kind, so it can be calculated independently
+        end
       end.merge(creator_attributes)
     end
 

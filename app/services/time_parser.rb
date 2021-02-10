@@ -8,7 +8,9 @@ class TimeParser
   def self.parse(time_str = nil, timezone_str = nil)
     return nil unless time_str.present?
     return time_str if time_str.is_a?(Time)
-    if time_str.is_a?(Integer) || time_str.to_s.strip.match(/^\d+\z/) # it's only numbers, so it's a timestamp
+    if time_str.is_a?(Integer) || time_str.to_s.strip.match(/^\d+\z/) # it's only numbers
+      return parse("#{time_str}-01-01") if time_str.to_s.length == 4 # Looks a year, valid 8601 format
+      # otherwise it's a timestamp
       Time.at(time_str.to_i)
     else
       Time.zone = parse_timezone(timezone_str)

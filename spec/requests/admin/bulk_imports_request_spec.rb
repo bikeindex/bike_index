@@ -35,14 +35,14 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       expect(bulk_import.no_notify).to be_falsey
     end
     context "passed params" do
-      let(:organization) { FactoryBot.create(:organization) }
+      let(:current_organization) { FactoryBot.create(:organization) }
       it "includes them" do
-        get "#{base_url}/new?organization_id=#{organization.slug}&no_notify=1"
+        get "#{base_url}/new?organization_id=#{current_organization.slug}&no_notify=1"
         expect(response).to be_ok
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
         bulk_import = assigns(:bulk_import)
-        expect(bulk_import.organization_id).to eq organization.id
+        expect(bulk_import.organization_id).to eq current_organization.id
         expect(bulk_import.no_notify).to be_truthy
       end
     end
@@ -50,9 +50,9 @@ RSpec.describe Admin::BulkImportsController, type: :request do
 
   describe "create" do
     context "valid create" do
-      let(:organization) { FactoryBot.create(:organization) }
+      let(:current_organization) { FactoryBot.create(:organization) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
-      let(:valid_attrs) { {file: file, organization_id: organization.id, no_notify: "1"} }
+      let(:valid_attrs) { {file: file, organization_id: current_organization.id, no_notify: "1"} }
       it "creates" do
         expect {
           post base_url, params: {bulk_import: valid_attrs}
@@ -62,8 +62,9 @@ RSpec.describe Admin::BulkImportsController, type: :request do
         expect(bulk_import.user).to eq current_user
         expect(bulk_import.file_url).to be_present
         expect(bulk_import.progress).to eq "pending"
-        expect(bulk_import.organization).to eq organization
+        expect(bulk_import.organization).to eq current_organization
         expect(bulk_import.send_email).to be_falsey
+        expect(bulk_import.kind).to eq "organization_import"
         expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
       end
     end

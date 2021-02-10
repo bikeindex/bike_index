@@ -161,8 +161,8 @@ RSpec.describe BulkImportWorker, type: :job do
       end
     end
     context "valid file" do
-      let!(:green) { FactoryBot.create(:color, name: "Green") }
-      let!(:white) { FactoryBot.create(:color, name: "White") }
+      let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+      let!(:color_white) { FactoryBot.create(:color, name: "White") }
       let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
@@ -183,11 +183,12 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bulk_import.file_import_errors).to_not be_present
 
           bike1 = bulk_import.bikes.reorder(:created_at).first
-          expect(bike1.primary_frame_color).to eq green
+          expect(bike1.primary_frame_color).to eq color_green
           expect(bike1.serial_number).to eq "xyz_test"
           expect(bike1.owner_email).to eq "test@bikeindex.org"
           expect(bike1.manufacturer).to eq trek
           expect(bike1.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike1.creation_state.status).to eq "status_with_owner"
           expect(bike1.creator).to eq organization.auto_user
           expect(bike1.creation_organization).to eq organization
           expect(bike1.year).to eq 2019
@@ -201,7 +202,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.owner_name).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
-          expect(bike2.primary_frame_color).to eq white
+          expect(bike2.primary_frame_color).to eq color_white
           expect(bike2.serial_number).to eq "example"
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
@@ -218,22 +219,93 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.owner_name).to eq "Sally"
         end
       end
+      context "valid file, kind: impounded" do
+        let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
+        let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+        let(:organization) { impound_configuration.organization }
+        let!(:state) { FactoryBot.create(:state_california) }
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+        let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+        include_context :geocoder_real
+        it "creates the bikes and impound records" do
+          VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
+            allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+            expect {
+              instance.perform(bulk_import.id)
+            }.to change(Bike, :count).by 2
+            bulk_import.reload
+            expect(bulk_import.progress).to eq "finished"
+            expect(bulk_import.bikes.count).to eq 2
+            expect(bulk_import.file_import_errors).to_not be_present
+
+            bike1 = bulk_import.bikes.reorder(:created_at).first
+            expect(bike1.primary_frame_color).to eq color_green
+            expect(bike1.serial_number).to eq "xyz_test"
+            expect(bike1.owner_email).to eq "test@bikeindex.org"
+            expect(bike1.manufacturer).to eq trek
+            expect(bike1.creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike1.creator).to eq organization.auto_user
+            expect(bike1.creation_organization).to eq organization
+            expect(bike1.year).to eq 2019
+            expect(bike1.description).to eq "I love this, it's my favorite"
+            expect(bike1.frame_size).to eq "29in"
+            expect(bike1.frame_size_unit).to eq "in"
+            expect(bike1.public_images.count).to eq 0
+            expect(bike1.phone).to eq("8887776666")
+            expect(bike1.registration_address).to be_blank
+            expect(bike1.extra_registration_number).to be_nil
+            expect(bike1.owner_name).to be_nil
+            expect(bike1.status).to eq "status_impounded"
+            expect(bike1.created_by_notification_or_impounding?).to be_truthy
+            bike1_impound_record = bike1.current_impound_record
+            expect(bike1_impound_record).to be_present
+            expect(bike1_impound_record.impounded_description).to eq "It was locked to a handicap railing"
+            expect(bike1_impound_record.display_id).to eq "2020-33333"
+            expect(bike1_impound_record.unregistered_bike).to be_truthy
+            expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
+            expect(bike1_impound_record.unregistered_bike).to be_truthy
+            expect(bike1_impound_record.street).to eq "1409 Martin Luther King Jr Way"
+            expect(bike1_impound_record.city).to eq "Berkeley"
+            expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
+            expect(bike1_impound_record.state_id).to eq state.id
+            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+
+            bike2 = bulk_import.bikes.reorder(:created_at).last
+            expect(bike2.primary_frame_color).to eq color_white
+            expect(bike2.serial_number).to eq "example"
+            expect(bike2.owner_email).to eq "test2@bikeindex.org"
+            expect(bike2.manufacturer).to eq surly
+            expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike2.creator).to eq organization.auto_user
+            expect(bike2.creation_organization).to eq organization
+            expect(bike2.year).to_not be_present
+            expect(bike2.public_images.count).to eq 1
+            expect(bike2.frame_size).to eq "m"
+            expect(bike2.frame_size_unit).to eq "ordinal"
+            expect(bike2.registration_address).to_not be_present
+            expect(bike2.phone).to be_nil
+            expect(bike2.extra_registration_number).to eq "extra serial number"
+            expect(bike2.owner_name).to eq "Sally"
+            expect(bike2.status).to eq "status_impounded"
+            expect(bike2.created_by_notification_or_impounding?).to be_truthy
+            bike2_impound_record = bike2.current_impound_record
+            expect(bike2_impound_record).to be_present
+            expect(bike2_impound_record.impounded_description).to eq "Appears to be abandoned"
+            expect(bike2_impound_record.display_id).to eq "1"
+            expect(bike2_impound_record.unregistered_bike).to be_truthy
+            expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
+            expect(bike2_impound_record.street).to eq "327 17th St"
+            expect(bike2_impound_record.city).to eq "Oakland"
+            expect(bike2_impound_record.zipcode).to eq "94612"
+            expect(bike2_impound_record.state_id).to eq state.id
+            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
+          end
+        end
+      end
     end
-    # WHOOOOAH
-    #
-    # TODO: MAKE THIS TEST!!!!!
-    #
-    # context "valid file, kind: impounded" do
-    #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
-    #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
-    #   let(:organization) { impound_configuration.organization }
-    #   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    #   # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-    #   let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
-    #   it "creates the bikes and impound records" do
-    #     fail
-    #   end
-    # end
   end
 
   context "with assigned bulk import" do
@@ -312,7 +384,7 @@ RSpec.describe BulkImportWorker, type: :job do
           it "returns the hash we want" do
             row_hash = row.merge(hidden: true, another_thing: "912913")
             result = instance.row_to_b_param_hash(row_hash)
-            expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
+            expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
             expect(result[:bike]).to eq target
           end
         end
@@ -355,12 +427,13 @@ RSpec.describe BulkImportWorker, type: :job do
             zipcode: "94710",
             country: "US",
             display_id: "ddd33333",
-            impounded_description: nil
+            impounded_description: nil,
+            organization_id: bulk_import.organization_id
           }
         end
         it "returns impounded kind" do
           result = instance.row_to_b_param_hash(row)
-          expect(result.select { |k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
+          expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
           expect(result[:bike]).to eq target
           expect(result[:impound_record]).to eq target_impound
         end
