@@ -177,14 +177,6 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  def latitude_public
-    show_address ? latitude : latitude.round(2)
-  end
-
-  def longitude_public
-    show_address ? longitude : longitude.round(2)
-  end
-
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)

@@ -92,14 +92,6 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
-  def latitude_public
-    latitude.round(2)
-  end
-
-  def longitude_public
-    longitude.round(2)
-  end
-
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?
     false
