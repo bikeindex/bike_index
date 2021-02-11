@@ -119,11 +119,11 @@
   %li= t(".if_only_some_of_your_bikes_html")
   %li
     = t(".if_you_are_including_photo_url_html")
-    %ul
-      %li
+    %ul{ style: "word-break: break-word;"}
+      %li.mt-3{ style: "line-height: 1.5;" }
         = t(".correct_actual_image_url_html")
         = link_to t(".spokecard_image_url"), style: "word-wrap: break-word;", class: "small"
-      %li
+      %li.mt-3{ style: "line-height: 1.5;" }
         = t(".incorrect_image_on_webpage_html")
         = link_to t(".spokecard_page_url"), style: "word-wrap: break-word;", class: "small"
         %em.text-danger

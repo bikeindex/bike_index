@@ -271,6 +271,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
             expect(bike1_impound_record.state_id).to eq state.id
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+            expect(bike1.address_hash).to eq bike1_impound_record.address_hash
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
             expect(bike2.primary_frame_color).to eq color_white
@@ -302,6 +303,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2_impound_record.zipcode).to eq "94612"
             expect(bike2_impound_record.state_id).to eq state.id
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
+            expect(bike2.address_hash).to eq bike2_impound_record.address_hash
           end
         end
       end
