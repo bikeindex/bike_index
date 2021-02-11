@@ -719,16 +719,18 @@ RSpec.describe BikesController, type: :request do
         end
         context "failure" do
           it "assigns a bike and a impound record with the attrs passed" do
-            expect {
-              post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
-            }.to change(Bike, :count).by(0)
-            expect(BParam.all.count).to eq 1
-            expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
-            bike = assigns(:bike)
-            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
-            expect(bike.status).to eq "status_impounded"
-            # we retain the stolen record attrs, test that they are assigned correctly too
-            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+            VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
+              expect {
+                post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
+              }.to change(Bike, :count).by(0)
+              expect(BParam.all.count).to eq 1
+              expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
+              bike = assigns(:bike)
+              expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+              expect(bike.status).to eq "status_impounded"
+              # we retain the stolen record attrs, test that they are assigned correctly too
+              expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+            end
           end
         end
       end
@@ -1473,45 +1475,48 @@ RSpec.describe BikesController, type: :request do
       end
 
       it "clears the existing alert image" do
-        bike.reload
-        stolen_record.current_alert_image
-        stolen_record.reload
-        expect(bike.current_stolen_record).to eq stolen_record
-        expect(stolen_record.without_location?).to be_truthy
-        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
-        expect(og_alert_image_id).to be_present
-        Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: {
-            bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}
-          }
-          expect(flash[:success]).to be_present
+        # Cassette required for alert image
+        VCR.use_cassette("bike_request-stolen", match_requests_on: [:path], re_record_interval: 1.month) do
+          bike.reload
+          stolen_record.current_alert_image
+          stolen_record.reload
+          expect(bike.current_stolen_record).to eq stolen_record
+          expect(stolen_record.without_location?).to be_truthy
+          og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
+          expect(og_alert_image_id).to be_present
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: {
+              bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}
+            }
+            expect(flash[:success]).to be_present
+          end
+          bike.reload
+          stolen_record.reload
+          stolen_record.current_alert_image
+          stolen_record.reload
+
+          expect(bike.current_stolen_record.id).to eq stolen_record.id
+          expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
+
+          expect(stolen_record.phone).to eq "1111111111"
+          expect(stolen_record.secondary_phone).to eq "1231231234"
+          expect(stolen_record.country_id).to eq Country.united_states.id
+          expect(stolen_record.state_id).to eq state.id
+          expect(stolen_record.show_address).to be_truthy
+          expect(stolen_record.estimated_value).to eq 2101
+          expect(stolen_record.locking_description).to eq "party"
+          expect(stolen_record.lock_defeat_description).to eq "cool things"
+          expect(stolen_record.theft_description).to eq "Something"
+          expect(stolen_record.police_report_number).to eq "23891921"
+          expect(stolen_record.police_report_department).to eq "Manahattan"
+          expect(stolen_record.proof_of_ownership).to be_falsey
+          expect(stolen_record.receive_notifications).to be_truthy
+
+          expect(stolen_record.alert_image).to be_present
+          expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
         end
-        bike.reload
-        stolen_record.reload
-        stolen_record.current_alert_image
-        stolen_record.reload
-
-        expect(bike.current_stolen_record.id).to eq stolen_record.id
-        expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
-        expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
-
-        expect(stolen_record.phone).to eq "1111111111"
-        expect(stolen_record.secondary_phone).to eq "1231231234"
-        expect(stolen_record.country_id).to eq Country.united_states.id
-        expect(stolen_record.state_id).to eq state.id
-        expect(stolen_record.show_address).to be_truthy
-        expect(stolen_record.estimated_value).to eq 2101
-        expect(stolen_record.locking_description).to eq "party"
-        expect(stolen_record.lock_defeat_description).to eq "cool things"
-        expect(stolen_record.theft_description).to eq "Something"
-        expect(stolen_record.police_report_number).to eq "23891921"
-        expect(stolen_record.police_report_department).to eq "Manahattan"
-        expect(stolen_record.proof_of_ownership).to be_falsey
-        expect(stolen_record.receive_notifications).to be_truthy
-
-        expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
       end
     end
     context "updating impound_record" do

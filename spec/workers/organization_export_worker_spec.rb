@@ -229,19 +229,21 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:target_headers) { %w[organization_affiliation] }
         let(:export_options) { {headers: target_headers} }
         it "returns the expected values" do
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_falsey
-          instance.perform(export.id)
-          export.reload
-          expect(instance.export_headers).to eq target_headers
-          expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read
-          bike_line = generated_csv_string.split("\n").last
-          expect(bike_line.split(",").count).to eq target_headers.count
-          expect(bike_line).to eq "\"community_member\""
+          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_falsey
+            instance.perform(export.id)
+            export.reload
+            expect(instance.export_headers).to eq target_headers
+            expect(export.progress).to eq "finished"
+            generated_csv_string = export.file.read
+            bike_line = generated_csv_string.split("\n").last
+            expect(bike_line.split(",").count).to eq target_headers.count
+            expect(bike_line).to eq "\"community_member\""
 
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_falsey
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_falsey
+          end
         end
       end
       context "including every available field + stickers" do

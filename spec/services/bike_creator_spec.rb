@@ -63,26 +63,28 @@ RSpec.describe BikeCreator do
     end
     context "se data" do
       it "adds se bike data if it exists" do
-        manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
-        color = FactoryBot.create(:color)
-        bike = {
-          serial_number: "Some serial",
-          description: "Input description",
-          manufacturer_id: manufacturer.id,
-          year: 2014,
-          frame_model: "Draft",
-          primary_frame_color_id: color.id
-        }
-        b_param = FactoryBot.create(:b_param, params: {bike: bike})
-        BikeCreator.new(b_param).send(:add_bike_book_data)
+        VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
+          manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
+          color = FactoryBot.create(:color)
+          bike = {
+            serial_number: "Some serial",
+            description: "Input description",
+            manufacturer_id: manufacturer.id,
+            year: 2014,
+            frame_model: "Draft",
+            primary_frame_color_id: color.id
+          }
+          b_param = FactoryBot.create(:b_param, params: {bike: bike})
+          BikeCreator.new(b_param).send(:add_bike_book_data)
 
-        b_param.reload
-        expect(b_param.params["components"].count).to be > 5
-        expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
-        expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
-        expect(b_param.bike["description"]).not_to eq("Input description")
-        expect(b_param.bike["serial_number"]).to eq("Some serial")
-        expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
+          b_param.reload
+          expect(b_param.params["components"].count).to be > 5
+          expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
+          expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
+          expect(b_param.bike["description"]).not_to eq("Input description")
+          expect(b_param.bike["serial_number"]).to eq("Some serial")
+          expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
+        end
       end
     end
   end

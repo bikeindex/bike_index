@@ -42,7 +42,9 @@ RSpec.describe BikeBookUpdateWorker, type: :job do
     component2 = FactoryBot.create(:component,
       bike: bike, ctype_id: Ctype.friendly_find("crankset").id,
       description: "Sweet cranks")
-    BikeBookUpdateWorker.new.perform(bike.id)
+    VCR.use_cassette("bike_book_update_worker", re_record_interval: 1.month) do
+      BikeBookUpdateWorker.new.perform(bike.id)
+    end
     bike.reload
     expect(bike.components.count).to eq(14)
     expect(bike.components.where(id: component1.id).first.is_stock).to be_truthy
