@@ -961,6 +961,7 @@ class Bike < ApplicationRecord
   def location_record_address_hash
     location_record = [
       current_parking_notification,
+      current_impound_record,
       creation_organization&.default_location,
       owner
     ].compact.find { |rec| rec.latitude.present? }

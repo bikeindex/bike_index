@@ -110,7 +110,7 @@ class ImpoundRecord < ApplicationRecord
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: %i[skip_default optional]
+      country: [(:skip_default if skip_default_country)]
     ).presence
   end
 
