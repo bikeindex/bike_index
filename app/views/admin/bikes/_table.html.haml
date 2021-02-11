@@ -41,6 +41,8 @@
               .less-strong-hold
                 %a.small.convertTime{ href: edit_admin_bike_url(bike) }
                   = l bike.created_at, format: :convert_time
+                -# Add a space so that the id doesn't get grouped with the time
+                &nbsp;
                 %span.less-strong-right.d-none.d-md-block.only-dev-visible
                   - if bike.example
                     %span.text-danger

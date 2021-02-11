@@ -226,6 +226,36 @@ RSpec.describe BikeCreator do
         instance.create_bike
       end
     end
+    context "organized" do
+      it "creates" do
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user)
+        manufacturer = FactoryBot.create(:manufacturer)
+        color = FactoryBot.create(:color)
+        wheel_size = FactoryBot.create(:wheel_size)
+        b_param = BParam.create(creator: user, params: {
+          bike: {
+            creation_organization_id: organization.id,
+            propulsion_type: "sail",
+            cycle_type: "stroller",
+            serial_number: "BIKE TOKENd",
+            manufacturer_id: manufacturer.id,
+            rear_tire_narrow: false,
+            rear_wheel_size_id: wheel_size.id,
+            primary_frame_color_id: color.id,
+            handlebar_type: "bmx",
+            owner_email: "stuff@stuff.com"
+          }
+        })
+        instance = subject.new(b_param)
+        expect { instance.create_bike }.to change(Bike, :count).by(1)
+        expect(b_param.skip_owner_email?).to be_falsey
+        bike = Bike.last
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.bike_organizations.count).to eq 1
+        expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+      end
+    end
 
     it "returns the bike instead of saving if the bike has errors" do
       bike = Bike.new(serial_number: "LOLZ")
