@@ -207,7 +207,7 @@
               = render partial: "stolen_map", locals: { mapping_record: impound_record }
             .col-md-4
               %ul.attr-list.separate-lines
-                = attr_list_item(impound_record.address(skip_default_country: true), t(".location"))
+                = attr_list_item(impound_record.address, t(".location"))
                 %li
                   %strong.attr-title
                     - if @bike.status_found?

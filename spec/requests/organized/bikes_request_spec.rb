@@ -210,7 +210,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
           expect(bike.created_by_parking_notification).to be_truthy
-          expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
+          expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey

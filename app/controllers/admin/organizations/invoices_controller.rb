@@ -52,7 +52,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   protected
 
   def find_organization_features
-    @organization_features = OrganizationFeature.order(:name)
+    @organization_features = OrganizationFeature.name_ordered
   end
 
   def permitted_parameters
