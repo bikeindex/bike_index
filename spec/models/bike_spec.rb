@@ -1124,6 +1124,8 @@ RSpec.describe Bike, type: :model do
       it "returns bike_update" do
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
+        expect(bike.latitude).to eq 43.9
+        expect(bike.latitude_public).to eq 43.9
       end
     end
     context "b_param" do
