@@ -286,6 +286,8 @@ export default class BinxAppOrgParkingNotificationMapping {
       binxAppOrgParkingNotificationMapping.totalRecords >=
       binxAppOrgParkingNotificationMapping.perPage
     ) {
+      // set the perPage to show the max count
+      $("#perPageCount").text(binxAppOrgParkingNotificationMapping.perPage);
       $(".maxNumberDisplayed").slideDown();
     } else {
       $(".maxNumberDisplayed").slideUp();

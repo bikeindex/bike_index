@@ -7,6 +7,7 @@ RSpec.describe CreationState, type: :model do
         creation_state = CreationState.new(origin: "SOMEwhere", bike_id: 2)
         creation_state.set_calculated_attributes
         expect(creation_state.origin).to eq "web"
+        expect(creation_state.origin_enum).to eq "web"
       end
     end
     context "known origin" do
@@ -15,6 +16,17 @@ RSpec.describe CreationState, type: :model do
         creation_state = CreationState.new(origin: origin)
         creation_state.set_calculated_attributes
         expect(creation_state.origin).to eq origin
+        expect(creation_state.origin_enum).to eq origin
+      end
+    end
+    # Temporary hack, to get this shipped
+    context "creator_unregistered_parking_notification" do
+      let(:origin) { "unregistered_parking_notification" }
+      it "uses the origin" do
+        creation_state = CreationState.new(origin: origin)
+        creation_state.set_calculated_attributes
+        expect(creation_state.origin).to eq origin
+        expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
       end
     end
   end
@@ -38,7 +50,7 @@ RSpec.describe CreationState, type: :model do
         expect(creation_state.creation_description).to eq "Lightspeed"
       end
       context "ascend" do
-        let(:bulk_import) { BulkImport.new(is_ascend: true) }
+        let(:bulk_import) { BulkImport.new(kind: "ascend") }
         let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
         it "returns pos reg" do
           expect(creation_state.creation_description).to eq "Ascend"
@@ -85,7 +97,7 @@ RSpec.describe CreationState, type: :model do
       end
     end
     context "ascend bulk import" do
-      let(:bulk_import) { BulkImport.new(is_ascend: true) }
+      let(:bulk_import) { BulkImport.new(kind: "ascend") }
       let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
       it "returns ascend" do
         expect(bulk_import.ascend?).to be_truthy

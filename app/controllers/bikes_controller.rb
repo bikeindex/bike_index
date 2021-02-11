@@ -27,7 +27,7 @@ class BikesController < ApplicationController
 
   def show
     @components = @bike.components
-    if @bike.stolen && @bike.current_stolen_record.present?
+    if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
@@ -53,7 +53,7 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    if @bike.stolen && @bike.current_stolen_record.present?
+    if @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
@@ -106,14 +106,10 @@ class BikesController < ApplicationController
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], abandoned: params[:abandoned])
+    @bike ||= BikeCreator.new(@b_param).build_bike(BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
-    if @bike.stolen
-      @stolen_record = @bike.stolen_records.build(@b_param.params["stolen_record"])
-      @stolen_record.country_id ||= Country.united_states.id
-    end
     @page_errors = @b_param.bike_errors
   end
 
@@ -130,7 +126,6 @@ class BikesController < ApplicationController
                                  origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
           redirect_to(embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
@@ -151,7 +146,6 @@ class BikesController < ApplicationController
       @b_param.clean_params(permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
         flash[:success] = translation(:bike_was_added)
@@ -214,15 +208,19 @@ class BikesController < ApplicationController
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
+        # Sometimes, weird things error. In production, Don't show a 500 page to the user
+        # ... but in testing or development re-raise error to make stack tracing better
+        raise e unless Rails.env.production?
       end
     end
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
-    @bike = @bike.decorate
+    @bike = @bike.reload.decorate
 
     if @bike.errors.any? || flash[:error].present?
+      @edit_templates = nil # So when we render edit it includes templates if the bike state has changed
       edit && return
     else
       flash[:success] ||= translation(:bike_was_updated)
@@ -232,8 +230,8 @@ class BikesController < ApplicationController
   end
 
   def edit_templates
-    return @edit_templates if defined?(@edit_templates)
-    @theft_templates = @bike.stolen? ? theft_templates : {}
+    return @edit_templates if @edit_templates.present?
+    @theft_templates = @bike.status_stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)
   end
@@ -255,9 +253,10 @@ class BikesController < ApplicationController
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
-        elsif matching_notification.impounded?
+        elsif matching_notification.impounded? || matching_notification.impound_record_id.present?
           flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
-        elsif matching_notification.retrieved?
+        else
+          # It's probably marked retrieved - but it could be something else (status: resolved_otherwise)
           flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
@@ -279,7 +278,7 @@ class BikesController < ApplicationController
   def target_edit_template(requested_page:)
     result = {}
     valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
-    default_page = @bike.stolen? ? :theft_details : :bike_details
+    default_page = @bike.status_stolen? ? :theft_details : :bike_details
 
     if requested_page.blank?
       result[:is_valid] = true
@@ -300,11 +299,10 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.abandoned?
-      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit)
       h[:publicize] = translation(:publicize, controller_method: :edit)
       h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.abandoned?
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
     end
   end
 
@@ -314,13 +312,16 @@ class BikesController < ApplicationController
   def bike_templates
     {}.with_indifferent_access.tap do |h|
       h[:bike_details] = translation(:bike_details, controller_method: :edit)
+      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
       h[:photos] = translation(:photos, controller_method: :edit)
       h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
       h[:accessories] = translation(:accessories, controller_method: :edit)
       h[:ownership] = translation(:ownership, controller_method: :edit)
       h[:groups] = translation(:groups, controller_method: :edit)
       h[:remove] = translation(:remove, controller_method: :edit)
-      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.stolen?
+      unless @bike.status_stolen_or_impounded?
+        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
+      end
     end
   end
 
@@ -360,7 +361,7 @@ class BikesController < ApplicationController
 
   def find_or_new_b_param
     token = params[:b_param_token]
-    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    token ||= params.dig(:bike, :b_param_id_token)
     @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id)
   end
 
@@ -371,7 +372,11 @@ class BikesController < ApplicationController
     return true if @bike.authorize_and_claim_for_user(current_user)
 
     if @bike.current_impound_record.present?
-      error = translation(:bike_impounded, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+      error = if @bike.current_impound_record.organized?
+        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+      else
+        translation(:bike_impounded, bike_type: type)
+      end
     elsif current_user.present?
       error = translation(:you_dont_own_that, bike_type: type)
     else
@@ -437,7 +442,7 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(Bike.old_attr_accessible)}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

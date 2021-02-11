@@ -37,10 +37,10 @@
       = humanized_time_range(@time_range)
 - else
   %p.mt-4
-    = number_with_delimiter(Bike.where(stolen: true).count)
+    = number_with_delimiter(Bike.status_stolen.count)
     Stolen Bikes indexed,
     %em
-      (#{number_with_delimiter(Bike.where(stolen: true).where("created_at >= ?", Time.current.beginning_of_day).count)} today)
+      (#{number_with_delimiter(Bike.status_stolen.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
   .row.mb-4.mt-4
     - if @only_with_location
       .col-5

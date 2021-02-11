@@ -398,7 +398,7 @@ RSpec.describe BikesController, type: :request do
         it "renders" do
           parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.status).to eq "retrieved"
           expect(parking_notification.retrieval_link_token).to be_present
           expect(parking_notification.retrieved?).to be_truthy
           expect(bike.current_parking_notification).to be_blank
@@ -407,23 +407,35 @@ RSpec.describe BikesController, type: :request do
           expect(assigns(:bike)).to eq bike
           expect(assigns(:token)).to eq parking_notification.retrieval_link_token
           expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         end
       end
       context "abandoned as well" do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "renders" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
-          parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.reload.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification_abandoned.retrieval_link_token}"
+          expect(parking_notification_abandoned.reload.status).to eq "current"
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
-          expect(assigns(:token)).to eq parking_notification_abandoned.retrieval_link_token
-          expect(assigns(:token_type)).to eq "appears_abandoned_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification_abandoned
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
+          # And then resolve that token, to test it works as well
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
+            expect(flash[:success]).to be_present
+          end
+          # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
+          expect(parking_notification_abandoned.reload.status).to eq "retrieved"
+          expect(parking_notification_abandoned.resolved?).to be_truthy
+          expect(parking_notification_abandoned.retrieved_kind).to eq "link_token_recovery"
+          expect(parking_notification.reload.status).to eq "replaced"
+          expect(parking_notification.resolved?).to be_truthy
+          expect(parking_notification.retrieved_kind).to be_blank
         end
       end
       context "impound notification" do
@@ -438,7 +450,7 @@ RSpec.describe BikesController, type: :request do
           expect(assigns(:bike)).to eq bike
           expect(assigns(:token)).to eq parking_notification.retrieval_link_token
           expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         end
       end
     end
@@ -446,21 +458,29 @@ RSpec.describe BikesController, type: :request do
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
       it "includes an impound_claim" do
         expect(impound_record).to be_present
-        expect(bike.current_impound_record).to be_present
+        expect(bike.reload.current_impound_record).to be_present
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
+        expect(response).to be_ok
         expect(assigns(:bike)).to eq bike
         expect(assigns(:impound_claim)).to be_present
         expect(assigns(:impound_claim)&.id).to be_blank
+        get "#{base_url}/#{bike.id}?contact_owner=true"
+        expect(flash).to be_blank
+        expect(response).to be_ok
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:contact_owner_open)).to be_truthy
       end
       context "current_user has impound_claim" do
         let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
         it "uses impound_claim" do
+          expect(impound_record.creator_public_display_name).to eq "bike finder"
           expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+          expect(assigns(:contact_owner_open)).to be_falsey
         end
       end
       context "current_user has submitting_impound_claim" do
@@ -478,7 +498,375 @@ RSpec.describe BikesController, type: :request do
     end
   end
 
-  describe "update token" do
+  describe "new" do
+    context "stolen from params" do
+      it "renders a new stolen bike" do
+        get "#{base_url}/new?stolen=true"
+        expect(response.code).to eq("200")
+        expect(assigns(:b_param).revised_new?).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.stolen_records.last).to be_present
+        expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
+        expect(response).to render_template(:new)
+      end
+      it "renders a new stolen bike from status" do
+        country = FactoryBot.create(:country_canada)
+        current_user.update(country_id: country.id)
+        get "#{base_url}/new?status=stolen"
+        expect(response.code).to eq("200")
+        bike = assigns(:bike)
+        expect(bike.status_humanized).to eq "stolen"
+        expect(bike.stolen_records.last).to be_present
+        expect(bike.stolen_records.last.country_id).to eq country.id
+        expect(response).to render_template(:new)
+      end
+    end
+    context "impounded from params" do
+      it "renders with status" do
+        get "#{base_url}/new?status=impounded"
+        expect(response.code).to eq("200")
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.impound_records.last).to be_present
+        expect(response).to render_template(:new)
+      end
+      it "found is impounded" do
+        get "#{base_url}/new?status=found"
+        expect(response.code).to eq("200")
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.impound_records.last).to be_present
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
+  describe "create" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let(:color) { FactoryBot.create(:color, name: "black") }
+    let(:state) { FactoryBot.create(:state_illinois) }
+    let(:country) { state.country }
+    let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug, :manufacturer_id) }
+    let(:basic_bike_params) do
+      {
+        serial_number: "Bike serial",
+        manufacturer_id: manufacturer.name,
+        year: "2022",
+        frame_model: "Cool frame model",
+        primary_frame_color_id: color.id.to_s,
+        owner_email: current_user.email
+      }
+    end
+    let(:chicago_stolen_params) do
+      {
+        country_id: country.id,
+        street: "2459 W Division St",
+        city: "Chicago",
+        zipcode: "60622",
+        state_id: state.id
+      }
+    end
+    context "unverified authenticity token" do
+      include_context :test_csrf_token
+      it "fails" do
+        expect(current_user).to be_present
+        expect {
+          post base_url, params: {bike: basic_bike_params}
+        }.to_not change(Ownership, :count)
+        expect(flash[:error]).to match(/verify/i)
+      end
+    end
+    context "blank serials" do
+      let(:bike_params) { basic_bike_params.except(:year, :frame_model).merge(serial_number: "unknown", made_without_serial: "0") }
+      it "creates" do
+        expect(current_user.bikes.count).to eq 0
+        expect {
+          post base_url, params: {bike: bike_params}
+        }.to change(Ownership, :count).by(1)
+        expect(current_user.bikes.count).to eq 1
+        new_bike = current_user.bikes.first
+        expect(new_bike.claimed?).to be_truthy
+        expect(new_bike.no_serial?).to be_truthy
+        expect(new_bike.made_without_serial?).to be_falsey
+        expect(new_bike.creation_state.origin).to eq "web"
+        expect(new_bike.serial_unknown?).to be_truthy
+        expect(new_bike.serial_number).to eq "unknown"
+        expect(new_bike.normalized_serial_segments).to eq([])
+      end
+      context "made_without_serial" do
+        it "creates, is made_without_serial" do
+          expect(current_user.bikes.count).to eq 0
+          expect {
+            post base_url, params: {bike: bike_params.merge(made_without_serial: "1")}
+          }.to change(Ownership, :count).by(1)
+          expect(current_user.bikes.count).to eq 1
+          new_bike = current_user.bikes.first
+          expect(new_bike.claimed?).to be_truthy
+          expect(new_bike.no_serial?).to be_truthy
+          expect(new_bike.made_without_serial?).to be_truthy
+          expect(new_bike.serial_unknown?).to be_falsey
+          expect(new_bike.serial_number).to eq "made_without_serial"
+          expect(new_bike.normalized_serial_segments).to eq([])
+          expect(new_bike.current_ownership.impound_record_id).to be_blank
+        end
+      end
+    end
+    context "no existing b_param and stolen" do
+      let(:wheel_size) { FactoryBot.create(:wheel_size) }
+      let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
+      let(:bike_params) do
+        {
+          b_param_id_token: "",
+          cycle_type: "tall-bike",
+          serial_number: "example serial",
+          manufacturer_id: manufacturer.slug,
+          manufacturer_other: "",
+          year: "2016",
+          frame_model: extra_long_string,
+          primary_frame_color_id: color.id.to_s,
+          secondary_frame_color_id: "",
+          tertiary_frame_color_id: "",
+          owner_email: "something@stuff.com",
+          phone: "312.379.9513",
+          date_stolen: Time.current.to_i
+        }
+      end
+      before { expect(BParam.all.count).to eq 0 }
+      context "successful creation" do
+        include_context :geocoder_real
+        it "creates a bike and doesn't create a b_param" do
+          bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
+          VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+            bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
+            # We need to call clean_params on the BParam after bikebook update, so that
+            # the foreign keys are assigned correctly. This is how we test that we're
+            # This is also where we're testing bikebook assignment
+            expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+            expect {
+              post base_url, params: {bike: bike_params, stolen_record: chicago_stolen_params.merge(show_address: true)}
+            }.to change(Bike, :count).by(1)
+            expect(flash[:success]).to be_present
+            expect(BParam.all.count).to eq 0
+            bike = Bike.last
+            bike_params.except(:manufacturer_id, :phone, :date_stolen).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            expect(bike.manufacturer).to eq manufacturer
+            expect(bike.status).to eq "status_stolen"
+            bike_user.reload
+            expect(bike.current_stolen_record.phone).to eq "3123799513"
+            expect(bike_user.phone).to eq "3123799513"
+            expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
+            expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
+            expect(bike.creation_state.status).to eq "status_stolen"
+            stolen_record = bike.current_stolen_record
+            chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+            expect(stolen_record.show_address).to be_truthy
+          end
+        end
+      end
+      context "failure" do
+        it "assigns a bike and a stolen record with the attrs passed" do
+          expect {
+            post base_url, params: {bike: bike_params.except(:manufacturer_id), stolen_record: chicago_stolen_params}
+          }.to change(Bike, :count).by(0)
+          expect(BParam.all.count).to eq 1
+          expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
+          bike = assigns(:bike)
+          expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+          expect(bike.status).to eq "status_stolen"
+          # we retain the stolen record attrs, test that they are assigned correctly too
+          expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
+        end
+      end
+    end
+    context "no existing b_param, impounded" do
+      let(:bike_params) { basic_bike_params }
+      context "impound_record" do
+        include_context :geocoder_real
+        let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
+        it "creates a new ownership and impound_record" do
+          VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
+            expect {
+              post base_url, params: {bike: bike_params, impound_record: impound_params}
+              expect(assigns(:bike).errors&.full_messages).to_not be_present
+            }.to change(Ownership, :count).by 1
+            new_bike = Bike.last
+            expect(new_bike).to be_present
+            expect(new_bike.authorized?(current_user)).to be_truthy
+            expect(new_bike.creation_state.origin).to eq "web"
+            expect(new_bike.creation_state.organization&.id).to be_blank
+            expect(new_bike.creation_state.creator&.id).to eq current_user.id
+            expect(new_bike.status).to eq "status_impounded"
+            expect(new_bike.status_humanized).to eq "found"
+            expect(new_bike.creation_state.status).to eq "status_impounded" # Make sure this status matches
+            expect_attrs_to_match_hash(new_bike, testable_bike_params)
+            expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
+            impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
+            expect(new_bike.current_impound_record&.id).to eq impound_record.id
+            expect(impound_record.kind).to eq "found"
+            expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
+            expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+            expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+            expect(impound_record.unregistered_bike?).to be_truthy
+
+            ownership = new_bike.current_ownership
+            expect(ownership.claimed?).to be_truthy
+            expect(ownership.send_email?).to be_falsey
+            expect(ownership.self_made?).to be_truthy
+            expect(ownership.impound_record_id).to eq impound_record.id
+          end
+        end
+        context "failure" do
+          it "assigns a bike and a impound record with the attrs passed" do
+            expect {
+              post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
+            }.to change(Bike, :count).by(0)
+            expect(BParam.all.count).to eq 1
+            expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
+            bike = assigns(:bike)
+            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+            expect(bike.status).to eq "status_impounded"
+            # we retain the stolen record attrs, test that they are assigned correctly too
+            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+          end
+        end
+      end
+    end
+    context "existing b_param, no bike" do
+      let(:bike_params) do
+        basic_bike_params.merge(cycle_type: "cargo-rear",
+                                serial_number: "example serial",
+                                secondary_frame_color_id: "",
+                                tertiary_frame_color_id: "",
+                                owner_email: "something@stuff.com")
+      end
+      let(:target_address) { {street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "US", latitude: 40.7143528, longitude: -74.0059731} }
+      let(:b_param) { BParam.create(params: {"bike" => bike_params.as_json}, origin: "embed_partial") }
+      before do
+        expect(b_param.partial_registration?).to be_truthy
+        bb_data = {bike: {}}
+        # We need to call clean_params on the BParam after bikebook update, so that
+        # the foreign keys are assigned correctly.
+        # This is also where we're testing bikebook assignment
+        expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+      end
+      it "creates a bike" do
+        expect {
+          post base_url, params: {
+            bike: {
+              manufacturer_id: manufacturer.slug,
+              b_param_id_token: b_param.id_token,
+              address: default_location[:address],
+              extra_registration_number: "XXXZZZ",
+              organization_affiliation: "employee",
+              phone: "888.777.6666"
+            }
+          }
+        }.to change(Bike, :count).by(1)
+        expect(flash[:success]).to be_present
+        new_bike = Bike.last
+        expect(new_bike.creator_id).to eq current_user.id
+        b_param.reload
+        expect(b_param.created_bike_id).to eq new_bike.id
+        expect(b_param.phone).to eq "8887776666"
+        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect(new_bike.manufacturer).to eq manufacturer
+        expect(new_bike.creation_state.origin).to eq "embed_partial"
+        expect(new_bike.creation_state.creator).to eq new_bike.creator
+        expect(new_bike.registration_address).to eq target_address.as_json
+        expect(new_bike.extra_registration_number).to eq "XXXZZZ"
+        expect(new_bike.organization_affiliation).to eq "employee"
+        expect(new_bike.phone).to eq "8887776666"
+        current_user.reload
+        expect(new_bike.owner).to eq current_user # NOTE: not bike user
+        expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
+      end
+      context "updated address" do
+        let!(:target_address) { {street: "212 Main St", city: "Chicago", state: state.abbreviation, zipcode: "60647"} }
+        it "creates the bike and does the updated address thing" do
+          expect {
+            post base_url, params: {
+              bike: {
+                manufacturer_id: manufacturer.slug,
+                b_param_id_token: b_param.id_token,
+                street: "212 Main St",
+                city: "Chicago",
+                state: "IL",
+                zipcode: "60647",
+                extra_registration_number: " ",
+                organization_affiliation: "student",
+                phone: "8887776666"
+              }
+            }
+          }.to change(Bike, :count).by(1)
+          expect(flash[:success]).to be_present
+          new_bike = Bike.last
+          b_param.reload
+          expect(b_param.created_bike_id).to eq new_bike.id
+          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect(new_bike.manufacturer).to eq manufacturer
+          expect(new_bike.creation_state.origin).to eq "embed_partial"
+          expect(new_bike.creation_state.creator).to eq new_bike.creator
+          expect(new_bike.registration_address).to eq target_address.as_json
+          expect(new_bike.state.name).to eq "Illinois"
+          expect(new_bike.extra_registration_number).to be_blank
+          expect(new_bike.organization_affiliation).to eq "student"
+          expect(new_bike.phone).to eq "8887776666"
+          current_user.reload
+          expect(new_bike.owner).to eq current_user # NOTE: not bike user
+          expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
+        end
+        context "legacy address" do
+          it "returns with address" do
+            Country.united_states # Ensure it's around
+            expect {
+              post base_url, params: {
+                bike: {
+                  manufacturer_id: manufacturer.slug,
+                  b_param_id_token: b_param.id_token,
+                  address: "212 Main St",
+                  address_city: "Chicago",
+                  address_state: "IL",
+                  address_zipcode: "60647",
+                  extra_registration_number: " ",
+                  organization_affiliation: "student",
+                  phone: "8887776666"
+                }
+              }
+            }.to change(Bike, :count).by(1)
+            expect(flash[:success]).to be_present
+            new_bike = Bike.last
+            b_param.reload
+            expect(b_param.address_hash.except("country")).to eq target_address.as_json
+            expect(b_param.created_bike_id).to eq new_bike.id
+            expect_attrs_to_match_hash(new_bike, testable_bike_params)
+            expect(new_bike.manufacturer).to eq manufacturer
+            expect(new_bike.creation_state.origin).to eq "embed_partial"
+            expect(new_bike.creation_state.creator).to eq new_bike.creator
+            expect(new_bike.registration_address).to eq target_address.as_json
+            expect(new_bike.state.abbreviation).to eq "IL"
+            expect(new_bike.extra_registration_number).to be_blank
+            expect(new_bike.organization_affiliation).to eq "student"
+            expect(new_bike.phone).to eq "8887776666"
+            current_user.reload
+            expect(new_bike.owner).to eq current_user # NOTE: not bike user
+            expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
+          end
+        end
+      end
+    end
+    context "existing b_param, created bike" do
+      it "redirects to the bike" do
+        b_param = BParam.create(params: {bike: {}}, created_bike_id: bike.id, creator_id: current_user.id)
+        expect(b_param.created_bike).to be_present
+        post base_url, params: {bike: {b_param_id_token: b_param.id_token}}
+        expect(response).to redirect_to(edit_bike_url(bike.id))
+      end
+    end
+  end
+
+  describe "resolve_token" do
     context "graduated_notification" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
       let!(:bike) { graduated_notification.bike }
@@ -676,8 +1064,9 @@ RSpec.describe BikesController, type: :request do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          expect(parking_notification_abandoned.reload.status).to eq "current"
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
           Sidekiq::Worker.clear_all
@@ -691,15 +1080,14 @@ RSpec.describe BikesController, type: :request do
           parking_notification.reload
           parking_notification_abandoned.reload
           expect(bike.current_parking_notification).to be_blank
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.retrieved?).to be_truthy
-          expect(parking_notification.retrieved_by).to eq current_user
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.resolved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
+          expect(parking_notification.retrieved_by&.id).to be_blank
+          expect(parking_notification.retrieved_kind).to be_blank
 
-          expect(parking_notification_abandoned.retrieved?).to be_truthy
-          expect(parking_notification_abandoned.retrieved_by).to be_blank
-          expect(parking_notification_abandoned.associated_retrieved_notification).to eq parking_notification
+          expect(parking_notification_abandoned.status).to eq "retrieved"
+          expect(parking_notification_abandoned.retrieved_by&.id).to eq current_user.id
+          expect(parking_notification_abandoned.retrieved_kind).to eq "link_token_recovery"
         end
       end
       context "impound notification" do
@@ -707,8 +1095,9 @@ RSpec.describe BikesController, type: :request do
         it "refuses" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.resolved?).to be_truthy
+          expect(parking_notification.status).to eq "replaced"
+          expect(parking_notification.active?).to be_falsey
+          expect(bike.reload.status).to eq "status_impounded"
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
@@ -716,7 +1105,7 @@ RSpec.describe BikesController, type: :request do
             expect(assigns(:bike)).to eq bike
             expect(flash[:error]).to match(/impound/i)
           end
-          bike.reload
+          expect(bike.reload.status).to eq "status_impounded"
           parking_notification.reload
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.retrieved?).to be_falsey
@@ -727,56 +1116,91 @@ RSpec.describe BikesController, type: :request do
   end
 
   describe "edit" do
+    let(:default_edit_templates) { %w[bike_details photos drivetrain accessories ownership groups remove report_stolen] }
     it "renders" do
       get "#{base_url}/#{bike.id}/edit"
       expect(flash).to be_blank
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
+      expect(assigns(:edit_templates).keys).to match_array(default_edit_templates)
+    end
+    context "stolen bike" do
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+      let(:ownership) { bike.current_ownership }
+      it "renders" do
+        get "#{base_url}/#{bike.id}/edit"
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_theft_details)
+        expect(assigns(:bike).id).to eq bike.id
+        bike.current_stolen_record.add_recovery_information
+        # And if the bike is recovered, it redirects without page
+        get "#{base_url}/#{bike.id}/edit?page=theft_details"
+        expect(flash).to be_blank
+        expect(response).to redirect_to(edit_bike_path(bike.id, page: "bike_details"))
+      end
     end
     context "with impound_record" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
-      before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
-      it "redirects with flash error" do
-        bike.reload
-        expect(bike.status).to eq "status_impounded"
+      it "renders" do
+        target_edit_templates = default_edit_templates - ["report_stolen"] + ["found_details"]
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(bike.owner&.id).to eq current_user.id
+        expect(bike.authorized?(current_user)).to be_truthy
         get "#{base_url}/#{bike.id}/edit"
-        expect(flash[:error]).to match(/impounded/i)
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_bike_details)
+        expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
+        # it also renders the found bike page
+        get "#{base_url}/#{bike.id}/edit?page=found_details"
+        expect(flash).to be_blank
+        expect(response).to render_template(:edit_found_details)
+        expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
       end
-      context "unclaimed" do
-        let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
-        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
-        let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
-        it "claims, but then redirects with flash error" do
-          expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check
-          bike.reload
-          expect(bike.current_ownership.claimed?).to be_falsey
-          expect(bike.claimable_by?(current_user)).to be_truthy
-          expect(bike.authorized?(current_user)).to be_falsey
-          expect(bike.status).to eq "status_impounded"
+      context "organized impound_record" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+        before { ProcessImpoundUpdatesWorker.new.perform(impound_record.id) }
+        it "redirects with flash error" do
+          expect(bike.reload.status).to eq "status_impounded"
           get "#{base_url}/#{bike.id}/edit"
           expect(flash[:error]).to match(/impounded/i)
           expect(response).to redirect_to(bike_path(bike.id))
-          bike.reload
-          expect(bike.current_ownership.claimed?).to be_truthy
-          expect(bike.user.id).to eq current_user.id
-          expect(bike.authorized?(current_user)).to be_falsey
         end
-      end
-      context "organization member" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
-        it "renders" do
-          bike.reload
-          expect(bike.claimed?).to be_truthy
-          expect(bike.status).to eq "status_impounded"
-          expect(bike.created_by_parking_notification).to be_falsey
-          expect(bike.bike_organizations.map(&:organization_id)).to eq([])
-          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
-          get "#{base_url}/#{bike.id}/edit"
-          expect(flash).to be_blank
-          expect(response).to render_template(:edit_bike_details)
-          expect(assigns(:bike).id).to eq bike.id
+        context "unclaimed" do
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
+          let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
+          it "claims, but then redirects with flash error" do
+            expect(current_user).to be_present # Doing weird lazy initialization here, so sanity check
+            bike.reload
+            expect(bike.current_ownership.claimed?).to be_falsey
+            expect(bike.claimable_by?(current_user)).to be_truthy
+            expect(bike.authorized?(current_user)).to be_falsey
+            expect(bike.status).to eq "status_impounded"
+            get "#{base_url}/#{bike.id}/edit"
+            expect(flash[:error]).to match(/impounded/i)
+            expect(response).to redirect_to(bike_path(bike.id))
+            bike.reload
+            expect(bike.current_ownership.claimed?).to be_truthy
+            expect(bike.user.id).to eq current_user.id
+            expect(bike.authorized?(current_user)).to be_falsey
+          end
+        end
+        context "organization member" do
+          let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+          let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
+          it "renders" do
+            bike.reload
+            expect(bike.claimed?).to be_truthy
+            expect(bike.status).to eq "status_impounded"
+            expect(bike.created_by_parking_notification).to be_falsey
+            expect(bike.bike_organizations.map(&:organization_id)).to eq([])
+            expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+            get "#{base_url}/#{bike.id}/edit"
+            expect(flash).to be_blank
+            expect(response).to render_template(:edit_bike_details)
+            expect(assigns(:bike).id).to eq bike.id
+            expect(response).to render_template(:edit_bike_details)
+            expect(assigns(:edit_templates).keys).to match_array(default_edit_templates - ["report_stolen"])
+          end
         end
       end
     end
@@ -820,7 +1244,7 @@ RSpec.describe BikesController, type: :request do
     end
     context "setting address for bike" do
       let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
-      let(:ownership) { FactoryBot.create(:ownership, user: current_user, creator: current_user) }
+      let(:ownership) { FactoryBot.create(:ownership, creator: current_user, owner_email: current_user.email) }
       let(:update_attributes) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "sets the address for the bike" do
@@ -846,46 +1270,103 @@ RSpec.describe BikesController, type: :request do
         expect(bike.address_set_manually).to be_truthy
       end
     end
-    context "mark bike stolen, the way it's done in the app" do
+    context "mark bike stolen, the way it's done on the web" do
       include_context :geocoder_real # But it shouldn't make any actual calls!
       it "marks bike stolen and doesn't set a location in Kansas!" do
-        expect(current_user.authorized?(bike)).to be_truthy
-        expect(bike.stolen?).to be_falsey
+        bike.reload
+        expect(bike.status_stolen?).to be_falsey
+        expect(bike.claimed?).to be_falsey
+        expect(bike.authorized?(current_user)).to be_truthy
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
+          patch "#{base_url}/#{bike.id}", params: {
+            edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
+          }
           expect(flash[:success]).to be_present
+          # Redirects to same page passed
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+          # ... and that page redirects to theft_details
+          get edit_bike_path(bike.to_param, page: "report_stolen")
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
         end
         bike.reload
-        expect(bike.stolen?).to be_truthy
+        expect(bike.status).to eq "status_stolen"
         expect(bike.to_coordinates.compact).to eq([])
+        expect(bike.claimed?).to be_falsey # Still controlled by creator
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
         expect(stolen_record.to_coordinates.compact).to eq([])
         expect(stolen_record.date_stolen).to be_within(5).of Time.current
+        expect(stolen_record.phone).to be_blank
+        expect(stolen_record.country_id).to eq Country.united_states.id
       end
-      context "bike has location" do
-        let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
-        it "marks the bike stolen, doesn't set a location, blanks bike location" do
-          bike.update_attributes(location_attrs)
+      context "no sidekiq" do
+        it "redirects correctly" do
           bike.reload
-          expect(bike.address_set_manually).to be_truthy
-          expect(bike.stolen?).to be_falsey
-          Sidekiq::Worker.clear_all
-          Sidekiq::Testing.inline! do
-            patch "#{base_url}/#{bike.id}", params: {bike: {stolen: true}}
-            expect(flash[:success]).to be_present
-          end
+          patch "#{base_url}/#{bike.id}", params: {
+            edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
+          }
+          expect(flash[:success]).to be_present
+          expect(assigns(:edit_templates)).to be_nil
+          # Redirects to same page passed
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+          # ... and that page redirects to theft_details
+          get edit_bike_path(bike.to_param, page: "report_stolen")
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
           bike.reload
-          expect(bike.stolen?).to be_truthy
+          expect(bike.status).to eq "status_stolen"
           expect(bike.to_coordinates.compact).to eq([])
-          expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
+          expect(bike.claimed?).to be_falsey # Still controlled by creator
 
           stolen_record = bike.current_stolen_record
           expect(stolen_record).to be_present
           expect(stolen_record.to_coordinates.compact).to eq([])
           expect(stolen_record.date_stolen).to be_within(5).of Time.current
+          expect(stolen_record.phone).to be_blank
+          expect(stolen_record.country_id).to eq Country.united_states.id
+        end
+      end
+      context "bike has location" do
+        let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
+        let(:time) { Time.current - 10.minutes }
+        let(:phone) { "2221114444" }
+        let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }
+        let(:ownership) { FactoryBot.create(:ownership, owner_email: current_user.email) }
+        # If the phone isn't already confirmed, it sends a confirmation message
+        let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
+        it "marks the bike stolen, doesn't set a location, blanks bike location" do
+          expect(current_user.reload.phone).to eq "2221114444"
+          bike.update_attributes(location_attrs)
+          bike.reload
+          expect(bike.address_set_manually).to be_truthy
+          expect(bike.status_stolen?).to be_falsey
+          expect(bike.claimed?).to be_falsey
+          expect(bike.user&.id).to eq current_user.id
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: {
+              edit_template: "report_stolen", bike: {date_stolen: time.to_i}
+            }
+            expect(flash[:success]).to be_present
+            # Redirects to same page passed
+            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
+            # ... and that page redirects to theft_details
+            get edit_bike_path(bike.to_param, page: "report_stolen")
+            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
+          end
+          bike.reload
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.to_coordinates.compact).to eq([])
+          expect(bike.user&.id).to eq current_user.id
+          expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
+
+          stolen_record = bike.current_stolen_record
+          expect(stolen_record).to be_present
+          expect(stolen_record.to_coordinates.compact).to eq([])
+          expect(stolen_record.date_stolen).to be_within(2).of time
+          expect(stolen_record.phone).to eq "2221114444"
+          expect(stolen_record.country_id).to eq Country.united_states.id
         end
       end
     end
@@ -908,6 +1389,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
         expect(bike.ownerships.count).to eq 1
         expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.stolen_records.count).to eq 0
         Sidekiq::Worker.clear_all
         expect {
           patch "#{base_url}/#{bike.id}", params: {
@@ -920,6 +1402,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.current_ownership.user_id).to be_blank
         expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
         expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.stolen_records.count).to eq 0
         expect(bike.status).to eq "status_with_owner"
         expect(bike.user_hidden).to be_falsey
         expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
@@ -1029,6 +1512,38 @@ RSpec.describe BikesController, type: :request do
 
         expect(stolen_record.alert_image).to be_present
         expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+      end
+    end
+    context "updating impound_record" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike) }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+      let(:impound_params) do
+        {
+          timezone: "America/Los_Angeles",
+          impounded_at_with_timezone: "2020-04-28T11:00",
+          country_id: Country.united_states.id,
+          street: "278 Broadway",
+          city: "New York",
+          zipcode: "10007",
+          state_id: state.id
+        }
+      end
+      it "updates the impound_record" do
+        bike.reload
+        expect(bike.current_impound_record_id).to eq impound_record.id
+        expect(bike.authorized?(current_user)).to be_truthy
+        impound_record.reload
+        expect(impound_record.latitude).to be_blank
+        patch "#{base_url}/#{bike.id}", params: {
+          bike: {impound_records_attributes: {"0" => impound_params}},
+          edit_template: "found_details"
+        }
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to(edit_bike_path(bike, page: "found_details"))
+        impound_record.reload
+        expect(impound_record.latitude).to be_present
+        expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
+        expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
       end
     end
   end

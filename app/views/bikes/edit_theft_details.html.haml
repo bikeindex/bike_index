@@ -1,7 +1,6 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form stolenEditPage' } do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
-  = f.hidden_field :stolen
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
@@ -20,15 +19,13 @@
             -# Theft Details
             %h3= @edit_templates[@edit_template]
 
-          -# Helper text display
-          - stolen_type = @bike.abandoned ? t(".abandoned") : t(".stolen")
           = f.fields_for :stolen_records do |srecord|
-            - next unless srecord.object.current # Because they may have multiple stolen records
+            - next unless srecord.object.current? # Because they may have multiple stolen records
 
             %h3
             .form-group.row.unnested-field
               = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-              = srecord.label :date_stolen, t(".when_was_it_stolen", stolen_type: stolen_type), class: 'form-well-label'
+              = srecord.label :date_stolen, t(".when_was_it_stolen_at"), class: 'form-well-label'
               .form-well-input
                 - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
                 = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
@@ -44,7 +41,7 @@
               .form-well-input
                 = srecord.text_field :secondary_phone, class: 'form-control'
 
-            = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
+            = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
             .form-group.row.unnested-field
               = srecord.label :estimated_value, class: 'form-well-label'
@@ -53,20 +50,17 @@
                   = t("number.currency.format.unit")
                 = srecord.number_field :estimated_value, min: '1', class: 'form-control'
 
-            - unless @bike.abandoned?
-              .form-group.row.unnested-field.fancy-select-placeholder.unfancy
-                = srecord.label :locking_description, class:  'form-well-label'
-                .form-well-input
-                  = srecord.select(:locking_description, StolenRecord.locking_description_select_options, prompt: '')
-              .form-group.row.unnested-field.fancy-select-placeholder.unfancy
-                = srecord.label :lock_defeat_description, class:  'form-well-label'
-                .form-well-input
-                  = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select_options, prompt: '')
+            .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+              = srecord.label :locking_description, class:  'form-well-label'
+              .form-well-input
+                = srecord.select(:locking_description, StolenRecord.locking_description_select_options, prompt: '')
+            .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+              = srecord.label :lock_defeat_description, class:  'form-well-label'
+              .form-well-input
+                = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select_options, prompt: '')
 
             .form-group.row.unnested-field
-              - description_label = @bike.abandoned ? t(".how_did_you_recover", bike_type: @bike.type) : t(".description_of_the_incident")
-
-              = srecord.label :theft_description, description_label, class:  'form-well-label'
+              = srecord.label :theft_description, t(".description_of_the_incident"), class:  'form-well-label'
               .form-well-input-large
                 = srecord.text_area :theft_description, rows: 3, class: 'form-control'
 

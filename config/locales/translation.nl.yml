@@ -986,6 +986,14 @@ nl:
           community_member: Gemeenschap lid
           employee: Werknemer
           student: Student
+    status_humanized:
+      bike:
+        abandoned: Verlaten
+        found: gevonden
+        impounded: in beslag genomen
+        stolen: Gestolen
+        with_owner: met eigenaar
+        unregistered: niet ingeschreven
   datetime:
     distance_in_words:
       half_a_minute: een halve minuut
@@ -1655,8 +1663,6 @@ nl:
       location: Plaats
       primary_colors: Primaire kleuren
       serial: Serie
-      stolen: Gestolen
-      abandoned: Verlaten
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -1708,8 +1714,6 @@ nl:
       no_one_can_see_it_but_you: Niemand kan het zien behalve jij
       please_tell_us_how_you_got_your_bike: Vertel ons alsjeblieft hoe je je %{bike_type}
         terug hebt gekregen, het kan ons echt schelen!
-      thank_you_for_recovering_this_bike_type: Bedankt voor het herstellen van deze
-        %{bike_type}!
       this_bike_type_is_hidden: Deze %{bike_type} is verborgen.
       were_honored_to_have_your_bike: We zijn vereerd dat uw %{bike_type} op de index
         staat.
@@ -1730,6 +1734,8 @@ nl:
       organization_sent_this_message: "%{org_name} heeft deze melding verzonden"
       please_email_organization_with_questions_html: Stuur een e-mail naar %{email_link}
         als u vragen heeft
+      thank_you_for_registering_this_found_bike_type: Bedankt voor het registreren
+        van deze gevonden %{bike_type}!
     edit_accessories:
       add_a_component: Voeg een component toe
       other_handlebar_type: Ander type stuur
@@ -1791,6 +1797,7 @@ nl:
       state: Staat
       street: Straat
       organization_affiliation: "%{org_name} aansluiting"
+      made_without_serial: Gemaakt zonder serie
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
@@ -1896,17 +1903,13 @@ nl:
       do_you_have_proof_of_ownership: Hebt u een bewijs van eigendom van deze %{bike_type}?
       eg_if_we_tweet_about_it: bijv. als we erover tweeten of iemand zien zoeken naar
         het framenummer
-      how_did_you_recover: Hoe heb je de %{bike_type} hersteld
       if_this_bike_type_was_added: Als deze %{bike_type} door een fietsenwinkel aan
         de Index is toegevoegd, geldt dat als bewijs van eigendom
       police_report: 'Politierapport #'
       receive_notifications: Ontvang meldingen van Bike Index over deze gestolen %{bike_type}
-      stolen: Gestolen
-      when_was_it_stolen: Wanneer was het %{stolen_type}
       without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
         fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
         door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
-      abandoned: Verlaten
       charges_go_to_cost_of_ad: De kosten gaan rechtstreeks naar de kosten van het
         hosten van de advertentie op Facebook.
       click_to_see_promoted_alert_blog_post_html: Klik op %{link} om te lezen hoe
@@ -1920,6 +1923,7 @@ nl:
       try_one_now: Probeer er nu een!
       we_can_create_fb_ads_for_you: Wist je dat we gerichte Facebook-advertenties
         kunnen maken om het woord over je gestolen fiets voor jou te verspreiden?
+      when_was_it_stolen_at: Wanneer is het gestolen?
     index:
       all: Alle
       anywhere: Overal
@@ -1978,6 +1982,7 @@ nl:
       manufacturer: Fabrikant
       enter_stolen_bike_type_details: Voer de gegevens voor Gestolen %{bike_type}
         in
+      enter_found_bike_type_details: Voer de gevonden %{bike_type} -gegevens in
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -2100,14 +2105,12 @@ nl:
         fietscodes geclaimd.
       link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
-      at: bij
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Neem contact op met de eigenaar
       cycle_type: Type cyclus
-      date_stolen_type: Datum %{stolen_type}
       department_city: Afdeling & stad
       description_of_incident: Beschrijving van het incident
       distinguishing_features: Onderscheidende kenmerken
@@ -2144,8 +2147,6 @@ nl:
       share_it: Deel het!
       spread_the_word: Vertel het verder!
       stock_photo: Stock foto van een %{year} %{model}
-      stolen: Gestolen
-      theft_details: "%{bike_abandoned} Details"
       view_users_other_registrations: Bekijk andere registraties van gebruiker
       wheel_diameter: Wiel diameter
       where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
@@ -2160,15 +2161,16 @@ nl:
       update: Bijwerken
       you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
         gescand die aan deze %{bike_type} is toegewezen.
-      abandoned: Verlaten
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
-      not_registered: Niet echt geregistreerd!
       paint_description: Kleurbeschrijving
-      by: Door
       from: uit
       impounded_at: In beslag genomen fietsen
-      this_was_impounded: Deze %{bike_type} werd in beslag genomen
+      found_at: Gevonden bij
+      stolen_at: Gestolen op
+      stolen_details: Diefstal details
+      not_registered_by_user: Niet geregistreerd door een gebruiker
+      in: in
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -2221,11 +2223,11 @@ nl:
         ownership: Eigendom overdragen
         photos: foto's
         publicize: Delen op sociale media
-        recovery_details: Hersteldetails
         remove: Verbergen of verwijderen
         report_recovered: Markeer deze fiets hersteld
         report_stolen: Melden als gestolen of vermist
         theft_details: Diefstal details
+        found_details: Informatie over het vinden
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -2236,6 +2238,8 @@ nl:
         you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
         bike_impounded: "%{org_name} heeft dat %{bike_type} in beslag genomen. Praat
           met hen om toegang te krijgen tot deze %{bike_type}."
+        bike_impounded_by_organization: "%{org_name} heeft dat %{bike_type} in beslag
+          genomen. Praat met hen om toegang te krijgen tot deze %{bike_type}."
       index:
         we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
           een andere locatie om gestolen fietsen in de buurt te zoeken.
@@ -2543,9 +2547,6 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
-        impounding:
-          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
-            op met Bike Index support.
       graduated_notifications:
         ensure_access_to_graduated_notifications!:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
@@ -2554,6 +2555,14 @@ nl:
         ensure_access_to_hot_sheet!:
           org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
             contact op met Bike Index support.
+      manage_impoundings:
+        assign_organization:
+          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
+            op met Bike Index support.
+        update:
+          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
+            van %{org_name}.
+          updated_successfully: "%{org_name} is succesvol bijgewerkt."
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -2697,10 +2706,6 @@ nl:
         we_sent_out_this_tweet_from: We hebben deze tweet verstuurd vanuit
         were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
           gestolen %{bike_type}!
-        this_email_is_about_the_found_bike: Deze e-mail gaat over de herstelde / gevonden
-          %{bike_type} geregistreerd op Bike Index op %{date}
-        were_spreading_the_word_about_your_found: We verspreiden het woord over je
-          herstelde / gevonden %{bike_type}!
       text:
         color: 'Kleur:'
         hopefully_you_find_the_bike_soon: Hopelijk vindt u de %{bike_type} binnenkort.
@@ -2709,8 +2714,6 @@ nl:
         serial: 'Serial:'
         we_sent_out_this_tweet_from: 'We hebben deze tweet verstuurd van %{twitter_handle},
           een Bike Index gestolen fietsalerter:'
-        were_spreading_the_word_about_your_found: We verspreiden het woord over uw
-          herstelde / gevonden %{bike_type}!
         were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
           gestolen %{bike_type}!
     stolen_notification_email:
@@ -2733,6 +2736,10 @@ nl:
           %{date}. De eigenaar heeft het nog niet geclaimd en het is niet gemarkeerd
           als gestolen, dus je hebt deze e-mail ontvangen om toestemming te geven
           contact met hem op te nemen.
+        no_one_should_be_extorted: Als je denkt dat deze persoon je afperst of het
+          systeem misbruikt, stuur ons dan een e-mail en laat het ons weten - je mag
+          nooit gedwongen worden om iemand te 'belonen' of 'terug te betalen' voor
+          je gestolen fiets
       subject: Contact met gestolen fiets
       text:
         message_about_stolen_bike: "** %{sender_email} heeft een bericht verzonden
@@ -4482,6 +4489,7 @@ nl:
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
         progress: Vooruitgang
         unable_to_process: Niet in staat te verwerken
+        kind: Soort
       new:
         choose_file: Kies bestand...
         correct_actual_image_url_html: '<span class="text-success">Juist</span> :
@@ -4492,7 +4500,6 @@ nl:
           e-mail - dus als de fietsen niet correct worden geïmporteerd, kunt u aanpassingen
           maken en de fietsen verwijderen, zonder een groot aantal te verwijderen
           bikes.
-        example_csv_link: voorbeeld CSV met alle optionele kolommen hier
         for_best_results: Voor de beste resultaten plaatst u aanhalingstekens rond
           alle cellen.
         if_only_some_of_your_bikes_html: Als slechts enkele van uw fietsen waarden
@@ -4503,7 +4510,6 @@ nl:
           met de foto erop, werkt <em>het importeren van foto''s niet</em> . Voorbeelden:'
         incorrect_image_on_webpage_html: '<span class="text-danger"">ONJUIST</span>
           : afbeelding op webpagina'
-        look_at_example_csv_html: Kijk naar %{link_to_example_csv}.
         must_have_required_headers_html: Uw CSV <em>moet</em> onze vereiste headers
           hebben.
         notes_on_successfully_importing: 'Opmerkingen over succesvol importeren:'
@@ -4517,13 +4523,15 @@ nl:
         spokecard_page_url: https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
         this_will_not_work: dit gaat niet werken!
         upload_and_begin_import: Upload en begin met importeren
-        view_an_example_csv_html: Bekijk een %{link_to_example_csv}.
         we_support_a_few_additional: We ondersteunen een paar extra, optionele kolommen.
           U hoeft ze niet op te nemen, tenzij u dat wilt.
         you_must_upload_a_dot_csv_html: U moet een <code>.CSV</code> uploaden
         your_headers_must_match_html: Uw kopteksten moeten <em>exact</em> overeenkomen
           met onze kopteksten - als u bijvoorbeeld 'serienummer' als koptekst hebt,
           werkt de import niet.
+        example_csv_with_all_options: voorbeeld CSV met alle optionele kolommen
+        look_at_example_csv_and_html: Kijk naar %{link_to_example_csv}, en ook naar
+          ons
       show:
         ascend_import: Ascending importeren
         bikes: Bikes
@@ -4557,7 +4565,6 @@ nl:
         bikes_exported: Fietsen geëxporteerd
         bikes_registered_after: Fietsen geregistreerd na
         bikes_registered_before: Fietsen eerder geregistreerd
-        by: Door
         columns_in_csv: Kolommen in csv
         created: Gemaakt
         download_export: Export downloaden
@@ -4579,6 +4586,7 @@ nl:
         unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
         registration_types: Registratietypen
+        by: Door
     stickers:
       edit:
         bike: Fiets
@@ -4724,9 +4732,6 @@ nl:
         update: Bijwerken
         org_settings: Instellingen
         square_image: Gebruik een vierkante afbeelding voor het beste resultaat
-      impounding:
-        impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
-        save: Opslaan
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
@@ -4737,6 +4742,10 @@ nl:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
+    manage_impoundings:
+      edit:
+        impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
+        save: Opslaan
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5099,13 +5108,11 @@ nl:
       update: Bijwerken
       next: Volgende
     edit_bike_skeleton:
-      abandoned: Verlaten
       edit: Bewerken
       owned_but_hasnt_been_claimed_html: Eigendom van <em>%{owner_email}</em> maar
         het is nog niet geclaimd
       owned_with_permission_to_edit_html: Eigendom van <em>%{owner_email}</em> maar
         %{org_name} heeft toestemming om te bewerken
-      stolen: Gestolen
       view_bike: Bekijk %{bike_type}
     organized_skeleton:
       additional_features_html: Bike Index biedt extra functies voor geverifieerde
@@ -5361,7 +5368,6 @@ nl:
       stolen: Gestolen!
       this_user_has_no_bikes_yet: Deze gebruiker heeft nog geen fietsen!
       this_users_bikes: De fietsen van deze gebruiker
-      abandoned: Verlaten
     request_password_reset_form:
       enter_the_email_address: Voer het e-mailadres in dat je hebt gebruikt om je
         aan te melden. We sturen u een e-mail met een link om uw wachtwoord opnieuw
@@ -5388,9 +5394,9 @@ nl:
     choose_registration:
       add_a_bike_through: Voeg een fiets toe door
       add_a_stolen_bike: Voeg een gestolen fiets toe
-      add_a_stolenfound_bike: Voeg een gestolen / gevonden fiets toe die je hebt hersteld
       add_your_own_bike: Voeg je eigen fiets toe
       register_bike: Fiets aanmelden
+      add_abandoned_bike_you_found: Voeg een achtergelaten fiets toe die je hebt gevonden
     goodbye:
       come_back_soon: Kom snel terug!
       youve_been_logged_out: U bent uitgelogd
@@ -5812,13 +5818,11 @@ nl:
       select_or_enter_amount: Selecteer of voer een bedrag in
   my_accounts:
     show:
-      abandoned: VERLATEN
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
       add_a_photo: Voeg een foto toe
       bikes: fietsen
       combination: Combinatie
-      date_abandoned: Datum van vermissing
       date_stolen: Datum gestolen
       edit: Bewerken
       edit_bike: Fiets bewerken
@@ -5835,7 +5839,6 @@ nl:
       serial: Serie
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
         maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
-      stolen: GESTOLEN
       tell_us_more_about_yourself: Vertel ons meer over uzelf.
       thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
         heeft toegevoegd aan de index.
@@ -5846,6 +5849,7 @@ nl:
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
+      date_found: Datum gevonden
   org_public:
     impounded_bikes:
       index:

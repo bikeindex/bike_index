@@ -24,7 +24,7 @@ class TheftAlert < ApplicationRecord
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
-    StolenRecord.unscoped.find_by_id(stolen_record_id)
+    StolenRecord.current_and_not.find_by_id(stolen_record_id)
   end
 
   def bike

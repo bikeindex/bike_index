@@ -288,7 +288,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
   end
 
   describe "bikes_header_tags" do
-    let(:bike) { Bike.new(stolen: true) }
+    let(:bike) { Bike.new(status: "status_stolen") }
     context "new stolen bike" do
       let(:user) { FactoryBot.build(:user) }
       it "says new stolen on new stolen" do

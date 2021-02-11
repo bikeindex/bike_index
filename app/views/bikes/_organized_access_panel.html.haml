@@ -27,7 +27,8 @@
                 = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
-        - display_unstolen_notification_form = !@bike.stolen? && passive_organization.enabled?("unstolen_notifications")
+        -# Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
+        - display_unstolen_notification_form = @bike.status_with_owner? && passive_organization.enabled?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
@@ -308,7 +309,7 @@
 
     - resolved_notifications = parking_notifications.resolved.where.not(id: current_impound_notification&.id)
     %p{ style: "margin-top: -12px;" }
-      = pluralize number_with_delimiter(parking_notifications.current.count), "current notifications"
+      = pluralize number_with_delimiter(parking_notifications.current.count), "current notification"
       - if parking_notifications.resolved.count > 0
         \-
         %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }

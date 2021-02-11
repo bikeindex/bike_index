@@ -38,6 +38,23 @@ $white: #ffffff;
 $primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;
 
+// Duplicated in _packs_colors.scss
+$stolen-color: $red;
 .stolen-color {
-  color: $red;
+  color: $stolen-color;
+}
+
+$found-color: $green;
+.found-color {
+  color: $found-color;
+}
+
+$impounded-color: $stolen-color;
+.impounded-color {
+  color: $impounded-color;
+}
+
+$unregistered-color: #f0ad4e; // text-warning color
+.unregistered-color {
+  color: $unregistered-color;
 }

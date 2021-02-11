@@ -5,9 +5,9 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com") }
+  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com", created_at: Time.current - 4.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
+  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111) }
 
   describe "index" do
     it "renders" do
@@ -17,19 +17,19 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
     end
     context "multiple impound_records" do
-      let!(:impound_record2) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user, bike: bike2) }
+      let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
-      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
+      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, :with_organization, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
       let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
         [impound_record2, impound_record_retrieved, impound_record_unorganized].each do |ir|
-          ImpoundUpdateBikeWorker.new.perform(ir.id)
+          ProcessImpoundUpdatesWorker.new.perform(ir.id)
         end
         # Test that impound_record.active.bikes scopes correctly
         expect(current_organization.impound_records.active.pluck(:id)).to eq([impound_record2.id])
         expect(current_organization.impound_records.active.bikes.pluck(:id)).to eq([bike2.id])
         expect(impound_record).to be_present
-        ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
         expect(current_organization.impound_records.bikes.count).to eq 2
         get base_url
         expect(response.status).to eq(200)
@@ -56,7 +56,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   describe "show" do
     it "renders" do
       impound_record.reload
-      expect(impound_record.display_id).to eq 1111
+      expect(impound_record.display_id).to eq "1111"
       get "#{base_url}/1111"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
@@ -65,8 +65,23 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     context "id-" do
       it "renders" do
         impound_record.reload
-        expect(impound_record.display_id).to eq 1111
+        expect(impound_record.display_id).to eq "1111"
         get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_record)).to eq impound_record
+      end
+    end
+    context "with prefix" do
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111, display_id_prefix: "d8sff-") }
+      it "renders" do
+        impound_record.reload
+        expect(impound_record.display_id).to eq "d8sff-1111"
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_record)).to eq impound_record
+        get "#{base_url}/#{impound_record.display_id}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(assigns(:impound_record)).to eq impound_record
@@ -87,7 +102,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     let!(:ownership_original) { FactoryBot.create(:ownership, bike: bike) }
     before do
       expect(impound_record).to be_present
-      ImpoundUpdateBikeWorker.new.perform(impound_record.id)
+      ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
       ActionMailer::Base.deliveries = []
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline!
@@ -106,7 +121,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(impound_record_update.kind).to eq "note"
       expect(impound_record_update.notes).to eq "OK boomer"
       expect(impound_record_update.user).to eq current_user
-      expect(impound_record_update.resolved).to be_truthy
+      expect(impound_record_update.processed?).to be_truthy
     end
     context "retrieved_by_owner" do
       let(:kind) { "retrieved_by_owner" }
@@ -128,7 +143,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "retrieved_by_owner"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.status_with_owner?).to be_truthy
@@ -136,7 +151,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       end
     end
     context "removed_from_bike_index" do
-      let(:impound_record) { FactoryBot.create(:impound_record, organization: current_organization, bike: bike) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, bike: bike) }
       let(:kind) { "removed_from_bike_index" }
       it "deletes, updates user on the impound_record" do
         expect(impound_record.user).to_not eq current_user
@@ -156,9 +171,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "removed_from_bike_index"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
-
-        expect(impound_record.bike.deleted?).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
+        expect(bike.reload.deleted?).to be_truthy
       end
     end
     context "transferred_to_new_owner" do
@@ -183,7 +197,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.kind).to eq "transferred_to_new_owner"
         expect(impound_record_update.notes).to eq "OK boomer"
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.owner_email).to eq "a@b.c"
@@ -242,7 +256,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_update.location).to eq location2
         expect(impound_record_update.notes).to be_blank
         expect(impound_record_update.user).to eq current_user
-        expect(impound_record_update.resolved).to be_truthy
+        expect(impound_record_update.processed?).to be_truthy
 
         bike.reload
         expect(bike.status).to eq "status_impounded"
@@ -296,7 +310,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record_update.kind).to eq "transferred_to_new_owner"
           expect(impound_record_update.notes).to eq "OK boomer"
           expect(impound_record_update.user).to eq current_user
-          expect(impound_record_update.resolved).to be_truthy
+          expect(impound_record_update.processed?).to be_truthy
 
           bike.reload
           expect(bike.owner_email).to eq "example@school.edu"
@@ -324,7 +338,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record.current?).to be_truthy
           expect(bike.ownerships.count).to eq 1
           expect {
-            put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
+            patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
           }.to_not change(ImpoundRecordUpdate, :count)
           expect(flash[:error]).to be_present
           impound_record.reload
@@ -345,13 +359,13 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             expect(impound_claim.status).to eq "approved"
             expect(impound_record.update_kinds).to match_array(%w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note])
             expect {
-              put "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
+              patch "#{base_url}/#{impound_record.display_id}", params: {impound_record_update: update_params}
             }.to change(ImpoundRecordUpdate, :count).by 1
             expect(flash[:success]).to be_present
             impound_claim.reload
             expect(impound_claim.status).to eq "retrieved"
             expect(impound_claim.bike_claimed_id).to eq bike.id
-            expect(impound_claim.bike_submitting.stolen?).to be_falsey
+            expect(impound_claim.bike_submitting.status_stolen?).to be_falsey
             expect(impound_claim.impound_record_updates.count).to eq 2
 
             og_id = impound_record.id
@@ -371,6 +385,61 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             expect(bike.created_by_parking_notification?).to be_truthy
             expect(bike.deleted?).to be_truthy
           end
+        end
+      end
+    end
+
+    describe "update - multi_update" do
+      let(:bike2) { FactoryBot.create(:bike, created_at: Time.current - 3.weeks) }
+      let(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, bike: bike2) }
+      it "updates two records" do
+        expect(impound_record.reload.status).to eq "current"
+        expect(impound_record2.reload.status).to eq "current"
+        expect(impound_record2.update_multi_kinds).to include("retrieved_by_owner")
+        expect {
+          patch "#{base_url}/multi_update", params: {
+            ids: "#{impound_record.id}, #{impound_record2.id}",
+            impound_record_update: {kind: "retrieved_by_owner", notes: "some note here"}
+          }
+        }.to change(ImpoundRecordUpdate, :count).by 2
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to base_url
+        expect(impound_record.reload.status).to eq "retrieved_by_owner"
+        expect(impound_record2.reload.status).to eq "retrieved_by_owner"
+        expect(ImpoundRecordUpdate.count).to eq 2
+        user_note = [current_user.id, "some note here"]
+        expect(ImpoundRecordUpdate.pluck(:user_id, :notes)).to eq([user_note, user_note])
+      end
+      context "id structure in hash" do
+        it "updates two records" do
+          expect(impound_record.reload.status).to eq "current"
+          expect(impound_record2.reload.status).to eq "current"
+          expect(impound_record2.update_multi_kinds).to include("retrieved_by_owner")
+          expect {
+            patch "#{base_url}/multi_update", params: {
+              ids: {impound_record.id.to_s => impound_record.id.to_s, impound_record2.id.to_s => impound_record2.id.to_s},
+              impound_record_update: {kind: "retrieved_by_owner", notes: "some note here"}
+            }
+          }.to change(ImpoundRecordUpdate, :count).by 2
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to base_url
+          expect(impound_record.reload.status).to eq "retrieved_by_owner"
+          expect(impound_record2.reload.status).to eq "retrieved_by_owner"
+          expect(ImpoundRecordUpdate.count).to eq 2
+          user_note = [current_user.id, "some note here"]
+          expect(ImpoundRecordUpdate.pluck(:user_id, :notes)).to eq([user_note, user_note])
+        end
+      end
+      context "no records updated" do
+        it "flash error" do
+          expect {
+            patch "#{base_url}/multi_update", params: {
+              impound_record_update: {kind: "retrieved_by_owner"},
+              ids: "fasdf"
+            }
+          }.to change(ImpoundRecordUpdate, :count).by 0
+          expect(flash[:error]).to be_present
+          expect(response).to redirect_to base_url
         end
       end
     end

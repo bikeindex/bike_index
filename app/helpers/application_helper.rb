@@ -142,7 +142,7 @@ module ApplicationHelper
       html_options[:class] += " active"
       span_content = direction == "asc" ? "\u2193" : "\u2191"
     end
-    link_to(sortable_search_params.merge(sort: column, direction: direction, query: params[:query]), html_options) do
+    link_to(sortable_search_params.merge(sort: column, direction: direction), html_options) do
       concat(title.html_safe)
       concat(content_tag(:span, span_content, class: "sortable-direction"))
     end
@@ -153,9 +153,11 @@ module ApplicationHelper
   end
 
   def sortable_search_params
-    search_param_keys = params.keys.select { |k| k.to_s.start_with?(/search_/) }
-    params.permit(:direction, :sort, :user_id, :organization_id, :period, :start_time, :end_time, :time_range_column,
-      :query, :render_chart, *search_param_keys)
+    params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+      :direction, :sort, # sorting params
+      :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
+      :user_id, :organization_id, :query, # General search params
+      :serial, :stolenness, query_items: []) # Bike searching params
   end
 
   def button_to_toggle_task_completion_status(ambassador_task_assignment, current_user, current_organization)

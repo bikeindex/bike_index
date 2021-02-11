@@ -1,5 +1,6 @@
 class BulkImport < ApplicationRecord
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
+  KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3}.freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
@@ -9,18 +10,26 @@ class BulkImport < ApplicationRecord
   has_many :bikes, through: :creation_states
 
   enum progress: VALID_PROGRESSES
+  enum kind: KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
-  scope :ascend, -> { where(is_ascend: true) }
-  scope :not_ascend, -> { where(is_ascend: false) }
+  scope :not_ascend, -> { where.not(kind: "ascend") }
 
   before_save :set_calculated_attributes
 
   def self.ascend_api_token
     ENV["ASCEND_API_TOKEN"]
+  end
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
+
+  def self.kind_humanized(str)
+    str&.gsub("_", " ")
   end
 
   def file_import_errors
@@ -53,10 +62,6 @@ class BulkImport < ApplicationRecord
     import_errors["bikes"] == "none_imported"
   end
 
-  def ascend?
-    is_ascend
-  end
-
   def ascend_unprocessable?
     ascend? && organization_id.blank?
   end
@@ -84,6 +89,10 @@ class BulkImport < ApplicationRecord
 
   def creator
     organization&.auto_user || user
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def filename
@@ -118,7 +127,7 @@ class BulkImport < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.is_ascend = false unless is_ascend # Ensure no null
+    self.kind ||= calculated_kind
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
     unless creator.present?
@@ -143,5 +152,12 @@ class BulkImport < ApplicationRecord
   rescue => e
     add_file_error(e.message)
     raise e
+  end
+
+  private
+
+  def calculated_kind
+    return "unorganized" if organization_id.blank?
+    "organization_import" # Default
   end
 end

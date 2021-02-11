@@ -60,6 +60,22 @@ class BulkImportWorker < ApplicationWorker
       [k, v.blank? ? nil : v.strip]
     }.to_h
 
+    if @bulk_import.impounded?
+      row[:owner_email] ||= @bulk_import.user&.email # email isn't required for bulk imports
+      impound_attrs = {
+        # impounded_at_with_timezone parses with timeparser, and doesn't need timezone
+        impounded_at_with_timezone: row[:impounded_at],
+        street: row[:impounded_street],
+        city: row[:impounded_city],
+        state: row[:impounded_state],
+        zipcode: row[:impounded_zipcode],
+        country: row[:impounded_country],
+        impounded_description: row[:impounded_description],
+        display_id: row[:impounded_id],
+        organization_id: @bulk_import.organization_id
+      }
+    end
+
     {
       bulk_import_id: @bulk_import.id,
       bike: {
@@ -81,6 +97,7 @@ class BulkImportWorker < ApplicationWorker
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
+      impound_record: impound_attrs || {},
       # Photo need to be an array - only include if photo has a value
       photos: row[:photo].present? ? [row[:photo]] : nil
     }
@@ -96,7 +113,7 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s/, "_").downcase.to_sym }
+    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s|-/, "_").downcase.to_sym }
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 
@@ -114,7 +131,11 @@ class BulkImportWorker < ApplicationWorker
   private
 
   def validate_headers(attrs)
-    required_headers = %i[manufacturer owner_email serial_number]
+    required_headers = if @bulk_import.impounded?
+      %i[manufacturer serial_number impounded_at]
+    else
+      %i[manufacturer owner_email serial_number]
+    end
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers

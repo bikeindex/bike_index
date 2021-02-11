@@ -1,5 +1,5 @@
 -# TODO: Add translations
-- if @bike.impounded?
+- if @bike.impounded? && @bike.current_impound_record.organized?
   .alert.alert-danger.mt-4.mb-4
     %h3.uncap
       Your
@@ -7,7 +7,7 @@
       is currently impounded!
     Impounded
     %em.convertTime
-      = l @bike.current_impound_record.created_at, format: :convert_time
+      = l @bike.current_impound_record.impounded_at, format: :convert_time
     %em.small.convertTimezone
     by
     %strong
@@ -15,6 +15,7 @@
     - if @bike.current_impound_record.parking_notification.present?
       from
       = @bike.current_impound_record.parking_notification.address
+
 - if @bike.parking_notifications.active.any?
   - parking_notifications = @bike.parking_notifications.active.reorder(created_at: :desc)
   .alert.alert-warning.mt-4.mb-4
@@ -63,9 +64,12 @@
     - if current_parking_notification.present?
       %h3.uncap.text-center.mt-4.mb-2
         %strong
-          Have you retrieved this #{@bike.type}?
+          - if @bike.unregistered_parking_notification?
+            Was this bike retrieved?
+          - else
+            Have you retrieved this #{@bike.type}?
       %p.text-center
-        %em
-          Let #{current_parking_notification.organization&.short_name} know
+        - unless @bike.unregistered_parking_notification?
+          %em Let #{current_parking_notification.organization&.short_name} know
         = link_to "mark retrieved", bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), class: "btn btn-sm btn-success", style: "color: white;"
 

@@ -6,6 +6,18 @@ RSpec.describe ImpoundClaim, type: :model do
     it "is valid" do
       expect(impound_claim).to be_valid
       expect(impound_claim.bike_claimed).to be_present
+      expect(impound_claim.impound_record.organized?).to be_truthy
+      expect(impound_claim.impound_record.creator_public_display_name).to eq impound_claim.organization.name
+    end
+    context "unorganized" do
+      let(:impound_record) { FactoryBot.create(:impound_record) }
+      let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record) }
+      it "is valid" do
+        expect(impound_claim).to be_valid
+        expect(impound_claim.bike_claimed).to be_present
+        expect(impound_record.organized?).to be_falsey
+        expect(impound_record.creator_public_display_name).to eq "bike finder"
+      end
     end
     context "with_stolen_record" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -13,8 +25,8 @@ RSpec.describe ImpoundClaim, type: :model do
       it "is valid" do
         expect(impound_claim).to be_valid
         expect(impound_claim.bike_claimed).to be_present
-        expect(impound_claim.bike_submitting.user).to eq impound_claim.user
-        expect(impound_claim.stolen_record.user).to eq impound_claim.user
+        expect(impound_claim.bike_submitting.user&.id).to eq impound_claim.user.id
+        expect(impound_claim.stolen_record.user&.id).to eq impound_claim.user.id
         expect(impound_claim.impound_record.organization&.id).to eq organization.id
         expect(organization.public_impound_bikes?).to be_falsey # There can be claims on records, even if organization isn't enabled
       end

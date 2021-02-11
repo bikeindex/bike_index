@@ -48,13 +48,13 @@ RSpec.describe OwnershipCreator do
       bike = ownership.bike
       bike.update_attribute :hidden, true
       ownership_creator = OwnershipCreator.new(bike: bike)
-      expect(ownership_creator.current_is_hidden).to be_truthy
+      expect(ownership_creator.send("current_is_hidden")).to be_truthy
       expect(ownership.phone_registration?).to be_falsey
     end
     it "returns false" do
       bike = Bike.new
       ownership_creator = OwnershipCreator.new(bike: bike)
-      expect(ownership_creator.current_is_hidden).to be_falsey
+      expect(ownership_creator.send("current_is_hidden")).to be_falsey
     end
   end
 
@@ -64,7 +64,7 @@ RSpec.describe OwnershipCreator do
       bike = Bike.new
       ownership.errors.add(:problem, "BALLZ")
       creator = OwnershipCreator.new(bike: bike)
-      creator.add_errors_to_bike(ownership)
+      creator.send("add_errors_to_bike", ownership)
       expect(bike.errors.messages[:problem]).to eq(["BALLZ"])
     end
   end

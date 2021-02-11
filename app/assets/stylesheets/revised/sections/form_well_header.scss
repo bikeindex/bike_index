@@ -5,6 +5,9 @@
   h1 {
     margin-bottom: 0;
   }
+  .bike-status-html {
+    font-size: 26px;
+  }
 }
 // There is a margin issue on bike edit, fixing it by clobbering here
 @media (min-width: 768px) {

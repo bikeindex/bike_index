@@ -53,6 +53,7 @@ class Organization < ApplicationRecord
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
+  has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -196,7 +197,7 @@ class Organization < ApplicationRecord
 
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    enabled?("show_bulk_import") || ascend_pos?
+    enabled?("show_bulk_import") || ascend_pos? || enabled?("show_bulk_import_impound_bikes")
   end
 
   def show_multi_serial?
@@ -204,12 +205,11 @@ class Organization < ApplicationRecord
   end
 
   def public_impound_bikes?
-    enabled?("impound_bikes") && public_impound_bikes
+    enabled?("impound_bikes") && fetch_impound_configuration.public_view?
   end
 
-  # Stub for now. Might actually just be public_impound_bikes?
   def impound_claims?
-    enabled?("impound_features_2021")
+    enabled?("impound_bikes") && fetch_impound_configuration.impound_claims?
   end
 
   def broken_pos?
@@ -234,6 +234,10 @@ class Organization < ApplicationRecord
 
   def suspended?
     is_suspended?
+  end
+
+  def fetch_impound_configuration
+    impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?

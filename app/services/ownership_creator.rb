@@ -10,6 +10,19 @@ class OwnershipCreator
     @user_hidden = creation_params[:user_hidden]
   end
 
+  def create_ownership
+    @user_hidden = current_is_hidden
+    ownership = Ownership.new(new_ownership_params)
+
+    unless ownership.save
+      add_errors_to_bike(ownership)
+      raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
+    end
+    ownership
+  end
+
+  private
+
   def creator_id
     # If this isn't the first ownership, the creator is the current_user, which is passed in
     # On the first ownership, the creator is the creator of the bike - because organization creation
@@ -25,7 +38,8 @@ class OwnershipCreator
       current: true,
       is_phone: @bike.phone_registration?,
       send_email: @send_email,
-      user_hidden: @user_hidden
+      user_hidden: @user_hidden,
+      impound_record_id: @bike.impound_records.current.last&.id # Calculate current_impound_record
     }
   end
 
@@ -39,16 +53,5 @@ class OwnershipCreator
 
   def current_is_hidden
     @bike&.user_hidden
-  end
-
-  def create_ownership
-    @user_hidden = current_is_hidden
-    ownership = Ownership.new(new_ownership_params)
-
-    unless ownership.save
-      add_errors_to_bike(ownership)
-      raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
-    end
-    ownership
   end
 end

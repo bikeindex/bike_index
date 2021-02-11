@@ -63,6 +63,13 @@ RSpec.describe TimeParser do
         # expect(subject.parse("03-2017").to_date).to eq target_date
       end
     end
+    context "2019" do
+      let(:target_date) { Date.parse("2019-01-01") }
+      it "returns 2019-01-01" do
+        expect(subject.parse("2019").to_date).to eq target_date
+        expect(subject.parse("1999").to_date).to eq(target_date - 20.years)
+      end
+    end
     context "not a date" do
       it "errors" do
         expect {
@@ -73,25 +80,24 @@ RSpec.describe TimeParser do
   end
 
   describe "timezone_parser" do
-    let(:timezone_str) { "America/New York" }
-    let(:target_timezone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
-    it "returns correctly" do
-      expect(subject.parse_timezone("")).to eq subject::DEFAULT_TIMEZONE
-      expect(subject.parse_timezone(timezone_str).utc_offset).to eq target_timezone.utc_offset
-      # Alternative timezone name
-      expect(subject.parse_timezone("Eastern Time (US & Canada)").utc_offset).to eq target_timezone.utc_offset
-    end
+    let(:target_timezone) { ActiveSupport::TimeZone[timezone_str] }
     context "LA" do
       let(:timezone_str) { "America/Los_Angeles" }
-      let(:target_timezone) { ActiveSupport::TimeZone["America/Los_Angeles"] }
       it "returns correct timezone" do
         expect(subject.parse_timezone(timezone_str)).to eq target_timezone
         expect(subject.parse_timezone(timezone_str).utc_offset).to eq TimeParser::DEFAULT_TIMEZONE.utc_offset - 2.hours
       end
     end
+    context "Chicago" do
+      let(:timezone_str) { "America/Chicago" }
+      let(:target_timezone) { ActiveSupport::TimeZone[timezone_str] }
+      it "returns correct timezone" do
+        expect(subject.parse_timezone(timezone_str)).to eq target_timezone
+        expect(subject.parse_timezone(timezone_str).utc_offset).to eq TimeParser::DEFAULT_TIMEZONE.utc_offset
+      end
+    end
     context "eating itself" do
       let(:timezone_str) { "America/Guatemala" }
-      let(:target_timezone) { ActiveSupport::TimeZone["America/Guatemala"] }
       it "returns correct timezone" do
         expect(target_timezone.utc_offset).to eq(-21600)
         expect(subject.parse_timezone(timezone_str)).to eq target_timezone
@@ -100,6 +106,16 @@ RSpec.describe TimeParser do
         parsed_result = subject.parse_timezone(timezone_str)
         expect(subject.parse_timezone(parsed_result)).to eq target_timezone
         expect(subject.parse_timezone(parsed_result).utc_offset).to eq(-21600)
+      end
+    end
+    context "America/New York" do
+      let(:timezone_str) { "America/New York" }
+      let(:target_timezone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
+      it "returns correctly" do
+        expect(subject.parse_timezone("")).to eq subject::DEFAULT_TIMEZONE
+        expect(subject.parse_timezone(timezone_str).utc_offset).to eq target_timezone.utc_offset
+        # Alternative timezone name
+        expect(subject.parse_timezone("Eastern Time (US & Canada)").utc_offset).to eq target_timezone.utc_offset
       end
     end
   end

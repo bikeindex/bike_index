@@ -13,7 +13,7 @@ class ApproveStolenListingWorker < ApplicationWorker
     end
 
     title_string =
-      if bike.abandoned
+      if bike.status_abandoned?
         "We tweeted about the bike you found!"
       else
         "We tweeted about your stolen bike!"

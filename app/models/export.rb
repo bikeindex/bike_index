@@ -16,6 +16,8 @@ class Export < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
+
   attr_accessor :timezone # permit assignment
   attr_reader :avery_export
 

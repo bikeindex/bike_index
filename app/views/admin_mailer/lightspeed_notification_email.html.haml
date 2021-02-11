@@ -1,0 +1,10 @@
+%h2{style:"font-weight: 400;"}
+  = @organization.name
+  Uploaded an API key
+
+%p
+  = @api_key
+
+%p
+  View
+  = link_to @organization.name, admin_organization_url(@organization)

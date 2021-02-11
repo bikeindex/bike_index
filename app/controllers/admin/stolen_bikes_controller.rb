@@ -52,7 +52,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(Bike.old_attr_accessible)
+    params.require(:bike).permit(BikeCreator.old_attr_accessible)
   end
 
   def find_bike

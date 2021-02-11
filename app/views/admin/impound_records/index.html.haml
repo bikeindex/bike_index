@@ -87,8 +87,11 @@
     - @impound_records.each do |impound_record|
       %tr
         %td
-          %a.convertTime.preciseTime{ href: organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) }
+          - impound_link_url = impound_record.organization_id.present? ? organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) : "#"
+          %a.convertTime.preciseTime{href: impound_link_url}
             = l(impound_record.created_at, format: :convert_time)
+          - if impound_record.organization_id.blank?
+            %small.text-warning no organization, link broken
         %td
           %span.convertTime.preciseTime
             = l(impound_record.updated_at, format: :convert_time)

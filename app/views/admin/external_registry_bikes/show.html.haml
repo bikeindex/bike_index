@@ -12,7 +12,6 @@
           No Image
     .col-lg-5.col-9.mt-auto.mb-2
       %p.strong.mb-0
-        %span.text-danger= @bike.status.titleize
         = @bike.title_string
       %table.table-list.mb-0
         %tbody
@@ -43,6 +42,10 @@
 
     .col-lg-5.col-9.mt-auto.mb-2
       %table.table-list
+        %tr
+          %td Status
+          %td
+            = BikeDecorator.new(@bike).status_html
         %tr
           %td Date Stolen
           %td.convertTime= l @bike.date_stolen, format: :convert_time

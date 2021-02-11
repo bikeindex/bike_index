@@ -40,6 +40,10 @@ class BikeV2Serializer < ApplicationSerializer
     object.title_string
   end
 
+  def stolen
+    object.status_stolen?
+  end
+
   def date_stolen
     object.current_stolen_record&.date_stolen&.to_i
   end

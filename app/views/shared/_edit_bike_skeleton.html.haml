@@ -2,16 +2,12 @@
   -# Show alerts if bike is impounded or has current notifications
   = render partial: "owner_bike_status_alerts"
   .edit-bike-header
-    %h1
-      - if @bike.stolen && @bike.fetch_current_stolen_record.present?
-        %span.text-danger
-          = @bike.abandoned ? t(".abandoned") : t(".stolen")
-      - else
+    %h1.uncap
+      - if @bike.status_with_owner?
         = t(".edit")
-      = @bike.year
-      = @bike.mnfg_name
-      = @bike.frame_model
-      = @bike.type unless @bike.type == 'bike'
+      - else
+        = BikeDecorator.new(@bike).status_html
+      = BikeDecorator.new(@bike).title_html
       - if @bike.deleted?
         %em.text-danger.uncap
           This #{@bike.type} was deleted

@@ -921,13 +921,19 @@ en:
         two_u_locks: Two U-locks
         u_lock: U-lock
         u_lock_and_cable: U-lock and cable
+    status_humanized:
+      bike:
+        abandoned: abandoned
+        found: found
+        impounded: impounded
+        stolen: stolen
+        unregistered: unregistered
+        with_owner: with owner
   bikes:
     bike:
-      abandoned: Abandoned
       location: Location
       primary_colors: Primary colors
       serial: Serial
-      stolen: Stolen
     bike_fields:
       revised_colors:
         add_a_color: Add a color
@@ -984,7 +990,8 @@ en:
         you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
-      thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
+      thank_you_for_registering_this_found_bike_type: Thank you for registering this
+        found %{bike_type}!
       this_bike_type_is_hidden: This %{bike_type} is hidden.
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
         Index.
@@ -1044,6 +1051,7 @@ en:
       existing_stickers: Existing stickers
       frame_size: Frame size
       general_description: General description
+      made_without_serial: Made without serial
       main_frame_material: Main frame material
       manufacturer: Manufacturer
       model_year: Model year
@@ -1165,7 +1173,6 @@ en:
     edit_report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     edit_theft_details:
-      abandoned: Abandoned
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
       click_to_see_promoted_alert_blog_post_html: >-
@@ -1179,7 +1186,6 @@ en:
       eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
         for its serial number
       here: here
-      how_did_you_recover: How did you recovered the %{bike_type}
       if_this_bike_type_was_added: >-
         If this %{bike_type} was added to the Index by a bike shop, that counts as
         proof of ownership
@@ -1190,12 +1196,11 @@ en:
       promoted_theft_alerts: Promoted Theft Alerts
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
-      stolen: Stolen
       try_one_now: Try one now!
       we_can_create_fb_ads_for_you: >-
         Did you know we can create targeted Facebook ads to spread the word about
         your stolen bike for you?
-      when_was_it_stolen: When was it %{stolen_type}
+      when_was_it_stolen_at: When was it stolen
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
@@ -1219,6 +1224,7 @@ en:
       are_you_certain: Are you certain?
       city: City
       enter_bike_type_details: Enter %{bike_type} details
+      enter_found_bike_type_details: Enter Found %{bike_type} details
       enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
       highly_recommended: highly recommended
       how_to_find_serial: how to find your serial number
@@ -1381,22 +1387,19 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      abandoned: Abandoned
-      at: at
       bike_photo: "%{bike_type} photo"
-      by: by
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
-      created_to_record_parking_notification: "%{bike_type} created by %{organization}
-        to record a Parking Notification"
+      created_to_record_parking_notification: created by %{organization} to record
+        a Parking Notification
       cycle_type: Cycle type
-      date_stolen_type: Date %{stolen_type}
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
+      found_at: Found at
       frame_material: Frame Material
       frame_size: Frame size
       from: from
@@ -1406,6 +1409,7 @@ en:
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
       impounded_at: Impounded
+      in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
@@ -1420,7 +1424,7 @@ en:
       name: Name
       no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
         admins) can see it
-      not_registered: Not actually registered!
+      not_registered_by_user: Not registered by a user
       or_call: Or call
       other: Other
       other_serial: Other serial/registration/sticker
@@ -1435,10 +1439,9 @@ en:
       share_it: Share it!
       spread_the_word: Spread the word!
       stock_photo: Stock photo of a %{year} %{model}
-      stolen: Stolen
+      stolen_at: Stolen at
+      stolen_details: Theft Details
       switch_to_new_bike_id: Switch to a new bike ID
-      theft_details: "%{bike_abandoned} Details"
-      this_was_impounded: This %{bike_type} was impounded
       update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
@@ -1520,11 +1523,11 @@ en:
         alert: Activate Promoted Alert
         bike_details: Bike Details
         drivetrain: Wheels and Drivetrain
+        found_details: Information about finding
         groups: Groups and Organizations
         ownership: Transfer Ownership
         photos: Photos
         publicize: Share on Social Media
-        recovery_details: Recovery details
         remove: Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
@@ -1533,7 +1536,8 @@ en:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
-        bike_impounded: >-
+        bike_impounded: That %{bike_type} was impounded.
+        bike_impounded_by_organization: >-
           %{org_name} has impounded that %{bike_type}. Please speak with them to access
           this %{bike_type}.
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
@@ -1696,15 +1700,19 @@ en:
           org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
+      manage_impoundings:
+        assign_organization:
+          can_not_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        update:
+          could_not_update: We're sorry, we had trouble updating %{org_name}.
+          updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
           contact_support_to_delete: Please contact support@bikeindex.org to delete
             %{org_name}.
           deleted_org: Deleted %{org_name}.
-        impounding:
-          can_not_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
@@ -2010,14 +2018,9 @@ en:
         improve_your_chances_of_recovery_by_doing: Improve your chances of recovery
           by doing all these things!
         stolen_bike_alerter: 'a Bike Index stolen bike alerter:'
-        this_email_is_about_the_found_bike: >-
-          This email is about the recovered/found %{bike_type} registered on Bike
-          Index on %{date}
         this_email_is_about_the_stolen_bike: This email is about the stolen %{bike_type}
           registered on Bike Index on %{date}
         we_sent_out_this_tweet_from: We sent out this tweet from
-        were_spreading_the_word_about_your_found: We're spreading the word about your
-          recovered/found %{bike_type}!
         were_spreading_the_word_about_your_stolen: We're spreading the word about
           your stolen %{bike_type}!
       text:
@@ -2028,8 +2031,6 @@ en:
         serial: 'Serial:'
         we_sent_out_this_tweet_from: 'We sent out this tweet from %{twitter_handle},
           a Bike Index stolen bike alerter:'
-        were_spreading_the_word_about_your_found: We are spreading the word about
-          your recovered/found %{bike_type}!
         were_spreading_the_word_about_your_stolen: We are spreading the word about
           your stolen %{bike_type}!
     stolen_notification_email:
@@ -2037,6 +2038,10 @@ en:
         if_you_believe_this_email_is_illegitimate: If you believe this email is illegitimate,
           please contact support@bikeindex.org
         link: 'link:'
+        no_one_should_be_extorted: >-
+          If you think this person is extorting you or abusing the system, email us
+          and let us know - you should never be forced to 'reward' or 'repay' someone
+          for your stolen bike
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
@@ -3945,13 +3950,12 @@ en:
       nl: EUR
   my_accounts:
     show:
-      abandoned: ABANDONED
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
       bikes: bikes
       combination: Combination
-      date_abandoned: Date abandoned
+      date_found: Date found
       date_stolen: Date stolen
       edit: Edit
       edit_bike: Edit Bike
@@ -3969,7 +3973,6 @@ en:
       sorry_your_bike_was_stolen: >-
         We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
         able to search for it, you'll get it back!
-      stolen: STOLEN
       tell_us_more_about_yourself: Tell us more about yourself.
       thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
         to the Index.
@@ -4346,6 +4349,7 @@ en:
         exclude_empty_imports: Exclude Empty imports
         file: File!
         include_empty_imports: Include Empty imports
+        kind: Kind
         line: Line
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
@@ -4362,11 +4366,11 @@ en:
           just 1 or 2 rows, and replace the email with your own email - so if the
           bikes don't import correctly, you can make adjustments and delete the bikes,
           without having to delete a large number of bikes.
-        example_csv_link: example CSV with all optional columns here
+        example_csv_with_all_options: example CSV with all optional columns
         for_best_results: For best results, put quotes around all the cells.
         if_only_some_of_your_bikes_html: >-
           If only some of your bikes have values in optional columns, leave the cell
-          blank for the ones that don't have it (rather than putting <em>unknown</em>
+          blank for the ones that don't have it (e.g. rather than putting <em>unknown</em>
           or <em>n/a</em>).
         if_you_are_including_photo_url_html: >-
           If you are including "photo_url" make sure the url is of the image itself.
@@ -4374,7 +4378,7 @@ en:
           work</em>. Examples:
         incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>:
           image on webpage'
-        look_at_example_csv_html: Look at %{link_to_example_csv}.
+        look_at_example_csv_and_html: Look at %{link_to_example_csv}, and also our
         must_have_required_headers_html: Your CSV <em>must</em> have our required
           headers.
         notes_on_successfully_importing: 'Notes on successfully importing:'
@@ -4382,15 +4386,14 @@ en:
         our_example_csv_here: our example CSV here
         register_bikes_from_a_csv: Register bikes from a CSV
         required_headers_are_html: >-
-          The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code>
-          <code>email</code> and <code>serial</code>.
+          The required headers are <code>manufacturer</code>, <code>model</code>,
+          <code>color</code>, <code>email</code> and <code>serial</code>.
         spokecard_image_url: >-
           https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
         spokecard_page_url: >-
           https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
         this_will_not_work: this will not work!
         upload_and_begin_import: Upload and begin import
-        view_an_example_csv_html: View an %{link_to_example_csv}.
         we_support_a_few_additional: >-
           We support a few additional, optional columns. You do not have to include
           them unless you want to.
@@ -4463,10 +4466,11 @@ en:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email
-    manages:
-      impounding:
+    manage_impoundings:
+      edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
         save: Save
+    manages:
       location_fields:
         address: Address
         choose_country: Choose country
@@ -4916,13 +4920,11 @@ en:
     donation_modal:
       donation_header: Help support our efforts!
     edit_bike_skeleton:
-      abandoned: abandoned
       edit: Edit
       owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
         been claimed yet
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
         has permission to edit
-      stolen: stolen
       view_bike: View %{bike_type}
     email_bike_box:
       color: Color
@@ -5410,7 +5412,6 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
-      abandoned: Abandoned
       bikes: Bikes
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
@@ -5436,7 +5437,7 @@ en:
     choose_registration:
       add_a_bike_through: Add a bike through
       add_a_stolen_bike: Add a stolen bike
-      add_a_stolenfound_bike: Add a stolen/found bike you've recovered
+      add_abandoned_bike_you_found: Add an abandoned bike you found
       add_your_own_bike: Add your own bike
       register_bike: Register bike
     goodbye:

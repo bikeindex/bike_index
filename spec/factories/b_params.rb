@@ -7,7 +7,7 @@ FactoryBot.define do
     params { {bike: {owner_email: owner_email}} }
 
     factory :b_param_stolen do
-      params { {bike: {owner_email: owner_email, stolen: true}} }
+      params { {bike: {owner_email: owner_email, date_stolen: Time.current.to_i}} }
     end
 
     factory :organized do

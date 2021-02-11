@@ -8,18 +8,6 @@ RSpec.describe Bike, type: :model do
     it "default scopes to created_at desc" do
       expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
     end
-    it "scopes to only stolen bikes" do
-      expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
-    end
-    it "non_stolen scopes to only non_stolen bikes" do
-      expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
-    end
-    it "non_abandoned scopes to only non_abandoned bikes" do
-      expect(Bike.non_abandoned.to_sql).to eq(Bike.where(abandoned: false).to_sql)
-    end
-    it "abandoned scopes to only abandoned bikes" do
-      expect(Bike.abandoned.to_sql).to eq(Bike.where(abandoned: true).to_sql)
-    end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
@@ -98,6 +86,30 @@ RSpec.describe Bike, type: :model do
         expect(stolen_record.phone).to eq "1112223333"
         expect(stolen_record.date_stolen).to be > Time.current - 1.second
         expect(stolen_record.creation_organization_id).to be_blank
+      end
+    end
+  end
+
+  describe "build_new_impound_record" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:us_id) { Country.united_states.id }
+    it "builds a new record" do
+      impound_record = bike.build_new_impound_record
+      expect(impound_record.country_id).to eq us_id
+      expect(impound_record.impounded_at).to be > Time.current - 1.second
+      expect(impound_record.organization_id).to be_blank
+    end
+    context "organized record" do
+      let(:bike) { FactoryBot.create(:bike_organized) }
+      let(:organization) { bike.creation_organization }
+      let(:country) { FactoryBot.create(:country) }
+      it "builds new record without organization" do
+        bike.update(created_at: Time.current - 2.days)
+        # Accepts properties
+        impound_record = bike.build_new_impound_record(country_id: country.id)
+        expect(impound_record.country_id).to eq country.id
+        expect(impound_record.impounded_at).to be > Time.current - 1.second
+        expect(impound_record.organization_id).to be_blank
       end
     end
   end
@@ -181,21 +193,22 @@ RSpec.describe Bike, type: :model do
   end
 
   describe ".possibly_found_with_match" do
+    let(:bike1) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
+    let(:bike1b) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
+    let(:bike2) { FactoryBot.create(:stolen_bike, serial_number: "he110") }
+    let(:bike2b) { FactoryBot.create(:abandoned_bike, serial_number: "HEllO") }
+    let(:bike3) { FactoryBot.create(:stolen_bike, serial_number: "1100ll") }
+    let(:bike3b) { FactoryBot.create(:impounded_bike, serial_number: "IIOO11") }
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
-      pair0 = [
-        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
-        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o")
-      ]
+      pair0 = [bike1, bike1b]
+      expect(bike1.reload.status).to eq "status_impounded"
+      expect(bike1b.reload.status).to eq "status_impounded"
 
-      pair1 = [
-        FactoryBot.create(:bike, stolen: true, serial_number: "he110"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO")
-      ]
+      pair1 = [bike2, bike2b]
+      expect(bike2.reload.status).to eq "status_stolen"
+      expect(bike2b.reload.status).to eq "status_impounded"
 
-      pair2 = [
-        FactoryBot.create(:bike, stolen: true, serial_number: "1100ll"),
-        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11")
-      ]
+      pair2 = [bike3, bike3b]
 
       results = Bike.possibly_found_with_match
       expect(results.length).to eq(2)
@@ -350,7 +363,7 @@ RSpec.describe Bike, type: :model do
 
     context "stolen" do
       let(:stolen_record) { StolenRecord.new(phone: "7883747392", phone_for_users: false, phone_for_shops: false, phone_for_police: false) }
-      let(:bike) { Bike.new(stolen: true, current_stolen_record: stolen_record) }
+      let(:bike) { Bike.new(current_stolen_record: stolen_record) }
 
       it "returns true for superusers, even with everything false" do
         user.superuser = true
@@ -544,6 +557,22 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "status_humanized_translated" do
+    let(:bike) { Bike.new(status: status) }
+    let(:status) { "unregistered_parking_notification" }
+    it "responds with status" do
+      expect(bike.status_humanized).to eq "unregistered"
+      expect(bike.status_humanized_translated).to eq "unregistered"
+    end
+    context "status_with_owner" do
+      let(:status) { "status_with_owner" }
+      it "responds with status" do
+        expect(bike.status_humanized).to eq "with owner"
+        expect(bike.status_humanized_translated).to eq "with owner"
+      end
+    end
+  end
+
   describe "authorize_and_claim_for_user, authorized?" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
@@ -703,9 +732,27 @@ RSpec.describe Bike, type: :model do
         end
       end
     end
-    context "impound record" do
+    context "impound_record" do
+      let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+      let(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user) }
+      it "returns truthy if impound_record is current unless user is organization_member" do
+        expect(impound_record.bike_id).to eq bike.id
+        expect(bike.reload.claimed?).to be_truthy
+        expect(bike.impound_records.pluck(:id)).to eq([impound_record.id])
+        expect(bike.current_impound_record_id).to eq impound_record.id
+        expect(impound_record.reload.active?).to be_truthy
+        expect(impound_record.user_id).to eq user.id
+        expect(ownership.reload.claimed?).to be_truthy
+        expect(ownership.owner&.id).to eq user.id
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "found"
+        expect(bike.status_humanized_translated).to eq "found"
+        expect(bike.authorized?(user)).to be_truthy
+      end
+    end
+    context "impound_record with organization" do
       let(:ownership) { FactoryBot.create(:ownership, user: user) }
-      let(:impound_record) { FactoryBot.build(:impound_record, bike: bike) }
+      let(:impound_record) { FactoryBot.build(:impound_record_with_organization, bike: bike) }
       let(:organization) { impound_record.organization }
       let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns falsey if impound record is current unless user is organization_member" do
@@ -723,6 +770,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorized?(organization_member)).to be_truthy
+          expect(bike.current_impound_record_id).to eq impound_record.id
           impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
         end
         impound_record.reload
@@ -805,7 +853,7 @@ RSpec.describe Bike, type: :model do
       context "registered as stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
         it "is truthy" do
-          expect(bike.stolen?).to be_truthy
+          expect(bike.status_stolen?).to be_truthy
           expect(bike.contact_owner_user?).to be_truthy
           expect(bike.contact_owner_email).to eq owner_email
         end
@@ -1031,7 +1079,16 @@ RSpec.describe Bike, type: :model do
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
-        bike = Bike.new(serial_number: "something", abandoned: true)
+        bike = Bike.new(serial_number: "something", status: "status_abandoned")
+        expect(bike.serial_hidden?).to be_truthy
+        expect(bike.serial_display).to eq "Hidden"
+      end
+    end
+    context "impounded" do
+      it "only returns the serial if we should show people the serial" do
+        # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
+        bike = Bike.new(serial_number: "something", status: "status_impounded")
+        expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
       end
     end
@@ -1117,8 +1174,9 @@ RSpec.describe Bike, type: :model do
           expect(bike.owner_name).to eq "some name"
           expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
-          FactoryBot.create(:impound_record, bike: bike)
-          bike.reload
+          FactoryBot.create(:impound_record_with_organization, bike: bike, organization: organization)
+          bike.update(updated_at: Time.current) # Bump current_impound_record
+          expect(bike.reload.current_impound_record_id).to be_present
           expect(bike.avery_exportable?).to be_falsey
         end
       end
@@ -1455,7 +1513,6 @@ RSpec.describe Bike, type: :model do
       bike.update_attributes(year: 1999, frame_material: "steel",
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
-                             stolen: true,
                              handlebar_type: "bmx",
                              propulsion_type: "sail",
                              cycle_type: "unicycle",
@@ -1502,7 +1559,7 @@ RSpec.describe Bike, type: :model do
     end
 
     it "is the current stolen record date stolen * 1000" do
-      allow(bike).to receive(:stolen).and_return(true)
+      allow(bike).to receive(:status).and_return("status_stolen")
       stolen_record = StolenRecord.new
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
@@ -1517,10 +1574,18 @@ RSpec.describe Bike, type: :model do
       expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
-    context "stolen record date" do
+    context "stolen_record date" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
-        expect(bike.listing_order).to be_within(1).of bike.current_stolen_record.date_stolen.to_i
+        expect(bike.reload.listing_order).to be_within(1).of bike.current_stolen_record.date_stolen.to_i
+      end
+    end
+
+    context "impound_record date" do
+      let(:bike) { FactoryBot.create(:impounded_bike) }
+      it "does not get out of integer errors" do
+        expect(bike.reload.current_impound_record.impounded_at.to_i).to be_present
+        expect(bike.listing_order).to be_within(1).of bike.current_impound_record.impounded_at.to_i
       end
     end
   end

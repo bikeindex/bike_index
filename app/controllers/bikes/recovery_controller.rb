@@ -42,7 +42,7 @@ module Bikes
       @stolen_record = StolenRecord.find_matching_token(bike_id: @bike&.id,
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
-        return true if @bike.stolen
+        return true if @bike.status_stolen?
         flash[:info] = translation(:already_recovered)
       else
         flash[:error] = translation(:incorrect_token)

@@ -216,7 +216,6 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.creation_state.origin).to eq "api_v2"
       expect(bike.creation_state.organization).to eq organization
       expect(bike.creation_state.creator).to eq bike.creator
-      expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
@@ -347,7 +346,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.code).to eq("200")
       expect(bike.reload.year).to eq(params[:year])
       expect(bike.serial_number).to eq(serial)
-      expect(bike.stolen).to be_truthy
+      expect(bike.status).to eq "status_stolen"
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq("999999")
     end
@@ -468,11 +467,10 @@ RSpec.describe "Bikes API V2", type: :request do
   end
 
   describe "send_stolen_notification" do
-    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creator: user) }
     let(:params) { {message: "Something I'm sending you"} }
     let(:url) { "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{token.token}" }
     let!(:token) { create_doorkeeper_token(scopes: "read_user") }
-    before { bike.update_attribute :stolen, true }
 
     it "fails to send a stolen notification without read_user" do
       token.update_attribute :scopes, "public"
@@ -483,11 +481,14 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.body).to_not match("is not stolen")
     end
 
-    it "fails if the bike isn't stolen" do
-      bike.update_attribute :stolen, false
-      post url, params: params.to_json, headers: json_headers
-      expect(response.code).to eq("400")
-      expect(response.body.match("is not stolen")).to be_present
+    context "non-stolen bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
+      it "fails if the bike isn't stolen" do
+        expect(bike.reload.status).to eq "status_with_owner"
+        post url, params: params.to_json, headers: json_headers
+        expect(response.code).to eq("400")
+        expect(response.body.match("is not stolen")).to be_present
+      end
     end
 
     it "fails if the bike isn't owned by the access token user" do
@@ -498,6 +499,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "sends a notification" do
+      expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)

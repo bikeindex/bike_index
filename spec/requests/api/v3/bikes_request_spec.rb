@@ -533,9 +533,12 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
+      expect(bike.bike_organizations.count).to eq 1
+      bike_organization = bike.bike_organizations.first
+      expect(bike_organization.organization_id).to eq organization.id
+      expect(bike_organization.can_edit_claimed).to be_truthy
       expect(bike.creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
       expect(bike.creation_state.organization).to eq organization
-      expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
@@ -558,7 +561,7 @@ RSpec.describe "Bikes API V3", type: :request do
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to be_blank
       expect(bike.creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to be_nil
       expect(bike.current_stolen_record.phone).to be_nil
@@ -735,7 +738,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.year).to eq(params[:year])
       expect(bike.primary_frame_color&.name).to eq("Orange")
       expect(bike.serial_number).to eq(serial)
-      expect(bike.stolen).to be_truthy
+      expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq("999999")
       expect(bike.current_stolen_record.show_address).to be_truthy
@@ -873,6 +876,57 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.external_image_urls).to eq([]) # Because we haven't created another bparam - this could change though
         expect(bike.public_images.count).to eq 1
       end
+      context "updating email address to a new owner without an existing account" do
+        before do
+          bike.reload # Ensure it's established
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline!
+        end
+        after { Sidekiq::Testing.fake! }
+        let(:og_creator) { ownership.creator }
+        let(:new_email) { "newuser@example.com" }
+        let(:bike_organization) { bike.bike_organizations.first }
+        it "creates a new ownership, emails owner, permits organization editing until has been claimed" do
+          expect(og_creator.reload.authorized?(organization)).to be_truthy
+          expect(user.reload.authorized?(organization)).to be_truthy
+          bike.reload
+          expect(bike.bike_organizations.count).to eq 1
+          expect(bike.public_images.count).to eq 0
+          expect(bike.owner).to_not eq(user)
+          expect(bike.authorized_by_organization?(u: user)).to be_truthy
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(og_creator))
+          expect(bike.claimed?).to be_falsey
+          expect(bike.current_ownership.claimed?).to be_falsey
+          expect(bike_organization.can_edit_claimed).to be_truthy
+          expect {
+            put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json, headers: json_headers
+          }.to change(Ownership, :count).by(1)
+          expect(response.code).to eq("200")
+          expect(response.headers["Content-Type"].match("json")).to be_present
+          bike.reload
+          ownership.reload
+          expect(ownership.current?).to be_falsey
+          expect(bike_organization.reload.can_edit_claimed).to be_truthy # Because the ownership hasn't been claimed yet
+          expect(bike.owner_email).to eq new_email
+          expect(bike.user).to be_blank
+          expect(bike.claimed?).to be_falsey
+          expect(bike.current_ownership.id).to_not eq ownership.id
+          expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(og_creator)).to be_truthy
+          expect(bike.authorized_by_organization?(u: og_creator)).to be_truthy
+          current_ownership = bike.current_ownership
+          expect(current_ownership.creator_id).to eq user.id
+          expect(current_ownership.owner_email).to eq new_email
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          mail = ActionMailer::Base.deliveries.last
+          expect(mail.subject).to eq("Confirm your #{organization.name} Bike Index registration")
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.from).to eq(["contact@bikeindex.org"])
+          expect(mail.to).to eq([new_email])
+        end
+      end
     end
 
     context "updating email address to a new owner with an existing account" do
@@ -901,7 +955,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(ownership.claimed?).to be_truthy
         expect(ownership.current?).to be_falsey
         expect(bike.owner_email).to eq new_user.email
-        expect(bike.user).to eq new_user # Because the new owner hasn't claimed the ownership yet
+        expect(bike.user).to eq new_user
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.id).to_not eq ownership.id
         current_ownership = bike.current_ownership
@@ -979,11 +1033,10 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "send_stolen_notification" do
-    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creator: user) }
     let(:params) { {message: "Something I'm sending you"} }
     let(:url) { "/api/v3/bikes/#{bike.id}/send_stolen_notification?access_token=#{token.token}" }
     let!(:token) { create_doorkeeper_token(scopes: "read_user") }
-    before { bike.update_attribute :stolen, true }
 
     it "fails to send a stolen notification without read_user" do
       token.update_attribute :scopes, "public"
@@ -995,7 +1048,8 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "fails if the bike isn't stolen" do
-      bike.update_attribute :stolen, false
+      bike.current_stolen_record.add_recovery_information
+      expect(bike.reload.status).to eq "status_with_owner"
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("400")
       expect(response.body.match("is not stolen")).to be_present
@@ -1009,6 +1063,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "sends a notification" do
+      expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)

@@ -132,7 +132,7 @@ RSpec.describe BikeSearcher do
   describe "matching_stolenness" do
     before :each do
       @non_stolen = FactoryBot.create(:bike)
-      @stolen = FactoryBot.create(:bike, stolen: true)
+      @stolen = FactoryBot.create(:stolen_bike)
     end
     it "selects only stolen bikes if non-stolen isn't selected" do
       search = BikeSearcher.new(stolen: "on")

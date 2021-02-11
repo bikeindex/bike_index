@@ -30,7 +30,7 @@ class EmailDonationWorker < ApplicationWorker
       return "donation_theft_alert"
     end
 
-    stolen_records = user.bikes.stolen.map(&:current_stolen_record)
+    stolen_records = user.bikes.stolen.map(&:current_stolen_record).reject(&:blank?)
     if stolen_records.any? { |s| s.date_stolen > relevant_period.first }
       "donation_stolen"
     elsif user.payments.donation.where("id < ?", payment.id).any?
