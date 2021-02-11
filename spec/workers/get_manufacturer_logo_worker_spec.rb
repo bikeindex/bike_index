@@ -20,11 +20,13 @@ RSpec.describe GetManufacturerLogoWorker, type: :job do
   end
 
   it "Doesn't break if no logo present" do
-    manufacturer = FactoryBot.create(:manufacturer, website: "bbbbbbbbbbbbbbsafasds.net")
-    described_class.new.perform(manufacturer.id)
-    manufacturer.reload
-    expect(manufacturer.logo).to_not be_present
-    expect(manufacturer.logo_source).to be_nil
+    VCR.use_cassette("get_manufacturer_logo_worker-nologo", re_record_interval: 1.month) do
+      manufacturer = FactoryBot.create(:manufacturer, website: "bbbbbbbbbbbbbbsafasds.net")
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to_not be_present
+      expect(manufacturer.logo_source).to be_nil
+    end
   end
 
   it "returns true if no website present" do

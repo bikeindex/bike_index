@@ -288,10 +288,12 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         ]
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          expect {
-            post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
-          }.to change(Ownership, :count).by(1)
+        VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path], re_record_interval: 1.month) do
+          Sidekiq::Testing.inline! do
+            expect {
+              post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
+            }.to change(Ownership, :count).by(1)
+          end
         end
         # expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
@@ -344,7 +346,9 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           "http://i.imgur.com/lybYl1l.jpg",
           "http://bikeindex.org/not_actually_a_thing_404_and_shit"
         ]
-        post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
+        VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path], re_record_interval: 1.month) do
+          post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
+        end
         bike = Bike.unscoped.where(serial_number: "69 photo-test").first
         expect(bike.example).to be_falsey
         expect(bike.public_images.count).to eq(1)
