@@ -71,7 +71,7 @@
                 %small
                   = impound_record.location&.name
             %td
-              = impound_record.address(skip_default_country: true)
+              = impound_record.address
 
   .paginate-container.paginate-container-bottom
     = paginate @impound_records

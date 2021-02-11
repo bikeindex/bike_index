@@ -106,12 +106,11 @@ class ImpoundRecord < ApplicationRecord
   end
 
   # force_show_address, just like parking_notification
-  def address(skip_default_country: false, force_show_address: false)
-    country_args = skip_default_country ? [:skip_default] : nil
+  def address(force_show_address: false)
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: country_args
+      country: %i[skip_default optional]
     ).presence
   end
 
