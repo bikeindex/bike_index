@@ -532,7 +532,6 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(json_result["bike"]["id"])
-      pp bike.b_params.first
       expect(bike.creation_organization).to eq(organization)
       expect(bike.bike_organizations.count).to eq 1
       bike_organization = bike.bike_organizations.first
