@@ -54,13 +54,25 @@ RSpec.describe SessionsController, type: :controller do
           get :new, params: {return_to: "/bikes/12?contact_owner=true", partner: "bikehub"}
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_template("layouts/application_bikehub")
+          expect(session[:partner]).to eq "bikehub"
+          expect(session[:company]).to be_blank
+        end
+        context "with company" do
+          it "sets and renders" do
+            get :new, params: {return_to: "/bikes/12?contact_owner=true", partner: "bikehub", company: "Metro BikeHub"}
+            expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+            expect(response).to render_template("layouts/application_bikehub")
+            expect(session[:partner]).to eq "bikehub"
+            expect(session[:company]).to eq "Metro BikeHub"
+          end
         end
         context "partner in session" do
           it "actually sets it, renders bikehub layout" do
             session[:partner] = "bikehub"
             get :new, params: {return_to: "/bikes/12?contact_owner=true"}
-            # commented in PR#1435 expect(session[:partner]).to be_nil
             expect(response).to render_template("layouts/application_bikehub")
+            expect(session[:partner]).to eq "bikehub"
+            expect(session[:company]).to eq "Metro BikeHub"
           end
         end
       end
@@ -156,6 +168,7 @@ RSpec.describe SessionsController, type: :controller do
     it "logs out the current user" do
       session[:return_to] = "/bikes/12?contact_owner=true"
       session[:partner] = "bikehub"
+      session[:company] = "Some BikeHub"
       session[:passive_organization_id] = 12
       session[:whatever] = "XXXXXX"
       get :destroy
@@ -165,6 +178,7 @@ RSpec.describe SessionsController, type: :controller do
       expect(flash[:notice]).to be_present
       expect(session[:return_to]).to be_nil
       expect(session[:partner]).to be_nil
+      expect(session[:company]).to be_nil
       expect(session[:passive_organization_id]).to be_nil
       expect(session[:whatever]).to be_nil
     end
