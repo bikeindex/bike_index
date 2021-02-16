@@ -35,7 +35,9 @@
               = link_to t(".sign_up"), new_user_path(partner: sign_in_partner, email: params[:email])
             = t(".log_in")
             - if sign_in_partner.present? && session[:company].present?
-              For #{session[:company]}
+              %span.company-text.uncap
+                for
+                %em #{session[:company]}
           = form_for :session, url: session_url(params.permit(:return_to)) do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
