@@ -26,6 +26,10 @@
                 = t(".already_have_an_account")
               = link_to t(".log_in"), new_session_path(partner: sign_in_partner, email: params[:email])
             = t(".sign_up")
+            - if sign_in_partner.present? && session[:company].present?
+              %span.company-text.uncap
+                for
+                %em #{session[:company]}
 
           = form_for @user do |f|
             - if sign_in_partner

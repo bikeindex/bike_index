@@ -212,6 +212,10 @@ $bikehub-text-color: #212529;
   .sign-in-up-main-form-header {
     color: $bikehub-green;
   }
+  .company-text {
+    font-size: 85%;
+    display: inline-block;
+  }
   .main-form .btn-primary {
     background: $bikehub-green;
     border-color: $bikehub-green;

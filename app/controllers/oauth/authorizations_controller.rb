@@ -11,7 +11,10 @@ module Oauth
 
     # Overriding doorkeepers default, so we can add partner to the session
     def authenticate_resource_owner!
-      session[:partner] = params[:partner] if params[:partner].present?
+      if params[:partner].present?
+        session[:partner] = params[:partner]
+        session[:company] = params[:company] # Only set company when partner is present
+      end
       super
     end
   end
