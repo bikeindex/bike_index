@@ -26,14 +26,13 @@
               - else
                 = t(".already_have_an_account")
               = link_to t(".log_in"), new_session_path(partner: sign_in_partner, email: params[:email])
-            - if company
-              - image_path = session[:company].match?(/metro/i) ? "bikehub/metro_logo.png" : "bikehub/bikehub_logo_nosubtitle.png"
+            - if company.present?
+              - image_path = company.match?(/metro/i) ? "bikehub/metro_logo.png" : "bikehub/bikehub_logo_nosubtitle.png"
               = image_tag image_path, alt: "", class: "company-logo"
               = t(".sign_up")
               %span.company-text.uncap
                 for
-                %em= session[:company]
-
+                %em= company
             - else
               = t(".sign_up")
 
