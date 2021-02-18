@@ -6,12 +6,13 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
+    # Submit form on clicking one of the stolenness tabs -
+    # ... So that if user enters new information then clicks, the new info is applied
     $('#stolenness_tabs a').click (e) =>
       # If there are any modifier keys held, don't try to submit the form
-      # The user is probably opening up a separate tab or something
+      # The user is probably trying to open up a separate tab or something
       if e.altKey or e.ctrlKey or e.metaKey or e.shiftKey
         return
-
       tab = $(e.target).parents('li')
       $('#stolenness').val(tab.attr('data-stolenness'))
       $('#bikes_search_form').submit()
