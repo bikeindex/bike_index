@@ -182,7 +182,6 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bike1.created_by_notification_or_impounding?).to be_truthy
               expect(bike1.current_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-10-2")
 
-
               bike2 = bulk_import.bikes.reorder(:created_at).last
               expect(bike2.mnfg_name).to eq "Surly"
               expect(bike2.serial_number).to eq "example"

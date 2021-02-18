@@ -32,7 +32,7 @@
       .search-type-tabs
         %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
           %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
-            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'proximity'), role: 'tab' }
+            %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'proximity')), class: ('active' if @stolenness == 'proximity'), role: 'tab' }
               = t(".stolen_within")
               %span#search_distance
                 X
@@ -41,15 +41,15 @@
                 = t(".you")
               %span.count
           %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
-            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
+            %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'stolen')), class: ('active' if @stolenness == 'stolen'), role: 'tab' }
               = t(".stolen_anywhere")
               %span.count
           %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
-            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'non'), role: 'tab' }
+            %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'non')), class: ('active' if @stolenness == 'non'), role: 'tab' }
               = t(".not_marked_stolen")
               %span.count
           %li#stolenness_tab_all.nav-item{ data: { stolenness: 'all' } }
-            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'all'), role: 'tab' }
+            %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'all')), class: ('active' if @stolenness == 'all'), role: 'tab' }
               = t(".all")
   .row
     .col-md-12

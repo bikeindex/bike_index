@@ -7,9 +7,15 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   initializeEventListeners: ->
     $('#stolenness_tabs a').click (e) =>
+      # If there are any modifier keys held, don't try to submit the form
+      # The user is probably opening up a separate tab or something
+      if e.altKey or e.ctrlKey or e.metaKey or e.shiftKey
+        return
+
       tab = $(e.target).parents('li')
       $('#stolenness').val(tab.attr('data-stolenness'))
       $('#bikes_search_form').submit()
+      false # return false to prevent following the link
 
   setSearchProximity: ($location) ->
     location = $location.val()
