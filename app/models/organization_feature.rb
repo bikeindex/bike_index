@@ -53,7 +53,7 @@ class OrganizationFeature < ApplicationRecord
 
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
-  scope :name_ordered, -> { order("LOWER(name)") }
+  scope :name_ordered, -> { order(arel_table["name"].lower) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
