@@ -52,7 +52,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
       # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
       impound_record.reload
       if impound_record.unregistered_bike?
-        impound_record.bike.marked_user_unhidden = true
+        impound_record.bike&.marked_user_unhidden = true
       end
       impound_record.bike&.update(updated_at: Time.current)
       impound_record.bike&.reload
