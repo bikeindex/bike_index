@@ -82,6 +82,7 @@ class BikeSearch extends Component {
       non: "abandoned",
       all: "all",
       stolen: "stolen",
+      proximity: "stolen",
     }[this.props.interpretedParams.stolenness];
 
     return (
