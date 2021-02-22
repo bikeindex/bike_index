@@ -81,9 +81,9 @@
         %p
           The required headers for
           %em impounded imports
-          are <code>manufacturer</code>, <code>model</code>, <code>color</code>, <code>serial</code> and <code>impounded_time</code>.
+          are <code>manufacturer</code>, <code>model</code>, <code>color</code>, <code>serial</code> and <code>impounded_at</code>.
         %p
-          <code>impounded time</code> should be formatted <strong>YYYY-MM-DD</strong> - #{link_to "ISO 8601", "https://www.w3.org/QA/Tips/iso-date"}
+          <code>impounded_at</code> should be formatted <strong>YYYY-MM-DD</strong> - #{link_to "ISO 8601", "https://www.w3.org/QA/Tips/iso-date"}
           %span.less-strong
             (e.g. if including time, "#{Time.current.iso8601}")
 

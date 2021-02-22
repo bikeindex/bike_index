@@ -1,6 +1,6 @@
 class Admin::Organizations::InvoicesController < Admin::BaseController
   before_action :find_organization
-  before_action :find_invoice, only: %i[edit update]
+  before_action :find_invoice, only: %i[edit update destroy]
   before_action :find_organization_features, only: %i[new edit]
 
   def index
@@ -47,6 +47,17 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     else
       render :edit
     end
+  end
+
+  def destroy
+    if @invoice.payments.any?
+      flash[:error] = "Not removed! You can't delete invoices with payments"
+    elsif @invoice.destroy
+      flash[:success] = "Invoice deleted!"
+    else
+      flash[:error] = "Not removed! #{@invoice.errors.full_messages.to_sentence}"
+    end
+    redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
   end
 
   protected
