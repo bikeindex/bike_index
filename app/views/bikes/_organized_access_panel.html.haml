@@ -204,13 +204,14 @@
 
       / Additional law enforcement information
       - if passive_organization.enabled?("additional_registrations_information")
+        -# If user isn't present, use email to search
+        - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
         .row.law-enforcement-wrapper.mt-4
           .col-xs-12.mt-2
             %p.mt-2.mb-2
               = t(".additional_registrations_information")
               %em.less-strong.hidden-md-down
                 = t(".additional_registrations_information_visible_because", org_name: passive_organization.short_name)
-
             %table.table.table-striped.table-bordered.table-sm.without-exterior-border
               %tbody
                 %thead
@@ -218,8 +219,6 @@
                     = t(".additional_registrations_registered_at")
                   %th
 
-                -# If user isn't present, use email to search
-                - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
                   %tr
                     %td
@@ -230,6 +229,9 @@
                         %em.less-strong= t(".additional_registrations_this_bike", bike_type: @bike.type)
                       - else
                         = link_to organized_bike_text(other_bike), bike_path(other_bike)
+            - if other_user_bikes.count > 25
+              %p.text-center.less-strong.m-0
+                User has #{other_user_bikes.count} registrations, only 25 most recent shown.
 
         - duplicate_bikes = @bike.duplicate_bikes.where.not(id: @bike.id)
         - if duplicate_bikes.any?
