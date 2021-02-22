@@ -155,4 +155,24 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       end
     end
   end
+
+  describe "destroy" do
+    it "destroys" do
+      expect(invoice.payments).to be_blank
+      expect {
+        delete "#{base_url}/#{invoice.to_param}"
+      }.to change(Invoice, :count).by(-1)
+      expect(flash[:success]).to be_present
+    end
+    context "payment present" do
+      let!(:payment) { FactoryBot.create(:payment, invoice: invoice) }
+      it "fails" do
+        expect(invoice.payments).to be_present
+        expect {
+          delete "#{base_url}/#{invoice.to_param}"
+        }.to change(Invoice, :count).by 0
+        expect(flash[:error]).to be_present
+      end
+    end
+  end
 end
