@@ -290,6 +290,8 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv"
 
+  resources :theft_ring_listings, only: [:index]
+
   resource :integrations, only: [:create]
   get "/auth/twitter/callback", to: "admin/twitter_accounts#create"
   get "/auth/:provider/callback", to: "integrations#create"

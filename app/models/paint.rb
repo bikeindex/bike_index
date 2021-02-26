@@ -16,28 +16,8 @@ class Paint < ApplicationRecord
 
   before_create :associate_colors
 
-  def set_calculated_attributes
-    self.name = name.downcase.strip
-  end
-
-  def associate_colors
-    color_ids = {}
-    Color.all.each do |color|
-      color_ids[color.name.split(/\W+/).first.downcase] = color.id
-    end
-    paint_words = paint_name_parser(name.clone).split(/\W+/).uniq
-    used_ids = []
-
-    # go through the paint words, add the colors id to the used ids if it's a known color
-    paint_words.each { |w| used_ids << color_ids[w] if color_ids[w].present? }
-
-    self.color_id = used_ids[0] if used_ids[0]
-    self.secondary_color_id = used_ids[1] if used_ids[1]
-    self.tertiary_color_id = used_ids[2] if used_ids[2]
-    self
-  end
-
-  def paint_name_parser(paint_str)
+  def self.paint_name_parser(str)
+    paint_str = str.clone
     paint_str.gsub!(/[\\\/"\-()?,&+;.]/, " ")
 
     # RAL colors. See wikipedia table for rough groupings. Many of the reds are pink, greys are brown, etc. by whatever
@@ -67,7 +47,7 @@ class Paint < ApplicationRecord
     paint_str.gsub!(/champagne/, "white")
     paint_str.gsub!(/(\A|\s)wht?(\s|\Z)/, " white ")
     paint_str.gsub!(/beige/, "white")
-    paint_str.gsub!(/(\A|\s)bl?k(\s|\Z)/, " black ")
+    paint_str.gsub!(/(\A|\s)bl?c?k(\s|\Z)/, " black ")
     paint_str.gsub!(/carbon/, "black")
     paint_str.gsub!(/composite/, "black")
     paint_str.gsub!(/celeste/, "blue")
@@ -101,5 +81,26 @@ class Paint < ApplicationRecord
     paint_str.gsub!(/gr(a|e)y/, " silver ")
     paint_str.gsub!(/burgu?a?ndy/, "red")
     paint_str
+  end
+
+  def set_calculated_attributes
+    self.name = name.downcase.strip
+  end
+
+  def associate_colors
+    color_ids = {}
+    Color.all.each do |color|
+      color_ids[color.name.split(/\W+/).first.downcase] = color.id
+    end
+    paint_words = self.class.paint_name_parser(name).split(/\W+/).uniq
+    used_ids = []
+
+    # go through the paint words, add the colors id to the used ids if it's a known color
+    paint_words.each { |w| used_ids << color_ids[w] if color_ids[w].present? }
+
+    self.color_id = used_ids[0] if used_ids[0]
+    self.secondary_color_id = used_ids[1] if used_ids[1]
+    self.tertiary_color_id = used_ids[2] if used_ids[2]
+    self
   end
 end

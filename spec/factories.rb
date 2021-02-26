@@ -45,11 +45,6 @@ FactoryBot.define do
     slug { FactoryBot.generate(:unique_name).downcase }
   end
 
-  factory :color do
-    name { FactoryBot.generate(:unique_name) }
-    priority { 1 }
-  end
-
   factory :paint do
     name { FactoryBot.generate(:unique_name) }
   end
