@@ -1,0 +1,46 @@
+.row.mt-4
+  .col-md-5
+    %p
+      #{number_with_delimiter(matching_theft_ring_listings.count)} matching listings
+
+.mt-4
+
+= paginate @theft_ring_listings
+
+.full-screen-table
+  %table.table.table-bordered.table-striped.table-sm
+    %thead.thead-light.sortable
+      %th
+        = sortable "listed_at"
+      %th
+        = sortable "amount_cents", "price"
+      %th
+        = sortable "mnfg_name", "Manufacturer"
+      %th
+        Model
+      %th
+        Listing text
+      %th
+        Photos
+    %tbody
+      - @theft_ring_listings.each do |theft_ring_listing|
+          %tr
+            %td
+              %span.convertTime
+                = l theft_ring_listing.listed_at, format: :convert_time
+            %td
+              = theft_ring_listing.amount_formatted
+            %td
+              = theft_ring_listing.mnfg_name
+            %td
+              = theft_ring_listing.model
+            %td
+              = theft_ring_listing.listing
+            %td
+              - theft_ring_listing.photo_urls.each_with_index |url, index|
+                = link_to index, url
+
+= paginate @theft_ring_listings
+- unless @users.present?
+  %h1.mt-4
+    No listings found!
