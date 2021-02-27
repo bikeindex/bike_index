@@ -2080,39 +2080,6 @@ ALTER SEQUENCE public.organizations_id_seq OWNED BY public.organizations.id;
 
 
 --
--- Name: other_listings; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.other_listings (
-    id integer NOT NULL,
-    bike_id integer,
-    url character varying(255),
-    listing_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.other_listings_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.other_listings_id_seq OWNED BY public.other_listings.id;
-
-
---
 -- Name: ownerships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3266,13 +3233,6 @@ ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: other_listings id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('public.other_listings_id_seq'::regclass);
-
-
---
 -- Name: ownerships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3820,14 +3780,6 @@ ALTER TABLE ONLY public.organization_features
 
 ALTER TABLE ONLY public.organizations
     ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
-
-
---
--- Name: other_listings other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.other_listings
-    ADD CONSTRAINT other_listings_pkey PRIMARY KEY (id);
 
 
 --
@@ -5449,6 +5401,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210204191110'),
 ('20210204223335'),
 ('20210205191728'),
-('20210208203928');
+('20210208203928'),
+('20210227162633');
 
 

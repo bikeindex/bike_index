@@ -13,7 +13,7 @@ class BikeCreator
       coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
       timezone date_stolen receive_notifications phone creator creator_id image
       components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
-      stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
+      stock_photo_url pdf send_email skip_email listing_order approved_stolen
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
@@ -247,7 +247,6 @@ class BikeCreator
       StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
       attach_photo(bike)
       attach_photos(bike)
-      add_other_listings(bike)
       bike.reload.save
     rescue => e
       bike.errors.add(:association_error, e.message)
@@ -288,11 +287,5 @@ class BikeCreator
     return nil unless @b_param.params["photos"].present?
     photos = @b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
-  end
-
-  def add_other_listings(bike)
-    return nil unless @b_param.params["bike"]["other_listing_urls"].present?
-    urls = @b_param.params["bike"]["other_listing_urls"]
-    urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 end
