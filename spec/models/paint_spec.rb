@@ -16,7 +16,6 @@ RSpec.describe Paint, type: :model do
     end
   end
 
-
   it "has before_create_callback_method" do
     expect(Paint._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:associate_colors)).to eq(true)
   end

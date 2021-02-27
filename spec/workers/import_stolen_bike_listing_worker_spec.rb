@@ -23,6 +23,8 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       expect(stolen_bike_listing.color_id).to eq Color.black
       expect(stolen_bike_listing.manufacturer_id).to eq manufacturer.id
       expect(stolen_bike_listing.amount).to eq 203.33
+      expect(stolen_bike_listing.currency).to eq "mxn"
+      expect(stolen_bike_listing.amount_formatted).to eq 203.33
       expect(stolen_bike_listing.frame_model).to eq "whatever"
       expect(stolen_bike_listing.listing).to eq row[:listing]
       expect(stolen_bike_listing.listed_at).to be_within(1.day).of Time.parse("2020-11-3")

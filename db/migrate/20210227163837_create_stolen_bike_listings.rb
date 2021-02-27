@@ -6,10 +6,12 @@ class CreateStolenBikeListings < ActiveRecord::Migration[5.2]
       t.references :primary_frame_color
       t.references :secondary_frame_color
       t.references :tertiary_frame_color
+      t.integer :listing_order
 
       # Manufacturer
       t.references :manufacturer
       t.string :manufacturer_other
+      t.string :mnfg_name
 
       t.text :frame_model
 

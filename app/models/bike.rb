@@ -85,7 +85,7 @@ class Bike < ApplicationRecord
   default_scope do
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
       .current
-      .order("listing_order desc")
+      .order(listing_order: :desc)
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status

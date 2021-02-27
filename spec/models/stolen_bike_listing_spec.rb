@@ -5,18 +5,18 @@ RSpec.describe StolenBikeListing, type: :model do
   let(:color) { FactoryBot.create(:color) }
 
   describe "amount" do
-    let(:stolen_bike_listing) { FactoryBot.build(:stolen_bike_listing, amount_cents: 12_000) }
+    let(:stolen_bike_listing) { FactoryBot.build(:stolen_bike_listing, amount_cents: 12_000, currency: "MXN") }
     it "is in pesos" do
-      expect(stolen_bike_listing.amount_formatted).to eq "₱12,000"
+      expect(stolen_bike_listing.amount_formatted).to eq "$120.00"
     end
   end
 
   describe "searchable" do
     let(:interpreted_params) { StolenBikeListing.searchable_interpreted_params(query_params) }
     context "color_ids of primary, secondary and tertiary" do
-      let(:color_2) { FactoryBot.create(:color) }
+      let(:color2) { FactoryBot.create(:color) }
       let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, listed_at: Time.current - 3.months) }
-      let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, secondary_frame_color: color, tertiary_frame_color: color_2, listed_at: Time.current - 2.weeks) }
+      let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, secondary_frame_color: color, tertiary_frame_color: color2, listed_at: Time.current - 2.weeks) }
       let(:stolen_bike_listing3) { FactoryBot.create(:stolen_bike_listing, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
@@ -43,7 +43,7 @@ RSpec.describe StolenBikeListing, type: :model do
         end
       end
       context "second color" do
-        let(:query_params) { {colors: [color.id, color_2.id], stolenness: "all"} }
+        let(:query_params) { {colors: [color.id, color2.id], stolenness: "all"} }
         it "matches just the bike with both colors" do
           expect(StolenBikeListing.search(interpreted_params).pluck(:id)).to eq([stolen_bike_listing2.id])
         end
