@@ -22,7 +22,8 @@ RSpec.describe Paint, type: :model do
   end
 
   describe "assign_colors" do
-    include_context :create_all_colors
+    before { Color::ALL_NAMES.each { |c| FactoryBot.create(:color, name: c) } }
+
     it "associates paint with reasonable colors" do
       paint = Paint.new(name: "burgandy/ivory with black stripes")
       paint.associate_colors

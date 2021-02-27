@@ -2413,6 +2413,49 @@ ALTER SEQUENCE public.states_id_seq OWNED BY public.states.id;
 
 
 --
+-- Name: stolen_bike_listings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stolen_bike_listings (
+    id bigint NOT NULL,
+    bike_id bigint,
+    initial_listing_id bigint,
+    primary_frame_color_id bigint,
+    secondary_frame_color_id bigint,
+    tertiary_frame_color_id bigint,
+    manufacturer_id bigint,
+    manufacturer_other character varying,
+    frame_model text,
+    listed_at timestamp without time zone,
+    amount_cents integer,
+    currency character varying,
+    listing_text text,
+    data jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: stolen_bike_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stolen_bike_listings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stolen_bike_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stolen_bike_listings_id_seq OWNED BY public.stolen_bike_listings.id;
+
+
+--
 -- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3289,6 +3332,13 @@ ALTER TABLE ONLY public.states ALTER COLUMN id SET DEFAULT nextval('public.state
 
 
 --
+-- Name: stolen_bike_listings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stolen_bike_listings ALTER COLUMN id SET DEFAULT nextval('public.stolen_bike_listings_id_seq'::regclass);
+
+
+--
 -- Name: stolen_notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3852,6 +3902,14 @@ ALTER TABLE ONLY public.states
 
 ALTER TABLE ONLY public.stolen_records
     ADD CONSTRAINT stolen_bike_descriptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stolen_bike_listings stolen_bike_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stolen_bike_listings
+    ADD CONSTRAINT stolen_bike_listings_pkey PRIMARY KEY (id);
 
 
 --
@@ -4718,6 +4776,48 @@ CREATE INDEX index_states_on_country_id ON public.states USING btree (country_id
 
 
 --
+-- Name: index_stolen_bike_listings_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_bike_id ON public.stolen_bike_listings USING btree (bike_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_initial_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_initial_listing_id ON public.stolen_bike_listings USING btree (initial_listing_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_manufacturer_id ON public.stolen_bike_listings USING btree (manufacturer_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_primary_frame_color_id ON public.stolen_bike_listings USING btree (primary_frame_color_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_secondary_frame_color_id ON public.stolen_bike_listings USING btree (secondary_frame_color_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.stolen_bike_listings USING btree (tertiary_frame_color_id);
+
+
+--
 -- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5402,6 +5502,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210204223335'),
 ('20210205191728'),
 ('20210208203928'),
-('20210227162633');
+('20210227162633'),
+('20210227163837');
 
 

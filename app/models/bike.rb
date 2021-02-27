@@ -42,6 +42,7 @@ class Bike < ApplicationRecord
   has_many :stolen_notifications
   has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
+  has_many :stolen_bike_listings
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy

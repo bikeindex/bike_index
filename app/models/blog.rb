@@ -1,6 +1,8 @@
 class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
   include Localizable
+  include PgSearch::Model
+
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
 
   belongs_to :user
@@ -22,7 +24,6 @@ class Blog < ApplicationRecord
   scope :published, -> { where(published: true) }
   default_scope { order("published_at desc") }
 
-  include PgSearch::Model
   pg_search_scope :text_search, against: {title: "A", body: "B"}
 
   def self.kinds
