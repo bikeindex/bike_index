@@ -20,9 +20,11 @@ class StolenBikeListingsController < ApplicationController
 
   def permitted_search_params
     params.permit(*StolenBikeListing.permitted_search_params)
+      .merge(stolenness: "all")
   end
 
   def matching_stolen_bike_listings
+    @interpreted_params = StolenBikeListing.searchable_interpreted_params(permitted_search_params)
     # This might become more sophisticated someday...
     matching_stolen_bike_listings = StolenBikeListing.search(@interpreted_params)
     @matching_stolen_bike_listings = matching_stolen_bike_listings

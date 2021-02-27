@@ -24,21 +24,21 @@
         Photos
     %tbody
       - @stolen_bike_listings.each do |stolen_bike_listing|
-          %tr
-            %td
-              %span.convertTime
-                = l stolen_bike_listing.listed_at, format: :convert_time
-            %td
-              = stolen_bike_listing.amount_formatted
-            %td
-              = stolen_bike_listing.mnfg_name
-            %td
-              = stolen_bike_listing.model
-            %td
-              = stolen_bike_listing.listing
-            %td
-              - stolen_bike_listing.photo_urls.each_with_index |url, index|
-                = link_to index, url
+        %tr
+          %td
+            %span.convertTime
+              = l stolen_bike_listing.listed_at, format: :convert_time
+          %td
+            = stolen_bike_listing.amount_formatted
+          %td
+            = stolen_bike_listing.mnfg_name
+          %td
+            = stolen_bike_listing.model
+          %td
+            = stolen_bike_listing.listing
+          %td
+            - stolen_bike_listing.photo_urls.each_with_index do |url, index|
+              = link_to index, url
 
 = paginate @stolen_bike_listings
 - unless @users.present?
