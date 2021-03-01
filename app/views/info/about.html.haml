@@ -1,10 +1,10 @@
-- bikes_count = number_with_precision(Bike.count.round(-3), precision: 0, delimiter: ',')
-- partners_count = number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ',')
+- bikes_count = number_with_precision(Bike.count.round(-3), precision: 0, delimiter: ",")
+- partners_count = number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ",")
 - nonprofit_blog_link = link_to(t(".nonprofit_status"), news_path("bike-index--now-a-nonprofit"))
 
 %h1= t(".about_bike_index")
 
-- cache('about_counts', expires_in: 24.hours) do
+- cache("about_counts", expires_in: 24.hours) do
   %p= t(".cofounded_by_html", description_link: nonprofit_blog_link)
   %p= t(".widely_used", bikes_count: bikes_count, partners_count: partners_count)
 
@@ -37,19 +37,19 @@
 %ul.about-people
   %li
     %p
-      = image_tag "who/seth-herr2.jpg", alt: 'Seth Herr', title: t(".seth_herr_image_title")
+      = image_tag "who/seth-herr2.jpg", alt: "Seth Herr", title: t(".seth_herr_image_title")
       = t(".seth_herr_bio_html")
   %li
     %p
-      = image_tag "who/bryan-hance.jpg", alt: 'Bryan Hance'
+      = image_tag "who/bryan-hance.jpg", alt: "Bryan Hance"
       = t(".bryan_hance_bio_new_html")
   %li
     %p
-      = image_tag 'who/craig-dalton1.jpg', alt: 'Craig Dalton'
+      = image_tag "who/craig-dalton1.jpg", alt: "Craig Dalton"
       = t(".craig_dalton_bio_html")
   %li
     %p
-      = image_tag 'who/lily-williams.jpg', alt: 'Lily Williams'
+      = image_tag "who/lily-williams.jpg", alt: "Lily Williams"
       = t(".lily_williams_bio_html")
   %li
     %p
@@ -57,35 +57,34 @@
       = t(".jan_pecnik_bio_html")
   %li
     %p
-      = image_tag 'who/mike-oleon.jpg', alt: 'Mike Oleon'
+      = image_tag "who/mike-oleon.jpg", alt: "Mike Oleon"
       = t(".mike_oleon_bio_html")
-  %li
-    %p
-      = image_tag 'who/bobby-gervais.jpg', alt: "Bobby Gervais"
-      = t(".bobby_gervais_bio_html")
-
 %h2.the-alumni.d-none
   = t(".alumni")
 
 %ul.about-list.about-alumni-list.d-none
   %li
-    = image_tag "who/will-barrett.jpg", alt: 'Will Barrett'
+    = image_tag "who/will-barrett.jpg", alt: "Will Barrett"
     %h4 Will Barrett
   %li
-    = image_tag "who/erin-vogel.jpg", alt: 'Erin Vogel'
+    = image_tag "who/erin-vogel.jpg", alt: "Erin Vogel"
     %h4 Erin Vogel
   %li
-    = image_tag "who/andrew-herr.jpg", alt: 'Andrew Herr'
+    = image_tag "who/andrew-herr.jpg", alt: "Andrew Herr"
     %h4 Andrew Herr
   %li
-    = image_tag "who/laura-nash.jpg", alt: 'Laura Nash'
+    = image_tag "who/laura-nash.jpg", alt: "Laura Nash"
     %h4 Laura Nash
   %li
-    = image_tag 'who/michael-catano.jpg', alt: 'Michael Catano'
+    = image_tag "who/michael-catano.jpg", alt: "Michael Catano"
     %h4 Michael Catano
   %li
-    = image_tag "who/stephanie-scheurich1.jpg", alt: 'Stephanie Scheurich'
+    = image_tag "who/stephanie-scheurich1.jpg", alt: "Stephanie Scheurich"
     %h4 Stephanie Scheurich
   %li
-    = image_tag "who/bike-mike.jpg", alt: 'Mike Pickerd'
+    = image_tag "who/bike-mike.jpg", alt: "Mike Pickerd"
     %h4 Mike Pickerd
+
+  %li
+    = image_tag "who/bobby-gervais.jpg", alt: "Bobby Gervais"
+    %h4 Bobby Gervais
