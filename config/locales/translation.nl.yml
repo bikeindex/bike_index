@@ -2836,10 +2836,6 @@ nl:
       about_bike_index: Over Bike Index
       alumni: alumni
       bike_registration_that_works: De fietsregistratie die werkt.
-      bryan_hance_bio_html: "<strong>Bryan Hance</strong> creëerde StolenBicycleRegistry.com
-        in 2004 omdat 5 van zijn fietsen in een tijdsbestek van 9 jaar gestolen zijn
-        - en bovendien besefte dat het herstellen van fietsen erg leuk is. Hij woont
-        in Portland en herstelt veel fietsen."
       cofounded_by_html: Mede opgericht door Seth Herr en Bryan Hance in 2013, is
         Bike Index een %{description_link} organisatie.
       craig_dalton_bio_html: "<strong>Craig Dalton</strong> dacht dat hij uit de fietsenindustrie
@@ -2878,10 +2874,11 @@ nl:
       widely_used: Het is de meest gebruikte en succesvolle fietsregistratieservice
         ter wereld, met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
         communitypartners en tienduizenden dagelijkse zoekopdrachten.
-      bobby_gervais_bio_html: "<strong>Bobby Gervais</strong> heeft een lange geschiedenis
-        in het bezorgen en vervoeren van dingen op zijn fiets, voor werk. Nu leeft
-        hij van mensen helpen om hun fiets terug te vinden. Bobby helpt met het bijhouden
-        van Bike Index en creëert nieuwe functies."
+      bryan_hance_bio_new_html: "<strong>Bryan Hance</strong> creëerde StolenBicycleRegistry.com
+        in 2004 omdat er veel te veel fietsen waren gestolen - en hij realiseerde
+        zich dat het achtervolgen en terughalen van gestolen fietsen erg leuk was.
+        Hij houdt zich bezig met cybersecurity en past OSINT-methoden en -processen
+        toe op het achtervolgen van fietsdieven."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
