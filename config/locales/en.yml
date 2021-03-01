@@ -2315,16 +2315,11 @@ en:
       about_bike_index: About Bike Index
       alumni: Alumni
       bike_registration_that_works: Bike registration that works.
-      bobby_gervais_bio_html: |
-        <strong>Bobby Gervais</strong> has had a long history of delivering and
-        carrying stuff on his bike for work and now he's making a living out of helping
-        people recover their bikes. Bobby helps to maintain the Bike Index, and work
-        on new features.
-      bryan_hance_bio_html: |
-        <strong>Bryan Hance</strong> created StolenBicycleRegistry.com in 2004
-        because 5 of his bikes were stolen in 9 years&mdash;and realized
-        recovering bikes was really fun. He lives in Portland and recovers lots
-        of bikes.
+      bryan_hance_bio_new_html: >
+        <strong>Bryan Hance</strong> created StolenBicycleRegistry.com in 2004 because
+        he had way too many bikes stolen - and he realized chasing and recovering
+        stolen bikes was really fun. He works in cyber security and applies OSINT
+        methods and processes to chasing bike thieves.
       cofounded_by_html: >-
         Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a %{description_link}.
       craig_dalton_bio_html: |
