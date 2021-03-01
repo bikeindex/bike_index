@@ -4,8 +4,9 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/graduated_notifications" }
   include_context :request_spec_logged_in_as_organization_member
 
-  let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i) }
-  let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: Time.current - 2.years) }
+  let(:earliest_time) { Time.current - 2.years } # Have to set this for organization creation, or the org time_range is just the past year
+  let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i, created_at: earliest_time) }
+  let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: earliest_time) }
 
   describe "index" do
     let!(:graduated_notification_pending) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
@@ -17,7 +18,9 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
         marked_remaining_at: Time.current - current_organization.graduated_notification_interval + 2.days)
     end
     it "renders with correct things" do
+      expect(graduated_notification_pending.reload.status).to eq "active"
       expect(GraduatedNotification.current.pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id])
+
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
