@@ -14,6 +14,9 @@ class CreateStolenBikeListings < ActiveRecord::Migration[5.2]
       t.string :mnfg_name
 
       t.text :frame_model
+      t.string :frame_size
+      t.string :frame_size_unit
+      t.float :frame_size_number
 
       # stolen bike listing specific
       t.datetime :listed_at

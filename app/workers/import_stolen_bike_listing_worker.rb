@@ -1,17 +1,21 @@
 class ImportStolenBikeListingWorker < ApplicationWorker
   def perform(group, line, row)
-    stolen_bike_listing = StolenBikeListing.new(currency: "MXN",
-                                                frame_model: row["frame_model"],
-                                                listing_text: row["listing"],
-                                                amount: row["price"],
-                                                group: group,
-                                                line: line,
-                                                data: {
-                                                  photo_folder: row["folder"],
-                                                  photo_urls: row["photo_urls"],
-                                                  notes: row["notes"],
-                                                })
-    stolen_bike_listing.listed_at = TimeParser.parse(row["listed_at"]) if row["listed_at"].present?
+    return nil if skip_storing?(row)
+    stolen_bike_listing = StolenBikeListing.where(group: group, line: line).first
+    stolen_bike_listing ||= StolenBikeListing.new(group: group, line: line)
+    stolen_bike_listing.attributes = {
+      currency: "MXN",
+      frame_model: row["model"],
+      listing_text: row["listing_text"],
+      amount: row["price"],
+      frame_size: row["size"],
+      data: {
+        photo_folder: row["folder"],
+        photo_urls: row["photo_urls"],
+        notes: row["notes"]
+      }
+    }
+    stolen_bike_listing.listed_at = TimeParser.parse(row["listed_at"]) if row["listed_at"]
     stolen_bike_listing.attributes = manufacturer_attrs(row["manufacturer"])
     stolen_bike_listing.attributes = color_attrs(row["color"])
     stolen_bike_listing.bike_id = find_bike_id(row["owner_found"])
@@ -39,5 +43,14 @@ class ImportStolenBikeListingWorker < ApplicationWorker
     return nil if str.blank?
     # Just grab any integers longer than 2 digits, good enough for now
     str[/\d\d+/]
+  end
+
+  def skip_storing?(row)
+    return true if row["bike"].to_s.match?(/no/i)
+    # We aren't storing reposts - just for now, we'll add sometime
+    return true if row["repost"].to_s.match?(/yes/i)
+    # Don't store if there is data that is useful in any columns
+    row.slice("color", "manufacturer", "model", "listing_text")
+      .values.join("").gsub(/\s+/, " ").length < 5
   end
 end
