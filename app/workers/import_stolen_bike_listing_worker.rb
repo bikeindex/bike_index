@@ -65,7 +65,7 @@ class ImportStolenBikeListingWorker < ApplicationWorker
     end
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
-      .values.join("").gsub(/\s+/, " ").gsub("blank", "").gsub("raffle")
+      .values.join("").gsub(/\s+/, " ").gsub("blank", "").gsub("raffle", "")
       .length < 5
   end
 end
