@@ -5247,6 +5247,10 @@ en:
       your_local_police_department_will_do_what: >-
         Your local police department will do what it does to help recover your bike.
         Stay in communication with them.
+  stolen_bike_listings:
+    index:
+      search_bike_descriptions: Search bike descriptions
+      submit: submit
   support:
     array:
       last_word_connector: ", and "

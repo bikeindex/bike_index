@@ -334,7 +334,6 @@ nl:
         normalized_serial_segments: Genormaliseerde seriële segmenten
         number_of_seats: aantal zitplaatsen
         organizations: organisaties
-        other_listings: Andere vermeldingen
         owner_email: E-mailadres eigenaar
         ownerships: ownerships
         pdf: PDF
@@ -594,9 +593,6 @@ nl:
         website: Website
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
-      other_listing:
-        listing_type: Soort vermelding
-        url: URL
       ownership:
         claimed: beweerde
         current: Stroom
@@ -5852,3 +5848,7 @@ nl:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
         search_for_serial_number: Zoek naar framenummer
+  stolen_bike_listings:
+    index:
+      search_bike_descriptions: Zoek fietsbeschrijvingen
+      submit: Voorleggen

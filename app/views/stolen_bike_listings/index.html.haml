@@ -1,46 +1,68 @@
-.row.mt-4
-  .col-md-5
-    %p
-      #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
+.container
+  .mt-4
+    = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form", method: :get do
+      .query-field-wrap.nojs
+        - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i["text"], i["search_id"]]  }
+        = select_tag :query_items,                                      |
+          options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
+          placeholder: t(".search_bike_descriptions"),                  |
+          class: 'form-control query-field',                            |
+          multiple: true
 
-.mt-4
+        = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: "form-control query-field"
 
-= paginate @stolen_bike_listings
+      .search-button-wrap
+        = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+          :plain
+            <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
 
-.full-screen-table
-  %table.table.table-bordered.table-striped.table-sm
-    %thead.thead-light.sortable
-      %th
-        = sortable "listed_at"
-      %th
-        = sortable "amount_cents", "price"
-      %th
-        = sortable "mnfg_name", "Manufacturer"
-      %th
-        Model
-      %th
-        Listing text
-      %th
-        Photos
-    %tbody
-      - @stolen_bike_listings.each do |stolen_bike_listing|
-        %tr
-          %td
-            %span.convertTime
-              = l stolen_bike_listing.listed_at, format: :convert_time
-          %td
-            = stolen_bike_listing.amount_formatted
-          %td
-            = stolen_bike_listing.mnfg_name
-          %td
-            = stolen_bike_listing.model
-          %td
-            = stolen_bike_listing.listing
-          %td
-            - stolen_bike_listing.photo_urls.each_with_index do |url, index|
-              = link_to index, url
+      -# Skipping rendering these for now - they aren't strictly necessary
+      -#= render partial: "/shared/hidden_search_fields", locals: {kind: "stolen_bike_listings"}
 
-= paginate @stolen_bike_listings
-- unless @users.present?
-  %h1.mt-4
-    No listings found!
+  .row.mt-4
+    .col-md-5
+      %p
+        #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
+
+  .mt-4
+
+  = paginate @stolen_bike_listings
+
+  .full-screen-table
+    %table.table.table-bordered.table-striped.table-sm
+      %thead.thead-light.sortable
+        %th
+          = sortable "listed_at"
+        %th
+          = sortable "amount_cents", "price"
+        %th
+          = sortable "mnfg_name", "Manufacturer"
+        %th
+          Model
+        %th
+          Listing text
+        %th
+          Photos
+      %tbody
+        - @stolen_bike_listings.each do |stolen_bike_listing|
+          %tr
+            %td
+              %span.convertTime
+                = l stolen_bike_listing.listed_at, format: :convert_time
+            %td
+              = stolen_bike_listing.amount_formatted
+            %td
+              = stolen_bike_listing.mnfg_name
+            %td
+              = stolen_bike_listing.model
+            %td
+              = stolen_bike_listing.listing
+            %td
+              - stolen_bike_listing.photo_urls.each_with_index do |url, index|
+                = link_to index, url
+
+  = paginate @stolen_bike_listings
+
+  - unless @stolen_bike_listings.present?
+    %h1.mt-4
+      No listings found!
