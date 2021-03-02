@@ -1,13 +1,17 @@
 class ImportStolenBikeListingWorker < ApplicationWorker
-  HEADERS = %i[line listed_at folder bike repost price manufacturer model size color bike_index_bike notes listing_text].freeze
+  HEADERS = %i[line listed_at folder bike price repost manufacturer model size color bike_index_bike notes listing_text].freeze
 
   def self.headers
     override_headers = ENV["IMPORT_STOLEN_LISTING_HEADERS"]
     override_headers.present? ? override_headers.split(",").map(&:to_i) : HEADERS
   end
 
+  def self.row_from_str(row_str)
+    CSV.new(row_str, headers: headers).first.to_h
+  end
+
   def perform(group, line, row_str)
-    row = CSV.new(row_str, headers: self.class.headers).first.to_h
+    row = self.class.row_from_str(row_str)
     return nil if skip_storing?(row)
     stolen_bike_listing = StolenBikeListing.where(group: group, line: line).first
     stolen_bike_listing ||= StolenBikeListing.new(group: group, line: line)
@@ -54,13 +58,14 @@ class ImportStolenBikeListingWorker < ApplicationWorker
   end
 
   def skip_storing?(row)
-    return true if row[:bike].to_s.match?(/no/i)
+    return true if row[:bike].to_s.match?(/no|raffle/i)
     # We aren't storing reposts - just for now, we'll add sometime
     if row[:repost].present?
       return true unless row[:repost].to_s.match?(/no/i)
     end
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
-      .values.join("").gsub(/\s+/, " ").length < 5
+      .values.join("").gsub(/\s+/, " ").gsub("blank", "").gsub("raffle")
+      .length < 5
   end
 end

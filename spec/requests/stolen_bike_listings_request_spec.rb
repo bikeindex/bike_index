@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe StolenBikeListingsController, type: :request do
   describe "theft-ring" do
     it "redirects to stolen_bike_listings" do
-      get "/theft-ring"
+      get "/theft-rings"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
