@@ -42,7 +42,7 @@ class Bike < ApplicationRecord
   has_many :stolen_notifications
   has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
-  has_many :other_listings, dependent: :destroy
+  has_many :stolen_bike_listings
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -69,7 +69,7 @@ class Bike < ApplicationRecord
 
   validates_presence_of :primary_frame_color_id
 
-  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
+  attr_accessor :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
     :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
@@ -85,7 +85,7 @@ class Bike < ApplicationRecord
   default_scope do
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
       .current
-      .order("listing_order desc")
+      .order(listing_order: :desc)
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status

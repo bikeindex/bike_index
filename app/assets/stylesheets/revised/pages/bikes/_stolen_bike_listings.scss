@@ -1,0 +1,16 @@
+#stolen_bike_listings_index {
+  .listing-text-cell {
+    max-width: 40rem;
+  }
+  .listing-text-expand-link {
+    font-weight: bold;
+    font-size: 120%;
+    text-decoration: underline;
+  }
+  .listing-text-full {
+    display: none;
+    &.listing-text-shown {
+      display: inline !important;
+    }
+  }
+}

@@ -6,7 +6,7 @@ RSpec.describe Bike, type: :model do
 
   describe "scopes" do
     it "default scopes to created_at desc" do
-      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
     end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
@@ -1638,7 +1638,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.organizations.first }
     let(:bike_organization) { bike.bike_organizations.first }
-    let(:organization_2) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
     before { expect(bike.bike_organization_ids).to eq([organization.id]) }
     context "no organization_ids" do
       it "removes bike organizations" do
@@ -1656,14 +1656,14 @@ RSpec.describe Bike, type: :model do
     context "invalid organization_id" do
       let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
       it "adds valid organization but not invalid one" do
-        bike.bike_organization_ids = [organization.id, organization_2.id, organization_invalid.id]
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+        bike.bike_organization_ids = [organization.id, organization2.id, organization_invalid.id]
+        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
       end
     end
     context "different organization" do
       it "adds organization and removes existing" do
-        bike.bike_organization_ids = "#{organization_2.id}, "
-        expect(bike.reload.bike_organization_ids).to eq([organization_2.id])
+        bike.bike_organization_ids = "#{organization2.id}, "
+        expect(bike.reload.bike_organization_ids).to eq([organization2.id])
       end
     end
   end

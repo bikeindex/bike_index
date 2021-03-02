@@ -73,8 +73,18 @@ RSpec.describe MoneyHelper, type: :helper do
   end
 
   describe "#as_currency" do
-    before do
-      FactoryBot.create(:exchange_rate_to_eur)
+    before { FactoryBot.create(:exchange_rate_to_eur) }
+
+    context "given a valid target currency" do
+      it "returns a Money object converting to the default currency" do
+        expect(as_currency(100, exchange_to: :EUR)).to eq("€88")
+      end
+      context "peso" do
+        before { FactoryBot.create(:exchange_rate_to_mxn) }
+        it "returns a Money object converting to the default currency" do
+          expect(as_currency(100, exchange_to: :MXN)).to eq("$2,035")
+        end
+      end
     end
 
     context "given a valid target currency" do

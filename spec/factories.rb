@@ -45,11 +45,6 @@ FactoryBot.define do
     slug { FactoryBot.generate(:unique_name).downcase }
   end
 
-  factory :color do
-    name { FactoryBot.generate(:unique_name) }
-    priority { 1 }
-  end
-
   factory :paint do
     name { FactoryBot.generate(:unique_name) }
   end
@@ -66,17 +61,6 @@ FactoryBot.define do
   factory :component do
     bike { FactoryBot.create(:bike) }
     ctype { FactoryBot.create(:ctype) }
-  end
-
-  factory :exchange_rate do
-    from { "USD" }
-    to { 3.times.map { ("A".."Z").entries.sample }.join }
-    rate { rand.truncate(2) }
-
-    factory :exchange_rate_to_eur do
-      to { "EUR" }
-      rate { 0.88 }
-    end
   end
 
   factory :lock_type do

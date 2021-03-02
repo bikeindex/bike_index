@@ -140,7 +140,6 @@ en:
         normalized_serial_segments: Normalized serial segments
         number_of_seats: Number of seats
         organizations: Organizations
-        other_listings: Other listings
         owner_email: Owner email
         ownerships: Ownerships
         paint: :activerecord.models.paint
@@ -483,10 +482,6 @@ en:
         invoices: Invoices
         kind: Kind
         name: Name
-      other_listing:
-        bike: :activerecord.models.bike
-        listing_type: Listing type
-        url: Url
       ownership:
         bike: :activerecord.models.bike
         claimed: Claimed
@@ -5252,6 +5247,10 @@ en:
       your_local_police_department_will_do_what: >-
         Your local police department will do what it does to help recover your bike.
         Stay in communication with them.
+  stolen_bike_listings:
+    index:
+      search_bike_descriptions: Search bike descriptions
+      submit: Submit
   support:
     array:
       last_word_connector: ", and "

@@ -581,16 +581,6 @@ RSpec.describe BikeCreator do
     end
   end
 
-  describe "add_other_listings" do
-    it "calls create stolen record" do
-      bike = FactoryBot.create(:bike)
-      urls = ["http://some_blog.com", "http://some_thing.com"]
-      allow(b_param).to receive(:params).and_return({bike: {other_listing_urls: urls}}.as_json)
-      subject.new(b_param).send("add_other_listings", bike)
-      expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
-    end
-  end
-
   describe "attach_photo" do
     it "creates public images for the attached image" do
       bike = FactoryBot.create(:bike)

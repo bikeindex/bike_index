@@ -32,18 +32,18 @@ RSpec.shared_examples "bike_searchable" do
       end
     end
     context "multiple manufacturer_id and color_ids" do
-      let(:manufacturer_2) { FactoryBot.create(:manufacturer) }
-      let(:color_2) { FactoryBot.create(:color) }
+      let(:manufacturer2) { FactoryBot.create(:manufacturer) }
+      let(:color2) { FactoryBot.create(:color) }
       let(:target) do
         {
-          manufacturer: [manufacturer.id, manufacturer_2.id],
-          colors: [color.id, color_2.id],
+          manufacturer: [manufacturer.id, manufacturer2.id],
+          colors: [color.id, color2.id],
           query: "some other string another string",
           stolenness: "all"
         }
       end
       context "integer ids in query_items" do
-        let(:query_items) { multi_query_items + [manufacturer_2.search_id, color_2.search_id] }
+        let(:query_items) { multi_query_items + [manufacturer2.search_id, color2.search_id] }
         let(:query_params) { {query_items: query_items, stolenness: "all"} }
         it "returns them all" do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
@@ -53,8 +53,8 @@ RSpec.shared_examples "bike_searchable" do
         let(:query_params) do
           {
             query_items: multi_query_items,
-            manufacturer: [manufacturer.slug, manufacturer_2.name],
-            colors: [color.id, color_2.name],
+            manufacturer: [manufacturer.slug, manufacturer2.name],
+            colors: [color.id, color2.name],
             query: "some other string another string",
             stolenness: "all"
           }
@@ -210,21 +210,21 @@ RSpec.shared_examples "bike_searchable" do
   end
   describe "search" do
     context "color_ids of primary, secondary and tertiary" do
-      let(:color_2) { FactoryBot.create(:color) }
-      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months) }
-      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2, updated_at: Time.current - 2.weeks) }
-      let(:bike_3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
+      let(:color2) { FactoryBot.create(:color) }
+      let(:bike1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months) }
+      let(:bike2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color2, updated_at: Time.current - 2.weeks) }
+      let(:bike3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
-          bike_1.primary_frame_color_id,
-          bike_2.primary_frame_color_id,
-          bike_3.primary_frame_color_id,
-          bike_1.secondary_frame_color_id,
-          bike_2.secondary_frame_color_id,
-          bike_3.secondary_frame_color_id,
-          bike_1.tertiary_frame_color_id,
-          bike_2.tertiary_frame_color_id,
-          bike_3.tertiary_frame_color_id
+          bike1.primary_frame_color_id,
+          bike2.primary_frame_color_id,
+          bike3.primary_frame_color_id,
+          bike1.secondary_frame_color_id,
+          bike2.secondary_frame_color_id,
+          bike3.secondary_frame_color_id,
+          bike1.tertiary_frame_color_id,
+          bike2.tertiary_frame_color_id,
+          bike3.tertiary_frame_color_id
         ]
       end
       before do
@@ -233,21 +233,21 @@ RSpec.shared_examples "bike_searchable" do
       context "single color" do
         let(:query_params) { {colors: [color.id], stolenness: "all"} }
         it "matches bikes with the given color" do
-          expect(bike_1.listing_order < bike_2.listing_order).to be_truthy
-          expect(bike_2.listing_order < bike_3.listing_order).to be_truthy
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_3.id, bike_2.id, bike_1.id])
+          expect(bike1.listing_order < bike2.listing_order).to be_truthy
+          expect(bike2.listing_order < bike3.listing_order).to be_truthy
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike3.id, bike2.id, bike1.id])
         end
       end
       context "second color" do
-        let(:query_params) { {colors: [color.id, color_2.id], stolenness: "all"} }
+        let(:query_params) { {colors: [color.id, color2.id], stolenness: "all"} }
         it "matches just the bike with both colors" do
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike2.id])
         end
       end
       context "and manufacturer_id" do
         let(:query_params) { {colors: [color.id], manufacturer: manufacturer.id, stolenness: "all"} }
         it "matches just the bike with the matching manufacturer" do
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_3.id])
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike3.id])
         end
       end
     end
@@ -343,16 +343,16 @@ RSpec.shared_examples "bike_searchable" do
       context "organization bike" do
         let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: "d") }
 
-        let(:bike_1) { FactoryBot.create(:bike) }
-        let(:bike_2) { FactoryBot.create(:bike_organized) }
-        let(:organization) { bike_2.organizations.first }
+        let(:bike1) { FactoryBot.create(:bike) }
+        let(:bike2) { FactoryBot.create(:bike_organized) }
+        let(:organization) { bike2.organizations.first }
         let(:query_params) { {stolenness: "all"} }
         before do
-          expect([bike_1, bike_2].size).to eq 2
-          expect(organization.bikes.pluck(:id)).to eq([bike_2.id])
+          expect([bike1, bike2].size).to eq 2
+          expect(organization.bikes.pluck(:id)).to eq([bike2.id])
         end
         it "only finds bikes in the organization" do
-          expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+          expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike2.id])
         end
       end
     end
