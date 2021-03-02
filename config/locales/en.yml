@@ -5250,7 +5250,7 @@ en:
   stolen_bike_listings:
     index:
       search_bike_descriptions: Search bike descriptions
-      submit: submit
+      submit: Submit
   support:
     array:
       last_word_connector: ", and "
