@@ -15,7 +15,7 @@ class ImportStolenBikeListingWorker < ApplicationWorker
       currency: "MXN",
       frame_model: row[:model],
       listing_text: row[:listing_text],
-      amount: row[:price],
+      amount: row[:price].presence,
       frame_size: row[:size],
       data: {
         photo_folder: row[:folder],
@@ -56,7 +56,9 @@ class ImportStolenBikeListingWorker < ApplicationWorker
   def skip_storing?(row)
     return true if row[:bike].to_s.match?(/no/i)
     # We aren't storing reposts - just for now, we'll add sometime
-    return true if row[:repost].to_s.match?(/yes/i)
+    if row[:repost].present?
+      return !row[:repost].to_s.match?(/no/i)
+    end
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
       .values.join("").gsub(/\s+/, " ").length < 5

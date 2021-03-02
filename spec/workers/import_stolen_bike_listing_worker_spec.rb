@@ -82,7 +82,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       # At least for now!
       it "is nil" do
         expect(StolenBikeListing.count).to eq 0
-        expect(instance.perform("constru", 12, header_values(row.merge(repost: "yes")))).to be_blank
+        expect(instance.perform("constru", 12, header_values(row.merge(repost: "110.11")))).to be_blank
         expect(StolenBikeListing.count).to eq 0
       end
     end
