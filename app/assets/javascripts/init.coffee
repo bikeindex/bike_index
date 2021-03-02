@@ -62,7 +62,7 @@ class BikeIndex.Init extends BikeIndex
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm
-      stolen_bike_listings_index: BikeIndex.BikesIndex
+      stolen_bike_listings_index: BikeIndex.StolenBikeListing
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->

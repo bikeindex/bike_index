@@ -1,4 +1,6 @@
 .container
+  %h1
+    = link_to "Stolen bike listings", stolen_bike_listings_path
   .mt-4
     = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form single-search-input", method: :get do
       .query-field-wrap.nojs
@@ -12,7 +14,7 @@
         = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: "form-control query-field"
 
       .search-button-wrap
-        = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+        = button_tag(type: t(".submit"), class: 'searchit btn btn-primary') do
           :plain
             <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
 
@@ -34,9 +36,11 @@
         %th
           = sortable "mnfg_name", "Manufacturer"
         %th
+          Color
+        %th
           Model
         %th
-          Frame size
+          Size
         %th
           Listing text
         %th
@@ -52,11 +56,22 @@
             %td
               = stolen_bike_listing.mnfg_name
             %td
+              = stolen_bike_listing.frame_colors.to_sentence
+            %td
               = stolen_bike_listing.frame_model
             %td
               = stolen_bike_listing.frame_size&.upcase
-            %td
-              = stolen_bike_listing.listing_text
+            %td.listing-text-cell
+              - if stolen_bike_listing.listing_text.to_s.length > 60
+                - truncated_text = stolen_bike_listing.listing_text.truncate(60, omission: "", separator: /\s/)
+                %span
+                  #{truncated_text}<a class="listing-text-expand-link" href="#listing-text-#{stolen_bike_listing.id}" title="#{stolen_bike_listing.listing_text}">...</a>
+
+                %span.listing-text-full{ id: "listing-text-#{stolen_bike_listing.id}" }
+                  = stolen_bike_listing.listing_text[truncated_text.length..-1]
+
+              - else
+                = stolen_bike_listing.listing_text
             %td
               - stolen_bike_listing.photo_urls.each_with_index do |url, index|
                 = link_to index, url

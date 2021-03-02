@@ -39,6 +39,14 @@ class StolenBikeListing < ActiveRecord::Base
     data["photo_urls"] || []
   end
 
+  def frame_colors
+    [
+      primary_frame_color&.name,
+      secondary_frame_color&.name,
+      tertiary_frame_color&.name
+    ].compact
+  end
+
   # TODO: Refactor - this duplicates bike#clean_frame_size, they should both be better
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
