@@ -1,6 +1,6 @@
 .container
   .mt-4
-    = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form", method: :get do
+    = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form single-search-input", method: :get do
       .query-field-wrap.nojs
         - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i["text"], i["search_id"]]  }
         = select_tag :query_items,                                      |

@@ -103,19 +103,16 @@
     }
   }
 
-  // For forms with only one search input, make the button a 1 line height
+  // For forms with only one search input, make the button 1 line height
+  // initially added for stolen_bike_listings
   &.single-search-input {
     .searchit {
-      min-height: 1 $vertical-height;
+      min-height: 39px; // Actual min-height
 
       svg {
-        width: 25%;
-        // width: 50%;
-        // max-width: 60px;
-
-        // // so it doesn't break organization search
-        // margin-top: 5%;
-        // display: inline-block;
+        height: 29px;
+        margin-top: 2%;
+        width: auto;
       }
     }
   }
