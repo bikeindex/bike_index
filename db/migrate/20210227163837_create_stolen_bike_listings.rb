@@ -22,6 +22,9 @@ class CreateStolenBikeListings < ActiveRecord::Migration[5.2]
       t.text :listing_text
       t.jsonb :data
 
+      t.integer :line
+      t.integer :group
+
       t.timestamps
     end
   end

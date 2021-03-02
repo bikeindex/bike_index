@@ -2433,6 +2433,8 @@ CREATE TABLE public.stolen_bike_listings (
     currency character varying,
     listing_text text,
     data jsonb,
+    line integer,
+    "group" integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
