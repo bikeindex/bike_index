@@ -38,7 +38,7 @@ class ImportStolenBikeListingWorker < ApplicationWorker
   end
 
   def color_attrs(str)
-    colors = str.split(/\/|,/).map { |c| Paint.paint_name_parser(c) }
+    colors = str.to_s.split(/\/|,/).map { |c| Paint.paint_name_parser(c) }
     color_ids = colors.map { |c| Color.friendly_id_find(c) }.reject(&:blank?)
     {
       primary_frame_color_id: color_ids[0] || Color.black.id,
@@ -57,7 +57,7 @@ class ImportStolenBikeListingWorker < ApplicationWorker
     return true if row[:bike].to_s.match?(/no/i)
     # We aren't storing reposts - just for now, we'll add sometime
     if row[:repost].present?
-      return !row[:repost].to_s.match?(/no/i)
+      return true unless row[:repost].to_s.match?(/no/i)
     end
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
