@@ -23,12 +23,8 @@
     .col-md-5
       %p
         #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
-
-  .mt-4
-
-  = paginate @stolen_bike_listings
-
-  .full-screen-table
+.container-fluid
+  .full-screen-table.mt-4
     %table.table.table-bordered.table-striped.table-sm
       %thead.thead-light.sortable
         %th
@@ -40,6 +36,8 @@
         %th
           Model
         %th
+          Frame size
+        %th
           Listing text
         %th
           Photos
@@ -47,21 +45,25 @@
         - @stolen_bike_listings.each do |stolen_bike_listing|
           %tr
             %td
-              %span.convertTime
+              %small.convertTime
                 = l stolen_bike_listing.listed_at, format: :convert_time
             %td
               = stolen_bike_listing.amount_formatted
             %td
               = stolen_bike_listing.mnfg_name
             %td
-              = stolen_bike_listing.model
+              = stolen_bike_listing.frame_model
             %td
-              = stolen_bike_listing.listing
+              = stolen_bike_listing.frame_size&.upcase
+            %td
+              = stolen_bike_listing.listing_text
             %td
               - stolen_bike_listing.photo_urls.each_with_index do |url, index|
                 = link_to index, url
-
-  = paginate @stolen_bike_listings
+  - if @stolen_bike_listings.total_count > @stolen_bike_listings.count
+    .paginate-container.paginate-container-bottom.row
+      .col-sm-6.mb-2
+        = paginate @stolen_bike_listings
 
   - unless @stolen_bike_listings.present?
     %h1.mt-4

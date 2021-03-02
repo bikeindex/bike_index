@@ -36,7 +36,7 @@ class StolenBikeListing < ActiveRecord::Base
   end
 
   def photo_urls
-    data["photo_urls"]
+    data["photo_urls"] || []
   end
 
   # TODO: Refactor - this duplicates bike#clean_frame_size, they should both be better

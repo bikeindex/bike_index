@@ -1,24 +1,32 @@
 class ImportStolenBikeListingWorker < ApplicationWorker
-  def perform(group, line, row)
+  HEADERS = %i[line listed_at folder bike repost price manufacturer model size color bike_index_bike notes listing_text].freeze
+
+  def self.headers
+    override_headers = ENV["IMPORT_STOLEN_LISTING_HEADERS"]
+    override_headers.present? ? override_headers.split(",").map(&:to_i) : HEADERS
+  end
+
+  def perform(group, line, row_str)
+    row = CSV.new(row_str, headers: self.class.headers).first.to_h
     return nil if skip_storing?(row)
     stolen_bike_listing = StolenBikeListing.where(group: group, line: line).first
     stolen_bike_listing ||= StolenBikeListing.new(group: group, line: line)
     stolen_bike_listing.attributes = {
       currency: "MXN",
-      frame_model: row["model"],
-      listing_text: row["listing_text"],
-      amount: row["price"],
-      frame_size: row["size"],
+      frame_model: row[:model],
+      listing_text: row[:listing_text],
+      amount: row[:price],
+      frame_size: row[:size],
       data: {
-        photo_folder: row["folder"],
-        photo_urls: row["photo_urls"],
-        notes: row["notes"]
+        photo_folder: row[:folder],
+        photo_urls: row[:photo_urls],
+        notes: row[:notes]
       }
     }
-    stolen_bike_listing.listed_at = TimeParser.parse(row["listed_at"]) if row["listed_at"]
-    stolen_bike_listing.attributes = manufacturer_attrs(row["manufacturer"])
-    stolen_bike_listing.attributes = color_attrs(row["color"])
-    stolen_bike_listing.bike_id = find_bike_id(row["owner_found"])
+    stolen_bike_listing.listed_at = TimeParser.parse(row[:listed_at]) if row[:listed_at]
+    stolen_bike_listing.attributes = manufacturer_attrs(row[:manufacturer])
+    stolen_bike_listing.attributes = color_attrs(row[:color])
+    stolen_bike_listing.bike_id = find_bike_id(row[:bike_index_bike])
     stolen_bike_listing.save
     stolen_bike_listing
   end
@@ -46,11 +54,11 @@ class ImportStolenBikeListingWorker < ApplicationWorker
   end
 
   def skip_storing?(row)
-    return true if row["bike"].to_s.match?(/no/i)
+    return true if row[:bike].to_s.match?(/no/i)
     # We aren't storing reposts - just for now, we'll add sometime
-    return true if row["repost"].to_s.match?(/yes/i)
+    return true if row[:repost].to_s.match?(/yes/i)
     # Don't store if there is data that is useful in any columns
-    row.slice("color", "manufacturer", "model", "listing_text")
+    row.slice(:color, :manufacturer, :model, :listing_text)
       .values.join("").gsub(/\s+/, " ").length < 5
   end
 end

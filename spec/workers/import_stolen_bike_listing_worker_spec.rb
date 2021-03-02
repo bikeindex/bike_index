@@ -4,25 +4,33 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
   let(:subject) { described_class }
   let(:instance) { subject.new }
 
+  def header_values(row)
+    ImportStolenBikeListingWorker::HEADERS.map { |h| row[h] }.join(",")
+  end
+
   describe "perform row" do
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "All City") }
     let!(:color) { Color.black }
     let(:row) do
-      {color: "Black",
-       manufacturer: "All City",
-       folder: "Dec 14 2020_003",
-       bike: "yes",
-       repost: "no",
-       listed_at: "2020-12-14",
-       model: "whatever",
-       price: "203.33",
-       size: "56",
-       listing_text: "something something All City, etc",
-       photo_urls: []}
+      {
+        line: "12",
+        listed_at: "2020-12-14",
+        folder: "Dec 14 2020_003",
+        bike: " ",
+        repost: "no",
+        price: "203.33",
+        manufacturer: "All City",
+        model: "whatever",
+        size: "56",
+        color: "Black",
+        bike_index_bike: "",
+        notes: "something else",
+        listing_text: "something something All City"
+      }
     end
     it "creates a StolenBikeListing" do
       expect(StolenBikeListing.count).to eq 0
-      stolen_bike_listing = instance.perform("constru", 12, row.as_json)
+      stolen_bike_listing = instance.perform("constru", 12, header_values(row))
       expect(StolenBikeListing.count).to eq 1
       expect(stolen_bike_listing.group).to eq "constru"
       expect(stolen_bike_listing.line).to eq 12
@@ -35,20 +43,21 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       expect(stolen_bike_listing.listing_text).to eq row[:listing_text]
       expect(stolen_bike_listing.listed_at).to be_within(1.day).of Time.parse("2020-12-14")
       expect(stolen_bike_listing.photo_urls).to eq([])
+      expect(stolen_bike_listing.data.dig("notes")).to eq("something else")
       expect(stolen_bike_listing.data.dig("photo_folder")).to eq("Dec 14 2020_003")
       # And test frame_size
       expect(stolen_bike_listing.frame_size_number).to eq 56
       expect(stolen_bike_listing.frame_size_unit).to eq "cm"
       expect(stolen_bike_listing.frame_size).to eq "56cm"
       expect {
-        instance.perform("constru", 12, row.as_json)
+        instance.perform("constru", 12, header_values(row))
       }.to_not change(StolenBikeListing, :count)
     end
     context "existing stolen_bike_listing" do
       let!(:stolen_bike_listing) { StolenBikeListing.create(group: "constru", line: 12) }
       it "updates existing one" do
         expect(StolenBikeListing.count).to eq 1
-        expect(instance.perform("constru", 12, row.as_json)&.id).to eq stolen_bike_listing.id
+        expect(instance.perform("constru", 12, header_values(row))&.id).to eq stolen_bike_listing.id
         expect(StolenBikeListing.count).to eq 1
         expect(stolen_bike_listing.reload.manufacturer_id).to eq manufacturer.id
       end
@@ -57,20 +66,15 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       let(:mostly_empty_row) do
         {color: "",
          manufacturer: " ",
-         folder: "Dec 14 2020_003",
          bike: "yes",
-         listed_at: "2020-12-14",
          model: " ",
-         price: "",
-         size: "",
-         listing_text: "",
-         photo_urls: []}
+         listing_text: ""}
       end
       it "is nil" do
         expect(StolenBikeListing.count).to eq 0
         # Not bike column
-        expect(instance.perform("constru", 12, row.merge(bike: "No").as_json)).to be_blank
-        expect(instance.perform("constru", 12, mostly_empty_row.as_json)).to be_blank
+        expect(instance.perform("constru", 12, header_values(row.merge(bike: "No")))).to be_blank
+        expect(instance.perform("constru", 12, header_values(row.merge(mostly_empty_row)))).to be_blank
         expect(StolenBikeListing.count).to eq 0
       end
     end
@@ -78,7 +82,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       # At least for now!
       it "is nil" do
         expect(StolenBikeListing.count).to eq 0
-        expect(instance.perform("constru", 12, row.merge(repost: "yes").as_json)).to be_blank
+        expect(instance.perform("constru", 12, header_values(row.merge(repost: "yes")))).to be_blank
         expect(StolenBikeListing.count).to eq 0
       end
     end
