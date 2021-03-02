@@ -290,6 +290,7 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv"
 
+  get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   resources :stolen_bike_listings, only: [:index]
 
   resource :integrations, only: [:create]

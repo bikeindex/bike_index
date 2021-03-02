@@ -25,7 +25,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
         color: "Black",
         bike_index_bike: "",
         notes: "something else",
-        listing_text: "something something All City"
+        listing_text: "something something All City 26&#34;"
       }
     end
     it "creates a StolenBikeListing" do
@@ -40,7 +40,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       expect(stolen_bike_listing.currency).to eq "MXN"
       expect(stolen_bike_listing.amount_formatted).to eq "$203.33"
       expect(stolen_bike_listing.frame_model).to eq "whatever"
-      expect(stolen_bike_listing.listing_text).to eq row[:listing_text]
+      expect(stolen_bike_listing.listing_text).to eq "something something All City 26\""
       expect(stolen_bike_listing.listed_at).to be_within(1.day).of Time.parse("2020-12-14")
       expect(stolen_bike_listing.photo_urls).to eq([])
       expect(stolen_bike_listing.data.dig("notes")).to eq("something else")
@@ -65,7 +65,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
     context "skip_storing" do
       let(:mostly_empty_row) do
         {color: "",
-         manufacturer: " ",
+         manufacturer: "blank",
          bike: "yes",
          model: " ",
          listing_text: ""}
@@ -74,6 +74,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
         expect(StolenBikeListing.count).to eq 0
         # Not bike column
         expect(instance.perform("constru", 12, header_values(row.merge(bike: "No")))).to be_blank
+        expect(instance.perform("constru", 12, header_values(row.merge(bike: "Raffle")))).to be_blank
         expect(instance.perform("constru", 12, header_values(row.merge(mostly_empty_row)))).to be_blank
         expect(StolenBikeListing.count).to eq 0
       end

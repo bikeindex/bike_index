@@ -98,6 +98,8 @@ class StolenBikeListing < ActiveRecord::Base
     end
     self.listed_at ||= Time.current
     self.listing_order = listed_at.to_i
+    # CSVs are hard. I encode double quotes and then decode them here
+    self.listing_text = listing_text.gsub("&#34;", '"') if listing_text.present?
     clean_frame_size
   end
 end
