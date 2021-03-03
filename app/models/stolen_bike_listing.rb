@@ -27,7 +27,8 @@ class StolenBikeListing < ActiveRecord::Base
 
   pg_search_scope :pg_search, against: {
     frame_model: "A",
-    listing: "B"
+    mnfg_name: "A",
+    listing_text: "B"
   }
 
   def self.search(interpreted_params)
