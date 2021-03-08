@@ -296,7 +296,7 @@ class StolenRecord < ApplicationRecord
     if new_image.valid?
       new_image
     else
-      update(alert_image: nil)
+      update(alert_image: nil) if alert_image.id.present?
       nil
     end
   end
