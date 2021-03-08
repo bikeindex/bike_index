@@ -7,6 +7,10 @@
         current_user ##{current_user.id}
   .col-7
     %ul
+      - if display_dev_info?
+        %li.nav-item.only-dev-visible
+          -
+          = link_to "updated", admin_users_path(sortable_search_params.merge(search_updated_at: !@updated_at)), class: @updated_at ? "nav-link active" : "nav-link"
       %li.nav-item
         - banned_search_params = sortable_search_params.merge(search_banned: !@search_banned)
         = link_to "Banned", admin_users_path(banned_search_params), class: @search_banned ? "nav-link active" : "nav-link"
@@ -54,7 +58,7 @@
 
 .mt-4
 = paginate @users, views_prefix: "admin"
-= render partial: "/admin/users/table", locals: { render_sortable: true }
+= render partial: "/admin/users/table", locals: { render_sortable: true, updated_at: @updated_at }
 = paginate @users, views_prefix: "admin"
 - unless @users.present?
   %h1.mt-4

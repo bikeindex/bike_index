@@ -58,7 +58,7 @@ class Admin::UsersController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at email]
+    %w[created_at email updated_at]
   end
 
   def earliest_period_date
@@ -74,6 +74,7 @@ class Admin::UsersController < Admin::BaseController
     @search_ambassadors = ParamsNormalizer.boolean(params[:search_ambassadors])
     @search_banned = ParamsNormalizer.boolean(params[:search_banned])
     @search_superusers = ParamsNormalizer.boolean(params[:search_superusers])
+    @updated_at = ParamsNormalizer.boolean(params[:search_updated_at])
     users = if current_organization.present?
       current_organization.users
     else
@@ -86,6 +87,8 @@ class Admin::UsersController < Admin::BaseController
     if params[:search_phone].present?
       users = users.search_phone(params[:search_phone])
     end
-    users.where(created_at: @time_range)
+
+    @time_range_column = sort_column == "updated_at" ? "updated_at" : "created_at"
+    users.where(@time_range_column => @time_range)
   end
 end
