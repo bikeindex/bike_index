@@ -40,7 +40,6 @@ RSpec.describe AfterUserChangeWorker, type: :job do
           instance.perform(user.id)
         }.to change(UserPhone, :count).by 1
         expect(AfterUserChangeWorker.jobs.count).to eq 0
-        fail
       end
     end
     context "existing user phone" do
