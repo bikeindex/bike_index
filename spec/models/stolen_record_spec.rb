@@ -108,8 +108,16 @@ RSpec.describe StolenRecord, type: :model do
         result = stolen_record.generate_alert_image(bike_image: bad_image)
 
         expect(result).to be_nil
-        expect(stolen_record.alert_image).to be_nil
+        expect(stolen_record.reload.alert_image).to be_nil
         expect(AlertImage.count).to eq(0)
+      end
+      it "doesn't update again" do
+        # ensure no looping of updates in the case of a failed image
+        bike = FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg")
+        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
+        expect(stolen_record.alert_image).to be_blank
+        expect(bike).to_not receive(:save)
+        expect(stolen_record.generate_alert_image).to be_blank
       end
     end
 
