@@ -75,6 +75,12 @@ RSpec.describe StolenBikeListing, type: :model do
         expect(stolen_bike_listing.updated_photo_folder).to eq "2020/7/7_2"
       end
     end
+    context "other weird shit" do
+      let(:photo_folder) { "Feb 14 2021_OMFG" }
+      it "deals with that too" do
+        expect(stolen_bike_listing.updated_photo_folder).to eq "2021/2/14_OMFG"
+      end
+    end
     context "empty" do
       let(:photo_folder) { "" }
       it "handles it" do

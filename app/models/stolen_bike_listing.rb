@@ -46,11 +46,14 @@ class StolenBikeListing < ActiveRecord::Base
 
   def updated_photo_folder
     return nil if photo_folder.blank?
-    folder = photo_folder
-    number_suffix = photo_folder[/_\d+\z/].to_s
-    number_suffix = nil if number_suffix.match?("2020")
+    suffix = photo_folder[/_\d+\z/].to_s
+    if suffix.blank? # Sometimes there folders like 2021_OMFG
+      suffix = photo_folder[/20\d\d_.*\z/].to_s
+      suffix = suffix.gsub(/\A20\d\d/, "")
+    end
+    suffix = nil if suffix.match?(/20\d\d/)
     date = TimeParser.parse(photo_folder.gsub(/\d+\//, ""))
-    "#{date.year}/#{date.month}/#{date.day}#{number_suffix}"
+    "#{date.year}/#{date.month}/#{date.day}#{suffix}"
   end
 
   def frame_colors
