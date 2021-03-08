@@ -51,7 +51,7 @@ class StolenBikeListing < ActiveRecord::Base
       suffix = photo_folder[/20\d\d_.*\z/].to_s
       suffix = suffix.gsub(/\A20\d\d/, "")
     end
-    suffix = nil if suffix.match?(/20\d\d/)
+    suffix = nil if suffix.present? && suffix.match?(/20\d\d/)
     date = TimeParser.parse(photo_folder.gsub(/\d+\//, ""))
     "#{date.year}/#{date.month}/#{date.strftime("%Y-%-m-%-d")}#{suffix}"
   end
