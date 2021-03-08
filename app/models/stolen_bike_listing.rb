@@ -53,7 +53,7 @@ class StolenBikeListing < ActiveRecord::Base
     end
     suffix = nil if suffix.match?(/20\d\d/)
     date = TimeParser.parse(photo_folder.gsub(/\d+\//, ""))
-    "#{date.year}/#{date.month}/#{date.day}#{suffix}"
+    "#{date.year}/#{date.month}/#{date.strftime("%Y-%-m-%-d")}#{suffix}"
   end
 
   def frame_colors
