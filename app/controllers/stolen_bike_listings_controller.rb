@@ -25,7 +25,7 @@ class StolenBikeListingsController < ApplicationController
   end
 
   def earliest_period_date
-    StolenBikeListing.minimum(:listed_at)
+    StolenBikeListing.minimum(:listed_at) || Time.current.beginning_of_year
   end
 
   def matching_stolen_bike_listings
