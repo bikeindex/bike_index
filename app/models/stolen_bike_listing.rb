@@ -40,6 +40,19 @@ class StolenBikeListing < ActiveRecord::Base
     data["photo_urls"] || []
   end
 
+  def photo_folder
+    data["photo_folder"]
+  end
+
+  def updated_photo_folder
+    return nil if photo_folder.blank?
+    folder = photo_folder
+    number_suffix = photo_folder[/_\d+\z/].to_s
+    number_suffix = nil if number_suffix.match?("2020")
+    date = TimeParser.parse(photo_folder.gsub(/\d+\//, ""))
+    "#{date.year}/#{date.month}/#{date.day}#{number_suffix}"
+  end
+
   def frame_colors
     [
       primary_frame_color&.name,

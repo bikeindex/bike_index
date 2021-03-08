@@ -1,5 +1,6 @@
 class StolenBikeListingsController < ApplicationController
   include SortableTable
+  before_action :set_period, only: [:index]
 
   def index
     page = params[:page] || 1
@@ -23,10 +24,16 @@ class StolenBikeListingsController < ApplicationController
       .merge(stolenness: "all")
   end
 
+  def earliest_period_date
+    StolenBikeListing.minimum(:listed_at)
+  end
+
   def matching_stolen_bike_listings
     @interpreted_params = StolenBikeListing.searchable_interpreted_params(permitted_search_params)
     # This might become more sophisticated someday...
     matching_stolen_bike_listings = StolenBikeListing.search(@interpreted_params)
-    @matching_stolen_bike_listings = matching_stolen_bike_listings
+
+    @time_range_column = "listed_at" # Maybe will have other possibilities later
+    @matching_stolen_bike_listings = matching_stolen_bike_listings.where(@time_range_column => @time_range)
   end
 end

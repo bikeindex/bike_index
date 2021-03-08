@@ -56,4 +56,30 @@ RSpec.describe StolenBikeListing, type: :model do
       end
     end
   end
+
+  describe "updated_photo_folder" do
+    let(:stolen_bike_listing) { StolenBikeListing.new(data: {photo_folder: photo_folder}) }
+    let(:photo_folder) { "Nov 20 2020_006" }
+    it "puts out expected thing" do
+      expect(stolen_bike_listing.updated_photo_folder).to eq "2020/11/20_006"
+    end
+    context "different date" do
+      let(:photo_folder) { "aug 23 2020" }
+      it "deals with that too" do
+        expect(stolen_bike_listing.updated_photo_folder).to eq "2020/8/23"
+      end
+    end
+    context "weird date" do
+      let(:photo_folder) { "july7_2020_2" }
+      it "deals with that too" do
+        expect(stolen_bike_listing.updated_photo_folder).to eq "2020/7/7_2"
+      end
+    end
+    context "empty" do
+      let(:photo_folder) { "" }
+      it "handles it" do
+        expect(stolen_bike_listing.updated_photo_folder).to be_blank
+      end
+    end
+  end
 end

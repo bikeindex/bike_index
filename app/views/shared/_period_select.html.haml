@@ -2,6 +2,8 @@
 - include_future ||= false
 - prepend_text ||= nil
 
+-# This is duplicated with different values in stolen_bike_listings#index
+
 #timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{skip_submission}" }
   - if prepend_text.present?
     %span.mr-2.less-strong.d-block.d-lg-inline-block

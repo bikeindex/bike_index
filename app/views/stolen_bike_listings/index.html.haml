@@ -19,12 +19,34 @@
             <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
 
       -# Skipping rendering these for now - they aren't strictly necessary
-      -#= render partial: "/shared/hidden_search_fields", locals: {kind: "stolen_bike_listings"}
+      = render partial: "/shared/hidden_search_fields", locals: {kind: "stolen_bike_listings"}
 
-  .row.mt-4
+
+  #timeSelectionBtnGroup.mt-4.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{false}" }
+    %span.mr-2.less-strong.d-block.d-lg-inline-block
+      Bikes listed
+    %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), data: { period: "all" } }
+      any time
+    %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
+      custom time frame
+
+  %form#timeSelectionCustom.custom-time-selection.mt-2.mb-2.collapse{ class: @period == "custom" ? "in show" : "" }
+    .form-group
+      = label_tag :start_time_selector, "from", class: "control-label mr-2"
+      = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    .form-group.end-time-contrtol
+      = label_tag :end_time_selector, "to", class: "control-label mr-2"
+      = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
+      update
+
+  .row.mt-2
     .col-md-5
       %p
         #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
+        %em
+          = humanized_time_range_column(@time_range_column)
+          = humanized_time_range(@time_range)
 .container-fluid
   .full-screen-table.mt-4
     %table.table.table-bordered.table-striped.table-sm
@@ -53,7 +75,7 @@
                 = l stolen_bike_listing.listed_at, format: :convert_time
               - if display_dev_info?
                 %em.small.less-strong.only-dev-visible
-                  #{stolen_bike_listing.line}
+                  = stolen_bike_listing.line
             %td
               = stolen_bike_listing.amount_formatted
             %td
@@ -86,3 +108,6 @@
   - unless @stolen_bike_listings.present?
     %h1.mt-4
       No listings found!
+
+-# include javascript pack for the time period select
+= javascript_pack_tag "application"
