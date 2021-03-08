@@ -31,20 +31,35 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(user_phone.notifications.count).to eq 1
       expect(user_phone.notifications.last.twilio_sid).to eq "asd7c80123123sdddf"
     end
+    context "test not reenqueueing" do
+      it "ensure it doesn't loop" do
+        user.reload
+        Sidekiq::Worker.clear_all
+        allow_any_instance_of(TwilioIntegration).to receive(:send_notification) { true }
+        expect {
+          instance.perform(user.id)
+        }.to change(UserPhone, :count).by 1
+        expect(AfterUserChangeWorker.jobs.count).to eq 0
+        fail
+      end
+    end
     context "existing user phone" do
       let(:user_phone) { FactoryBot.create(:user_phone, phone: phone) }
       let(:user) { user_phone.user }
       it "does not add the phone if the phone is present" do
         user.reload
+        Sidekiq::Worker.clear_all
         expect {
           instance.perform(user.id)
         }.to_not change(UserPhone, :count)
+        expect(AfterUserChangeWorker.jobs.count).to eq 0
         user.update(phone: phone)
         user_phone.destroy
         user.reload
         expect {
           instance.perform(user.id)
         }.to_not change(UserPhone, :count)
+        expect(AfterUserChangeWorker.jobs.count).to eq 0
         user.reload
         expect(user.phone).to eq phone
       end

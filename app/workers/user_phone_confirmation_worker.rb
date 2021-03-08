@@ -1,5 +1,5 @@
 class UserPhoneConfirmationWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 1
 
   def perform(user_phone_id, skip_user_update = false)
     user_phone = UserPhone.find(user_phone_id)

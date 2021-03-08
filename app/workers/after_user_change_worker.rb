@@ -39,7 +39,7 @@ class AfterUserChangeWorker < ApplicationWorker
     return false if user.user_phones.unscoped.where(phone: user.phone).present?
     user_phone = user.user_phones.create!(phone: user.phone)
     # Run this in the same process, rather than a different worker, so we update the general alerts
-    UserPhoneConfirmationWorker.new.perform(user_phone.id, false)
+    UserPhoneConfirmationWorker.new.perform(user_phone.id, true)
     user.reload
     true
   end
