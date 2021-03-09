@@ -15,7 +15,7 @@ class BikeIndex.StolenBikeListing extends BikeIndex
     $(".listing-images a").click (e) ->
       e.preventDefault()
       $target = $(e.target)
-      console.log($target.attr('href'))
+      window.stolenListingId = $target.attr('id')
       id = "#{$target.attr('id')}-modal"
       modal_html = "<div class='modal fade stolen-listing-photo-modal' id='#{id}'><div class='modal-dialog' role='document'><div class='modal-content'>"
       modal_html += "<div class='modal-title'><button class='close' 'aria-label'='Close' 'data-dismiss'='modal' type='button'><span 'aria-hidden'='true'>&times;</span></button></div>"
