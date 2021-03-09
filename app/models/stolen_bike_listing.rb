@@ -118,6 +118,7 @@ class StolenBikeListing < ActiveRecord::Base
   end
 
   def set_calculated_attributes
+    self.data ||= {}
     self.mnfg_name = if manufacturer.present?
       manufacturer.other? ? manufacturer_other : manufacturer.simple_name
     end
