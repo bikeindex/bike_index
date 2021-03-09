@@ -10,6 +10,7 @@ RSpec.describe BikesController, type: :controller do
   describe "index" do
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
+    let!(:impounded_bike) { FactoryBot.create(:impounded_bike) }
     let(:serial) { "1234567890" }
     let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles) }
     let(:ip_address) { "127.0.0.1" }
