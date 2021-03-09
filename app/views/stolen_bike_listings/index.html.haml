@@ -87,18 +87,27 @@
             %td
               = stolen_bike_listing.frame_size&.upcase
             %td.listing-text-cell
-              - if stolen_bike_listing.listing_text.to_s.length > 60
-                - truncated_text = stolen_bike_listing.listing_text.truncate(60, omission: "", separator: /\s/)
-                %span
-                  #{truncated_text}<a class="listing-text-expand-link" href="#listing-text-#{stolen_bike_listing.id}" title="#{stolen_bike_listing.listing_text}">...</a>
-                %span.listing-text-full{ id: "listing-text-#{stolen_bike_listing.id}" }
-                  = stolen_bike_listing.listing_text[truncated_text.length..-1]
-              - else
-                = stolen_bike_listing.listing_text
+              -#- if stolen_bike_listing.listing_text.to_s.length > 60
+              -#  - truncated_text = stolen_bike_listing.listing_text.truncate(60, omission: "", separator: /\s/)
+              -#  %span
+              -#    #{truncated_text}<a class="listing-text-expand-link" href="#listing-text-#{stolen_bike_listing.id}" title="#{stolen_bike_listing.listing_text}">...</a>
+              -#  %span.listing-text-full{ id: "listing-text-#{stolen_bike_listing.id}" }
+              -#    = stolen_bike_listing.listing_text[truncated_text.length..-1]
+              -#- else
+              = stolen_bike_listing.listing_text
 
             %td
-              - stolen_bike_listing.photo_urls.each_with_index do |url, index|
-                = link_to index, url
+              .listing-images
+                - if stolen_bike_listing.full_photo_urls.any?
+                  - preview_image = stolen_bike_listing.full_photo_urls.first
+                  = link_to image_tag(preview_image), preview_image, class: "preview-image"
+                  - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
+                  - if urls.any?
+                    %em
+                      additional photos:
+                      = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i].join("-")) }, ", ")
+                - else
+                  %em.less-strong We haven't uploaded the photos for this bike yet
 
   - if @stolen_bike_listings.total_count > @stolen_bike_listings.count
     .paginate-container.paginate-container-bottom.row

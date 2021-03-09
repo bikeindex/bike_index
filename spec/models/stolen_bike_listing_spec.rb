@@ -94,4 +94,28 @@ RSpec.describe StolenBikeListing, type: :model do
       end
     end
   end
+
+  describe "full_photo_urls" do
+    let(:photo_urls) { ["2020/6/2020-6-6_002/image-1793.png","2020/6/2020-6-6_002/image-1787.png","2020/6/2020-6-6_002/image-1778.png","2020/6/2020-6-6_002/image-1789.png","2020/6/2020-6-6_002/image-1806.png","2020/6/2020-6-6_002/image-1807.png","2020/6/2020-6-6_002/image-1811.png","2020/6/2020-6-6_002/image-1805.png","2020/6/2020-6-6_002/image-1810.png","2020/6/2020-6-6_002/image-1809.png"] }
+    let(:target) do
+      [
+        "image-1778.png",
+        "image-1787.png",
+        "image-1789.png",
+        "image-1793.png",
+        "image-1805.png",
+        "image-1806.png",
+        "image-1807.png",
+        "image-1809.png",
+        "image-1810.png",
+        "image-1811.png"
+      ]
+    end
+    let(:stolen_bike_listing) { StolenBikeListing.new(data: {photo_urls: photo_urls}) }
+    it "responds with them in order" do
+      expect(stolen_bike_listing.photo_urls[0..3]).to eq target.map { |u| "2020/6/2020-6-6_002/#{u}" }[0..3]
+      expect(stolen_bike_listing.photo_urls).to eq target.map { |u| "2020/6/2020-6-6_002/#{u}" }
+      expect(stolen_bike_listing.full_photo_urls).to eq target.map { |u| "https://files.bikeindex.org/theft-rings/2020/6/2020-6-6_002/#{u}" }
+    end
+  end
 end
