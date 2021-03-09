@@ -185,11 +185,13 @@ module BikeSearchable
       when "all"
         all
       when "non"
+        # Note: does not include impounded
         not_stolen
       when "proximity"
+        # Note: does not include impounded
         status_stolen.within_bounding_box(interpreted_params[:bounding_box])
       else
-        status_stolen
+        stolen_or_impounded
       end
     end
 
