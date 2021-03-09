@@ -164,7 +164,8 @@
       #map_canvas{ style: "height: 400px;" }
     .col-lg-6.mt-2
       .parking-notification-show-image{ style: "height: 400px;" }
-        = link_to(image_tag(@parking_notification.image_url(:large)), @parking_notification.image_url)
+        - if @parking_notification.image_url.present?
+          = link_to(image_tag(@parking_notification.image_url(:large)), @parking_notification.image_url)
 
 - else
   #map_canvas{ style: "height: 400px;" }
