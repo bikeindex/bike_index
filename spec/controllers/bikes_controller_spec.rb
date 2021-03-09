@@ -36,6 +36,15 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns(:selected_query_items_options)).to eq([])
           expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
           expect(assigns(:page_id)).to eq "bikes_index"
+          # Test impounded
+          get :index, params: {stolenness: "found"}
+          expect(assigns(:interpreted_params)).to eq(stolenness: "found")
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
+          get :index, params: {stolenness: "impounded"}
+          expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
         end
       end
       context "query_items and serial search" do
