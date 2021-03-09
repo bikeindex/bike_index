@@ -36,8 +36,18 @@ class StolenBikeListing < ActiveRecord::Base
       .listing_ordered
   end
 
+  def self.find_by_updated_photo_folder(str)
+    select { |l| l.updated_photo_folder == str }.first
+  end
+
   def photo_urls
-    data["photo_urls"] || []
+    (data["photo_urls"] || [])
+      .sort
+  end
+
+  def full_photo_urls
+    photo_urls
+      .map { |u| "https://files.bikeindex.org/theft-rings/#{u}" }
   end
 
   def photo_folder

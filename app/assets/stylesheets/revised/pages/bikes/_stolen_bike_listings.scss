@@ -1,6 +1,6 @@
 #stolen_bike_listings_index {
   .listing-text-cell {
-    max-width: 40rem;
+    max-width: 60rem;
   }
   .listing-text-expand-link {
     font-weight: bold;
@@ -11,6 +11,30 @@
     display: none;
     &.listing-text-shown {
       display: inline !important;
+    }
+  }
+  .listing-images {
+    text-align: center;
+    .preview-image {
+      display: block;
+      height: auto;
+      width: 300px;
+      margin: 0 auto 0.5rem;
+    }
+  }
+  .stolen-listing-photo-modal {
+    .modal-dialog {
+      max-width: 60%;
+      min-height: 300px;
+      .modal-title {
+        margin: 0.5rem 1rem 0;
+      }
+      img {
+        padding-top: 1rem;
+        display: block;
+        width: 100%;
+        height: auto;
+      }
     }
   }
 }
