@@ -6,6 +6,8 @@ RSpec.describe StolenBikeListingsController, type: :request do
       get "/theft-rings"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      get "/theft-ring"
+      expect(response).to redirect_to("/theft-rings")
     end
   end
   describe "index" do

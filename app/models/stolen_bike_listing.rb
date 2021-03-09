@@ -52,6 +52,16 @@ class StolenBikeListing < ActiveRecord::Base
     data["photo_folder"]
   end
 
+  def amount_usd_formatted
+    cents_usd = data["amount_cents_usd"] || calculated_amount_cents_usd
+    self.class.money_formatted_without_cents(cents_usd, :USD)
+  end
+
+  def calculated_amount_cents_usd
+    return 0 unless amount_cents.present?
+    Money.new(amount_cents, currency).exchange_to(:USD).cents
+  end
+
   def updated_photo_folder
     return nil if photo_folder.blank?
     suffix = photo_folder[/_\d+\z/].to_s
@@ -125,6 +135,8 @@ class StolenBikeListing < ActiveRecord::Base
     self.listing_order = listed_at.to_i
     # CSVs are hard. I encode double quotes and then decode them here
     self.listing_text = listing_text.gsub("&#34;", '"') if listing_text.present?
+    self.data ||= {}
+    self.data["amount_cents_usd"] = calculated_amount_cents_usd
     clean_frame_size
   end
 end

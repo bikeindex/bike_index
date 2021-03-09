@@ -5,9 +5,12 @@ RSpec.describe StolenBikeListing, type: :model do
   let(:color) { FactoryBot.create(:color) }
 
   describe "amount" do
-    let(:stolen_bike_listing) { FactoryBot.build(:stolen_bike_listing, amount_cents: 12_000, currency: "MXN") }
+    let(:stolen_bike_listing) { FactoryBot.create(:stolen_bike_listing, amount_cents: 420_000, currency: "MXN") }
+    let!(:exchange_rate) { FactoryBot.create(:exchange_rate, from: "MXN", to: "USD", rate: 0.047) }
     it "is in pesos" do
-      expect(stolen_bike_listing.amount_formatted).to eq "$120.00"
+      expect(stolen_bike_listing.amount_formatted).to eq "$4,200.00"
+      expect(stolen_bike_listing.data["amount_cents_usd"]).to eq 19740
+      expect(stolen_bike_listing.amount_usd_formatted).to eq "$197"
     end
   end
 
