@@ -9,6 +9,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
   end
 
   describe "perform row" do
+    let!(:exchange_rate) { FactoryBot.create(:exchange_rate, from: "MXN", to: "USD", rate: 0.047) }
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "All City") }
     let!(:color) { Color.black }
     let(:row) do
