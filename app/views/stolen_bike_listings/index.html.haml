@@ -77,7 +77,8 @@
                 %em.small.less-strong.only-dev-visible
                   = stolen_bike_listing.line
             %td
-              = stolen_bike_listing.amount_formatted
+              %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency}"}
+                = stolen_bike_listing.amount_usd_formatted
             %td
               = stolen_bike_listing.mnfg_name
             %td
