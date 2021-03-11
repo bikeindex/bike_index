@@ -4542,6 +4542,9 @@ nl:
         file_removed: Bestand verwijderd
         file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
           om ruimte te besparen
+        bulk_import_impounded: In beslag genomen bulkimport
+        impounded_at: In beslag genomen bij
+        impounded_id: In beslag genomen identiteitsbewijs
     exports:
       index:
         bikes_in_export: Fietsen in export

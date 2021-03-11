@@ -37,7 +37,7 @@ class StolenBikeListing < ActiveRecord::Base
   end
 
   def self.find_by_folder(str)
-    select { |l| l.updated_photo_folder == str }.first
+    find { |l| l.updated_photo_folder == str }
   end
 
   def photo_urls
