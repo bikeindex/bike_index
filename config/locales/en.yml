@@ -4395,6 +4395,7 @@ en:
         ascend_import: Ascend import
         bikes: Bikes
         bulk_import: Bulk import
+        bulk_import_impounded: Impounded bulk import
         color: Color
         created: Created
         creator: Creator

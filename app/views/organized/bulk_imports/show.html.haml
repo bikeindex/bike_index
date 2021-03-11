@@ -1,7 +1,9 @@
 .mb-4
-  %h1
+  %h1.uncap
     - if @bulk_import.ascend?
       = t(".ascend_import")
+    - elsif @bulk_import.impounded?
+      = t(".bulk_import_impounded")
     - else
       = t(".bulk_import")
 %table.table-list
