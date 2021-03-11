@@ -124,9 +124,14 @@
   .row.matching-bike-stickers.mt-4.mb-4{ style: "background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;" }
     .col-12.pt-4.pb-2
       %h2
-        Matching bike stickers
+        Matching
+        - if params[:search_query].present?
+          = link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query])
+        - else
+          bike stickers
+        %small= number_with_delimiter(@searched_bike_stickers.count)
       - if @searched_bike_stickers.count > 100
-        %h3 More than 100 matching stickers, just showing the first ones
+        %h3 More than 100 matching stickers, just showing the first 100
       = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @searched_bike_stickers.limit(100) }
 
 .row
