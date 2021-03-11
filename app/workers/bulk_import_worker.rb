@@ -23,6 +23,7 @@ class BulkImportWorker < ApplicationWorker
 
     # Grab the first line of the csv (which is the header line) and transform it
     headers = convert_headers(open_file.readline)
+    @bulk_import.data = (@bulk_import.data || {}).merge("headers" => headers)
     # Stream process the rest of the csv
     # The reason the starting_line is 1, if there hasn't been a file error:
     # We've already removed the first line, so it doesn't count. and we want lines to start at 1, not 0
@@ -113,7 +114,9 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s|-/, "_").downcase.to_sym }
+    headers = str.split(",").map do |h|
+      h.gsub(/"|'/, "").strip.gsub(/\s|-/, "_").downcase.gsub(/[^0-9A-Za-z_]/, "").to_sym
+    end
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 

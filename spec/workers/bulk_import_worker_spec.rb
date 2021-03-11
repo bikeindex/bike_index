@@ -86,6 +86,7 @@ RSpec.describe BulkImportWorker, type: :job do
           }.to change(Bike, :count).by 1
           bulk_import.reload
           expect(bulk_import.line_import_errors).to eq([target_line_error])
+          expect(bulk_import.headers).to eq(%w[description vendor manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email])
           expect(bulk_import.import_errors).to eq({line: [target_line_error]}.as_json)
           expect(bulk_import.bikes.count).to eq 1
           expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
@@ -238,6 +239,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bulk_import.progress).to eq "finished"
             expect(bulk_import.bikes.count).to eq 2
             expect(bulk_import.file_import_errors).to_not be_present
+            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.primary_frame_color).to eq color_green
@@ -512,6 +514,16 @@ RSpec.describe BulkImportWorker, type: :job do
         it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey
+        end
+        context "crazy characters" do
+          # EPS had a header with a nonbreaking space in it. It was very hard to debug. So - strip out any potential things like that
+          let(:shitty_character) { CGI.unescapeHTML("&#65279;") }
+          let(:header_string) { "#{shitty_character}impounded_id, BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded street, impounded-city, Stuff\n" }
+          it "returns the target" do
+            expect(header_string.first.ord).to eq 65279
+            expect(instance.convert_headers(header_string)).to eq([:impounded_id] + target)
+            expect(instance.bulk_import.import_errors?).to be_falsey
+          end
         end
       end
       context "conversions" do

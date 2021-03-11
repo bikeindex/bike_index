@@ -526,7 +526,8 @@ CREATE TABLE public.bulk_imports (
     updated_at timestamp without time zone NOT NULL,
     is_ascend boolean DEFAULT false,
     file_cleaned boolean DEFAULT false,
-    kind integer
+    kind integer,
+    data jsonb
 );
 
 
@@ -5510,6 +5511,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210205191728'),
 ('20210208203928'),
 ('20210227162633'),
-('20210227163837');
+('20210227163837'),
+('20210311160040');
 
 

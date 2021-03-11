@@ -74,10 +74,14 @@
           - else
             None
       %tr
+        %td Kind
+        %td= @bulk_import.kind_humanized
+      %tr
+        %td Headers
         %td
-          Ascend
-        %td
-          = check_mark if @bulk_import.ascend?
+          - if @bulk_import.headers.present?
+            %small
+              = safe_join(@bulk_import.headers.map { |a| content_tag(:code, a) }, ", ")
 
 - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"

@@ -32,6 +32,11 @@ class BulkImport < ApplicationRecord
     str&.gsub("_", " ")
   end
 
+  # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored
+  def headers
+    data&.dig("headers")
+  end
+
   def file_import_errors
     import_errors["file"] || import_errors["ascend"]
   end
