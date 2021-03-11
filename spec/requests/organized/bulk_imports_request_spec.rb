@@ -100,6 +100,18 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(assigns(:current_organization)).to eq current_organization
           expect(assigns(:permitted_kinds)).to eq(["organization_import"])
         end
+        context "ascend" do
+          let!(:current_organization) { FactoryBot.create(:organization, pos_kind: "ascend_pos") }
+          it "renders" do
+            expect(current_organization.reload.ascend_pos?).to be_truthy
+            expect(current_organization.show_bulk_import?).to be_truthy
+            get base_url
+            expect(response.status).to eq(200)
+            expect(response).to render_template :index
+            expect(assigns(:current_organization)).to eq current_organization
+            expect(assigns(:permitted_kinds)).to eq(["ascend"])
+          end
+        end
         context "show_bulk_import_impound_bikes" do
           let!(:current_organization) { impound_organization }
           it "renders" do

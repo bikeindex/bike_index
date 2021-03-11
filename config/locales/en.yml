@@ -4395,6 +4395,7 @@ en:
         ascend_import: Ascend import
         bikes: Bikes
         bulk_import: Bulk import
+        bulk_import_impounded: Impounded bulk import
         color: Color
         created: Created
         creator: Creator
@@ -4403,6 +4404,8 @@ en:
         file_removed: file removed
         file_removed_explanation: after a few days, we delete the uploaded file to
           save space
+        impounded_at: Impounded at
+        impounded_id: Impounded ID
         manufacturer: Manufacturer
         model: Model
         progress: Progress
