@@ -1175,6 +1175,9 @@ en:
         recover a stolen bike in less than one day.
       department_city: Department & city
       description_of_the_incident: Description of the incident
+      show_phone_users: Show phone to logged in users
+      show_phone_shops: Show to bike shop users
+      show_phone_police: Show to verified law enforcement partners
       do_these_things_for_the_best_chance: Do these things for the best chance of
         recovery!
       do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?

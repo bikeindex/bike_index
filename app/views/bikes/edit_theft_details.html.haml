@@ -30,16 +30,33 @@
                 - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
                 = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
-            -# Add an ID to this element because we want to link to the specific location
-            .form-group.row.unnested-field#where-theft-happened
-              = srecord.label :phone, class: 'form-well-label'
-              .form-well-input
-                = srecord.text_field :phone, class: 'form-control'
+            .related-fields
+              .form-group.row
+                = srecord.label :phone, class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :phone, class: 'form-control'
 
-            .form-group.row.unnested-field
-              = srecord.label :secondary_phone, class: 'form-well-label'
-              .form-well-input
-                = srecord.text_field :secondary_phone, class: 'form-control'
+              .form-group.row
+                = srecord.label :secondary_phone, class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :secondary_phone, class: 'form-control'
+
+              .form-group.row
+                %label.form-well-label.mb-0
+                %label.form-well-input.mb-0
+                  = srecord.check_box :phone_for_users
+                  = t(".show_phone_users")
+              .form-group.row
+                %label.form-well-label.mb-0
+                %label.form-well-input.mb-0
+                  = srecord.check_box :phone_for_shops
+                  = t(".show_phone_shops")
+              .form-group.row
+                %label.form-well-label.mb-0
+                %label.form-well-input.mb-0
+                  = srecord.check_box :phone_for_police
+                  = t(".show_phone_police")
+
 
             = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
