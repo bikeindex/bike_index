@@ -1191,6 +1191,9 @@ en:
       promoted_theft_alerts: Promoted Theft Alerts
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
+      show_phone_police: Show to verified law enforcement partners
+      show_phone_shops: Show to bike shop users
+      show_phone_users: Show phone to logged in users
       try_one_now: Try one now!
       we_can_create_fb_ads_for_you: >-
         Did you know we can create targeted Facebook ads to spread the word about

@@ -1464,6 +1464,9 @@ RSpec.describe BikesController, type: :request do
           show_address: "1",
           estimated_value: "2101",
           locking_description: "party",
+          phone_for_users: "0",
+          phone_for_shops: "1",
+          phone_for_police: "0",
           lock_defeat_description: "cool things",
           theft_description: "Something",
           police_report_number: "23891921",
@@ -1484,6 +1487,11 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.without_location?).to be_truthy
           og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
           expect(og_alert_image_id).to be_present
+          # Test stolen record phoning
+          expect(stolen_record.phone_for_everyone).to be_falsey
+          expect(stolen_record.phone_for_users).to be_truthy
+          expect(stolen_record.phone_for_shops).to be_truthy
+          expect(stolen_record.phone_for_police).to be_truthy
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{bike.id}", params: {
@@ -1513,6 +1521,10 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.police_report_department).to eq "Manahattan"
           expect(stolen_record.proof_of_ownership).to be_falsey
           expect(stolen_record.receive_notifications).to be_truthy
+          expect(stolen_record.phone_for_everyone).to be_falsey
+          expect(stolen_record.phone_for_users).to be_falsey
+          expect(stolen_record.phone_for_shops).to be_truthy
+          expect(stolen_record.phone_for_police).to be_falsey
 
           expect(stolen_record.alert_image).to be_present
           expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
