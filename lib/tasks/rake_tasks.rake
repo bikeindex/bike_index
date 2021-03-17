@@ -50,7 +50,7 @@ task database_size: :environment do
       size: size[0]["pg_total_relation_size"],
       pretty_size: pretty_size[0]["pg_size_pretty"]
     }
-  }.sort { |x, y| y[:size] <=> x[:size] }
+  }.sort { |x, y| x[:size] <=> y[:size] }
 
   # Get the width the name column needs to be
   name_col_length = output_tables.map { |t| t[:name].length }.max + 3
