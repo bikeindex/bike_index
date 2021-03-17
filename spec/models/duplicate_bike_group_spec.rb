@@ -7,7 +7,7 @@ RSpec.describe DuplicateBikeGroup, type: :model do
       expect(duplicate_bike_group.valid?).to be_truthy
       expect(duplicate_bike_group.normalized_serial_segments.count).to eq 2
       expect(duplicate_bike_group.bikes.count).to eq 2
-      expect(duplicate_bike_group.bikes.first.duplicate_bikes.count).to eq 2
+      expect(duplicate_bike_group.bikes.first.duplicate_bikes.count).to eq 1
       duplicate_bike_group.update(ignore: true)
       # If ignored, bikes ignore
       expect(duplicate_bike_group.bikes.first.duplicate_bikes.count).to eq 0
