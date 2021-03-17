@@ -50,7 +50,7 @@ class Bike < ApplicationRecord
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
-  has_many :duplicate_bikes, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
+  has_many :duplicate_bikes_including_self, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :impound_claims_claimed, through: :impound_records, source: :impound_claims
@@ -269,6 +269,11 @@ class Bike < ApplicationRecord
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
   def cleaned_error_messages
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
+  end
+
+  # Have to remove self from duplicate bike groups
+  def duplicate_bikes
+    duplicate_bikes_including_self.where.not(id: id)
   end
 
   def calculated_listing_order
