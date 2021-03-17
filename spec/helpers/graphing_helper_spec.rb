@@ -71,7 +71,7 @@ RSpec.describe GraphingHelper, type: :helper do
     context "6 days" do
       let(:start_time) { end_time - 10.days }
       it "is weekday month-date" do
-        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 1-5"
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 2020-1-5"
       end
     end
     context "13 months" do
@@ -181,6 +181,24 @@ RSpec.describe GraphingHelper, type: :helper do
         it "returns with preciseTimeSeconds" do
           expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
         end
+      end
+    end
+  end
+
+  describe "period_in_words" do
+    it "returns seconds" do
+      expect(period_in_words("32")).to eq "32 seconds"
+      expect(period_in_words(-32)).to eq "32 seconds"
+    end
+    context "hour" do
+      it "returns hours" do
+        expect(period_in_words(3_600)).to eq "1 hour"
+        expect(period_in_words(5_400)).to eq "1.5 hours"
+      end
+    end
+    context "days" do
+      it "returns days" do
+        expect(period_in_words(100800)).to eq "1.2 days"
       end
     end
   end
