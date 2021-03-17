@@ -38,7 +38,7 @@ module GraphingHelper
     elsif group_period == :group_by_hour
       "%a%l %p"
     elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
-      "%a %-m-%-d"
+      "%a %Y-%-m-%-d"
     elsif group_period == :group_by_month
       "%Y-%-m"
     end
@@ -79,6 +79,21 @@ module GraphingHelper
         concat content_tag(:em, l(time_range.last, format: :convert_time), class: "convertTime #{precision_class}")
       end
     end
+  end
+
+  # Initially just used by scheduled jobs display, but could be used by other things!
+  def period_in_words(seconds)
+    return "" if seconds.blank?
+    seconds = seconds.to_i.abs
+    if seconds < 1.minute
+      pluralize(seconds, "second")
+    elsif seconds >= 1.minute && seconds < 1.hour
+      pluralize((seconds / 60.0).round(1), "minute")
+    elsif seconds >= 1.hour && seconds < 24.hours
+      pluralize((seconds / 3600.0).round(1), "hour")
+    elsif seconds >= 24.hours
+      pluralize((seconds / 86400.0).round(1), "day")
+    end.gsub(".0 ", " ") # strip out the empty zero
   end
 
   def organization_dashboard_bikes_graph_data

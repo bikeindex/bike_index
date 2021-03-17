@@ -3,49 +3,41 @@
     %h1
       Schedule jobs
 
-.full-screen-table
+.full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th
-        Job
-      %th
-        Frequency
-      %th
-        Last started
-      %th
-        Last finished
-      %th
-        Duration
-
+      - if display_dev_info?
+        %th.only-dev-visible
+      %th Job
+      %th Frequency
+      %th Next run
+      %th Last started
+      %th Last finished
+      %th Duration
     %tbody
       - ScheduledWorkerRunner.scheduled_workers.sort_by { |klass| klass.name.downcase }.each do |klass|
-        / - klass
+        - last_started = klass.last_started && Time.parse(klass.last_started)
         %tr
+          - if display_dev_info?
+            %td
+              %code.small= klass
           %td
-            = klass
+            = klass.to_s.gsub(/\Ascheduled/i, "").gsub(/worker\z/i, "").underscore.humanize
           %td
-            - if klass.frequency < 1.minute
-              = klass.frequency
-              seconds
-            - elsif klass.frequency >= 1.minute && klass.frequency < 1.hour
-              = klass.frequency/60.00
-              minutes
-            - elsif klass.frequency >= 1.hour && klass.frequency < 24.hours
-              = klass.frequency/3600.00
-              hours
-            - elsif klass.frequency >= 24.hours
-              = klass.frequency/86400.00
-              days
+            = period_in_words(klass.frequency)
+          %td
+            - if last_started.blank? || last_started < (last_started + klass.frequency)
+              %span.less-strong now
+            - else
+              = period_in_words((last_started + klass.frequency) - Time.current)
           %td
             - if klass.last_finished.present?
               %span.convertTime.preciseTime
                 = l Time.parse(klass.last_finished), format: :convert_time
           %td
-            - if klass.last_started.present?
+            - if last_started.present?
               %span.convertTime.preciseTime
-                = l Time.parse(klass.last_started), format: :convert_time
+                = l last_started, format: :convert_time
           %td
-            - if klass.last_finished.present? && klass.last_started.present?
-              = Time.parse(klass.last_finished) - Time.parse(klass.last_started)
-
-
+            - if klass.last_finished.present? && last_started.present?
+              = period_in_words(Time.parse(klass.last_finished) - last_started)
