@@ -6,7 +6,7 @@ class ScheduledWorker < ApplicationWorker
   end
 
   def self.queue_maximum_addition_size
-    ENV["SIDEKIQ_QUEUE_MAX"]&.to_i || 200
+    200
   end
 
   def self.last_finished
