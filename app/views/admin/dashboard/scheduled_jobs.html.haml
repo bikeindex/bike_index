@@ -26,7 +26,7 @@
           %td
             = period_in_words(klass.frequency)
           %td
-            - if last_started.blank? || last_started < (last_started + klass.frequency)
+            - if last_started.blank? || last_started > (last_started + klass.frequency)
               %span.less-strong now
             - else
               = period_in_words((last_started + klass.frequency) - Time.current)
