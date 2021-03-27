@@ -149,11 +149,13 @@ module ApplicationHelper
   end
 
   def sortable_search_params?
-    sortable_search_params.values.reject(&:blank?).any?
+    s_params = sortable_search_params.except(:direction, :sort, :period).values.reject(&:blank?).any?
+    return true if s_params
+    params[:period].present? && params[:period] != "all"
   end
 
   def sortable_search_params
-    params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+    @sortable_search_params ||= params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
       :direction, :sort, # sorting params
       :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
       :user_id, :organization_id, :query, # General search params

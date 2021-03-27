@@ -1,6 +1,30 @@
 .container
-  %h1
-    = link_to "Stolen bike listings", stolen_bike_listings_path
+  - if @blog.present? && !sortable_search_params?
+    = content_for :header do
+      %link{rel: :canonical, href: canonical_url(@blog) }
+      - if @blog.secondary_title.present? # This is gross, but whatever
+        <meta name="title" content="#{@blog.secondary_title}">
+
+    #news_display
+      .blog-header
+        %h1.global-title
+          = @blog.title
+
+        %article.blogger-info
+          %h4.pub-date
+            updated
+            - if @blog.published_at > Time.current - 1.week
+              = l(@blog.published_at, format: :standard_display)
+            - else
+              = l(@blog.published_at, format: :no_day_with_year)
+
+    :markdown
+      #{@blog.body}
+  - else
+    %h1.uncap
+      Read about
+      = link_to "the stolen bike ring!", theft_rings_path
+
   .mt-4
     = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form single-search-input", method: :get do
       .query-field-wrap.nojs
@@ -40,13 +64,17 @@
     %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
       update
 
-  .row.mt-2
-    .col-md-5
+  .row.mt-4
+    .col-xs-12
       %p
         #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
         %em
           = humanized_time_range_column(@time_range_column)
           = humanized_time_range(@time_range)
+        - if sortable_search_params?
+          %span.less-strong
+            \- view
+            = link_to "all stolen bike listings", stolen_bike_listings_path
 .container-fluid
   .full-screen-table.mt-4
     %table.table.table-bordered.table-striped.table-sm

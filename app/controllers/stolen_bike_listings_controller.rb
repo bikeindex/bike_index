@@ -3,11 +3,17 @@ class StolenBikeListingsController < ApplicationController
   before_action :set_period, only: [:index]
 
   def index
+    @render_info = calculated_render_info
+    if @render_info
+      @blog = Blog.friendly_find(Blog.theft_rings_id)
+      per_page = 10
+    end
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    per_page ||= params[:per_page] || 25
     @stolen_bike_listings = matching_stolen_bike_listings
       .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}")
       .page(page).per(per_page)
+
     @selected_query_items_options = StolenBikeListing.selected_query_items_options(@interpreted_params)
   end
 
@@ -17,6 +23,17 @@ class StolenBikeListingsController < ApplicationController
 
   def sortable_columns
     %w[listed_at amount_cents mnfg_name]
+  end
+
+  def calculated_render_info
+    # Duplicates ApplicationHelper#sortable_search_params
+    sortable_search_params = params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+      :direction, :sort, # sorting params
+      :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
+      :user_id, :organization_id, :query, # General search params
+      :serial, :stolenness, :location, :distance, query_items: []) # Bike searching params
+    # only render info if it's present
+    sortable_search_params.values.reject(&:blank?).none?
   end
 
   def permitted_search_params

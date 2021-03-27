@@ -4,6 +4,8 @@ class InfoController < ApplicationController
     if @blog.blank?
       flash[:error] = "unable to find that page"
       redirect_to(news_path) && return
+    elsif @blog.id == Blog.theft_rings_id
+      redirect_to("/theft-rings") && return
     elsif @blog.blog?
       redirect_to(news_path(@blog.to_param)) && return
     end

@@ -1,6 +1,6 @@
 = content_for :header do
   %link{rel: :canonical, href: canonical_url(@blog) }
-  - if @blog.present? && @blog.secondary_title.present? # This is gross, but whatever
+  - if @blog&.secondary_title.present? # This is gross, but whatever
     <meta name="title" content="#{@blog.secondary_title}">
 
 #news_display
