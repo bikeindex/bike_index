@@ -48,6 +48,10 @@ class Blog < ApplicationRecord
       find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
   end
 
+  def self.theft_rings_slug
+    "theft-rings"
+  end
+
   def self.why_donate_slug
     "end-2020-with-a-donation-to-bike-index"
   end

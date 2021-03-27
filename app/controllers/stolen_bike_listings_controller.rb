@@ -8,6 +8,7 @@ class StolenBikeListingsController < ApplicationController
     @stolen_bike_listings = matching_stolen_bike_listings
       .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}")
       .page(page).per(per_page)
+    @blog = Blog.friendly_find(Blog.theft_rings_slug)
     @selected_query_items_options = StolenBikeListing.selected_query_items_options(@interpreted_params)
   end
 

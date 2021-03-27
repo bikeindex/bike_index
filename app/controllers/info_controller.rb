@@ -31,6 +31,12 @@ class InfoController < ApplicationController
   def privacy
   end
 
+  def theft_rings
+    @blog = Blog.friendly_find(Blog.theft_rings_slug)
+    @stolen_bike_listings = StolenBikeListing.reorder("stolen_bike_listings.listed_at desc")
+      .limit(10)
+  end
+
   def terms
   end
 

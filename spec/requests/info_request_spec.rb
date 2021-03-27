@@ -36,6 +36,20 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "theft-rings" do
+    it "renders" do
+      # Even if the blog can't be found, it should still render
+      get "/theft-rings"
+      expect(assigns(:blog)&.id).to be_blank
+      expect(response.status).to eq(200)
+      blog = FactoryBot.create(:blog, title: "Theft rings")
+      expect(blog.slug).to eq Blog.theft_rings_slug
+      get "/theft-rings"
+      expect(assigns(:blog)&.id).to eq blog.id
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe "static pages" do
     pages = %w[about protect_your_bike where serials image_resources resources security
       dev_and_design donate terms vendor_terms privacy lightspeed]

@@ -395,5 +395,19 @@ RSpec.describe ApplicationHelper, type: :helper do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end
     end
+    context "direction, sort, period: all " do
+      let(:passed_params) { {direction: "asc", sort: "stolen", period: "all"} }
+      let(:target) { {direction: "asc", sort: "stolen", period: "all"} }
+      it "returns an empty hash" do
+        expect(sortable_search_params?).to be_falsey
+      end
+    end
+    context "direction, sort, period: week" do
+      let(:passed_params) { {direction: "asc", sort: "stolen", period: "week"} }
+      let(:target) { {direction: "asc", sort: "stolen", period: "week"} }
+      it "returns an empty hash" do
+        expect(sortable_search_params?).to be_truthy
+      end
+    end
   end
 end
