@@ -4,6 +4,8 @@ class InfoController < ApplicationController
     if @blog.blank?
       flash[:error] = "unable to find that page"
       redirect_to(news_path) && return
+    elsif @blog.id == Blog.theft_rings_id
+      redirect_to("/theft-rings") && return
     elsif @blog.blog?
       redirect_to(news_path(@blog.to_param)) && return
     end
@@ -29,12 +31,6 @@ class InfoController < ApplicationController
   end
 
   def privacy
-  end
-
-  def theft_rings
-    @blog = Blog.friendly_find(Blog.theft_rings_slug)
-    @stolen_bike_listings = StolenBikeListing.reorder("stolen_bike_listings.listed_at desc")
-      .limit(10)
   end
 
   def terms

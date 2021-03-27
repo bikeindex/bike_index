@@ -42,14 +42,14 @@ class Blog < ApplicationRecord
 
   def self.friendly_find(str)
     return nil unless str.present?
-    return find(str) if integer_slug?(str)
+    return find_by_id(str) if integer_slug?(str)
     slug = slugify_title(str)
     find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
       find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
   end
 
-  def self.theft_rings_slug
-    "theft-rings"
+  def self.theft_rings_id
+    324
   end
 
   def self.why_donate_slug

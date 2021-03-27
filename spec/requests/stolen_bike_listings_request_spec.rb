@@ -6,6 +6,15 @@ RSpec.describe StolenBikeListingsController, type: :request do
       get "/theft-rings"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:blog)&.id).to be_blank
+      blog = FactoryBot.create(:blog, title: "Theft rings")
+      blog.update_column :id, Blog.theft_rings_id
+      blog.reload
+      expect(blog.id).to eq Blog.theft_rings_id
+      get "/theft-rings"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:blog)&.id).to eq blog.id
       get "/theft-ring"
       expect(response).to redirect_to("/theft-rings")
     end
