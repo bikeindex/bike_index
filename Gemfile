@@ -49,7 +49,7 @@ gem "high_voltage"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
-gem "kramdown", "2.3.0" # Markdown
+gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails", "~> 1.11"
