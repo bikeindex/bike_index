@@ -31,7 +31,7 @@ class Admin::GraphsController < Admin::BaseController
     @kind = ""
   end
 
-  helper_method :bike_graph_kinds
+  helper_method :bike_graph_kinds, :matching_bikes, :pos_search_kinds
 
   protected
 
@@ -63,7 +63,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def pos_search_kinds
-    %w[lightspeed_pos ascend_pos any_pos no_pos]
+    %w[lightspeed_pos ascend_pos pos_not_lightspeed_ascend no_pos]
   end
 
   def bike_chart_data
