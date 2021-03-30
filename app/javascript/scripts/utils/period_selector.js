@@ -73,8 +73,12 @@ function PeriodSelector() {
     enablePeriodSelection() {
       const self = this;
 
-      $("#timeSelectionBtnGroup button").on("click", (e) => {
+      $("#timeSelectionBtnGroup .btn").on("click", (e) => {
         let $target = $(e.target);
+        // If it's a link (e.g. "past hour") just follow the link!
+        if ($target.attr("href")) {
+          return true;
+        }
         let selectedPeriod = $target.attr("data-period");
         // Sometimes, the target isn't the button, it's something inside the button. In that case, find the correct period
         if (typeof selectedPeriod == "undefined") {

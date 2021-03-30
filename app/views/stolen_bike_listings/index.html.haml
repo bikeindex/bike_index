@@ -1,5 +1,5 @@
 .container
-  - if @blog.present? && !sortable_search_params?
+  - if @blog.present? && @render_info
     = content_for :header do
       %link{rel: :canonical, href: canonical_url(@blog) }
       - if @blog.secondary_title.present? # This is gross, but whatever

@@ -92,4 +92,8 @@ module AdminHelper
     return "#ffc107" if score < 70
     "#28a745"
   end
+
+  def admin_number_display(number)
+    content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
+  end
 end
