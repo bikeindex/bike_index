@@ -75,19 +75,19 @@ function PeriodSelector() {
 
       $("#timeSelectionBtnGroup .btn").on("click", (e) => {
         let $target = $(e.target);
-        // If it's a link (e.g. "past hour") just follow the link!
-        if ($target.attr("href")) {
-          return true;
-        }
         let selectedPeriod = $target.attr("data-period");
         // Sometimes, the target isn't the button, it's something inside the button. In that case, find the correct period
         if (typeof selectedPeriod == "undefined") {
           // If we can't figure out what the target was, return false, so the user clicks again
-          if (!$(e.target).parents("button").length) {
-            return false;
+          if (!$(e.target).parents(".btn").length) {
+            return;
           }
-          $target = $target.parents("button");
+          $target = $target.parents(".btn");
           selectedPeriod = $target.attr("data-period");
+        }
+        // If it's a link (e.g. "past hour") just follow the link!
+        if ($target.attr("href")) {
+          return true;
         }
         if (selectedPeriod === "custom") {
           return self.enableCustomSelection();
