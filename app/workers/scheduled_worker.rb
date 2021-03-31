@@ -29,7 +29,7 @@ class ScheduledWorker < ApplicationWorker
     # Check sidekiq's redis - which may be distinct from other redis things
     Sidekiq.redis do |conn|
       # Don't try to find the job if the queue is over max size
-    return true if conn.llen(redis_queue) > queue_maximum_addition_size
+      return true if conn.llen(redis_queue) > queue_maximum_addition_size
       # Jobs are json encoded in redis. Grab all of them and just match them by string
       conn.lrange(redis_queue, 0, -1).any? { |job| job.match(/class...#{name}/).present? }
     end
