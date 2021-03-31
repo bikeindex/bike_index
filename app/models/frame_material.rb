@@ -2,6 +2,7 @@ class FrameMaterial
   include Enumable
 
   SLUGS = {
+    magnesium: 5,
     organic: 4,
     composite: 3,
     titanium: 2,
@@ -10,6 +11,7 @@ class FrameMaterial
   }.freeze
 
   NAMES = {
+    magnesium: "Magnesium",
     aluminum: "Aluminum",
     composite: "Carbon or composite",
     organic: "Wood or organic material",
