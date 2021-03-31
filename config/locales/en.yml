@@ -715,6 +715,7 @@ en:
       frame_material:
         aluminum: Aluminum
         composite: Carbon or composite
+        magnesium: Magnesium
         organic: Wood or organic material
         steel: Steel
         titanium: Titanium
