@@ -35,7 +35,7 @@ RSpec.describe Admin::NewsController, type: :request do
         title: "new title thing stuff",
         body: "<p>html</p>",
         language: "en",
-        content_tag_names: "#{content_tag.name}"
+        content_tag_names: [content_tag.name]
       }
       put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
       blog.reload

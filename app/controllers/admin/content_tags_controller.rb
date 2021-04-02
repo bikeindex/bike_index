@@ -51,8 +51,13 @@ class Admin::ContentTagsController < Admin::BaseController
     ContentTag
   end
 
+  # Because we start with alpha ordering
+  def default_direction
+    "asc"
+  end
+
   def permitted_parameters
-    params.require(:content_tag).permit(:name, :priority)
+    params.require(:content_tag).permit(:name, :priority, :description)
   end
 
   def find_content_tag

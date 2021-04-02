@@ -18,4 +18,17 @@
       %li.nav-item
         = link_to 'New Post', new_admin_news_url, class: "btn btn-success btn-sm"
 
+.mt-2
+  = render partial: "/shared/period_select"
+
+%p
+  #{number_with_delimiter(available_blogs.count)} matching
+  %em
+    = humanized_time_range(@time_range)
+  - if @tags.present?
+    %span.less-strong
+      with tags:
+      = @tags.pluck(:name).join(", ")
+
+
 = render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"}

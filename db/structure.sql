@@ -696,8 +696,9 @@ ALTER SEQUENCE public.components_id_seq OWNED BY public.components.id;
 
 CREATE TABLE public.content_tags (
     id bigint NOT NULL,
-    name text,
-    slug text,
+    name character varying,
+    slug character varying,
+    description text,
     priority integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL

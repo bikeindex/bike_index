@@ -197,16 +197,16 @@ RSpec.describe Blog, type: :model do
       blog1.update(content_tag_names: "#{content_tag1.name}")
       expect(blog1.reload.content_tag_names).to eq([content_tag1.name])
 
-      expect(Blog.with_tag_ids(content_tag1.id).pluck(:id)).to match_array([blog1.id, blog2.id])
+      expect(Blog.with_tag_ids(content_tag1.id).map(&:id)).to match_array([blog1.id, blog2.id])
       blog1.update(content_tag_names: "#{content_tag2.name}, #{content_tag1.slug}")
       expect(blog1.reload.content_tag_names).to eq([content_tag1.name, content_tag2.name])
       # TODO: should be subtractive :/
-      # expect(Blog.with_tag_ids([content_tag1.id, content_tag2.id]).pluck(:id)).to eq([blog1.id])
+      # expect(Blog.with_tag_ids([content_tag1.id, content_tag2.id]).map(&:id)).to eq([blog1.id])
 
       blog1.update(content_tag_names: ", #{content_tag2.slug}")
       expect(blog1.reload.content_tag_names).to eq([content_tag2.name])
-      expect(Blog.with_tag_ids([content_tag1.id]).pluck(:id)).to eq([blog2.id])
-      expect(Blog.with_tag_ids([content_tag2.id]).pluck(:id)).to eq([blog1.id])
+      expect(Blog.with_tag_ids([content_tag1.id]).map(&:id)).to eq([blog2.id])
+      expect(Blog.with_tag_ids([content_tag2.id]).map(&:id)).to eq([blog1.id])
     end
   end
 end

@@ -8,7 +8,7 @@ class Blog < ApplicationRecord
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
-  has_many :blog_content_tags
+  has_many :blog_content_tags, dependent: :destroy
   has_many :content_tags, through: :blog_content_tags
   accepts_nested_attributes_for :listicles, allow_destroy: true
 
@@ -65,11 +65,13 @@ class Blog < ApplicationRecord
   # TODO: make this match only if *all* tag ids present
   def self.with_tag_ids(content_tag_ids)
     content_tag_ids = Array(content_tag_ids)
-    left_joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+      .distinct.references(:blog_content_tags)
   end
 
   def content_tag_names=(val)
-    ctag_ids = val.split(",").map { |c| ContentTag.friendly_id_find(c) }.compact
+    val = val.is_a?(Array) ? val : val.split(",")
+    ctag_ids = val.map { |c| ContentTag.friendly_id_find(c) }.compact
     blog_content_tags.where.not(id: ctag_ids).each { |c| c.destroy }
     blog_content_tag_ids = blog_content_tags.map(&:id)
     (ctag_ids - blog_content_tag_ids).each { |c| blog_content_tags.build(content_tag_id: c) }

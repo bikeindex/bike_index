@@ -1,6 +1,6 @@
 class ContentTag < ApplicationRecord
   include FriendlySlugFindable
-  has_many :blog_content_tags
+  has_many :blog_content_tags, dependent: :destroy
   has_many :blogs, through: :blog_content_tags
 
   scope :commonness, -> { order("priority ASC, name ASC") }

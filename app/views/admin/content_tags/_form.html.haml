@@ -1,14 +1,17 @@
 = form_for [:admin, @content_tag] do |f|
+  - if @content_tag.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Content tag", obj: @content_tag }
+
   .row
-    .col-xs-12
-      - if @content_tag.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Content tag", obj: @content_tag }
-  .row
-    .col-md-6.col-xs-12
+    .col-md-6
       .form-group
         = f.label :name
         = f.text_field :name, class: "form-control"
-    .col-md-6.col-xs-12
+    .col-md-6
+      .form-group
+        = f.label :description
+        = f.text_area :description, class: "form-control"
+    .col-md-6
       .form-group
         = f.label :priority
         = f.number_field :priority, class: "form-control"
