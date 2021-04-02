@@ -1,5 +1,6 @@
 module FriendlySlugFindable
   extend ActiveSupport::Concern
+  include FriendlyNameFindable
 
   module ClassMethods
     def friendly_find(n)

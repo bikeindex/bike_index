@@ -190,7 +190,8 @@ Rails.application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
-      :ctypes, :parking_notifications, :impound_records, :graduated_notifications
+      :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
+      :content_tags
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
