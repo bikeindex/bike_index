@@ -18,4 +18,4 @@
       %li.nav-item
         = link_to 'New Post', new_admin_news_url, class: "btn btn-success btn-sm"
 
-= render partial: "/admin/news/table", locals: {blogs: @blogs, show_kind: @search_kind == "all"}
+= render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"}

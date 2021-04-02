@@ -19,7 +19,7 @@ class Admin::ContentTagsController < Admin::BaseController
   end
 
   def edit
-    @blogs = @content_tag.blogs
+    @blogs = @content_tag.blogs.includes(:user, :content_tags)
   end
 
   def update

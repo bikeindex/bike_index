@@ -62,6 +62,24 @@ class Blog < ApplicationRecord
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
   end
 
+  # TODO: make this match only if *all* tag ids present
+  def self.with_tag_ids(content_tag_ids)
+    content_tag_ids = Array(content_tag_ids)
+    left_joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+  end
+
+  def content_tag_names=(val)
+    ctag_ids = val.split(",").map { |c| ContentTag.friendly_id_find(c) }.compact
+    blog_content_tags.where.not(id: ctag_ids).each { |c| c.destroy }
+    blog_content_tag_ids = blog_content_tags.map(&:id)
+    (ctag_ids - blog_content_tag_ids).each { |c| blog_content_tags.build(content_tag_id: c) }
+    blog_content_tags
+  end
+
+  def content_tag_names
+    content_tags.name_ordered.pluck(:name)
+  end
+
   def to_param
     title_slug
   end

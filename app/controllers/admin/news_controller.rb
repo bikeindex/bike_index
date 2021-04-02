@@ -5,6 +5,7 @@ class Admin::NewsController < Admin::BaseController
 
   def index
     @blogs = available_blogs.reorder(sort_column + " " + sort_direction)
+      .includes(:user, :content_tags)
   end
 
   def new
@@ -88,7 +89,8 @@ class Admin::NewsController < Admin::BaseController
       :update_title,
       :user_email,
       :user_id,
-      :info_kind
+      :info_kind,
+      :content_tag_names
     )
   end
 
@@ -99,6 +101,10 @@ class Admin::NewsController < Admin::BaseController
       blogs = blogs.where(kind: @search_kind)
     else
       @search_kind = "all"
+    end
+    if params[:search_tags].present?
+      @tags = Array(params[:search_tags]).flatten.map { |i| ContentTag.friendly_find(i) }.compact
+      blogs = blogs.with_tag_ids(@tags.pluck(:id))
     end
     blogs = blogs.published if sort_column == "published_at"
     blogs
