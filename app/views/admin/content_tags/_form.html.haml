@@ -1,0 +1,16 @@
+= form_for [:admin, @content_tag] do |f|
+  .row
+    .col-xs-12
+      - if @content_tag.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Content tag", obj: @content_tag }
+  .row
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :name
+        = f.text_field :name, class: "form-control"
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :priority
+        = f.number_field :priority, class: "form-control"
+
+  = f.submit (@content_tag.id.present? ? "Update" : "Create"), class: 'btn btn-success'

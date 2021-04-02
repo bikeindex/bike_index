@@ -1,0 +1,8 @@
+%h1
+  Edit #{@content_tag.name}
+
+= render partial: "form"
+
+%h3 Blogs with this tag:
+
+= render partial: "/admin/news/table", locals: {blogs: @blogs}

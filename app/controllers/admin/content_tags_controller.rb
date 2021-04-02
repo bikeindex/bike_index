@@ -1,4 +1,5 @@
 class Admin::ContentTagsController < Admin::BaseController
+  include SortableTable
   before_action :find_content_tag, only: %i[edit update]
 
   def index
@@ -18,19 +19,17 @@ class Admin::ContentTagsController < Admin::BaseController
   end
 
   def edit
-  end
-
-  def new
+    @blogs = @content_tag.blogs
   end
 
   def update
-    @content_tag.update_attributes(permitted_update_parameters)
+    @content_tag.update_attributes(permitted_parameters)
     flash[:success] = "Tag updated" unless flash[:error].present?
     redirect_to admin_content_tags_path
   end
 
   def create
-    @content_tag = ContentTag.new(permitted_update_parameters)
+    @content_tag = ContentTag.new(permitted_parameters)
     if @content_tag.save
       flash[:success] = "Tag created"
       redirect_to admin_content_tags_path
@@ -45,18 +44,18 @@ class Admin::ContentTagsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[name created_at organization_id kind updated_at user_id resolved_at]
+    %w[name created_at updated_at priority]
   end
 
   def matching_content_tags
     ContentTag
   end
 
-  def permitted_update_parameters
+  def permitted_parameters
     params.require(:content_tag).permit(:name, :priority)
   end
 
   def find_content_tag
-    @content_tag = ContentTag.find(params[:id])
+    @content_tag = ContentTag.friendly_find(params[:id])
   end
 end

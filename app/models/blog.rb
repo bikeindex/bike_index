@@ -8,6 +8,8 @@ class Blog < ApplicationRecord
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
+  has_many :blog_content_tags
+  has_many :content_tags, through: :blog_content_tags
   accepts_nested_attributes_for :listicles, allow_destroy: true
 
   validates_presence_of :title, :body, :user_id

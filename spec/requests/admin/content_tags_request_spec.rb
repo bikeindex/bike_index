@@ -36,7 +36,7 @@ RSpec.describe Admin::ContentTagsController, type: :request do
       put "#{base_url}/#{subject.to_param}", params: {content_tag: valid_params}
       expect(flash[:success]).to be_present
       subject.reload
-      passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
+      valid_params.each { |k, v| expect(subject.send(k)).to eq(v) }
     end
   end
 
@@ -46,8 +46,7 @@ RSpec.describe Admin::ContentTagsController, type: :request do
         post base_url, params: {content_tag: valid_params}
       }.to change(ContentTag, :count).by 1
       content_tag = ContentTag.last
-      passed_params.each { |k, v| expect(content_tag.send(k)).to eq(v) }
-      expect(content_tag.feature_slugs).to eq([])
+      valid_params.each { |k, v| expect(content_tag.send(k)).to eq(v) }
     end
   end
 end
