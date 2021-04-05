@@ -462,6 +462,38 @@ ALTER SEQUENCE public.bikes_id_seq OWNED BY public.bikes.id;
 
 
 --
+-- Name: blog_content_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.blog_content_tags (
+    id bigint NOT NULL,
+    blog_id bigint,
+    content_tag_id bigint,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: blog_content_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.blog_content_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: blog_content_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.blog_content_tags_id_seq OWNED BY public.blog_content_tags.id;
+
+
+--
 -- Name: blogs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -656,6 +688,40 @@ CREATE SEQUENCE public.components_id_seq
 --
 
 ALTER SEQUENCE public.components_id_seq OWNED BY public.components.id;
+
+
+--
+-- Name: content_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.content_tags (
+    id bigint NOT NULL,
+    name character varying,
+    slug character varying,
+    description text,
+    priority integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: content_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.content_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: content_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.content_tags_id_seq OWNED BY public.content_tags.id;
 
 
 --
@@ -2990,6 +3056,13 @@ ALTER TABLE ONLY public.bikes ALTER COLUMN id SET DEFAULT nextval('public.bikes_
 
 
 --
+-- Name: blog_content_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.blog_content_tags ALTER COLUMN id SET DEFAULT nextval('public.blog_content_tags_id_seq'::regclass);
+
+
+--
 -- Name: blogs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3022,6 +3095,13 @@ ALTER TABLE ONLY public.colors ALTER COLUMN id SET DEFAULT nextval('public.color
 --
 
 ALTER TABLE ONLY public.components ALTER COLUMN id SET DEFAULT nextval('public.components_id_seq'::regclass);
+
+
+--
+-- Name: content_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_tags ALTER COLUMN id SET DEFAULT nextval('public.content_tags_id_seq'::regclass);
 
 
 --
@@ -3505,6 +3585,14 @@ ALTER TABLE ONLY public.bikes
 
 
 --
+-- Name: blog_content_tags blog_content_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.blog_content_tags
+    ADD CONSTRAINT blog_content_tags_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: blogs blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3542,6 +3630,14 @@ ALTER TABLE ONLY public.colors
 
 ALTER TABLE ONLY public.components
     ADD CONSTRAINT components_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: content_tags content_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_tags
+    ADD CONSTRAINT content_tags_pkey PRIMARY KEY (id);
 
 
 --
@@ -4207,6 +4303,20 @@ CREATE INDEX index_bikes_on_state_id ON public.bikes USING btree (state_id);
 --
 
 CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id);
+
+
+--
+-- Name: index_blog_content_tags_on_blog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_blog_content_tags_on_blog_id ON public.blog_content_tags USING btree (blog_id);
+
+
+--
+-- Name: index_blog_content_tags_on_content_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_tags USING btree (content_tag_id);
 
 
 --
@@ -5512,6 +5622,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210208203928'),
 ('20210227162633'),
 ('20210227163837'),
-('20210311160040');
+('20210311160040'),
+('20210402214845'),
+('20210402214854');
 
 

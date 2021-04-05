@@ -77,12 +77,17 @@
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :post_date, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
         .col-md-6
-          .form-group
+          .form-group.fancy-select.no-restore-on-backspace.unfancy
             = f.label :tags, class: "control-label" do
               Tags
               %small.less-strong
-                Should include a main category: Tech, Design, or Update"
-            = f.text_area :tags, placeholder: "Separate tags with commas", class: "form-control"
+                at least one required
+                -# TODO: remove this after removing the blog tags attribute post PR#1926
+                - if @blog.tags.present?
+                  \- <em>old tags</em>: #{@blog.tags}
+            = f.select(:content_tag_names, options_for_select(ContentTag.name_ordered.pluck(:name, :id), selected: @blog.content_tags.pluck(:id)), { include_blank: true }, { multiple: true, class: "form-control", required: true })
+            -# options_for_select(ContentTag.name_ordered.map { }, selected: @blog.language)
+            -# ContentTag.name_ordered, :id, :name, { include_blank: true }, { multiple: true, class: "form-control", required: true })
         .col-md-6{ class: blogOnlyClass }
           .form-group
             = f.label :user_email, "Author email"

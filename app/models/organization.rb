@@ -69,6 +69,7 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
 
   default_scope { order(:name) }
+  scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }

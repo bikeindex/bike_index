@@ -16,6 +16,7 @@ module AdminHelper
       {title: "External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true},
       {title: "Organizations", path: admin_organizations_path, match_controller: true},
       {title: "News", path: admin_news_index_path, match_controller: true},
+      {title: "Content Tags", path: admin_content_tags_path, match_controller: true},
       {title: "POS Integration", path: lightspeed_interface_path, match_controller: false},
       {title: "Ambassador Activities", path: admin_ambassador_tasks_path, match_controller: true},
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
