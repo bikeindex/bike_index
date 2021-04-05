@@ -77,7 +77,7 @@
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :post_date, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
         .col-md-6
-          .form-group.fancy-select.unfancy
+          .form-group.fancy-select.no-restore-on-backspace.unfancy
             = f.label :tags, class: "control-label" do
               Tags
               %small.less-strong
