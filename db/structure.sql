@@ -507,7 +507,6 @@ CREATE TABLE public.blogs (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     published_at timestamp without time zone,
-    tags character varying(255),
     published boolean,
     old_title_slug character varying(255),
     description_abbr text,
@@ -5624,6 +5623,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210227163837'),
 ('20210311160040'),
 ('20210402214845'),
-('20210402214854');
+('20210402214854'),
+('20210405200829');
 
 

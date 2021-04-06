@@ -85,7 +85,6 @@ class Admin::NewsController < Admin::BaseController
       :post_now,
       :published,
       :published_at,
-      :tags,
       :timezone,
       :title,
       :secondary_title,
