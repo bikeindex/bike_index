@@ -33,7 +33,7 @@ gem "translation"
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
-gem "sidekiq", "~> 5.1.0" # Background processing
+gem "sidekiq"
 gem "sidekiq-failures"
 gem "soulheart", "~> 0.3.0"
 

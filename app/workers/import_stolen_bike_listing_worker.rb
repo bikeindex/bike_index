@@ -1,4 +1,5 @@
 class ImportStolenBikeListingWorker < ApplicationWorker
+  sidekiq_options retry: false
   HEADERS = %i[line listed_at folder bike price repost manufacturer model size color bike_index_bike notes listing_text].freeze
 
   def self.headers
