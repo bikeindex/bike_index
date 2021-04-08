@@ -443,7 +443,7 @@ GEM
       rack (~> 2.0)
     rack-mini-profiler (1.1.4)
       rack (>= 1.2.0)
-    rack-protection (2.0.7)
+    rack-protection (2.0.8.1)
       rack
     rack-proxy (0.6.5)
       rack
@@ -507,7 +507,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (3.3.5)
+    redis (4.2.5)
     regexp_parser (2.0.3)
     request_store (1.4.1)
       rack (>= 1.4)
@@ -581,11 +581,10 @@ GEM
     secure_headers (2.5.3)
       user_agent_parser
     shellany (0.0.1)
-    sidekiq (5.2.9)
-      connection_pool (~> 2.2, >= 2.2.2)
+    sidekiq (6.2.1)
+      connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      rack-protection (>= 1.5.0)
-      redis (>= 3.3.5, < 4.2)
+      redis (>= 4.2.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
     simple_oauth (0.3.1)
@@ -597,10 +596,10 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    sinatra (2.0.7)
+    sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
-      rack-protection (= 2.0.7)
+      rack-protection (= 2.0.8.1)
       tilt (~> 2.0)
     sitemap_generator (6.0.2)
       builder (~> 3.0)
@@ -608,9 +607,8 @@ GEM
       skylight-core (= 4.3.1)
     skylight-core (4.3.1)
       activesupport (>= 4.2.0)
-    soulheart (0.3.0)
-      multi_json (~> 1.11, >= 1.11.2)
-      redis (~> 3.0, >= 3.0.5)
+    soulheart (0.4.0)
+      redis (>= 3.0.5)
       sinatra (>= 1.4.4)
       vegas (>= 0.1.0)
     sprockets (4.0.0)
@@ -802,7 +800,7 @@ DEPENDENCIES
   simplecov
   sitemap_generator (~> 6)
   skylight
-  soulheart (~> 0.3.0)
+  soulheart
   sprockets (= 4.0.0)
   sprockets-rails
   stackprof
