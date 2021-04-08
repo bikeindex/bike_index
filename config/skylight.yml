@@ -1,1 +1,2 @@
 enable_sidekiq: true
+worker_component: "sidekiq"
