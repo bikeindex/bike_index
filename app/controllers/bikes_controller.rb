@@ -57,7 +57,7 @@ class BikesController < ApplicationController
       @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
-    filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
+    filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: "bikes/pdf"
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"

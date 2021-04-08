@@ -20,7 +20,7 @@ class UserPhone < ApplicationRecord
 
   def self.code_display(str)
     return nil unless str.present?
-    str[0..2] + " " + str[3..-1]
+    str[0..2] + " " + str[3..]
   end
 
   def self.code_normalize(str)

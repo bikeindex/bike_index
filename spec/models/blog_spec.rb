@@ -194,7 +194,7 @@ RSpec.describe Blog, type: :model do
     let!(:blog2) { FactoryBot.create(:blog, content_tag_names: content_tag1.name) }
     it "sets and returns" do
       expect(blog1.reload.content_tag_names).to eq([])
-      blog1.update(content_tag_names: "#{content_tag1.name}")
+      blog1.update(content_tag_names: content_tag1.name.to_s)
       expect(blog1.reload.content_tag_names).to eq([content_tag1.name])
 
       expect(Blog.with_tag_ids(content_tag1.id).map(&:id)).to match_array([blog1.id, blog2.id])
