@@ -4,7 +4,7 @@ base_url = "/admin/content_tags"
 RSpec.describe Admin::ContentTagsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
   let!(:subject) { FactoryBot.create(:content_tag) }
-  let(:valid_params) { { name: "New name", priority: 12, description: "pppp ffff cccccc"}}
+  let(:valid_params) { {name: "New name", priority: 12, description: "pppp ffff cccccc"} }
 
   describe "index" do
     it "renders" do
