@@ -59,6 +59,7 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
       it "updates existing one" do
         expect(StolenBikeListing.count).to eq 1
         expect(instance.perform("constru", 12, header_values(row))&.id).to eq stolen_bike_listing.id
+        expect(instance.perform("constru", 12, header_values(row))&.id).to eq stolen_bike_listing.id
         expect(StolenBikeListing.count).to eq 1
         expect(stolen_bike_listing.reload.manufacturer_id).to eq manufacturer.id
       end

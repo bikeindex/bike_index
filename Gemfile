@@ -33,9 +33,9 @@ gem "translation"
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
-gem "sidekiq", "~> 5.1.0" # Background processing
+gem "sidekiq"
 gem "sidekiq-failures"
-gem "soulheart", "~> 0.3.0"
+gem "soulheart"
 
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder", "~> 0.4.2"

@@ -1,4 +1,5 @@
 class ImportStolenBikeListingWorker < ApplicationWorker
+  sidekiq_options retry: false
   HEADERS = %i[line listed_at folder bike price repost manufacturer model size color bike_index_bike notes listing_text].freeze
 
   def self.headers
@@ -60,9 +61,8 @@ class ImportStolenBikeListingWorker < ApplicationWorker
   def skip_storing?(row)
     return true if row[:bike].to_s.match?(/no|raffle/i)
     # We aren't storing reposts - just for now, we'll add sometime
-    if row[:repost].present?
-      return true unless row[:repost].to_s.match?(/no/i)
-    end
+    repost = row[:repost].present? && !row[:repost].to_s.match?(/no/i)
+    return true if repost
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
       .values.join("").gsub(/\s+/, " ").gsub("blank", "").gsub("raffle", "")
