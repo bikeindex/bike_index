@@ -43,9 +43,9 @@
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th
-      = sortable "created_at", "Sent"
+      = sortable "created_at"
     %th
-      = sortable "processed_at"
+      = sortable "processed_at", "Sent"
     %th
       %small primary?
     - unless current_organization.present?
