@@ -13,8 +13,10 @@ class BikeIndex.StolenBikeListing extends BikeIndex
         $expander.css("display", "inline-block")
 
     $(".listing-images a").click (e) ->
-      e.preventDefault()
+      # e.preventDefault() # Don't prevent default
       $target = $(e.target)
+      $target = $target.parents("a") unless $target.is("a")
+      return true unless $target.is("a") # Because otherwise, everything breaks
       window.stolenListingId = $target.attr('id')
       id = "#{$target.attr('id')}-modal"
       modal_html = "<div class='modal fade stolen-listing-photo-modal' id='#{id}'><div class='modal-dialog' role='document'><div class='modal-content'>"
@@ -31,3 +33,5 @@ class BikeIndex.StolenBikeListing extends BikeIndex
       $('.modal').on 'hide.bs.modal', ->
         $(window).off 'keyup'
 
+  # Do something like (from class BikeIndex.BikesShow extends BikeIndex coffee):
+  # rotatePhotosOnArrows: (event) ->
