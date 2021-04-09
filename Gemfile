@@ -109,7 +109,7 @@ gem "webpacker"
 # Show performance metrics
 gem "flamegraph", require: false
 gem "memory_profiler", require: false
-gem "rack-mini-profiler", require: false # If you can't see it you can't make it better
+gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
 gem "stackprof", require: false
 
 gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
