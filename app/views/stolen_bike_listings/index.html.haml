@@ -128,13 +128,13 @@
               .listing-images
                 - if stolen_bike_listing.full_photo_urls.any?
                   - preview_image = stolen_bike_listing.full_photo_urls.first
-                  = link_to image_tag(preview_image), preview_image, class: "preview-image"
+                  = link_to image_tag(preview_image), preview_image, id: [stolen_bike_listing.id, 0].join("-"), class: "preview-image"
                   - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
                   - if urls.any?
                     .additional-photos.mt-1.less-strong
                       %em
                         additional photos:
-                        = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i].join("-")) }, ", ")
+                        = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i + 1].join("-")) }, ", ")
                 - else
                   %em.less-strong We haven't uploaded the photos for this bike yet
 
