@@ -79,6 +79,8 @@
   .full-screen-table.mt-4
     %table.table.table-bordered.table-striped.table-sm
       %thead.thead-light.sortable
+        - if display_dev_info?
+          %th.small folder
         %th
           = sortable "listed_at"
         %th
@@ -98,6 +100,10 @@
       %tbody
         - @stolen_bike_listings.each do |stolen_bike_listing|
           %tr
+            - if display_dev_info?
+              %td{style: "min-width: 13em;"}
+                %code.small.only-dev-visible
+                  = stolen_bike_listing.updated_photo_folder
             %td
               %small.convertTime
                 = l stolen_bike_listing.listed_at, format: :convert_time
