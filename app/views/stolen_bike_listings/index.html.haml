@@ -79,6 +79,8 @@
   .full-screen-table.mt-4
     %table.table.table-bordered.table-striped.table-sm
       %thead.thead-light.sortable
+        -#- if display_dev_info?
+        -#  %th.small folder
         %th
           = sortable "listed_at"
         %th
@@ -98,6 +100,10 @@
       %tbody
         - @stolen_bike_listings.each do |stolen_bike_listing|
           %tr
+            -#- if display_dev_info?
+            -#  %td{style: "min-width: 13em;"}
+            -#    %code.small.only-dev-visible
+            -#      = stolen_bike_listing.updated_photo_folder
             %td
               %small.convertTime
                 = l stolen_bike_listing.listed_at, format: :convert_time
@@ -116,13 +122,6 @@
             %td
               = stolen_bike_listing.frame_size&.upcase
             %td.listing-text-cell
-              -#- if stolen_bike_listing.listing_text.to_s.length > 60
-              -#  - truncated_text = stolen_bike_listing.listing_text.truncate(60, omission: "", separator: /\s/)
-              -#  %span
-              -#    #{truncated_text}<a class="listing-text-expand-link" href="#listing-text-#{stolen_bike_listing.id}" title="#{stolen_bike_listing.listing_text}">...</a>
-              -#  %span.listing-text-full{ id: "listing-text-#{stolen_bike_listing.id}" }
-              -#    = stolen_bike_listing.listing_text[truncated_text.length..-1]
-              -#- else
               = stolen_bike_listing.listing_text
 
             %td

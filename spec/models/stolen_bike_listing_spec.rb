@@ -116,9 +116,26 @@ RSpec.describe StolenBikeListing, type: :model do
     end
     let(:stolen_bike_listing) { StolenBikeListing.new(data: {photo_urls: photo_urls}) }
     it "responds with them in order" do
-      expect(stolen_bike_listing.photo_urls[0..3]).to eq target.map { |u| "2020/6/2020-6-6_002/#{u}" }[0..3]
+      expect(stolen_bike_listing.photo_urls[0..3]).to eq(target.map { |u| "2020/6/2020-6-6_002/#{u}" }[0..3])
       expect(stolen_bike_listing.photo_urls).to eq target.map { |u| "2020/6/2020-6-6_002/#{u}" }
-      expect(stolen_bike_listing.full_photo_urls).to eq target.map { |u| "https://files.bikeindex.org/theft-rings/2020/6/2020-6-6_002/#{u}" }
+      expect(stolen_bike_listing.full_photo_urls).to eq(target.map { |u| "https://files.bikeindex.org/theft-rings/2020/6/2020-6-6_002/#{u}" })
+    end
+  end
+
+  describe "find_by_folder" do
+    let(:color) { Color.black }
+    let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, data: {photo_folder: "Mar 27 2021"}) }
+    let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, data: {photo_folder: "Mar 27 2021_003"}) }
+    it "finds by folder" do
+      expect(stolen_bike_listing1).to be_valid
+      expect(stolen_bike_listing1.updated_photo_folder).to eq "2021/3/2021-3-27"
+      expect(stolen_bike_listing2).to be_valid
+      expect(stolen_bike_listing2.updated_photo_folder).to eq "2021/3/2021-3-27_003"
+
+      expect(StolenBikeListing.find_by_folder("2021/3/2021-3-27")&.id).to eq stolen_bike_listing1.id
+      expect(StolenBikeListing.find_by_folder("2021/3/2021-3-27_002")&.id).to be_blank
+      expect(StolenBikeListing.find_by_folder("2021/3/2021-3-27_003")&.id).to eq stolen_bike_listing2.id
+      expect(StolenBikeListing.find_by_folder("2021/3/2021-3-27_004")&.id).to be_blank
     end
   end
 end
