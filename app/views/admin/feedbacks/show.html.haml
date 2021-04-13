@@ -26,12 +26,15 @@
           %td
             User
           %td
-            = @feedback.name
-            %span.less-strong
-              - if @feedback.user
-                = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param)
+            - if @feedback.user
+              = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param)
+              %small.less-strong
                 user present
-              - else
+                - if @feedback.user.display_name != @feedback.name
+                  (name entered: #{@feedback.name})
+            - else
+              = @feedback.name
+              %span.less-strong
                 = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
         - if @feedback.feedback_hash.present?
           %tr
