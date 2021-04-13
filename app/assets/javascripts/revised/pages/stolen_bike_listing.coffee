@@ -31,10 +31,10 @@ class BikeIndex.StolenBikeListing extends BikeIndex
     $target = $(e.target)
     $target = $target.parents("a") unless $target.is("a")
     return true unless $target.is("a") # Because otherwise, everything breaks
-    @shiftToPhoto($target.attr('id'), $target.attr("href"))
+    @openPhotoModal($target.attr('id'), $target.attr("href"))
 
   # If href isn't passed, it's assumed we aren't sure that the photo is present
-  shiftToPhoto: (id, href) ->
+  openPhotoModal: (id, href) ->
     window.photoExpandedId = id
     window.photoModalOpen = true
     modal_id = "#{id}-modal"
@@ -67,7 +67,7 @@ class BikeIndex.StolenBikeListing extends BikeIndex
       return true
     # Hide modal, or things get wacky
     $('.modal').modal('hide')
-    @shiftToPhoto(targetPhotoId, $targetPhoto.attr("href"))
+    @openPhotoModal(targetPhotoId, $targetPhoto.attr("href"))
 
   # similar to BikeIndex.BikesShow rotatePhotosOnArrows
   rotatePhotosOrCloseModal: (event) ->
