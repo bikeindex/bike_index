@@ -23,12 +23,13 @@
 
 .col-12.mt-4
   -# Only render stacked kinds if rendering type counts
+  - colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
   - if @render_type_counts
     - feedback_counts = Feedback.kinds.map { |k| {name: Feedback.humanized_kind(k), data: time_range_counts(collection: available_feedbacks.where(kind: k))} }
   - else
     - feedback_counts = time_range_counts(collection: available_feedbacks)
 
-  = column_chart feedback_counts, stacked: true, thousands: ",", defer: true
+  = column_chart feedback_counts, stacked: true, thousands: ",", defer: true, colors: colors
 
 = render partial: "/shared/period_select"
 
@@ -40,11 +41,13 @@
           %h3 Kinds
           %table.table-list.wide-definition
             %tbody
-              - Feedback.kinds.each do |kind|
+              - Feedback.kinds.each_with_index do |kind, index|
                 - count = available_feedbacks.where(kind: kind).count
                 - next unless count > 0
                 %tr
                   %td
+                    - color = colors[index]
+                    %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
                     = link_to Feedback.humanized_kind(kind), admin_feedbacks_path(sortable_search_params.merge(search_kind: kind))
                   %td
                     = number_with_delimiter(count)
