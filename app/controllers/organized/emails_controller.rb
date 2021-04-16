@@ -8,7 +8,6 @@ module Organized
     end
 
     def show
-      @organization = current_organization
       @email_preview = true
       if ParkingNotification.kinds.include?(@kind)
         find_or_build_parking_notification
@@ -16,6 +15,9 @@ module Organized
       elsif @kind == "graduated_notification"
         find_or_build_graduated_notification
         render template: "/organized_mailer/graduated_notification", layout: "email"
+      elsif %w[impound_claim_approved impound_claim_denied].include?(@kind)
+        find_or_build_impound_claim(@kind)
+        render template: "/organized_mailer/impound_claim_approved_or_denied", layout: "email"
       elsif @kind == "partial_registration"
         build_partial_email
         render template: "/organized_mailer/partial_registration", layout: "email"
@@ -26,7 +28,9 @@ module Organized
     end
 
     def edit
-      @can_edit = !%w[finished_registration partial_registration].include?(@kind)
+      # Attempt to build an impound claim if it's an impound_claim kind - sometimes we can't
+      # and we want to render that on the frontend
+      find_or_build_impound_claim(@kind) if @impound_claim_kind
     end
 
     def update
@@ -43,12 +47,12 @@ module Organized
 
     private
 
-    def parking_notifications
-      current_organization.parking_notifications
-    end
-
     def mail_snippets
       current_organization.mail_snippets.where(kind: MailSnippet.organization_message_kinds)
+    end
+
+    def parking_notifications
+      current_organization.parking_notifications
     end
 
     def viewable_email_kinds
@@ -57,20 +61,20 @@ module Organized
       viewable_email_kinds += ["partial_registration"] if current_organization.enabled?("show_partial_registrations")
       viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
       viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
-      viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.impound_claims?
+      viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.enabled?("impound_bikes")
       @viewable_email_kinds = viewable_email_kinds
     end
 
     def find_mail_snippets
+      @organization = current_organization
       @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
-      if ParkingNotification.kinds.include?(@kind) || @kind == "graduated_notification"
+      @impound_claim_kind = @kind.match?(/impound_claim/)
+      # These are uneditable kinds:
+      @can_edit = !%w[finished_registration partial_registration].include?(@kind)
+      if @can_edit
         @mail_snippet = mail_snippets.where(kind: @kind).first
         @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
       end
-    end
-
-    def permitted_mail_snippet_kinds
-      MailSnippet.organization_message_kinds
     end
 
     def permitted_parameters
@@ -103,6 +107,20 @@ module Organized
       @retrieval_link_url = "#"
       @bike ||= current_organization.bikes.last
       @graduated_notification
+    end
+
+    def find_or_build_impound_claim(kind)
+      status = @kind == "impound_claim_approved" ? "approved" : "denied"
+      impound_claims = @organization.impound_claims
+      @impound_claim = impound_claims.find(params[:impound_claim_id]) if params[:impound_claim_id].present?
+      @impound_claim ||= impound_claims.where(status: status).last
+      return @impound_claim if @impound_claim.present?
+
+      impound_record = current_organization.impound_records.last
+      # Just can't make it happen, so skip preview
+      if impound_record.present?
+        @impound_claim = impound_record.impound_claims.build(status: status)
+      end
     end
 
     def find_or_build_parking_notification

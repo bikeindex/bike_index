@@ -63,7 +63,7 @@ class ImpoundClaim < ApplicationRecord
 
   def status_humanized
     # It doesn't make sense to display "submitting"
-    submitting? ? "submitted" : status.tr("_", " ")
+    submitting? ? "submitted" : status&.tr("_", " ")
   end
 
   # return private images too

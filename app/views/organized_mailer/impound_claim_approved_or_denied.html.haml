@@ -1,8 +1,24 @@
-Your impound claim has been
-%strong= @impound_claim.status_humanized
+-# duplicates method in organized_mailer - required for preview
+- @reply_to ||= @organization && @organization.auto_user.present? ? @organization.auto_user.email : "contact@bikeindex.org"
 
-- if @impound_claim.approved?
-  %p
-    Please reply to this message or contact
-    = link_to @reply_to, "mailto:#{@reply_to}"
-    to arrange to pick up your #{@bike_submitting&.type || "bike"}
+%p
+  Your impound claim
+  - if @impound_claim.bike_claimed.present?
+    for
+    = link_to @impound_claim.bike_claimed.title_string, bike_path(@impound_claim.bike_claimed)
+  has been
+  %strong= @impound_claim.status_humanized
+
+- snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
+- if snippet_kind.present?
+  - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: snippet_kind).first
+
+- if organization_message_snippet&.body&.present?
+  = organization_message_snippet.body.html_safe
+
+- else
+  - if @impound_claim.approved?
+    %p
+      Please reply to this message or contact
+      = link_to @reply_to, "mailto:#{@reply_to}"
+      to arrange to pick up your #{@bike_submitting&.type || "bike"}
