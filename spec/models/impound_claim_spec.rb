@@ -14,6 +14,7 @@ RSpec.describe ImpoundClaim, type: :model do
       let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record) }
       it "is valid" do
         expect(impound_claim).to be_valid
+        expect(impound_claim.status_humanized).to eq "pending"
         expect(impound_claim.bike_claimed).to be_present
         expect(impound_record.organized?).to be_falsey
         expect(impound_record.creator_public_display_name).to eq "bike finder"
@@ -21,9 +22,10 @@ RSpec.describe ImpoundClaim, type: :model do
     end
     context "with_stolen_record" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, organization: organization) }
+      let(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, status: "submitting", organization: organization) }
       it "is valid" do
         expect(impound_claim).to be_valid
+        expect(impound_claim.status_humanized).to eq "submitted"
         expect(impound_claim.bike_claimed).to be_present
         expect(impound_claim.bike_submitting.user&.id).to eq impound_claim.user.id
         expect(impound_claim.stolen_record.user&.id).to eq impound_claim.user.id

@@ -1,0 +1,121 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Impound Claims
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status == available_statuses.first ? "" : "active") }
+          - if @search_status != "current" && ImpoundClaim.statuses.include?(@search_status)
+            = ImpoundClaim.statuses_humanized[@search_status.to_sym]
+          - elsif @search_status == "all"
+            All statuses
+          - else
+            #{@search_status.titleize} records
+        .dropdown-menu
+          - available_statuses.each do |status|
+            - if status != "current" && ImpoundClaim.statuses.include?(status)
+              - display_status = ImpoundClaim.status_humanized(status)
+            - elsif status == "all"
+              - display_status = "All statuses"
+            - else
+              - display_status = "#{status.titleize} records"
+            - status_active = @search_status == status
+            - status_link_params = sortable_search_params.merge(search_status: (status_active ? nil : status))
+            = link_to display_status, admin_impound_claims_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}"
+            - if status == "resolved" # Add a divider before all
+              .dropdown-divider
+      %li.nav-item
+        = link_to "graph", admin_impound_claims_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@impound_claims.total_count)
+    matching Impound Claims
+    %em
+      = humanized_time_range(@time_range)
+    - if current_organization.present?
+      %strong
+        from
+        = link_to current_organization.short_name, admin_organization_path(current_organization)
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_impound_claims), stacked: true, thousands: ",", defer: true
+  - unless params[:organization_id].present?
+    .row.mt-4
+      .col-md-6.offset-md-3
+        %table.table-list.wide-definition
+          %tbody
+            - matching_impound_claim_per_org_id = matching_impound_claims.distinct.pluck(:organization_id).map { |id| [id, matching_impound_claims.where(organization_id: id).count] }
+            - matching_impound_claim_per_org_id.sort_by { |id, number| number }.each do |id, number|
+              - organization = Organization.unscoped.find_by_id(id) if id.present?
+              %tr
+                %td
+                  - if organization.present?
+                    = link_to organization.short_name, admin_impound_claims_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")
+                  - else
+                    = link_to "no organization", admin_impound_claims_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link"
+                %td
+                  = number_with_delimiter(number)
+
+.mt-4.mb-4
+  = render partial: "/shared/period_select"
+
+= paginate @impound_claims, views_prefix: "admin"
+
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "created_at"
+    %th
+      = sortable "updated_at"
+    - unless current_organization.present?
+      %th
+        = sortable "organization_id"
+    %th
+      %small= sortable "impound_record_id", "Impound ID"
+    %th Claimed
+    %th Submitted
+    %th
+      = sortable "status"
+    %th
+      = sortable "user_id"
+    - unless @search_status == "current"
+      %th
+        = sortable "resolved_at"
+  %tbody
+    - @impound_claims.each do |impound_claim|
+      %tr
+        %td
+          - impound_link_url = impound_claim.organization_id.present? ? organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) : "#"
+          %a.convertTime.preciseTime{href: impound_link_url}
+            = l(impound_claim.created_at, format: :convert_time)
+          - if impound_claim.organization_id.blank?
+            %small.text-warning no organization, link broken
+        %td
+          %span.convertTime.preciseTime
+            = l(impound_claim.updated_at, format: :convert_time)
+        - unless current_organization.present?
+          %td
+            - if impound_claim.organization_id.present?
+              = link_to impound_claim.organization&.short_name || impound_claim.organization_id, admin_impound_claims_path(sortable_search_params.merge(organization_id: impound_claim.organization_id))
+        %td
+          - if impound_claim.impound_record.present? && impound_claim.organization.present?
+            = link_to "##{impound_claim.impound_record.display_id}", organization_impound_record_path(impound_claim.impound_record.display_id, organization_id: impound_claim.organization_id)
+        %td
+          - if impound_claim.bike_claimed.present?
+            = link_to organized_bike_text(impound_claim.bike_claimed), admin_bike_path(impound_claim.bike_claimed)
+        %td
+          - if impound_claim.bike_submitting.present?
+            = link_to organized_bike_text(impound_claim.bike_submitting), admin_bike_path(impound_claim.bike_submitting)
+        %td
+          %em
+            = status_display(impound_claim.status_humanized)
+        %td
+          = impound_claim.user&.display_name&.truncate(20)
+        - unless @search_status == "current"
+          %td
+            - if impound_claim.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_claim.resolved_at, format: :convert_time)
