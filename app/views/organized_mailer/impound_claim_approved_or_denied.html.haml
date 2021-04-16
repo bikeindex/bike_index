@@ -5,7 +5,7 @@
   Your impound claim
   - if @impound_claim.bike_claimed.present?
     for
-    = link_to @impound_claim.bike_claimed.title_string, bike_path(@impound_claim.bike_claimed)
+    = link_to @impound_claim.bike_claimed.title_string, bike_url(@impound_claim.bike_claimed)
   has been
   %strong= @impound_claim.status_humanized
 
