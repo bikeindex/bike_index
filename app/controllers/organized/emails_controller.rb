@@ -57,6 +57,7 @@ module Organized
       viewable_email_kinds += ["partial_registration"] if current_organization.enabled?("show_partial_registrations")
       viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
       viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
+      viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.impound_claims?
       @viewable_email_kinds = viewable_email_kinds
     end
 

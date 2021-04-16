@@ -4,7 +4,7 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/emails" }
   # we need a default organized bike to render emails, so build one
   let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: current_organization) }
-  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails] }
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
   let!(:bike) { ownership.bike }
 
   context "logged_in_as_organization_member" do
@@ -48,7 +48,10 @@ RSpec.describe Organized::EmailsController, type: :request do
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
-    let(:all_viewable_email_kinds) { %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification impound_notification graduated_notification] }
+    let(:all_viewable_email_kinds) do
+      %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
+        impound_notification impound_claim_approved impound_claim_denied]
+    end
     describe "index" do
       it "renders" do
         get base_url
