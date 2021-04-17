@@ -390,8 +390,8 @@ class Bike < ApplicationRecord
     status_abandoned? || status_impounded?
   end
 
-  def serial_display
-    return "Hidden" if serial_hidden?
+  def serial_display(u = nil)
+    return "Hidden" if !authorized?(u) && serial_hidden?
     return serial_number.humanize if no_serial?
     serial_number
   end

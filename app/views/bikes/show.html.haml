@@ -67,8 +67,10 @@
         = @bike.status_html
         %span.uncap= @bike.title_html
 
-      -# TODO: for impound CSV - hide this when it is not impounded anymore, or something
-      - if @bike.created_by_notification_or_impounding?
+      - if @bike.status_stolen_or_impounded?
+        %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)
+      - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
+        -# This should only show up if the bike isn't registered
         %strong.text-warning= t(".not_registered_by_user")
         - if @bike.creation_state&.origin == "unregistered_parking_notification"
           %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
@@ -128,11 +130,12 @@
         %ul.attr-list.split-sm
           %li
             %strong.attr-title #{t(".serial")}:
-            = @bike.serial_display
+            = @bike.serial_display(current_user)
             - if @bike.serial_hidden?
               %small.less-strong
-                because #{@bike.type} is
-                %em= @bike.status_humanized_translated
+                - if @bike.authorized?(current_user)
+                  = t(".hidden_for_unauthorized_users")
+                = t(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
 
           - unless @bike.serial_hidden?
             = attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
