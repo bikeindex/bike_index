@@ -1082,6 +1082,8 @@ RSpec.describe Bike, type: :model do
         bike = Bike.new(serial_number: "something", status: "status_abandoned")
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
+        allow(bike).to receive(:authorized?) { true }
+        expect(bike.serial_display(User.new)).to eq "something"
       end
     end
     context "impounded" do

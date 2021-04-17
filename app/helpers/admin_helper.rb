@@ -2,6 +2,8 @@ module AdminHelper
   def dev_nav_select_links
     return [] unless current_user&.developer?
     [
+      # Impound claims index is currently busted, so ignoring for now
+      {title: "Impound Claims", path: admin_impound_claims_path, match_controller: true},
       {title: "Mail Snippets", path: admin_mail_snippets_path, match_controller: true}
     ]
   end

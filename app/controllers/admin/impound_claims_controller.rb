@@ -1,0 +1,47 @@
+class Admin::ImpoundClaimsController < Admin::BaseController
+  include SortableTable
+
+  before_action :set_period, only: [:index]
+
+  def index
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @impound_claims = matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
+      .order(sort_column + " " + sort_direction)
+      .page(page).per(per_page)
+  end
+
+  helper_method :matching_impound_claims, :available_statuses
+
+  protected
+
+  def available_statuses
+    %w[all current resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
+  end
+
+  def sortable_columns
+    %w[created_at organization_id updated_at status user_id impound_record resolved_at]
+  end
+
+  def earliest_period_date
+    Time.at(1611367147) # 14 days before first impound claim created
+  end
+
+  def matching_impound_claims
+    impound_claims = ImpoundClaim
+
+    if params[:search_status] == "all"
+      @search_status = "all"
+    else
+      @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
+      impound_claims = if ImpoundClaim.statuses.include?(@search_status)
+        impound_claims.where(status: @search_status)
+      else
+        impound_claims.send(@search_status)
+      end
+    end
+
+    impound_claims = impound_claims.where(organization_id: current_organization.id) if current_organization.present?
+    impound_claims.where(created_at: @time_range)
+  end
+end

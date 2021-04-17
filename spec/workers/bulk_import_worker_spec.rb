@@ -483,6 +483,16 @@ RSpec.describe BulkImportWorker, type: :job do
           }.to change(Bike, :count).by 0
         end
       end
+      context "not valid bike" do
+        let(:row) { {manufacturer_id: "\n", serial_number: "", color: nil} }
+        let(:target_errors) { ["Owner email can't be blank"] }
+        it "returns the invalid bike with errors" do
+          bulk_import.kind = "impounded"
+          expect {
+            expect(instance.register_bike(instance.row_to_b_param_hash(row))).to be_blank
+          }.to change(Bike, :count).by 0
+        end
+      end
     end
 
     describe "rescue_blank_serials" do

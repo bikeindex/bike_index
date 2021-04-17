@@ -43,6 +43,11 @@ class ImpoundClaim < ApplicationRecord
     statuses - resolved_statuses
   end
 
+  def self.status_humanized(str)
+    # It doesn't make sense to display "submitting"
+    str == "submitting" ? "submitted" : str&.tr("_", " ")
+  end
+
   def resolved?
     self.class.resolved_statuses.include?(status)
   end
@@ -62,8 +67,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def status_humanized
-    # It doesn't make sense to display "submitting"
-    submitting? ? "submitted" : status.tr("_", " ")
+    self.class.status_humanized(status)
   end
 
   # return private images too

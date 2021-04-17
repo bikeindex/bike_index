@@ -1406,7 +1406,9 @@ en:
       front_rear: Front & rear
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
+      hidden_because_status: because %{bike_type} is %{status}
       hidden_by_owner: HIDDEN by owner
+      hidden_for_unauthorized_users: hidden for unauthorized users
       impounded_at: Impounded
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
@@ -1418,12 +1420,13 @@ en:
       location: Location
       locking_circumvented: Locking circumvented
       locking_description: Locking description
+      looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
       manufacturer: Manufacturer
       model: Model
       name: Name
       no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
         admins) can see it
-      not_registered_by_user: Not registered by a user
+      not_registered_by_user: Not registered to a user
       or_call: Or call
       other: Other
       other_serial: Other serial/registration/sticker
