@@ -2171,6 +2171,9 @@ nl:
       stolen_details: Diefstal details
       not_registered_by_user: Niet geregistreerd door een gebruiker
       in: in
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
+      looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
