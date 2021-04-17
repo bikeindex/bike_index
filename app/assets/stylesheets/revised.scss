@@ -99,6 +99,10 @@ $border-radius-sm: 1px;
 // Components w/ JavaScript
 $modal-backdrop-bg: $blue-dark;
 $modal-backdrop-opacity: 0.8;
+// Add some extra space at the top and bottom of the modal, to prevent overwhelming on mobile
+.modal .modal-dialog {
+  margin: 20px 10px;
+}
 
 @import "bootstrap/modal";
 @import "bootstrap/tooltip";

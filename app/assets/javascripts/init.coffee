@@ -153,10 +153,14 @@ enableEscapeForModals = ->
   $('.modal').on 'show.bs.modal', ->
     $(window).on 'keyup', (e) ->
       $('.modal').modal('hide') if e.keyCode == 27 # Escape key
+    $(".modal .close").on "click", (e) ->
+      # potentially having trouble closing modals, try to fix it
+      $(e.target).parents(".modal").modal("hide")
     return true
   # Remove keyup trigger, clean up after yourself
   $('.modal').on 'hide.bs.modal', ->
     $(window).off 'keyup'
+    $(".modal .close").off
 
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')

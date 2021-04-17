@@ -26,6 +26,11 @@ class BikeIndex.StolenBikeListing extends BikeIndex
       window.photoExpandedId = null
       return true
 
+    # delegated close catcher, to make sure modals can close
+    $("body").on "click", ".modal .close", (e) ->
+      # potentially having trouble closing modals, try to fix it
+      $(e.target).parents(".modal").modal("hide")
+
   clickPhoto: (e) ->
     e.preventDefault() # Might want to make it not prevent default sometimes...
     $target = $(e.target)
@@ -39,7 +44,7 @@ class BikeIndex.StolenBikeListing extends BikeIndex
     window.photoModalOpen = true
     modal_id = "#{id}-modal"
     modal_html = "<div class='modal fade stolen-listing-photo-modal' id='#{modal_id}'><div class='modal-dialog' role='document'><div class='modal-content'>"
-    modal_html += "<div class='modal-title'><button class='close' 'aria-label'='Close' 'data-dismiss'='modal' type='button'><span 'aria-hidden'='true'>&times;</span></button></div>"
+    modal_html += "<div class='modal-title'><button class='close' 'aria-label'='Close' 'data-dismiss'='modal' type='button'>&times;</button></div>"
     modal_html += "<a href='#{href}'><img src='#{href}'></a>"
     modal_html += "</div></div></div>"
     $("#stolen_bike_listings_index").append(modal_html)
