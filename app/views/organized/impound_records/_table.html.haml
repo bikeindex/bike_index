@@ -71,6 +71,9 @@
           %td
             - if impound_record.bike.present?
               = link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id)
+              -# Only show the serial if there is a serial. Because PSU asked for this
+              - if !impound_record.bike.no_serial?
+                %small #{impound_record.bike.serial_display(current_user)}
         - unless skip_status
           %td
             %em

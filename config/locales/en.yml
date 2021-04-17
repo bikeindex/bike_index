@@ -1395,9 +1395,6 @@ en:
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
       cycle_type: Cycle type
-      hidden_for_unauthorized_users: hidden for unauthorized users
-      hidden_because_status: because %{bike_type} is %{status}
-      looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
@@ -1409,7 +1406,9 @@ en:
       front_rear: Front & rear
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
+      hidden_because_status: because %{bike_type} is %{status}
       hidden_by_owner: HIDDEN by owner
+      hidden_for_unauthorized_users: hidden for unauthorized users
       impounded_at: Impounded
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
@@ -1421,6 +1420,7 @@ en:
       location: Location
       locking_circumvented: Locking circumvented
       locking_description: Locking description
+      looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
       manufacturer: Manufacturer
       model: Model
       name: Name

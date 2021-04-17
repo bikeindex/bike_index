@@ -82,7 +82,7 @@
                       = link_to organized_bike_text(bike, skip_creation: true), bike_link
                   %tr
                     %td Serial
-                    %td= bike.serial_display
+                    %td= bike.serial_display(current_user)
                   - if stolen_record.recovered?
                     %tr
                       %td
