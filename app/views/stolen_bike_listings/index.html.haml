@@ -1,5 +1,5 @@
-.container
-  - if @blog.present? && @render_info
+- if @blog.present? && @render_info
+  #news_show.container
     = content_for :header do
       %link{rel: :canonical, href: canonical_url(@blog) }
       - if @blog.secondary_title.present? # This is gross, but whatever
@@ -19,11 +19,13 @@
 
     :markdown
       #{@blog.body}
-  - else
+- else
+  .container
     %h1.uncap
       Read about
-      = link_to "the stolen bike ring!", theft_rings_path
+      = link_to "the stolen bike ring", theft_rings_path
 
+.container
   .mt-4
     = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form single-search-input", method: :get do
       .query-field-wrap.nojs
