@@ -67,7 +67,7 @@
         = @bike.status_html
         %span.uncap= @bike.title_html
 
-      - if @bike.status_stolen_or_impounded?
+      - if @bike.status_impounded?
         %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)
       - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
         -# This should only show up if the bike isn't registered
