@@ -6,6 +6,7 @@ RSpec.describe ImpoundRecord, type: :model do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
   let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+  let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
 
   describe "validations" do
     it "marks the bike impounded only once" do
@@ -96,6 +97,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.status_impounded?).to be_truthy
           expect(bike.status_found?).to be_falsey
           expect(bike.created_by_parking_notification?).to be_truthy
+          expect(bike.authorized?(user)).to be_truthy
           impound_record.reload
           expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
@@ -103,6 +105,8 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
           expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
+          expect(impound_record.authorized?(user)).to be_truthy
+          expect(impound_record.authorized?(organization_member)).to be_truthy
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
           expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - ["current"])
@@ -252,6 +256,19 @@ RSpec.describe ImpoundRecord, type: :model do
       expect {
         impound_record.destroy
       }.to_not change(ProcessImpoundUpdatesWorker.jobs, :count)
+    end
+  end
+
+  describe "authorized?" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
+    it "is not authorized by user" do
+      bike.reload
+      expect(bike.authorized?(bike.user)).to be_truthy
+      expect(bike.authorized?(user)).to be_falsey
+      expect(bike.current_impound_record).to be_present
+      expect(bike.current_impound_record.authorized?(bike.user)).to be_falsey
+      expect(bike.current_impound_record.authorized?(user)).to be_truthy
     end
   end
 

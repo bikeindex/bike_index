@@ -210,8 +210,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       context "with photo" do
+        # Bike claimed for this
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
         let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
         let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
+        let(:organization_user) { FactoryBot.create(:organization_member, organization: current_organization) }
         it "creates and adds photo" do
           FactoryBot.create(:state_new_york)
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
@@ -247,6 +250,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.hidden).to be_falsey
           expect(bike.user_hidden).to be_falsey
+          expect(bike.user).to be_present # Verify that user is present
+          expect(bike.authorized?(bike.user)).to be_truthy
+          expect(bike.serial_display(bike.user)).to eq bike.serial_number
+          # And then - verify that organization isn't authorized to edit this bike
+          expect(bike.authorized?(current_user)).to be_falsey
+          # Except - they are authorized to see the serial
+          expect(bike.serial_display(current_user)).to eq bike.serial_number
         end
       end
 

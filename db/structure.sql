@@ -1323,7 +1323,8 @@ CREATE TABLE public.impound_claims (
     submitted_at timestamp without time zone,
     resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    response_message text
 );
 
 
@@ -5624,6 +5625,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210311160040'),
 ('20210402214845'),
 ('20210402214854'),
-('20210405200829');
+('20210405200829'),
+('20210420161728');
 
 
