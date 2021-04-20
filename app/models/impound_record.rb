@@ -87,6 +87,11 @@ class ImpoundRecord < ApplicationRecord
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
+  def authorized?(u = nil)
+    return false if u.blank?
+    organized? ? u.authorized?(organization) : u.id == user_id
+  end
+
   # For now at least, we don't want to show exact address
   def show_address
     false

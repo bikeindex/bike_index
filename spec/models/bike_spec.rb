@@ -1079,7 +1079,7 @@ RSpec.describe Bike, type: :model do
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
-        bike = Bike.new(serial_number: "something", status: "status_abandoned")
+        bike = Bike.new(serial_number: "something", status: "unregistered_parking_notification")
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
         allow(bike).to receive(:authorized?) { true }

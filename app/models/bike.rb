@@ -387,7 +387,7 @@ class Bike < ApplicationRecord
 
   # Might be more sophisticated someday...
   def serial_hidden?
-    status_abandoned? || status_impounded?
+    status_impounded? || unregistered_parking_notification?
   end
 
   def serial_display(u = nil)

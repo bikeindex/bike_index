@@ -247,16 +247,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
           bike.reload
           expect(bike.status).to eq "status_abandoned"
-          expect(bike.serial_display).to eq "Hidden"
+          expect(bike.serial_hidden?).to be_falsey
           expect(bike.hidden).to be_falsey
           expect(bike.user_hidden).to be_falsey
           expect(bike.user).to be_present # Verify that user is present
-          expect(bike.authorized?(bike.user)).to be_truthy
-          expect(bike.serial_display(bike.user)).to eq bike.serial_number
-          # And then - verify that organization isn't authorized to edit this bike
-          expect(bike.authorized?(current_user)).to be_falsey
-          # Except - they are authorized to see the serial
-          expect(bike.serial_display(current_user)).to eq bike.serial_number
         end
       end
 

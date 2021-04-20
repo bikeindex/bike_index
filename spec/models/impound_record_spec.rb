@@ -264,8 +264,9 @@ RSpec.describe ImpoundRecord, type: :model do
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     it "is not authorized by user" do
       bike.reload
-      expect(bike.authorized?(bike.user)).to be_truthy
-      expect(bike.authorized?(user)).to be_falsey
+      expect(bike.send("authorization_requires_organization?")).to be_truthy
+      expect(bike.authorized?(bike.user)).to be_falsey
+      expect(bike.authorized?(user)).to be_truthy
       expect(bike.current_impound_record).to be_present
       expect(bike.current_impound_record.authorized?(bike.user)).to be_falsey
       expect(bike.current_impound_record.authorized?(user)).to be_truthy
