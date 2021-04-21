@@ -60,4 +60,36 @@ RSpec.describe ImpoundClaim, type: :model do
       expect(impound_claim.bike_submitting_images.pluck(:id)).to eq([public_image_private.id, public_image.id])
     end
   end
+
+  describe "impound_record_email" do
+    let(:user) { FactoryBot.create(:user, email: "example@stuff.com") }
+    let(:impound_record) { FactoryBot.create(:impound_record, user: user) }
+    let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record) }
+    it "returns user email" do
+      expect(impound_claim.impound_record_email).to eq "example@stuff.com"
+    end
+    context "organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization, email: "example@stuff.com") }
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, user: user, organization: organization) }
+      it "returns user email" do
+        organization.fetch_impound_configuration
+        expect(organization.reload.auto_user).to be_blank
+        impound_claim.reload
+        expect(impound_claim.impound_record_email).to eq "example@stuff.com"
+      end
+      context "organization with auto_user" do
+        let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+        it "is auto_user, or impound email" do
+          expect(organization.fetch_impound_configuration.email).to be_blank
+          expect(organization.reload.auto_user).to be_present
+          impound_claim.reload
+          expect(impound_claim.impound_record_email).to eq organization.reload.auto_user.email
+          organization.impound_configuration.update(email: "new@example.com")
+          impound_claim.reload
+          expect(impound_claim.impound_record_email).to eq "new@example.com"
+        end
+      end
+    end
+  end
 end

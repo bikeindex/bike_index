@@ -29,6 +29,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   def set_calculated_attributes
     self.display_id_prefix = nil if display_id_prefix.blank?
+    self.email = nil if email.blank?
     unless bulk_import_view
       self.bulk_import_view = false # should set based off whether there are any bulk imports, and not turn off once on
     end

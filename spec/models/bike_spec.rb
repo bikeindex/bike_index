@@ -1079,7 +1079,7 @@ RSpec.describe Bike, type: :model do
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
-        bike = Bike.new(serial_number: "something", status: "status_abandoned")
+        bike = Bike.new(serial_number: "something", status: "unregistered_parking_notification")
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
         allow(bike).to receive(:authorized?) { true }
@@ -1105,6 +1105,35 @@ RSpec.describe Bike, type: :model do
         bike = Bike.new(made_without_serial: true)
         bike.normalize_serial_number
         expect(bike.serial_display).to eq("Made without serial")
+      end
+    end
+    context "impound_record" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, serial_number: "Hello Party") }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let(:bike_impounded) { impound_record.bike }
+      let(:impound_user) { impound_record.user }
+      it "is hidden, except for the owner and org" do
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "found"
+        # individual users don't get the ability to override ownership access -
+        # only organization impounded records do
+        expect(bike.authorized?(bike.user)).to be_truthy
+        expect(bike.authorized?(impound_user)).to be_falsey
+        expect(bike.serial_display).to eq "Hidden"
+        expect(bike.serial_display(bike.user)).to eq "Hello Party"
+        expect(bike.serial_display(impound_user)).to eq "Hello Party"
+      end
+      context "organized" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+        it "is hidden, except for the owner and org" do
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(bike.status_humanized).to eq "impounded"
+          expect(bike.authorized?(bike.user)).to be_falsey
+          expect(bike.authorized?(impound_user)).to be_truthy
+          expect(bike.serial_display).to eq "Hidden"
+          expect(bike.serial_display(bike.user)).to eq "Hello Party"
+          expect(bike.serial_display(impound_user)).to eq "Hello Party"
+        end
       end
     end
   end
@@ -1784,11 +1813,14 @@ RSpec.describe Bike, type: :model do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
           bike.reload
+          expect(bike.current_impound_record).to_not be_present
           expect(bike.current_parking_notification).to eq parking_notification
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           expect(bike.address_hash).to eq stolen_record.address_hash
           expect(bike.address_set_manually).to be_falsey
           expect(bike.registration_address_source).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.send("authorization_requires_organization?")).to be_falsey
         end
       end
     end

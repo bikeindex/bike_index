@@ -8,6 +8,12 @@ RSpec.describe OrganizedMailer, type: :mailer do
       organization: organization,
       body: "<p>HEADERXSNIPPET</p>")
   end
+  let(:variable_snippet) do
+    FactoryBot.create(:organization_mail_snippet,
+      kind: variable_snippet_kind,
+      organization: organization,
+      body: "<p>#{variable_snippet_kind}-snippet</p>")
+  end
   describe "partial_registration" do
     context "without organization" do
       let(:b_param) { FactoryBot.create(:b_param_stolen) }
@@ -187,6 +193,15 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.body.encoded).to_not match "I picked up my"
         expect(mail.reply_to).to eq([parking_notification.reply_to_email])
       end
+      context "impound_configuration email" do
+        let!(:impound_configuration) { FactoryBot.create(:impound_configuration, email: "example@email.com", organization: organization) }
+        it "renders email" do
+          expect(parking_notification.retrieval_link_token).to_not be_present
+          expect(mail.body.encoded).to match header_mail_snippet.body
+          expect(mail.body.encoded).to match "map" # includes location
+          expect(mail.reply_to).to eq(["example@email.com"])
+        end
+      end
     end
   end
 
@@ -203,6 +218,18 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.to).to eq([graduated_notification.email])
       expect(mail.reply_to).to eq([organization.auto_user.email])
       expect(mail.subject).to eq graduated_notification.subject
+    end
+    context "with graduated_notification snippet" do
+      let(:variable_snippet_kind) { "graduated_notification" }
+      before { expect(variable_snippet).to be_present }
+      it "renders email" do
+        expect(graduated_notification.marked_remaining_link_token).to be_present
+        expect(mail.body.encoded).to match header_mail_snippet.body
+        expect(mail.body.encoded).to match variable_snippet.body
+        expect(mail.to).to eq([graduated_notification.email])
+        expect(mail.reply_to).to eq([organization.auto_user.email])
+        expect(mail.subject).to eq graduated_notification.subject
+      end
     end
   end
 
@@ -255,11 +282,23 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.bcc).to be_blank
         expect(mail.subject).to eq "New impound claim submitted"
       end
+      context "impound_configuration" do
+        let!(:impound_configuration) { FactoryBot.create(:impound_configuration, email: "example@email.com", organization: organization) }
+        it "renders" do
+          expect(impound_claim.reload.status).to eq status
+          expect(mail.to).to eq(["example@email.com"])
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.bcc).to be_blank
+          expect(mail.subject).to eq "New impound claim submitted"
+        end
+      end
     end
 
     describe "impound_claim_approved_or_denied" do
       let(:mail) { OrganizedMailer.impound_claim_approved_or_denied(impound_claim) }
       let(:status) { "approved" }
+      let(:variable_snippet_kind) { "impound_claim_denied" }
+      before { expect(variable_snippet).to be_present }
       it "renders" do
         expect(impound_claim.reload.status).to eq status
         organization.reload
@@ -267,6 +306,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.reply_to).to eq([organization.auto_user.email])
         expect(mail.bcc).to be_blank
         expect(mail.subject).to eq "Your impound claim was approved"
+        expect(mail.body.encoded).to_not match variable_snippet.body
       end
       context "denied" do
         let(:status) { "denied" }
@@ -277,6 +317,20 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.bcc).to be_blank
           expect(mail.subject).to eq "Your impound claim was denied"
+          expect(mail.body.encoded).to match variable_snippet.body
+        end
+      end
+      context "impound_configuration and snippet" do
+        let(:variable_snippet_kind) { "impound_claim_approved" }
+        let!(:impound_configuration) { FactoryBot.create(:impound_configuration, email: "example@email.com", organization: organization) }
+        it "renders" do
+          expect(impound_claim.reload.status).to eq status
+          organization.reload
+          expect(mail.to).to eq([impound_claim.user.email])
+          expect(mail.reply_to).to eq(["example@email.com"])
+          expect(mail.bcc).to be_blank
+          expect(mail.subject).to eq "Your impound claim was approved"
+          expect(mail.body.encoded).to match variable_snippet.body
         end
       end
     end

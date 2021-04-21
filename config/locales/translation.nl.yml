@@ -1660,6 +1660,8 @@ nl:
       location: Plaats
       primary_colors: Primaire kleuren
       serial: Serie
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe

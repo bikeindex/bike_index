@@ -1,6 +1,3 @@
--# duplicates method in organized_mailer - required for preview
-- @reply_to ||= @organization && @organization.auto_user.present? ? @organization.auto_user.email : "contact@bikeindex.org"
-
 %p
   Your impound claim
   - if @impound_claim.bike_claimed.present?
@@ -9,16 +6,20 @@
   has been
   %strong= @impound_claim.status_humanized
 
+-# Note: should be escaped
+%p= @impound_claim.response_message
+
 - snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
+
 - if snippet_kind.present?
   - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: snippet_kind).first
 
+-# If there is an organization message snippet, use it, otherwise default "reply to" message
 - if organization_message_snippet&.body&.present?
   = organization_message_snippet.body.html_safe
-
 - else
   - if @impound_claim.approved?
     %p
       Please reply to this message or contact
-      = link_to @reply_to, "mailto:#{@reply_to}"
+      = link_to @impound_claim.impound_record_email, "mailto:#{@impound_claim.impound_record_email}"
       to arrange to pick up your #{@bike_submitting&.type || "bike"}

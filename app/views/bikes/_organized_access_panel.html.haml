@@ -311,12 +311,18 @@
 
     - resolved_notifications = parking_notifications.resolved.where.not(id: current_impound_notification&.id)
     %p{ style: "margin-top: -12px;" }
-      = pluralize number_with_delimiter(parking_notifications.current.count), "current notification"
-      - if parking_notifications.resolved.count > 0
+      -# Gotta include the current impound notification if it's present
+      - current_count = parking_notifications.current.count
+      - current_count += 1 if current_impound_notification.present?
+      #{pluralize(number_with_delimiter(current_count), "current notification")},
+
+      - if resolved_notifications.count > 0
         \-
         %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }
           show
           = pluralize number_with_delimiter(resolved_notifications.count), "resolved notification"
+      - else
+        %span.less-strong 0 resolved notifications
       for #{@bike.type}
     - if parking_notifications.current.any?
       = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true }
