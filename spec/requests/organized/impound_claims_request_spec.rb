@@ -77,7 +77,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
       expect(impound_record.status).to eq "current"
       expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
       expect {
-        patch "#{base_url}/#{impound_claim.to_param}", params: {update_status: "approved"}
+        patch "#{base_url}/#{impound_claim.to_param}", params: {submit: "Approve"}
       }.to_not change(EmailImpoundClaimWorker.jobs, :count)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
@@ -96,7 +96,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location])
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {
-            update_status: "claim_approved",
+            submit: "Approve",
             impound_claim: {response_message: " "}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
@@ -135,7 +135,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{impound_claim.to_param}", params: {
-              update_status: "claim_approved",
+              submit: "approve",
               impound_claim: {response_message: response_message}
             }
           end
@@ -175,7 +175,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {
-            update_status: "claim_denied",
+            submit: "Deny",
             impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)

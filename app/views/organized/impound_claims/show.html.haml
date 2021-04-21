@@ -81,22 +81,11 @@
               .form-group.mt-0
                 = f.text_area :response_message, placeholder: "Optional additional to include", class: "form-control"
               .row.mt-4.approveOrDenyClaim
+                -# NOTE: the values for these match things in the update action. Make sure you update those if you change here
                 .col-xs-6.text-center
-                  %a.btn.btn-lg.btn-success{ href: "#", "data-status" => "claim_approved" }
-                    Approve
+                  = submit_tag "Approve", value: "Approve", name: "submit", class: "btn btn-lg btn-success"
                 .col-xs-6.text-center
-                  %a.btn.btn-lg.btn-danger{ href: "#", "data-status" => "claim_denied" }
-                    Deny
-
-              -# Small little inlined coffeescript to update the form on click and submit
-              -# gross, should be in a file, but whatever for now
-              :coffeescript
-                $(".approveOrDenyClaim a").click (e) ->
-                  e.preventDefault()
-                  $target = $(e.target)
-                  return false unless $target.attr("data-status")
-                  $("#update_status").val($target.attr("data-status"))
-                  $target.parents("form").submit()
+                  = submit_tag "Deny", value: "Deny", name: "submit", class: "btn btn-lg btn-danger"
             %p.mt-4.mb-0
               %em.less-strong
                 Clicking one these buttons will send an email to the user, letting them know the response to their claim.
@@ -105,7 +94,7 @@
     .col-sm-6.offset-sm-3
       %h3.uncap.mt-2.mb-2
         This claim has been updated since it was submitted:
-      = render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates: @impound_claim.impound_record_updates}
+      = render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates: @impound_claim.impound_record_updates.reorder(created_at: :desc)}
 
 %h3.uncap.mb-0.mt-4 Impounded bike:
 .row

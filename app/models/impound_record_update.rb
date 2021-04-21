@@ -86,7 +86,7 @@ class ImpoundRecordUpdate < ApplicationRecord
   end
 
   def kind_humanized
-    self.class.kinds_humanized[kind.to_sym]
+    self.class.kinds_humanized[kind&.to_sym]
   end
 
   def update_associations
