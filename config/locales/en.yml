@@ -930,6 +930,8 @@ en:
       location: Location
       primary_colors: Primary colors
       serial: Serial
+      hidden_because_status: because %{bike_type} is %{status}
+      hidden_for_unauthorized_users: hidden for unauthorized users
     bike_fields:
       revised_colors:
         add_a_color: Add a color

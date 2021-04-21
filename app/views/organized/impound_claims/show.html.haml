@@ -4,7 +4,7 @@
 .organized-page-header
   %h1.uncap
     Impound Claim for
-    = link_to @impound_record.display_id, organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+    = link_to "impound record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
 
 %h3.uncap.mb-0 Claiming bike:
 .row
@@ -64,7 +64,7 @@
   .col-md-6
     - if @bike_submitting.present?
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: @bike_submitting.decorate }
+        = render partial: "/bikes/bike", locals: { bike: @bike_submitting.decorate, skip_cache: true }
     %p.mt-4
       %strong.d-block Message from the user about claiming this bike:
       %em= @impound_claim.message
@@ -76,11 +76,28 @@
           .card-title
             %h3.uncap Respond to this claim
           .card-body
-            .row
-              .col-xs-6.text-center
-                = link_to "Approve", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_approved"), method: :patch, action: "update", class: "btn btn-lg btn-success"
-              .col-xs-6.text-center
-                = link_to "Deny", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_denied"), method: :patch, action: "update", class: "btn btn-lg btn-danger"
+            = form_for @impound_claim, {url: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id)} do |f|
+              = hidden_field_tag :update_status
+              .form-group.mt-0
+                = f.text_area :response_message, placeholder: "Optional additional to include", class: "form-control"
+              .row.mt-4.approveOrDenyClaim
+                .col-xs-6.text-center
+                  %a.btn.btn-lg.btn-success{ href: "#", "data-status" => "claim_approved" }
+                    Approve
+
+                  -#= link_to "Approve", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_approved"), method: :patch, action: "update", class: "btn btn-lg btn-success"
+                .col-xs-6.text-center
+                  %a.btn.btn-lg.btn-danger{ href: "#", "data-status" => "claim_denied" }
+                    Deny
+                  -#= link_to "Deny", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_denied"), method: :patch, action: "update", class: "btn btn-lg btn-danger"
+              -# Small little inlined coffeescript to update the form on click and submit
+              :coffeescript
+                $(".approveOrDenyClaim a").click (e) ->
+                  e.preventDefault()
+                  $target = $(e.target)
+                  return false unless $target.attr("data-status")
+                  $("#update_status").val($target.attr("data-status"))
+                  $target.parents("form").submit()
             %p.mt-4.mb-0
               %em.less-strong
                 Clicking one these buttons will send an email to the user, letting them know the response to their claim.
@@ -136,10 +153,15 @@
                 - @impound_record.notification_notes_and_messages.each do |note|
                   %li= note
 
+        - if @impound_claim.submitted?
+          %tr
+            %td Response message
+            %td= @impound_claim.response_message
+
   - if @bike_claimed.present?
     .col-md-6
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: @bike_claimed.decorate }
+        = render partial: "/bikes/bike", locals: { bike: @bike_claimed.decorate, skip_cache: true }
 
 
 - if @parking_notification.present?

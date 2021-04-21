@@ -31,6 +31,8 @@ class ImpoundClaim < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
 
+  attr_accessor :skip_update
+
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
   end
@@ -50,6 +52,10 @@ class ImpoundClaim < ApplicationRecord
 
   def resolved?
     self.class.resolved_statuses.include?(status)
+  end
+
+  def responded?
+    resolved? || approved?
   end
 
   def active?
@@ -89,6 +95,8 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.message = message.blank? ? nil : message.strip
+    self.response_message = response_message.blank? ? nil : response_message.strip
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"
     self.resolved_at ||= Time.current if resolved?
@@ -99,6 +107,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def send_triggered_notifications
+    return true if skip_update
     EmailImpoundClaimWorker.perform_async(id)
   end
 

@@ -80,7 +80,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
       end
       context "other update" do
         let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true, email: "something@stuff.com") }
-        let(:update_attributes) { { public_view: "0", display_id_prefix: "1", email: " "} }
+        let(:update_attributes) { {public_view: "0", display_id_prefix: "1", email: " "} }
         it "updates" do
           patch base_url, params: {
             organization_id: current_organization.to_param,

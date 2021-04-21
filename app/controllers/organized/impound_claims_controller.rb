@@ -17,7 +17,12 @@ module Organized
     end
 
     def update
-      if %w[claim_approved claim_denied].include?(params[:update_status])
+      if !@impound_claim.submitting?
+        flash[:error] = "That impound claim has"
+      elsif %w[claim_approved claim_denied].include?(params[:update_status])
+        # add the response message - but don't deliver a message yet
+        @impound_claim.update(permitted_update_params.merge(skip_update: true))
+        @impound_claim.skip_update = false
         impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
                                                                              kind: params[:update_status],
                                                                              impound_claim: @impound_claim)
@@ -74,6 +79,10 @@ module Organized
       @impound_claim = impound_claims.find(params[:id])
       @impound_record = @impound_claim.impound_record
       @parking_notification = @impound_record.parking_notification
+    end
+
+    def permitted_update_params
+      params.require(:impound_claim).permit(:response_message)
     end
   end
 end

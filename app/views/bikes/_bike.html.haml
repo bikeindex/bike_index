@@ -1,4 +1,7 @@
-- cache(bike) do
+-# somewhat gross hack to make it possible to show serial_display for the current user
+- skip_cache ||= false
+
+- cache_unless(skip_cache, bike) do
   %li.bike-box-item
     %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
       = bike.thumb_image
@@ -10,7 +13,17 @@
             = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
           = bike.frame_model.to_s
       %ul.attr-list
-        = attr_list_item(bike.serial_display, t(".serial"))
+        %li
+          %strong.attr-title #{t(".serial")}:
+          - if !skip_cache
+            = bike.serial_display
+          - else # Show the user specific info
+            = bike.serial_display(current_user)
+            - if bike.serial_hidden?
+              %em.small.less-strong
+                - if bike.authorized?(current_user)
+                  = t(".hidden_for_unauthorized_users")
+                = t(".hidden_because_status", bike_type: bike.type, status: bike.status_humanized_translated)
         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
       - if bike.current_stolen_record.present?
         %ul.attr-list
