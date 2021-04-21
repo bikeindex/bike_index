@@ -155,6 +155,7 @@ Rails.application.routes.draw do
   resources :bike_stickers, only: [:update]
   resources :locks, except: %(show index)
   resources :impound_claims, only: [:create, :update]
+  resources :review_impound_claims, only: [:show, :update]
 
   namespace :admin do
     root to: "dashboard#index", as: :root
