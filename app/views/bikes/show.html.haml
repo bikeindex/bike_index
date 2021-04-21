@@ -132,7 +132,7 @@
             %strong.attr-title #{t(".serial")}:
             = @bike.serial_display(current_user)
             - if @bike.serial_hidden?
-              %small.less-strong
+              %em.small.less-strong
                 - if @bike.authorized?(current_user)
                   = t(".hidden_for_unauthorized_users")
                 = t(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
