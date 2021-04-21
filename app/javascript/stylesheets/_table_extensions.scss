@@ -1,3 +1,4 @@
+// Full screen table stuff
 @mixin full-screen-table-overflown {
   // Enable scrolling and make it edge to edge
   // separate class so it can be applied via js if applicable
@@ -55,9 +56,6 @@
       width: 85%; // This is effectively min-width for tables
     }
   }
-  td ul {
-    margin-bottom: 0;
-  }
   tr.active-row {
     background-color: #ebf5fb !important;
     a {
@@ -77,11 +75,47 @@
   }
 }
 
+table thead.sortable {
+  th {
+    font-weight: normal;
+    a.sortable-link {
+      display: block;
+      position: relative;
+      // To give a spot for the sortable direction
+      &.active {
+        padding-right: 1.5rem;
+      }
+      span.sortable-direction {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      &.active {
+        font-weight: strong;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Random special formatting bits
 table {
   .table-cell-check {
     font-family: Courier;
     text-align: center;
     font-weight: bold;
+  }
+
+  code {
+    word-break: break-all;
+  }
+
+  .data-cell {
+    pre {
+      padding: 0.25rem 0.5rem;
+      margin: 0 0 0.5rem;
+    }
   }
 
   .less-strong-hold {
@@ -98,27 +132,10 @@ table {
     @extend .less-strong;
   }
 
-  thead.sortable {
-    th {
-      font-weight: normal;
-      a.sortable-link {
-        display: block;
-        position: relative;
-        // To give a spot for the sortable direction
-        &.active {
-          padding-right: 1.5rem;
-        }
-        span.sortable-direction {
-          display: block;
-          position: absolute;
-          right: 0;
-          top: 0;
-        }
-        &.active {
-          font-weight: strong;
-          text-decoration: underline;
-        }
-      }
+  .photo-cell {
+    text-align: center;
+    img {
+      max-width: 150px;
     }
   }
 }
