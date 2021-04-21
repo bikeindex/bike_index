@@ -139,6 +139,10 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def reply_to_email
+    if impound_notification? && organization.present?
+      impound_email = organization.fetch_impound_configuration.email
+      return impound_email if impound_email.present?
+    end
     organization&.auto_user&.email || user&.email
   end
 

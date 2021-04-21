@@ -107,18 +107,15 @@ class OrganizedMailer < ApplicationMailer
   def impound_claim_submitted(impound_claim)
     @impound_claim = impound_claim
     set_impound_claim_ivars
-    # TODO: make this better
-    organized_recipient = @impound_claim.organization&.auto_user&.email || "contact@bikeindex.org"
     mail(reply_to: "contact@bikeindex.org",
-         to: organized_recipient,
+         to: @impound_claim.impound_record_email,
          subject: "New impound claim submitted")
   end
 
   def impound_claim_approved_or_denied(impound_claim)
     @impound_claim = impound_claim
     set_impound_claim_ivars
-    @reply_to = reply_to
-    mail(reply_to: @reply_to,
+    mail(reply_to: impound_claim.impound_record_email,
          to: @impound_claim.user.email,
          subject: "Your impound claim was #{@impound_claim.status_humanized}")
   end

@@ -84,6 +84,10 @@ class ImpoundClaim < ApplicationRecord
     !unsubmitted?
   end
 
+  def impound_record_email
+    impound_record.reply_to_email
+  end
+
   def set_calculated_attributes
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"

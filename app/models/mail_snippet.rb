@@ -13,7 +13,7 @@ class MailSnippet < ApplicationRecord
     parked_incorrectly_notification: 8,
     impound_notification: 9,
     impound_claim_approved: 11,
-    impound_claim_denied: 11,
+    impound_claim_denied: 12,
     graduated_notification: 10
   }.freeze
 

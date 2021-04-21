@@ -61,10 +61,11 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
         {
           display_id_prefix: "xXx3",
           public_view: true,
-          display_id_next_integer: 324
+          display_id_next_integer: 324,
+          email: "impounding@organization.com"
         }
       end
-      it "updates, sends message about maps" do
+      it "updates" do
         patch base_url, params: {
           organization_id: current_organization.to_param,
           id: current_organization.to_param,
@@ -76,6 +77,23 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
         # TODO: this should be updateable for organizations in the future. But skipping for now,
         # to be able to enable, we need to add validations that check that the display_id_next_integer
         expect(impound_configuration.display_id_next_integer).to eq nil
+      end
+      context "other update" do
+        let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true, email: "something@stuff.com") }
+        let(:update_attributes) { { public_view: "0", display_id_prefix: "1", email: " "} }
+        it "updates" do
+          patch base_url, params: {
+            organization_id: current_organization.to_param,
+            id: current_organization.to_param,
+            impound_configuration: update_attributes
+          }
+          expect(response).to redirect_to edit_organization_manage_impounding_path(organization_id: current_organization.to_param)
+          expect(flash[:success]).to be_present
+          impound_configuration.reload
+          expect(impound_configuration.display_id_prefix).to eq "1"
+          expect(impound_configuration.public_view).to be_falsey
+          expect(impound_configuration.email).to eq nil
+        end
       end
     end
   end

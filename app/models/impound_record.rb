@@ -216,6 +216,14 @@ class ImpoundRecord < ApplicationRecord
     end
   end
 
+  def reply_to_email
+    # Delegate to parking notification, since that's the original email
+    return parking_notification.reply_to_email if parking_notification.present?
+    organization&.fetch_impound_configuration&.email ||
+      organization&.auto_user&.email ||
+      user&.email
+  end
+
   private
 
   def set_calculated_display_id
