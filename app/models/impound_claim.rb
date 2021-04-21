@@ -50,6 +50,24 @@ class ImpoundClaim < ApplicationRecord
     str == "submitting" ? "submitted" : str&.tr("_", " ")
   end
 
+  def kind
+    # Fallback to impounded
+    impound_record&.kind || ImpoundRecord.impounded_kind
+  end
+
+  # NOTE: actually cycle_type_name, so I'm ok with not matching cycle_type method name
+  def bike_type
+    bike_submitting&.type || bike_claimed&.type
+  end
+
+  def claim_kind_humanized
+    [kind, bike_type, "claim"].reject(&:blank?).join(" ")
+  end
+
+  def organized?
+    impound_record&.organized? || false
+  end
+
   def resolved?
     self.class.resolved_statuses.include?(status)
   end
