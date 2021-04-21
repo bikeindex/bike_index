@@ -7,13 +7,13 @@
   %strong= @impound_claim.status_humanized
 
 - snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
-<h1>#{snippet_kind}</h1>
+
 - if snippet_kind.present?
   - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: snippet_kind).first
 
+-# If there is an organization message snippet, use it, otherwise default "reply to" message
 - if organization_message_snippet&.body&.present?
   = organization_message_snippet.body.html_safe
-
 - else
   - if @impound_claim.approved?
     %p
