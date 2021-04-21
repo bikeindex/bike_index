@@ -30,6 +30,7 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.Organized if $('.organized-body').length > 0
     # Set the local timezone and convert all the times to local
     @localizeTimes()
+    @enableFullscreenOverflow()
 
   loadPageScript: (body_id) ->
     # If this is a landing page
@@ -137,6 +138,15 @@ class BikeIndex.Init extends BikeIndex
       $this = $(this)
       time = moment($this.attr("data-initialtime"), moment.ISO_8601)
       $this.val(time.format("YYYY-MM-DDTHH:mm")) # Format that at least Chrome expects for field
+
+  # copy of bike_index_utilities.js function
+  enableFullscreenOverflow: ->
+    pageWidth = $(window).width();
+    $('.full-screen-table table').each (index) ->
+      $this = $(this)
+      if $this.outerWidth() > pageWidth
+        $this.parents('.full-screen-table').addClass 'full-screen-table-overflown'
+
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
