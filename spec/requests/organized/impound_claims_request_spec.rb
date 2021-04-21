@@ -97,7 +97,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {
             update_status: "claim_approved",
-            impound_claim: { response_message: " " }
+            impound_claim: {response_message: " "}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
@@ -136,7 +136,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{impound_claim.to_param}", params: {
               update_status: "claim_approved",
-              impound_claim: { response_message: response_message}
+              impound_claim: {response_message: response_message}
             }
           end
           expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -176,7 +176,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {
             update_status: "claim_denied",
-            impound_claim: { response_message: "I recommend talking with us about all the things" }
+            impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)

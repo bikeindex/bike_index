@@ -84,13 +84,12 @@
                 .col-xs-6.text-center
                   %a.btn.btn-lg.btn-success{ href: "#", "data-status" => "claim_approved" }
                     Approve
-
-                  -#= link_to "Approve", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_approved"), method: :patch, action: "update", class: "btn btn-lg btn-success"
                 .col-xs-6.text-center
                   %a.btn.btn-lg.btn-danger{ href: "#", "data-status" => "claim_denied" }
                     Deny
-                  -#= link_to "Deny", organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id, update_status: "claim_denied"), method: :patch, action: "update", class: "btn btn-lg btn-danger"
+
               -# Small little inlined coffeescript to update the form on click and submit
+              -# gross, should be in a file, but whatever for now
               :coffeescript
                 $(".approveOrDenyClaim a").click (e) ->
                   e.preventDefault()

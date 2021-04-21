@@ -6,7 +6,7 @@
   has been
   %strong= @impound_claim.status_humanized
 
--# Note: shouldn't should be escaped
+-# Note: should be escaped
 %p= @impound_claim.response_message
 
 - snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
