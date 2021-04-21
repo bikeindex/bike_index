@@ -1,15 +1,33 @@
-.full-screen-table {
-  // Enable scrolling
+@mixin full-screen-table-overflown {
+  // Enable scrolling and make it edge to edge
+  // separate class so it can be applied via js if applicable
   overflow-x: scroll;
+  margin-left: -15px;
+  margin-right: -15px;
+}
 
-  // Make it edge to edge on xs screens
-  @include media-breakpoint-down(xs) {
-    margin-left: -15px;
-    margin-right: -15px;
+.full-screen-table-overflown {
+  @include full-screen-table-overflown;
+}
+
+.full-screen-table {
+  @include media-breakpoint-down(sm) {
+    @include full-screen-table-overflown;
   }
+
   td ul {
     padding: 0 0 0 1.5rem;
     margin: 0.5rem 0 0.5rem;
+  }
+
+  // Dropdown headers
+  .dropdown-toggle {
+    font-weight: normal;
+    &:active,
+    &.active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
   }
 }
 

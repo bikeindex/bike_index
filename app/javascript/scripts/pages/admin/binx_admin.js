@@ -1,6 +1,7 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/load_fancy_selects.js";
+import { BikeIndexUtilities } from "../../utils/bike_index_utilities.js";
 import BinxAdminGraphs from "./graphs.js";
 import BinxAdminBikesEdit from "./bikes_edit.js";
 import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
@@ -14,8 +15,11 @@ function BinxAdmin() {
   return {
     init() {
       this.initAdminSearchSelect();
-      // Enable bootstrap custom file upload boxes
-      binxApp.enableFilenameForUploads();
+
+      // Enable utilities
+      window.bikeIndexUtilities = new BikeIndexUtilities();
+      bikeIndexUtilities.init();
+
       LoadFancySelects();
 
       if ($(".calendar-box")[0]) {
