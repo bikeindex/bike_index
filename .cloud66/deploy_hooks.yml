@@ -1,4 +1,9 @@
 production:
+  first_thing:
+    # Install psql, for database loading
+    command: apt-get install postgresql-client
+    run_on: all_servers
+    sudo: true
   after_symlink:
     # Make the uploads cache folder writable
     - command: chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod -R 775 $RAILS_STACK_PATH/tmp/cache
