@@ -30,6 +30,13 @@
             = link_to "update location here", locations_organization_manage_path(organization_id: @organization.to_param)
         - else
           = link_to "Set impound locations", locations_organization_manage_path(organization_id: @organization.to_param)
+  .form-group.row.small-line-height
+    = f.label :email, "Impound email", class: 'org-form-label'
+    .col-sm-4
+      = f.email_field :email, placeholder: @organization.auto_user&.email, class: "form-control"
+      %span.below-input-help
+        Email address impound notifications (and claims, if enabled) will be sent from.
+        %em If blank, uses the default organization email
 
   .form-group.row.mt-4.small-line-height
     = f.label :display_id_prefix, class: 'org-form-label' do

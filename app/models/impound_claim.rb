@@ -31,6 +31,8 @@ class ImpoundClaim < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
 
+  attr_accessor :skip_update
+
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
   end
@@ -43,8 +45,35 @@ class ImpoundClaim < ApplicationRecord
     statuses - resolved_statuses
   end
 
+  def self.status_humanized(str)
+    # It doesn't make sense to display "submitting"
+    str == "submitting" ? "submitted" : str&.tr("_", " ")
+  end
+
+  def kind
+    # Fallback to impounded
+    impound_record&.kind || ImpoundRecord.impounded_kind
+  end
+
+  # NOTE: actually cycle_type_name, so I'm ok with not matching cycle_type method name
+  def bike_type
+    bike_submitting&.type || bike_claimed&.type
+  end
+
+  def claim_kind_humanized
+    [kind, bike_type, "claim"].reject(&:blank?).join(" ")
+  end
+
+  def organized?
+    impound_record&.organized? || false
+  end
+
   def resolved?
     self.class.resolved_statuses.include?(status)
+  end
+
+  def responded?
+    resolved? || approved?
   end
 
   def active?
@@ -62,8 +91,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def status_humanized
-    # It doesn't make sense to display "submitting"
-    submitting? ? "submitted" : status.tr("_", " ")
+    self.class.status_humanized(status)
   end
 
   # return private images too
@@ -80,7 +108,13 @@ class ImpoundClaim < ApplicationRecord
     !unsubmitted?
   end
 
+  def impound_record_email
+    impound_record.reply_to_email
+  end
+
   def set_calculated_attributes
+    self.message = message.blank? ? nil : message.strip
+    self.response_message = response_message.blank? ? nil : response_message.strip
     self.status = calculated_status
     self.submitted_at ||= Time.current if status == "submitting"
     self.resolved_at ||= Time.current if resolved?
@@ -91,6 +125,7 @@ class ImpoundClaim < ApplicationRecord
   end
 
   def send_triggered_notifications
+    return true if skip_update
     EmailImpoundClaimWorker.perform_async(id)
   end
 

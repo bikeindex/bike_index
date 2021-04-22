@@ -387,11 +387,16 @@ class Bike < ApplicationRecord
 
   # Might be more sophisticated someday...
   def serial_hidden?
-    status_abandoned? || status_impounded?
+    status_impounded? || unregistered_parking_notification?
   end
 
-  def serial_display
-    return "Hidden" if serial_hidden?
+  def serial_display(u = nil)
+    if serial_hidden?
+      # show the serial to the user, even if authorization_requires_organization?
+      return "Hidden" unless authorized?(u) ||
+        u&.id.present? && u.id == user&.id ||
+        current_impound_record.present? && current_impound_record.authorized?(u)
+    end
     return serial_number.humanize if no_serial?
     serial_number
   end
@@ -480,9 +485,9 @@ class Bike < ApplicationRecord
 
   def authorized?(u)
     return false if u.blank?
-    # If there isn't a current impound record - or if it's impound by a user, not an organization
-    # Authorization is based on whether the user is the owner of the bike
-    if current_impound_record.blank? || current_impound_record.unorganized?
+    # authorization requires organization if impounded or marked abandoned by an organization
+    unless authorization_requires_organization?
+      # Since it doesn't require an organization, authorize by user
       return true if u == owner || claimable_by?(u)
     end
     authorized_by_organization?(u: u)
@@ -985,5 +990,10 @@ class Bike < ApplicationRecord
 
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
+  end
+
+  def authorization_requires_organization?
+    # If there is a current impound record
+    current_impound_record.present? && current_impound_record.organized?
   end
 end

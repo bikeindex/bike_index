@@ -39,7 +39,7 @@ http_interactions:
       Server:
       - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
       Date:
-      - Thu, 11 Feb 2021 17:06:15 GMT
+      - Thu, 22 Apr 2021 01:32:07 GMT
       Via:
       - 1.1 vegur
     body:
@@ -47,5 +47,5 @@ http_interactions:
       string: '{"code":404,"message":"Shucks, no we couldn''t find that","description":"View
         all bikes: http://bikebook.io or documentation: http://bikebook.io/documentation"}'
     http_version:
-  recorded_at: Thu, 11 Feb 2021 17:06:15 GMT
+  recorded_at: Thu, 22 Apr 2021 01:32:07 GMT
 recorded_with: VCR 5.0.0

@@ -17,17 +17,30 @@ module Organized
     end
 
     def update
-      if %w[claim_approved claim_denied].include?(params[:update_status])
-        impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
-                                                                             kind: params[:update_status],
-                                                                             impound_claim: @impound_claim)
-        if impound_record_update.save
-          flash[:success] = impound_record_update.kind_humanized
+      if !@impound_claim.submitting?
+        flash[:error] = if @impound_claim.responded?
+          "That claim has already been responded to"
         else
-          flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
+          "That claim hasn't been submitted yet (it's #{@impound_claim.status_humanized})"
         end
       else
-        flash[:error] = "Unknown update action"
+        update_status = "claim_approved" if params[:submit].match?(/approve/i)
+        update_status = "claim_denied" if params[:submit].match?(/den/i)
+        if %w[claim_approved claim_denied].include?(update_status)
+          # add the response message - but don't deliver a message yet
+          @impound_claim.update(permitted_update_params.merge(skip_update: true))
+          @impound_claim.skip_update = false
+          impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
+                                                                               kind: update_status,
+                                                                               impound_claim: @impound_claim)
+          if impound_record_update.save
+            flash[:success] = impound_record_update.kind_humanized
+          else
+            flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
+          end
+        else
+          flash[:error] = "Unknown update action"
+        end
       end
       redirect_back(fallback_location: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id))
     end
@@ -74,6 +87,10 @@ module Organized
       @impound_claim = impound_claims.find(params[:id])
       @impound_record = @impound_claim.impound_record
       @parking_notification = @impound_record.parking_notification
+    end
+
+    def permitted_update_params
+      params.require(:impound_claim).permit(:response_message)
     end
   end
 end

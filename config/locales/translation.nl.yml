@@ -1660,6 +1660,8 @@ nl:
       location: Plaats
       primary_colors: Primaire kleuren
       serial: Serie
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -2121,9 +2123,6 @@ nl:
       front_wheel_diameter: Diameter voorwiel
       handlebar_type: Type stuur
       hidden_by_owner: VERBORGEN door eigenaar
-      is_this_your_bike_send_proof_of_ownership: Is dit jouw fiets? Stuur een bewijs
-        van eigendom (zoals het framenummer van de fiets of een link naar een foto
-        van jou met de fiets)
       know_something_about_this_bike_type: Weet u hier iets over %{bike_type}?
       link_url: Link url
       location: Plaats
@@ -2171,6 +2170,9 @@ nl:
       stolen_details: Diefstal details
       not_registered_by_user: Niet geregistreerd door een gebruiker
       in: in
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
+      looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen

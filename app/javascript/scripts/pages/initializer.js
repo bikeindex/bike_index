@@ -11,19 +11,6 @@ import PeriodSelector from "../utils/period_selector.js";
 
 window.binxApp || (window.binxApp = {});
 
-binxApp.enableFilenameForUploads = function () {
-  $("input.custom-file-input[type=file]").on("change", function (e) {
-    // The issue is that the files list isn't actually an array. So we can't map it
-    let files = [];
-    let i = 0;
-    while (i < e.target.files.length) {
-      files.push(e.target.files[i].name);
-      i++;
-    }
-    $(this).parent().find(".custom-file-label").text(files.join(", "));
-  });
-};
-
 // I've made the choice to have classes' first letter capitalized
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.

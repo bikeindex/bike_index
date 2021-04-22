@@ -87,6 +87,12 @@ class ImpoundRecord < ApplicationRecord
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
+  def authorized?(u = nil)
+    return false if u.blank?
+    return true if u.superuser?
+    organized? ? u.authorized?(organization) : u.id == user_id
+  end
+
   # For now at least, we don't want to show exact address
   def show_address
     false
@@ -209,6 +215,14 @@ class ImpoundRecord < ApplicationRecord
     else
       Geohelper.assignable_address_hash(address(force_show_address: true))
     end
+  end
+
+  def reply_to_email
+    # Delegate to parking notification, since that's the original email
+    return parking_notification.reply_to_email if parking_notification.present?
+    organization&.fetch_impound_configuration&.email ||
+      organization&.auto_user&.email ||
+      user&.email
   end
 
   private

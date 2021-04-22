@@ -37,7 +37,7 @@ class BulkImportWorker < ApplicationWorker
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
       bike = register_bike(row_to_b_param_hash(row.to_h))
-      next if bike.id.present?
+      next if bike.blank? || bike.id.present?
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end
@@ -47,6 +47,7 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def register_bike(b_param_hash)
+    return nil if b_param_hash.blank?
     b_param = BParam.create(creator_id: creator_id,
                             params: b_param_hash,
                             origin: "bulk_import_worker")
@@ -60,6 +61,7 @@ class BulkImportWorker < ApplicationWorker
 
       [k, v.blank? ? nil : v.strip]
     }.to_h
+    return nil if row.values.reject(&:blank?).none?
 
     if @bulk_import.impounded?
       row[:owner_email] ||= @bulk_import.user&.email # email isn't required for bulk imports

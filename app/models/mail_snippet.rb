@@ -12,6 +12,8 @@ class MailSnippet < ApplicationRecord
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
     impound_notification: 9,
+    impound_claim_approved: 11,
+    impound_claim_denied: 12,
     graduated_notification: 10
   }.freeze
 
@@ -51,7 +53,7 @@ class MailSnippet < ApplicationRecord
   end
 
   def self.organization_message_kinds
-    ParkingNotification.kinds + ["graduated_notification"]
+    ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
   end
 
   def self.finished_registration_kinds

@@ -44,10 +44,28 @@ RSpec.describe ParkingNotification, type: :model do
   describe "reply_to_email" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
+    let(:parking_notification_impound) { FactoryBot.build(:parking_notification_organized, organization: organization, kind: "impound_notification") }
     it "organization auto_user, because it's present" do
       expect(parking_notification.should_be_geocoded?).to be_falsey
       expect(parking_notification.user).to_not eq organization.auto_user
       expect(parking_notification.reply_to_email).to eq organization.auto_user.email
+      # And impound is the same
+      expect(parking_notification_impound.should_be_geocoded?).to be_falsey
+      expect(parking_notification_impound.user).to_not eq organization.auto_user
+      expect(parking_notification_impound.reply_to_email).to eq organization.auto_user.email
+    end
+    context "with impound configuration" do
+      let!(:impound_configuration) { FactoryBot.create(:impound_configuration, email: "coolnew@email.com", organization: organization) }
+      it "is organization auto_user, but impound configuration email" do
+        expect(organization.fetch_impound_configuration&.id).to eq impound_configuration.id
+        expect(parking_notification.should_be_geocoded?).to be_falsey
+        expect(parking_notification.user).to_not eq organization.auto_user
+        expect(parking_notification.reply_to_email).to eq organization.auto_user.email
+        # And impound is the same
+        expect(parking_notification_impound.should_be_geocoded?).to be_falsey
+        expect(parking_notification_impound.user).to_not eq organization.auto_user
+        expect(parking_notification_impound.reply_to_email).to eq "coolnew@email.com"
+      end
     end
   end
 
