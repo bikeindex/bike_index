@@ -1,7 +1,7 @@
 default: &default
   adapter: postgresql
   # manually set db_pool, separate from threads, because sidekiq
-  pool: <%= ENV.fetch("DB_POOL_COUNT") { 20 } %>
+  pool: <%= ENV.fetch("DB_POOL") { 20 } %>
 
 development:
   <<: *default
