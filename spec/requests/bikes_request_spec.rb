@@ -456,9 +456,11 @@ RSpec.describe BikesController, type: :request do
     end
     context "with impound_record" do
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
       it "includes an impound_claim" do
         expect(impound_record).to be_present
         expect(bike.reload.current_impound_record).to be_present
+        expect(bike.owner).to_not eq current_user
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(response).to be_ok
@@ -475,6 +477,7 @@ RSpec.describe BikesController, type: :request do
         let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
         it "uses impound_claim" do
           expect(impound_record.creator_public_display_name).to eq "bike finder"
+          expect(bike.reload.owner).to_not eq current_user
           expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(flash).to be_blank

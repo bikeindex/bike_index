@@ -1,71 +1,51 @@
 require "rails_helper"
 
-RSpec.describe Organized::ImpoundClaimsController, type: :request do
-  let(:base_url) { "/o/#{current_organization.to_param}/impound_claims" }
-  include_context :request_spec_logged_in_as_organization_member
-
-  let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:user_email) { "someemail@things.com" }
-  let(:user_claiming) { FactoryBot.create(:user_confirmed, email: user_email) }
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user: user_claiming) }
-  let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-  let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id: 1111) }
-  let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, stolen_record: bike.current_stolen_record, status: status) }
+RSpec.describe ReviewImpoundClaimsController, type: :request do
+  base_url = "/review_impound_claims"
+  include_context :request_spec_logged_in_as_user_if_present
+  let(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike_claimed) }
+  let(:bike_claimed) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+  let(:impound_claim) { FactoryBot.create(:impound_claim, :with_stolen_record, status: status, impound_record: impound_record) }
+  let(:bike_submitting) { impound_claim.bike_submitting }
   let(:status) { "submitting" }
-
-  describe "index" do
-    it "renders" do
-      get base_url
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
-      expect(assigns(:impound_claims).count).to eq 0
-    end
-    context "multiple impound_records" do
-      let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
-      let!(:impound_claim2) { FactoryBot.create(:impound_claim_with_stolen_record, organization: current_organization, user: current_user, bike: bike2, status: "submitting") }
-      let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, organization: current_organization, status: "approved") }
-      let!(:impound_claim_resolved) { FactoryBot.create(:impound_claim_resolved, organization: current_organization) }
-      let!(:impound_claim_unorganized) { FactoryBot.create(:impound_claim) }
-      it "finds by impound scoping" do
-        impound_claim.reload
-        expect(impound_claim.bike_submitting&.id).to eq bike.id
-        expect(impound_claim.bike_claimed&.id).to eq bike.id
-        expect(impound_claim.active?).to be_truthy
-        expect(impound_claim.organization_id).to eq current_organization.id
-        impound_claim2.reload
-        expect(impound_claim2.active?).to be_truthy
-        expect(impound_claim2.organization_id).to eq current_organization.id
-        impound_claim_approved.reload
-        expect(impound_claim_approved.active?).to be_truthy
-        expect(impound_claim_approved.organization_id).to eq current_organization.id
-        # Test that impound_claim.active.bikes scopes correctly
-        active_ids = [impound_claim.id, impound_claim2.id, impound_claim_approved.id]
-        expect(current_organization.impound_claims.active.pluck(:id)).to match_array(active_ids)
-        get base_url
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:index)
-        expect(assigns(:search_status)).to eq "active"
-        expect(assigns(:impound_claims).pluck(:id)).to match_array(active_ids)
-
-        get "#{base_url}?search_status=all"
-        expect(response.status).to eq(200)
-        expect(assigns(:search_status)).to eq "all"
-        expect(assigns(:impound_claims).pluck(:id)).to match_array(active_ids + [impound_claim_resolved.id])
-
-        get "#{base_url}?search_impound_record_id=#{impound_record.id}"
-        expect(response.status).to eq(200)
-        expect(assigns(:impound_claims).pluck(:id)).to match_array([impound_claim.id])
-      end
-    end
-  end
 
   describe "show" do
     it "renders" do
       impound_claim.reload
+      expect(impound_record.reload.organized?).to be_falsey
+      expect(impound_record.authorized?(current_user)).to be_truthy
+      expect(bike_claimed.reload.status).to eq "status_impounded"
+      expect(bike_submitting)
+      expect(current_user.authorized?(bike_claimed)).to be_truthy
+      expect(current_user.authorized?(bike_submitting)).to be_falsey
       get "#{base_url}/#{impound_claim.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:impound_claim)).to eq impound_claim
+    end
+    context "not users impound_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record) }
+      it "raises" do
+        expect(impound_record.reload.authorized?(current_user)).to be_falsey
+        expect {
+          get "#{base_url}/#{impound_claim.to_param}"
+        }.to raise_error(ActiveRecord::RecordNotFound)
+        # unless user is a superuser
+        current_user.update(superuser: true)
+        get "#{base_url}/#{impound_claim.to_param}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:impound_claim)).to eq impound_claim
+      end
+    end
+    context "organized impound_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: current_user) }
+      it "redirects" do
+        impound_claim.reload
+        expect(impound_record.reload.organized?).to be_truthy
+        get "#{base_url}/#{impound_claim.to_param}"
+        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: impound_record.organization_id)
+      end
     end
   end
 
@@ -83,7 +63,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         }
       }.to_not change(EmailImpoundClaimWorker.jobs, :count)
       expect(flash[:error]).to be_present
-      expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
+      expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
       impound_record.reload
       expect(impound_record.status).to eq "current"
       expect(impound_record.impound_record_updates.count).to eq 0
@@ -103,7 +83,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             impound_claim: {response_message: " "}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
-        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
+        expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"
@@ -120,10 +100,8 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_claim.response_message).to eq nil
       end
       context "inline sidekiq" do
-        let(:snippet_body) { "<p>claim-approved-snippet</p>" }
         let(:response_message) { "RESponse=MESSAGE<alert>" }
         it "sends a message" do
-          FactoryBot.create(:organization_mail_snippet, kind: "impound_claim_approved", organization: current_organization, body: snippet_body)
           EmailImpoundClaimWorker.new.perform(impound_claim.id)
           # ensure that the message includes the response_message
           expect(impound_claim.reload.status).to eq "submitting"
@@ -145,13 +123,12 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.to).to eq([impound_claim.user.email])
-          expect(mail.reply_to).to eq([current_organization.auto_user.email])
+          expect(mail.reply_to).to eq([current_user.email])
           expect(mail.subject).to eq "Your impound claim was approved"
-          expect(mail.body.encoded).to match snippet_body
           # It escapes things
           expect(mail.body.encoded).to match "RESponse=MESSAGE&lt;alert&gt;"
 
-          expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
+          expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
           expect(assigns(:impound_claim)).to eq impound_claim
           impound_record.reload
           expect(impound_record.status).to eq "current"
@@ -182,7 +159,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
         }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
-        expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
+        expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"

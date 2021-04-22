@@ -1414,9 +1414,6 @@ en:
       impounded_at: Impounded
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
-      is_this_your_bike_send_proof_of_ownership: >-
-        Is this your bike? Send proof of ownership (such as the bike's serial number
-        or a link to a photo of you with the bike)
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       location: Location

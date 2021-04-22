@@ -393,7 +393,9 @@ class Bike < ApplicationRecord
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?
-      return "Hidden" unless authorized?(u) || u&.id = user&.id
+      return "Hidden" unless authorized?(u) ||
+        u&.id.present? && u.id == user&.id ||
+        current_impound_record.present? && current_impound_record.authorized?(u)
     end
     return serial_number.humanize if no_serial?
     serial_number

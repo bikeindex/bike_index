@@ -1,5 +1,5 @@
 %p
-  Your impound claim
+  Your #{@impound_claim.claim_kind_humanized}
   - if @impound_claim.bike_claimed.present?
     for
     = link_to @impound_claim.bike_claimed.title_string, bike_url(@impound_claim.bike_claimed)
@@ -7,11 +7,14 @@
   %strong= @impound_claim.status_humanized
 
 -# Note: should be escaped
-%p= @impound_claim.response_message
+- if @impound_claim.response_message.present?
+  %p
+    %em Message:
+    = @impound_claim.response_message
 
 - snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
 
-- if snippet_kind.present?
+- if @impound_claim.organized? && snippet_kind.present?
   - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: snippet_kind).first
 
 -# If there is an organization message snippet, use it, otherwise default "reply to" message

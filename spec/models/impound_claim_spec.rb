@@ -18,6 +18,7 @@ RSpec.describe ImpoundClaim, type: :model do
         expect(impound_claim.bike_claimed).to be_present
         expect(impound_record.organized?).to be_falsey
         expect(impound_record.creator_public_display_name).to eq "bike finder"
+        expect(impound_claim.claim_kind_humanized).to eq "found bike claim"
       end
     end
     context "with_stolen_record" do
@@ -47,7 +48,7 @@ RSpec.describe ImpoundClaim, type: :model do
   end
 
   describe "bike_submitting_images" do
-    let(:bike) { FactoryBot.create(:bike) }
+    let(:bike) { FactoryBot.create(:bike, cycle_type: "trailer") }
     let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, bike: bike) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, listing_order: 4) }
     let!(:public_image_private) { FactoryBot.create(:public_image, imageable: bike, is_private: true, listing_order: 1) }
@@ -58,6 +59,9 @@ RSpec.describe ImpoundClaim, type: :model do
       impound_claim.reload
       expect(impound_claim.bike_submitting&.id).to eq bike.id
       expect(impound_claim.bike_submitting_images.pluck(:id)).to eq([public_image_private.id, public_image.id])
+      expect(impound_claim.kind).to eq "impounded"
+      expect(impound_claim.organized?).to be_truthy
+      expect(impound_claim.claim_kind_humanized).to eq "impounded bike trailer claim"
     end
   end
 

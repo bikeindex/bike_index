@@ -89,6 +89,7 @@ class ImpoundRecord < ApplicationRecord
 
   def authorized?(u = nil)
     return false if u.blank?
+    return true if u.superuser?
     organized? ? u.authorized?(organization) : u.id == user_id
   end
 

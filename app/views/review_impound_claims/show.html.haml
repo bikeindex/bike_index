@@ -1,0 +1,10 @@
+.container
+  %h1.uncap
+    #{@impound_claim.claim_kind_humanized.titleize}
+    %small
+      for
+      %em= @impound_claim.bike_claimed.title_string
+
+  -# block update for superusers viewing impound claims
+  - block_update = @impound_claim.impound_record&.user_id != current_user&.id
+  = render partial: "display", locals: { update_url: review_impound_claim_path(@impound_claim), block_superuser_update: block_update }

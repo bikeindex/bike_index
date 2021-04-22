@@ -2123,9 +2123,6 @@ nl:
       front_wheel_diameter: Diameter voorwiel
       handlebar_type: Type stuur
       hidden_by_owner: VERBORGEN door eigenaar
-      is_this_your_bike_send_proof_of_ownership: Is dit jouw fiets? Stuur een bewijs
-        van eigendom (zoals het framenummer van de fiets of een link naar een foto
-        van jou met de fiets)
       know_something_about_this_bike_type: Weet u hier iets over %{bike_type}?
       link_url: Link url
       location: Plaats
