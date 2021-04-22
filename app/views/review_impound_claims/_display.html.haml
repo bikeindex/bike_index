@@ -1,5 +1,6 @@
--# probably pass in locals:
+-# Need to pass update_url if you want the url to be for organization
 - update_url ||= review_impound_claim_path(@impound_claim.id)
+- block_superuser_update ||= false
 
 - @bike_claimed = @impound_claim.bike_claimed
 - @bike_submitting = @impound_claim.bike_submitting
@@ -77,19 +78,25 @@
           .card-title
             %h3.uncap Respond to this claim
           .card-body
-            = form_for @impound_claim, {url: update_url} do |f|
-              .form-group.mt-0
-                = f.text_area :response_message, placeholder: "Message to include (optional)", class: "form-control"
-              .row.mt-4.approveOrDenyClaim
-                -# NOTE: the values for these match things in the update action. Make sure you update those if you change here
-                .col-xs-6.text-center
-                  = submit_tag "Approve", value: "Approve", name: "submit", class: "btn btn-lg btn-success"
-                .col-xs-6.text-center
-                  = submit_tag "Deny", value: "Deny", name: "submit", class: "btn btn-lg btn-danger"
-            %p.mt-4.mb-0
-              %em.less-strong
-                Clicking one these buttons will send an email to the claimant, letting them know the response to their claim.
-                %strong They will still need to arrange to pick up the bike.
+            - if current_user.superuser? && block_superuser_update # Block update is to prevent superusers from editing things they shouldn't
+              %p.m0
+                %em.text-warning
+                  Hey #{current_user.first_display_name} - you don't own this #{@impound_claim.kind} #{@impound_claim.bike_type} - so you aren't allowed to respond to the claim.
+                %small.d-block.less-strong You'll only see this message if you're a superuser.
+            - else
+              = form_for @impound_claim, {url: update_url} do |f|
+                .form-group.mt-0
+                  = f.text_area :response_message, placeholder: "Message to include (optional)", class: "form-control"
+                .row.mt-4.approveOrDenyClaim
+                  -# NOTE: the values for these match things in the update action. Make sure you update those if you change here
+                  .col-xs-6.text-center
+                    = submit_tag "Approve", value: "Approve", name: "submit", class: "btn btn-lg btn-success"
+                  .col-xs-6.text-center
+                    = submit_tag "Deny", value: "Deny", name: "submit", class: "btn btn-lg btn-danger"
+              %p.mt-4.mb-0
+                %em.less-strong
+                  Clicking one these buttons will send an email to the claimant, letting them know the response to their claim.
+                  %strong They will still need to arrange to pick up the bike.
   - elsif @impound_claim.submitted?
     .col-sm-6.offset-sm-3
       %h3.uncap.mt-2.mb-2
