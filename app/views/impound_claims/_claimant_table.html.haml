@@ -1,0 +1,31 @@
+- skip_bike_claimed ||= false
+- skip_bike_submitting ||= false
+
+%table.table.table-sm.table-bordered.table-striped
+  %thead
+    %th Submitted
+    - unless skip_bike_claimed
+      %th Claimed
+    - unless skip_bike_submitting
+      %th Your bike
+    %th Status
+    %th Response
+  %tbody
+    - impound_claims.each do |impound_claim|
+      %tr
+        %td
+          - if impound_claim.submitted?
+            %span.convertTime.preciseTime
+              = l impound_claim.submitted_at, format: :convert_time
+        - unless skip_bike_claimed
+          %td
+            - if impound_claim.bike_claimed.present?
+              = link_to impound_claim.bike_claimed.title_string, bike_path(impound_claim.bike_claimed)
+        - unless skip_bike_submitting
+          %td
+            - if impound_claim.bike_submitting.present?
+              = link_to impound_claim.bike_submitting.title_string, bike_path(impound_claim.bike_submitting)
+        %td
+          = status_display(impound_claim.status_humanized.titleize)
+        %td
+          = impound_claim.response_message

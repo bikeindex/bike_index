@@ -7,7 +7,10 @@
   %strong= @impound_claim.status_humanized
 
 -# Note: should be escaped
-%p= @impound_claim.response_message
+- if @impound_claim.response_message.present?
+  %p
+    %em Message:
+    = @impound_claim.response_message
 
 - snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
 

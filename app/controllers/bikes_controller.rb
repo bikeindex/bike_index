@@ -33,10 +33,12 @@ class BikesController < ApplicationController
       @stolen_record = @bike.current_stolen_record
     end
     if current_user.present? && BikeDisplayer.display_impound_claim?(@bike, current_user)
+      impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
       @contact_owner_open = params[:contact_owner].present?
-      @impound_claim = @bike.impound_claims_claimed.where(user_id: current_user.id).last
+      @impound_claim = impound_claims.unsubmitted.last
       @impound_claim ||= @bike.impound_claims_submitting.where(user_id: current_user.id).last
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
+      @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)

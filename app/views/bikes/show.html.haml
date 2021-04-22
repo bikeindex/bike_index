@@ -56,6 +56,14 @@
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"
 
+  - if @submitted_impound_claims.present?
+    .mt-2
+      %em
+        You have
+        #{pluralize number_with_delimiter(@submitted_impound_claims.count), "submitted claim"}
+      = render partial: "impound_claims/claimant_table", locals: { impound_claims: @submitted_impound_claims, skip_bike_claimed: true }
+      %hr.mt-2.mb-4.less-strong
+
   - if @impound_claim.present?
     -# This is open if passed there is an existing impound_claim
     - @contact_owner_open = true if @impound_claim.id.present? && !@contact_owner_open
