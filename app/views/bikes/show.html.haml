@@ -136,7 +136,6 @@
                 - if @bike.authorized?(current_user)
                   = t(".hidden_for_unauthorized_users")
                 = t(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
-
           - unless @bike.serial_hidden?
             = attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
           - unless @bike.type == "bike"

@@ -1080,6 +1080,7 @@ RSpec.describe Bike, type: :model do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
         bike = Bike.new(serial_number: "something", status: "unregistered_parking_notification")
+        expect(bike.authorized?(nil)).to be_falsey
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
         allow(bike).to receive(:authorized?) { true }
@@ -1117,6 +1118,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.status_humanized).to eq "found"
         # individual users don't get the ability to override ownership access -
         # only organization impounded records do
+        expect(impound_record.authorized?(impound_user)).to be_truthy
         expect(bike.authorized?(bike.user)).to be_truthy
         expect(bike.authorized?(impound_user)).to be_falsey
         expect(bike.serial_display).to eq "Hidden"
@@ -1126,6 +1128,7 @@ RSpec.describe Bike, type: :model do
       context "organized" do
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
         it "is hidden, except for the owner and org" do
+          expect(impound_record.authorized?(impound_user)).to be_truthy
           expect(bike.reload.status).to eq "status_impounded"
           expect(bike.status_humanized).to eq "impounded"
           expect(bike.authorized?(bike.user)).to be_falsey
