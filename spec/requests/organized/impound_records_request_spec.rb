@@ -288,7 +288,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(parking_notification.bike_id).to eq impound_record.bike_id
           expect(parking_notification.bike_id).to eq bike.id
           expect(parking_notification.unregistered_bike).to be_truthy
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect(bike.status).to eq "status_impounded"
           expect(bike.current_impound_record).to eq impound_record
           expect(impound_record.current?).to be_truthy
@@ -332,7 +332,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(parking_notification.bike_id).to eq impound_record.bike_id
           expect(parking_notification.bike_id).to eq bike.id
           expect(parking_notification.unregistered_bike?).to be_truthy
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect(bike.status).to eq "status_impounded"
           expect(bike.current_impound_record).to eq impound_record
           expect(impound_record.current?).to be_truthy

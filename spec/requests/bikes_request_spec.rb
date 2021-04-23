@@ -249,7 +249,6 @@ RSpec.describe BikesController, type: :request do
           get "#{base_url}/#{bike.id}/edit"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
-          expect(bike.created_by_parking_notification?).to be_truthy
         end
       end
     end

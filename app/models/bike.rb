@@ -305,7 +305,7 @@ class Bike < ApplicationRecord
   end
 
   def created_by_parking_notification?
-    creation_state&.creator_unregistered_parking_notification
+    creation_state&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update

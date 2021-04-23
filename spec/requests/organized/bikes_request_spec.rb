@@ -120,7 +120,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.user_hidden).to be_truthy
         expect(bike.hidden).to be_truthy
-        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.created_by_parking_notification?).to be_truthy
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
         expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
@@ -209,7 +209,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.user_hidden).to be_falsey
           expect(bike.hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
 
           ownership = bike.ownerships.first
