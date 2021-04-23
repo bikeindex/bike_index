@@ -1,4 +1,4 @@
-# ONLY created in bike_creator in production
+# ONLY created in BikeCreator in production
 class CreationState < ApplicationRecord
   ORIGIN_ENUM = {
     web: 0,
