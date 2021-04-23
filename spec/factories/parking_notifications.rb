@@ -30,6 +30,8 @@ FactoryBot.define do
         bike { FactoryBot.create(:bike_organized, creator: user, can_edit_claimed: true, organization: organization, status: "unregistered_parking_notification") }
         after(:create) do |parking_notification, evaluator|
           evaluator.ownership.save
+          # I'm not in love with this, but...  it's something
+          evaluator.bike.creation_states.create if evaluator.bike.creation_states.none?
           parking_notification.bike.update_attributes(marked_user_hidden: true)
         end
       end

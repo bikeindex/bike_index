@@ -12,5 +12,9 @@ class RemoveDeprecatedColumns < ActiveRecord::Migration[5.2]
 
     # impound_configuration tracks public_impound_bikes
     remove_column :organizations, :public_impound_bikes, :boolean
+
+    # remove defaults, so they can be assigned if not assigned
+    change_column_default :creation_states, :status, nil
+    change_column_default :creation_states, :pos_kind, nil
   end
 end

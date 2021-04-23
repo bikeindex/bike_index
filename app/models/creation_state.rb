@@ -1,3 +1,4 @@
+# ONLY created in bike_creator in production
 class CreationState < ApplicationRecord
   ORIGIN_ENUM = {
     web: 0,
@@ -48,8 +49,16 @@ class CreationState < ApplicationRecord
 
   def set_calculated_attributes
     self.origin = "web" unless self.class.origins.include?(origin)
-    self.origin_enum = origin == "unregistered_parking_notification" ? "creator_unregistered_parking_notification" : origin
-    self.pos_kind = calculated_pos_kind
+    self.status ||= bike&.status
+    self.origin_enum ||= if status == "unregistered_parking_notification" || origin == "unregistered_parking_notification"
+      "creator_unregistered_parking_notification"
+    else
+      origin
+    end
+    self.pos_kind ||= calculated_pos_kind
+    # Hack, only set on create. TODO: should be passed from pos integration
+    # currently, lightspeed is using API v1, so that's where this needs to come from
+    self.is_new = pos_kind != "no_pos" if id.blank? && origin != "api_v1"
   end
 
   def create_bike_organization
@@ -71,7 +80,7 @@ class CreationState < ApplicationRecord
 
   # TODO: make this not happen. For now, useful method. Only returns matches made after
   def duplicates
-    self.class.where(bike_id: bike_id).where("id < ?", id)
+    self.class.where(bike_id: bike_id).where("id > ?", id)
   end
 
   private

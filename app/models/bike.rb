@@ -304,7 +304,7 @@ class Bike < ApplicationRecord
     creation_state&.pos_kind
   end
 
-  def created_by_parking_notification?
+  def creator_unregistered_parking_notification?
     creation_state&.creator_unregistered_parking_notification?
   end
 

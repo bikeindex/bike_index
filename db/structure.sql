@@ -768,8 +768,8 @@ CREATE TABLE public.creation_states (
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
     bulk_import_id integer,
-    pos_kind integer DEFAULT 0,
-    status integer DEFAULT 0,
+    pos_kind integer,
+    status integer,
     origin_enum integer
 );
 

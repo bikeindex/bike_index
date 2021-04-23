@@ -96,7 +96,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.reload.impounded?).to be_truthy
           expect(bike.status_impounded?).to be_truthy
           expect(bike.status_found?).to be_falsey
-          expect(bike.created_by_parking_notification?).to be_truthy
+          expect(bike.creator_unregistered_parking_notification?).to be_truthy
           expect(bike.authorized?(user)).to be_truthy
           impound_record.reload
           expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
@@ -129,7 +129,7 @@ RSpec.describe ImpoundRecord, type: :model do
           bike.reload
           expect(bike.deleted?).to be_falsey
           # It's still unregistered, nothing changed
-          expect(bike.created_by_parking_notification?).to be_truthy
+          expect(bike.creator_unregistered_parking_notification?).to be_truthy
           expect(bike.status).to eq "status_with_owner"
         end
         context "approved_claim" do
@@ -171,7 +171,7 @@ RSpec.describe ImpoundRecord, type: :model do
             bike.reload
             expect(bike.impounded?).to be_truthy
             expect(bike.status_impounded?).to be_truthy
-            expect(bike.created_by_parking_notification?).to be_truthy
+            expect(bike.creator_unregistered_parking_notification?).to be_truthy
             expect(impound_record.creator&.id).to eq user2.id
             expect(impound_record.location).to be_blank
             expect(impound_record.status).to eq "current"
@@ -200,7 +200,7 @@ RSpec.describe ImpoundRecord, type: :model do
             expect(impound_record.impound_claim_retrieved?).to be_truthy
 
             bike.reload
-            expect(bike.created_by_parking_notification?).to be_truthy
+            expect(bike.creator_unregistered_parking_notification?).to be_truthy
             expect(bike.deleted?).to be_truthy
 
             bike_submitting.reload

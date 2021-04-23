@@ -88,7 +88,7 @@
                 %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
                   = t(".nevermind")
 
-- unless modal_title.present? || @bike.created_by_parking_notification? # We don't want to show claiming info for parking notification unregistered bikes
+- unless modal_title.present? || @bike.creator_unregistered_parking_notification? # We don't want to show claiming info for parking notification unregistered bikes
   - if current_user.present?
     - if @bike.claimable_by?(current_user)
       - modal_title = t(".your_bike", bike_type: @bike.type)
