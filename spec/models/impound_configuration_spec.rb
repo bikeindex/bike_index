@@ -9,8 +9,10 @@ RSpec.describe ImpoundConfiguration, type: :model do
     it "is valid, organization is enabled" do
       expect(impound_configuration).to be_valid
       expect(impound_configuration.public_view?).to be_truthy
-      expect(impound_configuration.impound_claims?).to be_truthy
-      expect(impound_configuration.organization.impound_claims?).to be_truthy
+      organization = impound_configuration.organization
+      expect(organization.reload.impound_claims?).to be_truthy
+      expect(organization.enabled_feature_slugs).to include("impound_bikes_public")
+
       expect(impound_configuration.display_id_prefix).to eq nil
       expect(organization.reload.enabled?("impound_bikes")).to be_truthy
       expect(organization.public_impound_bikes?).to be_truthy
