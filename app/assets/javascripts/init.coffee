@@ -189,6 +189,10 @@ window.updateSearchBikesHeaderLink = ->
 renderDonationModal = ->
   hideModal = localStorage.getItem("hideDonationModal")
   unless hideModal == "true"
+    # Because caching, we can't assign email on load - so set it up now if you can
+    email = $("#navUserSettingLink")?.attr("data-email")
+    if email
+      $("#donationModal #stripe_form").attr("data-email", email)
     $("#donationModal").modal("show")
     new BikeIndex.Payments
     # NOTE: This is also set in payments.coffee on payment submission
