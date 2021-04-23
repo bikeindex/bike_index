@@ -5,13 +5,12 @@ RSpec.describe "Bikes API V2", type: :request do
     before :each do
       @bike = FactoryBot.create(:bike)
       FactoryBot.create(:bike)
-      # TODO after #1875: add back in abandoned bikes
-      FactoryBot.create(:abandoned_bike)
+      FactoryBot.create(:impounded_bike)
     end
     it "all bikes (root) search works" do
       get "/api/v2/bikes_search?per_page=1", params: {format: :json}
       expect(response.code).to eq("200")
-      expect(response.header["Total"]).to eq("2")
+      expect(response.header["Total"]).to eq("3")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
       result = response.body
       expect(JSON.parse(result)["bikes"][0]["id"]).to be_present
@@ -20,7 +19,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "non_stolen bikes search works" do
       get "/api/v2/bikes_search/non_stolen?per_page=1", params: {format: :json}
       expect(response.code).to eq("200")
-      expect(response.header["Total"]).to eq("2")
+      expect(response.header["Total"]).to eq("3")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
       result = response.body
       expect(JSON.parse(result)["bikes"][0]["id"]).to be_present

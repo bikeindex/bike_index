@@ -110,7 +110,7 @@ FactoryBot.define do
       kind { :bike_possibly_found }
 
       transient do
-        match { FactoryBot.create(:abandoned_bike) }
+        match { FactoryBot.create(:impounded_bike) }
       end
 
       after(:create) do |cc, evaluator|

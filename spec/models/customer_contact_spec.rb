@@ -20,7 +20,7 @@ RSpec.describe CustomerContact, type: :model do
 
     context "given a bike and match that have already triggered an email to the user" do
       it "returns true" do
-        match = FactoryBot.create(:abandoned_bike)
+        match = FactoryBot.create(:impounded_bike)
         contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
         bike = contact.bike
 
@@ -32,10 +32,10 @@ RSpec.describe CustomerContact, type: :model do
 
     context "given a bike and match where the match has changed" do
       it "returns false" do
-        match = FactoryBot.create(:abandoned_bike)
+        match = FactoryBot.create(:impounded_bike)
         contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
         bike = contact.bike
-        new_match = FactoryBot.create(:abandoned_bike)
+        new_match = FactoryBot.create(:impounded_bike)
 
         already_sent = CustomerContact.possibly_found_notification_sent?(bike, new_match)
 
@@ -45,7 +45,7 @@ RSpec.describe CustomerContact, type: :model do
 
     context "given a bike and match where the current_stolen_record has changed" do
       it "returns false" do
-        match = FactoryBot.create(:abandoned_bike)
+        match = FactoryBot.create(:impounded_bike)
         contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
         bike = contact.bike
         bike.update(current_stolen_record: FactoryBot.create(:stolen_record, bike: bike))
@@ -58,7 +58,7 @@ RSpec.describe CustomerContact, type: :model do
 
     context "given a bike and match where the owner email has changed" do
       it "returns false" do
-        match = FactoryBot.create(:abandoned_bike)
+        match = FactoryBot.create(:impounded_bike)
         contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
         bike = contact.bike
         bike.update(owner_email: "new_owner@example.com")
