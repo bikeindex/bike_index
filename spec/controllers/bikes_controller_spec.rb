@@ -69,7 +69,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "ip passed as parameter" do
@@ -79,7 +79,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: ip_query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "no location" do
@@ -89,7 +89,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: ip_query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "unknown location" do
