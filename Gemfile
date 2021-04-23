@@ -18,6 +18,8 @@ gem "pg", "~> 1.0" # Postgres
 gem "fast_blank", "~> 1.0"
 gem "dalli" # memcached client
 gem "active_model_serializers", "~> 0.9.3" # Use active model serializers to serialize JSON.
+gem "oj" # optimized json
+gem "multi_json" # TODO: use this more
 
 # Feature flagging
 gem "flipper"
