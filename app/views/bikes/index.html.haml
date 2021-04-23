@@ -75,4 +75,6 @@
 
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
-= render "/shared/donation_modal"
+-# Cache this render callout to avoid allocations
+- cache("donation_modal") do
+  = render "/shared/donation_modal"
