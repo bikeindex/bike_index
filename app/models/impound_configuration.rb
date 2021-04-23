@@ -6,10 +6,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  # Stub for now, because it might be more sophisticated later
-  def impound_claims?
-    public_view?
-  end
+  after_commit :update_organization
 
   # May do something different in the future
   def previous_prefixes
@@ -33,6 +30,11 @@ class ImpoundConfiguration < ApplicationRecord
     unless bulk_import_view
       self.bulk_import_view = false # should set based off whether there are any bulk imports, and not turn off once on
     end
+  end
+
+  # Bump organization to update enabled slugs
+  def update_organization
+    organization&.update(updated_at: Time.current)
   end
 
   private

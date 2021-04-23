@@ -13,6 +13,7 @@ class OrganizationFeature < ApplicationRecord
     reg_phone
     reg_address
   ].freeze
+  # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
     additional_registrations_information
     impound_bikes

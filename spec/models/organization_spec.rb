@@ -137,9 +137,12 @@ RSpec.describe Organization, type: :model do
         expect(org.website).to be_present
         expect(org.ascend_name).to be_present
         expect(org.parent_organization).to be_present
+        expect(org.enabled?("unstolen_notifications")).to be_falsey
+        expect(org.enabled_feature_slugs).to eq([])
 
         org.update_attributes(kind: :ambassador)
 
+        org.reload
         expect(org).to_not be_show_on_map
         expect(org).to_not be_lock_show_on_map
         expect(org).to_not be_api_access_approved
@@ -147,6 +150,8 @@ RSpec.describe Organization, type: :model do
         expect(org.website).to be_blank
         expect(org.ascend_name).to be_blank
         expect(org.parent_organization).to be_blank
+        expect(org.enabled?("unstolen_notifications")).to be_truthy
+        expect(org.enabled_feature_slugs).to eq(["unstolen_notifications"])
       end
     end
   end

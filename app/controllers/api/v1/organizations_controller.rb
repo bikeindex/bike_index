@@ -14,12 +14,12 @@ module Api
           redirect_to(api_v1_not_found_url) && return
         elsif params[:access_token] == @organization.access_token
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
-            if params[:manual_pos_kind] == "no_pos"
-              @organization.update_attributes(manual_pos_kind: nil)
-            else
-              @organization.update_attributes(manual_pos_kind: params[:manual_pos_kind])
+            m_kind = params[:manual_pos_kind] == "no_pos" ? nil : params[:manual_pos_kind]
+            # We really only want to update orgs when there is a change, otherwise it breaks where
+            unless @organization.manual_pos_kind == m_kind
+              @organization.update_attributes(manual_pos_kind: m_kind)
+              UpdateOrganizationPosKindWorker.perform_async(@organization.id)
             end
-            UpdateOrganizationPosKindWorker.perform_async(@organization.id)
             render json: organization_serialized(@organization)
           else
             message = {'406': "Not permitted POS kind"}
