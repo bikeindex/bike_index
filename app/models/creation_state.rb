@@ -69,6 +69,11 @@ class CreationState < ApplicationRecord
     true
   end
 
+  # TODO: make this not happen. For now, useful method. Only returns matches made after
+  def duplicates
+    self.class.where(bike_id: bike_id).where("id < ?", id)
+  end
+
   private
 
   def calculated_pos_kind

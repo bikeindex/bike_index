@@ -245,11 +245,11 @@ RSpec.describe BikesController, type: :request do
           get "#{base_url}/#{bike.id}"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           get "#{base_url}/#{bike.id}/edit"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
         end
       end
     end
@@ -1196,7 +1196,7 @@ RSpec.describe BikesController, type: :request do
             bike.reload
             expect(bike.claimed?).to be_truthy
             expect(bike.status).to eq "status_impounded"
-            expect(bike.created_by_parking_notification).to be_falsey
+            expect(bike.created_by_parking_notification?).to be_falsey
             expect(bike.bike_organizations.map(&:organization_id)).to eq([])
             expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
             get "#{base_url}/#{bike.id}/edit"
@@ -1224,7 +1224,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.current_impound_record&.id).to eq impound_record.id
         expect(bike.user).to eq current_user
         expect(bike.claimed?).to be_truthy
-        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.created_by_parking_notification?).to be_truthy
         expect(bike.status).to eq "status_impounded"
         expect(bike.bike_organizations.map(&:organization_id)).to eq([current_organization.id])
         expect(bike.authorized?(current_user)).to be_truthy
@@ -1388,7 +1388,7 @@ RSpec.describe BikesController, type: :request do
         bike.reload
         expect(bike.claimed?).to be_falsey
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
-        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.created_by_parking_notification?).to be_truthy
         expect(bike.unregistered_parking_notification?).to be_truthy
         expect(bike.user_hidden).to be_truthy
         expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
@@ -1406,13 +1406,13 @@ RSpec.describe BikesController, type: :request do
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.user_id).to be_blank
         expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
-        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.created_by_parking_notification?).to be_truthy
         expect(bike.stolen_records.count).to eq 0
         expect(bike.status).to eq "status_with_owner"
         expect(bike.user_hidden).to be_falsey
         expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
         expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
-        expect(bike.created_by_parking_notification).to be_truthy
+        expect(bike.created_by_parking_notification?).to be_truthy
       end
       context "add extra information" do
         let(:auto_user) { current_user }
@@ -1421,7 +1421,7 @@ RSpec.describe BikesController, type: :request do
           bike.reload
           expect(bike.claimed?).to be_falsey
           expect(bike.claimable_by?(current_user)).to be_truthy
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
           expect(bike.user_hidden).to be_truthy
           expect(bike.ownerships.count).to eq 1
@@ -1433,17 +1433,17 @@ RSpec.describe BikesController, type: :request do
           }.to_not change(Ownership, :count)
           bike.reload
           expect(bike.description).to eq "sooo cool and stuff"
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
           expect(bike.user_hidden).to be_truthy
           # And make sure it still can be rendered
           get "#{base_url}/#{bike.id}/edit"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           bike.reload
           expect(bike.claimed?).to be_truthy # Claimed by the edit render
-          expect(bike.created_by_parking_notification).to be_truthy
+          expect(bike.created_by_parking_notification?).to be_truthy
           expect(bike.unregistered_parking_notification?).to be_truthy
         end
       end

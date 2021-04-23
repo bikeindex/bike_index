@@ -304,6 +304,10 @@ class Bike < ApplicationRecord
     creation_state&.pos_kind
   end
 
+  def created_by_parking_notification?
+    creation_state&.creator_unregistered_parking_notification
+  end
+
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
     return false if creation_state.blank?
@@ -870,14 +874,6 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     set_location_info
     self.listing_order = calculated_listing_order
-    # Quick hack to store the fact that it was creation for parking notification
-    if unregistered_parking_notification?
-      self.created_by_parking_notification = true
-      # TODO: Switch to using creation_state, rather than this boolean, ASAP
-      if creation_state.present? && creation_state.origin != "unregistered_parking_notification"
-        creation_state.update(origin: "unregistered_parking_notification")
-      end
-    end
     self.status = calculated_status unless skip_status_update
     clean_frame_size
     set_mnfg_name
