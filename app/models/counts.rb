@@ -47,7 +47,7 @@ class Counts
 
     # And here are the assignments:
     def assign_stolen_bikes
-      assign_for("stolen_bikes", Bike.stolen.count)
+      assign_for("stolen_bikes", Bike.status_stolen.count)
     end
 
     def assign_total_bikes

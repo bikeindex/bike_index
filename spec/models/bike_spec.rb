@@ -193,10 +193,10 @@ RSpec.describe Bike, type: :model do
   end
 
   describe ".possibly_found_with_match" do
-    let(:bike1) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
-    let(:bike1b) { FactoryBot.create(:abandoned_bike, serial_number: "He10o") }
+    let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
+    let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
     let(:bike2) { FactoryBot.create(:stolen_bike, serial_number: "he110") }
-    let(:bike2b) { FactoryBot.create(:abandoned_bike, serial_number: "HEllO") }
+    let(:bike2b) { FactoryBot.create(:impounded_bike, serial_number: "HEllO") }
     let(:bike3) { FactoryBot.create(:stolen_bike, serial_number: "1100ll") }
     let(:bike3b) { FactoryBot.create(:impounded_bike, serial_number: "IIOO11") }
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do

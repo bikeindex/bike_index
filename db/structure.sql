@@ -380,7 +380,6 @@ CREATE TABLE public.bikes (
     creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_stolen boolean DEFAULT false NOT NULL,
     propulsion_type_other character varying(255),
     manufacturer_other character varying(255),
     zipcode character varying(255),
@@ -406,7 +405,6 @@ CREATE TABLE public.bikes (
     frame_size character varying(255),
     frame_size_unit character varying(255),
     pdf character varying(255),
-    is_abandoned boolean DEFAULT false NOT NULL,
     paint_id integer,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
@@ -435,7 +433,6 @@ CREATE TABLE public.bikes (
     street character varying,
     state_id bigint,
     address_set_manually boolean DEFAULT false,
-    created_by_parking_notification boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     conditional_information jsonb DEFAULT '{}'::jsonb,
     current_impound_record_id bigint
@@ -771,8 +768,8 @@ CREATE TABLE public.creation_states (
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
     bulk_import_id integer,
-    pos_kind integer DEFAULT 0,
-    status integer DEFAULT 0,
+    pos_kind integer,
+    status integer,
     origin_enum integer
 );
 
@@ -994,7 +991,6 @@ CREATE TABLE public.external_registry_bikes (
     frame_model character varying,
     location_found character varying,
     mnfg_name character varying,
-    old_status character varying,
     info_hash jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2123,8 +2119,7 @@ CREATE TABLE public.organizations (
     manual_pos_kind integer,
     passwordless_user_domain character varying,
     graduated_notification_interval bigint,
-    lightspeed_register_with_phone boolean DEFAULT false,
-    public_impound_bikes boolean DEFAULT false
+    lightspeed_register_with_phone boolean DEFAULT false
 );
 
 
@@ -2578,7 +2573,6 @@ CREATE TABLE public.stolen_records (
     zipcode character varying(255),
     city character varying(255),
     theft_description text,
-    "time" text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,
@@ -5628,6 +5622,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210402214854'),
 ('20210405200829'),
 ('20210420161728'),
-('20210421174751');
+('20210421174751'),
+('20210423200934');
 
 

@@ -23,7 +23,7 @@ RSpec.describe ScheduleBikePossiblyFoundNotificationWorker, type: :job do
       abandoned_bike.reload
       expect(abandoned_bike.parking_notifications.active.appears_abandoned_notification.any?).to be_truthy
       expect(abandoned_bike.status_abandoned?).to be_truthy
-      expect(Bike.abandoned.pluck(:id)).to eq([abandoned_bike.id])
+      expect(Bike.status_abandoned.pluck(:id)).to eq([abandoned_bike.id])
 
       described_class.new.perform
 
