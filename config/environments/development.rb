@@ -73,14 +73,19 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
-  config.lograge.enabled = true
-  config.log_level = :debug
-  config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
-  config.lograge.custom_options = lambda do |event|
-    {
-      remote_ip: event.payload[:ip],
-      params: event.payload[:params].except("controller", "action", "format", "id")
-    }
+  # Lograge is what we use in production, it makes requests create one log line, rather than the multitude the create by default
+  # Useful to turn off primarily to monitor caching
+  # Run rails dev:lograge to toggle lograge. It's enabled by default
+  unless Rails.root.join("tmp", "non-lograge-dev.txt").exist?
+    config.lograge.enabled = true
+    config.log_level = :debug
+    config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
+    config.lograge.custom_options = lambda do |event|
+      {
+        remote_ip: event.payload[:ip],
+        params: event.payload[:params].except("controller", "action", "format", "id")
+      }
+    end
   end
 
   # Bullet for n+1's
