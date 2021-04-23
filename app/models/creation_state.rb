@@ -78,7 +78,8 @@ class CreationState < ApplicationRecord
     true
   end
 
-  # TODO: make this not happen. For now, useful method. Only returns matches made after
+  # TODO: added in #1879, but turns out it hasn't been happening for a while
+  # - last duplicate occurred in > 12 months ago - so after removing them, check if still a problem, probably can remove method
   def duplicates
     self.class.where(bike_id: bike_id).where("id > ?", id)
   end

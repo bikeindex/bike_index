@@ -3,7 +3,6 @@ require "rails_helper"
 RSpec.describe EmailBikePossiblyFoundNotificationWorker, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
-  # TODO after #1875: - make this abandoned stuff work
   it "triggers an email for the given bike" do
     allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
     # stolen bike with no match

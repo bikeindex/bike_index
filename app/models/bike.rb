@@ -8,7 +8,6 @@ class Bike < ApplicationRecord
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
-  # For now, prefixed with status_ so it doesn't interfere with existing attrs
   STATUS_ENUM = {
     status_with_owner: 0,
     status_stolen: 1,
@@ -88,8 +87,6 @@ class Bike < ApplicationRecord
       .order(listing_order: :desc)
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
-  scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status
-  scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -190,8 +187,7 @@ class Bike < ApplicationRecord
     def possibly_found
       unscoped
         .current
-        .stolen
-        .not_abandoned_or_impounded
+        .status_stolen
         .where(serial_normalized: abandoned_or_impounded.select(:serial_normalized))
     end
 
@@ -259,7 +255,7 @@ class Bike < ApplicationRecord
       return none if location.values.any?(&:blank?)
 
       unscoped
-        .stolen
+        .status_stolen
         .current
         .with_known_serial
         .includes(:current_stolen_record)

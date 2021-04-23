@@ -81,7 +81,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
-    @bikes = stolenness == "stolen" ? bikes.stolen : bikes.not_stolen
+    @bikes = stolenness == "stolen" ? bikes.status_stolen : bikes.not_stolen
   end
 
   def parsed_attributes
