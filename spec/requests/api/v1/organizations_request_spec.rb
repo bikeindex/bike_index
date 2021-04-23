@@ -88,6 +88,22 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
       organization.reload
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
     end
+    context "no change" do
+      let(:updated_at) { Time.current - 5.minutes }
+      it "does not bump organization" do
+        organization.update(manual_pos_kind: "lightspeed_pos")
+        organization.update_column :updated_at, updated_at
+        expect(organization.reload.manual_pos_kind).to eq "lightspeed_pos"
+        expect(organization.updated_at).to be_within(1).of updated_at
+        expect {
+          put "#{base_url}/#{organization.to_param}", params: update_params.to_json, headers: json_headers
+        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        expect(response.code).to eq("200")
+        expect(json_result).to eq target.as_json
+        organization.reload
+        expect(organization.updated_at).to be_within(1).of updated_at
+      end
+    end
     context "broken pos" do
       include_context :test_csrf_token
       it "updates" do
