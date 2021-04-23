@@ -319,7 +319,7 @@ class User < ApplicationRecord
 
   # Just check a couple, so we don't move too slowly
   def rough_stolen_bikes
-    rough_approx_bikes.stolen.limit(10)
+    rough_approx_bikes.status_stolen.limit(10)
   end
 
   def unauthorized_organization_update_bike_sticker_ids

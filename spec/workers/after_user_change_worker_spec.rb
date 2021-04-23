@@ -109,7 +109,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       user.save
       expect(stolen_record.bike.status_stolen?).to be_truthy
       expect(stolen_record_with_location.bike.status_stolen?).to be_truthy
-      expect(user.rough_approx_bikes.stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
+      expect(user.rough_approx_bikes.status_stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
       expect(user.rough_stolen_bikes.select { |b| b.current_stolen_record.without_location? }.map(&:id)).to eq([stolen_record.bike_id])
       instance.perform(user.id)
 

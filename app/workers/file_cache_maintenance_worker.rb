@@ -36,7 +36,7 @@ class FileCacheMaintenanceWorker < ScheduledWorker
     File.open(tmp_path, "w") {}
     File.open(tmp_path, "a+") do |file|
       file << '{"bikes": ['
-      Bike.stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + "," }
+      Bike.status_stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + "," }
     end
     File.truncate(tmp_path, File.size(tmp_path) - 1) # remove final comma
     File.open(tmp_path, "a+") { |file| file << "]}" }

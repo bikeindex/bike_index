@@ -92,7 +92,7 @@ class Admin::StolenBikesController < Admin::BaseController
     @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
     if @unapproved_only
       # maintain previous functionality, by gross query (see PR#1545)
-      stolen_record_ids = Bike.stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
+      stolen_record_ids = Bike.status_stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
       available_stolen_records = StolenRecord.where(id: stolen_record_ids)
       @only_with_location = !ParamsNormalizer.boolean(params[:without_location])
       if @only_with_location
