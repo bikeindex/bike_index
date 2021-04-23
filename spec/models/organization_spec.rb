@@ -395,7 +395,7 @@ RSpec.describe Organization, type: :model do
     it "returns recovered bikes" do
       organization.reload
       expect(organization.bikes).to eq([bike])
-      expect(organization.bikes.stolen).to eq([bike])
+      expect(organization.bikes.status_stolen).to eq([bike])
       # Check the inverse lookup
       expect(Bike.organization(organization)).to eq([bike])
       expect(Bike.organization(organization.id)).to eq([bike])
