@@ -206,7 +206,7 @@ class Organization < ApplicationRecord
   end
 
   def public_impound_bikes?
-    enabled?("impound_bikes_public") # Secret feature
+    enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
   # Stub for now, but it might be more sophisticated later
