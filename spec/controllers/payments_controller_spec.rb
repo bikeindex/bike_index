@@ -35,7 +35,7 @@ RSpec.describe PaymentsController, type: :controller do
         set_current_user(user)
       end
       it "makes a onetime payment with current user (and renders with revised_layout if suppose to)" do
-        VCR.use_cassette("payments_controller-onetime", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-onetime", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post :create, params: {
               stripe_token: stripe_token.id,
@@ -54,7 +54,7 @@ RSpec.describe PaymentsController, type: :controller do
       end
 
       it "signs up for a plan" do
-        VCR.use_cassette("payments_controller-plan", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-plan", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post :create, params: {
               stripe_token: stripe_token.id,
@@ -78,7 +78,7 @@ RSpec.describe PaymentsController, type: :controller do
 
     context "email of signed up user" do
       it "makes a onetime payment with email for signed up user" do
-        VCR.use_cassette("payments_controller-email", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-email", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post :create, params: {
               stripe_token: stripe_token.id,
@@ -101,7 +101,7 @@ RSpec.describe PaymentsController, type: :controller do
     end
     context "no user email on file" do
       it "makes a onetime payment with no user, but associate with stripe" do
-        VCR.use_cassette("payments_controller-noemail", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-noemail", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post :create, params: {
               stripe_token: stripe_token.id,

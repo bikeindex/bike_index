@@ -17,7 +17,7 @@ class RakeDevConfiguration
         puts "Development mode is now being cached."
       end
 
-      FileUtils.touch "tmp/restart.txt"
+      FileUtils.touch "tmp/restart.txt" # Might not do anything right now, but whatever
     end
 
     def toggle_letter_opener
@@ -32,7 +32,7 @@ class RakeDevConfiguration
         puts "letter_opener is disabled."
       end
 
-      FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
+      FileUtils.touch "tmp/restart.txt"
     end
 
     def toggle_lograge
@@ -47,7 +47,7 @@ class RakeDevConfiguration
         puts "Logging using Rails logger (not lograge)"
       end
 
-      FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
+      FileUtils.touch "tmp/restart.txt"
     end
 
     private
