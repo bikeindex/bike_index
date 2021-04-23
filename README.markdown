@@ -54,6 +54,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 | ---------             | -------                      | -------  |
 | Caching               | `bin/rake dev:cache`         | disabled |
 | [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
+| logging with lograge  | `bin/rake dev:lograge`       | enabled  |
 
 [letter_opener]: https://github.com/ryanb/letter_opener
 
