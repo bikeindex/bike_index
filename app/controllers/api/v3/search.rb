@@ -83,7 +83,11 @@ module API
           {
             non: bikes.status_with_owner.count,
             stolen: bikes.stolen_or_impounded.count,
-            proximity: bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).count
+            proximity: if interpreted_params[:bounding_box].present?
+              bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).count
+            else # we're probably in testing, but regardless, just skip
+              0
+            end
           }
         end
 
