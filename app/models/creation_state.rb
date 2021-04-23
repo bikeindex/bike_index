@@ -58,7 +58,7 @@ class CreationState < ApplicationRecord
     self.pos_kind ||= calculated_pos_kind
     # Hack, only set on create. TODO: should be passed from pos integration
     # currently, lightspeed is using API v1, so that's where this needs to come from
-    self.is_new = pos_kind != "no_pos" if id.blank? && origin != "api_v1"
+    self.is_new = pos_kind != "no_pos" if id.blank?
   end
 
   def create_bike_organization
