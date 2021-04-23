@@ -6,7 +6,7 @@ RSpec.describe Bike, type: :model do
 
   describe "scopes" do
     it "default scopes to created_at desc" do
-      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
     end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
@@ -557,6 +557,22 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "status_humanized_translated" do
+    let(:bike) { Bike.new(status: status) }
+    let(:status) { "unregistered_parking_notification" }
+    it "responds with status" do
+      expect(bike.status_humanized).to eq "unregistered"
+      expect(bike.status_humanized_translated).to eq "unregistered"
+    end
+    context "status_with_owner" do
+      let(:status) { "status_with_owner" }
+      it "responds with status" do
+        expect(bike.status_humanized).to eq "with owner"
+        expect(bike.status_humanized_translated).to eq "with owner"
+      end
+    end
+  end
+
   describe "authorize_and_claim_for_user, authorized?" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
@@ -1063,9 +1079,12 @@ RSpec.describe Bike, type: :model do
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
-        bike = Bike.new(serial_number: "something", status: "status_abandoned")
+        bike = Bike.new(serial_number: "something", status: "unregistered_parking_notification")
+        expect(bike.authorized?(nil)).to be_falsey
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
+        allow(bike).to receive(:authorized?) { true }
+        expect(bike.serial_display(User.new)).to eq "something"
       end
     end
     context "impounded" do
@@ -1089,6 +1108,37 @@ RSpec.describe Bike, type: :model do
         expect(bike.serial_display).to eq("Made without serial")
       end
     end
+    context "impound_record" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, serial_number: "Hello Party") }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let(:bike_impounded) { impound_record.bike }
+      let(:impound_user) { impound_record.user }
+      it "is hidden, except for the owner and org" do
+        expect(bike.reload.status).to eq "status_impounded"
+        expect(bike.status_humanized).to eq "found"
+        # individual users don't get the ability to override ownership access -
+        # only organization impounded records do
+        expect(impound_record.authorized?(impound_user)).to be_truthy
+        expect(bike.authorized?(bike.user)).to be_truthy
+        expect(bike.authorized?(impound_user)).to be_falsey
+        expect(bike.serial_display).to eq "Hidden"
+        expect(bike.serial_display(bike.user)).to eq "Hello Party"
+        expect(bike.serial_display(impound_user)).to eq "Hello Party"
+      end
+      context "organized" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+        it "is hidden, except for the owner and org" do
+          expect(impound_record.authorized?(impound_user)).to be_truthy
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(bike.status_humanized).to eq "impounded"
+          expect(bike.authorized?(bike.user)).to be_falsey
+          expect(bike.authorized?(impound_user)).to be_truthy
+          expect(bike.serial_display).to eq "Hidden"
+          expect(bike.serial_display(bike.user)).to eq "Hello Party"
+          expect(bike.serial_display(impound_user)).to eq "Hello Party"
+        end
+      end
+    end
   end
 
   describe "pg search" do
@@ -1108,6 +1158,8 @@ RSpec.describe Bike, type: :model do
       it "returns bike_update" do
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
+        expect(bike.latitude).to eq 43.9
+        expect(bike.latitude_public).to eq 43.9
       end
     end
     context "b_param" do
@@ -1558,10 +1610,18 @@ RSpec.describe Bike, type: :model do
       expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
-    context "stolen record date" do
+    context "stolen_record date" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
         expect(bike.reload.listing_order).to be_within(1).of bike.current_stolen_record.date_stolen.to_i
+      end
+    end
+
+    context "impound_record date" do
+      let(:bike) { FactoryBot.create(:impounded_bike) }
+      it "does not get out of integer errors" do
+        expect(bike.reload.current_impound_record.impounded_at.to_i).to be_present
+        expect(bike.listing_order).to be_within(1).of bike.current_impound_record.impounded_at.to_i
       end
     end
   end
@@ -1612,7 +1672,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.organizations.first }
     let(:bike_organization) { bike.bike_organizations.first }
-    let(:organization_2) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
     before { expect(bike.bike_organization_ids).to eq([organization.id]) }
     context "no organization_ids" do
       it "removes bike organizations" do
@@ -1630,14 +1690,14 @@ RSpec.describe Bike, type: :model do
     context "invalid organization_id" do
       let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
       it "adds valid organization but not invalid one" do
-        bike.bike_organization_ids = [organization.id, organization_2.id, organization_invalid.id]
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+        bike.bike_organization_ids = [organization.id, organization2.id, organization_invalid.id]
+        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
       end
     end
     context "different organization" do
       it "adds organization and removes existing" do
-        bike.bike_organization_ids = "#{organization_2.id}, "
-        expect(bike.reload.bike_organization_ids).to eq([organization_2.id])
+        bike.bike_organization_ids = "#{organization2.id}, "
+        expect(bike.reload.bike_organization_ids).to eq([organization2.id])
       end
     end
   end
@@ -1756,11 +1816,14 @@ RSpec.describe Bike, type: :model do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
           bike.reload
+          expect(bike.current_impound_record).to_not be_present
           expect(bike.current_parking_notification).to eq parking_notification
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
           expect(bike.address_hash).to eq stolen_record.address_hash
           expect(bike.address_set_manually).to be_falsey
           expect(bike.registration_address_source).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.send("authorization_requires_organization?")).to be_falsey
         end
       end
     end

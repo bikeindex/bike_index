@@ -23,6 +23,7 @@ class BulkImportWorker < ApplicationWorker
 
     # Grab the first line of the csv (which is the header line) and transform it
     headers = convert_headers(open_file.readline)
+    @bulk_import.data = (@bulk_import.data || {}).merge("headers" => headers)
     # Stream process the rest of the csv
     # The reason the starting_line is 1, if there hasn't been a file error:
     # We've already removed the first line, so it doesn't count. and we want lines to start at 1, not 0
@@ -36,7 +37,7 @@ class BulkImportWorker < ApplicationWorker
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
       bike = register_bike(row_to_b_param_hash(row.to_h))
-      next if bike.id.present?
+      next if bike.blank? || bike.id.present?
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end
@@ -46,6 +47,7 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def register_bike(b_param_hash)
+    return nil if b_param_hash.blank?
     b_param = BParam.create(creator_id: creator_id,
                             params: b_param_hash,
                             origin: "bulk_import_worker")
@@ -59,6 +61,23 @@ class BulkImportWorker < ApplicationWorker
 
       [k, v.blank? ? nil : v.strip]
     }.to_h
+    return nil if row.values.reject(&:blank?).none?
+
+    if @bulk_import.impounded?
+      row[:owner_email] ||= @bulk_import.user&.email # email isn't required for bulk imports
+      impound_attrs = {
+        # impounded_at_with_timezone parses with timeparser, and doesn't need timezone
+        impounded_at_with_timezone: row[:impounded_at],
+        street: row[:impounded_street],
+        city: row[:impounded_city],
+        state: row[:impounded_state],
+        zipcode: row[:impounded_zipcode],
+        country: row[:impounded_country],
+        impounded_description: row[:impounded_description],
+        display_id: row[:impounded_id],
+        organization_id: @bulk_import.organization_id
+      }
+    end
 
     {
       bulk_import_id: @bulk_import.id,
@@ -81,6 +100,7 @@ class BulkImportWorker < ApplicationWorker
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
+      impound_record: impound_attrs || {},
       # Photo need to be an array - only include if photo has a value
       photos: row[:photo].present? ? [row[:photo]] : nil
     }
@@ -96,7 +116,9 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.gsub(/"|'/, "").strip.gsub(/\s/, "_").downcase.to_sym }
+    headers = str.split(",").map { |h|
+      h.gsub(/"|'/, "").strip.gsub(/\s|-/, "_").downcase.gsub(/[^0-9A-Za-z_]/, "").to_sym
+    }
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 
@@ -114,7 +136,11 @@ class BulkImportWorker < ApplicationWorker
   private
 
   def validate_headers(attrs)
-    required_headers = %i[manufacturer owner_email serial_number]
+    required_headers = if @bulk_import.impounded?
+      %i[manufacturer serial_number impounded_at]
+    else
+      %i[manufacturer owner_email serial_number]
+    end
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers

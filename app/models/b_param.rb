@@ -159,6 +159,7 @@ class BParam < ApplicationRecord
       # Don't override status with status_with_owner
       return bike["status"] unless bike["status"] == "status_with_owner"
     end
+    return "unregistered_parking_notification" if parking_notification_params.present?
     return "status_impounded" if impound_attrs.present?
     return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
     "status_with_owner"
@@ -177,7 +178,7 @@ class BParam < ApplicationRecord
   end
 
   def unregistered_parking_notification?
-    parking_notification_params.present?
+    status == "unregistered_parking_notification"
   end
 
   def primary_frame_color_id

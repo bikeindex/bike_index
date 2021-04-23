@@ -31,6 +31,7 @@ class User < ApplicationRecord
   has_many :integrations, dependent: :destroy
   has_many :creation_states, inverse_of: :creator, foreign_key: :creator_id
   has_many :impound_claims
+  has_many :impound_records
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
@@ -264,13 +265,13 @@ class User < ApplicationRecord
 
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).present?
+    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).any?
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).present?
+    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).any?
     superuser? && !no_superuser_override
   end
 

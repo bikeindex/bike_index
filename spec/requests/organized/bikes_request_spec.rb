@@ -90,6 +90,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "creates along with parking_notification and photo" do
         current_organization.reload
         expect(current_organization.auto_user).to eq current_user
+        expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
@@ -109,6 +110,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(b_param.origin).to eq "organization_form"
         expect(b_param.image_processed).to be_truthy
         expect(b_param.image).to be_present
+        expect(b_param.status).to eq "unregistered_parking_notification"
 
         bike = b_param.created_bike
         expect(bike.made_without_serial?).to be_falsey
@@ -117,6 +119,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creation_organization).to eq current_organization
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.user_hidden).to be_truthy
+        expect(bike.hidden).to be_truthy
         expect(bike.created_by_parking_notification).to be_truthy
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
@@ -129,7 +132,9 @@ RSpec.describe Organized::BikesController, type: :request do
         creation_state = bike.creation_state
         expect(creation_state.organization).to eq current_organization
         expect(creation_state.creator).to eq bike.creator
+        expect(creation_state.status).to eq "unregistered_parking_notification"
         expect(creation_state.origin).to eq "unregistered_parking_notification"
+        expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.parking_notifications.first
@@ -160,6 +165,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
       context "different auto_user, impound_notification" do
         let!(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let!(:impound_configuration) { FactoryBot.create(:impound_configuration, organization_id: current_organization.id, public_view: true) }
         let(:parking_notification_abandoned) do
           parking_notification.merge(use_entered_address: "1",
                                      kind: "impound_notification",
@@ -173,6 +179,7 @@ RSpec.describe Organized::BikesController, type: :request do
         it "creates a new ownership, parking_notification, impound_record" do
           current_organization.reload
           expect(current_organization.auto_user).to eq auto_user
+          expect(current_organization.public_impound_bikes?).to be_truthy
           expect(parking_notification_abandoned[:state_id]).to be_present # Test that we're blanking the state
           VCR.use_cassette("organized_bikes_controller-create-impound-record-edmonton", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! do
@@ -200,9 +207,10 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.creation_organization).to eq current_organization
           expect(bike.hidden).to be_falsey
           expect(bike.user_hidden).to be_falsey
+          expect(bike.hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
           expect(bike.created_by_parking_notification).to be_truthy
-          expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
+          expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey
@@ -213,7 +221,9 @@ RSpec.describe Organized::BikesController, type: :request do
           creation_state = bike.creation_state
           expect(creation_state.organization).to eq current_organization
           expect(creation_state.creator).to eq bike.creator
+          expect(creation_state.status).to eq "unregistered_parking_notification"
           expect(creation_state.origin).to eq "unregistered_parking_notification"
+          expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
 
           expect(ParkingNotification.where(bike_id: bike.id).count).to eq 1
           parking_notification = ParkingNotification.where(bike_id: bike.id).first
@@ -237,6 +247,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(impound_record.parking_notification).to eq parking_notification
           expect(impound_record.organization).to eq current_organization
           expect(impound_record.current?).to be_truthy
+          expect(impound_record.unregistered_bike).to be_truthy
         end
       end
     end

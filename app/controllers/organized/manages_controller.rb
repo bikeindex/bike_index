@@ -10,13 +10,6 @@ module Organized
     def locations
     end
 
-    def impounding
-      unless @organization.enabled?("impound_bikes")
-        flash[:error] = translation(:can_not_access, org_name: current_organization.name)
-        redirect_to(current_root_path) && return
-      end
-    end
-
     def update
       if @organization.update_attributes(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
@@ -56,7 +49,7 @@ module Organized
 
     def permitted_parameters
       params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
-        :avatar, :lightspeed_register_with_phone, :public_impound_bikes, show_on_map_if_permitted, permitted_kind,
+        :avatar, :lightspeed_register_with_phone, show_on_map_if_permitted, permitted_kind,
         locations_attributes: permitted_locations_params)
     end
 

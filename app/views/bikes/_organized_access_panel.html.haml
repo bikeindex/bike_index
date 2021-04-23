@@ -27,7 +27,8 @@
                 = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
-        - display_unstolen_notification_form = !@bike.status_stolen? && passive_organization.enabled?("unstolen_notifications")
+        -# Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
+        - display_unstolen_notification_form = @bike.status_with_owner? && passive_organization.enabled?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
@@ -203,13 +204,14 @@
 
       / Additional law enforcement information
       - if passive_organization.enabled?("additional_registrations_information")
+        -# If user isn't present, use email to search
+        - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
         .row.law-enforcement-wrapper.mt-4
           .col-xs-12.mt-2
             %p.mt-2.mb-2
               = t(".additional_registrations_information")
               %em.less-strong.hidden-md-down
                 = t(".additional_registrations_information_visible_because", org_name: passive_organization.short_name)
-
             %table.table.table-striped.table-bordered.table-sm.without-exterior-border
               %tbody
                 %thead
@@ -217,8 +219,6 @@
                     = t(".additional_registrations_registered_at")
                   %th
 
-                -# If user isn't present, use email to search
-                - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
                   %tr
                     %td
@@ -229,8 +229,11 @@
                         %em.less-strong= t(".additional_registrations_this_bike", bike_type: @bike.type)
                       - else
                         = link_to organized_bike_text(other_bike), bike_path(other_bike)
+            - if other_user_bikes.count > 25
+              %p.text-center.less-strong.m-0
+                User has #{other_user_bikes.count} registrations, only 25 most recent shown.
 
-        - duplicate_bikes = @bike.duplicate_bikes.where.not(id: @bike.id)
+        - duplicate_bikes = @bike.duplicate_bikes
         - if duplicate_bikes.any?
           %p.mt-2.mb-2
             = t(".additional_registrations_potential_duplicates")
@@ -295,7 +298,11 @@
       - impound_record = @bike.current_impound_record&.organization_id == passive_organization.id ? @bike.current_impound_record : nil
       %h3.uncap.mt-2
         %span.text-danger
-          #{@bike.type&.titleize} is impounded!
+          #{@bike.type&.titleize} is
+          - if @bike.current_impound_record&.organization&.id == passive_organization.id
+            impounded!
+          - else
+            impounded by #{@bike.current_impound_record&.organized? ? @bike.current_impound_record.organization.name : "an individual"}!
         - if impound_record.present?
           = link_to "Impound record ##{impound_record.display_id}", organization_impound_record_path(impound_record.display_id, organization_id: passive_organization.to_param)
           %em.small created by this impound notification:
@@ -308,12 +315,18 @@
 
     - resolved_notifications = parking_notifications.resolved.where.not(id: current_impound_notification&.id)
     %p{ style: "margin-top: -12px;" }
-      = pluralize number_with_delimiter(parking_notifications.current.count), "current notifications"
-      - if parking_notifications.resolved.count > 0
+      -# Gotta include the current impound notification if it's present
+      - current_count = parking_notifications.current.count
+      - current_count += 1 if current_impound_notification.present?
+      #{pluralize(number_with_delimiter(current_count), "current notification")},
+
+      - if resolved_notifications.count > 0
         \-
         %a{ href: "#resolvedParkingNotificationTable", "aria-controls" => "resolvedParkingNotificationTable", "data-toggle" => "collapse" }
           show
           = pluralize number_with_delimiter(resolved_notifications.count), "resolved notification"
+      - else
+        %span.less-strong 0 resolved notifications
       for #{@bike.type}
     - if parking_notifications.current.any?
       = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true }

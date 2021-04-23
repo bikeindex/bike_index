@@ -36,15 +36,18 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       let(:user) { user_phone.user }
       it "does not add the phone if the phone is present" do
         user.reload
+        Sidekiq::Worker.clear_all
         expect {
           instance.perform(user.id)
         }.to_not change(UserPhone, :count)
+        expect(AfterUserChangeWorker.jobs.count).to eq 0
         user.update(phone: phone)
         user_phone.destroy
         user.reload
         expect {
           instance.perform(user.id)
         }.to_not change(UserPhone, :count)
+        expect(AfterUserChangeWorker.jobs.count).to eq 0
         user.reload
         expect(user.phone).to eq phone
       end

@@ -78,10 +78,12 @@ class BikeSearch extends Component {
     }
 
     const Result = this.props.resultComponent;
+    // external registry search doesn't care about proximity, and for translation
     const stolenness = {
       non: "abandoned",
       all: "all",
       stolen: "stolen",
+      proximity: "stolen",
     }[this.props.interpretedParams.stolenness];
 
     return (

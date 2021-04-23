@@ -6,9 +6,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config and Dockerfile if Ruby version is bumped
-ruby "2.7.2"
+ruby "2.7.3"
 gem "rack", "2.0.8"
-gem "rails", "5.2.4"
+gem "rails", "~> 5.2.4"
 
 gem "bcrypt", "~> 3.1.7" # encryption
 gem "bootsnap" # Faster bootup
@@ -33,9 +33,9 @@ gem "translation"
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
-gem "sidekiq", "~> 5.1.0" # Background processing
+gem "sidekiq"
 gem "sidekiq-failures"
-gem "soulheart", "~> 0.3.0"
+gem "soulheart"
 
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder", "~> 0.4.2"
@@ -49,7 +49,7 @@ gem "high_voltage"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
-gem "kramdown", "2.3.0" # Markdown
+gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails", "~> 1.11"
@@ -109,7 +109,7 @@ gem "webpacker"
 # Show performance metrics
 gem "flamegraph", require: false
 gem "memory_profiler", require: false
-gem "rack-mini-profiler", require: false # If you can't see it you can't make it better
+gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
 gem "stackprof", require: false
 
 gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)

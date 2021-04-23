@@ -398,7 +398,7 @@ RSpec.describe BikesController, type: :request do
         it "renders" do
           parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.status).to eq "retrieved"
           expect(parking_notification.retrieval_link_token).to be_present
           expect(parking_notification.retrieved?).to be_truthy
           expect(bike.current_parking_notification).to be_blank
@@ -407,23 +407,35 @@ RSpec.describe BikesController, type: :request do
           expect(assigns(:bike)).to eq bike
           expect(assigns(:token)).to eq parking_notification.retrieval_link_token
           expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         end
       end
       context "abandoned as well" do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "renders" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
-          parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.reload.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
-          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification_abandoned.retrieval_link_token}"
+          expect(parking_notification_abandoned.reload.status).to eq "current"
+          get "#{base_url}/#{bike.id}?parking_notification_retrieved=#{parking_notification.retrieval_link_token}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
-          expect(assigns(:token)).to eq parking_notification_abandoned.retrieval_link_token
-          expect(assigns(:token_type)).to eq "appears_abandoned_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification_abandoned
+          expect(assigns(:token)).to eq parking_notification.retrieval_link_token
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
+          # And then resolve that token, to test it works as well
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
+            expect(flash[:success]).to be_present
+          end
+          # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
+          expect(parking_notification_abandoned.reload.status).to eq "retrieved"
+          expect(parking_notification_abandoned.resolved?).to be_truthy
+          expect(parking_notification_abandoned.retrieved_kind).to eq "link_token_recovery"
+          expect(parking_notification.reload.status).to eq "replaced"
+          expect(parking_notification.resolved?).to be_truthy
+          expect(parking_notification.retrieved_kind).to be_blank
         end
       end
       context "impound notification" do
@@ -438,29 +450,40 @@ RSpec.describe BikesController, type: :request do
           expect(assigns(:bike)).to eq bike
           expect(assigns(:token)).to eq parking_notification.retrieval_link_token
           expect(assigns(:token_type)).to eq "parked_incorrectly_notification"
-          expect(assigns(:matching_notification)).to eq parking_notification
+          expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         end
       end
     end
     context "with impound_record" do
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
       it "includes an impound_claim" do
         expect(impound_record).to be_present
         expect(bike.reload.current_impound_record).to be_present
+        expect(bike.owner).to_not eq current_user
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
+        expect(response).to be_ok
         expect(assigns(:bike)).to eq bike
         expect(assigns(:impound_claim)).to be_present
         expect(assigns(:impound_claim)&.id).to be_blank
+        get "#{base_url}/#{bike.id}?contact_owner=true"
+        expect(flash).to be_blank
+        expect(response).to be_ok
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:contact_owner_open)).to be_truthy
       end
       context "current_user has impound_claim" do
         let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record: impound_record) }
         it "uses impound_claim" do
+          expect(impound_record.creator_public_display_name).to eq "bike finder"
+          expect(bike.reload.owner).to_not eq current_user
           expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+          expect(assigns(:contact_owner_open)).to be_falsey
         end
       end
       context "current_user has submitting_impound_claim" do
@@ -638,6 +661,7 @@ RSpec.describe BikesController, type: :request do
             expect(bike_user.phone).to eq "3123799513"
             expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
             expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
+            expect(bike.creation_state.status).to eq "status_stolen"
             stolen_record = bike.current_stolen_record
             chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
             expect(stolen_record.show_address).to be_truthy
@@ -663,7 +687,7 @@ RSpec.describe BikesController, type: :request do
       let(:bike_params) { basic_bike_params }
       context "impound_record" do
         include_context :geocoder_real
-        let(:impound_params) { chicago_stolen_params.merge(impounded_at: (Time.current - 1.day).utc, timezone: "UTC") }
+        let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
         it "creates a new ownership and impound_record" do
           VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
             expect {
@@ -678,13 +702,16 @@ RSpec.describe BikesController, type: :request do
             expect(new_bike.creation_state.creator&.id).to eq current_user.id
             expect(new_bike.status).to eq "status_impounded"
             expect(new_bike.status_humanized).to eq "found"
+            expect(new_bike.creation_state.status).to eq "status_impounded" # Make sure this status matches
             expect_attrs_to_match_hash(new_bike, testable_bike_params)
             expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
             impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
             expect(new_bike.current_impound_record&.id).to eq impound_record.id
             expect(impound_record.kind).to eq "found"
-            expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at, :timezone))
+            expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
             expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
+            expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+            expect(impound_record.unregistered_bike?).to be_truthy
 
             ownership = new_bike.current_ownership
             expect(ownership.claimed?).to be_truthy
@@ -695,16 +722,18 @@ RSpec.describe BikesController, type: :request do
         end
         context "failure" do
           it "assigns a bike and a impound record with the attrs passed" do
-            expect {
-              post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
-            }.to change(Bike, :count).by(0)
-            expect(BParam.all.count).to eq 1
-            expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
-            bike = assigns(:bike)
-            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
-            expect(bike.status).to eq "status_impounded"
-            # we retain the stolen record attrs, test that they are assigned correctly too
-            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at, :timezone))
+            VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
+              expect {
+                post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
+              }.to change(Bike, :count).by(0)
+              expect(BParam.all.count).to eq 1
+              expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
+              bike = assigns(:bike)
+              expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+              expect(bike.status).to eq "status_impounded"
+              # we retain the stolen record attrs, test that they are assigned correctly too
+              expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+            end
           end
         end
       end
@@ -1040,8 +1069,9 @@ RSpec.describe BikesController, type: :request do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          expect(parking_notification_abandoned.reload.status).to eq "current"
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
           Sidekiq::Worker.clear_all
@@ -1055,15 +1085,14 @@ RSpec.describe BikesController, type: :request do
           parking_notification.reload
           parking_notification_abandoned.reload
           expect(bike.current_parking_notification).to be_blank
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.retrieved?).to be_truthy
-          expect(parking_notification.retrieved_by).to eq current_user
+          expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.resolved_at).to be_within(5).of Time.current
-          expect(parking_notification.retrieved_kind).to eq "link_token_recovery"
+          expect(parking_notification.retrieved_by&.id).to be_blank
+          expect(parking_notification.retrieved_kind).to be_blank
 
-          expect(parking_notification_abandoned.retrieved?).to be_truthy
-          expect(parking_notification_abandoned.retrieved_by).to be_blank
-          expect(parking_notification_abandoned.associated_retrieved_notification).to eq parking_notification
+          expect(parking_notification_abandoned.status).to eq "retrieved"
+          expect(parking_notification_abandoned.retrieved_by&.id).to eq current_user.id
+          expect(parking_notification_abandoned.retrieved_kind).to eq "link_token_recovery"
         end
       end
       context "impound notification" do
@@ -1071,8 +1100,9 @@ RSpec.describe BikesController, type: :request do
         it "refuses" do
           ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
           parking_notification.reload
-          expect(parking_notification.current?).to be_falsey
-          expect(parking_notification.resolved?).to be_truthy
+          expect(parking_notification.status).to eq "replaced"
+          expect(parking_notification.active?).to be_falsey
+          expect(bike.reload.status).to eq "status_impounded"
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
@@ -1080,7 +1110,7 @@ RSpec.describe BikesController, type: :request do
             expect(assigns(:bike)).to eq bike
             expect(flash[:error]).to match(/impound/i)
           end
-          bike.reload
+          expect(bike.reload.status).to eq "status_impounded"
           parking_notification.reload
           expect(bike.current_parking_notification).to be_blank
           expect(parking_notification.retrieved?).to be_falsey
@@ -1133,7 +1163,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "organized impound_record" do
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-        before { ImpoundUpdateBikeWorker.new.perform(impound_record.id) }
+        before { ProcessImpoundUpdatesWorker.new.perform(impound_record.id) }
         it "redirects with flash error" do
           expect(bike.reload.status).to eq "status_impounded"
           get "#{base_url}/#{bike.id}/edit"
@@ -1437,6 +1467,9 @@ RSpec.describe BikesController, type: :request do
           show_address: "1",
           estimated_value: "2101",
           locking_description: "party",
+          phone_for_users: "0",
+          phone_for_shops: "1",
+          phone_for_police: "0",
           lock_defeat_description: "cool things",
           theft_description: "Something",
           police_report_number: "23891921",
@@ -1448,45 +1481,57 @@ RSpec.describe BikesController, type: :request do
       end
 
       it "clears the existing alert image" do
-        bike.reload
-        stolen_record.current_alert_image
-        stolen_record.reload
-        expect(bike.current_stolen_record).to eq stolen_record
-        expect(stolen_record.without_location?).to be_truthy
-        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
-        expect(og_alert_image_id).to be_present
-        Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{bike.id}", params: {
-            bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}
-          }
-          expect(flash[:success]).to be_present
+        # Cassette required for alert image
+        VCR.use_cassette("bike_request-stolen", match_requests_on: [:path], re_record_interval: 1.month) do
+          bike.reload
+          stolen_record.current_alert_image
+          stolen_record.reload
+          expect(bike.current_stolen_record).to eq stolen_record
+          expect(stolen_record.without_location?).to be_truthy
+          og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
+          expect(og_alert_image_id).to be_present
+          # Test stolen record phoning
+          expect(stolen_record.phone_for_everyone).to be_falsey
+          expect(stolen_record.phone_for_users).to be_truthy
+          expect(stolen_record.phone_for_shops).to be_truthy
+          expect(stolen_record.phone_for_police).to be_truthy
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch "#{base_url}/#{bike.id}", params: {
+              bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}
+            }
+            expect(flash[:success]).to be_present
+          end
+          bike.reload
+          stolen_record.reload
+          stolen_record.current_alert_image
+          stolen_record.reload
+
+          expect(bike.current_stolen_record.id).to eq stolen_record.id
+          expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
+          expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
+
+          expect(stolen_record.phone).to eq "1111111111"
+          expect(stolen_record.secondary_phone).to eq "1231231234"
+          expect(stolen_record.country_id).to eq Country.united_states.id
+          expect(stolen_record.state_id).to eq state.id
+          expect(stolen_record.show_address).to be_truthy
+          expect(stolen_record.estimated_value).to eq 2101
+          expect(stolen_record.locking_description).to eq "party"
+          expect(stolen_record.lock_defeat_description).to eq "cool things"
+          expect(stolen_record.theft_description).to eq "Something"
+          expect(stolen_record.police_report_number).to eq "23891921"
+          expect(stolen_record.police_report_department).to eq "Manahattan"
+          expect(stolen_record.proof_of_ownership).to be_falsey
+          expect(stolen_record.receive_notifications).to be_truthy
+          expect(stolen_record.phone_for_everyone).to be_falsey
+          expect(stolen_record.phone_for_users).to be_falsey
+          expect(stolen_record.phone_for_shops).to be_truthy
+          expect(stolen_record.phone_for_police).to be_falsey
+
+          expect(stolen_record.alert_image).to be_present
+          expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
         end
-        bike.reload
-        stolen_record.reload
-        stolen_record.current_alert_image
-        stolen_record.reload
-
-        expect(bike.current_stolen_record.id).to eq stolen_record.id
-        expect(stolen_record.to_coordinates.compact).to eq([default_location[:latitude], default_location[:longitude]])
-        expect(stolen_record.date_stolen).to be_within(5).of Time.at(1588096800)
-
-        expect(stolen_record.phone).to eq "1111111111"
-        expect(stolen_record.secondary_phone).to eq "1231231234"
-        expect(stolen_record.country_id).to eq Country.united_states.id
-        expect(stolen_record.state_id).to eq state.id
-        expect(stolen_record.show_address).to be_truthy
-        expect(stolen_record.estimated_value).to eq 2101
-        expect(stolen_record.locking_description).to eq "party"
-        expect(stolen_record.lock_defeat_description).to eq "cool things"
-        expect(stolen_record.theft_description).to eq "Something"
-        expect(stolen_record.police_report_number).to eq "23891921"
-        expect(stolen_record.police_report_department).to eq "Manahattan"
-        expect(stolen_record.proof_of_ownership).to be_falsey
-        expect(stolen_record.receive_notifications).to be_truthy
-
-        expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
       end
     end
     context "updating impound_record" do
@@ -1495,7 +1540,7 @@ RSpec.describe BikesController, type: :request do
       let(:impound_params) do
         {
           timezone: "America/Los_Angeles",
-          impounded_at: "2020-04-28T11:00",
+          impounded_at_with_timezone: "2020-04-28T11:00",
           country_id: Country.united_states.id,
           street: "278 Broadway",
           city: "New York",
@@ -1518,7 +1563,7 @@ RSpec.describe BikesController, type: :request do
         impound_record.reload
         expect(impound_record.latitude).to be_present
         expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
-        expect_attrs_to_match_hash(impound_record, impound_params.except(:timezone, :impounded_at))
+        expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
       end
     end
   end

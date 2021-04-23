@@ -4,22 +4,21 @@
     <meta name="title" content="#{@blog.secondary_title}">
 
 - blogger = @blog.user
-#news_display
-  .blog-header
-    %h1.global-title
-      = @blog.title
+.blog-header
+  %h1.global-title
+    = @blog.title
 
-    %article.blogger-info
-      %h4
-        = t(".by")
+  %article.blogger-info
+    %h4
+      = t(".by")
 
-        %a.blog-poster{href: blogger.userlink}
-          = blogger.name.presence
-      %h4.pub-date
-        - if @blog.published_at > Time.current - 1.week
-          = l(@blog.published_at, format: :standard_display)
-        - else
-          = l(@blog.published_at, format: :no_day_with_year)
+      %a.blog-poster{href: blogger.userlink}
+        = blogger.name.presence
+    %h4.pub-date
+      - if @blog.published_at > Time.current - 1.week
+        = l(@blog.published_at, format: :standard_display)
+      - else
+        = l(@blog.published_at, format: :no_day_with_year)
 
 - if @blog.is_listicle
   - @blog.listicles.each_with_index do |list_item, i|

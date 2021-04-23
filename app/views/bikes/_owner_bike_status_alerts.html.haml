@@ -64,9 +64,12 @@
     - if current_parking_notification.present?
       %h3.uncap.text-center.mt-4.mb-2
         %strong
-          Have you retrieved this #{@bike.type}?
+          - if @bike.unregistered_parking_notification?
+            Was this bike retrieved?
+          - else
+            Have you retrieved this #{@bike.type}?
       %p.text-center
-        %em
-          Let #{current_parking_notification.organization&.short_name} know
+        - unless @bike.unregistered_parking_notification?
+          %em Let #{current_parking_notification.organization&.short_name} know
         = link_to "mark retrieved", bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), class: "btn btn-sm btn-success", style: "color: white;"
 

@@ -30,6 +30,7 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.Organized if $('.organized-body').length > 0
     # Set the local timezone and convert all the times to local
     @localizeTimes()
+    @enableFullscreenOverflow()
 
   loadPageScript: (body_id) ->
     # If this is a landing page
@@ -62,6 +63,7 @@ class BikeIndex.Init extends BikeIndex
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm
+      stolen_bike_listings_index: BikeIndex.StolenBikeListing
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->
@@ -137,6 +139,15 @@ class BikeIndex.Init extends BikeIndex
       time = moment($this.attr("data-initialtime"), moment.ISO_8601)
       $this.val(time.format("YYYY-MM-DDTHH:mm")) # Format that at least Chrome expects for field
 
+  # copy of bike_index_utilities.js function
+  enableFullscreenOverflow: ->
+    pageWidth = $(window).width();
+    $('.full-screen-table table').each (index) ->
+      $this = $(this)
+      if $this.outerWidth() > pageWidth
+        $this.parents('.full-screen-table').addClass 'full-screen-table-overflown'
+
+
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
   d = document.documentElement.style
@@ -152,10 +163,14 @@ enableEscapeForModals = ->
   $('.modal').on 'show.bs.modal', ->
     $(window).on 'keyup', (e) ->
       $('.modal').modal('hide') if e.keyCode == 27 # Escape key
+    $(".modal .close").on "click", (e) ->
+      # potentially having trouble closing modals, try to fix it
+      $(e.target).parents(".modal").modal("hide")
     return true
   # Remove keyup trigger, clean up after yourself
   $('.modal').on 'hide.bs.modal', ->
     $(window).off 'keyup'
+    $(".modal .close").off
 
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')

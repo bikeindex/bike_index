@@ -77,12 +77,12 @@
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :post_date, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
         .col-md-6
-          .form-group
-            = f.label :tags, class: "control-label" do
+          .form-group.fancy-select.no-restore-on-backspace.unfancy
+            = f.label :content_tag_names, class: "control-label" do
               Tags
               %small.less-strong
-                Should include a main category: Tech, Design, or Update"
-            = f.text_area :tags, placeholder: "Separate tags with commas", class: "form-control"
+                at least one required
+            = f.select(:content_tag_names, options_for_select(ContentTag.name_ordered.pluck(:name, :id), selected: @blog.content_tags.pluck(:id)), { include_blank: true }, { multiple: true, class: "form-control", required: true })
         .col-md-6{ class: blogOnlyClass }
           .form-group
             = f.label :user_email, "Author email"

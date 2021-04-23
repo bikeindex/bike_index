@@ -1,8 +1,28 @@
-Your impound claim has been
-%strong= @impound_claim.status_humanized
+%p
+  Your #{@impound_claim.claim_kind_humanized}
+  - if @impound_claim.bike_claimed.present?
+    for
+    = link_to @impound_claim.bike_claimed.title_string, bike_url(@impound_claim.bike_claimed)
+  has been
+  %strong= @impound_claim.status_humanized
 
-- if @impound_claim.approved?
+-# Note: should be escaped
+- if @impound_claim.response_message.present?
   %p
-    Please reply to this message or contact
-    = link_to @reply_to, "mailto:#{@reply_to}"
-    to arrange to pick up your #{@bike_submitting&.type || "bike"}
+    %em Message:
+    = @impound_claim.response_message
+
+- snippet_kind = "impound_claim_#{@impound_claim.status}" if %w[approved denied].include?(@impound_claim.status)
+
+- if @impound_claim.organized? && snippet_kind.present?
+  - organization_message_snippet = @organization.mail_snippets.enabled.where(kind: snippet_kind).first
+
+-# If there is an organization message snippet, use it, otherwise default "reply to" message
+- if organization_message_snippet&.body&.present?
+  = organization_message_snippet.body.html_safe
+- else
+  - if @impound_claim.approved?
+    %p
+      Please reply to this message or contact
+      = link_to @impound_claim.impound_record_email, "mailto:#{@impound_claim.impound_record_email}"
+      to arrange to pick up your #{@bike_submitting&.type || "bike"}

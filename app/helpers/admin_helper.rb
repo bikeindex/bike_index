@@ -2,6 +2,8 @@ module AdminHelper
   def dev_nav_select_links
     return [] unless current_user&.developer?
     [
+      # Impound claims index is currently busted, so ignoring for now
+      {title: "Impound Claims", path: admin_impound_claims_path, match_controller: true},
       {title: "Mail Snippets", path: admin_mail_snippets_path, match_controller: true}
     ]
   end
@@ -16,6 +18,7 @@ module AdminHelper
       {title: "External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true},
       {title: "Organizations", path: admin_organizations_path, match_controller: true},
       {title: "News", path: admin_news_index_path, match_controller: true},
+      {title: "Content Tags", path: admin_content_tags_path, match_controller: true},
       {title: "POS Integration", path: lightspeed_interface_path, match_controller: false},
       {title: "Ambassador Activities", path: admin_ambassador_tasks_path, match_controller: true},
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
@@ -47,7 +50,7 @@ module AdminHelper
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
       {title: "Feature Flags", path: admin_feature_flags_path, match_controller: false},
       {title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
-      {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: false},
+      {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links
   end
@@ -91,5 +94,9 @@ module AdminHelper
     return "#dc3545" if score < 31
     return "#ffc107" if score < 70
     "#28a745"
+  end
+
+  def admin_number_display(number)
+    content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
   end
 end

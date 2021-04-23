@@ -462,6 +462,38 @@ ALTER SEQUENCE public.bikes_id_seq OWNED BY public.bikes.id;
 
 
 --
+-- Name: blog_content_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.blog_content_tags (
+    id bigint NOT NULL,
+    blog_id bigint,
+    content_tag_id bigint,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: blog_content_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.blog_content_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: blog_content_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.blog_content_tags_id_seq OWNED BY public.blog_content_tags.id;
+
+
+--
 -- Name: blogs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -475,7 +507,6 @@ CREATE TABLE public.blogs (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     published_at timestamp without time zone,
-    tags character varying(255),
     published boolean,
     old_title_slug character varying(255),
     description_abbr text,
@@ -525,7 +556,9 @@ CREATE TABLE public.bulk_imports (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_ascend boolean DEFAULT false,
-    file_cleaned boolean DEFAULT false
+    file_cleaned boolean DEFAULT false,
+    kind integer,
+    data jsonb
 );
 
 
@@ -657,6 +690,40 @@ ALTER SEQUENCE public.components_id_seq OWNED BY public.components.id;
 
 
 --
+-- Name: content_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.content_tags (
+    id bigint NOT NULL,
+    name character varying,
+    slug character varying,
+    description text,
+    priority integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: content_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.content_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: content_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.content_tags_id_seq OWNED BY public.content_tags.id;
+
+
+--
 -- Name: countries; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -705,7 +772,8 @@ CREATE TABLE public.creation_states (
     creator_id integer,
     bulk_import_id integer,
     pos_kind integer DEFAULT 0,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    origin_enum integer
 );
 
 
@@ -1255,7 +1323,8 @@ CREATE TABLE public.impound_claims (
     submitted_at timestamp without time zone,
     resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    response_message text
 );
 
 
@@ -1279,6 +1348,42 @@ ALTER SEQUENCE public.impound_claims_id_seq OWNED BY public.impound_claims.id;
 
 
 --
+-- Name: impound_configurations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.impound_configurations (
+    id bigint NOT NULL,
+    organization_id bigint,
+    public_view boolean DEFAULT false,
+    bulk_import_view boolean DEFAULT false,
+    display_id_next_integer integer,
+    display_id_prefix character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    email character varying
+);
+
+
+--
+-- Name: impound_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.impound_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: impound_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.impound_configurations_id_seq OWNED BY public.impound_configurations.id;
+
+
+--
 -- Name: impound_record_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1290,7 +1395,7 @@ CREATE TABLE public.impound_record_updates (
     kind integer,
     notes text,
     transfer_email character varying,
-    resolved boolean DEFAULT false,
+    processed boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     impound_claim_id bigint
@@ -1328,7 +1433,7 @@ CREATE TABLE public.impound_records (
     resolved_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    display_id bigint,
+    display_id_integer bigint,
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
@@ -1339,7 +1444,11 @@ CREATE TABLE public.impound_records (
     city text,
     neighborhood text,
     country_id bigint,
-    state_id bigint
+    state_id bigint,
+    display_id character varying,
+    display_id_prefix character varying,
+    impounded_description text,
+    unregistered_bike boolean DEFAULT false
 );
 
 
@@ -2039,39 +2148,6 @@ ALTER SEQUENCE public.organizations_id_seq OWNED BY public.organizations.id;
 
 
 --
--- Name: other_listings; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.other_listings (
-    id integer NOT NULL,
-    bike_id integer,
-    url character varying(255),
-    listing_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.other_listings_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.other_listings_id_seq OWNED BY public.other_listings.id;
-
-
---
 -- Name: ownerships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2186,7 +2262,8 @@ CREATE TABLE public.parking_notifications (
     retrieval_link_token text,
     retrieved_by_id bigint,
     image text,
-    image_processing boolean DEFAULT false NOT NULL
+    image_processing boolean DEFAULT false NOT NULL,
+    repeat_number integer
 );
 
 
@@ -2401,6 +2478,56 @@ CREATE SEQUENCE public.states_id_seq
 --
 
 ALTER SEQUENCE public.states_id_seq OWNED BY public.states.id;
+
+
+--
+-- Name: stolen_bike_listings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stolen_bike_listings (
+    id bigint NOT NULL,
+    bike_id bigint,
+    initial_listing_id bigint,
+    primary_frame_color_id bigint,
+    secondary_frame_color_id bigint,
+    tertiary_frame_color_id bigint,
+    listing_order integer,
+    manufacturer_id bigint,
+    manufacturer_other character varying,
+    mnfg_name character varying,
+    frame_model text,
+    frame_size character varying,
+    frame_size_unit character varying,
+    frame_size_number double precision,
+    listed_at timestamp without time zone,
+    amount_cents integer,
+    currency character varying,
+    listing_text text,
+    data jsonb,
+    line integer,
+    "group" integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: stolen_bike_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stolen_bike_listings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stolen_bike_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stolen_bike_listings_id_seq OWNED BY public.stolen_bike_listings.id;
 
 
 --
@@ -2930,6 +3057,13 @@ ALTER TABLE ONLY public.bikes ALTER COLUMN id SET DEFAULT nextval('public.bikes_
 
 
 --
+-- Name: blog_content_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.blog_content_tags ALTER COLUMN id SET DEFAULT nextval('public.blog_content_tags_id_seq'::regclass);
+
+
+--
 -- Name: blogs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2962,6 +3096,13 @@ ALTER TABLE ONLY public.colors ALTER COLUMN id SET DEFAULT nextval('public.color
 --
 
 ALTER TABLE ONLY public.components ALTER COLUMN id SET DEFAULT nextval('public.components_id_seq'::regclass);
+
+
+--
+-- Name: content_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_tags ALTER COLUMN id SET DEFAULT nextval('public.content_tags_id_seq'::regclass);
 
 
 --
@@ -3081,6 +3222,13 @@ ALTER TABLE ONLY public.hot_sheets ALTER COLUMN id SET DEFAULT nextval('public.h
 --
 
 ALTER TABLE ONLY public.impound_claims ALTER COLUMN id SET DEFAULT nextval('public.impound_claims_id_seq'::regclass);
+
+
+--
+-- Name: impound_configurations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_configurations ALTER COLUMN id SET DEFAULT nextval('public.impound_configurations_id_seq'::regclass);
 
 
 --
@@ -3217,13 +3365,6 @@ ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: other_listings id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('public.other_listings_id_seq'::regclass);
-
-
---
 -- Name: ownerships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3277,6 +3418,13 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.states ALTER COLUMN id SET DEFAULT nextval('public.states_id_seq'::regclass);
+
+
+--
+-- Name: stolen_bike_listings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stolen_bike_listings ALTER COLUMN id SET DEFAULT nextval('public.stolen_bike_listings_id_seq'::regclass);
 
 
 --
@@ -3438,6 +3586,14 @@ ALTER TABLE ONLY public.bikes
 
 
 --
+-- Name: blog_content_tags blog_content_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.blog_content_tags
+    ADD CONSTRAINT blog_content_tags_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: blogs blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3475,6 +3631,14 @@ ALTER TABLE ONLY public.colors
 
 ALTER TABLE ONLY public.components
     ADD CONSTRAINT components_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: content_tags content_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_tags
+    ADD CONSTRAINT content_tags_pkey PRIMARY KEY (id);
 
 
 --
@@ -3611,6 +3775,14 @@ ALTER TABLE ONLY public.hot_sheets
 
 ALTER TABLE ONLY public.impound_claims
     ADD CONSTRAINT impound_claims_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: impound_configurations impound_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_configurations
+    ADD CONSTRAINT impound_configurations_pkey PRIMARY KEY (id);
 
 
 --
@@ -3766,14 +3938,6 @@ ALTER TABLE ONLY public.organizations
 
 
 --
--- Name: other_listings other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.other_listings
-    ADD CONSTRAINT other_listings_pkey PRIMARY KEY (id);
-
-
---
 -- Name: ownerships ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3843,6 +4007,14 @@ ALTER TABLE ONLY public.states
 
 ALTER TABLE ONLY public.stolen_records
     ADD CONSTRAINT stolen_bike_descriptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stolen_bike_listings stolen_bike_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stolen_bike_listings
+    ADD CONSTRAINT stolen_bike_listings_pkey PRIMARY KEY (id);
 
 
 --
@@ -4135,6 +4307,20 @@ CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree 
 
 
 --
+-- Name: index_blog_content_tags_on_blog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_blog_content_tags_on_blog_id ON public.blog_content_tags USING btree (blog_id);
+
+
+--
+-- Name: index_blog_content_tags_on_content_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_tags USING btree (content_tag_id);
+
+
+--
 -- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4342,6 +4528,13 @@ CREATE INDEX index_impound_claims_on_stolen_record_id ON public.impound_claims U
 --
 
 CREATE INDEX index_impound_claims_on_user_id ON public.impound_claims USING btree (user_id);
+
+
+--
+-- Name: index_impound_configurations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_configurations_on_organization_id ON public.impound_configurations USING btree (organization_id);
 
 
 --
@@ -4699,6 +4892,48 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 --
 
 CREATE INDEX index_states_on_country_id ON public.states USING btree (country_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_bike_id ON public.stolen_bike_listings USING btree (bike_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_initial_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_initial_listing_id ON public.stolen_bike_listings USING btree (initial_listing_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_manufacturer_id ON public.stolen_bike_listings USING btree (manufacturer_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_primary_frame_color_id ON public.stolen_bike_listings USING btree (primary_frame_color_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_secondary_frame_color_id ON public.stolen_bike_listings USING btree (secondary_frame_color_id);
+
+
+--
+-- Name: index_stolen_bike_listings_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.stolen_bike_listings USING btree (tertiary_frame_color_id);
 
 
 --
@@ -5379,6 +5614,20 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210120162658'),
 ('20210127173741'),
 ('20210127191226'),
-('20210129214432');
+('20210129214432'),
+('20210203164749'),
+('20210204184023'),
+('20210204191110'),
+('20210204223335'),
+('20210205191728'),
+('20210208203928'),
+('20210227162633'),
+('20210227163837'),
+('20210311160040'),
+('20210402214845'),
+('20210402214854'),
+('20210405200829'),
+('20210420161728'),
+('20210421174751');
 
 

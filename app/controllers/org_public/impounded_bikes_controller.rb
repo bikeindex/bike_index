@@ -41,7 +41,7 @@ module OrgPublic
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
-      a_impound_records = current_organization.impound_records
+      a_impound_records = current_organization.impound_records.active
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)

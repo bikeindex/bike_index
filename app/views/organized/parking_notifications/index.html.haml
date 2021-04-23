@@ -23,14 +23,42 @@
         %span.number 0
         total matches
         %em.maxNumberDisplayed.currently-hidden
-          \- first #{@per_page} loaded
+          \- first
+          %span#perPageCount
+          loaded
   .row.mt-2.mb-4
     .col-sm-12
       %ul.nav#parking-notification-nav-links
-        - status_display_hash = { all: { m: "All statuses"}, current: { m: "Current notifications" }, impounded: { m: "Impounded notifications", s: "impound notifications or notifications followed up by impounding" }, replaced: { m: "Replaced notifications", s: "notifications replaced by follow up notifications" }, retrieved: { m: "Retrieved notifications", s: "notifications retrieved by owner" } }
-        %li.nav-item.parking-notification-status-li
+        %li.nav-item
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            - current_status = status_display_hash[@search_status.to_sym]
+            - if @search_kind == "all"
+              All types
+            - else
+              #{@search_kind.humanize}s
+          .dropdown-menu
+            - (["all"] + ParkingNotification.kinds).each do |kind|
+              - kind_active = @search_kind == kind
+              - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_kind: (kind_active ? nil : kind))
+              - kind_display = kind == "all" ? "All types" : "#{kind.humanize}s"
+              = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item linkWithSortableSearchParams #{kind_active ? 'active' : ''}", "data-urlparams" => "search_kind,#{kind}"
+              - if kind == "all" # Add a divider after all
+                .dropdown-divider
+        %li.nav-item.parking-notification-status-li
+          :ruby
+            status_display_hash = {
+              current: {m: "Current notifications"},
+              resolved: {m: "Resolved notifications", s: "retrieved, impounded or otherwise resolved"},
+              all: {m: "All statuses"},
+              retrieved: {m: "Retrieved notifications", s: "notifications marked retrieved"},
+              replaced: {m: "Replaced notifications", s: "notifications replaced by another notification"},
+              impounded: {m: "Impounded notifications", s: "impound notifications"},
+              impounded_resolved: {m: "Impounded resolved", s: "impounded bikes which have been resolved"}
+            }
+            status_display_hash.except(*@unpermitted_statuses.map(&:to_sym))
+
+          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+            -# Fallback to status, in case there isn't a match (only happens if manually writing in other statuses right now)
+            - current_status = status_display_hash[@search_status.to_sym] || { m: @search_status }
             = current_status[:m]
             - if current_status[:s].present?
               %small.less-strong= current_status[:s]
@@ -45,20 +73,6 @@
                 - if display_hash[:s].present?
                   %small.less-strong= display_hash[:s]
               - if status == :all # Add a divider after all
-                .dropdown-divider
-        %li.nav-item
-          - search_kind = ParkingNotification.kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
-          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            = search_kind.humanize
-            - if search_kind == "all"
-              types
-          .dropdown-menu
-            - (["all"] + ParkingNotification.kinds).each do |kind|
-              - kind_active = params[:search_kind] == kind
-              - kind_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_kind: (kind_active ? nil : kind))
-              - kind_display = kind == "all" ? "All types" : "#{kind.humanize}"
-              = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item linkWithSortableSearchParams #{kind_active ? 'active' : ''}", "data-urlparams" => "search_kind,#{kind}"
-              - if kind == "all" # Add a divider after all
                 .dropdown-divider
         %li.nav-item
           %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
@@ -77,6 +91,7 @@
             - unregistered_not_active = @search_unregistered == "not_unregistered"
             - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
             = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_not_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
+
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
@@ -101,13 +116,10 @@
         = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
           :plain
             <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
-      = hidden_field_tag :stolenness, @stolenness
-      = hidden_field_tag :organization_id, passive_organization&.to_param
 
-      = hidden_field_tag :period, params[:period]
-      = hidden_field_tag :start_time, params[:start_time]
-      = hidden_field_tag :end_time, params[:end_time]
+      = render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search"}
       = hidden_field_tag :search_status, @search_status
+      = hidden_field_tag :search_kind, @search_kind
 
   .row.mt-4.mb-2
     .col-sm-6
@@ -141,7 +153,6 @@
 
 
   - # Form needs to wrap the table too
-
   = form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: current_organization) do |f|
     #sendRepeatNotifications.collapse
       -# similar form on parking notification show

@@ -17,3 +17,8 @@ $impounded-color: $stolen-color;
 .impounded-color {
   color: $impounded-color;
 }
+
+$unregistered-color: #f0ad4e; // text-warning color
+.unregistered-color {
+  color: $unregistered-color;
+}

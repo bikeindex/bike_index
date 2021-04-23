@@ -20,7 +20,7 @@ class BikeUpdator
   end
 
   def update_ownership
-    # Because this is a mess, managed independently in ImpoundUpdateBikeWorker
+    # Because this is a mess, managed independently in ProcessImpoundUpdatesWorker
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
@@ -97,9 +97,6 @@ class BikeUpdator
     impound_params = @bike_params.dig("bike", "impound_records_attributes")&.values&.reject(&:blank?)&.first
     impound_record = @bike.current_impound_record
     return unless impound_params.present? && impound_record.present?
-    # This is a gross hack
-    time = impound_params.slice("impounded_at", "timezone")
-    impound_record.impounded_at_with_timezone(time["impounded_at"], time["timezone"])
-    impound_record.update(impound_params.except("impounded_at", "timezone"))
+    impound_record.update(impound_params)
   end
 end

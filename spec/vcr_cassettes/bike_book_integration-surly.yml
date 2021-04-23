@@ -1,0 +1,77 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://bikebook.io/?frame_model=pugsley&manufacturer=surly&year=2013
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: 'OK '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, Authorization
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS
+      Access-Control-Request-Method:
+      - "*"
+      Content-Length:
+      - '2999'
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
+      Date:
+      - Thu, 22 Apr 2021 01:32:08 GMT
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"bike":{"frame_model":"Pugsley","manufacturer":"Surly","year":2013,"description":"Surly
+        Pugsley, Surly 4130 CroMoly steel. Main triangle double-butted. TIG-welded","paint_description":["Real
+        Blew","Apathetic Black"],"manufacturers_url":"http://surlybikes.com/bikes/pugsley/bike_specs","stock_photo_url":"https://bikebook.s3.amazonaws.com/uploads/Fr/5763/pugsley-blu-14_sv_930x390.jpg","stock_photo_small":"https://bikebook.s3.amazonaws.com/uploads/Fr/5763/medium_pugsley-blu-14_sv_930x390.jpg"},"components":[{"component_type":"fork","description":"Surly
+        Moonlander, 447mm axle to crown, tapered straight blade, 4130 CroMoly. 51mm
+        IS disc mount. 135mm-spaced dropouts. 17.5mm offset fork available after market","cgroup":"Frame
+        and fork"},{"component_type":"seatpost clamp","description":"Surly Stainless,
+        30.0mm (Surly stainless included)","cgroup":"Additional parts"},{"component_type":"crankset","description":"SRAM
+        X5 100mm 36/22,","cgroup":"Drivetrain and brakes"},{"component_type":"bottom
+        bracket","description":"100mm wide, standard English threading (1.37\u02dd
+        x 24t),","cgroup":"Drivetrain and brakes"},{"component_type":"derailleur","description":"Shimano
+        SLX FD-616-D, Direct Mount","front_or_rear":"front","cgroup":"Drivetrain and
+        brakes"},{"component_type":"derailleur","description":"Shimano M591 SGSL,","front_or_rear":"rear","cgroup":"Drivetrain
+        and brakes"},{"component_type":"cog/cassette/freewheel","description":"Shimano
+        CS-HG61, 9-speed 11\u201332t","cgroup":"Drivetrain and brakes"},{"component_type":"chain","description":"SRAM
+        PC-971,","cgroup":"Drivetrain and brakes"},{"component_type":"headset","description":"Cane
+        Creek 40,","cgroup":"Frame and fork"},{"component_type":"brake","description":"Avid
+        BB7, G2CS 160mm rotors","front_or_rear":"both","cgroup":"Drivetrain and brakes"},{"component_type":"brake
+        lever","description":"Avid FR-5,","front_or_rear":"both","cgroup":"Drivetrain
+        and brakes"},{"component_type":"shifter","description":"Microshift SL-T09,","front_or_rear":"both","cgroup":"Drivetrain
+        and brakes"},{"component_type":"stem","description":"HL, 31.8mm 4-bolt","cgroup":"Additional
+        parts"},{"component_type":"handlebar","description":"Salsa ProMoto 2, 11\u00b0
+        bend.","cgroup":"Additional parts"},{"component_type":"saddle","description":"Velo
+        VL2155,","cgroup":"Additional parts"},{"component_type":"seatpost","description":"Kalloy
+        SP-342 , 27.2 x 350mm","cgroup":"Additional parts"},{"component_type":"other","description":",
+        Surly toobs.","cgroup":"Additional parts"},{"component_type":"hub","description":"Surly
+        Ultra New,","front_or_rear":"front","cgroup":"Wheels"},{"component_type":"hub","description":"Shimano
+        529,","front_or_rear":"rear","cgroup":"Wheels"},{"component_type":"rim","description":"Surly
+        Marge Lite, Black","front_or_rear":"both","cgroup":"Wheels"},{"component_type":"spokes","description":"DT
+        Swiss Champion,","cgroup":"Wheels"},{"component_type":"tire","description":"Surly
+        Nate, 27tpi","front_or_rear":"both","cgroup":"Wheels"}]}'
+    http_version:
+  recorded_at: Thu, 22 Apr 2021 01:32:08 GMT
+recorded_with: VCR 5.0.0

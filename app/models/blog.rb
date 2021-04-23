@@ -1,12 +1,17 @@
 class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
   include Localizable
+  include PgSearch::Model
+
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
 
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
+  has_many :blog_content_tags, dependent: :destroy
+  has_many :content_tags, through: :blog_content_tags
   accepts_nested_attributes_for :listicles, allow_destroy: true
+  accepts_nested_attributes_for :blog_content_tags, allow_destroy: true
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
@@ -22,7 +27,6 @@ class Blog < ApplicationRecord
   scope :published, -> { where(published: true) }
   default_scope { order("published_at desc") }
 
-  include PgSearch::Model
   pg_search_scope :text_search, against: {title: "A", body: "B"}
 
   def self.kinds
@@ -41,10 +45,14 @@ class Blog < ApplicationRecord
 
   def self.friendly_find(str)
     return nil unless str.present?
-    return find(str) if integer_slug?(str)
+    return find_by_id(str) if integer_slug?(str)
     slug = slugify_title(str)
     find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
       find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
+  end
+
+  def self.theft_rings_id
+    324
   end
 
   def self.why_donate_slug
@@ -53,6 +61,26 @@ class Blog < ApplicationRecord
 
   def self.get_your_stolen_bike_back_slug
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
+  end
+
+  # TODO: make this match only if *all* tag ids present
+  def self.with_tag_ids(content_tag_ids)
+    content_tag_ids = Array(content_tag_ids)
+    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+      .distinct.references(:blog_content_tags)
+  end
+
+  def content_tag_names=(val)
+    val = val.is_a?(Array) ? val : val.split(",")
+    ctag_ids = val.map { |c| ContentTag.friendly_id_find(c) }.compact
+    blog_content_tags.where.not(content_tag_id: ctag_ids).each { |c| c.destroy }
+    blog_content_tag_ids = blog_content_tags.map(&:content_tag_id)
+    (ctag_ids - blog_content_tag_ids).each { |c| blog_content_tags.build(content_tag_id: c) }
+    blog_content_tags
+  end
+
+  def content_tag_names
+    content_tags.name_ordered.pluck(:name)
   end
 
   def to_param

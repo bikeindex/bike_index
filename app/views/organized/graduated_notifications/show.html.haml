@@ -18,17 +18,17 @@
 
         - if @graduated_notification.processed?
           %tr
-            %td Processed
+            %td Sent
             %td
               %span.convertTime.preciseTime
                 = l(@graduated_notification.processed_at, format: :convert_time)
         - else
           %tr
-            %td Will process
+            %td Will send
             %td
               %span.convertTime.preciseTime
                 = l(@graduated_notification.pending_period_ends_at, format: :convert_time)
-        - if @graduated_notification.marked_remaining?
+        - if @graduated_notification.processed?
           %tr
             %td Marked remaining
             %td
@@ -66,6 +66,18 @@
       sent:
     - else
       to send:
+  - mail_snippet = @graduated_notification.mail_snippet
+  - if @graduated_notification.processed_at.present? && mail_snippet.present? && @graduated_notification.processed_at < mail_snippet.updated_at
+    .row
+      .col-md-6.offset-md-3
+        .alert.alert-warning
+          %h5
+            %em= current_organization.name
+            = link_to "custom email content", edit_organization_email_path("graduated_notification", organization_id: current_organization.to_param)
+            has changed since this graduated notification was sent!
+          %span.text-danger This preview shows the current version of the custom email content,
+          not the version the user received
+
   .email-preview.parking-notification-email-preview
     <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
 - else

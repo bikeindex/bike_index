@@ -10,6 +10,7 @@ RSpec.describe BikesController, type: :controller do
   describe "index" do
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
+    let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :in_nyc) }
     let(:serial) { "1234567890" }
     let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles) }
     let(:ip_address) { "127.0.0.1" }
@@ -33,8 +34,17 @@ RSpec.describe BikesController, type: :controller do
           expect(flash).to_not be_present
           expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
           expect(assigns(:selected_query_items_options)).to eq([])
-          expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id])
+          expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
           expect(assigns(:page_id)).to eq "bikes_index"
+          # Test impounded
+          get :index, params: {stolenness: "found"}
+          expect(assigns(:interpreted_params)).to eq(stolenness: "found")
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
+          get :index, params: {stolenness: "impounded"}
+          expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
         end
       end
       context "query_items and serial search" do
@@ -59,7 +69,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "ip passed as parameter" do
@@ -69,7 +79,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: ip_query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "no location" do
@@ -79,7 +89,7 @@ RSpec.describe BikesController, type: :controller do
             get :index, params: ip_query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
-            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
           end
         end
         context "unknown location" do
@@ -91,6 +101,7 @@ RSpec.describe BikesController, type: :controller do
             expect(flash[:info]).to match(/location/)
             expect(query_params[:stolenness]).to eq "proximity"
             expect(assigns(:interpreted_params)[:stolenness]).to eq "stolen"
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
           end
         end
       end

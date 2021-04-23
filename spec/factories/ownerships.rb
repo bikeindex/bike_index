@@ -18,6 +18,7 @@ FactoryBot.define do
         organization { FactoryBot.create(:organization) }
         can_edit_claimed { true }
       end
+      creator { FactoryBot.create(:organization_member, organization: organization) }
       bike do
         FactoryBot.create(:creation_organization_bike,
           organization: organization,

@@ -1,0 +1,46 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://logo.clearbit.com/bbbbbbbbbbbbbbsafasds.net?size=400
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '1'
+      Connection:
+      - keep-alive
+      Date:
+      - Thu, 22 Apr 2021 01:32:33 GMT
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - envoy
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 c9cf34e325f403e993adb63735f5db29.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - LAX3-C4
+      X-Amz-Cf-Id:
+      - t0Qdhg7kCdtk3XWC2uPtnt4_s6sr4JgYGEO0FnaC40JQU4Q4AFzDsA==
+    body:
+      encoding: UTF-8
+      string: "\n"
+    http_version:
+  recorded_at: Thu, 22 Apr 2021 01:32:33 GMT
+recorded_with: VCR 5.0.0

@@ -13,6 +13,7 @@ class OrganizationFeature < ApplicationRecord
     reg_phone
     reg_address
   ].freeze
+  # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
     additional_registrations_information
     impound_bikes
@@ -29,12 +30,12 @@ class OrganizationFeature < ApplicationRecord
     graduated_notifications
     hot_sheet
     impound_bikes_locations
-    impound_features_2021
     passwordless_users
     regional_bike_counts
     claimed_ownerships
     credibility_badges
     show_bulk_import
+    show_bulk_import_impound_bikes
     show_multi_serial
     show_partial_registrations
     show_recoveries
@@ -53,6 +54,7 @@ class OrganizationFeature < ApplicationRecord
 
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
+  scope :name_ordered, -> { order(arel_table["name"].lower) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)

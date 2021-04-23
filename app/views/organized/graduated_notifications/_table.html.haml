@@ -16,9 +16,9 @@
         Created
     %th.small
       - if render_sortable
-        = sortable "processed_at"
+        = sortable "processed_at", "Sent"
       - else
-        Processed
+        Sent
     %th Bike(s)
     - unless skip_status
       %th

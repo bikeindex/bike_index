@@ -37,6 +37,7 @@ class ScheduledWorker < ApplicationWorker
 
   def self.should_enqueue?
     return false if enqueued?
+
     last_started.blank? || Time.parse(last_started) + frequency < Time.current
   end
 

@@ -1,4 +1,17 @@
 class CreationState < ApplicationRecord
+  ORIGIN_ENUM = {
+    web: 0,
+    embed: 1,
+    embed_extended: 2,
+    embed_partial: 3,
+    api_v1: 4,
+    api_v2: 5,
+    bulk_import_worker: 6,
+    organization_form: 7,
+    creator_unregistered_parking_notification: 8,
+    impound_import: 9
+  }.freeze
+
   belongs_to :bike
   belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization
   belongs_to :creator, class_name: "User"
@@ -6,6 +19,7 @@ class CreationState < ApplicationRecord
 
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
+  enum origin_enum: ORIGIN_ENUM
 
   before_validation :set_calculated_attributes
   after_create :create_bike_organization
@@ -13,9 +27,10 @@ class CreationState < ApplicationRecord
 
   attr_accessor :can_edit_claimed
 
-  # Probably should be switched to enum at some point
+  # TODO: switch to enum keys (and remove non-enum attribute)
+  # Also need to reconcile bike_status and origin creator_unregistered_parking_notification
   def self.origins
-    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification].freeze
+    %w[web embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker organization_form unregistered_parking_notification impound_import].freeze
   end
 
   def creation_description
@@ -33,6 +48,7 @@ class CreationState < ApplicationRecord
 
   def set_calculated_attributes
     self.origin = "web" unless self.class.origins.include?(origin)
+    self.origin_enum = origin == "unregistered_parking_notification" ? "creator_unregistered_parking_notification" : origin
     self.pos_kind = calculated_pos_kind
   end
 

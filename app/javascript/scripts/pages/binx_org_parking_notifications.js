@@ -86,10 +86,6 @@ export default class BinxAppOrgParkingNotifications {
         ? `<small class="convertTime">${record.resolved_at}</small>`
         : "";
     }
-    // TODO: remove this once there are no longer notifications missing resolved_at (see also parking_notification.rb#calculated_resolved_at)
-    if (record.resolved_at === null) {
-      return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="small">impounded</a>`;
-    }
     return `<a href="/o/${window.passiveOrganizationId}/impound_records/pkey-${record.impound_record_id}" class="convertTime small">${record.resolved_at}</a>`;
   }
 

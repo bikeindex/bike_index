@@ -72,6 +72,13 @@ RSpec.describe BikeDecorator do
     it "responds with nil" do
       expect(decorator.status_html).to be_blank
     end
+    context "unregistered parking notification" do
+      let(:status) { "unregistered_parking_notification" }
+      let(:target) { "<strong class=\"unregistered-color uppercase bike-status-html\">unregistered</strong>" }
+      it "responds with unregistered" do
+        expect(decorator.status_html).to eq target
+      end
+    end
     context "stolen" do
       let(:status) { "status_stolen" }
       let(:target) { "<strong class=\"stolen-color uppercase bike-status-html\">stolen</strong>" }

@@ -33,10 +33,12 @@ class BikesController < ApplicationController
       @stolen_record = @bike.current_stolen_record
     end
     if current_user.present? && BikeDisplayer.display_impound_claim?(@bike, current_user)
+      impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
       @contact_owner_open = params[:contact_owner].present?
-      @impound_claim = @bike.impound_claims_claimed.where(user_id: current_user.id).last
+      @impound_claim = impound_claims.unsubmitted.last
       @impound_claim ||= @bike.impound_claims_submitting.where(user_id: current_user.id).last
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
+      @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
@@ -57,7 +59,7 @@ class BikesController < ApplicationController
       @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
-    filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
+    filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: "bikes/pdf"
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
@@ -253,9 +255,10 @@ class BikesController < ApplicationController
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
-        elsif matching_notification.impounded?
+        elsif matching_notification.impounded? || matching_notification.impound_record_id.present?
           flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
-        elsif matching_notification.retrieved?
+        else
+          # It's probably marked retrieved - but it could be something else (status: resolved_otherwise)
           flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
@@ -441,8 +444,7 @@ class BikesController < ApplicationController
   end
 
   def permitted_bike_params
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible,
-      impound_records_attributes: %i[timezone impounded_at street country_id street city zipcode state_id])}
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

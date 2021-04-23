@@ -1,20 +1,23 @@
-development:
+default: &default
   adapter: postgresql
+  # manually set db_pool, separate from threads, because sidekiq
+  pool: <%= ENV.fetch("DB_POOL") { 20 } %>
+
+development:
+  <<: *default
   database: bikeindex_development
-  pool: 20
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  adapter: postgresql
+  <<: *default
   database: bikeindex_test<%= ENV["TEST_ENV_NUMBER"] %>
 
 staging:
-  adapter: postgresql
+  <<: *default
   database: bikeindex_staging
 
 production:
-  adapter: postgresql
+  <<: *default
   database: bikeindex
-  pool: 35

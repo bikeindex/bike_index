@@ -15,13 +15,17 @@
           = f.fields_for :impound_records do |irecord|
             - next unless irecord.object.current? # Because they may have multiple stolen records
 
-            %h3
             .form-group.row.unnested-field
               = irecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-              = irecord.label :impounded_at, "When did you find this bike?", class: 'form-well-label'
+              = irecord.label :impounded_at_with_timezone, "When did you find this bike?", class: 'form-well-label'
               .form-well-input
-                - irecord.object.impounded_at = TimeParser.round(irecord.object.impounded_at || Time.current)
-                = irecord.datetime_local_field :impounded_at, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
+                - impounded_at = TimeParser.round(irecord.object.impounded_at || Time.current)
+                = irecord.datetime_local_field :impounded_at_with_timezone, value: impounded_at, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
+
+            .form-group.row.unnested-field
+              = irecord.label :impounded_description, "Description", class: 'form-well-label'
+              .form-well-input
+                = irecord.text_area :impounded_description, rows: 3, class: 'form-control'
 
             = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
 

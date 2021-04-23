@@ -63,26 +63,28 @@ RSpec.describe BikeCreator do
     end
     context "se data" do
       it "adds se bike data if it exists" do
-        manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
-        color = FactoryBot.create(:color)
-        bike = {
-          serial_number: "Some serial",
-          description: "Input description",
-          manufacturer_id: manufacturer.id,
-          year: 2014,
-          frame_model: "Draft",
-          primary_frame_color_id: color.id
-        }
-        b_param = FactoryBot.create(:b_param, params: {bike: bike})
-        BikeCreator.new(b_param).send(:add_bike_book_data)
+        VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
+          manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
+          color = FactoryBot.create(:color)
+          bike = {
+            serial_number: "Some serial",
+            description: "Input description",
+            manufacturer_id: manufacturer.id,
+            year: 2014,
+            frame_model: "Draft",
+            primary_frame_color_id: color.id
+          }
+          b_param = FactoryBot.create(:b_param, params: {bike: bike})
+          BikeCreator.new(b_param).send(:add_bike_book_data)
 
-        b_param.reload
-        expect(b_param.params["components"].count).to be > 5
-        expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
-        expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
-        expect(b_param.bike["description"]).not_to eq("Input description")
-        expect(b_param.bike["serial_number"]).to eq("Some serial")
-        expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
+          b_param.reload
+          expect(b_param.params["components"].count).to be > 5
+          expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
+          expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
+          expect(b_param.bike["description"]).not_to eq("Input description")
+          expect(b_param.bike["serial_number"]).to eq("Some serial")
+          expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
+        end
       end
     end
   end
@@ -224,6 +226,36 @@ RSpec.describe BikeCreator do
         expect(instance).to receive(:find_or_build_bike).at_least(1).times.and_return(bike)
         expect(bike).to receive(:save).at_least(:once).and_return(true)
         instance.create_bike
+      end
+    end
+    context "organized" do
+      it "creates" do
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user)
+        manufacturer = FactoryBot.create(:manufacturer)
+        color = FactoryBot.create(:color)
+        wheel_size = FactoryBot.create(:wheel_size)
+        b_param = BParam.create(creator: user, params: {
+          bike: {
+            creation_organization_id: organization.id,
+            propulsion_type: "sail",
+            cycle_type: "stroller",
+            serial_number: "BIKE TOKENd",
+            manufacturer_id: manufacturer.id,
+            rear_tire_narrow: false,
+            rear_wheel_size_id: wheel_size.id,
+            primary_frame_color_id: color.id,
+            handlebar_type: "bmx",
+            owner_email: "stuff@stuff.com"
+          }
+        })
+        instance = subject.new(b_param)
+        expect { instance.create_bike }.to change(Bike, :count).by(1)
+        expect(b_param.skip_owner_email?).to be_falsey
+        bike = Bike.last
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.bike_organizations.count).to eq 1
+        expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
       end
     end
 
@@ -546,16 +578,6 @@ RSpec.describe BikeCreator do
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       subject.new(b_param).send("create_ownership", bike)
       expect(b_param.skip_owner_email?).to be_truthy
-    end
-  end
-
-  describe "add_other_listings" do
-    it "calls create stolen record" do
-      bike = FactoryBot.create(:bike)
-      urls = ["http://some_blog.com", "http://some_thing.com"]
-      allow(b_param).to receive(:params).and_return({bike: {other_listing_urls: urls}}.as_json)
-      subject.new(b_param).send("add_other_listings", bike)
-      expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
     end
   end
 

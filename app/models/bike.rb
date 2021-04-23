@@ -42,7 +42,7 @@ class Bike < ApplicationRecord
   has_many :stolen_notifications
   has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
-  has_many :other_listings, dependent: :destroy
+  has_many :stolen_bike_listings
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -50,7 +50,7 @@ class Bike < ApplicationRecord
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
-  has_many :duplicate_bikes, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
+  has_many :duplicate_bikes_including_self, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
   has_many :impound_records
   has_many :impound_claims_claimed, through: :impound_records, source: :impound_claims
@@ -69,7 +69,7 @@ class Bike < ApplicationRecord
 
   validates_presence_of :primary_frame_color_id
 
-  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
+  attr_accessor :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
     :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
@@ -85,12 +85,12 @@ class Bike < ApplicationRecord
   default_scope do
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
       .current
-      .order("listing_order desc")
+      .order(listing_order: :desc)
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status
   scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
-  scope :not_stolen, -> { where.not(status: "status_stolen") }
+  scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
   scope :abandoned_or_impounded, -> { where(status: %w[status_abandoned status_impounded]) }
@@ -103,6 +103,7 @@ class Bike < ApplicationRecord
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
+  scope :pos_not_lightspeed_ascend, -> { includes(:creation_states).where.not(creation_states: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
   scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
@@ -127,7 +128,8 @@ class Bike < ApplicationRecord
     end
 
     def status_humanized(str)
-      str.to_s&.gsub("status_", "")&.tr("_", " ")
+      status = str.to_s&.gsub("status_", "")&.tr("_", " ")
+      status == "unregistered parking notification" ? "unregistered" : status
     end
 
     def status_humanized_translated(str)
@@ -270,8 +272,14 @@ class Bike < ApplicationRecord
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
+  # Have to remove self from duplicate bike groups
+  def duplicate_bikes
+    duplicate_bikes_including_self.where.not(id: id)
+  end
+
   def calculated_listing_order
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
+    return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
     t = (updated_at || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
@@ -294,6 +302,13 @@ class Bike < ApplicationRecord
 
   def pos_kind
     creation_state&.pos_kind
+  end
+
+  # TODO: for impound CSV - this is a little bit of a stub, update
+  def created_by_notification_or_impounding?
+    return false if creation_state.blank?
+    %w[unregistered_parking_notification impound_import].include?(creation_state.origin) ||
+      creation_state.status == "status_impounded"
   end
 
   def pos?
@@ -372,11 +387,16 @@ class Bike < ApplicationRecord
 
   # Might be more sophisticated someday...
   def serial_hidden?
-    status_abandoned? || status_impounded?
+    status_impounded? || unregistered_parking_notification?
   end
 
-  def serial_display
-    return "Hidden" if serial_hidden?
+  def serial_display(u = nil)
+    if serial_hidden?
+      # show the serial to the user, even if authorization_requires_organization?
+      return "Hidden" unless authorized?(u) ||
+        u&.id.present? && u.id == user&.id ||
+        current_impound_record.present? && current_impound_record.authorized?(u)
+    end
     return serial_number.humanize if no_serial?
     serial_number
   end
@@ -465,9 +485,9 @@ class Bike < ApplicationRecord
 
   def authorized?(u)
     return false if u.blank?
-    # If there isn't a current impound record - or if it's impound by a user, not an organization
-    # Authorization is based on whether the user is the owner of the bike
-    if current_impound_record.blank? || current_impound_record.unorganized?
+    # authorization requires organization if impounded or marked abandoned by an organization
+    unless authorization_requires_organization?
+      # Since it doesn't require an organization, authorize by user
       return true if u == owner || claimable_by?(u)
     end
     authorized_by_organization?(u: u)
@@ -952,6 +972,7 @@ class Bike < ApplicationRecord
   def location_record_address_hash
     location_record = [
       current_parking_notification,
+      current_impound_record,
       creation_organization&.default_location,
       owner
     ].compact.find { |rec| rec.latitude.present? }
@@ -969,5 +990,10 @@ class Bike < ApplicationRecord
 
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
+  end
+
+  def authorization_requires_organization?
+    # If there is a current impound record
+    current_impound_record.present? && current_impound_record.organized?
   end
 end

@@ -44,9 +44,11 @@ RSpec.describe UsersController, type: :controller do
         context "with partner session" do
           it "actually sets it" do
             session[:partner] = "bikehub"
+            session[:company] = "Some BikeHub"
             get :new, params: {return_to: "/bikes/12?contact_owner=true"}
             expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
-            session[:partner] = "bikehub"
+            expect(session[:partner]).to eq "bikehub"
+            expect(session[:company]).to eq "Some BikeHub"
             expect(response).to render_template("layouts/application_bikehub")
           end
         end
@@ -193,12 +195,14 @@ RSpec.describe UsersController, type: :controller do
       context "with partner session" do
         it "renders parter sign in page" do
           session[:partner] = "bikehub"
+          session[:company] = "Some BikeHub"
           expect {
             post :create, params: {user: user_attributes}
           }.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
           expect(session[:partner]).to be_nil
+          expect(session[:company]).to be_nil
           user = User.order(:created_at).last
           expect(user.email).to eq(user_attributes[:email])
           expect(user.partner_sign_up).to eq "bikehub"

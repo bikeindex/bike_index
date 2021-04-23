@@ -1,0 +1,64 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://bikebook.io/?frame_model=draft&manufacturer=se&year=2014
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: 'OK '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, Authorization
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS
+      Access-Control-Request-Method:
+      - "*"
+      Content-Length:
+      - '1944'
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
+      Date:
+      - Thu, 22 Apr 2021 01:32:41 GMT
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"bike":{"frame_model":"Draft","manufacturer":"SE Bikes","year":2014,"description":"Urban
+        Single Speed Design, Butted Top Tube and Down Tube, Water Bottle & Fender
+        Mounts, Wide Tire Clearance","original_msrp":"$319.00","paint_description":["Copper","
+        Matte Black"],"manufacturers_url":"http://www.sebikes.com/bikes/lifestyle/urban-series/draft","rear_wheel_bsd":622,"rear_tire_narrow":"true","stock_photo_url":"https://bikebook.s3.amazonaws.com/uploads/Fr/9206/2-2014_SE_DRAFT_BLACK_SIDE.jpg","stock_photo_small":"https://bikebook.s3.amazonaws.com/uploads/Fr/9206/medium_2-2014_SE_DRAFT_BLACK_SIDE.jpg"},"components":[{"component_type":"fork","description":"SE
+        straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance","cgroup":"Frame
+        and fork"},{"component_type":"crankset","description":"SE Steel, Euro Cartridge
+        BB, 42T SE Bubble Chainwheel","cgroup":"Drivetrain and brakes"},{"component_type":"pedals","description":"SE
+        Resin Platform","cgroup":"Drivetrain and brakes"},{"component_type":"chain","description":"KMC
+        Z410A","cgroup":"Drivetrain and brakes"},{"component_type":"wheel","description":"SE
+        36H Hubs w/ High-profile Double-wall Rims, 16T Shimano Coaster Brake","front_or_rear":"both","cgroup":"Wheels"},{"component_type":"tire","description":"Vera
+        City Wide 700 x 28c","front_or_rear":"both","cgroup":"Wheels"},{"component_type":"headset","description":"Tange
+        1-1/8\" Threadless","cgroup":"Frame and fork"},{"component_type":"handlebar","description":"SE
+        23\" x 1.5\" Riser Bar","cgroup":"Additional parts"},{"component_type":"stem","description":"SE
+        Alloy, 25.4mm Clamp","cgroup":"Additional parts"},{"component_type":"grips/tape","description":"SE
+        Racing Mushroom Wing Grip w/ SE Rubber End Plugs","cgroup":"Additional parts"},{"component_type":"saddle","description":"SE
+        Classic w/ Bottle Opener","cgroup":"Additional parts"},{"component_type":"seatpost","description":"SE
+        Straight Post, 27.2mm","cgroup":"Additional parts"}]}'
+    http_version:
+  recorded_at: Thu, 22 Apr 2021 01:32:41 GMT
+recorded_with: VCR 5.0.0

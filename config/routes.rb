@@ -3,8 +3,6 @@
 require "soulheart/server"
 require "sidekiq/web"
 
-Sidekiq::Web.set :session_secret, ENV["SECRET_KEY_BASE"]
-
 Rails.application.routes.draw do
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -157,6 +155,7 @@ Rails.application.routes.draw do
   resources :bike_stickers, only: [:update]
   resources :locks, except: %(show index)
   resources :impound_claims, only: [:create, :update]
+  resources :review_impound_claims, only: [:show, :update]
 
   namespace :admin do
     root to: "dashboard#index", as: :root
@@ -190,7 +189,8 @@ Rails.application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
-      :ctypes, :parking_notifications, :impound_records, :graduated_notifications
+      :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
+      :content_tags, :impound_claims
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
@@ -290,6 +290,10 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv"
 
+  get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
+  get "theft-ring", to: redirect("theft-rings")
+  resources :stolen_bike_listings, only: [:index]
+
   resource :integrations, only: [:create]
   get "/auth/twitter/callback", to: "admin/twitter_accounts#create"
   get "/auth/:provider/callback", to: "integrations#create"
@@ -352,9 +356,9 @@ Rails.application.routes.draw do
     resource :manage, only: %i[show update destroy] do
       collection do
         get :locations
-        get :impounding
       end
     end
+    resource :manage_impounding
     resources :users, except: [:show]
   end
 

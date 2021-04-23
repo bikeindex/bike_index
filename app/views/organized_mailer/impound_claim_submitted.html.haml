@@ -1,15 +1,17 @@
+- claim_url = @impound_claim.organized? ? organization_impound_claim_url(@impound_claim.id, organization_id: @organization.id) : review_impound_claim_url(@impound_claim.id)
+
 %h2.uncap
-  Impounded claim submitted!
+  #{@impound_claim.claim_kind_humanized.titleize} submitted!
 
 %strong.mt-4
-  = link_to "View the claim", organization_impound_claim_url(@impound_claim.id, organization_id: @organization.id)
+  = link_to "View the claim", claim_url
 
 %table.table-list
   %tbody
     %tr
       %td Claim Created
       %td
-        = link_to email_time_display(@impound_claim.created_at), organization_impound_claim_url(@impound_claim.id, organization_id: @organization.id)
+        = link_to email_time_display(@impound_claim.created_at), claim_url
     %tr
       %td User
       %td
@@ -30,22 +32,28 @@
         - if @bike_submitting.present?
           = email_time_display(@bike_submitting.created_at)
 
-%h3.uncap.mt-4 Impounded bike:
+%h3.uncap.mt-4
+  - if @impound_claim.organized?
+    = @impound_claim.organization.short_name
+  - else
+    Your
+  #{@impound_claim.kind.titleize} #{@impound_claim.bike_type}:
 .row
   .col-md-6.mt-2
     %table.table-list
       %tbody
-        %tr
-          %td Impound ID
-          %td
-            %strong
-              = link_to @impound_record.display_id, organization_impound_record_url(@impound_record.display_id, organization_id: @organization.id)
+        - if @impound_claim.organized?
+          %tr
+            %td Impound ID
+            %td
+              %strong
+                = link_to @impound_record.display_id, organization_impound_record_url(@impound_record.display_id, organization_id: @organization.id)
         %tr
           %td Bike
           %td
             - if @bike_claimed.present?
               = link_to organized_bike_text(@bike_claimed), bike_url(@bike_claimed, organization_id: @organization.to_param)
         %tr
-          %td Impounded
+          %td #{@impound_claim.kind}
           %td
             = email_time_display(@impound_record.created_at)

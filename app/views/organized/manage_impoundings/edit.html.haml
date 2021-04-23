@@ -1,0 +1,75 @@
+.mb-4
+  %h1.uncap
+    = t(".impound_settings_html", org_name: @organization.name)
+
+= form_for @impound_configuration, { url: organization_manage_impounding_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
+
+  .form-group.row.mt-2.small-line-height
+    %label.org-form-label
+      Public search
+    .col-sm-4
+      .checkbox.mt-0
+        %label
+          = f.check_box :public_view
+          Publicly accessible impound page
+          %small.less-strong
+            if checked, #{link_to organization_impounded_bikes_path(organization_id: current_organization.to_param), organization_impounded_bikes_path(organization_id: current_organization.to_param)} will be accessible by everyone.
+            %em Serials are never displayed for impounded bikes, so they can be used for verification of ownership
+
+  - if @organization.enabled?("impound_bikes_locations")
+    .form-group.row.mt-2.small-line-height
+      %label.org-form-label Impound location
+      .col-sm-4
+        - if @organization.default_impound_location.present?
+          Bikes are impounded with locations
+          %br
+          The default location is
+          %strong
+            = @organization.default_impound_location.name
+          %small
+            = link_to "update location here", locations_organization_manage_path(organization_id: @organization.to_param)
+        - else
+          = link_to "Set impound locations", locations_organization_manage_path(organization_id: @organization.to_param)
+  .form-group.row.small-line-height
+    = f.label :email, "Impound email", class: 'org-form-label'
+    .col-sm-4
+      = f.email_field :email, placeholder: @organization.auto_user&.email, class: "form-control"
+      %span.below-input-help
+        Email address impound notifications (and claims, if enabled) will be sent from.
+        %em If blank, uses the default organization email
+
+  .form-group.row.mt-4.small-line-height
+    = f.label :display_id_prefix, class: 'org-form-label' do
+      ID prefix
+    .col-sm-4
+      .d-block.less-strong
+        The next impound record will have an ID of:
+        %code.strong
+          = @impound_configuration.calculated_display_id_next
+
+      = f.text_field :display_id_prefix, class: "form-control"
+      %span.below-input-help
+        If you change this field, the next impound record's ID will be
+        %code {prefix}1
+        %br
+        %em Use this to make IDs in Bike Index match an external system, or rotate every year.
+
+      .d-block
+        Previous prefixes:
+        %ul
+          %li no prefix
+          - @impound_configuration.previous_prefixes.each do |prefix|
+            %li
+              %code=prefix
+
+  .form-group.row.mt-4.small-line-height
+    .form-submit-button
+      = f.submit t(".save"), class: "btn btn-success btn-lg"
+
+  - if @organization.enabled?("show_bulk_import_impound_bikes")
+    .form-group.row.mt-4.pt-4.small-line-height
+      %label.org-form-label Bulk Import
+      .col-sm-4
+        %label
+          = link_to "Import impounded bikes", new_organization_bulk_import_path(organization_id: @organization.to_param, kind: "impounded")
+          %small.less-strong upload a CSV of impounded bikes

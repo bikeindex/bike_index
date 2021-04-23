@@ -53,6 +53,7 @@ class Organization < ApplicationRecord
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
+  has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -68,6 +69,7 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
 
   default_scope { order(:name) }
+  scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
@@ -196,7 +198,7 @@ class Organization < ApplicationRecord
 
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    enabled?("show_bulk_import") || ascend_pos?
+    enabled?("show_bulk_import") || ascend_pos? || enabled?("show_bulk_import_impound_bikes")
   end
 
   def show_multi_serial?
@@ -204,12 +206,12 @@ class Organization < ApplicationRecord
   end
 
   def public_impound_bikes?
-    enabled?("impound_bikes") && public_impound_bikes
+    enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
-  # Stub for now. Might actually just be public_impound_bikes?
+  # Stub for now, but it might be more sophisticated later
   def impound_claims?
-    enabled?("impound_features_2021")
+    public_impound_bikes?
   end
 
   def broken_pos?
@@ -234,6 +236,10 @@ class Organization < ApplicationRecord
 
   def suspended?
     is_suspended?
+  end
+
+  def fetch_impound_configuration
+    impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?
@@ -389,10 +395,7 @@ class Organization < ApplicationRecord
         .map { |name| name.strip.downcase.gsub(/\s/, "_") }
 
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
-    features.all? do |feature|
-      enabled_feature_slugs.include?(feature) ||
-        (ambassador? && feature == "unstolen_notifications")
-    end
+    features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end
 
   # Done multiple places, so consolidating. Might be worth optimizing
@@ -501,11 +504,20 @@ class Organization < ApplicationRecord
     if regional_parents.any?
       fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
     end
-    # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
-    if fslugs.include?("impound_bikes") && locations.impound_locations.any?
-      fslugs += ["impound_bikes_locations"]
+
+    if fslugs.include?("impound_bikes")
+      # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
+      fslugs += ["impound_bikes_locations"] if locations.impound_locations.any?
+
+      # Avoid loading impound_configuration on every request (since the menu needs to know)
+      # Add a special feature, not included in organization_features
+      fslugs += ["impound_bikes_public"] if impound_configuration&.public_view?
+      # Also - don't fetch to avoid creating impound_configurations all the time
     end
-    return fslugs unless parent_organization_id.present?
+
+    # Ambassador orgs get unstolen_notifications
+    fslugs += ["unstolen_notifications"] if ambassador?
+    return fslugs.uniq unless parent_organization_id.present?
     (fslugs + current_parent_invoices.map(&:child_enabled_feature_slugs).flatten).uniq
   end
 

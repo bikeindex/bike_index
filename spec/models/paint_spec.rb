@@ -16,13 +16,43 @@ RSpec.describe Paint, type: :model do
     end
   end
 
-  describe "assign_colors" do
-    before(:each) do
-      bi_colors = ["Black", "Blue", "Brown", "Green", "Orange", "Pink", "Purple", "Red", "Silver, Gray or Bare Metal", "Stickers tape or other cover-up", "Teal", "White", "Yellow or Gold"]
-      bi_colors.each do |col|
-        FactoryBot.create(:color, name: col)
-      end
+  it "has before_create_callback_method" do
+    expect(Paint._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:associate_colors)).to eq(true)
+  end
+
+  describe "paint_name_parser" do
+    it "returns black for black" do
+      expect(Paint.paint_name_parser("BLACK")).to eq "black"
+      expect(Paint.paint_name_parser("BLCK")).to eq "black"
+      expect(Paint.paint_name_parser("BLK")).to eq "black"
     end
+    it "returns whtie for white" do
+      expect(Paint.paint_name_parser("WHiTe")).to eq "white"
+      expect(Paint.paint_name_parser("whit")).to eq "white"
+      expect(Paint.paint_name_parser("wht")).to eq "white"
+    end
+    it "returns for shortened" do
+      expect(Paint.paint_name_parser("purpl")).to eq "purple"
+      expect(Paint.paint_name_parser("gren")).to eq "green"
+      expect(Paint.paint_name_parser("pnk")).to eq "pink"
+      expect(Paint.paint_name_parser("blu")).to eq "blue"
+      expect(Paint.paint_name_parser("gry")).to eq "silver"
+      expect(Paint.paint_name_parser("slvr")).to eq "silver"
+    end
+    it "returns without ish" do
+      expect(Paint.paint_name_parser("reddish")).to eq "red"
+      expect(Paint.paint_name_parser("redish")).to eq "red"
+      expect(Paint.paint_name_parser("bluish")).to eq "blue"
+      expect(Paint.paint_name_parser("blue-ish")).to eq "blue"
+      expect(Paint.paint_name_parser("pinkish")).to eq "pink"
+      expect(Paint.paint_name_parser("grayish")).to eq "silver"
+      expect(Paint.paint_name_parser("purpleish")).to eq "purple"
+    end
+  end
+
+  describe "assign_colors" do
+    before { Color::ALL_NAMES.each { |c| FactoryBot.create(:color, name: c) } }
+
     it "associates paint with reasonable colors" do
       paint = Paint.new(name: "burgandy/ivory with black stripes")
       paint.associate_colors
@@ -46,10 +76,6 @@ RSpec.describe Paint, type: :model do
       expect(paint.color.name.downcase).to eq("brown")
       expect(paint.secondary_color).to be_nil
       expect(paint.tertiary_color).to be_nil
-    end
-
-    it "has before_create_callback_method" do
-      expect(Paint._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:associate_colors)).to eq(true)
     end
   end
 end

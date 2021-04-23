@@ -1,0 +1,34 @@
+.row
+  .col-lg-10.col-sm-12
+    %h1 Content Tag
+  .col-lg-2.col-sm-12
+    = link_to "New tag", new_admin_content_tag_url, class: "btn btn-success float-right"
+
+%h4
+  #{matching_content_tags.count} total
+
+.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead.thead-light
+      %th.small
+        = sortable "created_at", "Added"
+      %th.small
+        = sortable "updated_at"
+      %th
+        = sortable "name"
+      %th
+        = sortable "priority"
+    %tbody
+      - @content_tags.each do |content_tag|
+        %tr
+          %td
+            %small.convertTime
+              = l content_tag.created_at, format: :convert_time
+          %td
+            %small.convertTime
+              = l content_tag.updated_at, format: :convert_time
+          %td
+            = link_to content_tag.name, edit_admin_content_tag_url(content_tag)
+          %td
+            %small
+              = content_tag.priority

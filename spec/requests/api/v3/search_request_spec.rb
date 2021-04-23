@@ -146,6 +146,15 @@ RSpec.describe "Search API V3", type: :request do
         expect(result["non"]).to eq 1
         expect(response.status).to eq(200)
       end
+      context "with colors" do
+        let!(:color) { FactoryBot.create(:color, name: "Purple") }
+        let(:target) { {non: 0, proximity: 0, stolen: 0} }
+        it "succeeds" do
+          get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
+          expect(json_result).to eq target.as_json
+          expect(response.status).to eq(200)
+        end
+      end
     end
   end
 end

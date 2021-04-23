@@ -186,4 +186,29 @@ RSpec.describe Blog, type: :model do
       expect(blog.feed_content).to eq(target)
     end
   end
+
+  describe "content_tag_names" do
+    let!(:blog1) { FactoryBot.create(:blog) }
+    let!(:content_tag1) { FactoryBot.create(:content_tag, name: "A tag") }
+    let!(:content_tag2) { FactoryBot.create(:content_tag, name: "b tag") }
+    let!(:blog2) { FactoryBot.create(:blog, content_tag_names: content_tag1.name) }
+    it "sets and returns" do
+      expect(blog1.reload.content_tag_names).to eq([])
+      blog1.update(content_tag_names: content_tag1.name.to_s)
+      expect(blog1.reload.content_tag_names).to eq([content_tag1.name])
+
+      expect(Blog.with_tag_ids(content_tag1.id).map(&:id)).to match_array([blog1.id, blog2.id])
+      blog1.update(content_tag_names: "#{content_tag2.name}, #{content_tag1.name}")
+      expect(blog1.reload.content_tags.pluck(:id)).to match_array([content_tag1.id, content_tag2.id])
+      blog1.reload
+      expect(blog1.content_tag_names).to eq([content_tag1.name, content_tag2.name])
+      # TODO: should be subtractive :/
+      # expect(Blog.with_tag_ids([content_tag1.id, content_tag2.id]).map(&:id)).to eq([blog1.id])
+
+      blog1.update(content_tag_names: [content_tag2.name])
+      expect(blog1.reload.content_tag_names).to eq([content_tag2.name])
+      expect(Blog.with_tag_ids([content_tag1.id]).map(&:id)).to eq([blog2.id])
+      expect(Blog.with_tag_ids([content_tag2.id]).map(&:id)).to eq([blog1.id])
+    end
+  end
 end

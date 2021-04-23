@@ -5,7 +5,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   include_context :request_spec_logged_in_as_organization_member
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike) }
+  let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
@@ -210,8 +210,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       context "with photo" do
+        # Bike claimed for this
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
         let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
         let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
+        let(:organization_user) { FactoryBot.create(:organization_member, organization: current_organization) }
         it "creates and adds photo" do
           FactoryBot.create(:state_new_york)
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
@@ -244,7 +247,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
           bike.reload
           expect(bike.status).to eq "status_abandoned"
-          expect(bike.serial_display).to eq "Hidden"
+          expect(bike.serial_hidden?).to be_falsey
+          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
+          expect(bike.user).to be_present # Verify that user is present
         end
       end
 
@@ -297,6 +303,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.location_from_address).to be_truthy
           expect(parking_notification.delivery_status).to eq("email_success")
           expect(parking_notification.impound_record).to be_present
+          expect(parking_notification.impound_record.unregistered_bike).to be_falsey
           expect(parking_notification.status).to eq "impounded"
           expect(parking_notification.associated_notifications.pluck(:id)).to eq([parking_notification_initial.id])
           expect(parking_notification.organization).to eq current_organization
@@ -304,7 +311,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.image_processing).to be_falsey
 
           parking_notification_initial.reload
-          expect(parking_notification_initial.status).to eq "impounded"
+          expect(parking_notification_initial.status).to eq "replaced"
           expect(parking_notification_initial.impound_record_id).to eq parking_notification.impound_record_id
           expect(parking_notification_initial.resolved_at).to be_within(5).of parking_notification.impound_record.created_at
 
@@ -552,20 +559,20 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         parking_notification_initial.reload
         parking_notification2.reload
 
-        expect(parking_notification_initial.current?).to be_falsey
-        expect(parking_notification_initial.impounded?).to be_truthy
+        expect(parking_notification_initial.status).to eq "replaced"
         expect(parking_notification_initial.impound_record_id).to be_present
         expect(parking_notification_initial.repeat_records.count).to eq 1
+        expect(parking_notification_initial.resolved_at).to be_present
         initial_impound_notification = parking_notification_initial.repeat_records.impound_notification.first
         expect(initial_impound_notification.delivery_status).to eq "email_success"
         expect(initial_impound_notification.retrieval_link_token).to be_blank
         expect(initial_impound_notification.user).to eq current_user
         expect(parking_notification_initial.to_coordinates).to eq(initial_impound_notification.to_coordinates)
 
-        expect(parking_notification2.current?).to be_falsey
-        expect(parking_notification2.impounded?).to be_truthy
+        expect(parking_notification2.status).to eq "replaced"
         expect(parking_notification2.impound_record_id).to be_present
         expect(parking_notification2.repeat_records.count).to eq 1
+        expect(parking_notification2.resolved_at).to be_present
         impound_notification2 = parking_notification2.repeat_records.impound_notification.first
         expect(impound_notification2.delivery_status).to eq "email_success"
         expect(impound_notification2.retrieval_link_token).to be_blank

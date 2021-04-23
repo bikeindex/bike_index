@@ -83,6 +83,19 @@ module Geocodeable
     !without_location?
   end
 
+  # stolen_record and impound_record
+  def latitude_public
+    return nil if latitude.blank?
+    return latitude unless defined?(show_address)
+    show_address ? latitude : latitude.round(2)
+  end
+
+  def longitude_public
+    return nil if longitude.blank?
+    return longitude unless defined?(show_address)
+    show_address ? longitude : longitude.round(2)
+  end
+
   # Should the receiving object be geocoded?
   #
   # By default:

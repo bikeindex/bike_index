@@ -26,14 +26,23 @@
         .sign-in-up-or
           %h3= t(".or")
         .main-form
-          %h3.sign-in-up-main-form-header
+          - company = session[:company] if sign_in_partner.present? && session[:company].present?
+          %h3.sign-in-up-main-form-header{ class: (company.present? ? "mb-1" : "") }
             %small
               - if sign_in_partner.present?
                 = t(".no_bike_index_account")
               - else
                 = t(".dont_have_an_account")
               = link_to t(".sign_up"), new_user_path(partner: sign_in_partner, email: params[:email])
-            = t(".log_in")
+            - if company.present?
+              - image_path = company.match?(/metro/i) ? "bikehub/metro_logo.png" : "bikehub/bikehub_logo_nosubtitle.png"
+              = image_tag image_path, alt: "", class: "company-logo"
+              = t(".log_in")
+              %span.company-text.uncap
+                for
+                %em= company
+            - else
+              = t(".log_in")
 
           = form_for :session, url: session_url(params.permit(:return_to)) do |f|
             - if sign_in_partner

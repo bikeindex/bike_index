@@ -1,20 +1,19 @@
 = content_for :header do
   %link{rel: :canonical, href: canonical_url(@blog) }
-  - if @blog.present? && @blog.secondary_title.present? # This is gross, but whatever
+  - if @blog&.secondary_title.present? # This is gross, but whatever
     <meta name="title" content="#{@blog.secondary_title}">
 
-#news_display
-  .blog-header
-    %h1.global-title
-      = @blog.title
+.blog-header
+  %h1.global-title
+    = @blog.title
 
-    %article.blogger-info
-      %h4.pub-date
-        updated
-        - if @blog.published_at > Time.current - 1.week
-          = l(@blog.published_at, format: :standard_display)
-        - else
-          = l(@blog.published_at, format: :no_day_with_year)
+  %article.blogger-info
+    %h4.pub-date
+      updated
+      - if @blog.published_at > Time.current - 1.week
+        = l(@blog.published_at, format: :standard_display)
+      - else
+        = l(@blog.published_at, format: :no_day_with_year)
 
 - if @blog.is_listicle
   - @blog.listicles.each_with_index do |list_item, i|

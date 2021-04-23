@@ -13,14 +13,19 @@ class BikeCreator
       coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
       timezone date_stolen receive_notifications phone creator creator_id image
       components_attributes b_param_id embeded embeded_extended example hidden organization_affiliation
-      stock_photo_url pdf send_email skip_email other_listing_urls listing_order approved_stolen
+      stock_photo_url pdf send_email skip_email listing_order approved_stolen
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
+        impound_records_attributes: permitted_impound_attrs,
         components_attributes: %i[id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
           manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
       ]
     ).freeze
+  end
+
+  def self.permitted_impound_attrs
+    %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
   end
 
   def initialize(b_param = nil, location: nil)
@@ -34,7 +39,8 @@ class BikeCreator
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(@b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(@b_param.impound_attrs) if bike.status_impounded?
-    bike = verify(bike)
+    bike = check_organization(bike)
+    bike = check_example(bike)
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
     bike = add_required_attributes(bike)
     add_front_wheel_size(bike)
@@ -71,7 +77,7 @@ class BikeCreator
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,
-      can_edit_claimed: @b_param.unregistered_parking_notification?,
+      can_edit_claimed: @bike.creation_organization_id.present?,
       organization_id: @bike.creation_organization_id
     }
   end
@@ -145,7 +151,6 @@ class BikeCreator
     if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
-
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
         bike_sticker&.claim(user: @bike.creator, bike: @bike.id, organization: @bike.creation_organization)
@@ -197,12 +202,6 @@ class BikeCreator
     attrs
   end
 
-  # Previous BikeCreatorVerifier
-  def verify(bike)
-    bike = check_organization(bike)
-    check_example(bike)
-  end
-
   # previously BikeCreatorOrganizer
   def check_organization(bike)
     organization_id = @b_param.params.dig("creation_organization_id").presence ||
@@ -248,7 +247,6 @@ class BikeCreator
       StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
       attach_photo(bike)
       attach_photos(bike)
-      add_other_listings(bike)
       bike.reload.save
     rescue => e
       bike.errors.add(:association_error, e.message)
@@ -271,7 +269,7 @@ class BikeCreator
   end
 
   def create_impound_record(b_param, bike)
-    impound_attrs = b_param.impound_attrs.slice("street", "city", "state_id", "zipcode", "country_id", "impounded_at")
+    impound_attrs = b_param.impound_attrs.slice(*self.class.permitted_impound_attrs)
     bike.build_new_impound_record(impound_attrs).save
   end
 
@@ -289,11 +287,5 @@ class BikeCreator
     return nil unless @b_param.params["photos"].present?
     photos = @b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
-  end
-
-  def add_other_listings(bike)
-    return nil unless @b_param.params["bike"]["other_listing_urls"].present?
-    urls = @b_param.params["bike"]["other_listing_urls"]
-    urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 end

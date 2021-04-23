@@ -49,7 +49,7 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to(please_confirm_email_users_path) && return
     else
-      force_sign_up = params[:unauthenticated_redirect] == "sign_up"
+      force_sign_up = params[:unauthenticated_redirect] == "sign_up" # other option is sign_in
       unless force_sign_up # Force signup doesn't show a flash message
         flash[flash_type] = translation(
           translation_key,

@@ -88,9 +88,13 @@
       = f.label :parent_organization_id do
         Parent organization
         %small.less-strong
-          must have "Child Organizations" enabled
+          %strong.text-danger (probably) do not add parents!
+          Parents must be part of the same organization
+
       = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
-      %em.small To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization
+      %small
+        %strong Use the "regional" feature instead.
+        %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
   .col-md-6
     - if display_dev_info?
       .mt-4.only-dev-visible.mb-4

@@ -177,14 +177,6 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  def latitude_public
-    show_address ? latitude : latitude.round(2)
-  end
-
-  def longitude_public
-    show_address ? longitude : longitude.round(2)
-  end
-
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
@@ -304,7 +296,7 @@ class StolenRecord < ApplicationRecord
     if new_image.valid?
       new_image
     else
-      update(alert_image: nil)
+      update(alert_image: nil) if alert_image.id.present?
       nil
     end
   end
@@ -340,7 +332,7 @@ class StolenRecord < ApplicationRecord
     self.date_stolen ||= Time.current
     year = date_stolen.year
     if date_stolen.year < (Time.current - 100.years).year
-      decade = year.to_s[-2..-1].chars.join("")
+      decade = year.to_s[-2..].chars.join("")
       corrected = date_stolen.change(year: "20#{decade}".to_i)
       self.date_stolen = corrected
     end

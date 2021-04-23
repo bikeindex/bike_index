@@ -37,7 +37,7 @@
                         = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
                       #{bike.frame_model}
                     %ul.attr-list
-                      = attr_list_item(bike.serial_display, t(".serial"))
+                      = attr_list_item(bike.serial_display(current_user), t(".serial"))
                       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
                         = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), t('.date_stolen'))
@@ -128,5 +128,6 @@
                 %p
                   = t(".want_to_sell_your_bikes")
                   = link_to t(".list_a_bike_on_bikefair"), "https://bikefair.org/auth/bikeindex"
-
-= render "/shared/donation_modal"
+-# Cache this render callout to avoid allocations
+- cache("donation_modal") do
+  = render "/shared/donation_modal"
