@@ -73,6 +73,9 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  # Lograge is what we use in production, it makes requests create one log line, rather than the multitude the create by default
+  # Useful to turn off primarily to monitor caching
+  # Run rails dev:lograge to toggle lograge. It's enabled by default
   unless Rails.root.join("tmp", "non-lograge-dev.txt").exist?
     config.lograge.enabled = true
     config.log_level = :debug
