@@ -52,7 +52,7 @@
 
   = form_tag payments_path, stripe_form_hash do
     = hidden_field_tag :stripe_token
-    = hidden_field_tag :stripe_amountnnnn
+    = hidden_field_tag :stripe_amount
     = hidden_field_tag :stripe_currency, default_currency
     = hidden_field_tag :stripe_email
     = hidden_field_tag :is_payment, is_payment
