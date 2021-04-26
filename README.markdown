@@ -20,7 +20,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of the following dependencies that Bike Index uses._
 
-- [Ruby 2.5](http://www.ruby-lang.org/en/)
+- [Ruby 2.7](http://www.ruby-lang.org/en/)
 
 - [Rails 5.2](http://rubyonrails.org/)
 
