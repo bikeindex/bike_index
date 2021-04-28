@@ -29,7 +29,7 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
-  config.cache_store = :dalli_store, {namespace: Bikeindex, expires_in: 0, compress: true}
+  config.cache_store = :mem_cache_store, {namespace: Bikeindex, expires_in: 0, compress: true}
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.

@@ -18,7 +18,7 @@ Rails.application.configure do
   # Run rails dev:cache to toggle caching.
   if Rails.root.join("tmp", "caching-dev.txt").exist?
     config.action_controller.perform_caching = true
-    config.cache_store = :dalli_store, {
+    config.cache_store = :mem_cache_store, {
       namespace: Bikeindex,
       expires_in: 0,
       compress: true
