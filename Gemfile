@@ -156,6 +156,9 @@ group :development, :test do
   gem "dotenv-rails"
   gem "foreman"
   gem "jazz_fingers"
+  # Required by jazz_fingers - it needs a new version: github.com/pry/pry-coolline/issues/22
+  # fixes issue https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
+  gem "pry-coolline", github: "pry/pry-coolline"
   gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"
