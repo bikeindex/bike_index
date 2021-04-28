@@ -2,7 +2,7 @@ class FetchProject529BikesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency
-    24.hours
+    23.5.hours
   end
 
   def perform(page = 1)

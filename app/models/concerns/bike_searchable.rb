@@ -191,8 +191,7 @@ module BikeSearchable
         # Note: does not include impounded
         status_with_owner
       when "proximity"
-        # Note: does not include impounded
-        status_stolen.within_bounding_box(interpreted_params[:bounding_box])
+        stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box])
       else
         stolen_or_impounded
       end

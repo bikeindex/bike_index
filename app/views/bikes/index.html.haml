@@ -55,7 +55,7 @@
     .col-md-12
       - if @bikes.present?
         %ul.bike-boxes
-          = render partial: 'bikes/bike', collection: @bikes, as: :bike
+          = render partial: 'bikes/bike', collection: @bikes, cached: true
         .row.mt-4
           .col-md-8
             .paginate-container.paginate-container-bottom
@@ -75,4 +75,6 @@
 
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
-= render "/shared/donation_modal"
+-# Cache this render callout to avoid allocations
+- cache("donation_modal1") do
+  = render partial: "/shared/donation_modal"

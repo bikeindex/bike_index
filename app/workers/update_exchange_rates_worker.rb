@@ -5,7 +5,7 @@ class UpdateExchangeRatesWorker < ScheduledWorker
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
-    1.day
+    24.1.hours
   end
 
   def perform

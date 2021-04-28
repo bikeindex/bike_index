@@ -1,3 +1,4 @@
+# ONLY created in BikeCreator in production
 class CreationState < ApplicationRecord
   ORIGIN_ENUM = {
     web: 0,
@@ -48,8 +49,16 @@ class CreationState < ApplicationRecord
 
   def set_calculated_attributes
     self.origin = "web" unless self.class.origins.include?(origin)
-    self.origin_enum = origin == "unregistered_parking_notification" ? "creator_unregistered_parking_notification" : origin
-    self.pos_kind = calculated_pos_kind
+    self.status ||= bike&.status
+    self.origin_enum ||= if status == "unregistered_parking_notification" || origin == "unregistered_parking_notification"
+      "creator_unregistered_parking_notification"
+    else
+      origin
+    end
+    self.pos_kind ||= calculated_pos_kind
+    # Hack, only set on create. TODO: should be passed from pos integration
+    # currently, lightspeed is using API v1, so that's where this needs to come from
+    self.is_new = pos_kind != "no_pos" if id.blank?
   end
 
   def create_bike_organization
@@ -67,6 +76,12 @@ class CreationState < ApplicationRecord
     b = Bike.unscoped.where(id: bike_id).first
     b.update_attribute(:creation_state_id, id) if b.present? && b&.creation_state_id != id
     true
+  end
+
+  # TODO: added in #1879, but turns out it hasn't been happening for a while
+  # - last duplicate occurred in > 12 months ago - so after removing them, check if still a problem, probably can remove method
+  def duplicates
+    self.class.where(bike_id: bike_id).where("id > ?", id)
   end
 
   private

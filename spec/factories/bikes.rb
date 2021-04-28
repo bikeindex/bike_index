@@ -67,7 +67,6 @@ FactoryBot.define do
       end
     end
 
-    factory :abandoned_bike, traits: [:impounded]
     factory :impounded_bike, traits: [:impounded]
 
     # THIS FACTORY SHOULD NEVER BE USED, except in other factories - there needs to be a stolen record created in addition to this.

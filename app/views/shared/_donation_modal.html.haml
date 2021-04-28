@@ -1,3 +1,4 @@
+-# NOTE: rendered from inside a cached wrapper. Make sure to break that if changing
 #donationModal.modal.fade
   .modal-dialog{ role: "document" }
     .modal-content.donate-block
@@ -9,4 +10,4 @@
         %h2.modal-title.uncap
           = t(".donation_header")
         %hr
-        = render partial: "/shared/donation_form", locals: {kind: "modal"}
+        = render partial: "/shared/donation_form", locals: {kind: "modal", is_cached: true}

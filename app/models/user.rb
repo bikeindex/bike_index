@@ -265,13 +265,13 @@ class User < ApplicationRecord
 
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).present?
+    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).any?
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).present?
+    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).any?
     superuser? && !no_superuser_override
   end
 
@@ -319,7 +319,7 @@ class User < ApplicationRecord
 
   # Just check a couple, so we don't move too slowly
   def rough_stolen_bikes
-    rough_approx_bikes.stolen.limit(10)
+    rough_approx_bikes.status_stolen.limit(10)
   end
 
   def unauthorized_organization_update_bike_sticker_ids

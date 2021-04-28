@@ -112,6 +112,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(creation_state.creator).to eq created_bike.creator
         expect(creation_state.origin).to eq "api_v1"
         expect(creation_state.pos_kind).to eq "lightspeed_pos"
+        expect(creation_state.is_new).to be_truthy
       end
 
       it "creates a bike and does not duplicate" do

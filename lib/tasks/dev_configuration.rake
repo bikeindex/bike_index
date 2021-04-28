@@ -17,7 +17,7 @@ class RakeDevConfiguration
         puts "Development mode is now being cached."
       end
 
-      FileUtils.touch "tmp/restart.txt"
+      FileUtils.touch "tmp/restart.txt" # Might not do anything right now, but whatever
     end
 
     def toggle_letter_opener
@@ -32,7 +32,22 @@ class RakeDevConfiguration
         puts "letter_opener is disabled."
       end
 
-      FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
+      FileUtils.touch "tmp/restart.txt"
+    end
+
+    def toggle_lograge
+      file = "tmp/non-lograge-dev.txt"
+      FileUtils.mkdir_p("tmp")
+
+      if File.exist?(file)
+        delete_toggle_file(file)
+        puts "Logging using lograge"
+      else
+        create_toggle_file(file)
+        puts "Logging using Rails logger (not lograge)"
+      end
+
+      FileUtils.touch "tmp/restart.txt"
     end
 
     private
@@ -56,5 +71,10 @@ namespace :dev do
   desc "Toggle letter_opener gem, which automatically opens sent emails in a browser window"
   task letter_opener: :environment do
     RakeDevConfiguration.toggle_letter_opener
+  end
+
+  desc "Toggle lograge logging in development"
+  task lograge: :environment do
+    RakeDevConfiguration.toggle_lograge
   end
 end

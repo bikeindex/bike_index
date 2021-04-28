@@ -149,6 +149,7 @@ class BikeCreator
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
+      # Only place creation_state should be created (except in testing)
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker.present? && @bike.creation_organization.present?

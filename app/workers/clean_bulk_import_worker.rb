@@ -2,7 +2,7 @@ class CleanBulkImportWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency
-    24.hours
+    25.hours
   end
 
   def self.clean_before

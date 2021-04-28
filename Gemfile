@@ -8,16 +8,21 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 # Update CircleCI config and Dockerfile if Ruby version is bumped
 ruby "2.7.3"
 gem "rack", "2.0.8"
-gem "rails", "~> 5.2.4"
+gem "rails", "~> 5.2"
 
+gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg", "~> 1.0" # Postgres
+gem "paranoia"
+gem "pg_search"
 
 # Speed
 gem "fast_blank", "~> 1.0"
 gem "dalli" # memcached client
 gem "active_model_serializers", "~> 0.9.3" # Use active model serializers to serialize JSON.
+gem "oj" # optimized json
+gem "multi_json" # TODO: use this more
 
 # Feature flagging
 gem "flipper"
@@ -37,21 +42,15 @@ gem "sidekiq"
 gem "sidekiq-failures"
 gem "soulheart"
 
-gem "carrierwave", "~> 0.11.2"
-gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
 gem "faraday_middleware"
-gem "fog-aws"
 gem "geocoder"
-gem "hamlit"
-gem "high_voltage"
+gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"
-gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
 gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
-gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails", "~> 1.11"
 gem "nokogiri", ">= 1.10.4"
 gem "omniauth", "~> 1.6"
@@ -59,25 +58,25 @@ gem "omniauth-facebook"
 gem "omniauth-globalid"
 gem "omniauth-strava"
 gem "omniauth-twitter"
-gem "paranoia"
-gem "pg_search"
-gem "puma"
-gem "rack-contrib"
-gem "rmagick"
-gem "rqrcode", "0.10.1"
-gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3"
 gem "sitemap_generator", "~> 6"
-gem "stripe", "~> 3.3.2"
 
 # Making other files
+gem "carrierwave", "~> 0.11.2" # File uploader
+gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
+gem "rmagick" # Images
+gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
+gem "rqrcode", "0.10.1" # QR Codes
+gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more
 
 # API wrappers
 gem "simple_spark" # Sparkpost gem - we use it to send newsletters
 gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
+gem "stripe", "~> 3.3.2" # Payments
+gem "fog-aws" # Aws used with carrierwave for S3 to store images
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
@@ -89,7 +88,7 @@ gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_inde
 gem "wine_bouncer"
 
 # Secure things
-gem "rack-throttle"
+gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
@@ -156,7 +155,10 @@ group :development, :test do
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"
-  gem "jazz_fingers"
+  # Commented out because jazz_fingers relies on pry-coolline, which currently errors on load
+  # the gem version hasn't been updated in a long time github.com/pry/pry-coolline/issues/22
+  # https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
+  # gem "jazz_fingers"
   gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"

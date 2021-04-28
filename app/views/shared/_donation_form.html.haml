@@ -1,3 +1,4 @@
+- is_cached ||= false
 - initial_amount ||= nil
 - is_payment ||= false
 - kind ||= "page"
@@ -45,8 +46,9 @@
   <script src="https://checkout.stripe.com/checkout.js"></script>
   - payment_type = is_payment ? 'Pay' : 'Donate'
   - description = is_payment ? t(".payment_to_bike_index") : t(".donate_to_bike_index")
-
-  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: current_user&.email, type: payment_type, currency: default_currency, description: description } }
+  -# If this is rendering from cache, don't include email because it breaks things
+  - email = is_cached ? nil : current_user&.email
+  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: email, type: payment_type, currency: default_currency, description: description } }
 
   = form_tag payments_path, stripe_form_hash do
     = hidden_field_tag :stripe_token

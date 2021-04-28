@@ -4,6 +4,7 @@ class ExchangeRateApiClient
   attr_accessor :base_iso, :base_url, :cache_key
 
   BASE_URL = ENV.fetch("EXCHANGE_RATE_API_BASE_URL", "https://api.exchangeratesapi.io")
+  API_KEY = ENV["EXCHANGE_RATE_API_KEY"]
 
   def initialize(base_iso = "USD")
     self.base_iso = base_iso
@@ -14,7 +15,7 @@ class ExchangeRateApiClient
   def latest
     Rails.cache.fetch(cache_key, expires_in: 24.hours) do
       resp = conn.get("latest") { |req|
-        req.params = {"base" => base_iso}
+        req.params = {"base" => base_iso, :access_key => API_KEY}
       }
 
       unless resp.status == 200 && resp.body.is_a?(Hash)

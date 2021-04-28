@@ -8,7 +8,7 @@
 .organized-page-header
   %h1
     Impound Record
-    - if @bike.present? && @bike.created_by_parking_notification
+    - if @bike.present? && @bike.creator_unregistered_parking_notification?
       %small.text-warning
         for
         %em

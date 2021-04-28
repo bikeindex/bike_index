@@ -8,7 +8,6 @@ class Bike < ApplicationRecord
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
-  # For now, prefixed with status_ so it doesn't interfere with existing attrs
   STATUS_ENUM = {
     status_with_owner: 0,
     status_stolen: 1,
@@ -88,8 +87,6 @@ class Bike < ApplicationRecord
       .order(listing_order: :desc)
   end
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
-  scope :stolen, -> { where(status: "status_stolen") } # TODO after #1875: - remove this scope and replace with status
-  scope :abandoned, -> { where(status: "status_abandoned") } # TODO after #1875: - remove this scope and replace with status
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -190,8 +187,7 @@ class Bike < ApplicationRecord
     def possibly_found
       unscoped
         .current
-        .stolen
-        .not_abandoned_or_impounded
+        .status_stolen
         .where(serial_normalized: abandoned_or_impounded.select(:serial_normalized))
     end
 
@@ -259,7 +255,7 @@ class Bike < ApplicationRecord
       return none if location.values.any?(&:blank?)
 
       unscoped
-        .stolen
+        .status_stolen
         .current
         .with_known_serial
         .includes(:current_stolen_record)
@@ -302,6 +298,10 @@ class Bike < ApplicationRecord
 
   def pos_kind
     creation_state&.pos_kind
+  end
+
+  def creator_unregistered_parking_notification?
+    creation_state&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update
@@ -870,14 +870,6 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     set_location_info
     self.listing_order = calculated_listing_order
-    # Quick hack to store the fact that it was creation for parking notification
-    if unregistered_parking_notification?
-      self.created_by_parking_notification = true
-      # TODO: Switch to using creation_state, rather than this boolean, ASAP
-      if creation_state.present? && creation_state.origin != "unregistered_parking_notification"
-        creation_state.update(origin: "unregistered_parking_notification")
-      end
-    end
     self.status = calculated_status unless skip_status_update
     clean_frame_size
     set_mnfg_name
