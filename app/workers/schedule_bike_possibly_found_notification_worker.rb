@@ -2,7 +2,7 @@ class ScheduleBikePossiblyFoundNotificationWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency
-    24.hours
+    23.hours
   end
 
   def perform

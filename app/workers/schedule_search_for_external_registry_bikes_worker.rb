@@ -2,7 +2,7 @@ class ScheduleSearchForExternalRegistryBikesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency
-    24.hours
+    22.hours
   end
 
   def perform
