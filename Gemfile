@@ -19,7 +19,6 @@ gem "pg_search"
 
 # Speed
 gem "fast_blank", "~> 1.0"
-gem "dalli" # memcached client
 gem "active_model_serializers", "~> 0.9.3" # Use active model serializers to serialize JSON.
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
@@ -36,8 +35,7 @@ gem "rails-i18n"
 gem "translation"
 
 # Redis and redis dependents
-gem "hiredis"
-gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
+gem "redis", ">= 3.2.0"
 gem "sidekiq"
 gem "sidekiq-failures"
 gem "soulheart"

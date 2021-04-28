@@ -125,7 +125,6 @@ GEM
     crass (1.0.6)
     css_parser (1.7.1)
       addressable
-    dalli (2.7.11)
     database_cleaner (1.7.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -246,7 +245,6 @@ GEM
     hashdiff (1.0.0)
     hashie (4.1.0)
     highline (2.0.3)
-    hiredis (0.6.3)
     honeybadger (4.5.4)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -688,7 +686,6 @@ DEPENDENCIES
   chartkick
   coderay
   coffee-rails
-  dalli
   database_cleaner
   doorkeeper (~> 5.2.5)
   dotenv-rails
@@ -714,7 +711,6 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   hamlit
-  hiredis
   honeybadger
   httparty
   i18n-country-translations

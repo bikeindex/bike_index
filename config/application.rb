@@ -50,7 +50,7 @@ module Bikeindex
 
     # Rate limit
     if Rails.env.production?
-      config.middleware.use Rack::Throttle::Minute, max: ENV["MIN_MAX_RATE"].to_i, cache: Dalli::Client.new, key_prefix: :throttle
+      config.middleware.use Rack::Throttle::Minute, max: ENV["MIN_MAX_RATE"].to_i, cache: Redis.new(url: ENV["REDIS_CACHE_URL"]), key_prefix: :throttle
     end
 
     # Add middleware to make i18n configuration thread-safe
