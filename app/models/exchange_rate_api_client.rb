@@ -13,7 +13,7 @@ class ExchangeRateApiClient
   end
 
   def latest
-    # Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+    Rails.cache.fetch(cache_key, expires_in: 24.hours) do
       resp = conn.get("latest") { |req|
         req.params = {"base" => base_iso, access_key: API_KEY}
       }
@@ -23,7 +23,7 @@ class ExchangeRateApiClient
       end
 
       resp.body.with_indifferent_access
-    # end
+    end
   end
 
   private
