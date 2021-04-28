@@ -442,8 +442,6 @@ GEM
     rack (2.0.8)
     rack-accept (0.4.5)
       rack (>= 0.4)
-    rack-contrib (2.1.0)
-      rack (~> 2.0)
     rack-mini-profiler (2.3.1)
       rack (>= 1.2.0)
     rack-protection (2.0.8.1)
@@ -767,7 +765,6 @@ DEPENDENCIES
   pry-rails
   puma
   rack (= 2.0.8)
-  rack-contrib
   rack-mini-profiler
   rack-throttle
   rails (~> 5.2.4)

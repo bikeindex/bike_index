@@ -64,7 +64,7 @@ gem "omniauth-twitter"
 gem "paranoia"
 gem "pg_search"
 gem "puma"
-gem "rack-contrib"
+# gem "rack-contrib" # What is this for?
 gem "rmagick"
 gem "rqrcode", "0.10.1"
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3"
@@ -91,7 +91,7 @@ gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_inde
 gem "wine_bouncer"
 
 # Secure things
-gem "rack-throttle"
+gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
