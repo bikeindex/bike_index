@@ -23,4 +23,22 @@ RSpec.describe ScheduledWorkerRunner, type: :lib do
       end
     end
   end
+
+  describe "staggered scheduling" do
+    it "raises if 3 things are scheduled the same frequency" do
+      frequencies = described_class.scheduled_workers
+        .map { |klass| [klass.name, klass.frequency] }.to_h
+
+      # Goofy name to make spec clearer
+      too_many_scheduled_jobs_with_same_frequency = frequencies.select do |_name, frequency|
+        matches = frequencies.values.select { |v| v == frequency }
+        matches.count > 2
+      end
+
+      if too_many_scheduled_jobs_with_same_frequency.present?
+        pp too_many_scheduled_jobs_with_same_frequency
+      end
+      expect(too_many_scheduled_jobs_with_same_frequency).to be_blank
+    end
+  end
 end
