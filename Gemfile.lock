@@ -750,7 +750,7 @@ DEPENDENCIES
   rack (= 2.0.8)
   rack-mini-profiler
   rack-throttle
-  rails (~> 5.2.4)
+  rails (~> 5.2)
   rails-assets-Stickyfill (~> 1.1.3)!
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
   rails-assets-lodash (~> 4.9.0)!
