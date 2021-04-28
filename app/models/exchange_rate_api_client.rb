@@ -15,7 +15,7 @@ class ExchangeRateApiClient
   def latest
     Rails.cache.fetch(cache_key, expires_in: 24.hours) do
       resp = conn.get("latest") { |req|
-        req.params = {"base" => base_iso, access_key: API_KEY}
+        req.params = {"base" => base_iso, :access_key => API_KEY}
       }
 
       unless resp.status == 200 && resp.body.is_a?(Hash)
