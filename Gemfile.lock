@@ -761,7 +761,7 @@ DEPENDENCIES
   rails-controller-testing
   rails-i18n
   rb-fsevent (~> 0.10.3)
-  redis (>= 3.2.0)
+  redis
   rerun
   responders (~> 2.0)
   rmagick

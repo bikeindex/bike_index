@@ -35,7 +35,7 @@ gem "rails-i18n"
 gem "translation"
 
 # Redis and redis dependents
-gem "redis", ">= 3.2.0"
+gem "redis"
 gem "sidekiq"
 gem "sidekiq-failures"
 gem "soulheart"
