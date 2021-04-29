@@ -48,10 +48,10 @@ module Bikeindex
     config.i18n.available_locales = %i[en nl]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    # Rate limit
-    if Rails.env.production?
-      config.middleware.use Rack::Throttle::Minute, max: ENV["MIN_MAX_RATE"].to_i, cache: Redis.new(url: ENV["REDIS_CACHE_URL"]), key_prefix: :throttle
-    end
+    config.middleware.use Rack::Throttle::Minute,
+      max: ENV["MIN_MAX_RATE"].to_i,
+      cache: Redis.new(url: ENV["REDIS_CACHE_URL"]),
+      key_prefix: :throttle
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware
