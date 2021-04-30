@@ -734,7 +734,6 @@ DEPENDENCIES
   mini_magick
   money-rails (~> 1.11)
   multi_json
-  nokogiri (>= 1.10.4)
   oj
   omniauth (~> 1.6)
   omniauth-facebook
