@@ -13,8 +13,8 @@ task slow_save: :environment do
   # end
 end
 
-desc "Create frame_makers and push to redis"
-task sm_import_manufacturers: :environment do
+desc "Reset Soulheart - colors and frame_makers"
+task reset_autocomplete: :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
 

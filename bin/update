@@ -26,8 +26,8 @@ chdir APP_ROOT do
   puts "\n== Removing old logs and tempfiles =="
   system! 'bin/rails log:clear tmp:clear'
 
-  puts "\n== loading manufacturer type ahead and bike counts =="
-  system "bin/rake sm_import_manufacturers load_counts"
+  puts "\n== loading typeahead and bike counts =="
+  system "bin/rake reset_autocomplete load_counts"
 
 
   puts "\n== Restarting application server =="

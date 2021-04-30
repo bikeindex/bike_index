@@ -38,8 +38,8 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
-# Autocomplete loader
-gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis"
+# soulheart on branch because github.com/sethherr/soulheart/pull/32
+gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocomplete loader
 
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
