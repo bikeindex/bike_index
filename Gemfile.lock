@@ -18,6 +18,16 @@ GIT
   specs:
     faraday-request_response_logger (0.1.0)
 
+GIT
+  remote: https://github.com/sethherr/soulheart.git
+  revision: 301ff545ad8449994bee5018272e22fac11b3e05
+  branch: non-hiredis
+  specs:
+    soulheart (0.4.0)
+      redis (>= 3.0.5)
+      sinatra (>= 1.4.4)
+      vegas (>= 0.1.0)
+
 GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
@@ -591,10 +601,6 @@ GEM
       builder (~> 3.0)
     skylight (5.0.1)
       activesupport (>= 5.2.0)
-    soulheart (0.4.0)
-      redis (>= 3.0.5)
-      sinatra (>= 1.4.4)
-      vegas (>= 0.1.0)
     sprockets (4.0.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -779,7 +785,7 @@ DEPENDENCIES
   simplecov
   sitemap_generator (~> 6)
   skylight
-  soulheart
+  soulheart!
   sprockets (= 4.0.0)
   sprockets-rails
   stackprof

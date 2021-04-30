@@ -36,9 +36,10 @@ gem "translation"
 
 # Redis and redis dependents
 gem "redis"
-gem "sidekiq"
-gem "sidekiq-failures"
-gem "soulheart"
+gem "sidekiq" # Background job processing
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+# Autocomplete loader
+gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis"
 
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
