@@ -18,7 +18,7 @@ jobs:
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
-      - image: circleci/postgres:10.4-alpine-postgis
+      - image: circleci/postgres:12.0-alpine-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test

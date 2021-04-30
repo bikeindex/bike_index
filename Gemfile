@@ -36,9 +36,10 @@ gem "translation"
 
 # Redis and redis dependents
 gem "redis"
-gem "sidekiq"
-gem "sidekiq-failures"
-gem "soulheart"
+gem "sidekiq" # Background job processing
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+# soulheart on branch because github.com/sethherr/soulheart/pull/32
+gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocomplete loader
 
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
@@ -50,7 +51,6 @@ gem "kaminari" # pagination
 gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "money-rails", "~> 1.11"
-gem "nokogiri", ">= 1.10.4"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
