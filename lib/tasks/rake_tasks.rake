@@ -15,7 +15,7 @@ end
 
 desc "Reset Soulheart - colors and frame_makers"
 task reset_autocomplete: :environment do
-  AutocompleteLoaderWorker.perform_async("load_manufacturers")
+  AutocompleteLoaderWorker.perform_async("reset")
 end
 
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
