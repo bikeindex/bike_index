@@ -32,8 +32,6 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 - [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/).
 
-- *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast) - you will need to install and start memcached `/usr/local/bin/memcached`)
-
 - Requires 1gb of ram (or at least more than 512mb)
 
 ## Running Bike Index locally
