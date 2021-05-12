@@ -67,7 +67,7 @@
                       %small.less-strong
                         verify your ownership - add additional details that prove this #{bike_submitting.type} is yours
                     = f.text_area :message, class: "form-control"
-                  = submit_tag "Save progress", class: "btn btn-outline-primary btn-sm"
+                  = submit_tag "Save progress", class: "btn btn-primary btn-sm"
                 - else
                   %h3.mt-4.uncap
                     %em
@@ -85,7 +85,7 @@
                   = render partial: "/impound_claims/checklist", locals: { impound_claim: impound_claim, bike_submitting: bike_submitting, current_path: bike_path(bike.to_param, contact_owner: true), render_optional: true }
                   - if impound_claim.unsubmitted?
                     .mt-4
-                      %a.btn.btn-success#submitClaimButton{ href: "#" }
+                      %a.btn.btn-outline-success#submitClaimButton{ href: "#" }
                         Submit claim
                       %em.small.less-strong.d-lg-block
                         after submitting you will no longer be able to edit the claim!
