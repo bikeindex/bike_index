@@ -86,6 +86,8 @@ class Bike < ApplicationRecord
       .current
       .order(listing_order: :desc)
   end
+
+  scope :without_location, -> { where(latitude: nil) }
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }

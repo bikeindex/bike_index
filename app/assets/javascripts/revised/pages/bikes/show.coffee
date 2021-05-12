@@ -107,6 +107,9 @@ class BikeIndex.BikesShow extends BikeIndex
       @renderParkingNotificationForm()
 
   initializeImpoundClaimPanel: ->
+    # If there is an impound claim form, add dirty forms so the message doesn't get lost
+    $('#impound_claim form').dirtyForms()
+    # Required, because the status has to change
     $("#submitClaimButton").on "click", (e) =>
       e.preventDefault()
       $("#impound_claim #impound_claim_status").val("submitting")
