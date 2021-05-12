@@ -12,6 +12,7 @@ class OrganizationFeature < ApplicationRecord
     organization_affiliation
     reg_phone
     reg_address
+    student_id
   ].freeze
   # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
