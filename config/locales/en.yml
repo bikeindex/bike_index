@@ -585,7 +585,6 @@ en:
         recovery_share: Recovery share
         recovery_tweet: Recovery tweet
         secondary_phone: Secondary phone
-        show_address: Show address
         state: :activerecord.models.state
         street: Street
         theft_alerts: Theft alerts
