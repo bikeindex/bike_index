@@ -1,4 +1,10 @@
-%h3 Bike Images
+%h3
+  Bike Images
+  - if bike.public_images.any?
+    link to edit via users interface
+  - else
+    make sure this works!!!
+    = link_to "Remove alert!", admin_stolen_bike_path(bike, public_image_id: nil, update_action: "regenerate_alert_image"), method: :put, action: "update", class: "btn btn-sm btn-outline-info"
 .stolen-bike-image-editing-list-group-wrapper
   %ul.list-group.list-group-horizontal.stolen-bike-image-editing-list-group#stolenBikeImageEditing
     - bike.public_images.each do |image|
