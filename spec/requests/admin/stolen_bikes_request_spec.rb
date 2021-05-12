@@ -75,6 +75,16 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(flash[:success]).to be_present
       end
+      context "without public image" do
+        # Sometimes bikes have alert images even though they have no photo, this enables deleting it
+        it "calls regenerates_alert_image" do
+          # Stub this call, it proves that the image will be deleted
+          expect_any_instance_of(StolenRecord).to receive(:generate_alert_image) { true }
+          put "#{base_url}/#{bike.id}", params: {public_image_id: nil, update_action: "regenerate_alert_image"}
+          expect(response).to redirect_to(:edit_admin_stolen_bike)
+          expect(flash[:success]).to be_present
+        end
+      end
       context "with public image" do
         let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
         describe "regenerate_alert_image" do

@@ -29,7 +29,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def update
-    if params[:public_image_id].present?
+    if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
       BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
@@ -69,7 +69,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def update_image
     selected_image = @bike.public_images.find_by_id(params[:public_image_id])
-    if selected_image.blank?
+    if params[:public_image_id].present? && selected_image.blank?
       flash[:error] = "Unable to find that image!"
     elsif params[:update_action] == "delete"
       selected_image.destroy
