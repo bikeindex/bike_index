@@ -959,7 +959,6 @@ en:
         address_or_intersection: Address or intersection
         choose_country: Choose country
         city: City
-        publicly_display_exact_address: Publicly display exact address theft occurred
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
