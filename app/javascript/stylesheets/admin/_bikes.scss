@@ -1,3 +1,9 @@
+.user-edit-link {
+  @extend .less-strong;
+  font-size: 70%; // This is used in h1 & h3 tags, so make it much smaller
+  font-style: italic;
+}
+
 .admin-bike-partial {
   margin: -1.5rem -15px 0;
   padding: 1.5rem 15px;
