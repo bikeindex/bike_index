@@ -1,4 +1,9 @@
-%h3 Bike Images
+%h3
+  Bike Images
+  - if bike.public_images.any?
+    = link_to "user edit", edit_bike_path(bike, page: "photos", return_to: url_for), class: "user-edit-link"
+  - else
+    = link_to "remove alert", admin_stolen_bike_path(bike, public_image_id: nil, update_action: "regenerate_alert_image"), method: :put, action: "update", class: "btn btn-sm btn-outline-info"
 .stolen-bike-image-editing-list-group-wrapper
   %ul.list-group.list-group-horizontal.stolen-bike-image-editing-list-group#stolenBikeImageEditing
     - bike.public_images.each do |image|
@@ -15,7 +20,7 @@
 %h3.mt-4 Promoted Alert Images
 
 - if alert_image_versions.blank?
-  None
+  .mb-4 None
 - else
   .stolen-bike-image-editing-list-group-wrapper
     %ul.mb-4.list-group.list-group-horizontal.stolen-bike-image-editing-list-group#promoted-images-display

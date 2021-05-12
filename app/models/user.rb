@@ -195,9 +195,9 @@ class User < ApplicationRecord
     organizations.paid.any?
   end
 
-  def authorized?(obj)
-    return true if superuser?
-    return obj.authorized?(self) if obj.is_a?(Bike)
+  def authorized?(obj, no_superuser_override: false)
+    return true if !no_superuser_override && superuser?
+    return obj.authorized?(self, no_superuser_override: no_superuser_override) if obj.is_a?(Bike)
     return member_of?(obj) if obj.is_a?(Organization)
     return obj.claimable_by?(self) if obj.is_a?(BikeSticker)
     false

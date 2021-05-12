@@ -577,6 +577,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
     let(:user) { FactoryBot.create(:user) }
+    let(:superuser) { User.new(superuser: true) }
 
     context "un-organized" do
       let(:ownership) { FactoryBot.create(:ownership) }
@@ -584,6 +585,7 @@ RSpec.describe Bike, type: :model do
         it "returns false" do
           expect(bike.authorized?(nil)).to be_falsey
           expect(bike.authorize_and_claim_for_user(nil)).to be_falsey
+          expect(bike.authorized?(superuser)).to be_truthy
         end
       end
       context "unauthorized" do
@@ -605,8 +607,28 @@ RSpec.describe Bike, type: :model do
           expect(bike.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
           expect(bike.authorized?(user)).to be_truthy
+          expect(bike.authorized?(user, no_superuser_override: true)).to be_truthy
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorize_and_claim_for_user(user)).to be_truthy
+          expect(bike.authorized?(superuser)).to be_truthy
+          expect(bike.authorized?(superuser, no_superuser_override: true)).to be_falsey
+          expect(superuser.authorized?(bike)).to be_truthy
+          expect(superuser.authorized?(bike, no_superuser_override: true)).to be_falsey
+        end
+      end
+      context "claimed" do
+        let(:superuser) { FactoryBot.create(:admin) }
+        let(:ownership) { FactoryBot.create(:ownership_claimed, user: superuser) }
+        it "returns true for user, not creator" do
+          expect(bike.claimed?).to be_truthy
+          expect(bike.authorized?(creator)).to be_falsey
+          expect(bike.authorized?(superuser)).to be_truthy
+          expect(bike.authorized?(superuser, no_superuser_override: true)).to be_truthy
+          expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(superuser)).to be_truthy
+          expect(bike.authorized?(superuser)).to be_truthy
+          expect(bike.authorized?(superuser, no_superuser_override: true)).to be_truthy
+          expect(superuser.authorized?(bike, no_superuser_override: true)).to be_truthy
         end
       end
       context "claimable_by?" do
@@ -748,6 +770,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.status_humanized).to eq "found"
         expect(bike.status_humanized_translated).to eq "found"
         expect(bike.authorized?(user)).to be_truthy
+        expect(bike.authorized?(superuser)).to be_truthy
       end
     end
     context "impound_record with organization" do
@@ -780,6 +803,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.status).to eq "status_with_owner"
         expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
         expect(bike.authorized?(user)).to be_truthy
+        expect(bike.authorized?(superuser)).to be_truthy
       end
       context "ownership claimed" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
@@ -805,6 +829,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.status).to eq "status_with_owner"
           expect(bike.authorized?(user)).to be_truthy
           expect(bike.authorized?(organization_member)).to be_falsey # Because no organization membership
+          expect(bike.authorized?(superuser)).to be_truthy
         end
       end
     end
