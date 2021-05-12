@@ -542,7 +542,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
-      expect(bike.current_stolen_record.show_address).to be_truthy
+      expect(bike.current_stolen_record.show_address).to be_falsey
     end
 
     it "does not register a stolen bike unless attrs are present" do
@@ -741,7 +741,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq("999999")
-      expect(bike.current_stolen_record.show_address).to be_truthy
+      expect(bike.current_stolen_record.show_address).to be_falsey
     end
 
     it "updates a bike, adds and removes components" do

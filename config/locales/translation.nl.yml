@@ -672,7 +672,6 @@ nl:
         recovery_share: Herstel aandeel
         recovery_tweet: Hersteltweet
         secondary_phone: Secundaire telefoon
-        show_address: Toon adres
         street: straat
         theft_alerts: Diefstalwaarschuwingen
         theft_description: Diefstal beschrijving
@@ -1689,7 +1688,6 @@ nl:
         address_or_intersection: Adres of kruispunt
         choose_country: Kies land
         city: City
-        publicly_display_exact_address: Openbaar weergeven exacte adresdiefstal opgetreden
         state: Staat
         where_was_it_stolen_type: Waar was het %{stolen_type}?
         zipcode: Postcode

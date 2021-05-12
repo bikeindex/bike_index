@@ -2608,7 +2608,6 @@ CREATE TABLE public.stolen_records (
     tsved_at timestamp without time zone,
     estimated_value integer,
     recovery_link_token text,
-    show_address boolean DEFAULT false,
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying
@@ -5623,6 +5622,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210405200829'),
 ('20210420161728'),
 ('20210421174751'),
-('20210423200934');
+('20210423200934'),
+('20210512162607');
 
 

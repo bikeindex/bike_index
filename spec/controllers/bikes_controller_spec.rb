@@ -615,7 +615,6 @@ RSpec.describe BikesController, type: :controller do
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
                 expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.current.yesterday.to_i)
-                expect(stolen_record.show_address).to be_falsey
               end
             end
           end

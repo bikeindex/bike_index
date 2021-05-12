@@ -153,6 +153,11 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
+  # Used to be an attribute, removed in
+  def show_address
+    false
+  end
+
   def address(skip_default_country: false, force_show_address: false)
     Geocodeable.address(
       self,
