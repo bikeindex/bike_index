@@ -21,8 +21,7 @@
       %span.checklist-text
         Loss/theft location and time
 
-    -# NOTE: In the stolen checklist, this is more sophisticated, because it provides suggestions for the netherlands
-    -# Ignoring that here, for now
+    -# NOTE: In the stolen checklist, this is more sophisticated, keeping this simple
     - police_report_present = bike_submitting.current_stolen_record.police_report_number.present?
     %li{ class: police_report_present ? "completed-item" : "" }
       %span.checklist-checkbox
