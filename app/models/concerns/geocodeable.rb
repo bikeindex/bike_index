@@ -11,7 +11,6 @@ module Geocodeable
     before_validation :clean_state_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
-    scope :without_location, -> { where(latitude: nil) }
     scope :with_location, -> { where.not(latitude: nil) }
 
     # Skip geocoding if this flag is truthy

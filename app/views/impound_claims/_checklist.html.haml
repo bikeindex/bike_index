@@ -21,6 +21,17 @@
       %span.checklist-text
         Loss/theft location and time
 
+    -# NOTE: In the stolen checklist, this is more sophisticated, because it provides suggestions for the netherlands
+    -# Ignoring that here, for now
+    - police_report_present = bike_submitting.current_stolen_record.police_report_number.present?
+    %li{ class: police_report_present ? "completed-item" : "" }
+      %span.checklist-checkbox
+        = "&#10003;".html_safe if police_report_present
+      %span.checklist-text
+        = link_to("Loss/theft reported to police", edit_bike_url(id: bike_submitting.to_param, page: "theft_details"))
+        - if render_optional
+          %em.small.less-strong optional
+
     - serial_known = !bike_submitting.serial_unknown?
     %li{ class: serial_known ? "completed-item" : "" }
       %span.checklist-checkbox
@@ -30,8 +41,7 @@
         - unless serial_known
           = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, page: "bike_details", return_to: current_path), class: "small"
         - if render_optional
-          %em.small.less-strong
-            optional
+          %em.small.less-strong optional
 
     - if bike_submitting.creation_state&.is_pos
       %li.completed-item
@@ -60,8 +70,7 @@
       %span.checklist-text
         = link_to "Photo of you with the #{bike_submitting.type}", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
         - if render_optional
-          %em.small.less-strong
-            optional
+          %em.small.less-strong optional
 
     - message_present = impound_claim.message.present?
     %li{ class: message_present ? "completed-item" : "" }
