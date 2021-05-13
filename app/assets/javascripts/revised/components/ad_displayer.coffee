@@ -1,6 +1,6 @@
 class @AdDisplayer
-  ads_right = ['right300x600']
-  ads_top = ['top468x60']
+  ads_syscraper = ['ad300x600']
+  ads_sm_rectangle = ['ad468x60']
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
   max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
@@ -9,13 +9,13 @@ class @AdDisplayer
   constructor: ->
     renderedAds = []
 
-    for el_id in ads_right
-      if document.getElementById(el_id)
-        Array::push.apply renderedAds, @renderAdRight(el_id)
+    for el_id in ads_syscraper
+      if document.getElementsByClassName(el_id)
+        Array::push.apply renderedAds, @renderSkyscraper(el_id)
 
-    for el_id in ads_top
-      if document.getElementById(el_id)
-        Array::push.apply renderedAds, @renderAdTop(el_id)
+    for el_id in ads_sm_rectangle
+      if document.getElementsByClassName(el_id)
+        Array::push.apply renderedAds, @renderSmRectangle(el_id)
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
@@ -24,14 +24,13 @@ class @AdDisplayer
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderAdRight: (el_id) ->
-    $(".content-nav-group:last").addClass("additional-ad-space")
-    $("##{el_id}").html([max_tracker_300].join("")).addClass("rendered-ad")
+  renderSkyscraper: (el_id) ->
+    $(".#{el_id}").html([max_tracker_300].join("")).addClass("rendered-ad")
 
     ["max_tracker_300"]
 
-  renderAdTop: (el_id) ->
-    $("##{el_id}").html([max_tracker_468].join("")).addClass("rendered-ad")
+  renderSmRectangle: (el_id) ->
+    $(".#{el_id}").html([max_tracker_468].join("")).addClass("rendered-ad")
 
     ["max_tracker_468"]
 
