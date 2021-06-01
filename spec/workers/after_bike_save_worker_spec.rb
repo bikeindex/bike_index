@@ -91,19 +91,64 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
   end
 
   describe "remove_partial_registrations" do
-    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM") }
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM", origin: "embed_partial", organization: organization) }
     let(:bike) { FactoryBot.create(:bike, owner_email: "stuff@things.com") }
-    it "removes the partial registration" do
+    let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@things.com") }
+    let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user) }
+    it "assigns the partial registration" do
+      expect(bike.creation_organization_id).to be_blank
+      expect(bike.creation_state.organization_id).to be_blank
+      expect(bike.creation_state.origin).to eq "web"
       expect(partial_registration.partial_registration?).to be_truthy
       expect(partial_registration.with_bike?).to be_falsey
       instance.perform(bike.id)
       partial_registration.reload
       expect(partial_registration.with_bike?).to be_truthy
       expect(partial_registration.created_bike).to eq bike
+      bike.reload
+      expect(bike.creation_organization_id).to eq organization.id # TODO: Remove when creation_organization_id deleted
+      expect(bike.creation_state.organization_id).to eq organization.id
+      expect(bike.creation_state.origin).to eq "embed_partial"
+    end
+    context "bike already has organization" do
+      let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
+      it "does not assign" do
+        og_organization_id = creation_state.organization_id
+        expect(bike.creation_organization_id).to be_blank
+        expect(bike.creation_state.organization_id).to be_blank
+        expect(bike.creation_state.origin).to eq "web"
+        expect(partial_registration.partial_registration?).to be_truthy
+        expect(partial_registration.with_bike?).to be_falsey
+        instance.perform(bike.id)
+        partial_registration.reload
+        expect(partial_registration.with_bike?).to be_truthy
+        expect(partial_registration.created_bike).to eq bike
+        bike.reload
+        expect(bike.creation_state.organization_id).to eq og_organization_id
+        expect(bike.creation_state.origin).to eq "web"
+      end
+    end
+    context "creation state isn't web" do
+      let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, origin: "api_v2") }
+      it "doesn't assign" do
+        expect(bike.creation_organization_id).to be_blank
+        expect(bike.creation_state.organization_id).to be_blank
+        expect(bike.creation_state.origin).to eq "api_v2"
+        expect(partial_registration.partial_registration?).to be_truthy
+        expect(partial_registration.with_bike?).to be_falsey
+        instance.perform(bike.id)
+        partial_registration.reload
+        expect(partial_registration.with_bike?).to be_truthy
+        expect(partial_registration.created_bike).to eq bike
+        bike.reload
+        expect(bike.creation_state.organization_id).to be_blank
+        expect(bike.creation_state.origin).to eq "api_v2"
+      end
     end
     context "with a more accurate match" do
       let(:manufacturer) { bike.manufacturer }
-      let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
+      let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer, origin: "api_v2") }
       it "only removes the more accurate match" do
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
@@ -115,6 +160,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(partial_registration.with_bike?).to be_falsey
         expect(partial_registration_accurate.with_bike?).to be_truthy
         expect(partial_registration_accurate.created_bike).to eq bike
+        bike.reload
+        expect(bike.creation_state.origin).to eq "web" # It doesn't change this, because it doesn't match
       end
     end
   end
