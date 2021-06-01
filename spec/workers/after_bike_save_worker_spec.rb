@@ -115,8 +115,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
       it "does not assign" do
         og_organization_id = creation_state.organization_id
-        expect(bike.creation_organization_id).to be_blank
-        expect(bike.creation_state.organization_id).to be_blank
+        expect(bike.creation_state.organization_id).to be_present
         expect(bike.creation_state.origin).to eq "web"
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
@@ -148,7 +147,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     end
     context "with a more accurate match" do
       let(:manufacturer) { bike.manufacturer }
-      let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer, origin: "api_v2") }
+      let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
       it "only removes the more accurate match" do
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
@@ -161,7 +160,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(partial_registration_accurate.with_bike?).to be_truthy
         expect(partial_registration_accurate.created_bike).to eq bike
         bike.reload
-        expect(bike.creation_state.origin).to eq "web" # It doesn't change this, because it doesn't match
+        expect(bike.creation_state.origin).to eq "embed_partial"
       end
     end
   end
