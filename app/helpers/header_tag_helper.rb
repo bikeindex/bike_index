@@ -78,7 +78,7 @@ module HeaderTagHelper
       tag(:meta, name: "viewport", content: "width=device-width"),
       content_tag(:title, page_title),
       tag(:meta, name: "description", content: page_description),
-      tag(:link, rel: "shortcut icon", href: "/fav.ico"),
+      tag(:link, rel: "shortcut icon", href: (Rails.env.development? ? "/favicon_dev.ico" : "/fav.ico")),
       tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple_touch_icon.png"),
       csrf_meta_tags
     ]
