@@ -5049,6 +5049,13 @@ CREATE INDEX index_user_phones_on_user_id ON public.user_phones USING btree (use
 
 
 --
+-- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
+
+
+--
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5623,6 +5630,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210420161728'),
 ('20210421174751'),
 ('20210423200934'),
-('20210512162607');
+('20210512162607'),
+('20210601175924');
 
 
