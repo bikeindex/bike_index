@@ -50,9 +50,6 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(current_organization.overview_dashboard?).to be_truthy
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to render_template(:index)
-        get "/o/#{current_organization.to_param}/dashboard/graph"
-        expect(json_result.count).to eq 2
-        expect(json_result.first.key?("data")).to be_truthy
       end
     end
     context "organization regional parent" do

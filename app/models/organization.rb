@@ -307,7 +307,7 @@ class Organization < ApplicationRecord
   end
 
   def nearby_and_partner_organization_ids
-    @nearby_and_partner_organization_ids ||= [id, parent_organization_id].compact + child_ids + nearby_organizations_including_siblings.pluck(:id)
+    [id, parent_organization_id].compact + child_ids + nearby_organizations_including_siblings.pluck(:id)
   end
 
   def mail_snippet_body(snippet_kind)

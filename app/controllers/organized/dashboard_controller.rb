@@ -1,8 +1,7 @@
 module Organized
   class DashboardController < Organized::BaseController
-    before_action :ensure_permitted_to_view, except: [:root]
     before_action :set_fallback_period
-    before_action :set_period, only: %i[index graph]
+    before_action :set_period, only: [:index]
     helper_method :bikes_for_graph
 
     def root
@@ -14,30 +13,17 @@ module Organized
     end
 
     def index
-      set_counts
-    end
-
-    def graph
-      set_counts
-      render json: if current_organization.enabled?("claimed_ownerships") && params[:kind] == "claimed_ownerships"
-        [
-          # {name: "Registrations sent to new owner", data: time_range_counts(collection: @ownerships_to_new_owner, column: "ownerships.created_at")},
-          {name: "Registrations claimed", data: time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at")}
-        ]
-      else
-        helpers.organization_dashboard_bikes_graph_data.chart_json
+      # Only render this page if the organization has overview_dashboard (or it's a superuser)
+      if !current_organization.overview_dashboard? && !current_user.superuser?
+        redirect_to organization_bikes_path
+        return
       end
-    end
 
-    private
-
-    def set_counts
       @child_organizations = current_organization.child_organizations
       @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
 
       if current_organization.regional?
-        # Required for graphing
         @bikes_not_in_organizations = current_organization.nearby_bikes.where.not(id: @bikes_in_organizations.pluck(:id)).where(created_at: @time_range)
 
         @bikes_in_child_organizations_count = Bike.organization(@child_organizations.pluck(:id)).where(created_at: @time_range).count
@@ -56,16 +42,10 @@ module Organized
       end
     end
 
+    private
+
     def set_fallback_period
       @period = "year" unless params[:period].present?
-    end
-
-    def ensure_permitted_to_view
-      # Only render this page if the organization has overview_dashboard (or it's a superuser)
-      if !current_organization.overview_dashboard? && !current_user.superuser?
-        redirect_to organization_bikes_path
-        return
-      end
     end
   end
 end

@@ -325,9 +325,7 @@ Rails.application.routes.draw do
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: "o", module: "organized" do
     get "/", to: "dashboard#root", as: :root
-    resources :dashboard, only: [:index] do
-      collection { get :graph }
-    end
+    resources :dashboard, only: [:index]
     get "landing", to: "manages#landing", as: :landing
     resources :bikes, only: %i[index new create show update] do
       collection do
