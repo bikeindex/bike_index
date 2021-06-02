@@ -110,6 +110,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       expect(bike.creation_organization_id).to eq organization.id # TODO: Remove when creation_organization_id deleted
       expect(bike.creation_state.organization_id).to eq organization.id
       expect(bike.creation_state.origin).to eq "embed_partial"
+      expect(bike.organizations.pluck(:id)).to eq([organization.id])
+      expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
     end
     context "bike already has organization" do
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
@@ -143,6 +145,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         bike.reload
         expect(bike.creation_state.organization_id).to be_blank
         expect(bike.creation_state.origin).to eq "api_v2"
+        expect(bike.organizations.pluck(:id)).to eq([])
       end
     end
     context "with a more accurate match" do
