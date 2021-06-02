@@ -142,7 +142,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    s_attrs.except("phone_no_show")
+    s_attrs.except("phone_no_show", "show_address")
   end
 
   def impound_attrs

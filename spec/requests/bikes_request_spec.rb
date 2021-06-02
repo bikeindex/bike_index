@@ -652,6 +652,7 @@ RSpec.describe BikesController, type: :request do
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             expect {
+              # Test that we can still pass show_address - because API backward compatibility
               post base_url, params: {bike: bike_params, stolen_record: chicago_stolen_params.merge(show_address: true)}
             }.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
@@ -668,7 +669,6 @@ RSpec.describe BikesController, type: :request do
             expect(bike.creation_state.status).to eq "status_stolen"
             stolen_record = bike.current_stolen_record
             chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.show_address).to be_truthy
           end
         end
       end
@@ -1519,7 +1519,7 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.secondary_phone).to eq "1231231234"
           expect(stolen_record.country_id).to eq Country.united_states.id
           expect(stolen_record.state_id).to eq state.id
-          expect(stolen_record.show_address).to be_truthy
+          expect(stolen_record.show_address).to be_falsey
           expect(stolen_record.estimated_value).to eq 2101
           expect(stolen_record.locking_description).to eq "party"
           expect(stolen_record.lock_defeat_description).to eq "cool things"

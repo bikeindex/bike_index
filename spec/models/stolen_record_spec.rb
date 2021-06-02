@@ -208,8 +208,7 @@ RSpec.describe StolenRecord, type: :model do
                                        country_id: country.id)
       expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
       expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
-      stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
+      expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
       expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
@@ -218,8 +217,7 @@ RSpec.describe StolenRecord, type: :model do
                                        country_id: country.id)
       expect(stolen_record.address).to eq("60647, NEVVVV")
       expect(stolen_record.without_location?).to be_falsey
-      stolen_record.show_address = true
-      expect(stolen_record.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
+      expect(stolen_record.address).to eq("60647, NEVVVV")
     end
     it "returns nil if there is no country" do
       stolen_record = StolenRecord.new(street: "302666 Richmond Blvd")
@@ -586,17 +584,10 @@ RSpec.describe StolenRecord, type: :model do
   describe "latitude_public" do
     let(:latitude) { -122.2824933 }
     let(:longitude) { 37.837112 }
-    let(:stolen_record) { StolenRecord.new(latitude: latitude, longitude: longitude, show_address: true) }
-    it "is the same as latitude" do
-      expect(stolen_record.latitude_public).to eq latitude
-      expect(stolen_record.longitude_public).to eq longitude
-    end
-    context "show_address false" do
-      it "is rounded" do
-        stolen_record.show_address = false
-        expect(stolen_record.latitude_public).to eq(-122.28)
-        expect(stolen_record.longitude_public).to eq longitude.round(2)
-      end
+    let(:stolen_record) { StolenRecord.new(latitude: latitude, longitude: longitude) }
+    it "is rounded" do
+      expect(stolen_record.latitude_public).to eq(-122.28)
+      expect(stolen_record.longitude_public).to eq longitude.round(2)
     end
   end
 

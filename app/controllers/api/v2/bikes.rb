@@ -34,6 +34,7 @@ module API
 
             optional :police_report_number, type: String, desc: "Police report number"
             optional :police_report_department, type: String, desc: "Police department reported to (include if report number present)"
+            # show_address NO LONGER ACTUALLY DOES ANYTHING. Keeping so that the API doesn't change
             optional :show_address, type: Boolean, desc: "Display the exact address the theft happened at"
 
             optional :theft_description, type: String, desc: "stuff"

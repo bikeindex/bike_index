@@ -7,7 +7,7 @@ class StolenRecordUpdator
       longitude theft_description current phone secondary_phone phone_for_everyone
       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
       approved recovered_at recovered_description index_helped_recovery can_share_recovery
-      recovery_posted show_address tsved_at estimated_value].freeze
+      recovery_posted tsved_at estimated_value].freeze
   end
 
   def initialize(creation_params = {})
@@ -59,7 +59,7 @@ class StolenRecordUpdator
     ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :zipcode,
       :country_id, :state_id, :police_report_number, :police_report_department, :estimated_value,
       :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
-      :receive_notifications, :show_address, :phone_for_everyone, :phone_for_users,
+      :receive_notifications, :phone_for_everyone, :phone_for_users,
       :phone_for_shops, :phone_for_police)
   end
 end

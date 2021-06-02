@@ -28,11 +28,3 @@
     %label.form-well-label
     .form-well-input
       = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
-
-  -# Impounded bikes never include the exact location found, because it's used as a way to verify claims
-  - if @bike.status_stolen?
-    .form-group.row
-      %label.form-well-label
-      %label.form-well-input
-        = srecord.check_box :show_address
-        = t(".publicly_display_exact_address")

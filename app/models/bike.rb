@@ -86,6 +86,8 @@ class Bike < ApplicationRecord
       .current
       .order(listing_order: :desc)
   end
+
+  scope :without_location, -> { where(latitude: nil) }
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
@@ -483,8 +485,9 @@ class Bike < ApplicationRecord
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorized?(u)
+  def authorized?(u, no_superuser_override: false)
     return false if u.blank?
+    return true if !no_superuser_override && u.superuser?
     # authorization requires organization if impounded or marked abandoned by an organization
     unless authorization_requires_organization?
       # Since it doesn't require an organization, authorize by user
