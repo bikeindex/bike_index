@@ -836,6 +836,20 @@ class Bike < ApplicationRecord
     previous_o_affiliation
   end
 
+  def student_id=(val)
+    conditional_information["student_id"] = val
+  end
+
+  def student_id
+    # TODO: make conditional_information hold more things
+    s_id = conditional_information["student_id"]
+    return s_id if s_id.present?
+    previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
+    return "" unless previous_s_id.present?
+    update(student_id: previous_s_id)
+    previous_s_id
+  end
+
   def external_image_urls
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
