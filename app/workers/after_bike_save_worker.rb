@@ -54,7 +54,10 @@ class AfterBikeSaveWorker < ApplicationWorker
       creation_state.organization_id = matching_b_param.organization_id
       creation_state.origin = matching_b_param.origin if (CreationState.origins - ["web"]).include?(matching_b_param.origin)
       creation_state.save
-      bike.update(creation_organization_id: matching_b_param.organization_id) if matching_b_param.organization_id.present?
+      if matching_b_param.organization_id.present?
+        bike.update(creation_organization_id: matching_b_param.organization_id)
+        bike.bike_organizations.create(organization_id: matching_b_param.organization_id)
+      end
     end
   end
 end
