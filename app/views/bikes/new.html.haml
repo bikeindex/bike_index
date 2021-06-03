@@ -81,10 +81,10 @@
 
           -# Show the phone if the bike is stolen, the organization requires phone
           -# only show the phone for impounded records if the current user doesn't have a confirmed phone
-          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
+          - if @bike.status_stolen? || include_field_reg_phone?(@organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
             .form-group.row.unnested-field
               = f.label :phone,
-                @organization&.registration_field_label("reg_phone") || t(".phone"),
+                registration_field_label(@organization, "reg_phone") || t(".phone"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
@@ -97,7 +97,7 @@
             = fields_for @bike.impound_records.last do |irecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
 
-          - if @organization&.include_field_reg_address?(current_user)
+          - if include_field_reg_address?(@organization, current_user)
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs
@@ -107,7 +107,7 @@
                   state: @b_param.address("state") }
 
                 = f.label :street,
-                  @organization.registration_field_label("reg_address") || t(".mailing_address"),
+                  registration_field_label(@organization, "reg_address") || t(".mailing_address"),
                   class: 'form-well-label'
 
                 .form-well-input
@@ -142,10 +142,10 @@
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 
-          - if @organization&.include_field_extra_registration_number?(current_user)
+          - if include_field_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :extra_registration_number,
-                @organization.registration_field_label("extra_registration_number") || t(".additional_serial_sticker_number"),
+                registration_field_label(@organization, "extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :extra_registration_number,
@@ -154,14 +154,36 @@
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if @organization&.include_field_organization_affiliation?(current_user)
+          - if include_field_organization_affiliation?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
               = f.label :organization_affiliation,
-                @organization.registration_field_label("organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                registration_field_label(@organization, "organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation,
                   @organization.organization_affiliation_options,
+                  class: "form-control"
+
+          - if include_field_reg_student_id?(@organization, current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :student_id,
+                registration_field_label(@organization, "student_id") || t(".student_id"),
+                class: "form-well-label"
+              .form-well-input
+                = f.text_field :student_id,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
+                  class: "form-control"
+
+          - if include_field_reg_bike_sticker?(@organization, current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label"
+              .form-well-input
+                = f.text_field :bike_sticker,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
                   class: "form-control"
 
           -# With impounded and found bikes, including owner_email is confusing

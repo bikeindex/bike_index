@@ -262,7 +262,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
               timezone: "",
               file_format: "csv",
               bike_code_start: "01", # Avery export organizations always submit a number here
-              headers: %w[link registered_at organization_affiliation extra_registration_number phone address sticker]
+              headers: %w[link registered_at organization_affiliation extra_registration_number phone address bike_sticker]
             }
           end
           it "creates the expected export" do

@@ -128,10 +128,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
     end
 
-    context "just organization_affiliation" do
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export::PERMITTED_HEADERS, bike_code_start: "fff"}) }
-    end
-
     context "all unpaid headers" do
       # Setting up what we have, rather than waiting on everything
       # Also - test that it doesn't explode if unable to assign stickers
@@ -187,7 +183,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member"}} }
+      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
@@ -195,9 +191,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
       include_context :geocoder_real
 
       context "assigning stickers" do
-        let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation], bike_code_start: "ff333333"} }
-        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation address city state zipcode assigned_sticker] }
-        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation student_id], bike_code_start: "ff333333"} }
+        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address city state zipcode assigned_sticker] }
+        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
             bike.reload
@@ -246,6 +242,28 @@ RSpec.describe OrganizationExportWorker, type: :job do
           end
         end
       end
+      context "header only student_id" do
+        let(:target_headers) { %w[student_id] }
+        let(:export_options) { {headers: target_headers} }
+        it "returns the expected values" do
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_falsey
+          expect(b_param.student_id).to eq "XX9999"
+          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+            instance.perform(export.id)
+            export.reload
+            expect(instance.export_headers).to eq target_headers
+            expect(export.progress).to eq "finished"
+            generated_csv_string = export.file.read
+            bike_line = generated_csv_string.split("\n").last
+            expect(bike_line.split(",").count).to eq target_headers.count
+            expect(bike_line).to eq "\"XX9999\""
+
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_falsey
+          end
+        end
+      end
       context "including every available field + stickers" do
         let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + ["bike_stickers"] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
@@ -265,7 +283,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
             owner_name: nil,
             organization_affiliation: "community_member",
             phone: "7177423423",
-            sticker: "FF 333 333",
+            bike_sticker: "FF 333 333",
+            student_id: "XX9999",
             address: "717 Market St",
             city: "San Francisco",
             state: "CA",
@@ -325,8 +344,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
             owner_email: "something@stuff.com",
             owner_name: nil,
             organization_affiliation: nil,
+            student_id: nil,
             phone: nil,
-            sticker: nil,
+            bike_sticker: nil,
             address: nil,
             city: nil,
             state: nil,
@@ -369,7 +389,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
               owner_name: nil,
               organization_affiliation: "community_member",
               phone: "7177423423",
-              sticker: nil,
+              bike_sticker: nil,
+              student_id: "XX9999",
               address: "717 Market St",
               city: "San Francisco",
               state: "CA",

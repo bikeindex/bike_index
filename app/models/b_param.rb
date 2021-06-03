@@ -263,6 +263,10 @@ class BParam < ApplicationRecord
     bike["organization_affiliation"]
   end
 
+  def student_id
+    bike["student_id"]
+  end
+
   def external_image_urls
     bike["external_image_urls"] || []
   end

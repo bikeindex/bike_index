@@ -48,6 +48,7 @@
     "extra_registration_number_cell" => "Secondary#",
     "reg_phone_cell" => "Phone",
     "reg_address_cell" => "Address",
+    "reg_student_id_cell" => "Student ID",
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
@@ -61,8 +62,10 @@
     owner_email_cell
     updated_at_cell
     owner_name_cell]
+  # We handle bike stickers separately, so exclude that
+  additional_registration_fields = current_organization.additional_registration_fields - ["reg_bike_sticker"]
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
-  initially_checked_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
+  initially_checked_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns = initially_checked_columns
   # Some optional columns
   enabled_columns += ["extra_registration_number_cell"] unless enabled_columns.include?("extra_registration_number_cell")
@@ -156,7 +159,7 @@
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
           %small
             = t(".owner_name")
-        - current_organization.additional_registration_fields.each do |reg_field|
+        - additional_registration_fields.each do |reg_field|
           - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
           %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
             = column_renames["#{reg_field}_cell"]
@@ -177,7 +180,8 @@
     %tbody
       - @bikes.each do |bike|
         %tr
-          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+          -# NOTE: Added 1 at the beginning to bust the cache after template modification
+          - cache("1#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
             %td.hiddenColumn.created_at_cell
               %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
@@ -209,10 +213,10 @@
               - if bike.owner_name.present?
                 %em
                   = bike.owner_name
-            - current_organization.additional_registration_fields.each do |reg_field|
+            - additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
-                - bike_attr = OrganizationFeature.reg_field_bike_attrs[reg_field.to_sym]
+                - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "registration_address"
                   - if bike.registration_address.present?
                     %small

@@ -316,6 +316,35 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "student_id" do
+    let(:bike) { FactoryBot.create(:bike) }
+    it "sets if searched" do
+      expect(bike.student_id).to eq "" # We expect it to be a string
+      expect(bike.conditional_information).to eq({})
+      bike.update(student_id: "424242")
+      bike.reload
+      expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
+      expect(bike.student_id).to eq "424242"
+    end
+    context "with b_param value" do
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
+      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", student_id: "CCCIIIIBBBBB"}} }
+      it "gets b_param value" do
+        bike.reload
+        expect(b_param.student_id).to eq "CCCIIIIBBBBB"
+        expect(bike.conditional_information).to eq({})
+        expect(bike.student_id).to eq "CCCIIIIBBBBB"
+        expect(bike.conditional_information).to eq({"student_id" => "CCCIIIIBBBBB"})
+        bike.update(student_id: "66")
+        bike.reload
+        b_param.reload
+        expect(bike.student_id).to eq "66"
+        expect(bike.conditional_information).to eq({"student_id" => "66"})
+        expect(b_param.student_id).to eq "CCCIIIIBBBBB"
+      end
+    end
+  end
+
   describe "phoneable_by?" do
     let(:bike) { Bike.new }
     let(:user) { User.new }
