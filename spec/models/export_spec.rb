@@ -180,7 +180,7 @@ RSpec.describe Export, type: :model do
     let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
     let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone organization_affiliation reg_student_id reg_bike_sticker]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
-    let(:additional_headers) { %w[organization_affiliation address phone sticker student_id] }
+    let(:additional_headers) { %w[organization_affiliation address phone bike_sticker student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 12
@@ -200,11 +200,11 @@ RSpec.describe Export, type: :model do
         expect(organization_regional.regional?).to be_truthy
         expect(organization_regional.regional_ids).to eq([organization_in_region.id])
         expect(organization_regional.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
-        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["sticker"])
+        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["bike_sticker"])
         expect(organization_regional.enabled?("reg_student_id")).to be_falsey
         expect(organization_regional.enabled?("reg_bike_sticker")).to be_truthy
         expect(organization_regional.additional_registration_fields).to eq(["reg_bike_sticker"])
-        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["sticker"])
+        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["bike_sticker"])
 
         organization_in_region.update(updated_at: Time.current) # To bump enabled features there
         organization_in_region.reload
@@ -214,7 +214,7 @@ RSpec.describe Export, type: :model do
         expect(organization_in_region.enabled?("reg_student_id")).to be_falsey
         expect(organization_in_region.enabled?("reg_bike_sticker")).to be_truthy
         expect(organization_in_region.additional_registration_fields).to eq(["reg_bike_sticker"])
-        expect(Export.permitted_headers(organization_in_region)).to eq(permitted_headers + ["sticker"])
+        expect(Export.permitted_headers(organization_in_region)).to eq(permitted_headers + ["bike_sticker"])
       end
     end
   end

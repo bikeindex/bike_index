@@ -84,7 +84,7 @@
           - if @bike.status_stolen? || include_field_reg_phone?(@organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
             .form-group.row.unnested-field
               = f.label :phone,
-                @organization&.registration_field_label("reg_phone") || t(".phone"),
+                registration_field_label(@organization, "reg_phone") || t(".phone"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
@@ -107,7 +107,7 @@
                   state: @b_param.address("state") }
 
                 = f.label :street,
-                  @organization.registration_field_label("reg_address") || t(".mailing_address"),
+                  registration_field_label(@organization, "reg_address") || t(".mailing_address"),
                   class: 'form-well-label'
 
                 .form-well-input
@@ -145,7 +145,7 @@
           - if include_field_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :extra_registration_number,
-                @organization.registration_field_label("extra_registration_number") || t(".additional_serial_sticker_number"),
+                registration_field_label(@organization, "extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :extra_registration_number,
@@ -157,7 +157,7 @@
           - if include_field_organization_affiliation?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
               = f.label :organization_affiliation,
-                @organization.registration_field_label("organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                registration_field_label(@organization, "organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation,

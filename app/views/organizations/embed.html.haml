@@ -18,7 +18,7 @@
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if include_field_extra_registration_number?(@organization)
-        - label_secondary_serial = @organization.registration_field_label("extra_registration_number") || t(".additional_serial")
+        - label_secondary_serial = registration_field_label(@organization, "extra_registration_number") || t(".additional_serial")
         = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
         .controls
           = f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
@@ -137,7 +137,7 @@
                 %span
                   = t(".eg_if_we_tweet_about_or_someone_searches")
   - if include_field_reg_address?(@organization)
-    - label_address = @organization.registration_field_label("reg_address") || t(".owners_street_address")
+    - label_address = registration_field_label(@organization, "reg_address") || t(".owners_street_address")
     / Set all the bike address attrs
     - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
     - @bike.country_id ||= @organization.country_id || Country.united_states.id
@@ -156,7 +156,7 @@
           .control-group.special-select-single#us_id_data{ data: { usid: Country.united_states.id } }
             = f.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
   - if include_field_reg_phone?(@organization)
-    - label_phone = @organization.registration_field_label("reg_phone") || t(".your_phone_number")
+    - label_phone = registration_field_label(@organization, "reg_phone") || t(".your_phone_number")
     .input-group
       = f.label :phone, label_phone
       .controls

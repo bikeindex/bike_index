@@ -147,7 +147,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
-    when "sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
+    when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     end
   end
