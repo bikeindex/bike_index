@@ -4117,6 +4117,7 @@ en:
       model_year: Model year
       optional_additions: Optional additions
       org_affiliation: "%{org_name} affiliation"
+      student_id: Student ID
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address

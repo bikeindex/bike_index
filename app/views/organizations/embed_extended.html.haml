@@ -110,6 +110,13 @@
       = f.label :organization_affiliation, label_affiliation
       .controls
         = f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control"
+  - if include_field_reg_student_id?(@organization)
+    .input-group
+      .control-group
+        - label_student_id = registration_field_label(@organization, "student_id") || t(".student_id")
+        = f.label :student_id, label_student_id, class: "control-label"
+        .controls
+          = f.text_field :student_id
   - if include_field_reg_bike_sticker?(@organization)
     .input-group
       .control-group
