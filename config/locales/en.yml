@@ -1219,6 +1219,8 @@ en:
       you: you
     new:
       additional_serial_sticker_number: Additional serial/sticker number
+      student_id: Student ID
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
@@ -4093,6 +4095,8 @@ en:
       where_was_it_stolen: Where was it stolen?
       your_email_address: Your email address
       your_phone_number: Your phone number
+      student_id: Student ID
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       zipcode: Postal Code
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} was registered to you through

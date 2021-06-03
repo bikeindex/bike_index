@@ -164,6 +164,28 @@
                   @organization.organization_affiliation_options,
                   class: "form-control"
 
+          - if include_field_reg_student_id?(@organization, current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :student_id,
+                registration_field_label(@organization, "student_id") || t(".student_id"),
+                class: "form-well-label"
+              .form-well-input
+                = f.text_field :student_id,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
+                  class: "form-control"
+
+          - if include_field_reg_bike_sticker?(@organization, current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label"
+              .form-well-input
+                = f.text_field :bike_sticker,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
+                  class: "form-control"
+
           -# With impounded and found bikes, including owner_email is confusing
           - if @bike.status_impounded?
             = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email

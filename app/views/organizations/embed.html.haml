@@ -161,6 +161,20 @@
       = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
+  - if include_field_reg_student_id?(@organization)
+    .input-group
+      .control-group
+        - label_student_id = registration_field_label(@organization, "reg_student_id") || t(".student_id")
+        = f.label :student_id, label_student_id, class: "control-label"
+        .controls
+          = f.text_field :student_id
+
+  - if include_field_reg_bike_sticker?(@organization)
+    .input-group
+      .control-group
+        = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"
+        .controls
+          = f.text_field :bike_sticker, value: @b_param.bike_sticker
 
   .input-group.form-foot
     .control-group

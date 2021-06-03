@@ -113,7 +113,7 @@
   - if include_field_reg_student_id?(@organization)
     .input-group
       .control-group
-        - label_student_id = registration_field_label(@organization, "student_id") || t(".student_id")
+        - label_student_id = registration_field_label(@organization, "reg_student_id") || t(".student_id")
         = f.label :student_id, label_student_id, class: "control-label"
         .controls
           = f.text_field :student_id
