@@ -138,4 +138,56 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
   end
+
+  describe "include_fields" do
+    let(:organization) { Organization.new }
+    let(:user) { User.new }
+    it "does not include" do
+      expect(include_field_reg_phone?(organization)).to be_falsey
+      expect(include_field_reg_phone?(organization, user)).to be_falsey
+      expect(include_field_reg_address?(organization)).to be_falsey
+      expect(include_field_reg_address?(organization, user)).to be_falsey
+      expect(include_field_extra_registration_number?(organization)).to be_falsey
+      expect(include_field_organization_affiliation?(organization, user)).to be_falsey
+      # the labels work with or without an organization
+      expect(registration_field_label(organization, "extra_registration_number")).to be_nil
+      expect(registration_field_label(organization, "reg_address")).to be_nil
+      expect(registration_field_label(nil, "reg_phone")).to be_nil
+      expect(registration_field_label(nil, "organization_affiliation")).to be_nil
+      expect(registration_field_label(nil, "reg_student_id")).to be_nil
+      expect(registration_field_label(organization, "reg_sticker")).to be_nil
+    end
+    context "with enabled features" do
+      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
+      let(:feature_slugs) { %w[extra_registration_number reg_address reg_phone organization_affiliation reg_student_id reg_sticker] }
+      let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
+      it "includes" do
+        expect(include_field_reg_phone?(organization)).to be_truthy
+        expect(include_field_reg_phone?(organization, user)).to be_truthy
+        expect(include_field_reg_address?(organization)).to be_truthy
+        expect(include_field_reg_address?(organization, user)).to be_truthy
+        expect(include_field_extra_registration_number?(organization)).to be_truthy
+        expect(include_field_organization_affiliation?(organization, user)).to be_truthy
+        # And test the labels
+        expect(registration_field_label(organization, "extra_registration_number")).to eq "XXXZZZZ"
+        expect(registration_field_label(organization, "reg_address")).to be_nil
+        expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
+        expect(registration_field_label(organization, "organization_affiliation")).to be_nil
+        expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
+        expect(registration_field_label(organization, "reg_sticker")).to be_nil
+      end
+      context "with user with attributes" do
+        let(:user) { User.new(phone: "888.888.8888") }
+        it "is falsey" do
+          expect(user.phone).to be_present
+          expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
+          expect(include_field_reg_phone?(organization, user)).to be_falsey
+          expect(include_field_reg_address?(organization, user)).to be_truthy
+          expect(include_field_reg_address?(nil, user)).to be_falsey
+          expect(include_field_reg_student_id?(organization, user)).to be_truthy
+          expect(include_field_reg_student_id?(organization, user)).to be_truthy
+        end
+      end
+    end
+  end
 end

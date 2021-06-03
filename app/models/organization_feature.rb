@@ -7,13 +7,17 @@ class OrganizationFeature < ApplicationRecord
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
+
+  # NOTE: reg_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
     extra_registration_number
     organization_affiliation
-    reg_phone
     reg_address
-    student_id
+    reg_phone
+    reg_sticker
+    reg_student_id
   ].freeze
+
   # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
     additional_registrations_information
@@ -21,6 +25,7 @@ class OrganizationFeature < ApplicationRecord
     parking_notifications
     unstolen_notifications
   ].freeze
+
   EXPECTED_SLUGS = (%w[
     avery_export
     bike_search
@@ -73,7 +78,9 @@ class OrganizationFeature < ApplicationRecord
       organization_affiliation: "organization_affiliation",
       extra_registration_number: "extra_registration_number",
       reg_phone: "phone",
-      reg_address: "registration_address"
+      reg_address: "registration_address",
+      reg_sticker: "bike_sticker",
+      reg_student_id: "student_id"
     }
   end
 

@@ -49,10 +49,9 @@ class Export < ApplicationRecord
   def self.permitted_headers(organization_or_overide = nil)
     return PERMITTED_HEADERS unless organization_or_overide.present?
     if organization_or_overide == "include_paid" # passing include_paid overrides
-      additional_headers = OrganizationFeature::REG_FIELDS + ["sticker"]
+      additional_headers = OrganizationFeature::REG_FIELDS
     elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
-      additional_headers += ["sticker"] if organization_or_overide.enabled?("bike_stickers")
       additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it

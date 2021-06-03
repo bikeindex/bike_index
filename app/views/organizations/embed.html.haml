@@ -17,7 +17,7 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization.include_field_extra_registration_number?
+      - if include_field_extra_registration_number?(@organization)
         - label_secondary_serial = @organization.registration_field_label("extra_registration_number") || t(".additional_serial")
         = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
         .controls
@@ -86,7 +86,7 @@
     #stolen_fields
       = fields_for @stolen_record do |builder|
         = builder.hidden_field :phone_no_show, value: true
-        - unless @organization&.include_field_reg_phone?
+        - unless include_field_reg_phone?(@organization)
           .input-group
             .control-group
               = builder.label :phone, class: "control-label"
@@ -136,7 +136,7 @@
                 = t(".receive_notifications_from_bike_index", bike_type: @bike.type)
                 %span
                   = t(".eg_if_we_tweet_about_or_someone_searches")
-  - if @organization&.include_field_reg_address?
+  - if include_field_reg_address?(@organization)
     - label_address = @organization.registration_field_label("reg_address") || t(".owners_street_address")
     / Set all the bike address attrs
     - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
@@ -155,7 +155,7 @@
             = f.collection_select(:state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
           .control-group.special-select-single#us_id_data{ data: { usid: Country.united_states.id } }
             = f.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
-  - if @organization&.include_field_reg_phone?
+  - if include_field_reg_phone?(@organization)
     - label_phone = @organization.registration_field_label("reg_phone") || t(".your_phone_number")
     .input-group
       = f.label :phone, label_phone

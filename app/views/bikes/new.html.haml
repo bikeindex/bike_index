@@ -81,7 +81,7 @@
 
           -# Show the phone if the bike is stolen, the organization requires phone
           -# only show the phone for impounded records if the current user doesn't have a confirmed phone
-          - if @bike.status_stolen? || @organization&.include_field_reg_phone?(current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
+          - if @bike.status_stolen? || include_field_reg_phone?(@organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed?
             .form-group.row.unnested-field
               = f.label :phone,
                 @organization&.registration_field_label("reg_phone") || t(".phone"),
@@ -97,7 +97,7 @@
             = fields_for @bike.impound_records.last do |irecord|
               = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
 
-          - if @organization&.include_field_reg_address?(current_user)
+          - if include_field_reg_address?(@organization, current_user)
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs
@@ -142,7 +142,7 @@
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 
-          - if @organization&.include_field_extra_registration_number?(current_user)
+          - if include_field_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :extra_registration_number,
                 @organization.registration_field_label("extra_registration_number") || t(".additional_serial_sticker_number"),
@@ -154,7 +154,7 @@
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if @organization&.include_field_organization_affiliation?(current_user)
+          - if include_field_organization_affiliation?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
               = f.label :organization_affiliation,
                 @organization.registration_field_label("organization_affiliation") || t(".affiliation", org_name: @organization.short_name),

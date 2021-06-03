@@ -320,33 +320,12 @@ class Organization < ApplicationRecord
     OrganizationFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
-  def include_field_organization_affiliation?(user = nil)
-    additional_registration_fields.include?("organization_affiliation")
-  end
-
   def organization_affiliation_options
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
     %w[student employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
-  end
-
-  def include_field_reg_phone?(user = nil)
-    return false unless additional_registration_fields.include?("reg_phone")
-    !user&.phone&.present?
-  end
-
-  def include_field_reg_address?(user = nil)
-    additional_registration_fields.include?("reg_address")
-  end
-
-  def include_field_extra_registration_number?(user = nil)
-    additional_registration_fields.include?("extra_registration_number")
-  end
-
-  def registration_field_label(field_slug)
-    registration_field_labels && registration_field_labels[field_slug.to_s]
   end
 
   def bike_actions?
@@ -414,7 +393,7 @@ class Organization < ApplicationRecord
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
-    self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact
+    self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.uniq.sort
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -504,6 +483,8 @@ class Organization < ApplicationRecord
     if regional_parents.any?
       fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
     end
+    # If it has stickers, add reg_sticker field
+    fslugs += ["reg_sticker"] if fslugs.include?("bike_stickers")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

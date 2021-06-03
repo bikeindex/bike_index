@@ -179,7 +179,7 @@ RSpec.describe Organization, type: :model do
       end
       context "by location city" do
         let(:location) { FactoryBot.create(:location, city: "Chicago") }
-        let!(:location_2) { FactoryBot.create(:location, city: "Chicago", organization: organization) }
+        let!(:location2) { FactoryBot.create(:location, city: "Chicago", organization: organization) }
         it "finds the organization" do
           expect(Organization.admin_text_search("chi")).to eq([organization])
         end
@@ -323,22 +323,22 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
-    context "regional_bike_codes" do
+    context "regional bike_stickers" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
       let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[regional_bike_counts bike_stickers])
+        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
         regional_child.reload
         # It's private, so, gotta send
-        expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(["bike_stickers"])
+        expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(%w[bike_stickers reg_sticker])
         regional_child.update(updated_at: Time.current)
-        expect(regional_child.enabled_feature_slugs).to eq(["bike_stickers"])
+        expect(regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_sticker])
         bike.reload
         expect(bike.organizations).to eq([regional_child])
         expect(bike.sticker_organizations).to eq([regional_child])
@@ -632,40 +632,18 @@ RSpec.describe Organization, type: :model do
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
       expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_falsey
-      expect(organization.include_field_reg_phone?).to be_falsey
-      expect(organization.include_field_reg_address?).to be_falsey
-      expect(organization.include_field_extra_registration_number?).to be_falsey
-      expect(organization.include_field_organization_affiliation?).to be_falsey
     end
     context "with organization_features" do
-      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ"}.as_json }
-      let(:organization) { Organization.new(enabled_feature_slugs: %w[extra_registration_number reg_address reg_phone organization_affiliation], registration_field_labels: labels) }
-      let(:user) { User.new }
+      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
+      let(:feature_slugs) { %w[extra_registration_number reg_address reg_phone organization_affiliation reg_student_id reg_sticker] }
+      let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
       it "is true" do
         expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
         expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_truthy
-        expect(organization.include_field_reg_phone?).to be_truthy
-        expect(organization.include_field_reg_phone?(user)).to be_truthy
-        expect(organization.include_field_reg_address?).to be_truthy
-        expect(organization.include_field_reg_address?(user)).to be_truthy
-        expect(organization.include_field_extra_registration_number?).to be_truthy
-        expect(organization.include_field_organization_affiliation?(user)).to be_truthy
-        # And test the lables
-        expect(organization.registration_field_label("extra_registration_number")).to eq "XXXZZZZ"
-        expect(organization.registration_field_label("reg_address")).to be_nil
-        expect(organization.registration_field_label("reg_phone")).to eq labels["reg_phone"]
-        expect(organization.registration_field_label("organization_affiliation")).to be_nil
-      end
-      context "with user with attributes" do
-        let(:user) { User.new(phone: "888.888.8888") }
-        it "is falsey" do
-          expect(user.phone).to be_present
-          expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
-          expect(organization.include_field_reg_phone?(user)).to be_falsey
-          expect(organization.include_field_reg_address?(user)).to be_truthy
-        end
+        expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_sticker")).to be_truthy
       end
     end
   end
