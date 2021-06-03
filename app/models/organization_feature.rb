@@ -8,13 +8,13 @@ class OrganizationFeature < ApplicationRecord
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
 
-  # NOTE: reg_sticker is automatically added if the org has stickers, no need to manually add
+  # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
     extra_registration_number
     organization_affiliation
     reg_address
     reg_phone
-    reg_sticker
+    reg_bike_sticker
     reg_student_id
   ].freeze
 
@@ -73,15 +73,8 @@ class OrganizationFeature < ApplicationRecord
     matching_slugs.any? ? matching_slugs : nil
   end
 
-  def self.reg_field_bike_attrs
-    {
-      organization_affiliation: "organization_affiliation",
-      extra_registration_number: "extra_registration_number",
-      reg_phone: "phone",
-      reg_address: "registration_address",
-      reg_sticker: "bike_sticker",
-      reg_student_id: "student_id"
-    }
+  def self.reg_field_to_bike_attrs(reg_field)
+    reg_field.to_s.gsub("reg_", "")
   end
 
   def one_time?

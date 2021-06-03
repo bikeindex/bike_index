@@ -330,15 +330,15 @@ RSpec.describe Organization, type: :model do
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_sticker regional_bike_counts])
+        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
         regional_child.reload
         # It's private, so, gotta send
-        expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(%w[bike_stickers reg_sticker])
+        expect(regional_child.send(:calculated_enabled_feature_slugs)).to eq(%w[bike_stickers reg_bike_sticker])
         regional_child.update(updated_at: Time.current)
-        expect(regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_sticker])
+        expect(regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
         bike.reload
         expect(bike.organizations).to eq([regional_child])
         expect(bike.sticker_organizations).to eq([regional_child])
@@ -635,7 +635,7 @@ RSpec.describe Organization, type: :model do
     end
     context "with organization_features" do
       let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
-      let(:feature_slugs) { %w[extra_registration_number reg_address reg_phone organization_affiliation reg_student_id reg_sticker] }
+      let(:feature_slugs) { %w[extra_registration_number reg_address reg_phone organization_affiliation reg_student_id reg_bike_sticker] }
       let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
       it "is true" do
         expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_truthy
@@ -643,7 +643,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
         expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
-        expect(organization.additional_registration_fields.include?("reg_sticker")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
       end
     end
   end

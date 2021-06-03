@@ -110,7 +110,7 @@
       = f.label :organization_affiliation, label_affiliation
       .controls
         = f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control"
-  - if @organization.enabled?("bike_stickers")
+  - if include_field_reg_bike_sticker?(@organization)
     .input-group
       .control-group
         = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"

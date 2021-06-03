@@ -111,9 +111,9 @@ module OrganizedHelper
     !user&.phone&.present?
   end
 
-  def include_field_reg_sticker?(organization = nil, user = nil)
+  def include_field_reg_bike_sticker?(organization = nil, user = nil)
     organization.present? &&
-      organization.additional_registration_fields.include?("reg_sticker")
+      organization.additional_registration_fields.include?("reg_bike_sticker")
   end
 
   def include_field_reg_student_id?(organization = nil, user = nil)
