@@ -55,7 +55,7 @@ RSpec.describe OrganizationFeature, type: :model do
 
     it "maps REG_FIELDS to bike attrs" do
       expect(additional_reg_fields).to match_array OrganizationFeature::REG_FIELDS
-      (additional_reg_fields).each do |reg_field|
+      additional_reg_fields.each do |reg_field|
         bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field.to_sym)
         if bike_attr == "bike_sticker" # Because it accepts arguments, I guess? it fails
           expect(bike.bike_sticker).to be_blank

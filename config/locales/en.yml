@@ -1219,8 +1219,6 @@ en:
       you: you
     new:
       additional_serial_sticker_number: Additional serial/sticker number
-      student_id: Student ID
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
@@ -1252,7 +1250,9 @@ en:
         more or see some examples, go to %{serial_page_link} <small>(opens in a separate
         window)</small>.
       state: State
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       street_address: Street address
+      student_id: Student ID
       this_is_a: This is a
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
@@ -4086,6 +4086,8 @@ en:
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
       state: State
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      student_id: Student ID
       third_color: Third color
       this: this
       unknown_serial: Unknown serial
@@ -4095,8 +4097,6 @@ en:
       where_was_it_stolen: Where was it stolen?
       your_email_address: Your email address
       your_phone_number: Your phone number
-      student_id: Student ID
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       zipcode: Postal Code
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} was registered to you through
@@ -4121,7 +4121,6 @@ en:
       model_year: Model year
       optional_additions: Optional additions
       org_affiliation: "%{org_name} affiliation"
-      student_id: Student ID
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address
@@ -4135,6 +4134,7 @@ en:
         listed
       state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      student_id: Student ID
       third_color: Third color
       unknown_serial: Unknown serial
       unknown_year: Unknown year

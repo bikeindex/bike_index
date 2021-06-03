@@ -121,7 +121,7 @@ module OrganizedHelper
       organization.additional_registration_fields.include?("reg_student_id")
   end
 
-  def registration_field_label(organization = nil, field_slug)
+  def registration_field_label(organization = nil, field_slug = nil)
     return nil unless organization&.registration_field_labels.present?
     organization.registration_field_labels[field_slug.to_s]
   end
