@@ -147,8 +147,8 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(include_field_reg_phone?(organization, user)).to be_falsey
       expect(include_field_reg_address?(organization)).to be_falsey
       expect(include_field_reg_address?(organization, user)).to be_falsey
-      expect(include_field_extra_registration_number?(organization)).to be_falsey
-      expect(include_field_organization_affiliation?(organization, user)).to be_falsey
+      expect(include_field_reg_extra_registration_number?(organization)).to be_falsey
+      expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
       # the labels work with or without an organization
       expect(registration_field_label(organization, "extra_registration_number")).to be_nil
       expect(registration_field_label(organization, "reg_address")).to be_nil
@@ -166,8 +166,8 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(include_field_reg_phone?(organization, user)).to be_truthy
         expect(include_field_reg_address?(organization)).to be_truthy
         expect(include_field_reg_address?(organization, user)).to be_truthy
-        expect(include_field_extra_registration_number?(organization)).to be_truthy
-        expect(include_field_organization_affiliation?(organization, user)).to be_truthy
+        expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
+        expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
         # And test the labels
         expect(registration_field_label(organization, "extra_registration_number")).to eq "XXXZZZZ"
         expect(registration_field_label(organization, "reg_address")).to be_nil

@@ -51,7 +51,7 @@ RSpec.describe OrganizationFeature, type: :model do
 
   describe "reg_field_to_bike_attrs" do
     let(:bike) { Bike.new }
-    let(:additional_reg_fields) { %w[organization_affiliation extra_registration_number reg_phone reg_address reg_bike_sticker reg_student_id] }
+    let(:additional_reg_fields) { %w[reg_organization_affiliation reg_extra_registration_number reg_phone reg_address reg_bike_sticker reg_student_id] }
 
     it "maps REG_FIELDS to bike attrs" do
       expect(additional_reg_fields).to match_array OrganizationFeature::REG_FIELDS

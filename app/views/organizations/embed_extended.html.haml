@@ -10,8 +10,8 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if include_field_extra_registration_number?(@organization)
-        - label_secondary_serial = registration_field_label(@organization, "extra_registration_number") || t(".additional_serial")
+      - if include_field_reg_extra_registration_number?(@organization)
+        - label_secondary_serial = registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial")
         = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
         .controls
           = f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
@@ -104,8 +104,8 @@
       = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
-  - if include_field_organization_affiliation?(@organization)
-    - label_affiliation = registration_field_label(@organization, "organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
+  - if include_field_reg_organization_affiliation?(@organization)
+    - label_affiliation = registration_field_label(@organization, "reg_organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name)
     .input-group
       = f.label :organization_affiliation, label_affiliation
       .controls
