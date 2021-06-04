@@ -222,17 +222,19 @@
           %tr
             %td Additional Fields
             %td
-              - additional_fields = @organization.additional_registration_fields.map(&:titleize)
+              - additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) }
               - if additional_fields.any?
                 = additional_fields.join(", ")
                 %br
-                %em.less-strong
-                  Custom Label
-                - @organization.registration_field_labels.each do |field, label|
-                  %small
-                    %strong
-                      - text = "#{field}: #{label}"
-                      = text
+                %small
+                  %em.less-strong
+                    Custom Labels:
+                  - if @organization.registration_field_labels.values.none?
+                    No custom labels
+                  - else
+                    - @organization.registration_field_labels.each do |field, label|
+                      %strong
+                        = "#{field}: #{label}"
               - else
                 %small.less-strong
                   None

@@ -90,14 +90,14 @@ module OrganizedHelper
     l datetime, format: :dotted
   end
 
-  def include_field_extra_registration_number?(organization = nil, user = nil)
+  def include_field_reg_extra_registration_number?(organization = nil, user = nil)
     organization.present? &&
-      organization.additional_registration_fields.include?("extra_registration_number")
+      organization.additional_registration_fields.include?("reg_extra_registration_number")
   end
 
-  def include_field_organization_affiliation?(organization = nil, user = nil)
+  def include_field_reg_organization_affiliation?(organization = nil, user = nil)
     organization.present? &&
-      organization.additional_registration_fields.include?("organization_affiliation")
+      organization.additional_registration_fields.include?("reg_organization_affiliation")
   end
 
   def include_field_reg_address?(organization = nil, user = nil)

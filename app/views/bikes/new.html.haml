@@ -142,10 +142,10 @@
                     { include_blank: true, required: true, prompt: t(".state") },
                     { class: "form-control" })
 
-          - if include_field_extra_registration_number?(@organization, current_user)
+          - if include_field_reg_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :extra_registration_number,
-                registration_field_label(@organization, "extra_registration_number") || t(".additional_serial_sticker_number"),
+                registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :extra_registration_number,
@@ -154,10 +154,10 @@
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if include_field_organization_affiliation?(@organization, current_user)
+          - if include_field_reg_organization_affiliation?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
               = f.label :organization_affiliation,
-                registration_field_label(@organization, "organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                registration_field_label(@organization, "reg_organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation,

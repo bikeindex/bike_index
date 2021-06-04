@@ -105,6 +105,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :website,
         [locations_attributes: permitted_locations_params]
       ).merge(kind: approved_kind)
+      .merge(registration_field_labels: registration_field_labels_val)
   end
 
   def matching_organizations
@@ -131,6 +132,12 @@ class Admin::OrganizationsController < Admin::BaseController
     else
       params[:search_pos]
     end
+  end
+
+  def registration_field_labels_val
+    # Get just the reg labels with values
+    params.select { |k, v| k.match?("reg_label-") && v.present? }.as_json
+      .map { |k, v| [k.gsub("reg_label-", ""), v] }.to_h
   end
 
   def permitted_locations_params

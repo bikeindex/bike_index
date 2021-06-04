@@ -10,8 +10,8 @@ class OrganizationFeature < ApplicationRecord
 
   # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
-    extra_registration_number
-    organization_affiliation
+    reg_extra_registration_number
+    reg_organization_affiliation
     reg_address
     reg_phone
     reg_bike_sticker
@@ -75,6 +75,11 @@ class OrganizationFeature < ApplicationRecord
 
   def self.reg_field_to_bike_attrs(reg_field)
     reg_field.to_s.gsub("reg_", "")
+  end
+
+  def self.reg_fields_with_customizable_labels
+    # Can't rename bike_stickers
+    REG_FIELDS - %w[reg_bike_sticker]
   end
 
   def one_time?
