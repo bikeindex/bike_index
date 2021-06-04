@@ -628,20 +628,20 @@ RSpec.describe Organization, type: :model do
   describe "additional_registration_fields" do
     let(:organization) { Organization.new }
     it "is false" do
-      expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_falsey
+      expect(organization.additional_registration_fields.include?("reg_extra_registration_number")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
-      expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_falsey
+      expect(organization.additional_registration_fields.include?("reg_organization_affiliation")).to be_falsey
     end
     context "with organization_features" do
-      let(:labels) { {reg_phone: "You have to put this in, jerk", extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
-      let(:feature_slugs) { %w[extra_registration_number reg_address reg_phone organization_affiliation reg_student_id reg_bike_sticker] }
+      let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
+      let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
       let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
       it "is true" do
-        expect(organization.additional_registration_fields.include?("extra_registration_number")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_extra_registration_number")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
-        expect(organization.additional_registration_fields.include?("organization_affiliation")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_organization_affiliation")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
       end
