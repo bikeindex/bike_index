@@ -178,7 +178,7 @@ RSpec.describe Export, type: :model do
   describe "permitted_headers_for" do
     let(:organization) { Organization.new }
     let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
-    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone organization_affiliation reg_student_id reg_bike_sticker]) }
+    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     let(:additional_headers) { %w[organization_affiliation address phone bike_sticker student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
