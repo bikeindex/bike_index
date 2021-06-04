@@ -190,10 +190,11 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       let(:target) { {reg_student_id: "party label", reg_address: "useful label"} }
       let(:update_params) do
         {
-         organization: { name: "new name"},
-        "reg_label-reg_student_id" => "party label",
+          :organization => {name: "new name"},
+          "reg_label-reg_student_id" => "party label",
           "reg_label-reg_address" => "useful label",
-          "reg_label-reg_organization_affiliation" => "  "}
+          "reg_label-reg_organization_affiliation" => "  "
+        }
       end
       it "updates the registration_field_label" do
         put "#{base_url}/#{organization.to_param}", params: update_params
