@@ -33,6 +33,9 @@ chdir APP_ROOT do
   puts "\n== Removing old logs and tempfiles =="
   system! "bin/rails log:clear tmp:clear"
 
+  puts "\n Running update to migrate and prepare typeahead"
+  system "bin/rake dev:seed_counts"
+
   puts "\n== Restarting application server =="
   system! "bin/rails restart"
 end
