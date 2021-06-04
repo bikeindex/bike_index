@@ -122,7 +122,7 @@
             You can use #{ENV['AUTO_ORG_MEMBER']} if
             there are no members of the organization
 
-    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications]
+    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications] + OrganizationFeature.reg_fields_with_customizable_labels
     - if @organization.any_enabled?(enabled_features_with_admin_forms)
       .card
         .card-body
@@ -162,6 +162,19 @@
                 = f.text_field :passwordless_user_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
               - unless current_user.developer?
                 %span.small.less-strong Ask Seth for help changing this, it's delicate
+
+          - OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field|
+            - if @organization.enabled?(reg_field)
+              - reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
+              - reg_attr_title = reg_attr.titleize(keep_id_suffix: true)
+              .form-group.small
+                = label_tag "reg_label-#{reg_field}" do
+                  Custom Label for
+                  %em= reg_attr_title
+                  %small.less-strong
+                    leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), { class: "form-control" }
+
 
 
   / .control-group.padded

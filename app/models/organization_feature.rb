@@ -77,6 +77,11 @@ class OrganizationFeature < ApplicationRecord
     reg_field.to_s.gsub("reg_", "")
   end
 
+  def self.reg_fields_with_customizable_labels
+    # Can't rename bike_stickers or extra registration_number
+    REG_FIELDS - %w[reg_bike_sticker extra_registration_number]
+  end
+
   def one_time?
     standard_one_time? || custom_one_time?
   end
