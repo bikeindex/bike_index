@@ -9,6 +9,8 @@ import moment from "moment-timezone";
 // - If elements have classes '.preciseTime' or '.preciseTimeSeconds', includes extra specificity in output
 // - If elements have class '.withPreposition' it includes preposition (to make time fit better in a sentence)
 // - Requires elements have HTML content of a time string (e.g. a unix timestamp)
+// - if the window has timeParserSingleFormat truthy, all times are a single format, for consistency
+//   ... except elements that have classes '.variableFormat'
 //
 // Imported and initialized like this:
 // if (!window.timeParser) { window.timeParser = new TimeParser() }
@@ -16,8 +18,8 @@ import moment from "moment-timezone";
 // To update an individual element with a time in it (doesn't require element to have class '.convertTime'):
 // timeParser.writeTime(el)
 //
-// To get just the text that is output into the element:
-// timeFromText("1604337131")
+// To get span with the localized time:
+// localizedTimeHtml("1604337131")
 //
 // You can add this to a react component:
 // componentDidUpdate() { window.timeParser.localize() }
@@ -27,6 +29,7 @@ export default class TimeParser {
     if (!window.localTimezone) {
       window.localTimezone = moment.tz.guess();
     }
+    this.singleFormat = !!window.timeParserSingleFormat;
     this.localTimezone = window.localTimezone;
     moment.tz.setDefault(this.localTimezone);
     this.yesterdayStart = moment().subtract(1, "day").startOf("day");
@@ -38,8 +41,8 @@ export default class TimeParser {
 
   // If we're display time with the hour, we have different formats based on whether we include seconds
   // this manages that functionality
-  hourFormat(time, baseTimeFormat, includeSeconds, includePreposition) {
-    const prefix = includePreposition ? " at " : "";
+  hourFormat(time, baseTimeFormat, includeSeconds, withPreposition) {
+    const prefix = withPreposition ? " at " : "";
     if (includeSeconds) {
       return `${prefix}${time.format(baseTimeFormat)}:<small>${time.format(
         "ss"
@@ -49,10 +52,20 @@ export default class TimeParser {
     }
   }
 
-  localizedDateText(time, preciseTime, includeSeconds, includePreposition) {
+  localizedDateText(
+    time,
+    singleFormat,
+    preciseTime,
+    includeSeconds,
+    withPreposition
+  ) {
     let prefix = "";
-    // If we're dealing with yesterday or today (not the future)
-    if (time < this.tomorrowEnd && time > this.yesterdayStart) {
+    // If we're doing inconsistent formatting, add a prefix if we're dealing with yesterday or today (not the future)
+    if (
+      !singleFormat &&
+      time < this.tomorrowEnd &&
+      time > this.yesterdayStart
+    ) {
       // If we're dealing with yesterday or tomorrow, we prepend that
       if (time < this.todayStart) {
         prefix = "Yesterday ";
@@ -60,34 +73,34 @@ export default class TimeParser {
         prefix = "Tomorrow ";
       }
       return (
-        prefix +
-        this.hourFormat(time, "h:mm", includeSeconds, includePreposition)
+        prefix + this.hourFormat(time, "h:mm", includeSeconds, withPreposition)
       );
     }
-    if (includePreposition) {
+    if (withPreposition) {
       prefix = "on ";
     }
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
     if (preciseTime || includeSeconds) {
-      let hourStr = this.hourFormat(
+      // Make the time less-strong, otherwise it's hard to separate from the date
+      let hourEl = `<span class="less-strong">${this.hourFormat(
         time,
         "h:mm",
         includeSeconds,
-        includePreposition
-      );
+        withPreposition
+      )}</span>`;
       // Only show the year if it isn't this year
-      if (time.year() - this.todayYear !== 0) {
-        return prefix + time.format("YYYY-MM-DD ") + hourStr;
+      if (singleFormat || time.year() - this.todayYear !== 0) {
+        return prefix + time.format("YYYY-MM-DD ") + hourEl;
       } else {
-        return prefix + time.format("MMM Do[,] ") + hourStr;
+        return prefix + time.format("MMM Do ") + hourEl;
       }
     }
     // Otherwise, format in basic format
-    if (time.year() - this.todayYear !== 0) {
+    if (singleFormat || time.year() - this.todayYear !== 0) {
       return prefix + time.format("YYYY-MM-DD");
     } else {
-      if (includePreposition) {
+      if (withPreposition) {
         return prefix + time.format("MMM Do");
       } else {
         return prefix + time.format("MMM Do");
@@ -116,19 +129,28 @@ export default class TimeParser {
     }
   }
 
-  // timeFromText() is not used, included to make getting the text output separately easier
-  timeFromText(
-    text,
-    preciseTime = false,
-    includeSeconds = false,
-    includePreposition = false
+  // This is for directly rendering localized time elements - it is not used by the window.localize()
+  localizedTimeHtml(
+    timeString,
+    { singleFormat, preciseTime, includeSeconds, withPreposition }
   ) {
-    return this.localizedDateText(
-      this.parse(text),
+    const time = this.parse(String(timeString).trim());
+
+    if (time === null) {
+      return `<span></span>`;
+    }
+    // If singleFormat was passed as true, override with that, otherwise default to window format
+    let variableFormat = !singleFormat ? true : !this.singleFormat;
+
+    return `<span title="${this.preciseTimeSeconds(
+      time
+    )}">${this.localizedDateText(
+      time,
+      !variableFormat,
       preciseTime,
       includeSeconds,
-      includePreposition
-    );
+      withPreposition
+    )}</span>`;
   }
 
   writeTime(el) {
@@ -143,9 +165,10 @@ export default class TimeParser {
     if (!(text.length > 0) || time === null) {
       return;
     }
-
     el.innerHTML = this.localizedDateText(
       time,
+      // If the window has singleFormat, then it should be single format - unless the element has variableFormat class
+      this.singleFormat ? !el.classList.contains("variableFormat") : false,
       el.classList.contains("preciseTime"),
       el.classList.contains("preciseTimeSeconds"),
       el.classList.contains("withPreposition")
