@@ -178,7 +178,6 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.b_params (
     id integer NOT NULL,
-    old_params text,
     bike_title character varying(255),
     creator_id integer,
     created_bike_id integer,
@@ -5631,6 +5630,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210421174751'),
 ('20210423200934'),
 ('20210512162607'),
-('20210601175924');
+('20210601175924'),
+('20210604191419');
 
 
