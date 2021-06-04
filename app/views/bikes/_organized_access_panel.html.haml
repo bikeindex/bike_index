@@ -140,10 +140,7 @@
                   - else
                     %tr
                       %td
-                        - if (bike_attr || reg_field) == "student_id" # Humanize strips out id
-                          Student ID
-                        - else
-                          = "#{(bike_attr || reg_field).humanize}"
+                        = "#{(bike_attr || reg_field).humanize(keep_id_suffix: true)}"
                       %td
                         - if bike_attr == "organization_affiliation"
                           = @bike.organization_affiliation.humanize

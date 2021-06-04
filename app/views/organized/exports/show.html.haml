@@ -2,8 +2,9 @@
   .organized-page-header
     %h1
       = t(".exports")
-      %small
-        = link_to t(".download_export"), @export.file.url, class: "btn btn-secondary pull-right"
+      - if @export.finished?
+        %small
+          = link_to t(".download_export"), @export.file.url, class: "btn btn-secondary pull-right"
 
   - if @avery_export_redirect
     .mb-4
@@ -131,4 +132,4 @@
         %td
           %ul
             - @export.written_headers.each do |header|
-              %li= header.humanize
+              %li= header.humanize(keep_id_suffix: true)
