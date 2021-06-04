@@ -109,8 +109,9 @@
                     = @bike.creator&.display_name
                     %em.less-strong
                       = origin_display(@bike.creation_description)
-                - passive_organization.additional_registration_fields.each do |reg_field|
-                  - bike_attr = OrganizationFeature.reg_field_bike_attrs[reg_field.to_sym]
+                -# Bike Stickers are handled separately, so skip it
+                - (passive_organization.additional_registration_fields - ["reg_bike_sticker"]).each do |reg_field|
+                  - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                   - if bike_attr == "registration_address"
                     %tr
                       %td= t(".address")
@@ -139,7 +140,7 @@
                   - else
                     %tr
                       %td
-                        = "#{(bike_attr || reg_field).humanize}"
+                        = "#{(bike_attr || reg_field).humanize(keep_id_suffix: true)}"
                       %td
                         - if bike_attr == "organization_affiliation"
                           = @bike.organization_affiliation.humanize

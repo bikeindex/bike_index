@@ -1250,7 +1250,9 @@ en:
         more or see some examples, go to %{serial_page_link} <small>(opens in a separate
         window)</small>.
       state: State
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       street_address: Street address
+      student_id: Student ID
       this_is_a: This is a
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
@@ -4084,6 +4086,8 @@ en:
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
       state: State
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      student_id: Student ID
       third_color: Third color
       this: this
       unknown_serial: Unknown serial
@@ -4130,6 +4134,7 @@ en:
         listed
       state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      student_id: Student ID
       third_color: Third color
       unknown_serial: Unknown serial
       unknown_year: Unknown year

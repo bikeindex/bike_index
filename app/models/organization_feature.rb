@@ -7,12 +7,17 @@ class OrganizationFeature < ApplicationRecord
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
+
+  # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
-    extra_registration_number
-    organization_affiliation
-    reg_phone
+    reg_extra_registration_number
+    reg_organization_affiliation
     reg_address
+    reg_phone
+    reg_bike_sticker
+    reg_student_id
   ].freeze
+
   # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
     additional_registrations_information
@@ -20,6 +25,7 @@ class OrganizationFeature < ApplicationRecord
     parking_notifications
     unstolen_notifications
   ].freeze
+
   EXPECTED_SLUGS = (%w[
     avery_export
     bike_search
@@ -67,13 +73,13 @@ class OrganizationFeature < ApplicationRecord
     matching_slugs.any? ? matching_slugs : nil
   end
 
-  def self.reg_field_bike_attrs
-    {
-      organization_affiliation: "organization_affiliation",
-      extra_registration_number: "extra_registration_number",
-      reg_phone: "phone",
-      reg_address: "registration_address"
-    }
+  def self.reg_field_to_bike_attrs(reg_field)
+    reg_field.to_s.gsub("reg_", "")
+  end
+
+  def self.reg_fields_with_customizable_labels
+    # Can't rename bike_stickers
+    REG_FIELDS - %w[reg_bike_sticker]
   end
 
   def one_time?

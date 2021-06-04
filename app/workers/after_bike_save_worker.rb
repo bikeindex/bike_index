@@ -39,11 +39,25 @@ class AfterBikeSaveWorker < ApplicationWorker
   def update_matching_partial_registrations(bike)
     return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
     matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
+      .reorder(:created_at)
     if matches.count > 1
       # Try to make it a little more accurate lookup
       best_matches = matches.select { |b_param| b_param.manufacturer_id == bike.manufacturer_id }
       matches = best_matches if matches.any?
     end
-    matches.first&.update_attributes(created_bike_id: bike.id)
+    matching_b_param = matches.last # Because we want the last created
+    return true unless matching_b_param.present?
+    matching_b_param.update_attributes(created_bike_id: bike.id)
+    # Only set creation_state
+    creation_state = bike.creation_state
+    if creation_state.present? && creation_state.origin == "web" && creation_state.organization_id.blank?
+      creation_state.organization_id = matching_b_param.organization_id
+      creation_state.origin = matching_b_param.origin if (CreationState.origins - ["web"]).include?(matching_b_param.origin)
+      creation_state.save
+      if matching_b_param.organization_id.present?
+        bike.update(creation_organization_id: matching_b_param.organization_id)
+        bike.bike_organizations.create(organization_id: matching_b_param.organization_id)
+      end
+    end
   end
 end

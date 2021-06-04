@@ -25,7 +25,7 @@ RSpec.describe OrganizationFeature, type: :model do
 
           expect(organization.kind).to eq "law_enforcement"
           expect(organization_child.kind).to eq "bike_shop"
-          expect(organization.enabled_feature_slugs).to eq %w[child_organizations bike_stickers]
+          expect(organization.enabled_feature_slugs).to eq %w[bike_stickers child_organizations reg_bike_sticker]
           expect(organization.reload.child_ids).to eq([organization_child.id])
           expect(organization_child.enabled_feature_slugs).to eq %w[bike_search]
         end
@@ -36,28 +36,32 @@ RSpec.describe OrganizationFeature, type: :model do
         Sidekiq::Testing.inline! do
           invoice.update_attributes(child_enabled_feature_slugs_string: "bike_stickers")
 
-          expect(organization.enabled_feature_slugs).to eq(%w[child_organizations bike_stickers])
+          expect(organization.enabled_feature_slugs).to eq(%w[bike_stickers child_organizations reg_bike_sticker])
           expect(organization_child.current_invoices.pluck(:id)).to match_array([organization_child.invoices.first.id])
           expect(organization.kind).to eq "law_enforcement"
           expect(organization_child.kind).to eq "bike_shop"
-          expect(organization.enabled_feature_slugs).to eq %w[child_organizations bike_stickers]
+          expect(organization.enabled_feature_slugs).to eq %w[bike_stickers child_organizations reg_bike_sticker]
 
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.enabled_feature_slugs).to match_array(%w[bike_stickers bike_search])
+          expect(organization_child.enabled_feature_slugs).to match_array(%w[bike_search bike_stickers reg_bike_sticker])
         end
       end
     end
   end
 
-  describe "additional_reg_field_bike_attrs" do
+  describe "reg_field_to_bike_attrs" do
     let(:bike) { Bike.new }
-    let(:additional_reg_fields) { %w[organization_affiliation extra_registration_number reg_phone reg_address] }
+    let(:additional_reg_fields) { %w[reg_organization_affiliation reg_extra_registration_number reg_phone reg_address reg_bike_sticker reg_student_id] }
 
     it "maps REG_FIELDS to bike attrs" do
       expect(additional_reg_fields).to match_array OrganizationFeature::REG_FIELDS
       additional_reg_fields.each do |reg_field|
-        bike_attr = OrganizationFeature.reg_field_bike_attrs[reg_field.to_sym]
-        expect(bike.send(bike_attr)).to be_blank
+        bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field.to_sym)
+        if bike_attr == "bike_sticker" # Because it accepts arguments, I guess? it fails
+          expect(bike.bike_sticker).to be_blank
+        else
+          expect(bike.send(bike_attr)).to be_blank
+        end
       end
     end
   end

@@ -71,7 +71,8 @@ class Bike < ApplicationRecord
   attr_accessor :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
     :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
-    :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr
+    :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
+    :bike_sticker
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
@@ -834,6 +835,20 @@ class Bike < ApplicationRecord
     return "" unless previous_o_affiliation.present?
     update(organization_affiliation: previous_o_affiliation)
     previous_o_affiliation
+  end
+
+  def student_id=(val)
+    conditional_information["student_id"] = val
+  end
+
+  def student_id
+    # TODO: make conditional_information hold more things
+    s_id = conditional_information["student_id"]
+    return s_id if s_id.present?
+    previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
+    return "" unless previous_s_id.present?
+    update(student_id: previous_s_id)
+    previous_s_id
   end
 
   def external_image_urls

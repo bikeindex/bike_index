@@ -240,7 +240,6 @@ RSpec.describe BikesController, type: :request do
       context "with org member" do
         include_context :request_spec_logged_in_as_organization_member
         it "renders, even though user hidden" do
-          pp bike.status, bike.reload.status
           expect(bike.reload.user_hidden).to be_truthy
           expect(bike.owner).to_not eq current_user
           expect(bike.b_params.count).to eq 0
@@ -769,6 +768,7 @@ RSpec.describe BikesController, type: :request do
               address: default_location[:address],
               extra_registration_number: "XXXZZZ",
               organization_affiliation: "employee",
+              student_id: "999888",
               phone: "888.777.6666"
             }
           }
@@ -786,6 +786,8 @@ RSpec.describe BikesController, type: :request do
         expect(new_bike.registration_address).to eq target_address.as_json
         expect(new_bike.extra_registration_number).to eq "XXXZZZ"
         expect(new_bike.organization_affiliation).to eq "employee"
+        expect(new_bike.student_id).to eq "999888"
+        expect_hashes_to_match(new_bike.conditional_information, {organization_affiliation: "employee", student_id: "999888"})
         expect(new_bike.phone).to eq "8887776666"
         current_user.reload
         expect(new_bike.owner).to eq current_user # NOTE: not bike user

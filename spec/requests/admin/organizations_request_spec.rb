@@ -179,9 +179,35 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     context "updating graduated notifications" do
       it "updates graduated_notification_interval_days" do
+        organization.update(registration_field_labels: {reg_student_id: "Cool label"})
         put "#{base_url}/#{organization.to_param}", params: {organization: {graduated_notification_interval_days: "365"}}
         organization.reload
         expect(organization.graduated_notification_interval).to eq 365.days.to_i
+        expect(organization.registration_field_labels).to eq({})
+      end
+    end
+    context "updating registration labels" do
+      let(:target) { {reg_student_id: "party label", reg_address: "useful label"} }
+      let(:update_params) do
+        {
+          :organization => {name: "new name"},
+          "reg_label-reg_student_id" => "party label",
+          "reg_label-reg_address" => "useful label",
+          "reg_label-reg_organization_affiliation" => "  "
+        }
+      end
+      it "updates the registration_field_label" do
+        put "#{base_url}/#{organization.to_param}", params: update_params
+        organization.reload
+        expect(organization.registration_field_labels).to eq target.as_json
+      end
+      context "with existing registration_field_label" do
+        it "updates" do
+          organization.update(registration_field_labels: {extra_registration_number: "Cool label"})
+          put "#{base_url}/#{organization.to_param}", params: update_params
+          organization.reload
+          expect(organization.registration_field_labels).to eq target.as_json
+        end
       end
     end
     context "not updating manual_pos_kind" do

@@ -320,33 +320,12 @@ class Organization < ApplicationRecord
     OrganizationFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
 
-  def include_field_organization_affiliation?(user = nil)
-    additional_registration_fields.include?("organization_affiliation")
-  end
-
   def organization_affiliation_options
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
     %w[student employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
-  end
-
-  def include_field_reg_phone?(user = nil)
-    return false unless additional_registration_fields.include?("reg_phone")
-    !user&.phone&.present?
-  end
-
-  def include_field_reg_address?(user = nil)
-    additional_registration_fields.include?("reg_address")
-  end
-
-  def include_field_extra_registration_number?(user = nil)
-    additional_registration_fields.include?("extra_registration_number")
-  end
-
-  def registration_field_label(field_slug)
-    registration_field_labels && registration_field_labels[field_slug.to_s]
   end
 
   def bike_actions?
@@ -414,7 +393,7 @@ class Organization < ApplicationRecord
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
-    self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact
+    self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -504,6 +483,14 @@ class Organization < ApplicationRecord
     if regional_parents.any?
       fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
     end
+    # Ambassador orgs get unstolen_notifications
+    fslugs += ["unstolen_notifications"] if ambassador?
+    # Pull in the parent invoice features
+    if parent_organization_id.present?
+      fslugs += current_parent_invoices.map(&:child_enabled_feature_slugs).flatten
+    end
+    # If it has stickers, add reg_bike_sticker field
+    fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
@@ -514,11 +501,7 @@ class Organization < ApplicationRecord
       fslugs += ["impound_bikes_public"] if impound_configuration&.public_view?
       # Also - don't fetch to avoid creating impound_configurations all the time
     end
-
-    # Ambassador orgs get unstolen_notifications
-    fslugs += ["unstolen_notifications"] if ambassador?
-    return fslugs.uniq unless parent_organization_id.present?
-    (fslugs + current_parent_invoices.map(&:child_enabled_feature_slugs).flatten).uniq
+    fslugs.uniq
   end
 
   def set_ambassador_organization_defaults

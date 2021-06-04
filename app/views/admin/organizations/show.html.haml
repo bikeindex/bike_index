@@ -222,20 +222,21 @@
           %tr
             %td Additional Fields
             %td
-              - additional_fields = @organization.additional_registration_fields.map(&:titleize)
-              - if additional_fields.any?
-                = additional_fields.join(", ")
-                %br
-                %em.less-strong
-                  Custom Label
-                - @organization.registration_field_labels.each do |field, label|
-                  %small
-                    %strong
-                      - text = "#{field}: #{label}"
-                      = text
+              - additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) }
+              - if additional_fields.none?
+                %small.less-strong None
               - else
-                %small.less-strong
-                  None
+                %small= additional_fields.join(", ")
+                %br
+                - if @organization.registration_field_labels.values.none?
+                  %em.small.less-strong No custom labels
+                - else
+                  %em.small.less-strong Custom Labels:
+                  %ul.small.mb-0
+                    - @organization.registration_field_labels.each do |field, label|
+                      %li
+                        %strong #{OrganizationFeature.reg_field_to_bike_attrs(field).titleize(keep_id_suffix: true)}:
+                        = label
           - if @organization.enabled?("hot_sheet")
             %tr
               %td Hot Sheet
