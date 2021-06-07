@@ -1,21 +1,42 @@
 class @AdDisplayer
-  ads_syscraper = ['ad300x600']
-  ads_sm_rectangle = ['ad468x60']
+  ads_skyscraper = ["ad300x600"]
+  ads_sm_rectangle = ["ad468x60"]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
   max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
   max_tracker_468 = "<a id=\"binxad-max_tracker_468\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
 
+  internalAds = {
+    "max_tracker_300": {
+      "href": "https://landing.mymaxtracker.com",
+      "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
+    },
+    "max_tracker_468": {
+      "href": "https://landing.mymaxtracker.com",
+      "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+    }
+  }
+
+  skyscrapers = ["max_tracker_300"]
+  sm_rectangles = ["max_tracker_468"]
+
   constructor: ->
     renderedAds = []
 
-    for el_klass in ads_syscraper
-      if document.getElementsByClassName(el_klass)
-        Array::push.apply renderedAds, @renderSkyscraper(el_klass)
-
+    for el_klass in ads_skyscraper
+      $(".#{el_klass}").each (index, el) =>
+        renderedAds.push @renderAdElement(el, index, skyscrapers)
+      # # if document.getElementsByClassName(el_klass)
+      # for el, index in document.getElementsByClassName(el_klass)
+      #   Array::push.apply renderedAds, @renderSkyscraperAd(el, index)
     for el_klass in ads_sm_rectangle
-      if document.getElementsByClassName(el_klass)
-        Array::push.apply renderedAds, @renderSmRectangle(el_klass)
+      # if document.getElementsByClassName(el_klass)
+      # for el, index in document.getElementsByClassName(el_klass)
+      $(".#{el_klass}").each (index, el) =>
+        renderedAds.push @renderAdElement(el, index, sm_rectangles)
+        # @renderAdElement(el, index, sm_rectangles)
+
+    window.renderedAds = renderedAds
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
@@ -24,20 +45,38 @@ class @AdDisplayer
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderSkyscraper: (el_klass) ->
-    skyscrapers
-    for el in document.querySelectorAll(".#{el_klass}")
-      el
+  renderSkyscraperAd: (el, index) ->
+    val = skyscrapers[index] || "Google ad"
+    el.innerHTML = val
+    el.classList.add("rendered-ad")
+    "#{val}"
+    # for el, index in document.querySelectorAll(".#{el_klass}")
+    #   console.log(skyscrapers[index])
+
     # for el in document.getElementsByClassName(el_klass)
     #   el
     # $(".#{el_klass}").html([max_tracker_300].join("")).addClass("rendered-ad")
 
-    ["max_tracker_300"]
+    # ["max_tracker_300"]
 
-  renderSmRectangle: (el_klass) ->
-    $(".#{el_klass}").html([max_tracker_468].join("")).addClass("rendered-ad")
+  renderSmRectangleAd: (el, index) ->
+    val = sm_rectangles[index] || "Google ad"
+    el.innerHTML = val
+    el.classList.add("rendered-ad")
+    "#{val}"
+    # $(".#{el_klass}").html([max_tracker_468].join("")).addClass("rendered-ad")
 
-    ["max_tracker_468"]
+    # ["max_tracker_468"]
+
+  renderAdElement: (el, index, adArray) ->
+    el.classList.add("rendered-ad")
+    if adArray[index]
+      renderedAd = internalAds[adArray[index]]
+      el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
+      adArray[index]
+    else
+      el.innerHTML = "Google ad"
+      "Google ad"
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
