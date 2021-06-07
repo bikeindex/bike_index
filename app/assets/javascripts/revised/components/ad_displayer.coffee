@@ -9,13 +9,13 @@ class @AdDisplayer
   constructor: ->
     renderedAds = []
 
-    for el_id in ads_syscraper
-      if document.getElementsByClassName(el_id)
-        Array::push.apply renderedAds, @renderSkyscraper(el_id)
+    for el_klass in ads_syscraper
+      if document.getElementsByClassName(el_klass)
+        Array::push.apply renderedAds, @renderSkyscraper(el_klass)
 
-    for el_id in ads_sm_rectangle
-      if document.getElementsByClassName(el_id)
-        Array::push.apply renderedAds, @renderSmRectangle(el_id)
+    for el_klass in ads_sm_rectangle
+      if document.getElementsByClassName(el_klass)
+        Array::push.apply renderedAds, @renderSmRectangle(el_klass)
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
@@ -24,13 +24,18 @@ class @AdDisplayer
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderSkyscraper: (el_id) ->
-    $(".#{el_id}").html([max_tracker_300].join("")).addClass("rendered-ad")
+  renderSkyscraper: (el_klass) ->
+    skyscrapers
+    for el in document.querySelectorAll(".#{el_klass}")
+      el
+    # for el in document.getElementsByClassName(el_klass)
+    #   el
+    # $(".#{el_klass}").html([max_tracker_300].join("")).addClass("rendered-ad")
 
     ["max_tracker_300"]
 
-  renderSmRectangle: (el_id) ->
-    $(".#{el_id}").html([max_tracker_468].join("")).addClass("rendered-ad")
+  renderSmRectangle: (el_klass) ->
+    $(".#{el_klass}").html([max_tracker_468].join("")).addClass("rendered-ad")
 
     ["max_tracker_468"]
 
