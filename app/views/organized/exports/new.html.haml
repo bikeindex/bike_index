@@ -29,7 +29,7 @@
               %label.checkbox
                 = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
                 = header.titleize(keep_id_suffix: true)
-    .form-group.row.mt-4
+    .form-group.row.mt-4.hiddenOnOnlyCustom
       = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4
         %a.field-expander{ href: "#" }
@@ -38,7 +38,7 @@
           = f.datetime_local_field :start_at, step: 60, class: "form-control"
           %a.field-collapser{ href: "#" }
             remove
-    .form-group.row
+    .form-group.row.hiddenOnOnlyCustom
       = f.label :end_at, "Registered before", class: "org-form-label"
       .col-sm-4
         %a.field-expander{ href: "#" }
@@ -58,7 +58,7 @@
               %label.checkbox
                 = check_box_tag :include_full_registrations, true, include_full
                 Registered bikes
-            .col-xs-4.mb-0.hiddenOnAveryExport{ style: "line-height: 1.25;" }
+            .col-xs-4.mb-0.hiddenOnAveryExport.hiddenOnOnlyCustom{ style: "line-height: 1.25;" }
               %label.checkbox
                 = check_box_tag :include_partial_registrations, true, include_partial
                 Incomplete registrations
@@ -66,9 +66,12 @@
             %a.field-expander{ href: "#expandCustomBikeIds" }
               Add specific bikes to export
         .collapsed-fields
-          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control"
+          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
           %span.below-input-help
             For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+          %label.checkbox.mt-0
+            = f.check_box :only_custom_bike_ids
+            <em>Only</em> include specific bikes
     .form-group.row.mt-2.hiddenOnAveryExport
       = f.label :format, "Export file format", class: "org-form-label"
       .col-sm-4

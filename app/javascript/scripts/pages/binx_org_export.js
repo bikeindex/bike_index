@@ -13,23 +13,21 @@ export default class BinxAppOrgExport {
 
   initNewForm() {
     // make the datetimefield expand, set the time
-    $(".field-expander").on("click", e => {
+    $(".field-expander").on("click", (e) => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      $parent.find(".field-expander").slideUp("fast", function() {
+      $parent.find(".field-expander").slideUp("fast", function () {
         $parent.find(".collapsed-fields").slideDown("fast");
-        $parent.find("input[type='datetime-local']").val(
-          moment()
-            .startOf("day")
-            .format("YYYY-MM-DDTHH:mm")
-        );
+        $parent
+          .find("input[type='datetime-local']")
+          .val(moment().startOf("day").format("YYYY-MM-DDTHH:mm"));
       });
     });
     // make the datetimefield collapse, remove the time
-    $(".field-collapser").on("click", e => {
+    $(".field-collapser").on("click", (e) => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      $parent.find(".collapsed-fields").slideUp("fast", function() {
+      $parent.find(".collapsed-fields").slideUp("fast", function () {
         $parent.find(".field-expander").slideDown("fast");
         $parent.find("input[type='datetime-local']").val("");
       });
@@ -38,8 +36,15 @@ export default class BinxAppOrgExport {
     // Show avery
     this.showOrHideNonAvery();
     // and on future changes, trigger the update
-    $("#export_avery_export").on("change", e => {
+    $("#export_avery_export").on("change", (e) => {
       this.showOrHideNonAvery();
+    });
+
+    // Show onlyCustom
+    this.showOrHideOnlyCustom();
+    // and on future changes, trigger the update
+    $("#export_only_custom_bike_ids").on("change", (e) => {
+      this.showOrHideOnlyCustom();
     });
   }
 
@@ -47,14 +52,19 @@ export default class BinxAppOrgExport {
     let isAvery = $("#export_avery_export").is(":checked");
     if (isAvery) {
       $(".hiddenOnAveryExport").slideUp("fast");
-      $(".shownOnAveryExport")
-        .slideDown("fast")
-        .css("display", "flex");
+      $(".shownOnAveryExport").slideDown("fast").css("display", "flex");
     } else {
-      $(".hiddenOnAveryExport")
-        .slideDown("fast")
-        .css("display", "flex");
+      $(".hiddenOnAveryExport").slideDown("fast").css("display", "flex");
       $(".shownOnAveryExport").slideUp("fast");
+    }
+  }
+
+  showOrHideOnlyCustom() {
+    let isOnlyCustom = $("#export_only_custom_bike_ids").is(":checked");
+    if (isOnlyCustom) {
+      $(".hiddenOnOnlyCustom").slideUp("fast");
+    } else {
+      $(".hiddenOnOnlyCustom").slideDown("fast").css("display", "flex");
     }
   }
 
@@ -69,4 +79,4 @@ export default class BinxAppOrgExport {
       }
     }
   }
-};
+}
