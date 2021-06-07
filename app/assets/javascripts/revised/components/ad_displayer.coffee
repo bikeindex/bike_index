@@ -26,15 +26,10 @@ class @AdDisplayer
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
         renderedAds.push @renderAdElement(el, index, skyscrapers)
-      # # if document.getElementsByClassName(el_klass)
-      # for el, index in document.getElementsByClassName(el_klass)
-      #   Array::push.apply renderedAds, @renderSkyscraperAd(el, index)
+
     for el_klass in ads_sm_rectangle
-      # if document.getElementsByClassName(el_klass)
-      # for el, index in document.getElementsByClassName(el_klass)
       $(".#{el_klass}").each (index, el) =>
         renderedAds.push @renderAdElement(el, index, sm_rectangles)
-        # @renderAdElement(el, index, sm_rectangles)
 
     window.renderedAds = renderedAds
 
@@ -44,29 +39,6 @@ class @AdDisplayer
         window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-load", eventLabel: "#{adname}"})
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
-
-  renderSkyscraperAd: (el, index) ->
-    val = skyscrapers[index] || "Google ad"
-    el.innerHTML = val
-    el.classList.add("rendered-ad")
-    "#{val}"
-    # for el, index in document.querySelectorAll(".#{el_klass}")
-    #   console.log(skyscrapers[index])
-
-    # for el in document.getElementsByClassName(el_klass)
-    #   el
-    # $(".#{el_klass}").html([max_tracker_300].join("")).addClass("rendered-ad")
-
-    # ["max_tracker_300"]
-
-  renderSmRectangleAd: (el, index) ->
-    val = sm_rectangles[index] || "Google ad"
-    el.innerHTML = val
-    el.classList.add("rendered-ad")
-    "#{val}"
-    # $(".#{el_klass}").html([max_tracker_468].join("")).addClass("rendered-ad")
-
-    # ["max_tracker_468"]
 
   renderAdElement: (el, index, adArray) ->
     el.classList.add("rendered-ad")
