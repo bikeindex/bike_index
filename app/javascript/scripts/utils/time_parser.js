@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 
 // TimeParser updates all HTML elements with class '.convertTime', making them:
 // - Human readable
-// - Display time in current timezone
+// - Displayed with time in provided timezone
 // - With context relevant data (e.g. today shows hour, last month just date)
 // - Gives the element a title of the precise time with seconds (so hovering shows it)
 // - If elements have classes '.preciseTime' or '.preciseTimeSeconds', includes extra specificity in output
@@ -14,12 +14,10 @@ import moment from "moment-timezone";
 //
 // Imported and initialized like this:
 // if (!window.timeParser) { window.timeParser = new TimeParser() }
-//
-// To update an individual element with a time in it (doesn't require element to have class '.convertTime'):
-// timeParser.writeTime(el)
+// window.timeParser.localize() // updates all the elements on the page with the localized time
 //
 // To get span with the localized time:
-// localizedTimeHtml("1604337131")
+// localizedTimeHtml("1604337131", {})
 //
 // You can add this to a react component:
 // componentDidUpdate() { window.timeParser.localize() }
@@ -37,6 +35,78 @@ export default class TimeParser {
     this.todayEnd = moment().endOf("day");
     this.tomorrowEnd = moment().add(1, "day").endOf("day");
     this.todayYear = moment().year();
+  }
+
+  // Directly render localized time elements. Returns an HTML string
+  localizedTimeHtml(
+    timeString,
+    { singleFormat, preciseTime, includeSeconds, withPreposition }
+  ) {
+    const time = this.parse(String(timeString).trim());
+
+    if (time === null) {
+      return `<span></span>`;
+    }
+    // If singleFormat was passed as true, override with that, otherwise default to window format
+    let variableFormat = singleFormat ? false : !this.singleFormat;
+
+    return `<span title="${this.preciseTimeSeconds(
+      time
+    )}">${this.localizedDateText(
+      time,
+      !variableFormat,
+      preciseTime,
+      includeSeconds,
+      withPreposition
+    )}</span>`;
+  }
+
+  // Update all the times (and timezones) on the page
+  // Removes the classes that trigger localization, so it doesn't reupdate the times
+  localize() {
+    // Write times
+    Array.from(document.getElementsByClassName("convertTime")).forEach((el) =>
+      this.writeTime(el)
+    );
+
+    // Write timezones
+    Array.from(
+      document.getElementsByClassName("convertTimezone")
+    ).forEach((el) => this.writeTimezone(el));
+
+    // Write hidden timezone fields - so if we're submitting a form, it includes the current timezone
+    Array.from(
+      document.getElementsByClassName("hiddenFieldTimezone")
+    ).forEach((el) => this.setHiddenTimezoneFields(el));
+  }
+
+  // ---------
+  // Methods below here are internal methods
+  // ---------
+
+  // Update an element with the current time.
+  // Requires the element have parseable text of a time, pulls properties from the element classes
+  writeTime(el) {
+    const text = el.textContent.trim();
+    const time = this.parse(text);
+    // So running this again doesn't reapply to this element
+    el.classList.remove("convertTime");
+    // So we know which were updated (for styling, future updates, etc)
+    el.classList.add("convertedTime");
+
+    // If we couldn't parse the time, exit
+    if (!(text.length > 0) || time === null) {
+      return;
+    }
+    el.innerHTML = this.localizedDateText(
+      time,
+      // If the window has singleFormat, then it should be single format - unless the element has variableFormat class
+      this.singleFormat ? !el.classList.contains("variableFormat") : false,
+      el.classList.contains("preciseTime"),
+      el.classList.contains("preciseTimeSeconds"),
+      el.classList.contains("withPreposition")
+    );
+    el.setAttribute("title", this.preciseTimeSeconds(time));
   }
 
   // If we're display time with the hour, we have different formats based on whether we include seconds
@@ -129,72 +199,8 @@ export default class TimeParser {
     }
   }
 
-  // This is for directly rendering localized time elements - it is not used by the window.localize()
-  localizedTimeHtml(
-    timeString,
-    { singleFormat, preciseTime, includeSeconds, withPreposition }
-  ) {
-    const time = this.parse(String(timeString).trim());
-
-    if (time === null) {
-      return `<span></span>`;
-    }
-    // If singleFormat was passed as true, override with that, otherwise default to window format
-    let variableFormat = !singleFormat ? true : !this.singleFormat;
-
-    return `<span title="${this.preciseTimeSeconds(
-      time
-    )}">${this.localizedDateText(
-      time,
-      !variableFormat,
-      preciseTime,
-      includeSeconds,
-      withPreposition
-    )}</span>`;
-  }
-
-  writeTime(el) {
-    const text = el.textContent.trim();
-    const time = this.parse(text);
-    // So running this again doesn't reapply to this element
-    el.classList.remove("convertTime");
-    // So we know which were updated (for styling, future updates, etc)
-    el.classList.add("convertedTime");
-
-    // If we couldn't parse the time, exit
-    if (!(text.length > 0) || time === null) {
-      return;
-    }
-    el.innerHTML = this.localizedDateText(
-      time,
-      // If the window has singleFormat, then it should be single format - unless the element has variableFormat class
-      this.singleFormat ? !el.classList.contains("variableFormat") : false,
-      el.classList.contains("preciseTime"),
-      el.classList.contains("preciseTimeSeconds"),
-      el.classList.contains("withPreposition")
-    );
-    el.setAttribute("title", this.preciseTimeSeconds(time));
-  }
-
   writeTimezone(el) {
     el.textContent = moment().format("z");
     el.classList.remove("convertTimezone");
-  }
-
-  localize() {
-    // Write times
-    Array.from(document.getElementsByClassName("convertTime")).forEach((el) =>
-      this.writeTime(el)
-    );
-
-    // Write timezones
-    Array.from(
-      document.getElementsByClassName("convertTimezone")
-    ).forEach((el) => this.writeTimezone(el));
-
-    // Write hidden timezone fields - so if we're submitting a form, it includes the current timezone
-    Array.from(
-      document.getElementsByClassName("hiddenFieldTimezone")
-    ).forEach((el) => this.setHiddenTimezoneFields(el));
   }
 }
