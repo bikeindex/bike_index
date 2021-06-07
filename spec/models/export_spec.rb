@@ -117,10 +117,21 @@ RSpec.describe Export, type: :model do
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
-      # Bike1 is within the time parameters - so with no custom bikes, it returns that
+      # only_custom_bike_ids
+      export.only_custom_bike_ids = true
+      expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
+      export.assign_exported_bike_ids
+      expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
+      # only_custom_bike_ids with no custom bikes
       export.custom_bike_ids = ""
       export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to be_nil
+      expect(export.bikes_scoped.pluck(:id)).to match_array([])
+      expect(export.exported_bike_ids).to match_array([])
+      export.only_custom_bike_ids = "0" # Reassign to false for the
+      # Bike1 is within the time parameters - so with no custom bikes, it returns that
+      export.custom_bike_ids = ""
+      export.assign_exported_bike_ids
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id])
       expect(export.exported_bike_ids).to match_array([bike1.id])
       # And it also returns the bike that is from the time period in addition to any custom bikes that are assigned
@@ -129,6 +140,12 @@ RSpec.describe Export, type: :model do
       expect(export.custom_bike_ids).to match_array([bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
+      # with only_custom_bike_ids it doesn't include bike from the time period
+      export.only_custom_bike_ids = "1"
+      export.assign_exported_bike_ids
+      expect(export.custom_bike_ids).to match_array([bike2.id, bike3.id])
+      expect(export.bikes_scoped.pluck(:id)).to match_array([bike2.id])
+      expect(export.exported_bike_ids).to match_array([bike2.id])
     end
   end
 

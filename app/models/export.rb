@@ -91,6 +91,14 @@ class Export < ApplicationRecord
     options["custom_bike_ids"]
   end
 
+  def only_custom_bike_ids
+    options["only_custom_bike_ids"]
+  end
+
+  def only_custom_bike_ids=(val)
+    options["only_custom_bike_ids"] = ParamsNormalizer.boolean(val)
+  end
+
   def partial_registrations
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
   end
@@ -200,6 +208,7 @@ class Export < ApplicationRecord
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
     return Bike.none if partial_registrations == "only"
+    return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
