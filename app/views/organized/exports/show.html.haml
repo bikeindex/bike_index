@@ -32,17 +32,13 @@
         %tr
           %td= t(".registration_types")
           %td
-            -# Add a comma if there is a secondary type to explain
-            - joiner = @export.only_custom_bike_ids ? "," : ""
             - if @export.partial_registrations == "only"
               %strong Only incomplete
-              registrations#{joiner}
+              registrations
             - elsif @export.partial_registrations
-              Registered bikes & incomplete registrations#{joiner}
+              Registered bikes & incomplete registrations
             - else
-              Only registered bikes#{joiner}
-            - if @export.only_custom_bike_ids
-              %em Only specified bikes
+              Only registered bikes
       %tr
         %td= t(".bikes_exported")
         %td
@@ -88,6 +84,8 @@
         %tr
           %td= t(".specific_bikes")
           %td
+            - if @export.only_custom_bike_ids
+              %small.d-block.mb-1 Only these specific bikes are included in this export:
             - included_bike_ids = (@export.custom_bike_ids & @export.bikes_scoped.pluck(:id))
             %ul.mb-0
               - @export.custom_bike_ids.each do |custom_id|
@@ -99,7 +97,6 @@
                       = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning text-underline")
                       \:
                       %em= t(".unable_to_export")
-
       - if @export.avery_export?
         %tr
           %td= t(".avery_export")
