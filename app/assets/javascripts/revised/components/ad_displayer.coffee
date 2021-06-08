@@ -21,21 +21,20 @@ class @AdDisplayer
   sm_rectangles = ["max_tracker_468"]
 
   constructor: ->
-    renderedAds = []
+    @renderedAds = []
+    @renderedGoogleAds = false
 
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
-        renderedAds.push @renderAdElement(el, index, skyscrapers)
+        @renderedAds.push @renderAdElement(el, index, skyscrapers)
 
     for el_klass in ads_sm_rectangle
       $(".#{el_klass}").each (index, el) =>
-        renderedAds.push @renderAdElement(el, index, sm_rectangles)
-
-    window.renderedAds = renderedAds
+        @renderedAds.push @renderAdElement(el, index, sm_rectangles)
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
-      for adname in renderedAds
+      for adname in @renderedAds
         window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-load", eventLabel: "#{adname}"})
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
@@ -47,8 +46,18 @@ class @AdDisplayer
       el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
       adArray[index]
     else
-      el.innerHTML = "Google ad"
-      "Google ad"
+      @initializeGoogleAds() unless @renderedGoogleAds
+      el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
+      "google_ad"
+
+  # This adds the google ads script
+  initializeGoogleAds: ->
+    # googleadscript = document.createElement('script');
+    # googleadscript.setAttribute("src", "//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+    # googleadscript.setAttribute("async", true)
+    # googleadscript.setAttribute("data-ad-client", "ca-pub-8140931939249510")
+    # document.head.appendChild(googleadscript)
+    @renderedGoogleAds = true
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
