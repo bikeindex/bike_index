@@ -22,7 +22,6 @@ class @AdDisplayer
 
   constructor: ->
     @renderedAds = []
-    @renderedGoogleAds = false
 
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
@@ -46,18 +45,8 @@ class @AdDisplayer
       el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
       adArray[index]
     else
-      @initializeGoogleAds() unless @renderedGoogleAds
       el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
       "google_ad"
-
-  # This adds the google ads script
-  initializeGoogleAds: ->
-    # googleadscript = document.createElement('script');
-    # googleadscript.setAttribute("src", "//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-    # googleadscript.setAttribute("async", true)
-    # googleadscript.setAttribute("data-ad-client", "ca-pub-8140931939249510")
-    # document.head.appendChild(googleadscript)
-    @renderedGoogleAds = true
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
