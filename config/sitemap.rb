@@ -15,12 +15,11 @@ SitemapGenerator::Sitemap.create do
     LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9 }
   end
 
-  group(filename: :news) do
-    add "/blogs", priority: 0.9, changefreq: "daily"
+  group(filename: :info) do
     Blog.published.info.each do |b|
       add("/info/#{b.title_slug}",
         priority: 0.9,
-        news: {
+        info: {
           publication_name: "Bike Index Information",
           publication_language: "en",
           title: b.title,
@@ -30,7 +29,7 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :news) do
-    add "/blogs", priority: 0.9, changefreq: "daily"
+    add "/news", priority: 0.9, changefreq: "daily"
     Blog.published.blog.each do |b|
       add("/news/#{b.title_slug}",
         priority: 0.9,
@@ -53,11 +52,11 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :bikes) do
-    Bike.all.each { |b| add bike_path(b), changefreq: "daily", priority: 0.9 }
+    Bike.find_each { |b| add bike_path(b), changefreq: "daily", priority: 0.8 }
   end
 
   group(filename: :images) do
-    PublicImage.bike.each do |i|
+    PublicImage.bike.find_each do |i|
       bike = Bike.where(id: i.imageable_id).first
       if bike.present?
         add(bike_path(i.imageable), images: [{loc: i.image_url, title: i.name}])
@@ -66,7 +65,7 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :users) do
-    User.where(show_bikes: true).each { |u| add "/users/#{u.username}", priority: 0.4 }
+    User.where(show_bikes: true).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
   end
 
   group(filename: :contact) do
