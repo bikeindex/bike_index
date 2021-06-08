@@ -22,12 +22,10 @@ SitemapGenerator::Sitemap.create do
       add("/info/#{b.title_slug}",
         priority: 0.9,
         lastmod: b.updated_at,
-        info: {
-          publication_name: "Bike Index Information",
-          publication_language: "en",
-          title: b.title,
-          publication_date: b.published_at
-        })
+        publication_name: "Bike Index Information",
+        publication_language: "en",
+        title: b.title,
+        publication_date: b.published_at)
     end
   end
 
@@ -37,12 +35,10 @@ SitemapGenerator::Sitemap.create do
       add("/news/#{b.title_slug}",
         priority: 0.9,
         lastmod: b.updated_at,
-        news: {
-          publication_name: "Bike Index Blog",
-          publication_language: "en",
-          title: b.title,
-          publication_date: b.published_at
-        })
+        publication_name: "Bike Index Blog",
+        publication_language: "en",
+        title: b.title,
+        publication_date: b.published_at)
     end
   end
 
