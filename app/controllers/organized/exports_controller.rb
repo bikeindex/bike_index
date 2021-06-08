@@ -72,11 +72,13 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:export).permit(:timezone, :start_at, :end_at, :file_format, :custom_bike_ids, headers: [])
+      params.require(:export).permit(:timezone, :start_at, :end_at, :file_format,
+        :custom_bike_ids, :only_custom_bike_ids, headers: [])
     end
 
     def avery_export_parameters
-      params.require(:export).permit(:timezone, :start_at, :end_at, :bike_code_start, :custom_bike_ids)
+      params.require(:export).permit(:timezone, :start_at, :end_at, :bike_code_start,
+        :custom_bike_ids, :only_custom_bike_ids)
         .merge(avery_export: true)
     end
 

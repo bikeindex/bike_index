@@ -59,43 +59,44 @@
                 - bike_ids.each_with_index do |id, i|
                   %li
                     #{link_to id, bike_path(id, organization_id: current_organization.to_param)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
-
-      %tr
-        %td
-          = t(".bikes_registered_after")
-        %td
-          - if @export.start_at.present?
-            %span.convertTime.preciseTime
-              = l(@export.start_at, format: :convert_time)
-          - else
-            %small.less-strong
-              \-
-      %tr
-        %td
-          = t(".bikes_registered_before")
-        %td
-          - if @export.end_at.present?
-            %span.convertTime.preciseTime
-              = l(@export.end_at, format: :convert_time)
-          - else
-            %small.less-strong
-              \-
+      - unless @export.only_custom_bike_ids
+        %tr
+          %td
+            = t(".bikes_registered_after")
+          %td
+            - if @export.start_at.present?
+              %span.convertTime.preciseTime
+                = l(@export.start_at, format: :convert_time)
+            - else
+              %small.less-strong
+                \-
+        %tr
+          %td
+            = t(".bikes_registered_before")
+          %td
+            - if @export.end_at.present?
+              %span.convertTime.preciseTime
+                = l(@export.end_at, format: :convert_time)
+            - else
+              %small.less-strong
+                \-
       - if @export.custom_bike_ids.present?
         %tr
           %td= t(".specific_bikes")
           %td
+            - if @export.only_custom_bike_ids
+              %small.d-block.mb-1 Only these specific bikes are included in this export:
             - included_bike_ids = (@export.custom_bike_ids & @export.bikes_scoped.pluck(:id))
-            %ul
+            %ul.mb-0
               - @export.custom_bike_ids.each do |custom_id|
                 %li
                   - if included_bike_ids.include?(custom_id)
                     = link_to custom_id, bike_path(custom_id, organization_id: current_organization.to_param)
                   - else
                     %small.text-warning
-                      = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning")
+                      = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning text-underline")
                       \:
                       %em= t(".unable_to_export")
-
       - if @export.avery_export?
         %tr
           %td= t(".avery_export")
@@ -130,6 +131,6 @@
       %tr
         %td= t(".columns_in_csv")
         %td
-          %ul
+          %ul.mb-0
             - @export.written_headers.each do |header|
               %li= header.humanize(keep_id_suffix: true)

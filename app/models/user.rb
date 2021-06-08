@@ -248,14 +248,13 @@ class User < ApplicationRecord
   end
 
   def confirm(token)
-    if token == confirmation_token
-      self.confirmation_token = nil
-      self.confirmed = true
-      save
-      reload
-      AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
-      true
-    end
+    return false if token != confirmation_token
+    self.confirmation_token = nil
+    self.confirmed = true
+    save
+    reload
+    AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
+    true
   end
 
   def role(organization)

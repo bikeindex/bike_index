@@ -5,6 +5,7 @@ require "open-uri"
 
 class TwitterTweeterIntegration
   TWEET_LENGTH = 280
+  MAX_RETWEET_COUNT = (ENV["MAX_RETWEET_COUNT"] || 3).to_i
 
   attr_accessor \
     :bike,
@@ -65,7 +66,8 @@ class TwitterTweeterIntegration
   def retweet(posted_tweet)
     self.retweets = [tweet]
 
-    close_twitter_accounts.each do |twitter_account|
+    # TODO: test that you are only retweeting XXX times
+    close_twitter_accounts[0..MAX_RETWEET_COUNT].each do |twitter_account|
       retweet = tweet.retweet_to_account(twitter_account)
       retweets << retweet if retweet.present?
     end
