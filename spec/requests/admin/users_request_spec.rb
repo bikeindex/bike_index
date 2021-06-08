@@ -97,7 +97,6 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:user2) { FactoryBot.create(:user, email: "secondary@email.com") }
       let!(:ownership) { FactoryBot.create(:ownership_claimed, owner_email: "secondary@email.com", user: user2) }
       it "merges the users, even though they're unconfirmed" do
-        user2.reload
         expect(user2.confirmed?).to be_falsey
         expect(user2.user_emails.pluck(:email)).to eq([])
         user2_id = user2.id
@@ -125,6 +124,43 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_email_secondary.old_user_id).to eq user2_id
         expect(user_email_secondary.confirmed?).to be_truthy
         expect(user_email_secondary.primary?).to be_falsey
+      end
+      context "with unconfirmed secondary email" do
+        it "merges the users" do
+          user2.confirm(user2.confirmation_token)
+          user2.reload
+          expect(user2.confirmed?).to be_truthy
+          expect(user2.user_emails.pluck(:email)).to eq(["secondary@email.com"])
+          user2_id = user2.id
+          expect(user2.ownerships.count).to eq 1
+
+          user_subject.update(additional_emails: "secondary@email.com")
+          user_subject.reload
+          expect(user_subject.confirmed?).to be_falsey
+          expect(user_subject.user_emails.pluck(:email)).to eq(["secondary@email.com"])
+          user_email_secondary = user_subject.user_emails.first
+          expect(user_email_secondary.confirmed?).to be_falsey
+          expect(user_subject.ownerships.count).to eq 0
+          ActionMailer::Base.deliveries = []
+          put "#{base_url}/#{user_subject.id}", params: { force_merge_email: "SeconDary@email.com " }
+          expect(flash[:success]).to be_present
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+          expect(User.where(id: user2_id).count).to eq 0
+
+          user_subject.reload
+          expect(user_subject.confirmed?).to be_truthy
+          expect(user_subject.ownerships.count).to eq 1
+          expect(user_subject.user_emails.pluck(:email)).to match_array([user_subject.email, "secondary@email.com"])
+
+          user_email = user_subject.user_emails.where(email: user_subject.email).first
+          expect(user_email.confirmed?).to be_truthy
+          expect(user_email.primary?).to be_truthy
+
+          user_email_secondary.reload
+          expect(user_email_secondary.old_user_id).to eq user2_id
+          expect(user_email_secondary.confirmed?).to be_truthy
+          expect(user_email_secondary.primary?).to be_falsey
+        end
       end
       context "not a matching email" do
         it "flash errors" do

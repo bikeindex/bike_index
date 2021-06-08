@@ -83,7 +83,10 @@ class Admin::UsersController < Admin::BaseController
         secondary_user.reload
       end
       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
+
       user_email = @user.user_emails.find_by_email(email)
+      # Manually confirm the user
+      user_email.update(confirmation_token: nil) if user_email&.unconfirmed?
       user_email ||= @user.user_emails.create(email: email)
       if MergeAdditionalEmailWorker.new.perform(user_email.id)
         flash[:success] = "User #{@user.display_name} merged with '#{email}'"
