@@ -73,8 +73,8 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :resources) do
     %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
-    serials about where vendor_terms resources image_resources privacy terms security
-    how_not_to_buy_stolen dev_and_design lightspeed
-    why-donate documentation].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
+      serials about where vendor_terms resources image_resources privacy terms security
+      how_not_to_buy_stolen dev_and_design lightspeed
+      why-donate documentation].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 end
