@@ -29,22 +29,26 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def update
-    @user.name = params[:user][:name]
-    @user.email = params[:user][:email]
-    @user.superuser = params[:user][:superuser]
-    @user.developer = params[:user][:developer] if current_user.developer?
-    @user.banned = params[:user][:banned]
-    @user.username = params[:user][:username]
-    @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
-    @user.phone = params[:user][:phone]
-    if @user.save
-      @user.update_auth_token("auth_token") if @user.banned? # Force reauthentication for the user
-      @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
-      redirect_to admin_users_url, notice: "User Updated"
+    if params[:force_merge_email].present?
+      force_merge_users(params[:force_merge_email])
     else
-      bikes = @user.bikes
-      @bikes = BikeDecorator.decorate_collection(bikes)
-      render action: :edit
+      @user.name = params[:user][:name]
+      @user.email = params[:user][:email]
+      @user.superuser = params[:user][:superuser]
+      @user.developer = params[:user][:developer] if current_user.developer?
+      @user.banned = params[:user][:banned]
+      @user.username = params[:user][:username]
+      @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
+      @user.phone = params[:user][:phone]
+      if @user.save
+        @user.update_auth_token("auth_token") if @user.banned? # Force reauthentication for the user
+        @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+        redirect_to admin_users_url, notice: "User Updated"
+      else
+        bikes = @user.bikes
+        @bikes = BikeDecorator.decorate_collection(bikes)
+        render action: :edit
+      end
     end
   end
 
@@ -68,6 +72,28 @@ class Admin::UsersController < Admin::BaseController
   def find_user
     @user = User.username_friendly_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
+  end
+
+  def force_merge_users(email)
+    email = EmailNormalizer.normalize(email)
+    secondary_user = User.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    if secondary_user.present?
+      if secondary_user.unconfirmed?
+        secondary_user.confirm(secondary_user.confirmation_token)
+        secondary_user.reload
+      end
+      @user.confirm(@user.confirmation_token) if @user.unconfirmed?
+      user_email = @user.user_emails.find_by_email(email)
+      user_email ||= @user.user_emails.create(email: email)
+      if MergeAdditionalEmailWorker.new.perform(user_email.id)
+        flash[:success] = "User #{@user.display_name} merged with '#{email}'"
+      else
+        flash[:error] = "Unable to merge users!"
+      end
+    else
+      flash[:error] = "Unable to find user with email: '#{email}', did not merge"
+    end
+    redirect_to admin_user_path(@user)
   end
 
   def matching_users
