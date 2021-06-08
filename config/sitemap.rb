@@ -8,15 +8,17 @@ SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 
 SitemapGenerator::Sitemap.create do
   group(filename: :about) do
-    paths = ["about"]
-    paths.each { |i| add "/#{i}", priority: 0.9 }
+    %w[about ambassadors_current ambassadors_how_to ascend bike_shop_packages campus_packages
+      cities_packages for_bike_shops for_community_groups for_cities for_law_enforcement
+      for_schools help].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
+
   group(filename: :organizations) do
-    LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9 }
+    LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 
   group(filename: :info) do
-    Blog.published.info.each do |b|
+    Blog.published.info.find_each do |b|
       add("/info/#{b.title_slug}",
         priority: 0.9,
         info: {
@@ -30,7 +32,7 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :news) do
     add "/news", priority: 0.9, changefreq: "daily"
-    Blog.published.blog.each do |b|
+    Blog.published.blog.find_each do |b|
       add("/news/#{b.title_slug}",
         priority: 0.9,
         news: {
@@ -45,10 +47,6 @@ SitemapGenerator::Sitemap.create do
   group(filename: :partners) do
     paths = ["where", "organizations/new"]
     paths.each { |i| add "/#{i}", priority: 0.9 }
-  end
-
-  group(filename: :documentation) do
-    add "/documentation/api_v2"
   end
 
   group(filename: :bikes) do
@@ -68,18 +66,15 @@ SitemapGenerator::Sitemap.create do
     User.where(show_bikes: true).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
   end
 
-  group(filename: :contact) do
-    paths = ["help"]
-    paths.each { |i| add "/#{i}", priority: 0.8 }
-  end
-
   group(filename: :recovery_stories) do
     paths = ["recovery_stories"]
-    paths.each { |i| add "/#{i}", priority: 0.8 }
+    paths.each { |i| add "/#{i}", priority: 0.8, changefreq: "daily" }
   end
 
   group(filename: :resources) do
-    paths = %w[resources serials stolen image_resources protect_your_bike how_not_to_buy_stolen]
-    paths.each { |i| add "/#{i}" }
+    %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
+    serials about where vendor_terms resources image_resources privacy terms security
+    how_not_to_buy_stolen dev_and_design lightspeed
+    why-donate documentation].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 end
