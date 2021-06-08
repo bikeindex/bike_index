@@ -21,11 +21,12 @@ SitemapGenerator::Sitemap.create do
     Blog.published.info.find_each do |b|
       add("/info/#{b.title_slug}",
         priority: 0.9,
+        lastmod: b.updated_at,
         info: {
           publication_name: "Bike Index Information",
           publication_language: "en",
           title: b.title,
-          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+          publication_date: b.published_at
         })
     end
   end
@@ -35,11 +36,12 @@ SitemapGenerator::Sitemap.create do
     Blog.published.blog.find_each do |b|
       add("/news/#{b.title_slug}",
         priority: 0.9,
+        lastmod: b.updated_at,
         news: {
           publication_name: "Bike Index Blog",
           publication_language: "en",
           title: b.title,
-          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+          publication_date: b.published_at
         })
     end
   end
@@ -50,13 +52,17 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :bikes) do
-    Bike.find_each { |b| add bike_path(b), changefreq: "daily", priority: 0.8 }
+    Bike.find_each do |b|
+      add(bike_path(b),
+        changefreq: "daily",
+        priority: 0.8,
+        lastmod: b.updated_at)
+    end
   end
 
   group(filename: :images) do
-    PublicImage.bike.find_each do |i|
-      bike = Bike.where(id: i.imageable_id).first
-      if bike.present?
+    Bike.with_public_images.find_each do |bike|
+      bike.public_images.each do |image|
         add(bike_path(i.imageable), images: [{loc: i.image_url, title: i.name}])
       end
     end
