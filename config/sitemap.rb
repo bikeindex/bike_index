@@ -54,7 +54,7 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :images) do
     Bike.with_public_image.find_each do |bike|
-      bike.public_images.each do |image|
+      bike.public_images.each do |i|
         add(bike_path(i.imageable), images: [{loc: i.image_url, title: i.name}])
       end
     end
