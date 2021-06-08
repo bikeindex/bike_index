@@ -19,26 +19,22 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :info) do
     Blog.published.info.find_each do |b|
-      add("/info/#{b.title_slug}",
-        priority: 0.9,
-        lastmod: b.updated_at,
-        publication_name: "Bike Index Information",
-        publication_language: "en",
-        title: b.title,
-        publication_date: b.published_at)
+      add("/info/#{b.title_slug}", priority: 0.9, lastmod: b.updated_at,
+                                   news: {publication_name: "Bike Index Information",
+                                          publication_language: "en",
+                                          title: b.title,
+                                          publication_date: b.published_at})
     end
   end
 
   group(filename: :news) do
     add "/news", priority: 0.9, changefreq: "daily"
     Blog.published.blog.find_each do |b|
-      add("/news/#{b.title_slug}",
-        priority: 0.9,
-        lastmod: b.updated_at,
-        publication_name: "Bike Index Blog",
-        publication_language: "en",
-        title: b.title,
-        publication_date: b.published_at)
+      add("/news/#{b.title_slug}", priority: 0.9, lastmod: b.updated_at,
+                                   news: {publication_name: "Bike Index Blog",
+                                          publication_language: "en",
+                                          title: b.title,
+                                          publication_date: b.published_at})
     end
   end
 
