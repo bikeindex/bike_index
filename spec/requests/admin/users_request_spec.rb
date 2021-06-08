@@ -106,7 +106,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.user_emails.pluck(:email)).to eq([])
         expect(user_subject.ownerships.count).to eq 0
         ActionMailer::Base.deliveries = []
-        put "#{base_url}/#{user_subject.id}", params: { force_merge_email: "SeconDary@email.com " }
+        put "#{base_url}/#{user_subject.id}", params: {force_merge_email: "SeconDary@email.com "}
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(User.where(id: user2_id).count).to eq 0
@@ -142,7 +142,7 @@ RSpec.describe Admin::UsersController, type: :request do
           expect(user_email_secondary.confirmed?).to be_falsey
           expect(user_subject.ownerships.count).to eq 0
           ActionMailer::Base.deliveries = []
-          put "#{base_url}/#{user_subject.id}", params: { force_merge_email: "SeconDary@email.com " }
+          put "#{base_url}/#{user_subject.id}", params: {force_merge_email: "SeconDary@email.com "}
           expect(flash[:success]).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 0
           expect(User.where(id: user2_id).count).to eq 0
@@ -164,7 +164,7 @@ RSpec.describe Admin::UsersController, type: :request do
       end
       context "not a matching email" do
         it "flash errors" do
-          put "#{base_url}/#{user_subject.id}", params: { force_merge_email: "2secondary@email.com" }
+          put "#{base_url}/#{user_subject.id}", params: {force_merge_email: "2secondary@email.com"}
           expect(flash[:error]).to be_present
         end
       end
