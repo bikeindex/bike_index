@@ -20,8 +20,10 @@ SitemapGenerator::Sitemap.create do
       why-donate documentation].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 
-  group(filename: :organizations) do
+  group(filename: :partners) do
     LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9, changefreq: "weekly" }
+
+    ["where", "organizations/new"].each { |i| add "/#{i}", priority: 0.9, changefreq: "daily" }
   end
 
   group(filename: :info) do
@@ -45,11 +47,6 @@ SitemapGenerator::Sitemap.create do
                                           title: b.title,
                                           publication_date: b.published_at})
     end
-  end
-
-  group(filename: :partners) do
-    paths = ["where", "organizations/new"]
-    paths.each { |i| add "/#{i}", priority: 0.9 }
   end
 
   group(filename: :bikes) do
