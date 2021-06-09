@@ -20,7 +20,6 @@ class Admin::ManufacturersController < Admin::BaseController
   def update
     if @manufacturer.update_attributes(permitted_parameters)
       flash[:success] = "Manufacturer Saved!"
-      expire_fragment "header_search"
       AutocompleteLoaderWorker.perform_async("reset")
       redirect_to admin_manufacturer_url(@manufacturer)
     else
@@ -32,7 +31,6 @@ class Admin::ManufacturersController < Admin::BaseController
     @manufacturer = Manufacturer.create(permitted_parameters)
     if @manufacturer.save
       flash[:success] = "Manufacturer Created!"
-      expire_fragment "header_search"
       AutocompleteLoaderWorker.perform_async("reset")
       redirect_to admin_manufacturer_url(@manufacturer)
     else

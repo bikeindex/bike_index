@@ -18,7 +18,6 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def show
     if params[:id] == "bust_cache"
-      clear_index_wrap_cache
       flash[:success] = "Recovery Display Cache busted"
       redirect_to admin_recovery_displays_url
     else
@@ -33,7 +32,6 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def update
     if @recovery_display.update_attributes(permitted_parameters)
-      clear_index_wrap_cache
       flash[:success] = "Recovery display saved!"
       redirect_to admin_recovery_displays_url
     else
@@ -44,7 +42,6 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def create
     @recovery_display = RecoveryDisplay.create(permitted_parameters)
     if @recovery_display.save
-      clear_index_wrap_cache
       flash[:success] = "Recovery display created!"
       redirect_to admin_recovery_displays_url
     else
@@ -54,7 +51,6 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def destroy
     @recovery_display.destroy
-    clear_index_wrap_cache
     redirect_to admin_recovery_displays_url
   end
 
@@ -64,14 +60,6 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     params.require(:recovery_display)
       .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link, :image,
         :remote_image_url, :date_input, :remove_image)
-  end
-
-  def clear_index_wrap_cache
-    # TODO: Make this actually clear the index cache, rather than everything. It wasn't doing it before :/
-    # I18n.available_locales.each do |locale|
-    #   expire_fragment(["root_recovery_stories", "locale", locale])
-    # end
-    Rails.cache.clear
   end
 
   def find_recovery_displays

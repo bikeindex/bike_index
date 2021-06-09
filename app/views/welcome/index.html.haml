@@ -9,9 +9,7 @@
             = t(".register_now")
             %span.chevron &raquo;
   = render partial: "/landing_pages/for_organizations_photo_list"
-
-  -# Expired in admin/recovery_displays_controller
-  - cache("root_recovery_stories", skip_digest: true) do
+  - cache("root_recovery_stories-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do
     .root-landing-recovery-stories
       .container
         %h3= t(".recent_recovery_stories")
