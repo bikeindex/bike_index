@@ -18,6 +18,7 @@ class TwitterAccount < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :national, -> { active.where(national: true) }
+  scope :not_national, -> { active.where(national: false) }
   scope :errored, -> { where.not(last_error_at: nil) }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
@@ -107,6 +108,10 @@ class TwitterAccount < ApplicationRecord
 
   def errored?
     last_error_at.present?
+  end
+
+  def not_national?
+    !national
   end
 
   def check_credentials
