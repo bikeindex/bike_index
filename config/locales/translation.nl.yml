@@ -3615,6 +3615,10 @@ nl:
         gaan, waar je wordt gevraagd om Bike Index te autoriseren om toegang te krijgen
         tot je Lightspeed-account. Benieuwd naar wat we verzamelen? Lees de %{security_link}.
       security_link_text: POS-integratie FAQ
+      registering_with_a_sticker_html: 'Fietsen registreren bij uw lokale wetshandhavende/gemeentelijke
+        register en QR-stickers uitdelen? <strong>Voeg gewoon "Sticker: <em>fietsstickernummer</em>
+        " toe aan het einde van de verkoopnota in Lightspeed</strong> en de sticker
+        zal naar de fiets linken en de fiets toevoegen aan je lokale register.'
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -4015,6 +4019,8 @@ nl:
         of Lightspeed Retail-account.
       sign_up_for_free: Gratis inschrijven
       use_ascend: Ascend gebruiken?
+      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
+        op uw website
     for_cities:
       actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
         En doe het goedkoop.
@@ -4045,6 +4051,9 @@ nl:
       trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
       bike_index_new_dashboard: Nieuw fietsindexdashboard handig voor het bestrijden
         van fietscriminaliteit
+      bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
+      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
+        op uw website
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -4114,6 +4123,9 @@ nl:
       youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
         fietsen worden gestolen. Ga naar en doorzoek onze internationale database
         om de fietsen van uw gemeenschap terug te geven aan hun rechtmatige eigenaars.
+      bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
+      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
+        op uw website
     for_organizations_photo_list:
       bike_shops: Fietsenwinkels
       cities: Steden
@@ -4158,6 +4170,8 @@ nl:
       must_read: Moet lezen -
       six_best_features_for_schools: De zes beste functies van Bike Index voor fietsbeheer
         op de campus
+      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
+        op uw website
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -4904,6 +4918,7 @@ nl:
       als ze fietsen niet als gestolen hebben gemarkeerd</li><li> Cross-database zoeken</li><li>
       Integratie met LeadsOnline</li><li> Dagelijks gestolen fietsen hot sheet</li><li>
       Openbare inbeslagname pagina</li></ol>
+    impound_bikes: Fietsen in beslag nemen en claiminzendingen ontvangen
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een
@@ -5085,6 +5100,7 @@ nl:
       security: veiligheid
       protect_your_bike: Bescherm je fiets
       how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
+      press_inquiries: Persvragen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
