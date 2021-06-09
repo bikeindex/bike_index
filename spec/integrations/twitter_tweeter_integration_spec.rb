@@ -129,9 +129,9 @@ RSpec.describe TwitterTweeterIntegration do
 
   describe "close_twitter_accounts" do
     let!(:national) { FactoryBot.create(:twitter_account_1, :national, :active, :default, country: Country.united_states) }
-    let(:stolen_bike_bay_area)  do
+    let(:stolen_bike_bay_area) do
       Bike.new(manual_csr: true,
-        current_stolen_record: StolenRecord.new(latitude: 37.8390534, longitude: -122.3114197, country: Country.united_states))
+               current_stolen_record: StolenRecord.new(latitude: 37.8390534, longitude: -122.3114197, country: Country.united_states))
     end
     let(:twitter_tweeter_integration) { TwitterTweeterIntegration.new(stolen_bike_bay_area) }
     it "returns empty if no location" do
@@ -143,11 +143,11 @@ RSpec.describe TwitterTweeterIntegration do
     end
     context "bay area accounts" do
       include_context :geocoder_real
-      let(:twitter_brk) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, twitter_account_info: {info: true},) }
-      let(:twitter_oak) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, twitter_account_info: {info: true},) }
-      let(:twitter_sfo) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, twitter_account_info: {info: true},) }
-      let(:twitter_marin) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, twitter_account_info: {info: true},) }
-      let(:twitter_sj) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, twitter_account_info: {info: true},) }
+      let(:twitter_brk) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, twitter_account_info: {info: true}) }
+      let(:twitter_oak) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, twitter_account_info: {info: true}) }
+      let(:twitter_sfo) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, twitter_account_info: {info: true}) }
+      let(:twitter_marin) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, twitter_account_info: {info: true}) }
+      let(:twitter_sj) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, twitter_account_info: {info: true}) }
       let(:all_account_ids) { [twitter_brk.id, twitter_oak.id, twitter_sfo.id, twitter_marin.id, twitter_sj.id, national.id] }
       it "matches area accounts" do
         stub_const("TwitterTweeterIntegration::MAX_RETWEET_COUNT", 3)
