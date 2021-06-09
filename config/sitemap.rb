@@ -10,7 +10,7 @@ SitemapGenerator::Sitemap.create do
   group(filename: :about) do
     %w[about ambassadors_current ambassadors_how_to bike_shop_packages campus_packages
       cities_packages for_bike_shops for_community_groups for_cities for_law_enforcement
-      for_schools help recovery_stories].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
+      for_schools help].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 
   group(filename: :resources) do
@@ -32,6 +32,8 @@ SitemapGenerator::Sitemap.create do
                                           title: b.title,
                                           publication_date: b.published_at})
     end
+    # recovery stories
+    add("/recovery_stories", priority: 0.8, changefreq: "daily")
   end
 
   group(filename: :news) do
@@ -62,10 +64,5 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :users) do
     User.where(show_bikes: true).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
-  end
-
-  group(filename: :recovery_stories) do
-    paths = ["recovery_stories"]
-    paths.each { |i| add "/#{i}", priority: 0.8, changefreq: "daily" }
   end
 end
