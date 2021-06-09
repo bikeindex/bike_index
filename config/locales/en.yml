@@ -3545,7 +3545,6 @@ en:
     for_bike_shops:
       5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
         bike shop
-      embed_a_bike_index_registration_form: Embed a bike registration form on your website
       automatic_registration_at_point_of_sale: Automatic registration at point of
         sale
       bike_index_for_bike_shops: Bike Index for Bike Shops
@@ -3568,6 +3567,8 @@ en:
         us about %{printed_materials}.
       driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle
         registration
+      embed_a_bike_index_registration_form: Embed a bike registration form on your
+        website
       for_free_we_provide_you_with_t: >-
         For free we provide you with the tools needed to automatically register each
         bike you sell in Bike Index through your POS. All it takes is a few minutes
@@ -3603,15 +3604,16 @@ en:
         network in the world.
       bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
         crime
+      bike_index_organization_impounding: Impounding bikes with Bike Index
       bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
         the City of Palo Alto
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      embed_a_bike_index_registration_form: Embed a bike registration form on your website
       bring_together_bike_shops_schools_municip: >-
         Bring together bike shops, schools, municipal departments, and law enforcement
         to register bikes in one system. Gone are the days of waiting for people to
         not come in to register their bikes, or wondering if that other department
         took care of it. Bike Index consolidates everything in one manageable place.
+      embed_a_bike_index_registration_form: Embed a bike registration form on your
+        website
       engage_your_residents_and_recover_their_b: Engage your residents and recover
         their bikes, and they will love you forever.
       features_amp_pricing: Features & Pricing
@@ -3659,11 +3661,12 @@ en:
       automated_tweets: automated tweets
       bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
       bike_index_for_law_enforcement: Bike Index for Law Enforcement
+      bike_index_organization_impounding: Impounding bikes with Bike Index
       bike_indexs_newest_municipal_partner: 'Bike Index''s newest municipal partner:
         New Orleans'
+      embed_a_bike_index_registration_form: Embed a bike registration form on your
+        website
       here: here
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      embed_a_bike_index_registration_form: Embed a bike registration form on your website
       if_you_want_to_collaborate_html: >-
         If you want to collaborate with other departments in your city to manage a
         registry, learn more about Bike Index for municipalities %{link}.
@@ -3704,7 +3707,6 @@ en:
       schools: Schools
     for_schools:
       bike_index_for_universities: Bike Index for Universities
-      embed_a_bike_index_registration_form: Embed a bike registration form on your website
       bike_index_users_provide: >-
         Bike Index users provide serial numbers, proof of ownership and identifying
         information about their bikes. When a bike is reported lost or stolen, our
@@ -3712,6 +3714,8 @@ en:
         computer or smartphone. Our extensive archive has helped officers recover
         bikes involved in criminal situations, from simple theft to chop shops, drug
         houses - even fencing rings and online black markets.
+      embed_a_bike_index_registration_form: Embed a bike registration form on your
+        website
       features_amp_pricing: Features & Pricing
       how_it_works: How it works
       keep_campus_bikes_in_order: Keep campus bikes in order
@@ -5091,13 +5095,13 @@ en:
       how_to_get_your_stolen_bike_back: Get your stolen bike back
       language: Language
       law_enforcement: Law Enforcement
+      press_inquiries: Press inquiries
       privacy_policy: Privacy policy
       protect_your_bike: Protect your bike
       resources: Resources
       schools_and_universities: Schools and Universities
       security: Security
       stolen_bike_map: Stolen Bike Map
-      press_inquiries: Press inquiries
       stolen_bike_recoveries: Stolen Bike Recoveries
       store: Store
       support_us: Support Us
