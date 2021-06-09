@@ -1,4 +1,3 @@
-
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "https://bikeindex.org"
 # Cloudflare also has a redirect for bikeindex.org/sitemaps/* -> files.bikeindex.org/sitemaps/$1

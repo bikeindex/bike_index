@@ -23,16 +23,10 @@ RSpec.describe "Sitemaps pages" do
     end
 
     def to_formatted_path(route)
-      route.path.gsub("(.:format)", "").gsub(/\A\//, "")
+      route.path.gsub("(.:format)", "").delete_prefix("/")
     end
 
     it "includes all the info and landing page routes" do
-      # r = Rails.application.routes.routes.collect { |route| ActionDispatch::Routing::RouteWrapper.new route }.reject(&:internal?)
-      # information_routes = r.select { |r| r.controller == "info" }
-      # route = information_routes.first
-      # route
-      # information_routes.first
-      pp info_routes + landing_pages_routes
       missing_info_paths = info_routes - excluded_routes - SitemapPages::INFORMATION - SitemapPages::ADDITIONAL
       expect(missing_info_paths).to eq([])
 

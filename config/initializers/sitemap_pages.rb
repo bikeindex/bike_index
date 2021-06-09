@@ -1,10 +1,10 @@
-# This is a separate class to make it easier to test
+# This is a class to make it easier to test
 class SitemapPages
   INFORMATION = %w[about ambassadors_current ambassadors_how_to
-  bike_shop_packages campus_packages cities_packages for_bike_shops for_community_groups
-  for_cities for_law_enforcement for_schools help donate protect_your_bike serials about
-  where resources image_resources privacy terms vendor_terms security how_not_to_buy_stolen
-  dev_and_design lightspeed ascend why-donate].freeze
+    bike_shop_packages campus_packages cities_packages for_bike_shops for_community_groups
+    for_cities for_law_enforcement for_schools help donate protect_your_bike serials about
+    where resources image_resources privacy terms vendor_terms security how_not_to_buy_stolen
+    dev_and_design lightspeed ascend why-donate].freeze
 
   ADDITIONAL = ["where", "organizations/new", "documentation/api_v3", "recovery_stories"].freeze
 end
