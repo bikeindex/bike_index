@@ -121,13 +121,4 @@ RSpec.describe TwitterAccount, type: :model do
     expect(status).to be_an_instance_of(Twitter::Tweet)
     expect(status.id).to eq(tweet_id)
   end
-
-  # Actually a method on stolen record, makes more sense to test here
-  describe "twitter_accounts_in_proximity" do
-    let!(:national) { FactoryBot.create(:twitter_account_1, :national, :active, :default) }
-    it "returns empty if no location" do
-      expect(TwitterAccount.in_proximity).to eq([])
-      expect(TwitterAccount.in_proximity(StolenRecord.new)).to eq([])
-    end
-  end
 end

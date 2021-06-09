@@ -26,7 +26,7 @@ class TwitterTweeterIntegration
     if bike.public_images.first.present?
       self.bike_photo_url = bike.public_images.first.image_url(:large)
     end
-    self.close_twitter_accounts = stolen_record&.twitter_accounts_in_proximity || []
+    self.close_twitter_accounts = TwitterAccount.in_proximity(stolen_record)
     self.nearest_twitter_account = close_twitter_accounts.find { |i| i.not_national? } || close_twitter_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
@@ -63,11 +63,15 @@ class TwitterTweeterIntegration
     tweet
   end
 
+  def retweetable_accounts
+    return [] if MAX_RETWEET_COUNT < 1
+    close_twitter_accounts.reject { |t| t.id == nearest_twitter_account.id }[0..MAX_RETWEET_COUNT]
+  end
+
   def retweet(posted_tweet)
     self.retweets = [tweet]
 
-    # TODO: test that you are only retweeting XXX times
-    close_twitter_accounts[0..MAX_RETWEET_COUNT].each do |twitter_account|
+    retweetable_accounts.each do |twitter_account|
       retweet = tweet.retweet_to_account(twitter_account)
       retweets << retweet if retweet.present?
     end
