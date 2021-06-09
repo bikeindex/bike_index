@@ -28,7 +28,7 @@
         %p= render partial: "/landing_pages/tweet", locals: { tweet_id: 1033174779585605633 }
 
         %h3= t(".our_community_is_your_community")
-        %p= t(".bike_index_is_the_community_registration_")
+        %p= t(".bike_index_is_the_community_registration_", organization_counts: number_with_delimiter(Counts.organizations))
         %p= t(".engage_your_residents_and_recover_their_b")
 
         %h4= t(".related_articles")

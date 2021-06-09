@@ -2430,6 +2430,9 @@ en:
       bicycles_sold_before_you_activated_lights: >-
         Bicycles sold before you activated Lightspeed Retail integration will not
         be registered.
+      registering_with_a_sticker_html: >-
+        Registering bikes with your local law enforcement/municipal registry and distributing QR decals? <strong>Just add "Sticker: <em>bike sticker number</em>" to the end of the sale note in Lightspeed</strong> and the sticker will link to the bike and add the bike to your local registry.
+
       bike_index_cofounder: Bike Index co-founder
       how_to_lightspeed_retail: 'How to: Lightspeed Retail and Bike Index Integration'
       i_started_bike_index_because: >-
@@ -2472,8 +2475,8 @@ en:
         with Lightspeed Retail and we're always looking for ways to improve the integration.
         Please email %{link} with any questions, concerns, comments, or suggestions.
       write_do_not_register: >-
-        If a customer doesn't want a bike to be added to Bike Index, simply write
-        "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
+        If a customer doesn't want a bike to be added to Bike Index, simply add
+        "DO NOT REGISTER" to the notes for the sale and the bicycle will not be registered.
     privacy:
       available_here: available here
       changes: Changes
@@ -3592,9 +3595,9 @@ en:
       bike_index_for_cities: Bike Index for Cities
       bike_index_is_the_community_registration_: >-
         Bike Index is the community registration system of choice. We are the bike
-        registration system of over 600 organizations - communities in every corner
-        of the country. Join the most widely used bike registration network in the
-        nation.
+        registration system of %{organization_counts} organizations - communities in every corner
+        of the world. Join the most widely used bike registration network in the
+        world.
       bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
         crime
       bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
@@ -3674,7 +3677,7 @@ en:
         With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we
         know how to help.
       with_over_600_partnerships_html: >-
-        With over 600 partnerships, Bike Index is the industry leader in bicycle registration.
+        With %{organization_counts} partnerships, Bike Index is the industry leader in bicycle registration.
         Join our network for free %{link}, or ask us to put you in touch with an existing
         partner in law enforcement.
       you_have_the_authority_to_bring_html: >-
@@ -4769,8 +4772,8 @@ en:
       Law enforcement tools: <ol class="le-list"><li>Bulk serial search</li><li>Flagged
       duplicate registrations and bike credibility scores</li><li>Ability to message
       users even if they haven't marked bikes as stolen</li><li>Cross-database search</li><li>Integration
-      with LeadsOnline</li><li>Daily stolen bikes hot sheet</li><li>Public-facing
-      impound page</li></ol>
+      with LeadsOnline</li><li>Daily stolen bikes hot sheet</li></ol>
+    impound_bikes: Impound bikes and receive claim submissions
     mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
     organization_dashboard: >-
       City and Law enforcement dashboard - analyze statistics on local registration

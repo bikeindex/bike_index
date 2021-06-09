@@ -36,7 +36,7 @@
 
         %p= t(".our_extensive_archive_has_helped_officers")
 
-        %p= t(".with_over_600_partnerships_html", link: link_to(t(".here"), new_organization_path))
+        %p= t(".with_over_600_partnerships_html", link: link_to(t(".here"), new_organization_path), organization_counts: number_with_delimiter(Counts.organizations))
 
         %p
           = t(".if_you_want_to_collaborate_html", link: link_to(t(".here"), for_cities_path))
