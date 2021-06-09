@@ -7,80 +7,36 @@ SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/"
 SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 
 SitemapGenerator::Sitemap.create do
-  group(filename: :about) do
-    paths = ["about"]
-    paths.each { |i| add "/#{i}", priority: 0.9 }
-  end
-  group(filename: :organizations) do
-    LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9 }
-  end
+  group(filename: :information) do
+    SitemapPages::INFORMATION.each { |i| add("/#{i}", priority: 0.9, changefreq: "weekly") }
 
-  group(filename: :news) do
-    add "/blogs", priority: 0.9, changefreq: "daily"
-    Blog.published.info.each do |b|
-      add("/info/#{b.title_slug}",
-        priority: 0.9,
-        news: {
-          publication_name: "Bike Index Information",
-          publication_language: "en",
-          title: b.title,
-          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
-        })
+    Blog.published.info.find_each do |b|
+      add("/info/#{b.title_slug}", priority: 0.9, lastmod: b.updated_at)
     end
+
+    SitemapPages::ADDITIONAL.each { |i| add("/#{i}", priority: 0.8, changefreq: "daily") }
+
+    LandingPages::ORGANIZATIONS.each { |i| add("/o/#{i}", priority: 0.7, changefreq: "weekly") }
   end
 
-  group(filename: :news) do
-    add "/blogs", priority: 0.9, changefreq: "daily"
-    Blog.published.blog.each do |b|
-      add("/news/#{b.title_slug}",
-        priority: 0.9,
-        news: {
-          publication_name: "Bike Index Blog",
-          publication_language: "en",
-          title: b.title,
-          publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
-        })
+  group(filename: :blog) do
+    add "/news", priority: 0.9, changefreq: "daily"
+    Blog.published.blog.find_each do |b|
+      add("/news/#{b.title_slug}", priority: 0.9, lastmod: b.updated_at)
     end
-  end
-
-  group(filename: :partners) do
-    paths = ["where", "organizations/new"]
-    paths.each { |i| add "/#{i}", priority: 0.9 }
-  end
-
-  group(filename: :documentation) do
-    add "/documentation/api_v2"
   end
 
   group(filename: :bikes) do
-    Bike.all.each { |b| add bike_path(b), changefreq: "daily", priority: 0.9 }
-  end
-
-  group(filename: :images) do
-    PublicImage.bike.each do |i|
-      bike = Bike.where(id: i.imageable_id).first
-      if bike.present?
-        add(bike_path(i.imageable), images: [{loc: i.image_url, title: i.name}])
-      end
+    Bike.find_each do |b|
+      add(bike_path(b),
+        changefreq: "daily",
+        priority: 0.8,
+        lastmod: b.updated_at,
+        images: b.public_images.map { |i| {loc: i.image_url, title: i.name} })
     end
   end
 
   group(filename: :users) do
-    User.where(show_bikes: true).each { |u| add "/users/#{u.username}", priority: 0.4 }
-  end
-
-  group(filename: :contact) do
-    paths = ["help"]
-    paths.each { |i| add "/#{i}", priority: 0.8 }
-  end
-
-  group(filename: :recovery_stories) do
-    paths = ["recovery_stories"]
-    paths.each { |i| add "/#{i}", priority: 0.8 }
-  end
-
-  group(filename: :resources) do
-    paths = %w[resources serials stolen image_resources protect_your_bike how_not_to_buy_stolen]
-    paths.each { |i| add "/#{i}" }
+    User.where(show_bikes: true).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
   end
 end

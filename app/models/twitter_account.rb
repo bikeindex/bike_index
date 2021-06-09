@@ -18,6 +18,7 @@ class TwitterAccount < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :national, -> { active.where(national: true) }
+  scope :not_national, -> { active.where(national: false) }
   scope :errored, -> { where.not(last_error_at: nil) }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
@@ -72,6 +73,14 @@ class TwitterAccount < ApplicationRecord
     default_account.get_tweet(tweet_id)
   end
 
+  def self.in_proximity(obj = nil)
+    return [] unless obj&.to_coordinates&.compact.present?
+    [
+      active.near(obj.to_coordinates, 50),
+      default_account_for_country(obj&.country)
+    ].flatten.compact.uniq
+  end
+
   def twitter_account_url
     "https://twitter.com/#{screen_name}"
   end
@@ -107,6 +116,10 @@ class TwitterAccount < ApplicationRecord
 
   def errored?
     last_error_at.present?
+  end
+
+  def not_national?
+    !national
   end
 
   def check_credentials
