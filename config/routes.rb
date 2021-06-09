@@ -35,7 +35,6 @@ Rails.application.routes.draw do
   %w[
     ambassadors_current
     ambassadors_how_to
-    ascend
     bike_shop_packages
     campus_packages
     cities_packages
@@ -301,7 +300,7 @@ Rails.application.routes.draw do
 
   %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
     serials about where vendor_terms resources image_resources privacy terms security
-    how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
+    how_not_to_buy_stolen dev_and_design ascend lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end
   get "why-donate", to: "info#why_donate", as: "why_donate"
