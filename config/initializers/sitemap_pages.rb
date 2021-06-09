@@ -1,4 +1,4 @@
-# This is a class to make it easier to test
+# This is a class so that we can test that we're including the relevant routes
 class SitemapPages
   INFORMATION = %w[about ambassadors_current ambassadors_how_to
     bike_shop_packages campus_packages cities_packages for_bike_shops for_community_groups

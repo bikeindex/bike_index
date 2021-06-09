@@ -63,14 +63,11 @@ class TwitterTweeterIntegration
     tweet
   end
 
-  def retweetable_accounts
-    close_twitter_accounts[0..MAX_RETWEET_COUNT]
-  end
-
   def retweet(posted_tweet)
     self.retweets = [tweet]
 
-    retweetable_accounts.each do |twitter_account|
+    # TODO: test that you are only retweeting XXX times
+    close_twitter_accounts[0..MAX_RETWEET_COUNT].each do |twitter_account|
       retweet = tweet.retweet_to_account(twitter_account)
       retweets << retweet if retweet.present?
     end
