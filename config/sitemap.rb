@@ -8,7 +8,7 @@ SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 
 SitemapGenerator::Sitemap.create do
   group(filename: :about) do
-    %w[about ambassadors_current ambassadors_how_to ascend bike_shop_packages campus_packages
+    %w[about ambassadors_current ambassadors_how_to bike_shop_packages campus_packages
       cities_packages for_bike_shops for_community_groups for_cities for_law_enforcement
       for_schools help recovery_stories].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
@@ -16,7 +16,7 @@ SitemapGenerator::Sitemap.create do
   group(filename: :resources) do
     %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
       serials about where vendor_terms resources image_resources privacy terms security
-      how_not_to_buy_stolen dev_and_design lightspeed
+      how_not_to_buy_stolen dev_and_design lightspeed ascend
       why-donate documentation].each { |i| add "/#{i}", priority: 0.9, changefreq: "weekly" }
   end
 
@@ -55,14 +55,8 @@ SitemapGenerator::Sitemap.create do
       add(bike_path(b),
         changefreq: "daily",
         priority: 0.8,
-        lastmod: b.updated_at)
-    end
-  end
-
-  group(filename: :images) do
-    Bike.with_public_image.find_each do |bike|
-      add(bike_path(i.imageable),
-        images: bike.public_images.map { |i| {loc: i.image_url, title: i.name} })
+        lastmod: b.updated_at,
+        images: b.public_images.map { |i| {loc: i.image_url, title: i.name} })
     end
   end
 
