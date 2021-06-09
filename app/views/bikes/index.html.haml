@@ -57,12 +57,12 @@
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @bikes, cached: true
         .row
-          .col-md-4.mt-4.d-none.d-lg-block
+          .col-md-4.mt-4
             .ad-block.ad468x60
           .col-md-8.col-lg-4.mt-4
             .paginate-container.paginate-container-bottom
               = paginate @bikes
-          .col-md-4.mt-4
+          .col-md-4.mt-4.d-none.d-md-block
             .ad-block.ad468x60
       - else
         %h3.no-exact-results

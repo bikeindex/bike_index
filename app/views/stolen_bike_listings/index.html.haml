@@ -141,8 +141,12 @@
 
   - if @stolen_bike_listings.total_count > @stolen_bike_listings.count
     .paginate-container.paginate-container-bottom.row
-      .col-sm-6.mb-2
+      .col-md-4.mt-4
+        .ad-block.ad468x60
+      .col-md-8.col-lg-4.mt-4
         = paginate @stolen_bike_listings
+      .col-md-4.mt-4.d-none.d-md-block
+        .ad-block.ad468x60
 
   - unless @stolen_bike_listings.present?
     %h1.mt-4
