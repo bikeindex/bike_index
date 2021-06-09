@@ -6,6 +6,8 @@ RSpec.describe DocumentationController, type: :controller do
       get :index
       expect(response).to redirect_to("/documentation/api_v3")
       expect(flash).to_not be_present
+      # Test that the redirect location is included in the sitemap
+      expect(SitemapPages::ADDITIONAL).to include("documentation/api_v3")
     end
   end
 
