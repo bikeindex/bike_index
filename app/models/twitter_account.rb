@@ -73,6 +73,14 @@ class TwitterAccount < ApplicationRecord
     default_account.get_tweet(tweet_id)
   end
 
+  def self.in_proximity(obj = nil)
+    return [] unless obj&.to_coordinates&.compact.present?
+    [
+      active.near(obj.to_coordinates, 50),
+      default_account_for_country(obj&.country)
+    ].flatten.compact.uniq
+  end
+
   def twitter_account_url
     "https://twitter.com/#{screen_name}"
   end

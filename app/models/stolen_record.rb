@@ -118,13 +118,6 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  def twitter_accounts_in_proximity
-    [
-      TwitterAccount.default_account_for_country(country),
-      TwitterAccount.active.near(self, 50)
-    ].flatten.compact.uniq
-  end
-
   def recovered?
     !current?
   end
