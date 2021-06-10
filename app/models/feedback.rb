@@ -18,6 +18,7 @@ class Feedback < ApplicationRecord
   validates_presence_of :body, :email, :title
 
   belongs_to :user
+  belongs_to :mailchimp_datum
 
   before_validation :set_calculated_attributes
 
