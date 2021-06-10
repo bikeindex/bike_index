@@ -81,6 +81,13 @@
         .mt-4.text-center
           = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
 
+- tweets = @stolen_record.tweets
+- if tweets.any?
+  %hr.mt-4
+    = render partial: "/admin/tweets/table", locals: { tweets: tweets, render_sortable: false }
+
+
+
 %hr.mt-4.mb-4
 
 - if @customer_contact.present?
