@@ -3602,6 +3602,7 @@ en:
         registration system of %{organization_counts} organizations - communities
         in every corner of the world. Join the most widely used bike registration
         network in the world.
+      cities_deck: Check out our cities partner deck
       bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
         crime
       bike_index_organization_impounding: Impounding bikes with Bike Index
@@ -3662,7 +3663,8 @@ en:
       bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
       bike_index_for_law_enforcement: Bike Index for Law Enforcement
       bike_index_organization_impounding: Impounding bikes with Bike Index
-      bike_indexs_newest_municipal_partner: 'Bike Index''s newest municipal partner:
+      law_enforcement_deck: Check out our Law Enforcement partner deck
+      calgary_doubles: Calgary doubles bike recovery rate with Bike Index
         New Orleans'
       embed_a_bike_index_registration_form: Embed a bike registration form on your
         website
