@@ -53,7 +53,8 @@ class @AdDisplayer
     else
       @initializeGoogleAds() unless @renderedGoogleAd
       adId = googleAds[klass]
-      el.innerHTML = "<ins class=\"adsbygoogle\" style=\"display:block\" data-ad-client=\"ca-pub-8140931939249510\" data-ad-slot=\"#{adId}\" data-ad-format=\"auto\" data-full-width-responsive=\"true\"></ins>"
+      el.innerHTML = "<ins class=\"adsbygoogle\" style=\"display:block;width:100%;height:100%;\" data-ad-client=\"ca-pub-8140931939249510\" data-ad-slot=\"#{adId}\" data-ad-format=\"auto\" data-full-width-responsive=\"true\"></ins>"
+      (adsbygoogle = window.adsbygoogle || []).push({});
       "google_ad-#{adId}"
 
   initializeGoogleAds: ->
@@ -62,7 +63,6 @@ class @AdDisplayer
     googleadscript.setAttribute("async", true)
     document.head.appendChild(googleadscript)
     @renderedGoogleAd = true
-    (adsbygoogle = window.adsbygoogle || []).push({});
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
   #   if location?
