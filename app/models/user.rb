@@ -41,6 +41,8 @@ class User < ApplicationRecord
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :theft_alerts
+  has_many :feedbacks
+  has_one :mailchimp_datum
 
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
@@ -126,6 +128,10 @@ class User < ApplicationRecord
 
   def additional_emails=(value)
     UserEmail.add_emails_for_user_id(id, value)
+  end
+
+  def confirmed_emails
+    user_emails.confirmed.pluck(:email)
   end
 
   def secondary_emails

@@ -80,6 +80,19 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  context "feedback" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user_email) { FactoryBot.create(:user_email, user: user, email: "secondary_email@stuff.com") }
+    let(:feedback) { FactoryBot.create(:feedback, email: "secondary_email@stuff.com") }
+    it "associates feedbacks" do
+      expect(feedback.reload.user_id).to be_blank
+      user_email.confirm(user_email.confirmation_token)
+      expect(feedback.reload.user_id).to be_blank
+      instance.perform(user.id)
+      expect(feedback.reload.user_id).to eq user.id
+    end
+  end
+
   describe "stolen records missing locations" do
     let(:user) { FactoryBot.create(:user) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }

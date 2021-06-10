@@ -7,6 +7,8 @@ class AfterUserChangeWorker < ApplicationWorker
 
     add_phones_for_verification(user)
 
+    associate_feedbacks(user)
+
     current_alerts = user_general_alerts(user)
     unless user.general_alerts == current_alerts
       user.update_attributes(general_alerts: current_alerts, skip_update: true)
@@ -32,6 +34,12 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     alerts.sort
+  end
+
+  def associate_feedbacks(user)
+    Feedback.no_user.where(email: user.confirmed_emails).each { |f|
+      f.update(user_id: user.id)
+    }
   end
 
   def add_phones_for_verification(user)

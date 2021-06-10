@@ -31,9 +31,15 @@ class Feedback < ApplicationRecord
   scope :notification_types, -> { where.not(feedback_type: no_notification_types) }
   scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
   scope :stolen_tip, -> { where(kind: stolen_tip_kinds) }
+  scope :no_user, -> { where(user_id: nil) }
+  scope :leads, -> { where(kind: lead_types) }
 
   def self.no_notification_types
     %w[manufacturer_update_request serial_update_request bike_delete_request]
+  end
+
+  def self.lead_types
+    %w[lead_for_bike_shop lead_for_city lead_for_school lead_for_law_enforcement]
   end
 
   def self.bike(bike_or_bike_id = nil)
