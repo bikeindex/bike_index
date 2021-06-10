@@ -46,6 +46,7 @@
         %h4= t(".related_articles")
         %ul
           %li
+            = t(".check_out")
             = link_to t(".law_enforcement_deck"), "https://docs.google.com/presentation/d/1De4TeyXdqshjhxBdrP9YL_f2AmzRkNx8VuRVCiniUic/edit?usp=sharing"
           %li
             = link_to t(".bend_reduces_bike_theft_by_60_percent"), news_path("bend-reduces-bike-theft-by-60-percent-with-help-from-pine-mountain-spo")
@@ -68,5 +69,5 @@
             = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
           .trusted-by
             .header
-              = t(".trusted_by_law_enforcement_everywhere")
+              = t(".used_by_law_enforcement_everywhere")
             = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"

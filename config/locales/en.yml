@@ -3543,6 +3543,8 @@ en:
       want_qr_stickers: Want QR stickers? Ask us how their cost offsets the price
         of a package.
     for_bike_shops:
+      check_out: Check out our
+      bike_shops_deck: bike shop partner deck
       5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
         bike shop
       automatic_registration_at_point_of_sale: Automatic registration at point of
@@ -3602,7 +3604,8 @@ en:
         registration system of %{organization_counts} organizations - communities
         in every corner of the world. Join the most widely used bike registration
         network in the world.
-      cities_deck: Check out our cities partner deck
+      check_out: Check out our
+      cities_deck: cities partner deck
       bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
         crime
       bike_index_organization_impounding: Impounding bikes with Bike Index
@@ -3626,8 +3629,8 @@ en:
       our_community_is_your_community: Our community is your community
       plug_your_city_in_nationally: Plug your city in nationally.
       related_articles: 'Related articles:'
-      trusted_by_law_enforcement_everywhere: Trusted by Law Enforcement everywhere
       trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
+      used_by_municipalities_everywhere: Used by municipalities everywhere
     for_community_groups:
       bike_index_for_community_groups: Bike Index for Community Groups
       bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors
@@ -3663,9 +3666,9 @@ en:
       bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
       bike_index_for_law_enforcement: Bike Index for Law Enforcement
       bike_index_organization_impounding: Impounding bikes with Bike Index
-      law_enforcement_deck: Check out our Law Enforcement partner deck
+      check_out: Check out our
+      law_enforcement_deck: law enforcement partner deck
       calgary_doubles: Calgary doubles bike recovery rate with Bike Index
-        New Orleans'
       embed_a_bike_index_registration_form: Embed a bike registration form on your
         website
       here: here
@@ -3685,6 +3688,7 @@ en:
       related_articles: 'Related articles:'
       sign_up_for_free: Sign up for free
       trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
+      used_by_law_enforcement_everywhere: Used by law enforcement everywhere
       with_over_215000_registries_and_almost_55: >-
         With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we
         know how to help.
@@ -3708,6 +3712,8 @@ en:
       for: for
       schools: Schools
     for_schools:
+      check_out: Check out our
+      schools_deck: university partner deck
       bike_index_for_universities: Bike Index for Universities
       bike_index_users_provide: >-
         Bike Index users provide serial numbers, proof of ownership and identifying
