@@ -36,6 +36,9 @@
       %span.blue-bullet
       %p= t(".bicycles_sold_before_you_activated_lights")
     %li
+      %span.blue-bullet
+      %p= t(".registering_with_a_sticker_html")
+    %li
       - link = link_to t(".privacy_policy_here"), privacy_url
       %span.blue-bullet
       %p= t(".we_know_you_and_your_customers_html", link: link)
@@ -46,7 +49,7 @@
       %span.blue-bullet
       %p= t(".were_happy_to_answer_any_questions_html", link: email_link)
 
-  %blockquote
+  %blockquote.mt-4
     = t(".i_started_bike_index_because")
 
   .blockquote-cite

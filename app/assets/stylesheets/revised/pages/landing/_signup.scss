@@ -72,11 +72,17 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
   .trusted-by {
     padding: 10px;
 
+    &.hidden-lg-up {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
     .header {
       background-color: transparent;
       text-align: center;
       font-weight: 600;
       font-size: 14px;
+      line-height: 1;
       margin: 0;
       padding: 0;
     }

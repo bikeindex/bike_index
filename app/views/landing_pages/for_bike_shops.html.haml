@@ -71,12 +71,17 @@
         %h4= t(".related_articles")
         %ul
           %li
+            = t(".check_out")
+            = link_to t(".bike_shops_deck"), "https://docs.google.com/presentation/d/1oQ3b96NRtAgJmYNhNfrAP3khDvB8lO_0gFG1cq86Rx0/edit?usp=sharing"
+          %li
             = link_to t(".driving_service_revenues_with_bicycle_reg"), news_path("driving-service-revenues-with-bicycle-registration")
           %li
             = link_to t(".5_ways_to_grow_community_for_your_bike_sh"), news_path("5-ways-to-grow-community-for-your-bike-shop")
+          %li
+            = link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
         .trusted-by.hidden-lg-up
-          %h3= t(".trusted_by_bike_shops_everywhere")
+          %h3= t(".used_at_bike_shops_everywhere")
           = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
 
       .next-steps-col

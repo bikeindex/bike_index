@@ -63,10 +63,7 @@ class RakeDevConfiguration
 end
 
 namespace :dev do
-  desc "Toggle caching"
-  task cache: :environment do
-    RakeDevConfiguration.toggle_dev_caching
-  end
+  # desc "Toggle caching" - already a rake action, no need to add our own
 
   desc "Toggle letter_opener gem, which automatically opens sent emails in a browser window"
   task letter_opener: :environment do
