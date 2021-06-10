@@ -35,6 +35,7 @@ class StolenRecord < ApplicationRecord
   belongs_to :recovering_user, class_name: "User"
 
   has_many :impound_claims
+  has_many :tweets
   has_many :theft_alerts
   has_one :alert_image
   has_one :recovery_display

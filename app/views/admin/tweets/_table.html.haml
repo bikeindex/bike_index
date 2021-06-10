@@ -2,6 +2,7 @@
 - render_sortable ||= false
 - skip_twitter_account ||= false
 - skip_kind ||= false
+- skip_stolen_record ||= false
 - skip_retweets ||= false
 
 .full-screen-table
@@ -12,8 +13,7 @@
           = sortable "created_at"
         - else
           Created
-      %th.small
-        Twitter ID
+      %th.small Twitter ID
       - unless skip_twitter_account
         %th
           - if render_sortable
@@ -26,12 +26,10 @@
             = sortable "kind"
           - else
             Kind
-      %th
-        Tweet
-      %th
-        Stolen Record
-      %th
-        Image?
+      %th Tweet
+      - unless skip_stolen_record
+        %th Stolen Record
+      %th Image?
       - unless skip_retweets
         %th
           Retweets
@@ -63,12 +61,13 @@
                   = strip_tags(tweet.body_html)
                 - else
                   = tweet.body
-          %td
-            - if tweet.stolen_tweet?
-              %small.less-strong
-                - link_text = tweet.bike.title_string if tweet.bike.present?
-                - link_text ||= tweet.stolen_record.id
-                = link_to link_text, admin_stolen_bike_path(tweet.stolen_record_id, stolen_record_id: true) if tweet.stolen_record.present?
+          - unless skip_stolen_record
+            %td
+              - if tweet.stolen_tweet?
+                %small.less-strong
+                  - link_text = tweet.bike.title_string if tweet.bike.present?
+                  - link_text ||= tweet.stolen_record.id
+                  = link_to link_text, admin_stolen_bike_path(tweet.stolen_record_id, stolen_record_id: true) if tweet.stolen_record.present?
           %td
             = check_mark if tweet.image.present? || tweet.tweeted_image.present?
           - unless skip_retweets
