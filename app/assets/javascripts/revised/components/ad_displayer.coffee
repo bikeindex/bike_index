@@ -17,11 +17,17 @@ class @AdDisplayer
     }
   }
 
+  googleAds = {
+    "ad300x600": "4203947975",
+    "ad468x60": "3828489557"
+  }
+
   skyscrapers = ["max_tracker_300"]
   sm_rectangles = ["max_tracker_468"]
 
   constructor: ->
     @renderedAds = []
+    @renderedGoogleAd = false
 
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
@@ -45,8 +51,12 @@ class @AdDisplayer
       el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
       adArray[index]
     else
-      el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
-      "#{el_klass}-google_ad"
+      unless @renderedGoogleAd
+        @renderedGoogleAd = true
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      adId = googleAds[klass]
+      el.innerHTML = "<ins class=\"adsbygoogle\" style=\"display:block\" data-ad-client=\"ca-pub-8140931939249510\" data-ad-slot=\"#{adId}\" data-ad-format=\"auto\" data-full-width-responsive=\"true\"></ins>"
+      "google_ad-#{adId}"
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
