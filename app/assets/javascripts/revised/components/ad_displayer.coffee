@@ -25,11 +25,11 @@ class @AdDisplayer
 
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, skyscrapers)
+        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
 
     for el_klass in ads_sm_rectangle
       $(".#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, sm_rectangles)
+        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
@@ -38,7 +38,7 @@ class @AdDisplayer
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderAdElement: (el, index, adArray) ->
+  renderAdElement: (el, index, klass, adArray) ->
     el.classList.add("rendered-ad")
     if adArray[index]
       renderedAd = internalAds[adArray[index]]
@@ -46,7 +46,7 @@ class @AdDisplayer
       adArray[index]
     else
       el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
-      "google_ad"
+      "#{el_klass}-google_ad"
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
