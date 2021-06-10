@@ -58,7 +58,7 @@ class @AdDisplayer
 
   initializeGoogleAds: ->
     googleadscript = document.createElement('script');
-    googleadscript.setAttribute("src", "//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+    googleadscript.setAttribute("src", "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
     googleadscript.setAttribute("async", true)
     document.head.appendChild(googleadscript)
     @renderedGoogleAd = true
