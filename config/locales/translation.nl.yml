@@ -4021,6 +4021,8 @@ nl:
       use_ascend: Ascend gebruiken?
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
+      bike_shops_deck: fietswinkel partner deck
+      check_out: Bekijk onze
     for_cities:
       actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
         En doe het goedkoop.
@@ -4047,13 +4049,15 @@ nl:
       our_community_is_your_community: Onze gemeenschap is uw gemeenschap
       plug_your_city_in_nationally: Sluit je stad landelijk aan.
       related_articles: 'Gerelateerde artikelen:'
-      trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
       trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
       bike_index_new_dashboard: Nieuw fietsindexdashboard handig voor het bestrijden
         van fietscriminaliteit
       bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
+      check_out: Bekijk onze
+      cities_deck: steden partner deck
+      used_by_municipalities_everywhere: Overal gebruikt door gemeenten
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -4084,13 +4088,13 @@ nl:
         om verloren en gestolen fietsen terug te vinden. Ongeacht het type fiets of
         fietser, we willen alle fietsen laten rijden met de eigenaren die ze nodig
         hebben.
+      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
+        op uw website
     for_law_enforcement:
       automated_tweets: geautomatiseerde tweets
       bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
         procent
       bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      bike_indexs_newest_municipal_partner: 'Bike Index''s nieuwste gemeentelijke
-        partner: New Orleans'
       here: hier
       if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
         in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
@@ -4126,6 +4130,10 @@ nl:
       bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
+      calgary_doubles: Calgary verdubbelt fietsherstelpercentage met Bike Index
+      check_out: Bekijk onze
+      law_enforcement_deck: partnerdeck voor wetshandhaving
+      used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
     for_organizations_photo_list:
       bike_shops: Fietsenwinkels
       cities: Steden
@@ -4172,6 +4180,8 @@ nl:
         op de campus
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
+      check_out: Bekijk onze
+      schools_deck: universitair partnerdeck
     packages_list:
       forever: Voor altijd
       free: GRATIS

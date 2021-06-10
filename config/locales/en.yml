@@ -3548,12 +3548,14 @@ en:
       automatic_registration_at_point_of_sale: Automatic registration at point of
         sale
       bike_index_for_bike_shops: Bike Index for Bike Shops
+      bike_shops_deck: bike shop partner deck
       bikes_before_they: >-
         Unite against bike theft and protect your customers bikes before they're even
         out there.
       build_goodwill_with_your_customers_with_a: >-
         Build goodwill with your customers with a service you can offer at no cost.
         Recover a stolen bike, and you'll have a customer for life.
+      check_out: Check out our
       connect_your_ascend_account_html: >-
         Connect your Ascend account and your Bike Index shop account. Each night,
         Ascend will export the bikes you've sold, and we'll import them into Bike
@@ -3612,6 +3614,8 @@ en:
         to register bikes in one system. Gone are the days of waiting for people to
         not come in to register their bikes, or wondering if that other department
         took care of it. Bike Index consolidates everything in one manageable place.
+      check_out: Check out our
+      cities_deck: cities partner deck
       embed_a_bike_index_registration_form: Embed a bike registration form on your
         website
       engage_your_residents_and_recover_their_b: Engage your residents and recover
@@ -3625,13 +3629,15 @@ en:
       our_community_is_your_community: Our community is your community
       plug_your_city_in_nationally: Plug your city in nationally.
       related_articles: 'Related articles:'
-      trusted_by_law_enforcement_everywhere: Trusted by Law Enforcement everywhere
       trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
+      used_by_municipalities_everywhere: Used by municipalities everywhere
     for_community_groups:
       bike_index_for_community_groups: Bike Index for Community Groups
       bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors
         program
       bike_index_welcomes_stolen_bikes_nola: Bike Index welcomes Stolen Bikes NOLA
+      embed_a_bike_index_registration_form: Embed a bike registration form on your
+        website
       gone_are_the_days_where_you_had_to_regist: >-
         Gone are the days where you had to register your bike in your neighborhood,
         county, city, state and country. Just register all bikes in Bike Index and
@@ -3662,8 +3668,8 @@ en:
       bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
       bike_index_for_law_enforcement: Bike Index for Law Enforcement
       bike_index_organization_impounding: Impounding bikes with Bike Index
-      bike_indexs_newest_municipal_partner: 'Bike Index''s newest municipal partner:
-        New Orleans'
+      calgary_doubles: Calgary doubles bike recovery rate with Bike Index
+      check_out: Check out our
       embed_a_bike_index_registration_form: Embed a bike registration form on your
         website
       here: here
@@ -3673,6 +3679,7 @@ en:
       is_your_department_equipped_to_fight_bike: >-
         Is your department equipped to fight bike theft? Bike Index can help you get
         bikes back into the right hands.
+      law_enforcement_deck: law enforcement partner deck
       local_ambassadors: local ambassadors
       our_extensive_archive_has_helped_officers: >-
         Our extensive archive has helped officers recover bikes involved in criminal
@@ -3683,6 +3690,7 @@ en:
       related_articles: 'Related articles:'
       sign_up_for_free: Sign up for free
       trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
+      used_by_law_enforcement_everywhere: Used by law enforcement everywhere
       with_over_215000_registries_and_almost_55: >-
         With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we
         know how to help.
@@ -3714,6 +3722,7 @@ en:
         computer or smartphone. Our extensive archive has helped officers recover
         bikes involved in criminal situations, from simple theft to chop shops, drug
         houses - even fencing rings and online black markets.
+      check_out: Check out our
       embed_a_bike_index_registration_form: Embed a bike registration form on your
         website
       features_amp_pricing: Features & Pricing
@@ -3728,6 +3737,7 @@ en:
         Bike Index's partners, visit our partners page, and for information on partnering
         with Bike Index, please contact us.
       related_articles: 'Related articles:'
+      schools_deck: university partner deck
       six_best_features_for_schools: Bike Index’s six best features for campus bike
         management
       trusted_by_top_universities: Trusted by top universities
