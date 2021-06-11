@@ -58,6 +58,9 @@ class @AdDisplayer
       "google_ad-#{adId}"
 
   initializeGoogleAds: ->
+    # For some reason, doesn't work to dynamically add the script, so I added it to all the pages with ads
+    # Ideally, we'd be able to dynamically add the script tag, but... just getting it working for now
+
     # googleadscript = document.createElement('script');
     # googleadscript.setAttribute("src", "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
     # googleadscript.setAttribute("async", true)
