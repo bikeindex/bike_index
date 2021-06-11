@@ -8,6 +8,8 @@
     - additional_class = %w().include?(content_page_type) ? "" : "legacy-content-wrap"
     .col-md-8.primary-content-block{ class: additional_class }
       = yield
+      .d-md-none.d-sm-block.mb-2.mt-4
+        .ad-block.ad468x60
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
       - if render_why_donate
@@ -87,7 +89,8 @@
             %li
               = active_link t(".sign_up_your_organization"), new_organization_path
 
-        .ad-block#right300x600
+        .ad-block.ad300x600.d-none.d-md-block
+        .ad-block.ad300x600.mt-3.d-none.d-md-block
 
   - if render_get_your_stolen_bike_back
     .root-landing-recovery-stories.mt-4
@@ -101,3 +104,5 @@
   - if @blog.present? && current_user&.superuser?
     .text-center.mt-4.less-strong
       = link_to "edit post", edit_admin_news_path(@blog), class: "btn btn-outline-primary"
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

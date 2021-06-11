@@ -1,39 +1,84 @@
 class @AdDisplayer
-  ads_right = ['right300x600']
-  ads_top = ['top468x60']
+  ads_skyscraper = ["ad300x600"]
+  ads_sm_rectangle = ["ad468x60"]
+  ads_full_width = ["adFullWidth"]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
   max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
   max_tracker_468 = "<a id=\"binxad-max_tracker_468\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
 
+  internalAds = {
+    "max_tracker_300": {
+      "href": "https://landing.mymaxtracker.com",
+      "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
+    },
+    "max_tracker_468": {
+      "href": "https://landing.mymaxtracker.com",
+      "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+    }
+  }
+
+  googleAds = {
+    "ad300x600": "4203947975",
+    "adFullWidth": "3828489557"
+  }
+
+  skyscrapers = ["max_tracker_300"]
+  sm_rectangles = ["max_tracker_468"]
+
   constructor: ->
-    renderedAds = []
+    @renderedAds = []
+    @renderedGoogleAd = false
 
-    for el_id in ads_right
-      if document.getElementById(el_id)
-        Array::push.apply renderedAds, @renderAdRight(el_id)
+    # TODO: don't use jquery here for the element iterating
+    for el_klass in ads_skyscraper
+      $(".#{el_klass}").each (index, el) =>
+        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
 
-    for el_id in ads_top
-      if document.getElementById(el_id)
-        Array::push.apply renderedAds, @renderAdTop(el_id)
+    for el_klass in ads_sm_rectangle
+      $(".#{el_klass}").each (index, el) =>
+        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
+
+    for el_klass in ads_full_width
+      $(".#{el_klass}").each (index, el) =>
+        # Passing empty array so it always renders google
+        @renderedAds.push @renderAdElement(el, index, el_klass, [])
+
+    # Remove undefined ads (ie they weren't rendered)
+    @renderedAds = @renderedAds.filter (x) ->
+      x != undefined
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
-      for adname in renderedAds
+      for adname in @renderedAds
         window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-load", eventLabel: "#{adname}"})
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderAdRight: (el_id) ->
-    $(".content-nav-group:last").addClass("additional-ad-space")
-    $("##{el_id}").html([max_tracker_300].join("")).addClass("rendered-ad")
+  renderAdElement: (el, index, klass, adArray) ->
+    # check if element is visible, skip rendering if it isn't
+    return unless el.offsetWidth > 0 && el.offsetHeight > 0;
+    el.classList.add("rendered-ad")
+    if adArray[index]
+      renderedAd = internalAds[adArray[index]]
+      el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
+      adArray[index]
+    else
+      @initializeGoogleAds() unless @renderedGoogleAd
+      adId = googleAds[klass]
+      el.innerHTML = "<ins class=\"adsbygoogle\" style=\"display:block;width:100%;height:100%;\" data-ad-client=\"ca-pub-8140931939249510\" data-ad-slot=\"#{adId}\" data-ad-format=\"auto\" data-full-width-responsive=\"true\"></ins>"
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      "google_ad-#{adId}"
 
-    ["max_tracker_300"]
+  initializeGoogleAds: ->
+    # For some reason, doesn't work to dynamically add the script, so I added it to all the pages with ads
+    # Ideally, we'd be able to dynamically add the script tag, but... just getting it working for now
 
-  renderAdTop: (el_id) ->
-    $("##{el_id}").html([max_tracker_468].join("")).addClass("rendered-ad")
-
-    ["max_tracker_468"]
+    # googleadscript = document.createElement('script');
+    # googleadscript.setAttribute("src", "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+    # googleadscript.setAttribute("async", true)
+    # document.head.appendChild(googleadscript)
+    @renderedGoogleAd = true
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')
