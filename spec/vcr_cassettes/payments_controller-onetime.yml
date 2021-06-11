@@ -23,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 22 Apr 2021 01:31:42 GMT
+      - Fri, 11 Jun 2021 18:37:26 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '801'
+      - '803'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -43,7 +43,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_P0Sl8Is7LhroXT
+      - req_4J8faRfi0X1dk7
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -54,10 +54,10 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "tok_0IirOLm0T0GBfX0vQb1lJNIn",
+          "id": "tok_0J1FEQm0T0GBfX0vPbOegkTv",
           "object": "token",
           "card": {
-            "id": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+            "id": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -82,20 +82,20 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "client_ip": "99.14.101.245",
-          "created": 1619055101,
+          "client_ip": "162.234.253.239",
+          "created": 1623436646,
           "livemode": false,
           "type": "card",
           "used": false
         }
     http_version:
-  recorded_at: Thu, 22 Apr 2021 01:31:42 GMT
+  recorded_at: Fri, 11 Jun 2021 18:37:26 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/customers
     body:
       encoding: UTF-8
-      string: email=user18s%40bikeiasdndex.org&card=tok_0IirOLm0T0GBfX0vQb1lJNIn
+      string: email=user595s%40bikeiasdndex.org&card=tok_0J1FEQm0T0GBfX0vPbOegkTv
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -113,11 +113,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 22 Apr 2021 01:31:42 GMT
+      - Fri, 11 Jun 2021 18:37:27 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2878'
+      - '2879'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -133,7 +133,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_IeWGaAXSE3OtZb
+      - req_NewJFZAXT8ctQo
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -144,7 +144,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cus_JLYV8eyThsGo2L",
+          "id": "cus_JeYLGTJRwYOLFx",
           "object": "customer",
           "account_balance": 0,
           "address": null,
@@ -153,7 +153,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+                "id": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -165,7 +165,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_JLYV8eyThsGo2L",
+                "customer": "cus_JeYLGTJRwYOLFx",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -181,17 +181,17 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_JLYV8eyThsGo2L/cards"
+            "url": "/v1/customers/cus_JeYLGTJRwYOLFx/cards"
           },
-          "created": 1619055102,
+          "created": 1623436647,
           "currency": null,
-          "default_card": "card_0IirOLm0T0GBfX0v5k7a8Dao",
-          "default_source": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+          "default_card": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
+          "default_source": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
           "delinquent": false,
           "description": null,
           "discount": null,
-          "email": "user18s@bikeiasdndex.org",
-          "invoice_prefix": "3200DE44",
+          "email": "user595s@bikeiasdndex.org",
+          "invoice_prefix": "2370DF88",
           "invoice_settings": {
             "custom_fields": null,
             "default_payment_method": null,
@@ -211,7 +211,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+                "id": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -223,7 +223,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_JLYV8eyThsGo2L",
+                "customer": "cus_JeYLGTJRwYOLFx",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -239,7 +239,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_JLYV8eyThsGo2L/sources"
+            "url": "/v1/customers/cus_JeYLGTJRwYOLFx/sources"
           },
           "subscriptions": {
             "object": "list",
@@ -248,7 +248,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_JLYV8eyThsGo2L/subscriptions"
+            "url": "/v1/customers/cus_JeYLGTJRwYOLFx/subscriptions"
           },
           "tax_exempt": "none",
           "tax_ids": {
@@ -258,19 +258,19 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_JLYV8eyThsGo2L/tax_ids"
+            "url": "/v1/customers/cus_JeYLGTJRwYOLFx/tax_ids"
           },
           "tax_info": null,
           "tax_info_verification": null
         }
     http_version:
-  recorded_at: Thu, 22 Apr 2021 01:31:42 GMT
+  recorded_at: Fri, 11 Jun 2021 18:37:27 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/charges
     body:
       encoding: UTF-8
-      string: customer=cus_JLYV8eyThsGo2L&amount=4000&description=Bike+Index+customer&currency=usd
+      string: customer=cus_JeYLGTJRwYOLFx&amount=4000&description=Bike+Index+customer&currency=usd
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -288,7 +288,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 22 Apr 2021 01:31:43 GMT
+      - Fri, 11 Jun 2021 18:37:28 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -308,7 +308,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_qfZVSOqxUb9A4B
+      - req_KuM6yWNDxZU3Gu
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -319,7 +319,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "ch_0IirONm0T0GBfX0vk2nc8JWa",
+          "id": "ch_0J1FERm0T0GBfX0vPnMgXU5o",
           "object": "charge",
           "amount": 4000,
           "amount_captured": 4000,
@@ -327,7 +327,7 @@ http_interactions:
           "application": null,
           "application_fee": null,
           "application_fee_amount": null,
-          "balance_transaction": "txn_0IirONm0T0GBfX0vPzbmhACK",
+          "balance_transaction": "txn_0J1FESm0T0GBfX0vbufoMBUD",
           "billing_details": {
             "address": {
               "city": null,
@@ -344,7 +344,7 @@ http_interactions:
           "calculated_statement_descriptor": "Stripe",
           "captured": true,
           "card": {
-            "id": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+            "id": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -356,7 +356,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JLYV8eyThsGo2L",
+            "customer": "cus_JeYLGTJRwYOLFx",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -369,9 +369,9 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "created": 1619055103,
+          "created": 1623436647,
           "currency": "usd",
-          "customer": "cus_JLYV8eyThsGo2L",
+          "customer": "cus_JeYLGTJRwYOLFx",
           "description": "Bike Index customer",
           "destination": null,
           "dispute": null,
@@ -390,13 +390,13 @@ http_interactions:
             "network_status": "approved_by_network",
             "reason": null,
             "risk_level": "normal",
-            "risk_score": 19,
+            "risk_score": 45,
             "seller_message": "Payment complete.",
             "type": "authorized"
           },
           "paid": true,
           "payment_intent": null,
-          "payment_method": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+          "payment_method": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
           "payment_method_details": {
             "card": {
               "brand": "visa",
@@ -420,7 +420,7 @@ http_interactions:
           },
           "receipt_email": null,
           "receipt_number": null,
-          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0IirONm0T0GBfX0vk2nc8JWa/rcpt_JLYVA0K2py33wMwwSXWbgKrc0ptyuVf",
+          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0J1FERm0T0GBfX0vPnMgXU5o/rcpt_JeYLgqux8iCPHbBUbhFPOdCyGVbgBpO",
           "refunded": false,
           "refunds": {
             "object": "list",
@@ -429,12 +429,12 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/charges/ch_0IirONm0T0GBfX0vk2nc8JWa/refunds"
+            "url": "/v1/charges/ch_0J1FERm0T0GBfX0vPnMgXU5o/refunds"
           },
           "review": null,
           "shipping": null,
           "source": {
-            "id": "card_0IirOLm0T0GBfX0v5k7a8Dao",
+            "id": "card_0J1FEQm0T0GBfX0vnFEAu1j3",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -446,7 +446,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JLYV8eyThsGo2L",
+            "customer": "cus_JeYLGTJRwYOLFx",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -468,5 +468,5 @@ http_interactions:
           "transfer_group": null
         }
     http_version:
-  recorded_at: Thu, 22 Apr 2021 01:31:43 GMT
+  recorded_at: Fri, 11 Jun 2021 18:37:28 GMT
 recorded_with: VCR 5.0.0

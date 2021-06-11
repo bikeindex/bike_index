@@ -63,7 +63,7 @@ end
 
 RSpec.shared_context :geocoder_real do
   before do
-    Geocoder.configure(lookup: :google, use_https: true)
+    Geocoder.configure(lookup: :google, use_https: true, api_key: ENV["GOOGLE_GEOCODER"])
   end
 
   after do
