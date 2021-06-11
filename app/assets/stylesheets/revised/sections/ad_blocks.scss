@@ -9,11 +9,9 @@
 }
 
 .ad-block {
-  display: none;
   width: 100%;
 
   &.rendered-ad {
-    display: block;
     margin-top: $vertical-height;
     a,
     img {
@@ -33,6 +31,11 @@
     // Because otherwise it looks weird since it's so wide
     max-width: 300px;
     margin: 0 auto;
+  }
+
+  &.adFullWidth {
+    max-height: 500px;
+    min-height: 100px; // So that it shows up as visible
   }
 
   h3 {

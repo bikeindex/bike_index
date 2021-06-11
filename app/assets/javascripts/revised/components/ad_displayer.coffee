@@ -1,6 +1,7 @@
 class @AdDisplayer
   ads_skyscraper = ["ad300x600"]
   ads_sm_rectangle = ["ad468x60"]
+  ads_full_width = ["adFullWidth"]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
   max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
@@ -19,7 +20,7 @@ class @AdDisplayer
 
   googleAds = {
     "ad300x600": "4203947975",
-    "ad468x60": "3828489557"
+    "adFullWidth": "3828489557"
   }
 
   skyscrapers = ["max_tracker_300"]
@@ -29,6 +30,7 @@ class @AdDisplayer
     @renderedAds = []
     @renderedGoogleAd = false
 
+    # TODO: don't use jquery here for the element iterating
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
         @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
@@ -36,6 +38,15 @@ class @AdDisplayer
     for el_klass in ads_sm_rectangle
       $(".#{el_klass}").each (index, el) =>
         @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
+
+    for el_klass in ads_full_width
+      $(".#{el_klass}").each (index, el) =>
+        # Passing empty array so it always renders google
+        @renderedAds.push @renderAdElement(el, index, el_klass, [])
+
+    # Remove undefined ads (ie they weren't rendered)
+    @renderedAds = @renderedAds.filter (x) ->
+      x != undefined
 
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
     if window.ga
@@ -45,6 +56,8 @@ class @AdDisplayer
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
   renderAdElement: (el, index, klass, adArray) ->
+    # check if element is visible, skip rendering if it isn't
+    return unless el.offsetWidth > 0 && el.offsetHeight > 0;
     el.classList.add("rendered-ad")
     if adArray[index]
       renderedAd = internalAds[adArray[index]]
