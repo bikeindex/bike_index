@@ -64,6 +64,10 @@ VCR.configure do |config|
     match_requests_on: [:method, :host, :path]
   }
 
+  %w[GOOGLE_GEOCODER].each do |key|
+    config.filter_sensitive_data("<#{key}>") { ENV[key] }
+  end
+
   config.before_record do |i|
     i.response.headers.delete("Set-Cookie")
     i.request.headers.delete("Authorization")
