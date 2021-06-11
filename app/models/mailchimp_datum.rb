@@ -17,7 +17,7 @@ class MailchimpDatum < ApplicationRecord
   enum status: STATUS_ENUM
 
   before_validation :set_calculated_attributes
-  after_commit :update_associations
+  after_commit :update_association_and_mailchimp, if: :persisted?
 
   def self.find_or_create_for(obj)
     if obj.is_a?(User)
@@ -35,14 +35,17 @@ class MailchimpDatum < ApplicationRecord
 
   def set_calculated_attributes
     self.email = user.email if user.present?
+    @previous_data ||= data
     self.data = calculated_data
     self.status = calculated_status
   end
 
-  def update_associations
+  def update_association_and_mailchimp
     calculated_feedbacks.where(mailchimp_datum_id: nil).each { |f|
       f.update(mailchimp_datum_id: id)
     }
+    return true if @previous_data == data
+    UpdateMailchimpDatumWorker.perform_async(id)
   end
 
   def ensure_subscription_required
@@ -57,7 +60,8 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_status
-    return status if status.present? && !status.subscribed?
+    return status if status.present? &&
+      !%w[subscribed no_subscription_required].include?(status)
     return "no_subscription_required" if audiences.none?
     "subscribed"
   end
