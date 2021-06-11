@@ -1787,6 +1787,7 @@ CREATE TABLE public.mailchimp_data (
     user_id bigint,
     user_deleted_at timestamp without time zone,
     email character varying,
+    subscriber_hash character varying,
     status integer,
     data jsonb,
     created_at timestamp without time zone NOT NULL,

@@ -66,6 +66,7 @@ class MailchimpDatum < ApplicationRecord
     elsif user_id.present?
       self.user_deleted_at ||= Time.current
     end
+    self.subscriber_hash = Digest::MD5.hexdigest(email)
     self.data ||= {}
     @previous_data = data
     self.data = calculated_data
@@ -102,6 +103,10 @@ class MailchimpDatum < ApplicationRecord
     updated_tags = tags
     if new_lists.include?("organization") && admin_memberships.any?
       updated_tags << "not_organization_creator" if admin_memberships.any? { |m| !m.organization_creator? }
+      updated_tags += admin_memberships.map do |m|
+        next unless %w[lightspeed_pos ascend_pos].include?(m.organization.pos_kind)
+        m.organization.pos_kind.gsub("_pos", "")
+      end.compact
     end
     updated_tags.uniq.sort
   end

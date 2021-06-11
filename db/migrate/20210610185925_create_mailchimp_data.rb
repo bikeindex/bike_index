@@ -4,8 +4,10 @@ class CreateMailchimpData < ActiveRecord::Migration[5.2]
       t.references :user, index: true
       t.datetime :user_deleted_at
       t.string :email
+      t.string :subscriber_hash
       t.integer :status
       t.jsonb :data
+      t.datetime :mailchimp_updated_at
 
       t.timestamps
     end
