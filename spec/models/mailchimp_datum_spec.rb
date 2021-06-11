@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe MailchimpDatum, type: :model do
   let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
   let(:organization_kind) { "bike_shop"}
+  let(:empty_data) { {lists: [], tags: [], interests_organization: [], interests_individual: []} }
 
   describe "find_or_create_for" do
     before { Sidekiq::Worker.clear_all }
@@ -14,6 +15,7 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.lists).to eq([])
         expect(mailchimp_datum.no_subscription_required?).to be_truthy
         expect(mailchimp_datum.id).to be_blank
+        expect(mailchimp_datum.data).to eq empty_data.as_json
         expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
       end
       context "organization admin" do
@@ -103,7 +105,13 @@ RSpec.describe MailchimpDatum, type: :model do
       end
       context "lead_for_school" do
         let!(:feedback) { FactoryBot.create(:feedback, kind: "lead_for_school") }
-        let(:target) { { lists: ["organization"], tags: [], interests: {}}}
+        let(:target) do
+          { lists: ["organization"],
+            tags: [],
+            interests_organization: ["school"],
+            interests_individual: []
+          }
+        end
         it "creates" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
           mailchimp_datum = MailchimpDatum.find_or_create_for(feedback)
@@ -113,6 +121,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.user_id).to be_blank
           expect(mailchimp_datum.feedbacks.pluck(:id)).to eq([feedback.id])
           expect(feedback.reload.mailchimp_datum_id).to eq mailchimp_datum.id
+          expect(mailchimp_datum.data).to eq target.as_json
           expect(UpdateMailchimpDatumWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
 
           expect {
@@ -126,6 +135,29 @@ RSpec.describe MailchimpDatum, type: :model do
   describe "calculated_lists" do
     it "is empty" do
       expect(MailchimpDatum.new.send("calculated_lists")).to eq([])
+    end
+  end
+
+  describe "calculated_data" do
+    it "is empty" do
+      expect(MailchimpDatum.new.calculated_data.as_json).to eq empty_data.as_json
+    end
+    context "with organization admin" do
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
+      let(:mailchimp_datum)  { MailchimpDatum.create(user: user) }
+      let(:target)  {{ lists: ["organization"], tags: [], interests_organization: ["bike_shop"], interests_individual: []} }
+      it "is as expected" do
+        expect(user.reload.memberships.first.organization_creator?).to be_truthy
+        expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
+      end
+      context "not creator of organization" do
+        let!(:organization_creator) { FactoryBot.create(:organization_admin, organization: organization) }
+        it "is as expected" do
+          expect(organization_creator.reload.memberships.first.organization_creator?).to be_truthy
+          expect(user.reload.memberships.first.organization_creator?).to be_falsey
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: ["not_organization_creator"]).as_json
+        end
+      end
     end
   end
 end

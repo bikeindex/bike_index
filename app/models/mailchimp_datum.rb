@@ -47,16 +47,16 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def tags
-    data["tags"] || []
+    data&.dig("tags") || []
   end
 
   # interests aka "Groups"
   def interests_individual
-    data["interests_individual"] || []
+    data&.dig("interests_individual") || []
   end
 
   def interests_organization
-    data["interests_organization"] || []
+    data&.dig("interests_organization") || []
   end
 
   def set_calculated_attributes
@@ -91,7 +91,7 @@ class MailchimpDatum < ApplicationRecord
     new_lists = calculated_lists
     {
       lists: new_lists,
-      tags: calculated_tags,
+      tags: calculated_tags(new_lists),
       interests_organization: calculated_interests_organization(new_lists),
       interests_individual: calculated_interests_individual(new_lists),
     }
@@ -99,9 +99,16 @@ class MailchimpDatum < ApplicationRecord
 
   private
 
-  def calculated_tags
+  def calculated_tags(new_lists)
     updated_tags = tags
-    updated_tags
+    if new_lists.include?("organization") && admin_memberships.any?
+      updated_tags << "not_organization_creator" if admin_memberships.any? { |m| !m.organization_creator? }
+    end
+    updated_tags.uniq.sort
+  end
+
+  def admin_memberships
+    user&.memberships&.admin || []
   end
 
   def calculated_status
@@ -113,29 +120,35 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_feedbacks
-    c_feedbacks = user.present? ? user.feedbacks : Feedback.where(email: email)
-    (c_feedbacks + [creator_feedback]).compact
+    user.present? ? user.feedbacks : Feedback.where(email: email) +
+      [creator_feedback].compact
   end
 
   def calculated_lists
     c_list = []
     if calculated_feedbacks.any? { |f| f.lead? }
       c_list << "organization"
-    elsif user&.has_membership? # No need to calculate this if there is a lead
-      c_list << "organization" if user.memberships.any? { |u| u.admin? }
+    elsif admin_memberships.any? # No need to calculate this if there is a lead
+      c_list << "organization"
     end
-    c_list
+    c_list.uniq.sort
   end
 
   def calculated_interests_individual(new_lists)
     updated_interests_i = interests_individual
     return updated_interests_i unless new_lists.include?("individual")
-    updated_interests_i
+    updated_interests_i.uniq.sort
   end
 
   def calculated_interests_organization(new_lists)
     updated_interests_o = interests_individual
     return updated_interests_o unless new_lists.include?("organization")
-    updated_interests_o
+    if admin_memberships.any?
+      updated_interests_o += admin_memberships.map { |m| m.organization.kind }
+    else
+      updated_interests_o += calculated_feedbacks.select { |f| f.lead? }
+        .map { |f| f.kind.gsub(/lead_for_/, "") }
+    end
+    updated_interests_o.uniq.sort
   end
 end
