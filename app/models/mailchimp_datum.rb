@@ -68,7 +68,7 @@ class MailchimpDatum < ApplicationRecord
 
   def calculated_audiences
     aud = []
-    aud += calculated_feedbacks.leads.pluck(:kind).map { |k| k.gsub("lead_for_", "") }
+    aud += calculated_feedbacks.leads.pluck(:kind)
     aud
   end
 end
