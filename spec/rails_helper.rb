@@ -64,7 +64,7 @@ VCR.configure do |config|
     match_requests_on: [:method, :host, :path]
   }
 
-  %w[GOOGLE_GEOCODER].each do |key|
+  %w[GOOGLE_GEOCODER MAILCHIMP_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
 
