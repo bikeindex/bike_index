@@ -50,6 +50,10 @@ class MailchimpDatum < ApplicationRecord
     data&.dig("tags") || []
   end
 
+  def interests(list)
+    list == "organization" ? interests_organization : interests_individual
+  end
+
   # interests aka "Groups"
   def interests_individual
     data&.dig("interests_individual") || []
@@ -57,6 +61,18 @@ class MailchimpDatum < ApplicationRecord
 
   def interests_organization
     data&.dig("interests_organization") || []
+  end
+
+  def full_name
+    user&.name
+  end
+
+  def merge_fields
+    {}
+  end
+
+  def mailchimp_status
+    no_subscription_required? ? "unsubscribed" : status
   end
 
   def set_calculated_attributes

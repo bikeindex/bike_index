@@ -15,4 +15,31 @@ RSpec.describe MailchimpIntegration do
       end
     end
   end
+
+  describe "member_update_hash" do
+    let(:mailchimp_datum) { MailchimpDatum.create(email: "example@bikeindex.org") }
+    let(:target) do
+      { email: "example@bikeindex.org",
+        full_name: nil,
+        interests: [],
+        merge_fields: {},
+        status: "unsubscribed"}
+    end
+    it "is expected" do
+      expect(instance.member_update_hash(mailchimp_datum, "organization")).to eq target
+    end
+  end
+
+  describe "get_member" do
+    let(:mailchimp_datum) { MailchimpDatum.create(email: "example@bikeindex.org") }
+    it "gets mailchimp response" do
+      expect(mailchimp_datum.id).to be_blank
+      expect(mailchimp_datum.subscriber_hash).to eq "ae3dd3401b5ed77b0a23d85874d6113b"
+
+      VCR.use_cassette("mailchimp_integration-get_member-example", match_requests_on: [:path]) do
+        result = instance.get_member(mailchimp_datum, "individual")
+        expect(result).to eq nil
+      end
+    end
+  end
 end
