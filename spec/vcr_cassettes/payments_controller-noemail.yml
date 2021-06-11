@@ -352,10 +352,10 @@ http_interactions:
   recorded_at: Fri, 23 Apr 2021 17:02:29 GMT
 - request:
     method: post
-    uri: https://api.stripe.com/v1/charges
+    uri: https://api.stripe.com/v1/customers/cus_JeWSO2j1efT9ah
     body:
       encoding: UTF-8
-      string: customer=cus_JLwzsq4uYFP4cF&amount=4000&description=Bike+Index+customer&currency=usd
+      string: card=tok_0J1FEYm0T0GBfX0vyz2PeT3U
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -373,7 +373,182 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 23 Apr 2021 17:02:30 GMT
+      - Fri, 11 Jun 2021 18:37:35 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2872'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, POST, HEAD, OPTIONS, DELETE
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - Request-Id, Stripe-Manage-Version, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required
+      Access-Control-Max-Age:
+      - '300'
+      Cache-Control:
+      - no-cache, no-store
+      Request-Id:
+      - req_TvuWUHIGfluuYO
+      Stripe-Version:
+      - '2014-12-08'
+      X-Stripe-C-Cost:
+      - '3'
+      Strict-Transport-Security:
+      - max-age=31556926; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "id": "cus_JeWSO2j1efT9ah",
+          "object": "customer",
+          "account_balance": 0,
+          "address": null,
+          "balance": 0,
+          "cards": {
+            "object": "list",
+            "data": [
+              {
+                "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+                "object": "card",
+                "address_city": null,
+                "address_country": null,
+                "address_line1": null,
+                "address_line1_check": null,
+                "address_line2": null,
+                "address_state": null,
+                "address_zip": null,
+                "address_zip_check": null,
+                "brand": "Visa",
+                "country": "US",
+                "customer": "cus_JeWSO2j1efT9ah",
+                "cvc_check": "pass",
+                "dynamic_last4": null,
+                "exp_month": 12,
+                "exp_year": 2025,
+                "fingerprint": "70B1BgindTYnDA3n",
+                "funding": "credit",
+                "last4": "4242",
+                "metadata": {
+                },
+                "name": null,
+                "tokenization_method": null
+              }
+            ],
+            "has_more": false,
+            "total_count": 1,
+            "url": "/v1/customers/cus_JeWSO2j1efT9ah/cards"
+          },
+          "created": 1623429678,
+          "currency": null,
+          "default_card": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+          "default_source": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+          "delinquent": false,
+          "description": null,
+          "discount": null,
+          "email": "test_user@test.com",
+          "invoice_prefix": "D9D827C8",
+          "invoice_settings": {
+            "custom_fields": null,
+            "default_payment_method": null,
+            "footer": null
+          },
+          "livemode": false,
+          "metadata": {
+          },
+          "name": null,
+          "next_invoice_sequence": 1,
+          "phone": null,
+          "preferred_locales": [
+
+          ],
+          "shipping": null,
+          "sources": {
+            "object": "list",
+            "data": [
+              {
+                "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+                "object": "card",
+                "address_city": null,
+                "address_country": null,
+                "address_line1": null,
+                "address_line1_check": null,
+                "address_line2": null,
+                "address_state": null,
+                "address_zip": null,
+                "address_zip_check": null,
+                "brand": "Visa",
+                "country": "US",
+                "customer": "cus_JeWSO2j1efT9ah",
+                "cvc_check": "pass",
+                "dynamic_last4": null,
+                "exp_month": 12,
+                "exp_year": 2025,
+                "fingerprint": "70B1BgindTYnDA3n",
+                "funding": "credit",
+                "last4": "4242",
+                "metadata": {
+                },
+                "name": null,
+                "tokenization_method": null
+              }
+            ],
+            "has_more": false,
+            "total_count": 1,
+            "url": "/v1/customers/cus_JeWSO2j1efT9ah/sources"
+          },
+          "subscriptions": {
+            "object": "list",
+            "data": [
+
+            ],
+            "has_more": false,
+            "total_count": 0,
+            "url": "/v1/customers/cus_JeWSO2j1efT9ah/subscriptions"
+          },
+          "tax_exempt": "none",
+          "tax_ids": {
+            "object": "list",
+            "data": [
+
+            ],
+            "has_more": false,
+            "total_count": 0,
+            "url": "/v1/customers/cus_JeWSO2j1efT9ah/tax_ids"
+          },
+          "tax_info": null,
+          "tax_info_verification": null
+        }
+    http_version:
+  recorded_at: Fri, 11 Jun 2021 18:37:35 GMT
+- request:
+    method: post
+    uri: https://api.stripe.com/v1/charges
+    body:
+      encoding: UTF-8
+      string: customer=cus_JeWSO2j1efT9ah&amount=4000&description=Bike+Index+customer&currency=usd
+    headers:
+      User-Agent:
+      - Stripe/v1 RubyBindings/3.3.2
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Fri, 11 Jun 2021 18:37:36 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -393,7 +568,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_XBGSyF6omftRXs
+      - req_YAzDzduO9lKdsd
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -404,7 +579,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "ch_0IjSOfm0T0GBfX0vCwiZUhlO",
+          "id": "ch_0J1FEam0T0GBfX0vtXvvcANN",
           "object": "charge",
           "amount": 4000,
           "amount_captured": 4000,
@@ -412,7 +587,7 @@ http_interactions:
           "application": null,
           "application_fee": null,
           "application_fee_amount": null,
-          "balance_transaction": "txn_0IjSOgm0T0GBfX0vsobvpgAj",
+          "balance_transaction": "txn_0J1FEam0T0GBfX0v5YXGEj8M",
           "billing_details": {
             "address": {
               "city": null,
@@ -429,7 +604,7 @@ http_interactions:
           "calculated_statement_descriptor": "Stripe",
           "captured": true,
           "card": {
-            "id": "card_0IjSOdm0T0GBfX0vl1TwBLFJ",
+            "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -441,7 +616,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JLwzsq4uYFP4cF",
+            "customer": "cus_JeWSO2j1efT9ah",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -454,9 +629,9 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "created": 1619197349,
+          "created": 1623436656,
           "currency": "usd",
-          "customer": "cus_JLwzsq4uYFP4cF",
+          "customer": "cus_JeWSO2j1efT9ah",
           "description": "Bike Index customer",
           "destination": null,
           "dispute": null,
@@ -475,13 +650,13 @@ http_interactions:
             "network_status": "approved_by_network",
             "reason": null,
             "risk_level": "normal",
-            "risk_score": 23,
+            "risk_score": 28,
             "seller_message": "Payment complete.",
             "type": "authorized"
           },
           "paid": true,
           "payment_intent": null,
-          "payment_method": "card_0IjSOdm0T0GBfX0vl1TwBLFJ",
+          "payment_method": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
           "payment_method_details": {
             "card": {
               "brand": "visa",
@@ -505,7 +680,7 @@ http_interactions:
           },
           "receipt_email": null,
           "receipt_number": null,
-          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0IjSOfm0T0GBfX0vCwiZUhlO/rcpt_JMAkCDSFlDIanb5ntan03ThsgDl99UX",
+          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0J1FEam0T0GBfX0vtXvvcANN/rcpt_JeYLKn7wt7Jkk5hbIlKyme4LOVhgBjM",
           "refunded": false,
           "refunds": {
             "object": "list",
@@ -514,12 +689,12 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/charges/ch_0IjSOfm0T0GBfX0vCwiZUhlO/refunds"
+            "url": "/v1/charges/ch_0J1FEam0T0GBfX0vtXvvcANN/refunds"
           },
           "review": null,
           "shipping": null,
           "source": {
-            "id": "card_0IjSOdm0T0GBfX0vl1TwBLFJ",
+            "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -531,7 +706,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JLwzsq4uYFP4cF",
+            "customer": "cus_JeWSO2j1efT9ah",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -553,7 +728,7 @@ http_interactions:
           "transfer_group": null
         }
     http_version:
-  recorded_at: Fri, 23 Apr 2021 17:02:30 GMT
+  recorded_at: Fri, 11 Jun 2021 18:37:36 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/tokens
@@ -577,7 +752,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 11 Jun 2021 18:37:34 GMT
+      - Fri, 11 Jun 2021 18:41:03 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -597,7 +772,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_gGqFYnsa2XHZt0
+      - req_GFt9gOqtIwSzNg
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -608,10 +783,10 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "tok_0J1FEYm0T0GBfX0vyz2PeT3U",
+          "id": "tok_0J1FHvm0T0GBfX0vN96LixZl",
           "object": "token",
           "card": {
-            "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+            "id": "card_0J1FHvm0T0GBfX0vY0PQIffa",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -637,13 +812,13 @@ http_interactions:
             "tokenization_method": null
           },
           "client_ip": "162.234.253.239",
-          "created": 1623436654,
+          "created": 1623436863,
           "livemode": false,
           "type": "card",
           "used": false
         }
     http_version:
-  recorded_at: Fri, 11 Jun 2021 18:37:34 GMT
+  recorded_at: Fri, 11 Jun 2021 18:41:03 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers
@@ -667,7 +842,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 11 Jun 2021 18:37:34 GMT
+      - Fri, 11 Jun 2021 18:41:04 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -687,7 +862,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_MAsqTtpMlqx2Ro
+      - req_lS0A4Ek6JCIifh
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -700,6 +875,629 @@ http_interactions:
         {
           "object": "list",
           "data": [
+            {
+              "id": "cus_JeYMuvVYdzegGc",
+              "object": "customer",
+              "account_balance": 0,
+              "address": null,
+              "balance": 0,
+              "cards": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFym0T0GBfX0v4hBKE19S",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMuvVYdzegGc",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMuvVYdzegGc/cards"
+              },
+              "created": 1623436743,
+              "currency": null,
+              "default_card": "card_0J1FFym0T0GBfX0v4hBKE19S",
+              "default_source": "card_0J1FFym0T0GBfX0v4hBKE19S",
+              "delinquent": false,
+              "description": null,
+              "discount": null,
+              "email": "test_user@test.com",
+              "invoice_prefix": "94DDD989",
+              "invoice_settings": {
+                "custom_fields": null,
+                "default_payment_method": null,
+                "footer": null
+              },
+              "livemode": false,
+              "metadata": {
+              },
+              "name": null,
+              "next_invoice_sequence": 1,
+              "phone": null,
+              "preferred_locales": [
+
+              ],
+              "shipping": null,
+              "sources": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFym0T0GBfX0v4hBKE19S",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMuvVYdzegGc",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMuvVYdzegGc/sources"
+              },
+              "subscriptions": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMuvVYdzegGc/subscriptions"
+              },
+              "tax_exempt": "none",
+              "tax_ids": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMuvVYdzegGc/tax_ids"
+              },
+              "tax_info": null,
+              "tax_info_verification": null
+            },
+            {
+              "id": "cus_JeYMkwksUKNgHv",
+              "object": "customer",
+              "account_balance": 0,
+              "address": null,
+              "balance": 0,
+              "cards": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFwm0T0GBfX0vchHDW8U9",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMkwksUKNgHv",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMkwksUKNgHv/cards"
+              },
+              "created": 1623436740,
+              "currency": null,
+              "default_card": "card_0J1FFwm0T0GBfX0vchHDW8U9",
+              "default_source": "card_0J1FFwm0T0GBfX0vchHDW8U9",
+              "delinquent": false,
+              "description": null,
+              "discount": null,
+              "email": "user675s@bikeiasdndex.org",
+              "invoice_prefix": "32342FB1",
+              "invoice_settings": {
+                "custom_fields": null,
+                "default_payment_method": null,
+                "footer": null
+              },
+              "livemode": false,
+              "metadata": {
+              },
+              "name": null,
+              "next_invoice_sequence": 1,
+              "phone": null,
+              "preferred_locales": [
+
+              ],
+              "shipping": null,
+              "sources": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFwm0T0GBfX0vchHDW8U9",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMkwksUKNgHv",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMkwksUKNgHv/sources"
+              },
+              "subscriptions": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMkwksUKNgHv/subscriptions"
+              },
+              "tax_exempt": "none",
+              "tax_ids": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMkwksUKNgHv/tax_ids"
+              },
+              "tax_info": null,
+              "tax_info_verification": null
+            },
+            {
+              "id": "cus_JeYMOo28smDOPR",
+              "object": "customer",
+              "account_balance": 0,
+              "address": null,
+              "balance": 0,
+              "cards": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFtm0T0GBfX0vfnAIlnxN",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMOo28smDOPR",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMOo28smDOPR/cards"
+              },
+              "created": 1623436737,
+              "currency": "usd",
+              "default_card": "card_0J1FFtm0T0GBfX0vfnAIlnxN",
+              "default_source": "card_0J1FFtm0T0GBfX0vfnAIlnxN",
+              "delinquent": false,
+              "description": null,
+              "discount": null,
+              "email": "user674s@bikeiasdndex.org",
+              "invoice_prefix": "05164ACE",
+              "invoice_settings": {
+                "custom_fields": null,
+                "default_payment_method": null,
+                "footer": null
+              },
+              "livemode": false,
+              "metadata": {
+              },
+              "name": null,
+              "next_invoice_sequence": 2,
+              "phone": null,
+              "preferred_locales": [
+
+              ],
+              "shipping": null,
+              "sources": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFtm0T0GBfX0vfnAIlnxN",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMOo28smDOPR",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMOo28smDOPR/sources"
+              },
+              "subscriptions": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "sub_JeYMpXKRcvc3Vd",
+                    "object": "subscription",
+                    "application_fee_percent": null,
+                    "billing": "charge_automatically",
+                    "billing_cycle_anchor": 1623436738,
+                    "billing_thresholds": null,
+                    "cancel_at": null,
+                    "cancel_at_period_end": false,
+                    "canceled_at": null,
+                    "collection_method": "charge_automatically",
+                    "created": 1623436738,
+                    "current_period_end": 1626028738,
+                    "current_period_start": 1623436738,
+                    "customer": "cus_JeYMOo28smDOPR",
+                    "days_until_due": null,
+                    "default_payment_method": null,
+                    "default_source": null,
+                    "default_tax_rates": [
+
+                    ],
+                    "discount": null,
+                    "ended_at": null,
+                    "invoice_customer_balance_settings": {
+                      "consume_applied_balance_on_void": true
+                    },
+                    "items": {
+                      "object": "list",
+                      "data": [
+                        {
+                          "id": "si_JeYMof6flvqcUC",
+                          "object": "subscription_item",
+                          "billing_thresholds": null,
+                          "created": 1623436738,
+                          "metadata": {
+                          },
+                          "plan": {
+                            "id": "01",
+                            "object": "plan",
+                            "active": true,
+                            "aggregate_usage": null,
+                            "amount": 399,
+                            "amount_decimal": "399",
+                            "billing_scheme": "per_unit",
+                            "created": 1418246716,
+                            "currency": "usd",
+                            "interval": "month",
+                            "interval_count": 1,
+                            "livemode": false,
+                            "metadata": {
+                            },
+                            "name": "Bike Index membership",
+                            "nickname": null,
+                            "product": "prod_BTdRktWBwC9SQR",
+                            "statement_description": "Membership",
+                            "statement_descriptor": "Membership",
+                            "tiers": null,
+                            "tiers_mode": null,
+                            "transform_usage": null,
+                            "trial_period_days": null,
+                            "usage_type": "licensed"
+                          },
+                          "price": {
+                            "id": "01",
+                            "object": "price",
+                            "active": true,
+                            "billing_scheme": "per_unit",
+                            "created": 1418246716,
+                            "currency": "usd",
+                            "livemode": false,
+                            "lookup_key": null,
+                            "metadata": {
+                            },
+                            "nickname": null,
+                            "product": "prod_BTdRktWBwC9SQR",
+                            "recurring": {
+                              "aggregate_usage": null,
+                              "interval": "month",
+                              "interval_count": 1,
+                              "trial_period_days": null,
+                              "usage_type": "licensed"
+                            },
+                            "tiers_mode": null,
+                            "transform_quantity": null,
+                            "type": "recurring",
+                            "unit_amount": 399,
+                            "unit_amount_decimal": "399"
+                          },
+                          "quantity": 1,
+                          "subscription": "sub_JeYMpXKRcvc3Vd",
+                          "tax_rates": [
+
+                          ]
+                        }
+                      ],
+                      "has_more": false,
+                      "total_count": 1,
+                      "url": "/v1/subscription_items?subscription=sub_JeYMpXKRcvc3Vd"
+                    },
+                    "latest_invoice": "in_0J1FFum0T0GBfX0vgGnmi7Ek",
+                    "livemode": false,
+                    "metadata": {
+                    },
+                    "next_pending_invoice_item_invoice": null,
+                    "pause_collection": null,
+                    "pending_invoice_item_interval": null,
+                    "pending_setup_intent": null,
+                    "pending_update": null,
+                    "plan": {
+                      "id": "01",
+                      "object": "plan",
+                      "active": true,
+                      "aggregate_usage": null,
+                      "amount": 399,
+                      "amount_decimal": "399",
+                      "billing_scheme": "per_unit",
+                      "created": 1418246716,
+                      "currency": "usd",
+                      "interval": "month",
+                      "interval_count": 1,
+                      "livemode": false,
+                      "metadata": {
+                      },
+                      "name": "Bike Index membership",
+                      "nickname": null,
+                      "product": "prod_BTdRktWBwC9SQR",
+                      "statement_description": "Membership",
+                      "statement_descriptor": "Membership",
+                      "tiers": null,
+                      "tiers_mode": null,
+                      "transform_usage": null,
+                      "trial_period_days": null,
+                      "usage_type": "licensed"
+                    },
+                    "quantity": 1,
+                    "schedule": null,
+                    "start": 1623436738,
+                    "start_date": 1623436738,
+                    "status": "active",
+                    "tax_percent": null,
+                    "transfer_data": null,
+                    "trial_end": null,
+                    "trial_start": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMOo28smDOPR/subscriptions"
+              },
+              "tax_exempt": "none",
+              "tax_ids": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMOo28smDOPR/tax_ids"
+              },
+              "tax_info": null,
+              "tax_info_verification": null
+            },
+            {
+              "id": "cus_JeYMzGSUVP0lFz",
+              "object": "customer",
+              "account_balance": 0,
+              "address": null,
+              "balance": 0,
+              "cards": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFrm0T0GBfX0vKJvwi7ik",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMzGSUVP0lFz",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMzGSUVP0lFz/cards"
+              },
+              "created": 1623436735,
+              "currency": null,
+              "default_card": "card_0J1FFrm0T0GBfX0vKJvwi7ik",
+              "default_source": "card_0J1FFrm0T0GBfX0vKJvwi7ik",
+              "delinquent": false,
+              "description": null,
+              "discount": null,
+              "email": "user673s@bikeiasdndex.org",
+              "invoice_prefix": "D5A38F62",
+              "invoice_settings": {
+                "custom_fields": null,
+                "default_payment_method": null,
+                "footer": null
+              },
+              "livemode": false,
+              "metadata": {
+              },
+              "name": null,
+              "next_invoice_sequence": 1,
+              "phone": null,
+              "preferred_locales": [
+
+              ],
+              "shipping": null,
+              "sources": {
+                "object": "list",
+                "data": [
+                  {
+                    "id": "card_0J1FFrm0T0GBfX0vKJvwi7ik",
+                    "object": "card",
+                    "address_city": null,
+                    "address_country": null,
+                    "address_line1": null,
+                    "address_line1_check": null,
+                    "address_line2": null,
+                    "address_state": null,
+                    "address_zip": null,
+                    "address_zip_check": null,
+                    "brand": "Visa",
+                    "country": "US",
+                    "customer": "cus_JeYMzGSUVP0lFz",
+                    "cvc_check": "pass",
+                    "dynamic_last4": null,
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "fingerprint": "70B1BgindTYnDA3n",
+                    "funding": "credit",
+                    "last4": "4242",
+                    "metadata": {
+                    },
+                    "name": null,
+                    "tokenization_method": null
+                  }
+                ],
+                "has_more": false,
+                "total_count": 1,
+                "url": "/v1/customers/cus_JeYMzGSUVP0lFz/sources"
+              },
+              "subscriptions": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMzGSUVP0lFz/subscriptions"
+              },
+              "tax_exempt": "none",
+              "tax_ids": {
+                "object": "list",
+                "data": [
+
+                ],
+                "has_more": false,
+                "total_count": 0,
+                "url": "/v1/customers/cus_JeYMzGSUVP0lFz/tax_ids"
+              },
+              "tax_info": null,
+              "tax_info_verification": null
+            },
             {
               "id": "cus_JeYLT9tPJrqrsH",
               "object": "customer",
@@ -1705,642 +2503,19 @@ http_interactions:
               },
               "tax_info": null,
               "tax_info_verification": null
-            },
-            {
-              "id": "cus_JeWTxPI1IsvtXK",
-              "object": "customer",
-              "account_balance": 0,
-              "address": null,
-              "balance": 0,
-              "cards": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ8m0T0GBfX0v6XP1VaNS",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWTxPI1IsvtXK",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWTxPI1IsvtXK/cards"
-              },
-              "created": 1623429684,
-              "currency": null,
-              "default_card": "card_0J1DQ8m0T0GBfX0v6XP1VaNS",
-              "default_source": "card_0J1DQ8m0T0GBfX0v6XP1VaNS",
-              "delinquent": false,
-              "description": null,
-              "discount": null,
-              "email": "user465s@bikeiasdndex.org",
-              "invoice_prefix": "A72AFE8E",
-              "invoice_settings": {
-                "custom_fields": null,
-                "default_payment_method": null,
-                "footer": null
-              },
-              "livemode": false,
-              "metadata": {
-              },
-              "name": null,
-              "next_invoice_sequence": 1,
-              "phone": null,
-              "preferred_locales": [
-
-              ],
-              "shipping": null,
-              "sources": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ8m0T0GBfX0v6XP1VaNS",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWTxPI1IsvtXK",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWTxPI1IsvtXK/sources"
-              },
-              "subscriptions": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWTxPI1IsvtXK/subscriptions"
-              },
-              "tax_exempt": "none",
-              "tax_ids": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWTxPI1IsvtXK/tax_ids"
-              },
-              "tax_info": null,
-              "tax_info_verification": null
-            },
-            {
-              "id": "cus_JeWT91zFhnb9C5",
-              "object": "customer",
-              "account_balance": 0,
-              "address": null,
-              "balance": 0,
-              "cards": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ5m0T0GBfX0vowBr4eG5",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWT91zFhnb9C5",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWT91zFhnb9C5/cards"
-              },
-              "created": 1623429681,
-              "currency": "usd",
-              "default_card": "card_0J1DQ5m0T0GBfX0vowBr4eG5",
-              "default_source": "card_0J1DQ5m0T0GBfX0vowBr4eG5",
-              "delinquent": false,
-              "description": null,
-              "discount": null,
-              "email": "user464s@bikeiasdndex.org",
-              "invoice_prefix": "9E788AB0",
-              "invoice_settings": {
-                "custom_fields": null,
-                "default_payment_method": null,
-                "footer": null
-              },
-              "livemode": false,
-              "metadata": {
-              },
-              "name": null,
-              "next_invoice_sequence": 2,
-              "phone": null,
-              "preferred_locales": [
-
-              ],
-              "shipping": null,
-              "sources": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ5m0T0GBfX0vowBr4eG5",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWT91zFhnb9C5",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWT91zFhnb9C5/sources"
-              },
-              "subscriptions": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "sub_JeWTOyyxEtoH23",
-                    "object": "subscription",
-                    "application_fee_percent": null,
-                    "billing": "charge_automatically",
-                    "billing_cycle_anchor": 1623429682,
-                    "billing_thresholds": null,
-                    "cancel_at": null,
-                    "cancel_at_period_end": false,
-                    "canceled_at": null,
-                    "collection_method": "charge_automatically",
-                    "created": 1623429682,
-                    "current_period_end": 1626021682,
-                    "current_period_start": 1623429682,
-                    "customer": "cus_JeWT91zFhnb9C5",
-                    "days_until_due": null,
-                    "default_payment_method": null,
-                    "default_source": null,
-                    "default_tax_rates": [
-
-                    ],
-                    "discount": null,
-                    "ended_at": null,
-                    "invoice_customer_balance_settings": {
-                      "consume_applied_balance_on_void": true
-                    },
-                    "items": {
-                      "object": "list",
-                      "data": [
-                        {
-                          "id": "si_JeWT1hWWTul99g",
-                          "object": "subscription_item",
-                          "billing_thresholds": null,
-                          "created": 1623429682,
-                          "metadata": {
-                          },
-                          "plan": {
-                            "id": "01",
-                            "object": "plan",
-                            "active": true,
-                            "aggregate_usage": null,
-                            "amount": 399,
-                            "amount_decimal": "399",
-                            "billing_scheme": "per_unit",
-                            "created": 1418246716,
-                            "currency": "usd",
-                            "interval": "month",
-                            "interval_count": 1,
-                            "livemode": false,
-                            "metadata": {
-                            },
-                            "name": "Bike Index membership",
-                            "nickname": null,
-                            "product": "prod_BTdRktWBwC9SQR",
-                            "statement_description": "Membership",
-                            "statement_descriptor": "Membership",
-                            "tiers": null,
-                            "tiers_mode": null,
-                            "transform_usage": null,
-                            "trial_period_days": null,
-                            "usage_type": "licensed"
-                          },
-                          "price": {
-                            "id": "01",
-                            "object": "price",
-                            "active": true,
-                            "billing_scheme": "per_unit",
-                            "created": 1418246716,
-                            "currency": "usd",
-                            "livemode": false,
-                            "lookup_key": null,
-                            "metadata": {
-                            },
-                            "nickname": null,
-                            "product": "prod_BTdRktWBwC9SQR",
-                            "recurring": {
-                              "aggregate_usage": null,
-                              "interval": "month",
-                              "interval_count": 1,
-                              "trial_period_days": null,
-                              "usage_type": "licensed"
-                            },
-                            "tiers_mode": null,
-                            "transform_quantity": null,
-                            "type": "recurring",
-                            "unit_amount": 399,
-                            "unit_amount_decimal": "399"
-                          },
-                          "quantity": 1,
-                          "subscription": "sub_JeWTOyyxEtoH23",
-                          "tax_rates": [
-
-                          ]
-                        }
-                      ],
-                      "has_more": false,
-                      "total_count": 1,
-                      "url": "/v1/subscription_items?subscription=sub_JeWTOyyxEtoH23"
-                    },
-                    "latest_invoice": "in_0J1DQ6m0T0GBfX0vuVTzUras",
-                    "livemode": false,
-                    "metadata": {
-                    },
-                    "next_pending_invoice_item_invoice": null,
-                    "pause_collection": null,
-                    "pending_invoice_item_interval": null,
-                    "pending_setup_intent": null,
-                    "pending_update": null,
-                    "plan": {
-                      "id": "01",
-                      "object": "plan",
-                      "active": true,
-                      "aggregate_usage": null,
-                      "amount": 399,
-                      "amount_decimal": "399",
-                      "billing_scheme": "per_unit",
-                      "created": 1418246716,
-                      "currency": "usd",
-                      "interval": "month",
-                      "interval_count": 1,
-                      "livemode": false,
-                      "metadata": {
-                      },
-                      "name": "Bike Index membership",
-                      "nickname": null,
-                      "product": "prod_BTdRktWBwC9SQR",
-                      "statement_description": "Membership",
-                      "statement_descriptor": "Membership",
-                      "tiers": null,
-                      "tiers_mode": null,
-                      "transform_usage": null,
-                      "trial_period_days": null,
-                      "usage_type": "licensed"
-                    },
-                    "quantity": 1,
-                    "schedule": null,
-                    "start": 1623429682,
-                    "start_date": 1623429682,
-                    "status": "active",
-                    "tax_percent": null,
-                    "transfer_data": null,
-                    "trial_end": null,
-                    "trial_start": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWT91zFhnb9C5/subscriptions"
-              },
-              "tax_exempt": "none",
-              "tax_ids": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWT91zFhnb9C5/tax_ids"
-              },
-              "tax_info": null,
-              "tax_info_verification": null
-            },
-            {
-              "id": "cus_JeWSsiDzLyqdXV",
-              "object": "customer",
-              "account_balance": 0,
-              "address": null,
-              "balance": 0,
-              "cards": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ3m0T0GBfX0vflMyOhsX",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWSsiDzLyqdXV",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWSsiDzLyqdXV/cards"
-              },
-              "created": 1623429679,
-              "currency": null,
-              "default_card": "card_0J1DQ3m0T0GBfX0vflMyOhsX",
-              "default_source": "card_0J1DQ3m0T0GBfX0vflMyOhsX",
-              "delinquent": false,
-              "description": null,
-              "discount": null,
-              "email": "user463s@bikeiasdndex.org",
-              "invoice_prefix": "CCB1980A",
-              "invoice_settings": {
-                "custom_fields": null,
-                "default_payment_method": null,
-                "footer": null
-              },
-              "livemode": false,
-              "metadata": {
-              },
-              "name": null,
-              "next_invoice_sequence": 1,
-              "phone": null,
-              "preferred_locales": [
-
-              ],
-              "shipping": null,
-              "sources": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1DQ3m0T0GBfX0vflMyOhsX",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWSsiDzLyqdXV",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWSsiDzLyqdXV/sources"
-              },
-              "subscriptions": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWSsiDzLyqdXV/subscriptions"
-              },
-              "tax_exempt": "none",
-              "tax_ids": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWSsiDzLyqdXV/tax_ids"
-              },
-              "tax_info": null,
-              "tax_info_verification": null
-            },
-            {
-              "id": "cus_JeWSO2j1efT9ah",
-              "object": "customer",
-              "account_balance": 0,
-              "address": null,
-              "balance": 0,
-              "cards": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1Dhgm0T0GBfX0vYqDixIlQ",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWSO2j1efT9ah",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWSO2j1efT9ah/cards"
-              },
-              "created": 1623429678,
-              "currency": null,
-              "default_card": "card_0J1Dhgm0T0GBfX0vYqDixIlQ",
-              "default_source": "card_0J1Dhgm0T0GBfX0vYqDixIlQ",
-              "delinquent": false,
-              "description": null,
-              "discount": null,
-              "email": "test_user@test.com",
-              "invoice_prefix": "D9D827C8",
-              "invoice_settings": {
-                "custom_fields": null,
-                "default_payment_method": null,
-                "footer": null
-              },
-              "livemode": false,
-              "metadata": {
-              },
-              "name": null,
-              "next_invoice_sequence": 1,
-              "phone": null,
-              "preferred_locales": [
-
-              ],
-              "shipping": null,
-              "sources": {
-                "object": "list",
-                "data": [
-                  {
-                    "id": "card_0J1Dhgm0T0GBfX0vYqDixIlQ",
-                    "object": "card",
-                    "address_city": null,
-                    "address_country": null,
-                    "address_line1": null,
-                    "address_line1_check": null,
-                    "address_line2": null,
-                    "address_state": null,
-                    "address_zip": null,
-                    "address_zip_check": null,
-                    "brand": "Visa",
-                    "country": "US",
-                    "customer": "cus_JeWSO2j1efT9ah",
-                    "cvc_check": "pass",
-                    "dynamic_last4": null,
-                    "exp_month": 12,
-                    "exp_year": 2025,
-                    "fingerprint": "70B1BgindTYnDA3n",
-                    "funding": "credit",
-                    "last4": "4242",
-                    "metadata": {
-                    },
-                    "name": null,
-                    "tokenization_method": null
-                  }
-                ],
-                "has_more": false,
-                "total_count": 1,
-                "url": "/v1/customers/cus_JeWSO2j1efT9ah/sources"
-              },
-              "subscriptions": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWSO2j1efT9ah/subscriptions"
-              },
-              "tax_exempt": "none",
-              "tax_ids": {
-                "object": "list",
-                "data": [
-
-                ],
-                "has_more": false,
-                "total_count": 0,
-                "url": "/v1/customers/cus_JeWSO2j1efT9ah/tax_ids"
-              },
-              "tax_info": null,
-              "tax_info_verification": null
             }
           ],
           "has_more": true,
           "url": "/v1/customers"
         }
     http_version:
-  recorded_at: Fri, 11 Jun 2021 18:37:35 GMT
+  recorded_at: Fri, 11 Jun 2021 18:41:04 GMT
 - request:
     method: post
-    uri: https://api.stripe.com/v1/customers/cus_JeWSO2j1efT9ah
+    uri: https://api.stripe.com/v1/customers/cus_JeYMuvVYdzegGc
     body:
       encoding: UTF-8
-      string: card=tok_0J1FEYm0T0GBfX0vyz2PeT3U
+      string: card=tok_0J1FHvm0T0GBfX0vN96LixZl
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -2358,7 +2533,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 11 Jun 2021 18:37:35 GMT
+      - Fri, 11 Jun 2021 18:41:05 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -2378,7 +2553,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_TvuWUHIGfluuYO
+      - req_gGiwZ9uT1rSBu9
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -2389,7 +2564,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cus_JeWSO2j1efT9ah",
+          "id": "cus_JeYMuvVYdzegGc",
           "object": "customer",
           "account_balance": 0,
           "address": null,
@@ -2398,7 +2573,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+                "id": "card_0J1FHvm0T0GBfX0vY0PQIffa",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -2410,7 +2585,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_JeWSO2j1efT9ah",
+                "customer": "cus_JeYMuvVYdzegGc",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -2426,17 +2601,17 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_JeWSO2j1efT9ah/cards"
+            "url": "/v1/customers/cus_JeYMuvVYdzegGc/cards"
           },
-          "created": 1623429678,
+          "created": 1623436743,
           "currency": null,
-          "default_card": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
-          "default_source": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+          "default_card": "card_0J1FHvm0T0GBfX0vY0PQIffa",
+          "default_source": "card_0J1FHvm0T0GBfX0vY0PQIffa",
           "delinquent": false,
           "description": null,
           "discount": null,
           "email": "test_user@test.com",
-          "invoice_prefix": "D9D827C8",
+          "invoice_prefix": "94DDD989",
           "invoice_settings": {
             "custom_fields": null,
             "default_payment_method": null,
@@ -2456,7 +2631,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+                "id": "card_0J1FHvm0T0GBfX0vY0PQIffa",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -2468,7 +2643,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_JeWSO2j1efT9ah",
+                "customer": "cus_JeYMuvVYdzegGc",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -2484,7 +2659,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_JeWSO2j1efT9ah/sources"
+            "url": "/v1/customers/cus_JeYMuvVYdzegGc/sources"
           },
           "subscriptions": {
             "object": "list",
@@ -2493,7 +2668,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_JeWSO2j1efT9ah/subscriptions"
+            "url": "/v1/customers/cus_JeYMuvVYdzegGc/subscriptions"
           },
           "tax_exempt": "none",
           "tax_ids": {
@@ -2503,19 +2678,19 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_JeWSO2j1efT9ah/tax_ids"
+            "url": "/v1/customers/cus_JeYMuvVYdzegGc/tax_ids"
           },
           "tax_info": null,
           "tax_info_verification": null
         }
     http_version:
-  recorded_at: Fri, 11 Jun 2021 18:37:35 GMT
+  recorded_at: Fri, 11 Jun 2021 18:41:05 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/charges
     body:
       encoding: UTF-8
-      string: customer=cus_JeWSO2j1efT9ah&amount=4000&description=Bike+Index+customer&currency=usd
+      string: customer=cus_JeYMuvVYdzegGc&amount=4000&description=Bike+Index+customer&currency=usd
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -2533,7 +2708,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 11 Jun 2021 18:37:36 GMT
+      - Fri, 11 Jun 2021 18:41:06 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -2553,7 +2728,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_YAzDzduO9lKdsd
+      - req_LekZTFQLquirPh
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -2564,7 +2739,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "ch_0J1FEam0T0GBfX0vtXvvcANN",
+          "id": "ch_0J1FHxm0T0GBfX0vSTNAY6Aa",
           "object": "charge",
           "amount": 4000,
           "amount_captured": 4000,
@@ -2572,7 +2747,7 @@ http_interactions:
           "application": null,
           "application_fee": null,
           "application_fee_amount": null,
-          "balance_transaction": "txn_0J1FEam0T0GBfX0v5YXGEj8M",
+          "balance_transaction": "txn_0J1FHym0T0GBfX0vZ02OfZU0",
           "billing_details": {
             "address": {
               "city": null,
@@ -2589,7 +2764,7 @@ http_interactions:
           "calculated_statement_descriptor": "Stripe",
           "captured": true,
           "card": {
-            "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+            "id": "card_0J1FHvm0T0GBfX0vY0PQIffa",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -2601,7 +2776,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JeWSO2j1efT9ah",
+            "customer": "cus_JeYMuvVYdzegGc",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -2614,9 +2789,9 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "created": 1623436656,
+          "created": 1623436865,
           "currency": "usd",
-          "customer": "cus_JeWSO2j1efT9ah",
+          "customer": "cus_JeYMuvVYdzegGc",
           "description": "Bike Index customer",
           "destination": null,
           "dispute": null,
@@ -2635,13 +2810,13 @@ http_interactions:
             "network_status": "approved_by_network",
             "reason": null,
             "risk_level": "normal",
-            "risk_score": 28,
+            "risk_score": 47,
             "seller_message": "Payment complete.",
             "type": "authorized"
           },
           "paid": true,
           "payment_intent": null,
-          "payment_method": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+          "payment_method": "card_0J1FHvm0T0GBfX0vY0PQIffa",
           "payment_method_details": {
             "card": {
               "brand": "visa",
@@ -2665,7 +2840,7 @@ http_interactions:
           },
           "receipt_email": null,
           "receipt_number": null,
-          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0J1FEam0T0GBfX0vtXvvcANN/rcpt_JeYLKn7wt7Jkk5hbIlKyme4LOVhgBjM",
+          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_0J1FHxm0T0GBfX0vSTNAY6Aa/rcpt_JeYO4XGtDHOtzYGwKPUWXMUWcVz6bFZ",
           "refunded": false,
           "refunds": {
             "object": "list",
@@ -2674,12 +2849,12 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/charges/ch_0J1FEam0T0GBfX0vtXvvcANN/refunds"
+            "url": "/v1/charges/ch_0J1FHxm0T0GBfX0vSTNAY6Aa/refunds"
           },
           "review": null,
           "shipping": null,
           "source": {
-            "id": "card_0J1FEYm0T0GBfX0v7u4qSCfO",
+            "id": "card_0J1FHvm0T0GBfX0vY0PQIffa",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -2691,7 +2866,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_JeWSO2j1efT9ah",
+            "customer": "cus_JeYMuvVYdzegGc",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -2713,5 +2888,5 @@ http_interactions:
           "transfer_group": null
         }
     http_version:
-  recorded_at: Fri, 11 Jun 2021 18:37:36 GMT
+  recorded_at: Fri, 11 Jun 2021 18:41:06 GMT
 recorded_with: VCR 5.0.0

@@ -37,7 +37,7 @@ http_interactions:
       Server:
       - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
       Date:
-      - Thu, 22 Apr 2021 01:32:41 GMT
+      - Fri, 11 Jun 2021 18:40:45 GMT
       Via:
       - 1.1 vegur
     body:
@@ -60,5 +60,5 @@ http_interactions:
         Classic w/ Bottle Opener","cgroup":"Additional parts"},{"component_type":"seatpost","description":"SE
         Straight Post, 27.2mm","cgroup":"Additional parts"}]}'
     http_version:
-  recorded_at: Thu, 22 Apr 2021 01:32:41 GMT
+  recorded_at: Fri, 11 Jun 2021 18:40:45 GMT
 recorded_with: VCR 5.0.0
