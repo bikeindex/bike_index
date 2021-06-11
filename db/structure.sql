@@ -1785,6 +1785,7 @@ ALTER SEQUENCE public.mail_snippets_id_seq OWNED BY public.mail_snippets.id;
 CREATE TABLE public.mailchimp_data (
     id bigint NOT NULL,
     user_id bigint,
+    user_deleted_at timestamp without time zone,
     email character varying,
     status integer,
     data jsonb,

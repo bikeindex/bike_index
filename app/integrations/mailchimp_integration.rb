@@ -3,12 +3,15 @@ require "MailchimpMarketing"
 class MailchimpIntegration
   API_KEY = ENV["MAILCHIMP_KEY"]
   SERVER_PREFIX = "us6" # I don't think this changes?
-  AUDIENCE_IDS = {
-    lead_for_bike_shop: 3,
-    lead_for_city: 3,
-    lead_for_school: 3,
-    lead_for_law_enforcement: 3,
+
+  LISTS = {
+    organization: "1cdd",
+    individual: "890adf"
   }
+
+  def self.list_keys
+    LISTS.keys
+  end
 
   def client
     @client ||= MailchimpMarketing::Client.new(
@@ -16,7 +19,8 @@ class MailchimpIntegration
       server: SERVER_PREFIX)
   end
 
-  def get_audiences
+  # Lists are called "Audiences" outside of the API
+  def get_lists
     # Remove the _links, which are too much bs
     client.lists.get_all_lists
       .dig("lists").map { |l| l.except("_links") }

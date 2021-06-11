@@ -28,13 +28,13 @@ class Feedback < ApplicationRecord
 
   after_create :notify_admins
 
-  scope :notification_types, -> { where.not(feedback_type: no_notification_types) }
-  scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
+  scope :notification, -> { where.not(feedback_type: no_notification_kinds) }
+  scope :no_notification, -> { where(feedback_type: no_notification_kinds) }
   scope :stolen_tip, -> { where(kind: stolen_tip_kinds) }
   scope :no_user, -> { where(user_id: nil) }
-  scope :leads, -> { where(kind: lead_types) }
+  scope :lead, -> { where(kind: lead_types) }
 
-  def self.no_notification_types
+  def self.no_notification_kinds
     %w[manufacturer_update_request serial_update_request bike_delete_request]
   end
 
@@ -84,12 +84,12 @@ class Feedback < ApplicationRecord
         bike.destroy
       end
     end
-    return true if self.class.no_notification_types.include?(feedback_type)
+    return true if self.class.no_notification_kinds.include?(kind)
     EmailFeedbackNotificationWorker.perform_async(id)
   end
 
   def delete_request?
-    feedback_type == "bike_delete_request"
+    bike_delete_request? # Holdover from feedback_type > kind enum conversion
   end
 
   def bike_id
@@ -122,6 +122,7 @@ class Feedback < ApplicationRecord
     set_user_attrs
     self.body ||= "lead" if lead?
     self.kind ||= calculated_kind
+    self.feedback_type ||= kind
   end
 
   def looks_like_spam?
@@ -142,12 +143,12 @@ class Feedback < ApplicationRecord
   end
 
   def lead?
-    feedback_type&.match?(/lead_for_/)
+    kind&.match?(/lead_for_/)
   end
 
   def lead_type
     return nil unless lead?
-    feedback_type.gsub(/lead_for_/, "").humanize
+    kind.gsub(/lead_for_/, "").humanize
   end
 
   private
