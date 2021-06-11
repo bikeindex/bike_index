@@ -77,7 +77,6 @@ class MailchimpDatum < ApplicationRecord
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)
     end
-    # pp @previous_data, data, @previous_data == data
     return true if @previous_data == data
     UpdateMailchimpDatumWorker.perform_async(id)
   end

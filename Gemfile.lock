@@ -706,7 +706,6 @@ DEPENDENCIES
   dotenv-rails
   draper
   eventmachine
-  excon (~> 0.76)
   factory_bot_rails
   faraday-request_response_logger!
   faraday_middleware

@@ -9,10 +9,6 @@ class MailchimpIntegration
     individual: "890adf"
   }
 
-  def self.list_keys
-    LISTS.keys
-  end
-
   def client
     @client ||= MailchimpMarketing::Client.new(
       api_key: API_KEY,
