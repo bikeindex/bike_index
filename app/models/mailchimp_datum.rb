@@ -119,7 +119,7 @@ class MailchimpDatum < ApplicationRecord
   def merge_fields
     {
       organization_kind: "bike_shop",
-      organization_name: "#{mailchimp_organization.name}",
+      organization_name: mailchimp_organization&.name,
       organization_url: mailchimp_organization&.website,
       organization_country: mailchimp_organization&.country&.iso,
       organization_city: mailchimp_organization&.city,
