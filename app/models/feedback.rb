@@ -120,8 +120,8 @@ class Feedback < ApplicationRecord
   def set_calculated_attributes
     generate_title
     set_user_attrs
-    self.body ||= "lead" if lead?
     self.kind ||= calculated_kind
+    self.body ||= "lead" if lead?
     self.feedback_type ||= kind
   end
 
@@ -143,12 +143,14 @@ class Feedback < ApplicationRecord
   end
 
   def lead?
-    kind&.match?(/lead_for_/)
+    feedback_type&.match?(/lead_for_/) || kind&.match?(/lead_for_/)
   end
 
   def lead_type
     return nil unless lead?
-    kind.gsub(/lead_for_/, "").humanize
+    kind_str = feedback_type if feedback_type.present?
+    kind_str ||= kind
+    kind_str.gsub(/lead_for_/, "").humanize
   end
 
   private
