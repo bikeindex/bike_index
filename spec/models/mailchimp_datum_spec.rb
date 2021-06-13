@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe MailchimpDatum, type: :model do
   let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
   let(:organization_kind) { "bike_shop"}
-  let(:empty_data) { {lists: [], tags: [], interests_organization: [], interests_individual: []} }
+  let(:empty_data) { {lists: [], tags: [], interests: []} }
 
   describe "find_or_create_for" do
     before { Sidekiq::Worker.clear_all }
@@ -109,8 +109,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:target) do
           { lists: ["organization"],
             tags: [],
-            interests_organization: ["school"],
-            interests_individual: []
+            interests: ["school"]
           }
         end
         it "creates" do
@@ -140,13 +139,32 @@ RSpec.describe MailchimpDatum, type: :model do
   end
 
   describe "calculated_data" do
-    it "is empty" do
-      expect(MailchimpDatum.new.calculated_data.as_json).to eq empty_data.as_json
+    context "empty" do
+      let(:mailchimp_datum) { MailchimpDatum.new }
+      it "is empty" do
+        expect(mailchimp_datum.calculated_data.as_json).to eq empty_data.as_json
+        # expect(mailchimp_datum.member_hash).to eq empty_member_hash
+      end
     end
     context "with organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       let(:mailchimp_datum)  { MailchimpDatum.create(user: user) }
-      let(:target)  {{ lists: ["organization"], tags: [], interests_organization: ["bike_shop"], interests_individual: []} }
+      let(:target)  {{ lists: ["organization"], tags: [], interests: ["bike_shop"]} }
+      let(:target_merge_fields) do
+        {
+          organization_kind: "bike_shop",
+          organization_name: "#{organization.name}",
+          organization_url: organization.website,
+          organization_country: nil,
+          organization_city: nil,
+          organization_state: nil,
+          organization_signed_up_at: organization.created_at,
+          user_signed_up_at: user.created_at,
+          bikes: 0,
+          name: user.name,
+          phone_number: user.phone,
+        }
+      end
       it "is as expected" do
         expect(user.reload.memberships.first.organization_creator?).to be_truthy
         expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
@@ -158,14 +176,25 @@ RSpec.describe MailchimpDatum, type: :model do
           organization.update(pos_kind: "does_not_need_pos")
           expect(organization.reload.pos_kind).to eq "does_not_need_pos"
           # Doesn't include does_not_need_pos tag
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(interests_organization: ["software"]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(interests: ["software"]).as_json
+          expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
         end
       end
       context "lightspeed" do
+        let!(:location) { FactoryBot.create(:location_chicago, organization: organization) }
+        let(:lightspeed_merge_fields) do
+          target_merge_fields.merge(organization_url: "http://test.com",
+            organization_country: "US",
+            organization_city: "Chicago",
+            organization_state: "IL")
+        end
         it "responds with lightspeed" do
+          expect(location.reload&.state&.abbreviation).to eq "IL"
+          organization.update(website: "test.com")
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: ["lightspeed"]).as_json
+          expect(mailchimp_datum.merge_fields.as_json).to eq lightspeed_merge_fields.as_json
         end
       end
       context "ascend" do

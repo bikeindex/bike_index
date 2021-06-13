@@ -5,13 +5,13 @@ RSpec.describe MailchimpIntegration do
 
   describe "get_lists" do
     let(:target) do
-       [{name: "Individuals", id: "180a1141a4"},
-       {name: "Organizations", id: "b675299293"}]
+      [{name: "Individuals", id: "180a1141a4"},
+        {name: "Organizations", id: "b675299293"}]
     end
     it "gets the lists" do
       VCR.use_cassette("mailchimp_integration-get_lists", match_requests_on: [:path]) do
         lists = instance.get_lists
-        expect(lists.map { |l| l.slice("name", "id")}).to eq target.as_json
+        expect(lists.map { |l| l.slice("name", "id") }).to eq target.as_json
       end
     end
   end
@@ -19,11 +19,11 @@ RSpec.describe MailchimpIntegration do
   describe "member_update_hash" do
     let(:mailchimp_datum) { MailchimpDatum.create(email: "example@bikeindex.org") }
     let(:target) do
-      { email: "example@bikeindex.org",
-        full_name: nil,
-        interests: [],
-        merge_fields: {},
-        status: "unsubscribed"}
+      {email: "example@bikeindex.org",
+       full_name: nil,
+       interests: [],
+       merge_fields: {},
+       status: "unsubscribed"}
     end
     it "is expected" do
       expect(instance.member_update_hash(mailchimp_datum, "organization")).to eq target

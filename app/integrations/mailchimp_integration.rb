@@ -25,10 +25,9 @@ class MailchimpIntegration
   end
 
   def update_member(mailchimp_datum, list)
-
   end
 
-  def member_update_hash(mailchimp_datum, list)
+  def member_update_hash(mailchimp_datum, list = nil)
     {
       email: mailchimp_datum.email,
       full_name: mailchimp_datum.full_name,
@@ -41,7 +40,8 @@ class MailchimpIntegration
   def client
     @client ||= MailchimpMarketing::Client.new(
       api_key: API_KEY,
-      server: SERVER_PREFIX)
+      server: SERVER_PREFIX
+    )
   end
 
   # Lists are called "Audiences" outside of the API
