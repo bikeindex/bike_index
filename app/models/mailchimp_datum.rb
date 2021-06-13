@@ -30,7 +30,7 @@ class MailchimpDatum < ApplicationRecord
         create(user: obj)
     elsif obj.is_a?(Feedback)
       mailchimp_datum = where(user_id: obj.user_id).first if obj.user_id.present?
-      mailchimp_datum ||= where(email: obj.email).first ||
+      mailchimp_datum || where(email: obj.email).first ||
         create(email: obj.email, user: obj.user, creator_feedback: obj)
     else
       fail "Unable to create mailchimp data for #{obj}"
@@ -66,10 +66,6 @@ class MailchimpDatum < ApplicationRecord
 
   def full_name
     user&.name
-  end
-
-  def merge_fields
-    {}
   end
 
   def mailchimp_status
@@ -125,10 +121,11 @@ class MailchimpDatum < ApplicationRecord
       organization_city: mailchimp_organization&.city,
       organization_state: mailchimp_organization&.state&.abbreviation,
       organization_signed_up_at: mailchimp_organization&.created_at,
-      user_signed_up_at: user&.created_at,
       bikes: 0,
       name: full_name,
       phone_number: user&.phone,
+      user_signed_up_at: user&.created_at,
+      added_to_mailchimp_at: nil
     }
   end
 
@@ -136,6 +133,7 @@ class MailchimpDatum < ApplicationRecord
 
   def calculated_tags
     updated_tags = tags.dup
+    updated_tags << "in_index" if user.present?
     if mailchimp_organization.present?
       unless mailchimp_organization_membership.organization_creator?
         updated_tags << "not_organization_creator"

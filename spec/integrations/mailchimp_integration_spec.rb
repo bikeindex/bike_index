@@ -22,11 +22,28 @@ RSpec.describe MailchimpIntegration do
       {email: "example@bikeindex.org",
        full_name: nil,
        interests: [],
-       merge_fields: {},
+       merge_fields: target_merge_fields,
        status: "unsubscribed"}
     end
+    let(:target_merge_fields) do
+      {
+        organization_kind: "bike_shop",
+        organization_name: nil,
+        organization_url: nil,
+        organization_country: nil,
+        organization_city: nil,
+        organization_state: nil,
+        organization_signed_up_at: nil,
+        bikes: 0,
+        name: mailchimp_datum.full_name,
+        phone_number: nil,
+        user_signed_up_at: mailchimp_datum.user&.created_at,
+        added_to_mailchimp_at: nil
+      }
+    end
     it "is expected" do
-      expect(instance.member_update_hash(mailchimp_datum, "organization")).to eq target
+      expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
+      expect(instance.member_update_hash(mailchimp_datum, "organization").as_json).to eq target.as_json
     end
   end
 

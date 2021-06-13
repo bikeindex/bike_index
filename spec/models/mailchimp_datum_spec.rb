@@ -1,8 +1,8 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe MailchimpDatum, type: :model do
   let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
-  let(:organization_kind) { "bike_shop"}
+  let(:organization_kind) { "bike_shop" }
   let(:empty_data) { {lists: [], tags: [], interests: []} }
 
   describe "find_or_create_for" do
@@ -15,7 +15,7 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.lists).to eq([])
         expect(mailchimp_datum.no_subscription_required?).to be_truthy
         expect(mailchimp_datum.id).to be_blank
-        expect(mailchimp_datum.data).to eq empty_data.as_json
+        expect(mailchimp_datum.data).to eq empty_data.merge(tags: ["in_index"]).as_json
         expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
         expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
       end
@@ -107,10 +107,9 @@ RSpec.describe MailchimpDatum, type: :model do
       context "lead_for_school" do
         let!(:feedback) { FactoryBot.create(:feedback, kind: "lead_for_school") }
         let(:target) do
-          { lists: ["organization"],
-            tags: [],
-            interests: ["school"]
-          }
+          {lists: ["organization"],
+           tags: [],
+           interests: ["school"]}
         end
         it "creates" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
@@ -148,21 +147,22 @@ RSpec.describe MailchimpDatum, type: :model do
     end
     context "with organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-      let(:mailchimp_datum)  { MailchimpDatum.create(user: user) }
-      let(:target)  {{ lists: ["organization"], tags: [], interests: ["bike_shop"]} }
+      let(:mailchimp_datum) { MailchimpDatum.create(user: user) }
+      let(:target) { {lists: ["organization"], tags: %w[in_index], interests: %w[bike_shop]} }
       let(:target_merge_fields) do
         {
           organization_kind: "bike_shop",
-          organization_name: "#{organization.name}",
+          organization_name: organization.name.to_s,
           organization_url: organization.website,
           organization_country: nil,
           organization_city: nil,
           organization_state: nil,
           organization_signed_up_at: organization.created_at,
-          user_signed_up_at: user.created_at,
           bikes: 0,
           name: user.name,
           phone_number: user.phone,
+          user_signed_up_at: user.created_at,
+          added_to_mailchimp_at: nil
         }
       end
       it "is as expected" do
@@ -184,16 +184,16 @@ RSpec.describe MailchimpDatum, type: :model do
         let!(:location) { FactoryBot.create(:location_chicago, organization: organization) }
         let(:lightspeed_merge_fields) do
           target_merge_fields.merge(organization_url: "http://test.com",
-            organization_country: "US",
-            organization_city: "Chicago",
-            organization_state: "IL")
+                                    organization_country: "US",
+                                    organization_city: "Chicago",
+                                    organization_state: "IL")
         end
         it "responds with lightspeed" do
           expect(location.reload&.state&.abbreviation).to eq "IL"
           organization.update(website: "test.com")
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: ["lightspeed"]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_index lightspeed]).as_json
           expect(mailchimp_datum.merge_fields.as_json).to eq lightspeed_merge_fields.as_json
         end
       end
@@ -201,7 +201,7 @@ RSpec.describe MailchimpDatum, type: :model do
         it "responds with lightspeed" do
           expect(user).to be_present
           organization.update(pos_kind: "ascend_pos")
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: ["ascend"]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[ascend in_index]).as_json
         end
       end
       context "not creator of organization" do
@@ -209,7 +209,7 @@ RSpec.describe MailchimpDatum, type: :model do
         it "is as expected" do
           expect(organization_creator.reload.memberships.first.organization_creator?).to be_truthy
           expect(user.reload.memberships.first.organization_creator?).to be_falsey
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: ["not_organization_creator"]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_index not_organization_creator]).as_json
         end
       end
     end
