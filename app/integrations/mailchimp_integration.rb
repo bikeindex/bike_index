@@ -19,6 +19,12 @@ class MailchimpIntegration
       .dig("categories").map { |l| l.except("_links") }
   end
 
+  # requires a interest_category mailchimp_value
+  def get_interests(mailchimp_value)
+    client.lists.list_interest_category_interests(self.class.list_id(mailchimp_value.list), mailchimp_value.mailchimp_id)
+      .dig("interests").map { |l| l.except("_links") }
+  end
+
   def get_member(mailchimp_datum, list = nil)
     list ||= mailchimp_datum.lists.first
     begin

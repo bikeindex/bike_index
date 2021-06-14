@@ -10,19 +10,33 @@ class MailchimpValue < ApplicationRecord
     tag: 2
   }
 
-  validates_presence_of :slug
+  validates_presence_of :slug, :list, :kind, :mailchimp_id
   validates_uniqueness_of :mailchimp_id, scope: %i[list kind]
+
+  before_validation :set_calculated_attributes
 
   enum list: LIST_ENUM
   enum kind: KIND_ENUM
 
-  def self.friendly_find(str, kind, list = nil)
-    values = where(kind: kind)
-    values = values.where(list: list) if list.present?
-    values.find_by_slug(str)
+  def self.lists
+    LIST_ENUM.keys.map(&:to_s)
+  end
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
+
+  def self.friendly_find(str)
+    find_by_mailchimp_id(str) || find_by_slug(str) || find_by_id(str)
   end
 
   def display_name
+    data&.dig("title") || data&.dig("name") || ""
+  end
 
+  def set_calculated_attributes
+    self.data ||= {}
+    self.mailchimp_id ||= data["id"]
+    self.slug ||= Slugifyer.slugify(display_name)
   end
 end
