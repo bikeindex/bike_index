@@ -7,11 +7,16 @@ class MailchimpIntegration
   LISTS = {
     organization: "b675299293",
     individual: "180a1141a4",
-    from_bike_index: ""
+    from_bike_index: "9246283c07"
   }
 
   def self.list_id(str)
     LISTS[str&.to_sym]
+  end
+
+  def get_interest_categories(list)
+    client.lists.get_list_interest_categories(self.class.list_id(list))
+      .dig("categories").map { |l| l.except("_links") }
   end
 
   def get_member(mailchimp_datum, list = nil)
@@ -47,15 +52,7 @@ class MailchimpIntegration
 
   # Lists are called "Audiences" outside of the API
   def get_lists
-    # Remove the _links, which are too much bs
-    client.lists.get_all_lists
-      .dig("lists").map { |l| l.except("_links") }
-  end
-
-  def tags
-    {
-      in_index: "In Bike Index",
-      not_organization_creator: "Not organization creator"
-    }
+    client.lists.get_all_lists.as_json
+      .dig("lists").map { |l| l.slice("id", "name") }
   end
 end

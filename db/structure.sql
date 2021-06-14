@@ -1815,6 +1815,41 @@ ALTER SEQUENCE public.mailchimp_data_id_seq OWNED BY public.mailchimp_data.id;
 
 
 --
+-- Name: mailchimp_values; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.mailchimp_values (
+    id bigint NOT NULL,
+    list integer,
+    kind integer,
+    slug character varying,
+    mailchimp_id character varying,
+    data jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: mailchimp_values_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.mailchimp_values_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: mailchimp_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.mailchimp_values_id_seq OWNED BY public.mailchimp_values.id;
+
+
+--
 -- Name: manufacturers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3338,6 +3373,13 @@ ALTER TABLE ONLY public.mailchimp_data ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: mailchimp_values id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_values ALTER COLUMN id SET DEFAULT nextval('public.mailchimp_values_id_seq'::regclass);
+
+
+--
 -- Name: manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3907,6 +3949,14 @@ ALTER TABLE ONLY public.mail_snippets
 
 ALTER TABLE ONLY public.mailchimp_data
     ADD CONSTRAINT mailchimp_data_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mailchimp_values mailchimp_values_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_values
+    ADD CONSTRAINT mailchimp_values_pkey PRIMARY KEY (id);
 
 
 --
@@ -5698,6 +5748,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210512162607'),
 ('20210601175924'),
 ('20210604191419'),
-('20210610185925');
+('20210610185925'),
+('20210614175711');
 
 
