@@ -36,9 +36,6 @@ class MailchimpValue < ApplicationRecord
     mailchimp_value || values.find_by_slug(Slugifyer.slugify(str))
   end
 
-  def display_name
-    data&.dig("title") || data&.dig("name") || ""
-  end
 
   def set_calculated_attributes
     self.data ||= {}
@@ -47,6 +44,13 @@ class MailchimpValue < ApplicationRecord
     else
       data["id"] || data["merge_id"]
     end
-    self.slug ||= Slugifyer.slugify(display_name)
+    self.name = calculated_name if calculated_name.present? # Mainly for specs
+    self.slug ||= Slugifyer.slugify(name)
+  end
+
+  private
+
+  def calculated_name
+    data&.dig("title") || data&.dig("name") || ""
   end
 end

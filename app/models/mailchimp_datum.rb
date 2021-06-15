@@ -101,7 +101,6 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def add_mailchimp_merge_fields(list, val)
-    # new_values = val.select { |k, v| v.present? }.to_h
     new_values = val.map.map do |k, v|
       next unless v.present?
       m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.slug || k
@@ -181,7 +180,13 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def address_merge(list)
-    return {}
+    if list == "organization" && mailchimp_organization&.city.present?
+      { "CITY" => mailchimp_organization.city,
+        "STATE" => mailchimp_organization.state.abbreviation,
+        "COUNTRY" => mailchimp_organization.country.iso }
+    else
+      # user&.
+    end
   end
 
   private

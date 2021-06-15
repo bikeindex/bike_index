@@ -1822,6 +1822,7 @@ CREATE TABLE public.mailchimp_values (
     id bigint NOT NULL,
     list integer,
     kind integer,
+    name character varying,
     slug character varying,
     mailchimp_id character varying,
     data jsonb,

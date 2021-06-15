@@ -18,6 +18,6 @@ class Admin::MailchimpValuesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[slug list kind created_at updated_at]
+    %w[name slug list kind created_at updated_at]
   end
 end

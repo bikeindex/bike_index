@@ -17,8 +17,7 @@
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
   %thead.small-header.hidden-md-down
-    %th
-      Name
+    %th= sortable "name"
     %th.small
       = sortable "slug"
     %th
@@ -37,7 +36,7 @@
     - @mailchimp_values.each do |mailchimp_value|
       %tr
         %td
-          = mailchimp_value.display_name
+          = mailchimp_value.name
         %td.small
           = mailchimp_value.slug
         %td
