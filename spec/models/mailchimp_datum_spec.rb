@@ -26,6 +26,7 @@ RSpec.describe MailchimpDatum, type: :model do
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
           expect(mailchimp_datum.lists).to eq(["organization"])
           expect(mailchimp_datum.subscribed?).to be_truthy
+          expect(mailchimp_datum.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.id).to be_present
           expect(mailchimp_datum.user_id).to eq user.id
           expect(user.reload.mailchimp_datum&.id).to eq mailchimp_datum.id
@@ -163,7 +164,9 @@ RSpec.describe MailchimpDatum, type: :model do
           name: user.name,
           phone_number: user.phone,
           user_signed_up_at: user.created_at,
-          added_to_mailchimp_at: nil
+          added_to_mailchimp_at: nil,
+          most_recent_donation_at: nil,
+          number_of_donations: 0
         }
       end
       it "is as expected" do
@@ -237,12 +240,11 @@ RSpec.describe MailchimpDatum, type: :model do
         end
       end
     end
-    # context "individual" do
-    #   it "includes things" do
-    #     # Most recent_donation_at
-    #     # Number of donations
-    #     fail
-    #   end
-    # end
+    context "individual" do
+      xit "includes things" do
+        # Most recent_donation_at
+        # Number of donations
+      end
+    end
   end
 end

@@ -1,3 +1,5 @@
+# Mailchimp Values are the fields stored in Mailchimp
+
 class MailchimpValue < ApplicationRecord
   LIST_ENUM = {
     organization: 0,
@@ -40,7 +42,11 @@ class MailchimpValue < ApplicationRecord
 
   def set_calculated_attributes
     self.data ||= {}
-    self.mailchimp_id ||= data["id"] || data["merge_id"]
+    self.mailchimp_id ||= if merge_field?
+      data["tag"]
+    else
+      data["id"] || data["merge_id"]
+    end
     self.slug ||= Slugifyer.slugify(display_name)
   end
 end

@@ -34,6 +34,12 @@ class MailchimpIntegration
       .dig("interests").map { |l| l.except("_links") }
   end
 
+  def get_members(list, page:, count:)
+    result = client.lists.get_list_members_info(self.class.list_id(list), page: page, count: count)
+    # pp result
+    result.dig("members").map { |l| l.except("_links") }
+  end
+
   def get_member(mailchimp_datum, list = nil)
     list ||= mailchimp_datum.lists.first
     begin

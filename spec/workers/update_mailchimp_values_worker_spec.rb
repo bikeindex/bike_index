@@ -17,6 +17,12 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "2e650f9110"
       expect(mailchimp_value.data.as_json).to eq target_interest_categories_data.as_json
+
+      # Doesn't create more
+      VCR.use_cassette("update_mailchimp_values_worker-interest_category", match_requests_on: [:path]) do
+        instance.perform("organization", "interest_category")
+      end
+      expect(MailchimpValue.interest_category.count).to eq 1
     end
   end
 
@@ -35,6 +41,12 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "cbca7bf705"
       expect(mailchimp_value.data.as_json).to eq target_data.as_json
+
+      # Doesn't create more
+      VCR.use_cassette("update_mailchimp_values_worker-interest", match_requests_on: [:path]) do
+        instance.perform("organization", "interest")
+      end
+      expect(MailchimpValue.interest.count).to eq 3
     end
   end
 
@@ -52,6 +64,12 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "87314"
       expect(mailchimp_value.data.as_json).to eq target_data.as_json
+
+      # Doesn't create more
+      VCR.use_cassette("update_mailchimp_values_worker-tag", match_requests_on: [:path]) do
+        instance.perform("organization", "tag")
+      end
+      expect(MailchimpValue.tag.count).to eq 7
     end
   end
 
@@ -67,8 +85,14 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       expect(mailchimp_value.display_name).to eq "Address"
       expect(mailchimp_value.slug).to eq "address"
       expect(mailchimp_value.list).to eq "organization"
-      expect(mailchimp_value.mailchimp_id).to eq "3"
+      expect(mailchimp_value.mailchimp_id).to eq "ADDRESS"
       expect(mailchimp_value.data.as_json).to eq target_data.as_json
+
+      # Doesn't create more
+      VCR.use_cassette("update_mailchimp_values_worker-merge_field", match_requests_on: [:path]) do
+        instance.perform("organization", "merge_field")
+      end
+      expect(MailchimpValue.merge_field.count).to eq 10
     end
   end
 end

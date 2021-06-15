@@ -22,8 +22,9 @@ class MailchimpDatum < ApplicationRecord
   attr_accessor :creator_feedback
 
   scope :user_deleted, -> { where.not(user_deleted_at: nil) }
+  scope :on_mailchimp, -> { where.not(mailchimp_updated_at: nil) }
 
-  # obj can be a user or a feedback
+  # obj can be a user, a feedback or an email
   def self.find_or_create_for(obj)
     if obj.is_a?(User)
       where(user_id: obj.id).first || where(email: obj.confirmed_emails).first ||
@@ -50,9 +51,18 @@ class MailchimpDatum < ApplicationRecord
     user_deleted_at.present?
   end
 
+  def on_mailchimp?
+    mailchimp_updated_at.present?
+  end
+
   # Lists aka "Audiences"
   def lists
-    @lists ||= data["lists"] || []
+    data&.dig("lists") || []
+  end
+
+  # Mailchimp interests by id
+  def mailchimp_interests
+    data&.dig("mailchimp_interests") || {}
   end
 
   def tags
@@ -68,6 +78,10 @@ class MailchimpDatum < ApplicationRecord
     user&.name
   end
 
+  def subscriber_hash
+    Digest::MD5.hexdigest(email)
+  end
+
   def mailchimp_status
     no_subscription_required? ? "unsubscribed" : status
   end
@@ -79,10 +93,11 @@ class MailchimpDatum < ApplicationRecord
     elsif user_id.present?
       self.user_deleted_at ||= Time.current
     end
-    self.subscriber_hash = Digest::MD5.hexdigest(email)
+    self.email = EmailNormalizer.normalize(email)
     self.data ||= {}
-    @previous_data = data
-    self.data = calculated_data
+    @previous_data = data # I don't trust dirty with json
+    self.data = data.merge(calculated_data)
+    @previous_status = status # For some reason this doesn't work with dirty either
     self.status = calculated_status
   end
 
@@ -91,12 +106,12 @@ class MailchimpDatum < ApplicationRecord
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)
     end
-    return true if @previous_data == data
+    return true if data == @previous_data && status == @previous_status
     UpdateMailchimpDatumWorker.perform_async(id)
   end
 
   def ensure_subscription_required
-    return true unless no_subscription_required?
+    return true if !no_subscription_required? || on_mailchimp?
     errors.add(:base, "No mailchimp subscription required, so not creating")
   end
 
@@ -108,24 +123,25 @@ class MailchimpDatum < ApplicationRecord
     {
       lists: calculated_lists,
       tags: calculated_tags,
-      interests: calculated_interests
+      interests: calculated_interests,
+      mailchimp_interests: mailchimp_interests
     }
   end
 
   def merge_fields
     {
-      organization_kind: "bike_shop",
       organization_name: mailchimp_organization&.name,
-      organization_url: mailchimp_organization&.website,
+      organization_signed_up_at: mailchimp_organization&.created_at,
       organization_country: mailchimp_organization&.country&.iso,
       organization_city: mailchimp_organization&.city,
       organization_state: mailchimp_organization&.state&.abbreviation,
-      organization_signed_up_at: mailchimp_organization&.created_at,
       bikes: 0,
       name: full_name,
       phone_number: user&.phone,
       user_signed_up_at: user&.created_at,
-      added_to_mailchimp_at: nil
+      added_to_mailchimp_at: nil,
+      most_recent_donation_at: nil,
+      number_of_donations: 0
     }
   end
 
@@ -165,7 +181,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_lists
-    c_list = []
+    c_list = lists.dup
     if calculated_feedbacks.any? { |f| f.lead? }
       c_list << "organization"
     elsif mailchimp_organization_membership.present?

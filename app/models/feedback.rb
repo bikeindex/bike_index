@@ -120,6 +120,7 @@ class Feedback < ApplicationRecord
   def set_calculated_attributes
     generate_title
     set_user_attrs
+    self.email = EmailNormalizer.normalize(email)
     self.kind ||= calculated_kind
     self.body ||= "lead" if lead?
     self.feedback_type ||= kind
