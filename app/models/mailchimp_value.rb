@@ -1,8 +1,7 @@
 class MailchimpValue < ApplicationRecord
   LIST_ENUM = {
     organization: 0,
-    individual: 1,
-    from_bike_index: 2
+    individual: 1
   }
   KIND_ENUM = {
     interest_category: 0,

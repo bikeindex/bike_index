@@ -7,7 +7,6 @@ class MailchimpIntegration
   LISTS = {
     organization: "b675299293",
     individual: "180a1141a4",
-    from_bike_index: "9246283c07"
   }
 
   def self.list_id(str)

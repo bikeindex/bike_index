@@ -1,0 +1,53 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Mailchimp Values
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "update values", admin_mailchimp_values_path, action: :create, method: :post, class: "nav-link"
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@mailchimp_values.count)
+    matching Mailchimp Values
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      Name
+    %th.small
+      = sortable "slug"
+    %th
+      = sortable "list"
+    %th
+      = sortable "kind"
+    %th
+      Mailchimp ID
+    %th.small
+      = sortable "created_at"
+    %th.small
+      = sortable "updated_at"
+
+  %tbody
+    - @mailchimp_values.each do |mailchimp_value|
+      %tr
+        %td
+          = mailchimp_value.display_name
+        %td.small
+          = mailchimp_value.slug
+        %td
+          = mailchimp_value.list
+        %td
+          = mailchimp_value.kind
+        %td
+          = mailchimp_value.mailchimp_id
+        %td
+          %small.convertTime.preciseTime
+            = l(mailchimp_value.created_at, format: :convert_time)
+        %td
+          %small.convertTime.preciseTime
+            = l(mailchimp_value.updated_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(mailchimp_value.updated_at, format: :convert_time)

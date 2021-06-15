@@ -6,8 +6,7 @@ RSpec.describe MailchimpIntegration do
   describe "get_lists" do
     let(:target) do
       [{name: "Individuals", id: "180a1141a4"},
-        {name: "Organizations", id: "b675299293"},
-        {name: "From Bike Index", id: "9246283c07"}]
+        {name: "Organizations", id: "b675299293"}]
     end
     it "gets the lists" do
       VCR.use_cassette("mailchimp_integration-get_lists", match_requests_on: [:path]) do
@@ -66,11 +65,10 @@ RSpec.describe MailchimpIntegration do
     let(:target) { [{list_id: "180a1141a4", id: "bec514f886", title: "Bike Index user types", display_order: 0, type: "hidden"}] }
     it "gets interest categories" do
       VCR.use_cassette("mailchimp_integration-get_interest_categories", match_requests_on: [:path]) do
-        categories = instance.get_interest_categories("individual")
-        pp categories
-        expect(categories).to eq target.as_json
-        # expect(instance.get_interest_categories("individual")).to eq target.as_json
+        expect(instance.get_interest_categories("individual")).to eq target.as_json
       end
     end
   end
+  # get_interests and get_tags are both tested in update_mailchimp_values_worker instead
+
 end
