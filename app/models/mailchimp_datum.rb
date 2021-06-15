@@ -11,7 +11,7 @@ class MailchimpDatum < ApplicationRecord
   has_many :feedbacks
 
   validates_presence_of :email
-  validates_uniqueness_of :user_id
+  validates :user_id, uniqueness: true, allow_blank: true
   validate :ensure_subscription_required, on: :create
 
   before_validation :set_calculated_attributes
@@ -60,11 +60,6 @@ class MailchimpDatum < ApplicationRecord
     data&.dig("lists") || []
   end
 
-  # Mailchimp interests by id
-  def mailchimp_interests
-    data&.dig("mailchimp_interests") || {}
-  end
-
   def tags
     data&.dig("tags") || []
   end
@@ -72,6 +67,27 @@ class MailchimpDatum < ApplicationRecord
   # Interests aka "Groups"
   def interests
     data&.dig("interests") || []
+  end
+
+  # Mailchimp interests by id
+  def mailchimp_interests
+    data&.dig("mailchimp_interests") || {}
+  end
+
+  # TODO: make this lookup the IDs for mailchimp_value interests and add them
+  def add_mailchimp_interests(list, val)
+    new_values = val.select { |k, v| v.present? }.keys
+    self.data ||= {}
+    self.data["mailchimp_interests"] = mailchimp_interests.dup.merge(list => new_values)
+  end
+
+  def mailchimp_merge_fields
+    data&.dig("mailchimp_merge_fields") || {}
+  end
+
+  def mailchimp_merge_fields=(val)
+    new_values = val.select { |k, v| v.present? }.to_h
+    self.data["mailchimp_merge_fields"] = mailchimp_merge_fields.dup.merge(new_values)
   end
 
   def full_name
@@ -87,6 +103,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.user ||= User.fuzzy_email_find(email) if email.present?
     if user.present?
       self.email = user.email
       self.user_deleted_at = nil
@@ -124,7 +141,8 @@ class MailchimpDatum < ApplicationRecord
       lists: calculated_lists,
       tags: calculated_tags,
       interests: calculated_interests,
-      mailchimp_interests: mailchimp_interests
+      mailchimp_interests: mailchimp_interests,
+      mailchimp_merge_fields: mailchimp_merge_fields,
     }
   end
 

@@ -100,6 +100,14 @@ class Feedback < ApplicationRecord
     Bike.unscoped.where(id: bike_id).first
   end
 
+  def organization_id
+    feedback_hash&.dig("organization_id")
+  end
+
+  def organization
+    organization_id.present? && Organization.find_by_id(organization_id)
+  end
+
   def package_size
     (feedback_hash || {})["package_size"]
   end

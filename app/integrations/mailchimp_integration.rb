@@ -9,13 +9,16 @@ class MailchimpIntegration
     individual: "180a1141a4"
   }
 
+  attr_accessor :total_items # For paginated lookups
+
   def self.list_id(str)
     LISTS[str&.to_sym]
   end
 
   def get_tags(list)
-    client.lists.tag_search(self.class.list_id(list))
-      .dig("tags").map { |l| l.except("_links") }
+    result = client.lists.tag_search(self.class.list_id(list))
+    @total_items = result["total_items"]
+    result.dig("tags").map { |l| l.except("_links") }
   end
 
   def get_merge_fields(list)
@@ -36,7 +39,7 @@ class MailchimpIntegration
 
   def get_members(list, page:, count:)
     result = client.lists.get_list_members_info(self.class.list_id(list), page: page, count: count)
-    # pp result
+    @total_items = result["total_items"]
     result.dig("members").map { |l| l.except("_links") }
   end
 

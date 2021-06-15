@@ -62,6 +62,9 @@
       text-decoration: underline;
     }
   }
+  pre {
+    margin: 0;
+  }
   &.wide-definition tr td {
     &:last-child {
       width: 70%;
