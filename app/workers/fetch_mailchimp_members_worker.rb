@@ -6,8 +6,10 @@ class FetchMailchimpMembersWorker < ApplicationWorker
       find_or_create_datum(list, data)
     end
     return true unless enqueue_all_pages
-    additional_pages = mailchimp_integration.total_items / count
-    additional_pages.times { |page| FetchMailchimpMembersWorker.perform_async(list, page + 1, count) }
+    # Calculated pages
+    (mailchimp_integration.total_items / count).times do |page|
+      FetchMailchimpMembersWorker.perform_async(list, page + 1, count)
+    end
   end
 
   def mailchimp_integration
@@ -16,14 +18,14 @@ class FetchMailchimpMembersWorker < ApplicationWorker
 
   def find_or_create_datum(list, data)
     email = EmailNormalizer.normalize(data["email_address"])
-    mailchimp_data = MailchimpDatum.find_by_email(email)
-    mailchimp_data ||= MailchimpDatum.new(email: email)
-    mailchimp_data.mailchimp_updated_at = TimeParser.parse(data["last_changed"])
-    mailchimp_data.set_calculated_attributes
-    mailchimp_data.data["lists"] += [list]
-    mailchimp_data.data["tags"] += data["tags"].map { |t| t["name"] }
-    mailchimp_data.add_mailchimp_interests(list, data["interests"])
-    mailchimp_data.mailchimp_merge_fields = data["merge_fields"]
-    mailchimp_data.save!
+    mailchimp_datum = MailchimpDatum.find_by_email(email)
+    mailchimp_datum ||= MailchimpDatum.new(email: email)
+    mailchimp_datum.mailchimp_updated_at = TimeParser.parse(data["last_changed"])
+    mailchimp_datum.set_calculated_attributes
+    mailchimp_datum.data["lists"] += [list]
+    mailchimp_datum.data["tags"] += data["tags"].map { |t| t["name"] }
+    mailchimp_datum.add_mailchimp_interests(list, data["interests"])
+    mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])
+    mailchimp_datum.save!
   end
 end

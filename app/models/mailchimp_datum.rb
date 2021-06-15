@@ -21,6 +21,8 @@ class MailchimpDatum < ApplicationRecord
 
   attr_accessor :creator_feedback
 
+  scope :no_user, -> { where(user_id: nil) }
+  scope :with_user, -> { where.not(user_id: nil).where(user_deleted_at: nil) }
   scope :user_deleted, -> { where.not(user_deleted_at: nil) }
   scope :on_mailchimp, -> { where.not(mailchimp_updated_at: nil) }
 
@@ -47,6 +49,10 @@ class MailchimpDatum < ApplicationRecord
     mailchimp_organization_membership&.organization
   end
 
+  def with_user?
+    user.present?
+  end
+
   def user_deleted?
     user_deleted_at.present?
   end
@@ -69,25 +75,40 @@ class MailchimpDatum < ApplicationRecord
     data&.dig("interests") || []
   end
 
-  # Mailchimp interests by id
-  def mailchimp_interests
-    data&.dig("mailchimp_interests") || {}
+  def mailchimp_interests(list)
+    m_interests = interests.dup
+    m_interests.map do |i|
+      m_int = MailchimpValue.interest.friendly_find(i, list: list)&.mailchimp_id
+      m_int.present? ? [m_int, true] : nil
+    end.compact.uniq.to_h
   end
 
-  # TODO: make this lookup the IDs for mailchimp_value interests and add them
   def add_mailchimp_interests(list, val)
-    new_values = val.select { |k, v| v.present? }.keys
+    new_values = val.select { |k, v| v.present? }.keys.map do |i|
+      MailchimpValue.interest.friendly_find(i, list: list)&.slug || i
+    end
     self.data ||= {}
-    self.data["mailchimp_interests"] = mailchimp_interests.dup.merge(list => new_values)
+    self.data["interests"] = (interests + new_values).compact.uniq
   end
 
-  def mailchimp_merge_fields
-    data&.dig("mailchimp_merge_fields") || {}
+  def mailchimp_merge_fields(list)
+    m_merge_fields = merge_fields.dup.select { |k, v| v.present? }
+    m_merge_fields.map do |k, v|
+      m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.mailchimp_id
+      next unless m_key.present?
+      [m_key, v]
+    end.compact.to_h.merge(address_merge(list))
   end
 
-  def mailchimp_merge_fields=(val)
-    new_values = val.select { |k, v| v.present? }.to_h
-    self.data["mailchimp_merge_fields"] = mailchimp_merge_fields.dup.merge(new_values)
+  def add_mailchimp_merge_fields(list, val)
+    # new_values = val.select { |k, v| v.present? }.to_h
+    new_values = val.map.map do |k, v|
+      next unless v.present?
+      m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.slug || k
+      [m_key, v]
+    end.compact.to_h
+    self.data ||= {}
+    self.data["merge_fields"] = merge_fields.merge(new_values).reject { |k, v| v.blank? }.to_h
   end
 
   def full_name
@@ -141,33 +162,33 @@ class MailchimpDatum < ApplicationRecord
       lists: calculated_lists,
       tags: calculated_tags,
       interests: calculated_interests,
-      mailchimp_interests: mailchimp_interests,
-      mailchimp_merge_fields: mailchimp_merge_fields,
+      merge_fields: data&.dig("merge_fields")
     }
   end
 
   def merge_fields
     {
-      organization_name: mailchimp_organization&.name,
-      organization_signed_up_at: mailchimp_organization&.created_at,
-      organization_country: mailchimp_organization&.country&.iso,
-      organization_city: mailchimp_organization&.city,
-      organization_state: mailchimp_organization&.state&.abbreviation,
-      bikes: 0,
-      name: full_name,
-      phone_number: user&.phone,
-      user_signed_up_at: user&.created_at,
-      added_to_mailchimp_at: nil,
-      most_recent_donation_at: nil,
-      number_of_donations: 0
+      "organization-name" => mailchimp_organization&.name,
+      "organization-sign-up" => mailchimp_organization&.created_at,
+      "bikes" => 0,
+      "name" => full_name,
+      "phone-number" => user&.phone,
+      "user-signed-up-at" => user&.created_at,
+      "added-to-mailchimp-at" => nil,
+      "most-recent-donation-at" => nil,
+      "number-of-donations" => 0
     }
+  end
+
+  def address_merge(list)
+    return {}
   end
 
   private
 
   def calculated_tags
     updated_tags = tags.dup
-    updated_tags << "in-index" if user.present?
+    updated_tags << "in-bike-index" if user.present?
     if mailchimp_organization.present?
       unless mailchimp_organization_membership.organization_creator?
         updated_tags << "not-organization-creator"
@@ -194,7 +215,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_feedbacks
-    user.present? ? user.feedbacks : Feedback.where(email: email) +
+    (user.present? ? user.feedbacks : Feedback.where(email: email)).mailchimping +
       [creator_feedback].compact
   end
 

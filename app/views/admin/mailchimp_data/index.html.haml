@@ -4,8 +4,18 @@
       Mailchimp Values
   .col-md-7
     %ul
-      / %li.nav-item
-      /   = link_to "update values", admin_mailchimp_values_path, action: :create, method: :post, class: "nav-link"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_users == "all" ? "" : "active") }
+          - if @search_users == "all"
+            With and without users
+          - else
+            = @search_users.humanize
+        .dropdown-menu
+          = link_to "With and without users", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "all")), class: "dropdown-item #{@search_users == 'all' ? 'active' : ''}"
+          .dropdown-divider
+          = link_to "With user", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "with_user")), class: "dropdown-item #{@search_users == 'with_user' ? 'active' : ''}"
+          = link_to "No user", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}"
+
       %li.nav-item
         %a.nav-link{ href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
           Toggle data
@@ -14,7 +24,7 @@
 
 .row.mt-4.mb-4
   .col-sm-6
-    = number_with_delimiter(@mailchimp_data.total_count)
+    = number_with_delimiter(matching_mailchimp_data.count)
     matching Mailchimp Data
     %em
       = humanized_time_range_column(@time_range_column)

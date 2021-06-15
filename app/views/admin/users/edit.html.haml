@@ -217,6 +217,32 @@
             = user_email.old_user_id
 
 %hr.mt-4
+%h4 Mailchimp data
+- if @user.mailchimp_datum.blank?
+  %p No mailchimp data
+- else
+  - mailchimp_datum = @user.mailchimp_datum
+  .row
+    .col-md-6
+      %table.table-list
+        %tbody
+          %tr
+            %td Lists
+            %td= @user.mailchimp_datum.lists.join(", ")
+          %tr
+            %td Feedbacks
+            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
+          %tr
+            %td Mailchimp data updated at
+            %td
+              %span.convertTime
+                = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
+    .col-md-6
+      = pretty_print_json(mailchimp_datum.data)
+
+
+
+%hr.mt-4
 %h4 Edit
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?

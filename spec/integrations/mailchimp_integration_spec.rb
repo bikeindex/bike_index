@@ -26,9 +26,7 @@ RSpec.describe MailchimpIntegration do
     end
     let(:target_merge_fields) do
       {
-        organization_kind: "bike_shop",
         organization_name: nil,
-        organization_url: nil,
         organization_country: nil,
         organization_city: nil,
         organization_state: nil,
@@ -69,5 +67,4 @@ RSpec.describe MailchimpIntegration do
       end
     end
   end
-  # get_interests and get_tags are both tested in update_mailchimp_values_worker instead
 end

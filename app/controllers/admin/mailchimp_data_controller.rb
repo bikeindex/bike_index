@@ -23,9 +23,17 @@ class Admin::MailchimpDataController < Admin::BaseController
   end
 
   def matching_mailchimp_data
-     @time_range_column = sort_column if %w[updated_at mailchimp_updated_at].include?(sort_column)
-     @time_range_column ||= "created_at"
-     MailchimpDatum.order(sort_column + " " + sort_direction)
+    @search_users = %w[with_user no_user].include?(params[:search_users]) ? params[:search_users] : "all"
+    m_mailchimp_data = if @search_users == "with_user"
+      MailchimpDatum.with_user
+    elsif @search_users == "no_user"
+      MailchimpDatum.no_user
+    else
+      MailchimpDatum
+    end
+    @time_range_column = sort_column if %w[updated_at mailchimp_updated_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    m_mailchimp_data.order(sort_column + " " + sort_direction)
       .where(@time_range_column => @time_range)
   end
 end

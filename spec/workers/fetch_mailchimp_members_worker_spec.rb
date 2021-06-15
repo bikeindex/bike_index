@@ -34,7 +34,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
     context "individual" do
       let(:target_data) do
         {
-          tags: ["2020", "in-index"],
+          tags: ["2020", "in-bike-index"],
           interests: [],
           lists: %w[individual organization],
           mailchimp_interests: { individual: ["938bcefe9e"] },

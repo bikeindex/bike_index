@@ -38,7 +38,8 @@ class MailchimpIntegration
   end
 
   def get_members(list, page:, count:)
-    result = client.lists.get_list_members_info(self.class.list_id(list), page: page, count: count)
+    result = client.lists.get_list_members_info(self.class.list_id(list),
+      offset: (count * page), count: count)
     @total_items = result["total_items"]
     result.dig("members").map { |l| l.except("_links") }
   end
@@ -55,19 +56,23 @@ class MailchimpIntegration
   end
 
   def update_member(mailchimp_datum, list)
-    # Get or Update member
-
-    # Update tags
+    client.lists.set_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash,
+      member_update_hash(mailchimp_datum, list))
+      .except("_links")
   end
 
   def member_update_hash(mailchimp_datum, list)
     {
-      email: mailchimp_datum.email,
+      email_address: mailchimp_datum.email,
       full_name: mailchimp_datum.full_name,
-      status: mailchimp_datum.mailchimp_status,
-      merge_fields: mailchimp_datum.merge_fields,
-      interests: mailchimp_datum.interests
+      status_if_new: mailchimp_datum.mailchimp_status,
+      merge_fields: mailchimp_datum.mailchimp_merge_fields(list),
+      interests: mailchimp_datum.mailchimp_interests(list)
     }
+  end
+
+  def merge_fields_for(mailchimp_datum, list)
+
   end
 
   def client

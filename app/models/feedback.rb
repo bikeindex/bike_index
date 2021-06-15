@@ -33,6 +33,7 @@ class Feedback < ApplicationRecord
   scope :stolen_tip, -> { where(kind: stolen_tip_kinds) }
   scope :no_user, -> { where(user_id: nil) }
   scope :lead, -> { where(kind: lead_types) }
+  scope :mailchimping, -> { where(kind: mailchimping_kinds) }
 
   def self.no_notification_kinds
     %w[manufacturer_update_request serial_update_request bike_delete_request]
@@ -40,6 +41,11 @@ class Feedback < ApplicationRecord
 
   def self.lead_types
     %w[lead_for_bike_shop lead_for_city lead_for_school lead_for_law_enforcement]
+  end
+
+  # May be additional kinds in the future
+  def self.mailchimping_kinds
+    lead_types
   end
 
   def self.bike(bike_or_bike_id = nil)
@@ -90,6 +96,10 @@ class Feedback < ApplicationRecord
 
   def delete_request?
     bike_delete_request? # Holdover from feedback_type > kind enum conversion
+  end
+
+  def mailchimping?
+    self.class.mailchimping_kinds.include?(kind)
   end
 
   def bike_id
