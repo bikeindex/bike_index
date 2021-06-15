@@ -186,7 +186,9 @@
               - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
                 %p.text-danger
                   IS NOT MARKED PAID BUT HAS A LANDING PAGE
-              -else
+              -elsif @organization.paid_previously?
+                %strong.text-warning Previously paid!
+              - else
                 False
             %em.less-strong
               Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}

@@ -230,6 +230,10 @@ class Organization < ApplicationRecord
     is_paid
   end
 
+  def paid_previously?
+    !paid? && invoices.expired.any? { |i| i.was_active? }
+  end
+
   def display_avatar?
     avatar.present?
   end

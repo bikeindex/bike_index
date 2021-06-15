@@ -19,7 +19,7 @@ class MailchimpIntegration
   end
 
   def get_merge_fields(list)
-    client.lists.get_list_merge_fields(self.class.list_id(list))
+    client.lists.get_list_merge_fields(self.class.list_id(list), count: 1000)
       .dig("merge_fields").map { |l| l.except("_links") }
   end
 
@@ -46,6 +46,9 @@ class MailchimpIntegration
   end
 
   def update_member(mailchimp_datum, list)
+    # Get or Update member
+
+    # Update tags
   end
 
   def member_update_hash(mailchimp_datum, list)

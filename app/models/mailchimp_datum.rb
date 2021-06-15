@@ -133,13 +133,19 @@ class MailchimpDatum < ApplicationRecord
 
   def calculated_tags
     updated_tags = tags.dup
-    updated_tags << "in_index" if user.present?
+    updated_tags << "in-index" if user.present?
     if mailchimp_organization.present?
       unless mailchimp_organization_membership.organization_creator?
-        updated_tags << "not_organization_creator"
+        updated_tags << "not-organization-creator"
       end
       if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
         updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")
+        updated_tags << "pos-approved"
+      end
+      if mailchimp_organization.paid?
+        updated_tags << "paid"
+      elsif mailchimp_organization.paid_previously?
+        updated_tags << "paid-previously"
       end
     end
     updated_tags.uniq.sort
