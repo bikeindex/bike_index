@@ -70,5 +70,4 @@ RSpec.describe MailchimpIntegration do
     end
   end
   # get_interests and get_tags are both tested in update_mailchimp_values_worker instead
-
 end

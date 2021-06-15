@@ -6,6 +6,9 @@
     %ul
       %li.nav-item
         = link_to "update values", admin_mailchimp_values_path, action: :create, method: :post, class: "nav-link"
+      %li.nav-item
+        %a.nav-link{ href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
+          Toggle data
 
 .row.mt-4.mb-4
   .col-sm-6
@@ -28,6 +31,7 @@
       = sortable "created_at"
     %th.small
       = sortable "updated_at"
+    %th.collapse.data-cell-collapsed Data
 
   %tbody
     - @mailchimp_values.each do |mailchimp_value|
@@ -48,6 +52,5 @@
         %td
           %small.convertTime.preciseTime
             = l(mailchimp_value.updated_at, format: :convert_time)
-        %td
-          %span.convertTime.preciseTime
-            = l(mailchimp_value.updated_at, format: :convert_time)
+        %td.collapse.data-cell.data-cell-collapsed.small
+          = pretty_print_json(mailchimp_value.data)

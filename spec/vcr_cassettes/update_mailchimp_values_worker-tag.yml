@@ -1,0 +1,38 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://us6.api.mailchimp.com/3.0/lists/b675299293/tag-search
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - openresty
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '272'
+      Vary:
+      - Accept-Encoding
+      X-Request-Id:
+      - 2d861fa1-18bb-2eda-b4ec-470ea2af31df
+      Date:
+      - Tue, 15 Jun 2021 03:05:04 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: '{"tags":[{"id":87322,"name":"Ascend"},{"id":87306,"name":"In Bike Index"},{"id":87314,"name":"Lightspeed"},{"id":1882022,"name":"Not
+        organization creator"},{"id":1881982,"name":"Paying"},{"id":87318,"name":"POS
+        Approved"},{"id":87302,"name":"Trek shops"}],"total_items":7}'
+    http_version:
+  recorded_at: Tue, 15 Jun 2021 03:05:04 GMT
+recorded_with: VCR 5.0.0

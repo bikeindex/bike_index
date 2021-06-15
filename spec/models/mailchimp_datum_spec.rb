@@ -188,6 +188,16 @@ RSpec.describe MailchimpDatum, type: :model do
                                     organization_city: "Chicago",
                                     organization_state: "IL")
         end
+
+        # Organizations
+        # Add: pos_approved
+        # Add paid - paid invoice associated
+        # Add previously_paid tag
+
+        # Individual
+        # Most recent_donation_at
+        # Number of donations
+
         it "responds with lightspeed" do
           expect(location.reload&.state&.abbreviation).to eq "IL"
           organization.update(website: "test.com")

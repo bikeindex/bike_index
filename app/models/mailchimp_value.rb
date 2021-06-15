@@ -6,7 +6,8 @@ class MailchimpValue < ApplicationRecord
   KIND_ENUM = {
     interest_category: 0,
     interest: 1, # AKA groups
-    tag: 2
+    tag: 2,
+    merge_field: 3
   }
 
   validates_presence_of :slug, :list, :kind, :mailchimp_id
@@ -25,8 +26,12 @@ class MailchimpValue < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
-  def self.friendly_find(str)
-    find_by_mailchimp_id(str) || find_by_slug(str) || find_by_id(str)
+  def self.friendly_find(str, kind: nil, list: nil)
+    values = kind.present? ? where(kind: kind) : self
+    values = list.present? ? where(list: list) : values
+    mailchimp_value = values.find_by_mailchimp_id(str)
+    mailchimp_value ||= values.find_by_id(str) if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
+    mailchimp_value || values.find_by_slug(Slugifyer.slugify(str))
   end
 
   def display_name
@@ -35,7 +40,7 @@ class MailchimpValue < ApplicationRecord
 
   def set_calculated_attributes
     self.data ||= {}
-    self.mailchimp_id ||= data["id"]
+    self.mailchimp_id ||= data["id"] || data["merge_id"]
     self.slug ||= Slugifyer.slugify(display_name)
   end
 end

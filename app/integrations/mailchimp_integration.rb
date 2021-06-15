@@ -6,11 +6,21 @@ class MailchimpIntegration
 
   LISTS = {
     organization: "b675299293",
-    individual: "180a1141a4",
+    individual: "180a1141a4"
   }
 
   def self.list_id(str)
     LISTS[str&.to_sym]
+  end
+
+  def get_tags(list)
+    client.lists.tag_search(self.class.list_id(list))
+      .dig("tags").map { |l| l.except("_links") }
+  end
+
+  def get_merge_fields(list)
+    client.lists.get_list_merge_fields(self.class.list_id(list))
+      .dig("merge_fields").map { |l| l.except("_links") }
   end
 
   def get_interest_categories(list)
