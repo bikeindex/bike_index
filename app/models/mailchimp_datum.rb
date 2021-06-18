@@ -143,7 +143,6 @@ class MailchimpDatum < ApplicationRecord
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)
     end
-    pp user_deleted?
     return true if data == @previous_data && status == @previous_status
     UpdateMailchimpDatumWorker.perform_async(id)
   end
