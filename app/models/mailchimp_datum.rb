@@ -123,7 +123,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.user ||= User.fuzzy_email_find(email) if email.present?
+    self.user_id ||= User.fuzzy_email_find(email)&.id if email.present?
     if user.present?
       self.email = user.email
       self.user_deleted_at = nil
@@ -143,6 +143,7 @@ class MailchimpDatum < ApplicationRecord
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)
     end
+    pp user_deleted?
     return true if data == @previous_data && status == @previous_status
     UpdateMailchimpDatumWorker.perform_async(id)
   end

@@ -12,7 +12,7 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       end
       expect(MailchimpValue.interest_category.count).to eq 1
       mailchimp_value = MailchimpValue.last
-      expect(mailchimp_value.display_name).to eq "Organization type"
+      expect(mailchimp_value.name).to eq "Organization type"
       expect(mailchimp_value.slug).to eq "organization-type"
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "2e650f9110"
@@ -36,7 +36,7 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       end
       expect(MailchimpValue.interest.count).to eq 3
       mailchimp_value = MailchimpValue.organization.friendly_find("cbca7bf705")
-      expect(mailchimp_value.display_name).to eq "Bike shop"
+      expect(mailchimp_value.name).to eq "Bike shop"
       expect(mailchimp_value.slug).to eq "bike-shop"
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "cbca7bf705"
@@ -59,7 +59,7 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       end
       expect(MailchimpValue.tag.count).to eq 7
       mailchimp_value = MailchimpValue.organization.friendly_find("Lightspeed")
-      expect(mailchimp_value.display_name).to eq "Lightspeed"
+      expect(mailchimp_value.name).to eq "Lightspeed"
       expect(mailchimp_value.slug).to eq "lightspeed"
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "87314"
@@ -82,7 +82,7 @@ RSpec.describe UpdateMailchimpValuesWorker, type: :job do
       end
       expect(MailchimpValue.merge_field.count).to eq 10
       mailchimp_value = MailchimpValue.organization.friendly_find("ADDress ")
-      expect(mailchimp_value.display_name).to eq "Address"
+      expect(mailchimp_value.name).to eq "Address"
       expect(mailchimp_value.slug).to eq "address"
       expect(mailchimp_value.list).to eq "organization"
       expect(mailchimp_value.mailchimp_id).to eq "ADDRESS"
