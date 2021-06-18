@@ -181,11 +181,11 @@ class MailchimpDatum < ApplicationRecord
 
   def address_merge(list)
     if list == "organization" && mailchimp_organization&.city.present?
-      { "CITY" => mailchimp_organization.city,
-        "STATE" => mailchimp_organization.state.abbreviation,
-        "COUNTRY" => mailchimp_organization.country.iso }
+      { "O_CITY" => mailchimp_organization.city,
+        "O_STATE" => mailchimp_organization.state.abbreviation,
+        "O_COUNTRY" => mailchimp_organization.country.iso }
     else
-      # user&.
+      {} # For now, not handling
     end
   end
 

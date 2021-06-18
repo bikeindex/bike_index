@@ -5,7 +5,6 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     mailchimp_datum = MailchimpDatum.find(id)
     if mailchimp_datum.lists.include?("organization")
       result = mailchimp_integration.update_member(mailchimp_datum, "organization")
-      pp result
       update_mailchimp_datum("organization", mailchimp_datum, result)
       mailchimp_datum.reload
       # Update tags

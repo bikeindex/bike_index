@@ -66,8 +66,8 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "tag", slug: "not-organization-creator", mailchimp_id: "1882022", list: "organization")
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
-        let(:merge_address_fields) { {"CITY" => "Los Angeles", "STATE" => "CA", "COUNTRY" => "US"} }
-        let(:target_tags) { %w[paid in-bike-index not-organization-creator] }
+        let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
+        let(:target_tags) { %w[in-bike-index not-organization-creator] }
         it "updates mailchimp_datums" do
           FactoryBot.create(:membership_claimed, organization: organization)
           organization.update(updated_at: Time.current)
@@ -90,8 +90,9 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.lists).to eq(["organization"])
           expect(mailchimp_datum.interests).to eq(["c5bbab099c", "school"])
-          # expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields.merge(merge_address_fields)
-          expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
+          expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
+          target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
+          expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
           expect(mailchimp_datum.tags).to match_array target_tags
         end
       end
