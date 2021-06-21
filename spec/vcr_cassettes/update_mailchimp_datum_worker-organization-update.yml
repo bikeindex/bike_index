@@ -20,32 +20,33 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Content-Length:
-      - '3360'
+      - '3484'
       Vary:
       - Accept-Encoding
       X-Request-Id:
-      - 519159ed-fbab-edfe-3afc-79819aa1b5b0
+      - 9c144f0a-fc12-6101-9239-ac710b9c8b0f
       Link:
       - <https://us6.api.mailchimp.com/schema/3.0/Lists/Members/Instance.json>; rel="describedBy",
         <https://us6.admin.mailchimp.com/lists/members/view?id=549669146>; rel="dashboard"
       Date:
-      - Mon, 21 Jun 2021 20:37:13 GMT
+      - Mon, 21 Jun 2021 21:47:58 GMT
       Connection:
       - keep-alive
     body:
       encoding: ASCII-8BIT
       string: '{"id":"56a9d336c189b65b4f1269478b987fa7","email_address":"seth@bikeindex.org","unique_email_id":"921735569d","full_name":"Seth
-        Herr","web_id":549669146,"email_type":"html","status":"subscribed","merge_fields":{"PHONE":"","MMERGE5":"","MMERGE9":"","MMERGE10":"","NAME":"Seth
-        Herr","O_NAME":"Hogwarts","O_AT":"2019-03-08","O_CITY":"Los Angeles","O_STATE":"CA","O_COUNTRY":"US","SIGN_UP_AT":""},"interests":{"cbca7bf705":false,"11f66ed17a":false,"c5bbab099c":true},"stats":{"avg_open_rate":0,"avg_click_rate":0},"ip_signup":"","timestamp_signup":"","ip_opt":"99.14.101.245","timestamp_opt":"2021-06-15T22:25:35+00:00","member_rating":2,"last_changed":"2021-06-21T20:37:13+00:00","language":"","vip":false,"email_client":"Gmail","location":{"latitude":0,"longitude":0,"gmtoff":0,"dstoff":0,"country_code":"","timezone":""},"source":"API
-        - Generic","tags_count":0,"tags":[],"list_id":"b675299293","_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Members/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PATCH.json"},{"rel":"upsert","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"PUT","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PUT.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"DELETE"},{"rel":"activity","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/activity","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Activity/Response.json"},{"rel":"goals","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/goals","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Goals/Response.json"},{"rel":"notes","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/notes","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Notes/CollectionResponse.json"},{"rel":"events","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/events","method":"POST","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Events/POST.json"},{"rel":"delete_permanent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/actions/delete-permanent","method":"POST"}]}'
+        Herr","web_id":549669146,"email_type":"html","status":"subscribed","merge_fields":{"PHONE":"7177258428","MMERGE5":"","MMERGE9":"","MMERGE10":"","NAME":"Seth
+        Herr","O_NAME":"Hogwarts","O_AT":"2019-03-08","O_CITY":"Los Angeles","O_STATE":"CA","O_COUNTRY":"US","SIGN_UP_AT":"2013-07-14"},"interests":{"cbca7bf705":false,"11f66ed17a":false,"c5bbab099c":true},"stats":{"avg_open_rate":0,"avg_click_rate":0},"ip_signup":"","timestamp_signup":"","ip_opt":"99.14.101.245","timestamp_opt":"2021-06-15T22:25:35+00:00","member_rating":2,"last_changed":"2021-06-21T21:47:58+00:00","language":"","vip":false,"email_client":"Gmail","location":{"latitude":0,"longitude":0,"gmtoff":0,"dstoff":0,"country_code":"","timezone":""},"source":"API
+        - Generic","tags_count":3,"tags":[{"id":1882022,"name":"Not org creator"},{"id":1881982,"name":"Paid"},{"id":87306,"name":"In
+        Bike Index"}],"list_id":"b675299293","_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Members/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PATCH.json"},{"rel":"upsert","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"PUT","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PUT.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7","method":"DELETE"},{"rel":"activity","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/activity","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Activity/Response.json"},{"rel":"goals","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/goals","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Goals/Response.json"},{"rel":"notes","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/notes","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Notes/CollectionResponse.json"},{"rel":"events","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/events","method":"POST","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Events/POST.json"},{"rel":"delete_permanent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/actions/delete-permanent","method":"POST"}]}'
     http_version:
-  recorded_at: Mon, 21 Jun 2021 20:37:13 GMT
+  recorded_at: Mon, 21 Jun 2021 21:47:58 GMT
 - request:
     method: post
     uri: https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/tags
     body:
       encoding: UTF-8
-      string: "[]"
+      string: '{"tags":[]}'
     headers:
       Content-Type:
       - application/json
@@ -59,14 +60,14 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       X-Request-Id:
-      - 7cb44522-c560-e0a9-f467-ed1aecc87f5b
+      - 87e088d8-8a2f-9870-aa73-e57c8ffef306
       Date:
-      - Mon, 21 Jun 2021 20:37:13 GMT
+      - Mon, 21 Jun 2021 21:47:59 GMT
       Connection:
       - keep-alive
     body:
       encoding: ASCII-8BIT
       string: ''
     http_version:
-  recorded_at: Mon, 21 Jun 2021 20:37:14 GMT
+  recorded_at: Mon, 21 Jun 2021 21:47:59 GMT
 recorded_with: VCR 5.0.0

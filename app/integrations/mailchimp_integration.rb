@@ -73,7 +73,7 @@ class MailchimpIntegration
 
   def update_member_tags(mailchimp_datum, list)
     client.lists.update_list_member_tags(self.class.list_id(list), mailchimp_datum.subscriber_hash,
-      mailchimp_datum.mailchimp_tags(list).as_json)
+      {tags: mailchimp_datum.mailchimp_tags(list)}.as_json)
   end
 
   def client

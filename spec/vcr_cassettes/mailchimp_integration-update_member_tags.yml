@@ -5,8 +5,8 @@ http_interactions:
     uri: https://us6.api.mailchimp.com/3.0/lists/b675299293/members/56a9d336c189b65b4f1269478b987fa7/tags
     body:
       encoding: UTF-8
-      string: '[{"name":"In Bike Index","status":"active"},{"name":"Paid","status":"inactive"},{"name":"Paid
-        previously","status":"active"}]'
+      string: '{"tags":[{"name":"In Bike Index","status":"active"},{"name":"Paid","status":"inactive"},{"name":"Paid
+        previously","status":"active"}]}'
     headers:
       Content-Type:
       - application/json
@@ -20,14 +20,14 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       X-Request-Id:
-      - 75e12aec-aad2-7c90-3413-47e179225fc6
+      - 10f041af-1340-2c33-8cb7-a5d0329b4910
       Date:
-      - Mon, 21 Jun 2021 20:31:29 GMT
+      - Mon, 21 Jun 2021 21:29:46 GMT
       Connection:
       - keep-alive
     body:
       encoding: ASCII-8BIT
       string: ''
     http_version:
-  recorded_at: Mon, 21 Jun 2021 20:31:29 GMT
+  recorded_at: Mon, 21 Jun 2021 21:29:46 GMT
 recorded_with: VCR 5.0.0

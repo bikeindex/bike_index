@@ -213,7 +213,7 @@ RSpec.describe MailchimpDatum, type: :model do
         it "is as expected" do
           expect(organization_creator.reload.memberships.first.organization_creator?).to be_truthy
           expect(user.reload.memberships.first.organization_creator?).to be_falsey
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index not-organization-creator]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index not-org-creator]).as_json
         end
       end
       context "paid organization" do

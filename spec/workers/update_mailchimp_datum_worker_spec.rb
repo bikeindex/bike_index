@@ -28,7 +28,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "merge_field", name: "organization-signed-up-at", mailchimp_id: "O_AT", list: "organization")
           MailchimpValue.create(kind: "tag", name: "in-bike-index", mailchimp_id: "87306", list: "organization")
           MailchimpValue.create(kind: "tag", name: "paid", mailchimp_id: "1881982", list: "organization")
-          MailchimpValue.create(kind: "tag", name: "not-organization-creator", mailchimp_id: "1882022", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "not-org-creator", mailchimp_id: "1882022", list: "organization")
         end
         let(:target_tags) { %w[paid in-bike-index] }
         it "updates mailchimp_datums" do
@@ -63,17 +63,19 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "merge_field", slug: "organization-city", mailchimp_id: "CITY", list: "organization")
           MailchimpValue.create(kind: "merge_field", slug: "organization-state", mailchimp_id: "STATE", list: "organization")
           MailchimpValue.create(kind: "merge_field", slug: "organization-country", mailchimp_id: "COUNTRY", list: "organization")
-          MailchimpValue.create(kind: "tag", slug: "not-organization-creator", mailchimp_id: "1882022", list: "organization")
+          MailchimpValue.create(kind: "tag", slug: "Not org creator", mailchimp_id: "1882022", list: "organization")
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
-        let(:target_tags) { %w[in-bike-index not-organization-creator] }
+        let(:target_tags) { ["in-bike-index", "not-org-creator", "weird other tag"] }
         it "updates mailchimp_datums" do
           FactoryBot.create(:membership_claimed, organization: organization)
           organization.update(updated_at: Time.current)
           expect(organization.default_location&.id).to eq location.id
           expect(membership.reload.organization_creator?).to be_falsey
           expect(organization.reload.paid?).to be_falsey
+          mailchimp_datum.data["tags"] += ["weird other tag"]
+          mailchimp_datum.update(updated_at: Time.current)
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(MailchimpDatum.count).to eq 1
@@ -81,7 +83,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.on_mailchimp?).to be_falsey
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
-          expect(mailchimp_datum.tags).to eq(%w[in-bike-index not-organization-creator])
+          expect(mailchimp_datum.tags).to eq(["in-bike-index", "not-org-creator", "weird other tag"])
 
           VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:path]) do
             instance.perform(mailchimp_datum.id)

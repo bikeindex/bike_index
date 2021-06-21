@@ -226,6 +226,10 @@
     .col-md-6
       %table.table-list
         %tbody
+          - if display_dev_info?
+            %tr
+              %td.small.only-dev-visible ID
+              %td.small= mailchimp_datum.id
           %tr
             %td Lists
             %td= @user.mailchimp_datum.lists.join(", ")

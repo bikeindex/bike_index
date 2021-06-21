@@ -129,6 +129,20 @@ class MailchimpDatum < ApplicationRecord
     end
   end
 
+  def add_mailchimp_tags(list, val)
+    new_tags = tags.dup
+    val.each do |hash|
+      if status == "active"
+        new_tags << MailchimpValue.interest.friendly_find(hash["name"], list: list)&.slug || hash["name"]
+      else
+        slug = Slugifyer.slugify(hash["name"])
+        new_tags.reject! { |t| t == slug }
+      end
+    end
+    self.data ||= {}
+    self.data["tags"] = new_tags.compact.uniq.sort
+  end
+
   def full_name
     user&.name
   end
@@ -186,7 +200,7 @@ class MailchimpDatum < ApplicationRecord
 
   def merge_fields
     {
-      "organization-name" => mailchimp_organization&.name,
+      "organization-name" => mailchimp_organization&.short_name,
       "organization-signed-up-at" => mailchimp_date(mailchimp_organization&.created_at),
       "bikes" => user&.bikes&.count || 0,
       "name" => full_name,
@@ -230,7 +244,7 @@ class MailchimpDatum < ApplicationRecord
     updated_tags << "in-bike-index" if user.present?
     if mailchimp_organization.present?
       unless mailchimp_organization_membership.organization_creator?
-        updated_tags << "not-organization-creator"
+        updated_tags << "not-org-creator"
       end
       if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
         updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")

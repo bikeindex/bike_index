@@ -14,9 +14,9 @@ GIT
 
 GIT
   remote: https://github.com/mailchimp/mailchimp-marketing-ruby.git
-  revision: f31903e5e76555058d17fadb7de8e842c9200729
+  revision: 2cd67937bff16b42d38e0b0a918b4f2014c1a98c
   specs:
-    MailchimpMarketing (3.0.44)
+    MailchimpMarketing (3.0.48)
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
