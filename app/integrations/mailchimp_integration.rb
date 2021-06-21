@@ -71,6 +71,11 @@ class MailchimpIntegration
     }
   end
 
+  def update_member_tags(mailchimp_datum, list)
+    client.lists.update_list_member_tags(self.class.list_id(list), mailchimp_datum.subscriber_hash,
+      mailchimp_datum.mailchimp_tags(list).as_json)
+  end
+
   def client
     @client ||= MailchimpMarketing::Client.new(
       api_key: API_KEY,

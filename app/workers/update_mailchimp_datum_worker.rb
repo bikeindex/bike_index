@@ -7,12 +7,12 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
       result = mailchimp_integration.update_member(mailchimp_datum, "organization")
       update_mailchimp_datum("organization", mailchimp_datum, result)
       mailchimp_datum.reload
-      # Update tags
+      mailchimp_integration.update_member_tags(mailchimp_datum, "organization")
     end
     if mailchimp_datum.lists.include?("individual")
       result = mailchimp_integration.update_member(mailchimp_datum, "individual")
       update_mailchimp_datum("individual", mailchimp_datum, result)
-      # update tags
+      mailchimp_integration.update_member_tags(mailchimp_datum, "individual")
     end
     mailchimp_datum
   end
@@ -23,7 +23,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
 
   def update_mailchimp_datum(list, mailchimp_datum, data)
     updated_at = TimeParser.parse(data["last_changed"])
-    if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated
+    if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated_at
       mailchimp_datum.mailchimp_updated_at = updated_at
     end
     mailchimp_datum.data["lists"] += [list]

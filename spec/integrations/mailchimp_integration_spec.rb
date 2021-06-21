@@ -52,4 +52,22 @@ RSpec.describe MailchimpIntegration do
       end
     end
   end
+
+  describe "update_member_tags" do
+    let(:mailchimp_datum) { MailchimpDatum.new(data: {tags: %w[in-bike-index paid-previously]}, email: "seth@bikeindex.org") }
+    before do
+      MailchimpValue.create(kind: "tag", name: "Paid", mailchimp_id: "1881982", list: "organization")
+      MailchimpValue.create(kind: "tag", name: "Paid previously", mailchimp_id: "1889778", list: "organization")
+      MailchimpValue.create(kind: "tag", name: "In Bike Index", mailchimp_id: "87306", list: "organization")
+      MailchimpValue.create(kind: "tag", name: "In Bike Index", mailchimp_id: "1889682", list: "individual")
+    end
+    let(:target_tags_hash) { [{name: "In Bike Index", status: "active"}, {name: "Paid", status: "inactive"}, {name: "Paid previously", status: "active"}] }
+    it "updates with tags" do
+      MailchimpValue.create(kind: "tag", name: "Paid previously", mailchimp_id: "1881982", list: "organization")
+      expect(mailchimp_datum.mailchimp_tags("organization")).to match_array target_tags_hash
+      VCR.use_cassette("mailchimp_integration-update_member_tags", match_requests_on: [:path]) do
+        expect(instance.update_member_tags(mailchimp_datum, "organization")).to be_truthy # WTF mailchimp, send back the tags or something
+      end
+    end
+  end
 end

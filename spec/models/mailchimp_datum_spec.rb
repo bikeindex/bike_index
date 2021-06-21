@@ -289,4 +289,23 @@ RSpec.describe MailchimpDatum, type: :model do
       end
     end
   end
+
+  describe "mailchimp_organization_membership" do
+    let(:user) { FactoryBot.create(:organization_admin) }
+    let(:organization1) { user.organizations.first }
+    let(:membership2) { FactoryBot.create(:membership_claimed, user: user, role: "admin") }
+    let(:organization2) { membership2.organization }
+    let!(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
+    it "uses the existing organization" do
+      expect(mailchimp_datum).to be_valid
+      expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
+      mailchimp_datum.data["merge_fields"] = mailchimp_datum.merge_fields
+      mailchimp_datum.update(updated_at: Time.current)
+      expect(membership2).to be_valid
+      user.reload
+      id = mailchimp_datum.id
+      mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
+      expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
+    end
+  end
 end

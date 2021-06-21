@@ -40,9 +40,15 @@ class MailchimpDatum < ApplicationRecord
     end
   end
 
+  # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_membership
-    # TODO: base this on the existing organization in the datum
-    user&.memberships&.admin&.reorder(:created_at)&.last
+    return @mailchimp_organization_membership if defined?(@mailchimp_organization_membership)
+    memberships = user&.memberships&.admin&.reorder(:created_at)
+    return nil unless memberships.present? && memberships.any?
+    existing_name = data&.dig("merge_fields", "organization-name")
+    existing_org = Organization.friendly_find(existing_name) if existing_name.present?
+    @mailchimp_organization_membership = memberships.where(organization_id: existing_org.id).last if existing_org.present?
+    @mailchimp_organization_membership ||= memberships.last
   end
 
   def mailchimp_organization
@@ -115,6 +121,14 @@ class MailchimpDatum < ApplicationRecord
     self.data["merge_fields"] = merge_fields.merge(new_values).reject { |k, v| v.blank? }.to_h
   end
 
+  def mailchimp_tags(list)
+    m_tags = tags.dup.select { |v| v.present? }
+    MailchimpValue.tag.where(list: list).order(:name).map do |mailchimp_value|
+      present = m_tags.include?(mailchimp_value.slug)
+      {name: mailchimp_value.name, status: present ? "active" : "inactive"}
+    end
+  end
+
   def full_name
     user&.name
   end
@@ -167,7 +181,7 @@ class MailchimpDatum < ApplicationRecord
       tags: calculated_tags,
       interests: calculated_interests,
       merge_fields: data&.dig("merge_fields")
-    }
+    }.as_json
   end
 
   def merge_fields
@@ -186,7 +200,8 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def address_merge(list)
-    if list == "organization" && mailchimp_organization&.city.present?
+    if list == "organization"
+      return {} unless mailchimp_organization&.default_location.present? && mailchimp_organization&.city.present?
       {"O_CITY" => mailchimp_organization.city,
        "O_STATE" => mailchimp_organization.state.abbreviation,
        "O_COUNTRY" => mailchimp_organization.country.iso}

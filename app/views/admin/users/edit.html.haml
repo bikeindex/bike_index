@@ -233,12 +233,15 @@
             %td Feedbacks
             %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
           %tr
-            %td Mailchimp data updated at
+            %td mailchimp data updated at
             %td
-              %span.convertTime
-                = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
+              - if mailchimp_datum.mailchimp_updated_at.present?
+                %span.convertTime
+                  = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
     .col-md-6
-      = pretty_print_json(mailchimp_datum.data)
+      %a{href: "#mailchimpData", "aria-expanded" => "false", "data-toggle" => "collapse"}
+        Toggle data
+      .collapse.small#mailchimpData= pretty_print_json(mailchimp_datum.data)
 
 
 

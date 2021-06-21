@@ -17,7 +17,7 @@
           = link_to "No user", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}"
 
       %li.nav-item
-        %a.nav-link{ href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
+        %a.nav-link{href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
           Toggle data
       %li.nav-item
         = link_to "graph", admin_mailchimp_data_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
