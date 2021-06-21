@@ -22,13 +22,13 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       context "organization creator, create user" do
         let!(:invoice) { FactoryBot.create(:invoice_paid, organization: organization) }
         before do
-          MailchimpValue.create(kind: "interest", slug: "school", mailchimp_id: "c5bbab099c", list: "organization")
-          MailchimpValue.create(kind: "merge_field", slug: "name", mailchimp_id: "NAME", list: "organization")
-          MailchimpValue.create(kind: "merge_field", slug: "organization-name", mailchimp_id: "O_NAME", list: "organization")
-          MailchimpValue.create(kind: "merge_field", slug: "organization-signed-up-at", mailchimp_id: "O_AT", list: "organization")
-          MailchimpValue.create(kind: "tag", slug: "in-bike-index", mailchimp_id: "87306", list: "organization")
-          MailchimpValue.create(kind: "tag", slug: "paid", mailchimp_id: "1881982", list: "organization")
-          MailchimpValue.create(kind: "tag", slug: "not-organization-creator", mailchimp_id: "1882022", list: "organization")
+          MailchimpValue.create(kind: "interest", name: "school", mailchimp_id: "c5bbab099c", list: "organization")
+          MailchimpValue.create(kind: "merge_field", name: "name", mailchimp_id: "NAME", list: "organization")
+          MailchimpValue.create(kind: "merge_field", name: "organization-name", mailchimp_id: "O_NAME", list: "organization")
+          MailchimpValue.create(kind: "merge_field", name: "organization-signed-up-at", mailchimp_id: "O_AT", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "in-bike-index", mailchimp_id: "87306", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "paid", mailchimp_id: "1881982", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "not-organization-creator", mailchimp_id: "1882022", list: "organization")
         end
         let(:target_tags) { %w[paid in-bike-index] }
         it "updates mailchimp_datums" do
@@ -53,7 +53,6 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.lists).to eq(["organization"])
           expect(mailchimp_datum.interests).to eq(["school"])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
-          pp mailchimp_datum.merge_fields, mailchimp_datum.mailchimp_merge_fields("organization")
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
           expect(mailchimp_datum.tags).to match_array target_tags

@@ -174,7 +174,7 @@ class MailchimpDatum < ApplicationRecord
     {
       "organization-name" => mailchimp_organization&.name,
       "organization-signed-up-at" => mailchimp_date(mailchimp_organization&.created_at),
-      "bikes" => 0,
+      "bikes" => user&.bikes&.count || 0,
       "name" => full_name,
       "phone-number" => user&.phone,
       "signed-up-at" => mailchimp_date(user&.created_at),

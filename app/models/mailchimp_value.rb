@@ -45,9 +45,21 @@ class MailchimpValue < ApplicationRecord
     end
     self.name = calculated_name if calculated_name.present? # Mainly for specs
     self.slug = Slugifyer.slugify(name)
+    self.slug = special_interest_slug if interest? && organization?
   end
 
   private
+
+  # Make the slugs match organization kinds
+  def special_interest_slug
+    if slug == "school--university"
+      "school"
+    elsif slug == "law-enforcement--municipality"
+      "law_enforcement"
+    else
+      slug
+    end
+  end
 
   def calculated_name
     data&.dig("title") || data&.dig("name") || ""

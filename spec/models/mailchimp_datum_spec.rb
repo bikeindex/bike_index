@@ -266,7 +266,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[recovered-bike-owners], merge_fields: nil} }
         before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s) }
         let(:target_merge_fields_recovered) do
-          target_merge_fields.merge("most-recent-donation-at" => nil,
+          target_merge_fields.merge("most-recent-donation-at" => nil, "bikes" => 1,
                                     "number-of-donations" => 0, "recovered-bike-at" => recovery_time.to_date.to_s)
         end
         it "is recovered" do
@@ -277,7 +277,7 @@ RSpec.describe MailchimpDatum, type: :model do
         end
         context "both" do
           let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[donors recovered-bike-owners], merge_fields: nil} }
-          let(:target_merge_fields_both) { target_merge_fields.merge("recovered-bike-at" => recovery_time.to_date.to_s) }
+          let(:target_merge_fields_both) { target_merge_fields.merge("recovered-bike-at" => recovery_time.to_date.to_s, "bikes" => 1) }
           it "is both" do
             payment.reload
             expect(bike.reload.stolen_recovery?).to be_truthy
