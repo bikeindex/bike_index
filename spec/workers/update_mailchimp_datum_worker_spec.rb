@@ -26,9 +26,9 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "merge_field", name: "name", mailchimp_id: "NAME", list: "organization")
           MailchimpValue.create(kind: "merge_field", name: "organization-name", mailchimp_id: "O_NAME", list: "organization")
           MailchimpValue.create(kind: "merge_field", name: "organization-signed-up-at", mailchimp_id: "O_AT", list: "organization")
-          MailchimpValue.create(kind: "tag", name: "in-bike-index", mailchimp_id: "87306", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "In Bike Index", mailchimp_id: "87306", list: "organization")
           MailchimpValue.create(kind: "tag", name: "paid", mailchimp_id: "1881982", list: "organization")
-          MailchimpValue.create(kind: "tag", name: "not-org-creator", mailchimp_id: "1882022", list: "organization")
+          MailchimpValue.create(kind: "tag", name: "Not org creator", mailchimp_id: "1882022", list: "organization")
         end
         let(:target_tags) { %w[paid in-bike-index] }
         it "updates mailchimp_datums" do
