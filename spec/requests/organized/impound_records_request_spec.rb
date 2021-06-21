@@ -354,6 +354,9 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           let!(:impound_record_update_approved) { impound_record.impound_record_updates.create(user: current_user, kind: "claim_approved", impound_claim: impound_claim) }
           it "marks retrieved by owner" do
             expect(impound_record_update_approved).to be_valid
+            UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+            stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+            expect(MailchimpDatum.count).to eq 0
             impound_claim.reload
             expect(impound_claim.impound_record_updates.pluck(:id)).to eq([impound_record_update_approved.id])
             expect(impound_claim.status).to eq "approved"
@@ -384,6 +387,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
             bike.reload
             expect(bike.creator_unregistered_parking_notification?).to be_truthy
             expect(bike.deleted?).to be_truthy
+
+            expect(MailchimpDatum.count).to eq 1
           end
         end
       end
