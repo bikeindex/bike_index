@@ -24,7 +24,7 @@ class Payment < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_create :send_invoice_email
-  after_commit :update_invoice
+  after_commit :update_associations
 
   def self.payment_methods
     PAYMENT_METHOD_ENUM.keys.map(&:to_s)
@@ -71,7 +71,8 @@ class Payment < ApplicationRecord
     errors.add(:email, :requires_email_or_org)
   end
 
-  def update_invoice
+  def update_associations
+    user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
     return true unless invoice.present?
     invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
   end

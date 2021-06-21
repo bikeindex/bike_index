@@ -58,4 +58,26 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization.search_coordinates_set?).to be_truthy
     end
   end
+
+  context "bump user" do
+    let(:user) { FactoryBot.create(:organization_admin) }
+    let!(:organization) { user.organizations.first }
+    let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
+    it "creates the mailchimp_datum" do
+      expect(organization.reload.admins.pluck(:id)).to eq([user.id])
+      mailchimp_datum.update(updated_at: Time.current - 1.hour)
+      user.reload
+      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+      expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        organization.update(updated_at: Time.current)
+      end
+      user.reload
+      expect(user.mailchimp_datum).to be_present
+      expect(user.mailchimp_datum.lists).to eq(["organization"])
+      expect(user.mailchimp_datum.updated_at).to be > Time.current - 1.minute
+    end
+  end
 end

@@ -38,6 +38,9 @@ class Organization < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
 
+  has_many :admin_memberships, -> { admin }, class_name: "Membership"
+  has_many :admins, through: :admin_memberships, source: :user
+
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
 

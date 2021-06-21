@@ -40,6 +40,13 @@ class MailchimpDatum < ApplicationRecord
     end
   end
 
+  def self.find_and_update_or_create_for(obj)
+    mailchimp_datum = find_or_create_for(obj)
+    return mailchimp_datum unless mailchimp_datum.valid? && mailchimp_datum.updated_at < Time.current - 1.minute
+    mailchimp_datum.update(updated_at: Time.current)
+    mailchimp_datum
+  end
+
   # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_membership
     return @mailchimp_organization_membership if defined?(@mailchimp_organization_membership)
@@ -86,6 +93,7 @@ class MailchimpDatum < ApplicationRecord
     data&.dig("interests") || []
   end
 
+  # I'm not gonna lie - these methods (mailchimp_...) kinda suck. Sorry
   def mailchimp_interests(list)
     m_interests = interests.dup
     m_interests.map do |i|

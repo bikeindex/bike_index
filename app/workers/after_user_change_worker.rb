@@ -9,6 +9,9 @@ class AfterUserChangeWorker < ApplicationWorker
 
     associate_feedbacks(user)
 
+    # Create a new mailchimp datum if it's deserved
+    MailchimpDatum.find_and_update_or_create_for(user)
+
     current_alerts = user_general_alerts(user)
     unless user.general_alerts == current_alerts
       user.update_attributes(general_alerts: current_alerts, skip_update: true)

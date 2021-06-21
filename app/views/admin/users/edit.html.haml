@@ -206,7 +206,7 @@
             .less-strong-hold
               %span.less-strong-right.medium-screens
                 = user_email.id
-              %span.convertTime.preciseTime
+              %span.convertTime
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
@@ -227,8 +227,8 @@
       %table.table-list
         %tbody
           - if display_dev_info?
-            %tr
-              %td.small.only-dev-visible ID
+            %tr.only-dev-visible
+              %td.small ID
               %td.small= mailchimp_datum.id
           %tr
             %td Lists
@@ -237,7 +237,7 @@
             %td Feedbacks
             %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
           %tr
-            %td mailchimp data updated at
+            %td mailchimp updated
             %td
               - if mailchimp_datum.mailchimp_updated_at.present?
                 %span.convertTime
