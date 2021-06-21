@@ -37,7 +37,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
           tags: ["2020", "in-bike-index"],
           interests: [],
           lists: %w[individual organization],
-          mailchimp_interests: { individual: ["938bcefe9e"] },
+          mailchimp_interests: {individual: ["938bcefe9e"]},
           mailchimp_merge_fields: {"NAME" => "Seth Herr"}
         }
       end

@@ -49,6 +49,11 @@ class MailchimpDatum < ApplicationRecord
     mailchimp_organization_membership&.organization
   end
 
+  def stolen_records_recovered
+    return StolenRecord.none if user.blank?
+    StolenRecord.recovered.where(bike_id: user.ownerships.pluck(:bike_id))
+  end
+
   def with_user?
     user.present?
   end
@@ -168,28 +173,42 @@ class MailchimpDatum < ApplicationRecord
   def merge_fields
     {
       "organization-name" => mailchimp_organization&.name,
-      "organization-sign-up" => mailchimp_organization&.created_at,
+      "organization-signed-up-at" => mailchimp_date(mailchimp_organization&.created_at),
       "bikes" => 0,
       "name" => full_name,
       "phone-number" => user&.phone,
-      "user-signed-up-at" => user&.created_at,
+      "signed-up-at" => mailchimp_date(user&.created_at),
       "added-to-mailchimp-at" => nil,
-      "most-recent-donation-at" => nil,
-      "number-of-donations" => 0
+      "most-recent-donation-at" => most_recent_donation_at,
+      "number-of-donations" => user&.payments&.donation&.count || 0,
+      "recovered-bike-at" => most_recent_recovery_at
     }
   end
 
   def address_merge(list)
     if list == "organization" && mailchimp_organization&.city.present?
-      { "O_CITY" => mailchimp_organization.city,
-        "O_STATE" => mailchimp_organization.state.abbreviation,
-        "O_COUNTRY" => mailchimp_organization.country.iso }
+      {"O_CITY" => mailchimp_organization.city,
+       "O_STATE" => mailchimp_organization.state.abbreviation,
+       "O_COUNTRY" => mailchimp_organization.country.iso}
     else
       {} # For now, not handling
     end
   end
 
   private
+
+  def mailchimp_date(datetime = nil)
+    datetime&.to_date&.to_s
+  end
+
+  def most_recent_donation_at
+    return nil unless user.present?
+    mailchimp_date(user.payments.donation.maximum(:created_at))
+  end
+
+  def most_recent_recovery_at
+    mailchimp_date(stolen_records_recovered.maximum(:recovered_at))
+  end
 
   def calculated_tags
     updated_tags = tags.dup
@@ -231,6 +250,10 @@ class MailchimpDatum < ApplicationRecord
     elsif mailchimp_organization_membership.present?
       c_list << "organization"
     end
+    if user&.present?
+      c_list << "individual" if user.payments.donation.any?
+      c_list << "individual" if stolen_records_recovered.any?
+    end
     c_list.uniq.sort
   end
 
@@ -242,6 +265,8 @@ class MailchimpDatum < ApplicationRecord
       updated_interests += calculated_feedbacks.select { |f| f.lead? }
         .map { |f| f.kind.gsub(/lead_for_/, "") }
     end
+    updated_interests << "donors" if user&.payments&.donation&.any?
+    updated_interests << "recovered-bike-owners" if stolen_records_recovered.any?
     updated_interests.uniq.sort
   end
 end

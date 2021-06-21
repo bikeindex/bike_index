@@ -20,7 +20,7 @@ RSpec.describe Admin::MailchimpValuesController, type: :request do
       post base_url
       expect(response).to redirect_to admin_mailchimp_values_path
       expect(flash[:success]).to be_present
-      expect(UpdateMailchimpValuesWorker.jobs.count).to eq 8
+      expect(UpdateMailchimpValuesWorker.jobs.count).to eq 1
     end
   end
 end

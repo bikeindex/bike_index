@@ -3,7 +3,8 @@
 class UpdateMailchimpValuesWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: 5
 
-  def perform(list, kind)
+  def perform(list = nil, kind = nil)
+    return enqueue_all if list.blank?
     if kind == "interest_category"
       update_interest_categories(list)
     elsif kind == "interest"
@@ -14,6 +15,14 @@ class UpdateMailchimpValuesWorker < ApplicationWorker
       update_merge_fields(list)
     else
       fail "Unknown kind: #{kind}"
+    end
+  end
+
+  def enqueue_all
+    MailchimpValue.lists.each do |list|
+      MailchimpValue.kinds.each do |kind|
+        UpdateMailchimpValuesWorker.perform_async(list, kind)
+      end
     end
   end
 

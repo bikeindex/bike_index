@@ -71,10 +71,6 @@ class MailchimpIntegration
     }
   end
 
-  def merge_fields_for(mailchimp_datum, list)
-
-  end
-
   def client
     @client ||= MailchimpMarketing::Client.new(
       api_key: API_KEY,

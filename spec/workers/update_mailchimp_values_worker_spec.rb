@@ -3,6 +3,13 @@ require "rails_helper"
 RSpec.describe UpdateMailchimpValuesWorker, type: :job do
   let(:instance) { described_class.new }
 
+  it "enqueues all" do
+    Sidekiq::Worker.clear_all
+    expect(UpdateMailchimpValuesWorker.jobs.count).to eq 0
+    instance.perform
+    expect(UpdateMailchimpValuesWorker.jobs.count).to eq 8
+  end
+
   let(:target_interest_categories_data) { {list_id: "b675299293", id: "2e650f9110", title: "Organization type", display_order: 0, type: "checkboxes"} }
   context "interest_category" do
     it "gets and creates the values" do
