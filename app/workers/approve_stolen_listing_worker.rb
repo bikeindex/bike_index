@@ -1,5 +1,5 @@
 class ApproveStolenListingWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 1
 
   def perform(bike_id)
     bike = Bike.find(bike_id)
