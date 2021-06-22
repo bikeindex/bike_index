@@ -19,6 +19,10 @@ class FetchMailchimpMembersWorker < ApplicationWorker
   def find_or_create_datum(list, data)
     email = EmailNormalizer.normalize(data["email_address"])
     mailchimp_datum = MailchimpDatum.find_by_email(email)
+    if mailchimp_datum.blank?
+      user_id = User.fuzzy_email_find(email)&.id
+      mailchimp_datum = MailchimpDatum.find_by_user_id(user_id)
+    end
     mailchimp_datum ||= MailchimpDatum.new(email: email)
     mailchimp_datum.mailchimp_updated_at = TimeParser.parse(data["last_changed"])
     mailchimp_datum.set_calculated_attributes

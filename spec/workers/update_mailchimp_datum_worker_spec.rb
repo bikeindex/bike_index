@@ -103,7 +103,6 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
           expect(mailchimp_datum.tags).to eq(["in-bike-index", "not-org-creator", "weird other tag"])
-
           VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:path]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end
@@ -123,6 +122,13 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
 
           expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
           expect(MailchimpDatum.list("individual").pluck(:id)).to eq([mailchimp_datum.id])
+          # Make sure we aren't needlessly churning
+          original_data = mailchimp_datum.data
+          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:path]) do
+            instance.perform(mailchimp_datum.id, true) # Force update
+          end
+          mailchimp_datum.reload
+          expect(mailchimp_datum.data).to eq original_data
         end
       end
     end
