@@ -1,5 +1,5 @@
 class UpdateMailchimpDatumWorker < ApplicationWorker
-  sidekiq_options queue: "low_priority", retry: 5
+  sidekiq_options queue: "low_priority", retry: 2
 
   UPDATE_MAILCHIMP = !ENV["SKIP_UPDATE_MAILCHIMP"].present? # Emergency brake to stop updating
 
@@ -7,6 +7,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     return false unless UPDATE_MAILCHIMP
     mailchimp_datum = MailchimpDatum.find(id)
     return mailchimp_datum unless mailchimp_datum.should_update? || force_update
+    mailchimp_datum.skip_update = true
     if mailchimp_datum.lists.include?("organization")
       result = mailchimp_integration.update_member(mailchimp_datum, "organization")
       update_mailchimp_datum("organization", mailchimp_datum, result)

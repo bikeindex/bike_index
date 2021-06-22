@@ -19,7 +19,7 @@ class MailchimpDatum < ApplicationRecord
 
   enum status: STATUS_ENUM
 
-  attr_accessor :creator_feedback
+  attr_accessor :creator_feedback, :skip_update
 
   scope :no_user, -> { where(user_id: nil) }
   scope :with_user, -> { where.not(user_id: nil).where(user_deleted_at: nil) }
@@ -190,6 +190,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def update_association_and_mailchimp
+    return true if skip_update
     calculated_feedbacks.each do |f|
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)

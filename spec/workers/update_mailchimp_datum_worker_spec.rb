@@ -47,7 +47,9 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.tags).to match_array target_tags
 
           VCR.use_cassette("update_mailchimp_datum_worker-organization-create", match_requests_on: [:path]) do
+            Sidekiq::Worker.clear_all
             instance.perform(mailchimp_datum.id)
+            expect(described_class.jobs.count).to eq 0
           end
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy

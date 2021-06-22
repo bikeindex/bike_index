@@ -1,5 +1,5 @@
 class FetchMailchimpMembersWorker < ApplicationWorker
-  sidekiq_options queue: "low_priority", retry: 5
+  sidekiq_options queue: "low_priority", retry: 2
 
   def perform(list, page, count = 100, enqueue_all_pages = false)
     mailchimp_integration.get_members(list, page: page, count: count).each do |data|
