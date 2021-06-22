@@ -8,17 +8,8 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     mailchimp_datum = MailchimpDatum.find(id)
     return mailchimp_datum unless mailchimp_datum.should_update? || force_update
     mailchimp_datum.skip_update = true
-    if mailchimp_datum.lists.include?("organization")
-      result = mailchimp_integration.update_member(mailchimp_datum, "organization")
-      update_mailchimp_datum("organization", mailchimp_datum, result)
-      mailchimp_datum.reload
-      mailchimp_integration.update_member_tags(mailchimp_datum, "organization")
-    end
-    if mailchimp_datum.lists.include?("individual")
-      result = mailchimp_integration.update_member(mailchimp_datum, "individual")
-      update_mailchimp_datum("individual", mailchimp_datum, result)
-      mailchimp_integration.update_member_tags(mailchimp_datum, "individual")
-    end
+    update_for_list(mailchimp_datum, "organization")
+    update_for_list(mailchimp_datum, "individual")
     mailchimp_datum
   end
 
@@ -26,12 +17,23 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     @mailchimp_integration ||= MailchimpIntegration.new
   end
 
-  def update_mailchimp_datum(list, mailchimp_datum, data)
+  def update_for_list(mailchimp_datum, list)
+    return false unless mailchimp_datum.lists.include?("organization")
+    result = mailchimp_integration.update_member(mailchimp_datum, list)
+    update_mailchimp_datum(mailchimp_datum, list, result)
+    mailchimp_datum.reload
+    if mailchimp_datum.mailchimp_tags(list).any?
+      mailchimp_integration.update_member_tags(mailchimp_datum, list)
+    end
+  end
+
+  def update_mailchimp_datum(mailchimp_datum, list, data)
     updated_at = TimeParser.parse(data["last_changed"])
     if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated_at
       mailchimp_datum.mailchimp_updated_at = updated_at
     end
     mailchimp_datum.data["lists"] += [list]
+    pp data["tags"]
     mailchimp_datum.add_mailchimp_tags(list, data["tags"])
     mailchimp_datum.add_mailchimp_interests(list, data["interests"])
     mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])

@@ -202,7 +202,7 @@ RSpec.describe MailchimpDatum, type: :model do
           organization.update(website: "test.com")
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index lightspeed pos-approved]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index pos-approved]).as_json
           expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
         end
       end
@@ -213,7 +213,7 @@ RSpec.describe MailchimpDatum, type: :model do
           organization.update(pos_kind: "ascend_pos")
           expect(organization.reload.paid?).to be_falsey
           expect(organization.invoices.count).to eq 1
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[ascend in-bike-index pos-approved]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index pos-approved]).as_json
         end
       end
       context "not creator of organization" do
@@ -324,6 +324,63 @@ RSpec.describe MailchimpDatum, type: :model do
       id = mailchimp_datum.id
       mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
       expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
+    end
+  end
+
+  describe "add_mailchimp_interests" do
+    it "adds interests" do
+    end
+  end
+
+  describe "add_mailchimp_tags" do
+    let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
+    let(:data) { {} }
+    let(:tags) { [{id: 1892850, name: "Weird new tag"},{id: 1889682, name: "In Bike Index"}] }
+    it "adds new tags it doesn't know" do
+      mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
+      expect(mailchimp_datum.tags).to eq(["In Bike Index", "Weird new tag"])
+      expect(mailchimp_datum.data).to eq({"tags" => ["In Bike Index", "Weird new tag"]})
+      expect(mailchimp_datum.mailchimp_tags("individual")).to eq([])
+    end
+    context "tags are in the system" do
+      before do
+        MailchimpValue.create!(kind: "tag", name: "In Bike Index", mailchimp_id: "1889682", list: "individual")
+        MailchimpValue.create!(kind: "tag", name: "Weird new tag", mailchimp_id: "1892850", list: "individual")
+        MailchimpValue.create!(kind: "tag", name: "2020", mailchimp_id: "87330", list: "individual")
+        MailchimpValue.create!(kind: "tag", name: "POS Approved", mailchimp_id: "87318", list: "organization")
+      end
+      it "adds the tags" do
+        mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
+        expect(mailchimp_datum.tags).to eq(["in-bike-index", "weird-new-tag"])
+        expect(mailchimp_datum.data).to eq({"tags" => ["in-bike-index", "weird-new-tag"]})
+        expect(mailchimp_datum.mailchimp_tags("individual")).to eq([{name: "In Bike Index", status: "active"}])
+      end
+      context "non-managed tags" do
+        let(:tags) { [{id: 1892850, name: "Weird new tag"}, {id: 87330, name: "2020"}] }
+        it "doesn't update anything" do
+          mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
+          expect(mailchimp_datum.tags).to eq(["2020", "weird-new-tag"])
+          expect(mailchimp_datum.data).to eq({"tags" => ["2020", "weird-new-tag"]})
+          expect(mailchimp_datum.mailchimp_tags("individual")).to eq([{name: "In Bike Index", status: "inactive"}])
+        end
+      end
+      context "existing tags" do
+        let(:data) { {tags: ["2020", "AND THIS TOO"]} }
+        it "removes existing tags" do
+          mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
+          expect(mailchimp_datum.tags).to eq(["AND THIS TOO", "in-bike-index", "weird-new-tag"])
+          expect(mailchimp_datum.mailchimp_tags("individual")).to eq([{name: "In Bike Index", status: "active"}])
+        end
+      end
+      context "existing organization tags" do
+        let(:data) { {tags: ["2020", "POS Approved", "in Bike Index"]} }
+        let(:tags) { [{id: 1892850898888, name: "A different taggg"},{id: 1889682, name: "In Bike Index"}] }
+        it "doesn't remove them" do
+          mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
+          expect(mailchimp_datum.tags).to eq(["A different taggg", "POS Approved", "in-bike-index"])
+          expect(mailchimp_datum.mailchimp_tags("individual")).to eq([{name: "In Bike Index", status: "active"}])
+        end
+      end
     end
   end
 end

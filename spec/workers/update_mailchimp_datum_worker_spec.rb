@@ -46,15 +46,15 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
           expect(mailchimp_datum.tags).to match_array target_tags
 
-          VCR.use_cassette("update_mailchimp_datum_worker-organization-create", match_requests_on: [:path]) do
+          VCR.use_cassette("update_mailchimp_datum_worker-organization-create", match_requests_on: [:method]) do
             Sidekiq::Worker.clear_all
             instance.perform(mailchimp_datum.id)
             expect(described_class.jobs.count).to eq 0
           end
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
-          expect(mailchimp_datum.lists).to eq(["organization"])
-          expect(mailchimp_datum.interests).to eq(["school"])
+          expect(mailchimp_datum.lists).to eq(%w[individual organization])
+          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e d14183c940 school])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
@@ -67,6 +67,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "merge_field", slug: "organization-state", mailchimp_id: "STATE", list: "organization")
           MailchimpValue.create(kind: "merge_field", slug: "organization-country", mailchimp_id: "COUNTRY", list: "organization")
           MailchimpValue.create(kind: "tag", slug: "Not org creator", mailchimp_id: "1882022", list: "organization")
+          MailchimpValue.create(kind: "tag", slug: "Weird new tag", mailchimp_id: "1892850", list: "individual")
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
@@ -78,7 +79,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
            "BIKES" => 9,
            "PHONE" => "xxxxxxx",
            "bikes" => 0,
-           "RECOVE_AT" => "2020-08-25",
+           "RECOVE_AT" => "2015-08-05",
            "SIGN_UP_AT" => "2013-07-14",
            "signed-up-at" => "2021-06-22",
            "organization-name" => "Hogwarts",

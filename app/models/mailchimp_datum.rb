@@ -7,6 +7,8 @@ class MailchimpDatum < ApplicationRecord
     cleaned: 4
   }
 
+  MANAGED_TAGS = %w[in-bike-index not-org-creator paid paid-previously pos-approved].freeze
+
   belongs_to :user
   has_many :feedbacks
 
@@ -140,25 +142,25 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def mailchimp_tags(list)
-    m_tags = tags.dup.select { |v| v.present? }
+    tag_slugs = tags.dup.map { |t| MailchimpValue.tag.friendly_find(t, list: list)&.slug }.compact
     MailchimpValue.tag.where(list: list).order(:name).map do |mailchimp_value|
-      present = m_tags.include?(mailchimp_value.slug)
+      next unless MANAGED_TAGS.include?(mailchimp_value.slug)
+      present = tag_slugs.include?(mailchimp_value.slug)
       {name: mailchimp_value.name, status: present ? "active" : "inactive"}
-    end
+    end.compact
   end
 
   def add_mailchimp_tags(list, val)
-    new_tags = tags.dup
-    val.each do |hash|
-      if status == "active"
-        new_tags << MailchimpValue.interest.friendly_find(hash["name"], list: list)&.slug || hash["name"]
-      else
-        slug = Slugifyer.slugify(hash["name"])
-        new_tags.reject! { |t| t == slug }
-      end
+    kept_tags = tags.dup.map do |t|
+      MailchimpValue.tag.friendly_find(t, list: list)&.present? ? nil : t
+    end.compact
+    new_tags = val.map do |hash|
+      # TODO: Remove this if it never throws. I think we don't need it, but verifying
+      raise "STATUS PRESENT!" if hash.key?(hash["status"])
+      MailchimpValue.tag.friendly_find(hash["name"], list: list)&.slug || hash["name"]
     end
     self.data ||= {}
-    self.data["tags"] = new_tags.compact.uniq.sort
+    self.data["tags"] = (new_tags + kept_tags).sort
   end
 
   def full_name
@@ -259,6 +261,8 @@ class MailchimpDatum < ApplicationRecord
     mailchimp_date(stolen_records_recovered.maximum(:recovered_at))
   end
 
+  # NOTE: If adding more tags, make sure to add the tags to MANAGED_TAGS
+  # or else it won't update mailchimp
   def calculated_tags
     updated_tags = tags.dup
     updated_tags << "in-bike-index" if user.present?
@@ -267,7 +271,6 @@ class MailchimpDatum < ApplicationRecord
         updated_tags << "not-org-creator"
       end
       if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
-        updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")
         updated_tags << "pos-approved"
       end
       if mailchimp_organization.paid?
