@@ -116,7 +116,7 @@ RSpec.describe MailchimpDatum, type: :model do
       end
       context "lead_for_school" do
         let!(:feedback) { FactoryBot.create(:feedback, kind: "lead_for_school") }
-        let(:target) { empty_data.merge(lists: ["organization"],interests: ["school"]) }
+        let(:target) { empty_data.merge(lists: ["organization"], interests: ["school"]) }
         it "creates" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
           mailchimp_datum = MailchimpDatum.find_or_create_for(feedback)
@@ -321,12 +321,10 @@ RSpec.describe MailchimpDatum, type: :model do
     end
   end
 
-
-
   describe "add_mailchimp_interests" do
     let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
     let(:data) { {} }
-    let(:interests) { {"938bcefe9e"=>true, "d14183c940"=>false} }
+    let(:interests) { {"938bcefe9e" => true, "d14183c940" => false} }
     it "adds interests" do
       mailchimp_datum.add_mailchimp_interests("individual", interests.as_json)
       expect(mailchimp_datum.interests).to eq(["938bcefe9e"])
@@ -369,7 +367,7 @@ RSpec.describe MailchimpDatum, type: :model do
   describe "add_mailchimp_merge_fields" do
     let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
     let(:data) { {} }
-    let(:merge_fields) { {"NAME"=>"Party Pooper", "SIGN_UP_AT"=>"2021-05-14", "BIKES"=>2} }
+    let(:merge_fields) { {"NAME" => "Party Pooper", "SIGN_UP_AT" => "2021-05-14", "BIKES" => 2} }
     it "adds merge_fields" do
       mailchimp_datum.add_mailchimp_merge_fields("individual", merge_fields.as_json)
       expect(mailchimp_datum.merge_fields).to eq merge_fields
@@ -384,7 +382,7 @@ RSpec.describe MailchimpDatum, type: :model do
         MailchimpValue.create!(kind: "merge_field", name: "Signed up at", mailchimp_id: "SIGN_UP_AT", list: "organization")
         MailchimpValue.create!(kind: "merge_field", name: "Organization name", mailchimp_id: "O_NAME", list: "organization")
       end
-      let(:stored_merge_fields) { {"name" => "Party Pooper", "signed-up-at" => "2021-05-14", "bikes" => 2}}
+      let(:stored_merge_fields) { {"name" => "Party Pooper", "signed-up-at" => "2021-05-14", "bikes" => 2} }
       it "adds the merge_fields" do
         mailchimp_datum.add_mailchimp_merge_fields("individual", merge_fields.as_json)
         expect(mailchimp_datum.merge_fields).to eq stored_merge_fields
@@ -396,7 +394,7 @@ RSpec.describe MailchimpDatum, type: :model do
   describe "add_mailchimp_tags" do
     let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
     let(:data) { {} }
-    let(:tags) { [{id: 1892850, name: "Weird new tag"},{id: 1889682, name: "In Bike Index"}] }
+    let(:tags) { [{id: 1892850, name: "Weird new tag"}, {id: 1889682, name: "In Bike Index"}] }
     it "adds new tags it doesn't know" do
       mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
       expect(mailchimp_datum.tags).to eq(["In Bike Index", "Weird new tag"])
@@ -435,7 +433,7 @@ RSpec.describe MailchimpDatum, type: :model do
       end
       context "existing organization tags" do
         let(:data) { {tags: ["2020", "POS Approved", "in Bike Index"]} }
-        let(:tags) { [{id: 1892850898888, name: "A different taggg"},{id: 1889682, name: "In Bike Index"}] }
+        let(:tags) { [{id: 1892850898888, name: "A different taggg"}, {id: 1889682, name: "In Bike Index"}] }
         it "doesn't remove them" do
           mailchimp_datum.add_mailchimp_tags("individual", tags.as_json)
           expect(mailchimp_datum.tags).to eq(["A different taggg", "POS Approved", "in-bike-index"])

@@ -30,7 +30,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "tag", name: "paid", mailchimp_id: "1881982", list: "organization")
           MailchimpValue.create(kind: "tag", name: "Not org creator", mailchimp_id: "1882022", list: "organization")
         end
-        let(:target_tags) { %w[paid in-bike-index] }
+        let(:target_tags) { ["in-bike-index", "paid"] }
         it "updates mailchimp_datums" do
           expect(membership.organization_creator?).to be_truthy
           organization.update(updated_at: Time.current)
@@ -54,11 +54,11 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e d14183c940 school])
+          expect(mailchimp_datum.interests).to eq(%w[school])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
-          expect(mailchimp_datum.tags).to match_array target_tags
+          expect(mailchimp_datum.tags).to match_array(["In Bike Index", "in-bike-index", "not-org-creator", "paid"])
         end
       end
       context "not creator, update user" do
@@ -71,7 +71,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
-        let(:target_tags) { ["in-bike-index", "not-org-creator", "weird other tag"] }
+        let(:target_tags) { ["In Bike Index", "in-bike-index", "Not org creator", "not-org-creator", "Paid", "Weird new tag", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }
         let(:target_merge_fields) do
           {"NAME" => "Seth Herr",
@@ -104,19 +104,15 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
           expect(mailchimp_datum.tags).to eq(["in-bike-index", "not-org-creator", "weird other tag"])
-          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:path]) do
+          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e c5bbab099c d14183c940 donors school])
+          expect(mailchimp_datum.interests).to eq(%w[donors school])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
           expect(mailchimp_datum.should_update?).to be_falsey
-          # Even though they aren't included in mailchimp_merge_fields because they aren't mailchimp values, the data is stored
-          # THIS IS IMPORTANT. It makes sure we don't lose new information
-          unstored_fields = mailchimp_datum.data["merge_fields"].slice(*target_merge_fields.keys)
-          expect(unstored_fields).to eq target_merge_fields
           target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
           expect(mailchimp_datum.tags).to match_array target_tags
@@ -125,7 +121,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpDatum.list("individual").pluck(:id)).to eq([mailchimp_datum.id])
           # Make sure we aren't needlessly churning
           original_data = mailchimp_datum.data
-          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:path]) do
+          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end
           mailchimp_datum.reload

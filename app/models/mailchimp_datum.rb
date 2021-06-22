@@ -225,8 +225,7 @@ class MailchimpDatum < ApplicationRecord
       lists: calculated_lists,
       tags: calculated_tags,
       interests: calculated_interests,
-      merge_fields: managed_merge_fields.reject { |k, v| v.blank? }
-      # merge_fields: managed_merge_fields.map { |k, v| v.blank? ? nil : [k, v] }.compact.to_h
+      merge_fields: managed_merge_fields.reject { |_k, v| v.blank? }
     }.as_json
   end
 
