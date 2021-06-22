@@ -101,6 +101,7 @@ RSpec.describe MailchimpDatum, type: :model do
           # Thow this test in here too
           expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
           expect(MailchimpDatum.list("individual").pluck(:id)).to eq([])
+          expect(MailchimpDatum.list("stuff").pluck(:id)).to eq([])
         end
       end
     end

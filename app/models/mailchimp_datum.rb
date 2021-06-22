@@ -48,7 +48,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def self.list(str)
-    # where(data list str)
+    where("data->'lists' @> ?", [str].to_json)
   end
 
   # This finds the organization from the existing merge field, or uses the most recent organization
@@ -72,7 +72,8 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def should_update?
-    return false if mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
+    return false if id.blank? ||
+      mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
     true
   end
 

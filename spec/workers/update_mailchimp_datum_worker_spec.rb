@@ -71,18 +71,18 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         let(:target_tags) { ["in-bike-index", "not-org-creator", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }
         let(:target_merge_fields) do
-          {"NAME"=>"Seth Herr",
-           "name"=>"Seth Herr",
-           "BIKES"=>9,
-           "PHONE"=>"xxxxxxx",
-           "bikes"=>0,
-           "RECOVE_AT"=>"2020-08-25",
-           "SIGN_UP_AT"=>"2013-07-14",
-           "signed-up-at"=>"2021-06-22",
-           "organization-name"=>"Hogwarts",
-           "number-of-donations"=>1,
-           "most-recent-donation-at"=>"2021-06-22",
-           "organization-signed-up-at"=>"2019-03-08"}
+          {"NAME" => "Seth Herr",
+           "name" => "Seth Herr",
+           "BIKES" => 9,
+           "PHONE" => "xxxxxxx",
+           "bikes" => 0,
+           "RECOVE_AT" => "2020-08-25",
+           "SIGN_UP_AT" => "2013-07-14",
+           "signed-up-at" => "2021-06-22",
+           "organization-name" => "Hogwarts",
+           "number-of-donations" => 1,
+           "most-recent-donation-at" => "2021-06-22",
+           "organization-signed-up-at" => "2019-03-08"}
         end
         it "updates mailchimp_datums" do
           FactoryBot.create(:membership_claimed, organization: organization)
@@ -119,8 +119,8 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
           expect(mailchimp_datum.tags).to match_array target_tags
 
-          expect(MailchimpDatum.list("organization").pluck(:id)).to eq(mailchimp_datum.id)
-          expect(MailchimpDatum.list("individual").pluck(:id)).to eq(mailchimp_datum.id)
+          expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
+          expect(MailchimpDatum.list("individual").pluck(:id)).to eq([mailchimp_datum.id])
         end
       end
     end
