@@ -88,7 +88,8 @@
         %td
           = mailchimp_datum.lists.join(", ")
         %td
-          %span.convertTime
-            = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
+          - if mailchimp_datum.mailchimp_updated_at.present?
+            %span.convertTime
+              = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
         %td.collapse.data-cell.data-cell-collapsed.small
           = pretty_print_json(mailchimp_datum.data)
