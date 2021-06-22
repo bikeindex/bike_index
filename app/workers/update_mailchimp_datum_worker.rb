@@ -3,9 +3,12 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
 
   UPDATE_MAILCHIMP = !ENV["SKIP_UPDATE_MAILCHIMP"].present? # Emergency brake to stop updating
 
-  def perform(id)
+  def perform(id, reupdate_recent = false)
     return false unless UPDATE_MAILCHIMP
     mailchimp_datum = MailchimpDatum.find(id)
+    if mailchimp_datum.mailchimp_updated_at.present? && mailchimp_datum.mailchimp_updated_at > Time.current - 1.minute
+      return mailchimp_datum unless reupdate_recent
+    end
     if mailchimp_datum.lists.include?("organization")
       result = mailchimp_integration.update_member(mailchimp_datum, "organization")
       update_mailchimp_datum("organization", mailchimp_datum, result)

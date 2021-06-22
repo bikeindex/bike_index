@@ -42,9 +42,13 @@ class MailchimpDatum < ApplicationRecord
 
   def self.find_and_update_or_create_for(obj)
     mailchimp_datum = find_or_create_for(obj)
-    return mailchimp_datum unless mailchimp_datum.valid? && mailchimp_datum.updated_at < Time.current - 1.minute
+    return mailchimp_datum unless mailchimp_datum.should_update?
     mailchimp_datum.update(updated_at: Time.current)
     mailchimp_datum
+  end
+
+  def self.list(str)
+    # where(data list str)
   end
 
   # This finds the organization from the existing merge field, or uses the most recent organization
@@ -65,6 +69,11 @@ class MailchimpDatum < ApplicationRecord
   def stolen_records_recovered
     return StolenRecord.none if user.blank?
     StolenRecord.recovered.where(bike_id: user.ownerships.pluck(:bike_id))
+  end
+
+  def should_update?
+    return false if mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
+    true
   end
 
   def with_user?

@@ -18,7 +18,7 @@ class Admin::MailchimpValuesController < Admin::BaseController
   end
 
   def matching_mailchimp_values
-    if %w[organization individual].include?(params[:search_list])
+    if MailchimpValue.lists.include?(params[:search_list])
       @list = params[:search_list]
       MailchimpValue.where(list: @list)
     else

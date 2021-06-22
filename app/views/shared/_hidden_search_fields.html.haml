@@ -1,4 +1,5 @@
 - kind ||= "admin"
+- skip_organization ||= false
 
 -# Sortable
 = hidden_field_tag :sort, sort_column
@@ -8,7 +9,9 @@
 = hidden_field_tag :period, params[:period]
 = hidden_field_tag :end_time, params[:end_time]
 = hidden_field_tag :start_time, params[:start_time]
-= hidden_field_tag :organization_id, passive_organization&.to_param
+= hidden_field_tag :user_id, params[:user_id]
+- unless skip_organization
+  = hidden_field_tag :organization_id, passive_organization&.to_param
 
 -# Shared bike search fields
 - if kind == "organized_bike_search"
