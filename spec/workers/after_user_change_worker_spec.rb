@@ -30,6 +30,8 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(user_phone.phone).to eq phone
       expect(user_phone.notifications.count).to eq 1
       expect(user_phone.notifications.last.twilio_sid).to eq "asd7c80123123sdddf"
+      # And it doesn't add a mailchimp datum
+      expect(MailchimpDatum.count).to eq 0
     end
     context "existing user phone" do
       let(:user_phone) { FactoryBot.create(:user_phone, phone: phone) }
@@ -77,6 +79,19 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         user.reload
         expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
       end
+    end
+  end
+
+  context "feedback" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user_email) { FactoryBot.create(:user_email, user: user, email: "secondary_email@stuff.com") }
+    let(:feedback) { FactoryBot.create(:feedback, email: "secondary_email@stuff.com") }
+    it "associates feedbacks" do
+      expect(feedback.reload.user_id).to be_blank
+      user_email.confirm(user_email.confirmation_token)
+      expect(feedback.reload.user_id).to be_blank
+      instance.perform(user.id)
+      expect(feedback.reload.user_id).to eq user.id
     end
   end
 

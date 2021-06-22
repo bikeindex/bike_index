@@ -25,6 +25,9 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
 
       organization.calculated_children.where.not(id: organization_ids_for_update)
         .each { |o| o.update_attributes(skip_update: true, updated_at: Time.current) }
+
+      # Update mailchimp datum for organizations
+      organization.admins.each { |u| MailchimpDatum.find_and_update_or_create_for(u) }
     end
   end
 

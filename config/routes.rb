@@ -190,7 +190,7 @@ Rails.application.routes.draw do
     resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
-      :content_tags, :impound_claims
+      :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]

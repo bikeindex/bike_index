@@ -14,7 +14,7 @@
               = l @feedback.created_at, format: :convert_time
         %tr
           %td
-            Type
+            Kind
           %td
             = link_to @feedback.humanized_type, admin_feedbacks_path(search_kind: @feedback.kind)
         %tr
@@ -41,9 +41,10 @@
             %td
               data
             %td
-              %pre
-                %code
-                  = @feedback.feedback_hash.to_yaml.gsub("---\n", "")
+              - if @feedback.organization.present?
+                = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
+              .small.mt-2
+                = pretty_print_json(@feedback.feedback_hash)
         %tr
           %td
             Bike

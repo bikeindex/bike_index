@@ -1,0 +1,38 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://us6.api.mailchimp.com/3.0/lists/180a1141a4/members/ae3dd3401b5ed77b0a23d85874d6113b
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Server:
+      - openresty
+      Content-Type:
+      - application/problem+json; charset=utf-8
+      Content-Length:
+      - '211'
+      X-Request-Id:
+      - b37c37ed-ec4e-e80d-a79c-6ee2216e1874
+      Link:
+      - <https://us6.api.mailchimp.com/schema/3.0/Definitions/ProblemDetailDocument.json>;
+        rel="describedBy"
+      Date:
+      - Fri, 11 Jun 2021 23:43:06 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: '{"type":"https://mailchimp.com/developer/marketing/docs/errors/","title":"Resource
+        Not Found","status":404,"detail":"The requested resource could not be found.","instance":"b37c37ed-ec4e-e80d-a79c-6ee2216e1874"}'
+    http_version:
+  recorded_at: Fri, 11 Jun 2021 23:43:06 GMT
+recorded_with: VCR 5.0.0

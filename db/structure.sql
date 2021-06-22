@@ -1067,7 +1067,8 @@ CREATE TABLE public.feedbacks (
     feedback_type character varying(255),
     user_id integer,
     feedback_hash jsonb,
-    kind integer
+    kind integer,
+    mailchimp_datum_id bigint
 );
 
 
@@ -1775,6 +1776,78 @@ CREATE SEQUENCE public.mail_snippets_id_seq
 --
 
 ALTER SEQUENCE public.mail_snippets_id_seq OWNED BY public.mail_snippets.id;
+
+
+--
+-- Name: mailchimp_data; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.mailchimp_data (
+    id bigint NOT NULL,
+    user_id bigint,
+    user_deleted_at timestamp without time zone,
+    email character varying,
+    status integer,
+    data jsonb,
+    mailchimp_updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: mailchimp_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.mailchimp_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: mailchimp_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.mailchimp_data_id_seq OWNED BY public.mailchimp_data.id;
+
+
+--
+-- Name: mailchimp_values; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.mailchimp_values (
+    id bigint NOT NULL,
+    list integer,
+    kind integer,
+    name character varying,
+    slug character varying,
+    mailchimp_id character varying,
+    data jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: mailchimp_values_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.mailchimp_values_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: mailchimp_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.mailchimp_values_id_seq OWNED BY public.mailchimp_values.id;
 
 
 --
@@ -3294,6 +3367,20 @@ ALTER TABLE ONLY public.mail_snippets ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: mailchimp_data id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_data ALTER COLUMN id SET DEFAULT nextval('public.mailchimp_data_id_seq'::regclass);
+
+
+--
+-- Name: mailchimp_values id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_values ALTER COLUMN id SET DEFAULT nextval('public.mailchimp_values_id_seq'::regclass);
+
+
+--
 -- Name: manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3858,6 +3945,22 @@ ALTER TABLE ONLY public.mail_snippets
 
 
 --
+-- Name: mailchimp_data mailchimp_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_data
+    ADD CONSTRAINT mailchimp_data_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mailchimp_values mailchimp_values_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.mailchimp_values
+    ADD CONSTRAINT mailchimp_values_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: manufacturers manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4404,6 +4507,13 @@ CREATE INDEX index_external_registry_credentials_on_type ON public.external_regi
 
 
 --
+-- Name: index_feedbacks_on_mailchimp_datum_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feedbacks_on_mailchimp_datum_id ON public.feedbacks USING btree (mailchimp_datum_id);
+
+
+--
 -- Name: index_feedbacks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4660,6 +4770,13 @@ CREATE INDEX index_mail_snippets_on_organization_id ON public.mail_snippets USIN
 --
 
 CREATE INDEX index_mail_snippets_on_state_id ON public.mail_snippets USING btree (state_id);
+
+
+--
+-- Name: index_mailchimp_data_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btree (user_id);
 
 
 --
@@ -5631,6 +5748,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210423200934'),
 ('20210512162607'),
 ('20210601175924'),
-('20210604191419');
+('20210604191419'),
+('20210610185925'),
+('20210614175711');
 
 

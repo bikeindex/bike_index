@@ -69,11 +69,10 @@ class UserEmail < ActiveRecord::Base
   end
 
   def confirm(token)
-    if token == confirmation_token
-      update_attribute :confirmation_token, nil
-      MergeAdditionalEmailWorker.perform_async(id)
-      true
-    end
+    return false if token != confirmation_token
+    update_attribute :confirmation_token, nil
+    MergeAdditionalEmailWorker.perform_async(id)
+    true
   end
 
   def send_confirmation_email

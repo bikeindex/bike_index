@@ -1,0 +1,62 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Mailchimp Values
+  .col-md-7
+    %ul
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@list != "all" ? "active" : "") }
+          #{@list.titleize} #{@list == "all" ? "lists" : "list"}
+        .dropdown-menu
+          = link_to "All lists", url_for(sortable_search_params.merge(search_list: "all")), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
+          = link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : '' }"
+          = link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : '' }"
+      %li.nav-item
+        = link_to "update values", admin_mailchimp_values_path, action: :create, method: :post, class: "nav-link"
+      %li.nav-item
+        %a.nav-link{ href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
+          Toggle data
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = number_with_delimiter(@mailchimp_values.count)
+    matching Mailchimp Values
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    %th= sortable "name"
+    %th.small
+      = sortable "slug"
+    %th
+      = sortable "list"
+    %th
+      = sortable "kind"
+    %th
+      Mailchimp ID
+    %th.small
+      = sortable "created_at"
+    %th.small
+      = sortable "updated_at"
+    %th.collapse.data-cell-collapsed Data
+
+  %tbody
+    - @mailchimp_values.each do |mailchimp_value|
+      %tr
+        %td
+          = mailchimp_value.name
+        %td.small
+          = mailchimp_value.slug
+        %td
+          = mailchimp_value.list
+        %td
+          = mailchimp_value.kind
+        %td
+          = mailchimp_value.mailchimp_id
+        %td
+          %small.convertTime.preciseTime
+            = l(mailchimp_value.created_at, format: :convert_time)
+        %td
+          %small.convertTime.preciseTime
+            = l(mailchimp_value.updated_at, format: :convert_time)
+        %td.collapse.data-cell.data-cell-collapsed.small
+          = pretty_print_json(mailchimp_value.data)

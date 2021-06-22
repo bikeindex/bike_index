@@ -18,6 +18,7 @@ class Feedback < ApplicationRecord
   validates_presence_of :body, :email, :title
 
   belongs_to :user
+  belongs_to :mailchimp_datum
 
   before_validation :set_calculated_attributes
 
@@ -27,12 +28,24 @@ class Feedback < ApplicationRecord
 
   after_create :notify_admins
 
-  scope :notification_types, -> { where.not(feedback_type: no_notification_types) }
-  scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
+  scope :notification, -> { where.not(feedback_type: no_notification_kinds) }
+  scope :no_notification, -> { where(feedback_type: no_notification_kinds) }
   scope :stolen_tip, -> { where(kind: stolen_tip_kinds) }
+  scope :no_user, -> { where(user_id: nil) }
+  scope :lead, -> { where(kind: lead_types) }
+  scope :mailchimping, -> { where(kind: mailchimping_kinds) }
 
-  def self.no_notification_types
+  def self.no_notification_kinds
     %w[manufacturer_update_request serial_update_request bike_delete_request]
+  end
+
+  def self.lead_types
+    %w[lead_for_bike_shop lead_for_city lead_for_school lead_for_law_enforcement]
+  end
+
+  # May be additional kinds in the future
+  def self.mailchimping_kinds
+    lead_types
   end
 
   def self.bike(bike_or_bike_id = nil)
@@ -77,12 +90,16 @@ class Feedback < ApplicationRecord
         bike.destroy
       end
     end
-    return true if self.class.no_notification_types.include?(feedback_type)
+    return true if self.class.no_notification_kinds.include?(kind)
     EmailFeedbackNotificationWorker.perform_async(id)
   end
 
   def delete_request?
-    feedback_type == "bike_delete_request"
+    bike_delete_request? # Holdover from feedback_type > kind enum conversion
+  end
+
+  def mailchimping?
+    self.class.mailchimping_kinds.include?(kind)
   end
 
   def bike_id
@@ -91,6 +108,14 @@ class Feedback < ApplicationRecord
 
   def bike
     Bike.unscoped.where(id: bike_id).first
+  end
+
+  def organization_id
+    feedback_hash&.dig("organization_id")
+  end
+
+  def organization
+    organization_id.present? && Organization.find_by_id(organization_id)
   end
 
   def package_size
@@ -113,8 +138,10 @@ class Feedback < ApplicationRecord
   def set_calculated_attributes
     generate_title
     set_user_attrs
-    self.body ||= "lead" if lead?
+    self.email = EmailNormalizer.normalize(email)
     self.kind ||= calculated_kind
+    self.body ||= "lead" if lead?
+    self.feedback_type ||= kind
   end
 
   def looks_like_spam?
@@ -135,12 +162,14 @@ class Feedback < ApplicationRecord
   end
 
   def lead?
-    feedback_type&.match?(/lead_for_/)
+    feedback_type&.match?(/lead_for_/) || kind&.match?(/lead_for_/)
   end
 
   def lead_type
     return nil unless lead?
-    feedback_type.gsub(/lead_for_/, "").humanize
+    kind_str = feedback_type if feedback_type.present?
+    kind_str ||= kind
+    kind_str.gsub(/lead_for_/, "").humanize
   end
 
   private

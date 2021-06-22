@@ -23,7 +23,7 @@ FactoryBot.define do
     factory :location_chicago do
       sequence(:street) { |n| "#{n} W Jackson Blvd." }
       city { "Chicago" }
-      state { State.find_or_create_by(name: "Illinois", abbreviation: "IL") }
+      state { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
       zipcode { "60647" }
       country { Country.united_states }
       latitude { 41.9282162 }
@@ -33,7 +33,7 @@ FactoryBot.define do
     factory :location_nyc do
       sequence(:street) { |n| "#{n} Madison Ave." }
       city { "New York" }
-      state { State.find_or_create_by(name: "New York", abbreviation: "NY") }
+      state { State.find_or_create_by(name: "New York", abbreviation: "NY", country: Country.united_states) }
       zipcode { "10011" }
       country { Country.united_states }
       latitude { 40.7143528 }
@@ -43,7 +43,7 @@ FactoryBot.define do
     factory :location_los_angeles do
       sequence(:street) { |n| "#{n} Manzanita Ave." }
       city { "Los Angeles" }
-      state { State.find_or_create_by(name: "California", abbreviation: "CA") }
+      state { State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states) }
       zipcode { "90021" }
       country { Country.united_states }
       latitude { 34.05223 }

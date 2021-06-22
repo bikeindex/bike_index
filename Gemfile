@@ -75,6 +75,7 @@ gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe", "~> 3.3.2" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
+gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"

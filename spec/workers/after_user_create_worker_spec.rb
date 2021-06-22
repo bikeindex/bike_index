@@ -148,6 +148,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       expect(membership1.claimed?).to be_falsey
 
+      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+
       Sidekiq::Testing.inline! { user.save }
 
       expect(membership1.created_at < user.created_at).to be_truthy
@@ -222,6 +225,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         user.reload
         expect(user.confirmed?).to be_truthy
         expect(user.memberships.count).to eq 1
+        expect(user.mailchimp_datum).to be_blank
         membership = user.memberships.first
         expect(membership.claimed?).to be_truthy
         expect(membership.organization_id).to eq organization.id
@@ -237,6 +241,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           membership = FactoryBot.create(:membership, user: user, sender: nil, organization: organization, role: "admin")
           expect(membership.claimed?).to be_truthy
           user.reload
+          UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+          stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+          expect(user.mailchimp_datum).to be_blank
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           expect {
@@ -249,6 +256,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           membership.reload
           expect(membership.organization_id).to eq organization.id
           expect(membership.role).to eq "admin"
+          expect(user.mailchimp_datum).to be_present
         end
       end
     end

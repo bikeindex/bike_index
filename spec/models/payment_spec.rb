@@ -58,4 +58,23 @@ RSpec.describe Payment, type: :model do
       end
     end
   end
+
+  describe "after_commit" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:payment) { FactoryBot.create(:payment, kind: "donation", user: user) }
+    it "creates a mailchimp_datum" do
+      user.reload
+      expect(user.mailchimp_datum).to be_blank
+      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+      expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        payment.reload
+      end
+      user.reload
+      expect(user.mailchimp_datum).to be_present
+      expect(user.mailchimp_datum.interests).to eq(["donors"])
+    end
+  end
 end

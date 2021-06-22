@@ -71,6 +71,10 @@ class Membership < ApplicationRecord
     organization.ambassador?
   end
 
+  def organization_creator?
+    organization.memberships.minimum(:id) == id
+  end
+
   def enqueue_processing_worker
     return true if skip_processing
     ProcessMembershipWorker.perform_async(id)

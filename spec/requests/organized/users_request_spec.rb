@@ -284,6 +284,8 @@ RSpec.describe Organized::UsersController, type: :request do
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
             # and the organization needs to have the organization feature after the first membership is created
+            UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+            stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
             Sidekiq::Testing.inline! do
               invoice.update_attributes(organization_feature_ids: [organization_feature.id])
               expect(current_organization.reload.enabled_feature_slugs).to eq(["passwordless_users"])

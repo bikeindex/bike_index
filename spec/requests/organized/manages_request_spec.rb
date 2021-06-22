@@ -325,6 +325,9 @@ RSpec.describe Organized::ManagesController, type: :request do
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
+            UpdateMailchimpDatumWorker.new # So that it's present post stubbing
+            stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
               Sidekiq::Worker.clear_all
               # Need to inline to process UpdateOrganizationAssociationsWorker

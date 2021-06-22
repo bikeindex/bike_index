@@ -38,6 +38,7 @@ RSpec.describe Feedback, type: :model do
 
     it "auto sets the body for a lead_type" do
       feedback = Feedback.create(additional: "small", feedback_type: "lead_for_school", email: "example@example.com", package_size: "small")
+      expect(feedback.lead?).to be_truthy
       expect(feedback.looks_like_spam?).to be_truthy
       expect(feedback.errors.full_messages).to_not be_present
       expect(feedback.errors.count).to eq 0
@@ -81,7 +82,7 @@ RSpec.describe Feedback, type: :model do
     end
     context "lead type feedback" do
       it "returns type" do
-        expect(Feedback.new(feedback_type: "lead_for_school").lead_type).to eq "School"
+        expect(Feedback.new(kind: "lead_for_school").lead_type).to eq "School"
       end
     end
   end

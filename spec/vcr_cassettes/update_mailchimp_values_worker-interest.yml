@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - openresty
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '4616'
+      Vary:
+      - Accept-Encoding
+      X-Request-Id:
+      - c2e9c515-0fd3-7a65-0f0a-cc2ecbb4bd55
+      Link:
+      - <https://us6.api.mailchimp.com/schema/3.0/Lists/Interests/Collection.json>;
+        rel="describedBy"
+      Date:
+      - Mon, 14 Jun 2021 23:19:20 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: '{"interests":[{"category_id":"2e650f9110","list_id":"b675299293","id":"cbca7bf705","name":"Bike
+        shop","subscriber_count":"1361","display_order":1,"_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/cbca7bf705","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Interests/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/cbca7bf705","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/PATCH.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/cbca7bf705","method":"DELETE"}]},{"category_id":"2e650f9110","list_id":"b675299293","id":"11f66ed17a","name":"Law
+        enforcement / Municipality","subscriber_count":"123","display_order":2,"_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/11f66ed17a","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Interests/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/11f66ed17a","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/PATCH.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/11f66ed17a","method":"DELETE"}]},{"category_id":"2e650f9110","list_id":"b675299293","id":"c5bbab099c","name":"School
+        / University","subscriber_count":"70","display_order":3,"_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/c5bbab099c","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Interests/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/c5bbab099c","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/PATCH.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests/c5bbab099c","method":"DELETE"}]}],"list_id":"b675299293","category_id":"2e650f9110","total_items":3,"_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Interests/Collection.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/InterestCategories/Response.json"},{"rel":"create","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/interest-categories/2e650f9110/interests","method":"POST","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Interests/POST.json"}]}'
+    http_version:
+  recorded_at: Mon, 14 Jun 2021 23:19:21 GMT
+recorded_with: VCR 5.0.0
