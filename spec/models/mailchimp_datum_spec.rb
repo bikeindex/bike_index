@@ -153,7 +153,7 @@ RSpec.describe MailchimpDatum, type: :model do
     end
     context "with organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-      let(:target) { {lists: ["organization"], tags: %w[in-bike-index], interests: %w[bike_shop], merge_fields: target_merge_fields.reject { |k, v| v.blank? }} }
+      let(:target) { {lists: ["organization"], tags: %w[in-bike-index], interests: %w[bike_shop], merge_fields: target_merge_fields.reject { |_k, v| v.blank? }} }
       let(:target_merge_fields) do
         {
           "organization-name" => organization.name.to_s,
@@ -265,7 +265,7 @@ RSpec.describe MailchimpDatum, type: :model do
       context "recovered_bike_owner" do
         let(:bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: user) }
         let(:recovery_time) { Time.at(1592760319) }
-        let(:target_recovered) { target.merge(interests: %w[recovered-bike-owners], merge_fields: target_merge_fields_recovered.reject { |k, v| v.blank? }) }
+        let(:target_recovered) { target.merge(interests: %w[recovered-bike-owners], merge_fields: target_merge_fields_recovered.reject { |_k, v| v.blank? }) }
         let(:we_helped) { true }
         before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s, index_helped_recovery: we_helped) }
         let(:target_merge_fields_recovered) do
@@ -279,7 +279,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields_recovered.as_json
         end
         context "both" do
-          let(:target_both) { target_recovered.merge(interests: %w[donors recovered-bike-owners], merge_fields: target_merge_fields_both.reject { |k, v| v.blank? }) }
+          let(:target_both) { target_recovered.merge(interests: %w[donors recovered-bike-owners], merge_fields: target_merge_fields_both.reject { |_k, v| v.blank? }) }
           let(:target_merge_fields_both) { target_merge_fields.merge("recovered-bike-at" => recovery_time.to_date.to_s, "bikes" => 1) }
           it "is both" do
             payment.reload
