@@ -29,35 +29,32 @@
       %li.nav-item
         = link_to "graph", admin_mailchimp_data_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
+= render partial: "/shared/period_select"
+
 .row.mb-4.mt-4
-  .col-sm-6.col-lg-3
+  .col-sm-6.col-lg-4.mt-4
     = number_with_delimiter(matching_mailchimp_data.count)
     matching Mailchimp Data
     %em
       = humanized_time_range_column(@time_range_column)
       = humanized_time_range(@time_range)
-  .col-sm-6
+  .col-sm-6.col-lg-4.mt-3
     = form_tag admin_mailchimp_data_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_list, params[:search_list]
       = hidden_field_tag :search_users, params[:search_users]
-      .form-group.ml-2
+      .form-group.ml-auto.mb-0
         = text_field_tag :query, params[:query], placeholder: "Search email", class: "form-control ml-auto"
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
-
-- if @render_chart
-  = column_chart time_range_counts(collection: matching_mailchimp_data), stacked: true, thousands: ",", defer: true
-
-= render partial: "/shared/period_select"
-
-= paginate @mailchimp_data, views_prefix: "admin"
+  .col-lg-4
+    = paginate @mailchimp_data, views_prefix: "admin"
 
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
   %thead.small-header.hidden-md-down
     %th
       Email
-    %th
+    %th.small
       Feedbacks
     %th
       = sortable "created_at"
@@ -65,6 +62,10 @@
       = sortable "updated_at"
     %th
       Lists
+    %th
+      Groups
+      - if display_dev_info?
+        %small.only-dev-visible interests
     %th
       = sortable "mailchimp_updated_at"
     %th.collapse.data-cell-collapsed Data
@@ -87,6 +88,8 @@
             = l(mailchimp_datum.updated_at, format: :convert_time)
         %td
           = mailchimp_datum.lists.join(", ")
+        %td
+          = mailchimp_datum.interests.join(", ")
         %td
           - if mailchimp_datum.mailchimp_updated_at.present?
             %span.convertTime
