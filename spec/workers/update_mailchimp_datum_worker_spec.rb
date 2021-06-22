@@ -54,7 +54,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[school])
+          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e d14183c940 school])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
@@ -110,7 +110,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[donors school])
+          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e c5bbab099c d14183c940 donors school])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
           expect(mailchimp_datum.should_update?).to be_falsey
           target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
