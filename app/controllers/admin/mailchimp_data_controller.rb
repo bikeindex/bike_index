@@ -31,8 +31,16 @@ class Admin::MailchimpDataController < Admin::BaseController
     else
       MailchimpDatum
     end
+    if MailchimpValue.lists.include?(params[:search_list])
+      @list = params[:search_list]
+      m_mailchimp_data = m_mailchimp_data.list(@list)
+    else
+      @list = "all"
+    end
+    m_mailchimp_data = m_mailchimp_data.where("email ILIKE ?", "%#{params[:query]}%") if params[:query].present?
     @time_range_column = sort_column if %w[updated_at mailchimp_updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
+
     m_mailchimp_data.order(sort_column + " " + sort_direction)
       .where(@time_range_column => @time_range)
   end

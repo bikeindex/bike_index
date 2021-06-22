@@ -30,12 +30,7 @@
 
   .col-sm-4
     = form_tag admin_paints_path, method: :get do
-      = hidden_field_tag :sort, sort_column
-      = hidden_field_tag :sort_direction, sort_direction
-      = hidden_field_tag :render_chart, @render_chart
-      = hidden_field_tag :period, params[:period]
-      = hidden_field_tag :end_time, params[:end_time]
-      = hidden_field_tag :start_time, params[:start_time]
+      = render partial: "/shared/hidden_search_fields"
       = text_field_tag :search_name, params[:name], placeholder: "Search paints by name", class: "form-control"
   .col-sm-1
     = submit_tag "Search", name: "search", class: "btn btn-success"

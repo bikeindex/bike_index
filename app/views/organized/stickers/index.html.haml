@@ -10,9 +10,7 @@
 = form_tag organization_stickers_path(organization_id: current_organization.to_param),
   method: :get,
   class: "stickers-form" do
-
-  = hidden_field_tag :sort, sort_column
-  = hidden_field_tag :direction, sort_direction
+  = render partial: "/shared/hidden_search_fields"
 
   .row
     .col-md-4

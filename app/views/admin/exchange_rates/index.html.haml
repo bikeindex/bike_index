@@ -16,8 +16,7 @@
   .col-md-6
     = form_tag admin_exchange_rates_path, method: :get,
       class: "form-inline admin-filter-menu" do
-      = hidden_field_tag :sort, sort_column
-      = hidden_field_tag :sort_direction, sort_direction
+      = render partial: "/shared/hidden_search_fields"
       .form-group.ml-2
         = select_tag :search_to,
           options_for_select(ExchangeRate.pluck(:to).uniq),

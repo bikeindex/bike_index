@@ -34,6 +34,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect {
             mailchimp_datum.update(updated_at: Time.current)
           }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          expect(mailchimp_datum.should_update?).to be_truthy
 
           # Destroying the user updates mailchimp
           user.destroy
@@ -78,6 +79,9 @@ RSpec.describe MailchimpDatum, type: :model do
 
           # And test that creating a membership doesn't result in update mailchimp datum
           FactoryBot.create(:membership_claimed, user: user, organization: organization)
+          expect {
+            mailchimp_datum.update(updated_at: Time.current)
+          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
         end
         it "also creates if passed the feedback" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
@@ -94,6 +98,10 @@ RSpec.describe MailchimpDatum, type: :model do
           expect {
             mailchimp_datum.update(updated_at: Time.current)
           }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          # Thow this test in here too
+          expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
+          expect(MailchimpDatum.list("individual").pluck(:id)).to eq([])
+          expect(MailchimpDatum.list("stuff").pluck(:id)).to eq([])
         end
       end
     end
