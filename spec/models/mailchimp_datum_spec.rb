@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe MailchimpDatum, type: :model do
   let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
   let(:organization_kind) { "bike_shop" }
-  let(:empty_data) { {lists: [], tags: [], interests: [], merge_fields: nil} }
+  let(:empty_data) { {lists: [], tags: [], interests: [], merge_fields: {"bikes" => 0, "number-of-donations" => 0}} }
 
   describe "find_or_create_for" do
     before { Sidekiq::Worker.clear_all }
@@ -15,7 +15,7 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.lists).to eq([])
         expect(mailchimp_datum.no_subscription_required?).to be_truthy
         expect(mailchimp_datum.id).to be_blank
-        expect(mailchimp_datum.data).to eq empty_data.merge(tags: ["in-bike-index"]).as_json
+        expect(mailchimp_datum.data.except("merge_fields")).to eq empty_data.except(:merge_fields).merge(tags: ["in-bike-index"]).as_json
         expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
         expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
       end
@@ -116,12 +116,7 @@ RSpec.describe MailchimpDatum, type: :model do
       end
       context "lead_for_school" do
         let!(:feedback) { FactoryBot.create(:feedback, kind: "lead_for_school") }
-        let(:target) do
-          {lists: ["organization"],
-           tags: [],
-           interests: ["school"],
-           merge_fields: nil}
-        end
+        let(:target) { empty_data.merge(lists: ["organization"],interests: ["school"]) }
         it "creates" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
           mailchimp_datum = MailchimpDatum.find_or_create_for(feedback)
@@ -158,7 +153,7 @@ RSpec.describe MailchimpDatum, type: :model do
     end
     context "with organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-      let(:target) { {lists: ["organization"], tags: %w[in-bike-index], interests: %w[bike_shop], merge_fields: nil} }
+      let(:target) { {lists: ["organization"], tags: %w[in-bike-index], interests: %w[bike_shop], merge_fields: target_merge_fields.reject { |k, v| v.blank? }} }
       let(:target_merge_fields) do
         {
           "organization-name" => organization.name.to_s,
@@ -167,7 +162,6 @@ RSpec.describe MailchimpDatum, type: :model do
           "name" => user.name,
           "phone-number" => user.phone,
           "signed-up-at" => user.created_at.to_date&.to_s,
-          "added-to-mailchimp-at" => nil,
           "most-recent-donation-at" => nil,
           "number-of-donations" => 0,
           "recovered-bike-at" => nil
@@ -176,7 +170,7 @@ RSpec.describe MailchimpDatum, type: :model do
       it "is as expected" do
         expect(user.reload.memberships.first.organization_creator?).to be_truthy
         expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
-        expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
+        expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
       end
       context "not creator of organization" do
         let(:organization_kind) { "software" }
@@ -186,7 +180,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(organization.reload.pos_kind).to eq "does_not_need_pos"
           # Doesn't include does_not_need_pos tag
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(interests: ["software"]).as_json
-          expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
+          expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
         end
       end
       context "lightspeed" do
@@ -203,7 +197,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index pos-approved]).as_json
-          expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
+          expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
         end
       end
       context "ascend" do
@@ -240,7 +234,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(organization.paid?).to be_falsey
           expect(organization.paid_previously?).to be_truthy
           expect(invoice.reload.was_active?).to be_truthy
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index paid-previously]).as_json
+          expect(mailchimp_datum.calculated_data).to eq target.merge(tags: %w[in-bike-index paid-previously]).as_json
         end
       end
     end
@@ -248,7 +242,8 @@ RSpec.describe MailchimpDatum, type: :model do
       let(:user) { FactoryBot.create(:user) }
       let(:payment_time) { Time.at(1621876049) }
       let(:payment) { FactoryBot.create(:payment, user: user, kind: "donation", created_at: payment_time) }
-      let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[donors], merge_fields: nil} }
+      let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[donors], merge_fields: stored_merge_fields} }
+      let(:stored_merge_fields) { {"bikes" => 0, "name" => user.name, "signed-up-at" => user.created_at.to_date&.to_s, "most-recent-donation-at" => payment_time.to_date.to_s, "number-of-donations" => 1} }
       let(:target_merge_fields) do
         {
           "organization-name" => nil,
@@ -257,7 +252,6 @@ RSpec.describe MailchimpDatum, type: :model do
           "name" => user.name,
           "phone-number" => user.phone,
           "signed-up-at" => user.created_at.to_date&.to_s,
-          "added-to-mailchimp-at" => nil,
           "most-recent-donation-at" => payment_time.to_date.to_s,
           "number-of-donations" => 1,
           "recovered-bike-at" => nil
@@ -266,12 +260,12 @@ RSpec.describe MailchimpDatum, type: :model do
       it "is as expected" do
         payment.reload
         expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
-        expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields.as_json
+        expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
       end
       context "recovered_bike_owner" do
         let(:bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: user) }
         let(:recovery_time) { Time.at(1592760319) }
-        let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[recovered-bike-owners], merge_fields: nil} }
+        let(:target_recovered) { target.merge(interests: %w[recovered-bike-owners], merge_fields: target_merge_fields_recovered.reject { |k, v| v.blank? }) }
         let(:we_helped) { true }
         before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s, index_helped_recovery: we_helped) }
         let(:target_merge_fields_recovered) do
@@ -281,18 +275,18 @@ RSpec.describe MailchimpDatum, type: :model do
         it "is recovered and we helped" do
           expect(bike.reload.stolen_recovery?).to be_truthy
           expect(mailchimp_datum.stolen_records_recovered.pluck(:bike_id)).to eq([bike.id])
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
-          expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields_recovered.as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target_recovered.as_json
+          expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields_recovered.as_json
         end
         context "both" do
-          let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[donors recovered-bike-owners], merge_fields: nil} }
+          let(:target_both) { target_recovered.merge(interests: %w[donors recovered-bike-owners], merge_fields: target_merge_fields_both.reject { |k, v| v.blank? }) }
           let(:target_merge_fields_both) { target_merge_fields.merge("recovered-bike-at" => recovery_time.to_date.to_s, "bikes" => 1) }
           it "is both" do
             payment.reload
             expect(bike.reload.stolen_recovery?).to be_truthy
             expect(mailchimp_datum.stolen_records_recovered.pluck(:bike_id)).to eq([bike.id])
-            expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
-            expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields_both.as_json
+            expect(mailchimp_datum.calculated_data.as_json).to eq target_both.as_json
+            expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields_both.as_json
           end
         end
         context "we didn't help" do
@@ -317,7 +311,7 @@ RSpec.describe MailchimpDatum, type: :model do
     it "uses the existing organization" do
       expect(mailchimp_datum).to be_valid
       expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
-      mailchimp_datum.data["merge_fields"] = mailchimp_datum.merge_fields
+      mailchimp_datum.data["merge_fields"] = mailchimp_datum.managed_merge_fields
       mailchimp_datum.update(updated_at: Time.current)
       expect(membership2).to be_valid
       user.reload
@@ -327,8 +321,75 @@ RSpec.describe MailchimpDatum, type: :model do
     end
   end
 
+
+
   describe "add_mailchimp_interests" do
+    let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
+    let(:data) { {} }
+    let(:interests) { {"938bcefe9e"=>true, "d14183c940"=>false} }
     it "adds interests" do
+      mailchimp_datum.add_mailchimp_interests("individual", interests.as_json)
+      expect(mailchimp_datum.interests).to eq(["938bcefe9e"])
+      expect(mailchimp_datum.data).to eq({"interests" => ["938bcefe9e"]})
+      expect(mailchimp_datum.mailchimp_interests("individual")).to eq({})
+    end
+    context "interests are in the system" do
+      before do
+        MailchimpValue.create!(kind: "interest", name: "Donor", mailchimp_id: "938bcefe9e", list: "individual")
+        MailchimpValue.create!(kind: "interest", name: "Recovered bike owners", mailchimp_id: "d14183c940", list: "individual")
+        MailchimpValue.create!(kind: "interest", name: "Bike Shop", mailchimp_id: "cbca7bf705", list: "organization")
+      end
+      it "adds the interests" do
+        mailchimp_datum.add_mailchimp_interests("individual", interests.as_json)
+        expect(mailchimp_datum.interests).to eq(["donor"])
+        expect(mailchimp_datum.data).to eq({"interests" => ["donor"]})
+        expect(mailchimp_datum.mailchimp_interests("individual")).to eq interests
+      end
+      context "existing interests" do
+        let(:data) { {interests: ["Recovered bike owners"]} }
+        it "adds the interests" do
+          expect(mailchimp_datum.interests).to eq(["Recovered bike owners"])
+          mailchimp_datum.add_mailchimp_interests("individual", interests.as_json)
+          expect(mailchimp_datum.interests).to eq(["donor"])
+          expect(mailchimp_datum.mailchimp_interests("individual")).to eq interests
+        end
+      end
+      context "existing organization interests" do
+        let(:data) { {interests: ["Donor", "Bike Shop"]} }
+        it "adds the interests" do
+          mailchimp_datum.add_mailchimp_interests("individual", interests.as_json)
+          expect(mailchimp_datum.interests).to eq(["Bike Shop", "donor"])
+          expect(mailchimp_datum.mailchimp_interests("individual")).to eq interests
+        end
+      end
+    end
+  end
+
+  # NOTE: We don't actually use this right now. It's exclusively based on managed_merge_fields
+  describe "add_mailchimp_merge_fields" do
+    let(:mailchimp_datum) { MailchimpDatum.new(data: data) }
+    let(:data) { {} }
+    let(:merge_fields) { {"NAME"=>"Party Pooper", "SIGN_UP_AT"=>"2021-05-14", "BIKES"=>2} }
+    it "adds merge_fields" do
+      mailchimp_datum.add_mailchimp_merge_fields("individual", merge_fields.as_json)
+      expect(mailchimp_datum.merge_fields).to eq merge_fields
+      expect(mailchimp_datum.data).to eq({"merge_fields" => merge_fields})
+      expect(mailchimp_datum.mailchimp_merge_fields("individual")).to eq({})
+    end
+    context "merge_fields are in the system" do
+      before do
+        MailchimpValue.create!(kind: "merge_field", name: "Name", mailchimp_id: "NAME", list: "individual")
+        MailchimpValue.create!(kind: "merge_field", name: "Signed up at", mailchimp_id: "SIGN_UP_AT", list: "individual")
+        MailchimpValue.create!(kind: "merge_field", name: "Bikes", mailchimp_id: "BIKES", list: "individual")
+        MailchimpValue.create!(kind: "merge_field", name: "Signed up at", mailchimp_id: "SIGN_UP_AT", list: "organization")
+        MailchimpValue.create!(kind: "merge_field", name: "Organization name", mailchimp_id: "O_NAME", list: "organization")
+      end
+      let(:stored_merge_fields) { {"name" => "Party Pooper", "signed-up-at" => "2021-05-14", "bikes" => 2}}
+      it "adds the merge_fields" do
+        mailchimp_datum.add_mailchimp_merge_fields("individual", merge_fields.as_json)
+        expect(mailchimp_datum.merge_fields).to eq stored_merge_fields
+        expect(mailchimp_datum.mailchimp_merge_fields("individual")).to eq({"BIKES" => 0})
+      end
     end
   end
 

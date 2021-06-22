@@ -105,26 +105,34 @@ class MailchimpDatum < ApplicationRecord
     data&.dig("interests") || []
   end
 
+  def merge_fields
+    data&.dig("merge_fields") || {}
+  end
+
   # I'm not gonna lie - these methods (mailchimp_...) kinda suck. Sorry
   def mailchimp_interests(list)
-    m_interests = interests.dup
-    m_interests.map do |i|
-      m_int = MailchimpValue.interest.friendly_find(i, list: list)&.mailchimp_id
-      m_int.present? ? [m_int, true] : nil
-    end.compact.uniq.to_h
+    interest_slugs = interests.dup.map { |t| MailchimpValue.interest.friendly_find(t, list: list)&.slug }.compact
+    MailchimpValue.interest.where(list: list).order(:name).map do |mailchimp_value|
+      [mailchimp_value.mailchimp_id, interest_slugs.include?(mailchimp_value.slug) ? true : false]
+    end.compact.to_h
   end
 
   def add_mailchimp_interests(list, val)
-    new_values = val.select { |k, v| v.present? }.keys.map do |i|
-      MailchimpValue.interest.friendly_find(i, list: list)&.slug || i
-    end
+    kept_interests = interests.dup.map do |i|
+      MailchimpValue.interest.friendly_find(i, list: list)&.present? ? nil : i
+    end.compact
+
+    new_interests = val.map do |key, value|
+      next unless ParamsNormalizer.boolean(value)
+      MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
+    end.compact
     self.data ||= {}
-    self.data["interests"] = (interests + new_values).compact.uniq
+    self.data["interests"] = (kept_interests + new_interests).compact.uniq.sort
   end
 
   def mailchimp_merge_fields(list)
-    m_merge_fields = merge_fields.dup.select { |k, v| v.present? }
-    m_merge_fields.map do |k, v|
+    managed_merge_fields.dup.map do |k, v|
+      next unless v.present?
       m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.mailchimp_id
       next unless m_key.present?
       [m_key, v]
@@ -132,13 +140,16 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def add_mailchimp_merge_fields(list, val)
-    new_values = val.map.map do |k, v|
-      next unless v.present?
-      m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.slug || k
-      [m_key, v]
+    kept_merge_fields = merge_fields.dup.map do |k, v|
+      next if MailchimpValue.merge_field.friendly_find(k, list: list)&.present?
+      [k, v]
+    end.compact.to_h
+    new_merge_fields = val.map do |key, value|
+      next unless value.present?
+      [MailchimpValue.merge_field.friendly_find(key, list: list)&.slug || key, value]
     end.compact.to_h
     self.data ||= {}
-    self.data["merge_fields"] = merge_fields.merge(new_values).reject { |k, v| v.blank? }.to_h
+    self.data["merge_fields"] = kept_merge_fields.merge(new_merge_fields)
   end
 
   def mailchimp_tags(list)
@@ -155,12 +166,10 @@ class MailchimpDatum < ApplicationRecord
       MailchimpValue.tag.friendly_find(t, list: list)&.present? ? nil : t
     end.compact
     new_tags = val.map do |hash|
-      # TODO: Remove this if it never throws. I think we don't need it, but verifying
-      raise "STATUS PRESENT!" if hash.key?(hash["status"])
       MailchimpValue.tag.friendly_find(hash["name"], list: list)&.slug || hash["name"]
     end
     self.data ||= {}
-    self.data["tags"] = (new_tags + kept_tags).sort
+    self.data["tags"] = (new_tags + kept_tags).uniq.sort
   end
 
   def full_name
@@ -216,11 +225,12 @@ class MailchimpDatum < ApplicationRecord
       lists: calculated_lists,
       tags: calculated_tags,
       interests: calculated_interests,
-      merge_fields: data&.dig("merge_fields")
+      merge_fields: managed_merge_fields.reject { |k, v| v.blank? }
+      # merge_fields: managed_merge_fields.map { |k, v| v.blank? ? nil : [k, v] }.compact.to_h
     }.as_json
   end
 
-  def merge_fields
+  def managed_merge_fields
     {
       "organization-name" => mailchimp_organization&.short_name,
       "organization-signed-up-at" => mailchimp_date(mailchimp_organization&.created_at),
@@ -228,7 +238,6 @@ class MailchimpDatum < ApplicationRecord
       "name" => full_name,
       "phone-number" => user&.phone,
       "signed-up-at" => mailchimp_date(user&.created_at),
-      "added-to-mailchimp-at" => nil,
       "most-recent-donation-at" => most_recent_donation_at,
       "number-of-donations" => user&.payments&.donation&.count || 0,
       "recovered-bike-at" => most_recent_recovery_at

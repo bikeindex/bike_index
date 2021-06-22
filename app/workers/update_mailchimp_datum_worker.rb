@@ -33,10 +33,10 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
       mailchimp_datum.mailchimp_updated_at = updated_at
     end
     mailchimp_datum.data["lists"] += [list]
-    pp data["tags"]
     mailchimp_datum.add_mailchimp_tags(list, data["tags"])
     mailchimp_datum.add_mailchimp_interests(list, data["interests"])
-    mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])
+    # We don't currently update merge fields from mailchimp data
+    # mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])
     mailchimp_datum.save!
   end
 end
