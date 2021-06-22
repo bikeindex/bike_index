@@ -196,7 +196,7 @@ RSpec.describe MailchimpDatum, type: :model do
           organization.update(website: "test.com")
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index pos-approved]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index lightspeed pos-approved]).as_json
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
         end
       end
@@ -207,7 +207,7 @@ RSpec.describe MailchimpDatum, type: :model do
           organization.update(pos_kind: "ascend_pos")
           expect(organization.reload.paid?).to be_falsey
           expect(organization.invoices.count).to eq 1
-          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in-bike-index pos-approved]).as_json
+          expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[ascend in-bike-index pos-approved]).as_json
         end
       end
       context "not creator of organization" do

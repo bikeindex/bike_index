@@ -10,7 +10,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
           tags: ["In Bike Index"],
           interests: %w[cbca7bf705],
           lists: %w[organization],
-          merge_fields: {"MMERGE5" => "Ike's Bikes", "bikes" => 0, "number-of-donations" => 0}
+          merge_fields: {"bikes" => 0, "number-of-donations" => 0}
         }
       end
       let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T19:06:19+00:00") }
@@ -36,7 +36,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
           tags: %w[2020 in-bike-index],
           interests: ["938bcefe9e"],
           lists: %w[individual organization],
-          merge_fields: {"NAME" => "Seth Herr", "bikes" => 0, "number-of-donations" => 0}
+          merge_fields: {"name" => user.name, "bikes" => 0, "number-of-donations" => 0, "signed-up-at" => Time.current.to_date.to_s}
         }
       end
       let(:user) { FactoryBot.create(:user, email: "seth@bikeindex.org") }
@@ -55,7 +55,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
         expect(mailchimp_datum.user_id).to eq user.id
         expect(mailchimp_datum.status).to eq "subscribed"
         expect(mailchimp_datum.data.except("merge_fields")).to eq target_data.except(:merge_fields).as_json
-        expect(mailchimp_datum.data["merge_fields"].slice("NAME", "bikes", "number-of-donations")).to eq target_data[:merge_fields].as_json
+        expect(mailchimp_datum.data["merge_fields"]).to eq target_data[:merge_fields].as_json
         expect(mailchimp_datum.mailchimp_updated_at).to be_within(1).of mailchimp_updated_at
 
         # Because we're enqueue_all_pages

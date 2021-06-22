@@ -7,7 +7,7 @@ class MailchimpDatum < ApplicationRecord
     cleaned: 4
   }
 
-  MANAGED_TAGS = %w[in-bike-index not-org-creator paid paid-previously pos-approved].freeze
+  MANAGED_TAGS = %w[in-bike-index not-org-creator paid paid-previously pos-approved lightspeed ascend].freeze
 
   belongs_to :user
   has_many :feedbacks
@@ -279,6 +279,7 @@ class MailchimpDatum < ApplicationRecord
         updated_tags << "not-org-creator"
       end
       if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
+        updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")
         updated_tags << "pos-approved"
       end
       if mailchimp_organization.paid?
