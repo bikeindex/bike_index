@@ -68,7 +68,7 @@ class MailchimpDatum < ApplicationRecord
 
   def stolen_records_recovered
     return StolenRecord.none if user.blank?
-    StolenRecord.recovered.where(bike_id: user.ownerships.pluck(:bike_id))
+    StolenRecord.recovered.where(index_helped_recovery: true, bike_id: user.ownerships.pluck(:bike_id))
   end
 
   def should_update?

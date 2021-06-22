@@ -272,12 +272,13 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: user) }
         let(:recovery_time) { Time.at(1592760319) }
         let(:target) { {lists: ["individual"], tags: %w[in-bike-index], interests: %w[recovered-bike-owners], merge_fields: nil} }
-        before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s) }
+        let(:we_helped) { true }
+        before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s, index_helped_recovery: we_helped) }
         let(:target_merge_fields_recovered) do
           target_merge_fields.merge("most-recent-donation-at" => nil, "bikes" => 1,
                                     "number-of-donations" => 0, "recovered-bike-at" => recovery_time.to_date.to_s)
         end
-        it "is recovered" do
+        it "is recovered and we helped" do
           expect(bike.reload.stolen_recovery?).to be_truthy
           expect(mailchimp_datum.stolen_records_recovered.pluck(:bike_id)).to eq([bike.id])
           expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
@@ -292,6 +293,15 @@ RSpec.describe MailchimpDatum, type: :model do
             expect(mailchimp_datum.stolen_records_recovered.pluck(:bike_id)).to eq([bike.id])
             expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
             expect(mailchimp_datum.merge_fields.as_json).to eq target_merge_fields_both.as_json
+          end
+        end
+        context "we didn't help" do
+          let(:we_helped) { false }
+          it "is recovered and we helped" do
+            expect(bike.reload.stolen_recovery?).to be_truthy
+            expect(mailchimp_datum.no_subscription_required?).to be_truthy
+            expect(mailchimp_datum.stolen_records_recovered.pluck(:bike_id)).to eq([])
+            expect(mailchimp_datum.id).to be_blank
           end
         end
       end
