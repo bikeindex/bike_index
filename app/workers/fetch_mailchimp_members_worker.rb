@@ -27,7 +27,7 @@ class FetchMailchimpMembersWorker < ApplicationWorker
     mailchimp_datum.mailchimp_updated_at = TimeParser.parse(data["last_changed"])
     mailchimp_datum.set_calculated_attributes
     mailchimp_datum.data["lists"] += [list]
-    mailchimp_datum.data["tags"] += data["tags"].map { |t| t["name"] }
+    mailchimp_datum.add_mailchimp_tags(list, data["tags"])
     mailchimp_datum.add_mailchimp_interests(list, data["interests"])
     mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])
     mailchimp_datum.save!
