@@ -11,7 +11,7 @@ module AdminHelper
   end
 
   def admin_nav_select_links
-    [
+    ([
       {title: "Users", path: admin_users_path, match_controller: true},
       {title: "Bikes", path: admin_bikes_path, match_controller: true},
       {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},
@@ -54,7 +54,7 @@ module AdminHelper
       {title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
-    ] + dev_nav_select_links
+    ] + dev_nav_select_links).sort { |a, b| a[:title] <=> b[:title] }
   end
 
   def admin_nav_select_link_active
