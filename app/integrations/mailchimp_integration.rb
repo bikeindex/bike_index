@@ -62,7 +62,7 @@ class MailchimpIntegration
       .except("_links")
     rescue MailchimpMarketing::ApiError => e
       if e.status == 400 && e.to_s.match(/looks fake/i)
-        # SHITT method to get error detail. e.detail returns nil
+        # SHIT method to get error detail. e.detail returns nil
         return {"error" => e.to_s.gsub(/\A.*detail/, "").gsub(/",.*/, "").gsub(/\\+/, "")}
       end
       raise e # re-raise if it isn't a 404

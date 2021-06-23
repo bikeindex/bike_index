@@ -323,7 +323,7 @@ class MailchimpDatum < ApplicationRecord
     c_list = []
     if calculated_feedbacks.any? { |f| f.lead? }
       c_list << "organization"
-    elsif user.blank? # If no feedbacks or user, this is based on mailchimp data
+    elsif user_id.blank? # If no feedbacks or user, this is based on mailchimp data, so keep that
       return lists.dup
     elsif mailchimp_organization_membership.present?
       c_list << "organization"
