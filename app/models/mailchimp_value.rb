@@ -56,6 +56,8 @@ class MailchimpValue < ApplicationRecord
       "school"
     elsif slug == "law_enforcement__municipality"
       "law_enforcement"
+    elsif slug == "other_kind_of_organization"
+      "other"
     else
       slug
     end
