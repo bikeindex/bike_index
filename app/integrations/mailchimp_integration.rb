@@ -77,12 +77,10 @@ class MailchimpIntegration
   end
 
   def archive_member(mailchimp_datum, list)
-    begin
-      client.lists.delete_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash)
-    rescue MailchimpMarketing::ApiError => e
-      return if e.status == 404
-      raise e # re-raise if it isn't a 404
-    end
+    client.lists.delete_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash)
+  rescue MailchimpMarketing::ApiError => e
+    return if e.status == 404
+    raise e # re-raise if it isn't a 404
   end
 
   def client
