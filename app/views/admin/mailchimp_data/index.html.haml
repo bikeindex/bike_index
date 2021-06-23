@@ -11,6 +11,14 @@
           = link_to "All lists", url_for(sortable_search_params.merge(search_list: "all")), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
           = link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : '' }"
           = link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : '' }"
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@status != "all" ? "active" : "") }
+          #{@status.titleize} #{@status == "all" ? "statuses" : "status"}
+        .dropdown-menu
+          = link_to "All statuses", url_for(sortable_search_params.merge(search_status: "all")), class: "dropdown-item #{@status == 'all' ? 'active' : '' }"
+          .dropdown-divider
+          - MailchimpDatum.statuses.each do |status|
+            = link_to "#{status.humanize} status", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : '' }"
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_users == "all" ? "" : "active") }
           - if @search_users == "all"
@@ -69,8 +77,17 @@
     - @mailchimp_data.each do |mailchimp_datum|
       %tr
         %td
-          - if mailchimp_datum.user.present?
-            = link_to mailchimp_datum.email, admin_user_path(mailchimp_datum.user)
+          - if mailchimp_datum.user_id.present?
+            - if mailchimp_datum.user.present?
+              = link_to mailchimp_datum.email, admin_user_path(mailchimp_datum.user)
+            - else # Handle deleted users
+              - user = User.unscoped.find_by_id(mailchimp_datum.user_id)
+              - if user.present?
+                = link_to user.display_name, admin_user_path(user.to_param)
+                %small.text-danger user deleted
+              - else
+                = mailchimp_datum.email
+                %small.text-danger missing user: #{mailchimp_datum.user_id}
           - else
             = mailchimp_datum.email
         %td

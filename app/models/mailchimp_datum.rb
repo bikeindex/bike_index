@@ -4,8 +4,9 @@ class MailchimpDatum < ApplicationRecord
     subscribed: 1,
     unsubscribed: 2, # Should remove
     pending: 3, # Never should be in this status
-    cleaned: 4
-  }
+    cleaned: 4,
+    archived: 5 # Not a mailchimp status, but tracking it as well
+  }.freeze
 
   MANAGED_TAGS = %w[in_bike_index not_org_creator paid paid_previously pos_approved lightspeed ascend].freeze
 
@@ -27,6 +28,10 @@ class MailchimpDatum < ApplicationRecord
   scope :with_user, -> { where.not(user_id: nil).where(user_deleted_at: nil) }
   scope :user_deleted, -> { where.not(user_deleted_at: nil) }
   scope :on_mailchimp, -> { where.not(mailchimp_updated_at: nil) }
+
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
 
   # obj can be a user, a feedback or an email
   def self.find_or_create_for(obj)
@@ -76,9 +81,9 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def should_update?
-    return false if id.blank? ||
-      mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
-    true
+    return false if id.blank?
+    return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
+    status != calculated_status # If status doesn't match, we should update!
   end
 
   def with_user?
@@ -294,10 +299,13 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_status
-    return "unsubscribed" if user_deleted?
+    return "archived" if user_deleted?
     return status if status.present? &&
       !%w[subscribed no_subscription_required].include?(status)
-    return "no_subscription_required" if lists.none?
+    if lists.none?
+      # If the mailchimp_datum is created, we need to persist it, otherwise - don't save
+      return id.present? ? "archived" : "no_subscription_required"
+    end
     "subscribed"
   end
 
@@ -307,9 +315,11 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def calculated_lists
-    c_list = lists.dup
+    c_list = []
     if calculated_feedbacks.any? { |f| f.lead? }
       c_list << "organization"
+    elsif user.blank? # If no feedbacks or user, this is based on mailchimp data
+      return lists.dup
     elsif mailchimp_organization_membership.present?
       c_list << "organization"
     end

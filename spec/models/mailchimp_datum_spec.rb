@@ -44,8 +44,25 @@ RSpec.describe MailchimpDatum, type: :model do
           }.to change(UpdateMailchimpDatumWorker.jobs, :count).by 1
           mailchimp_datum.reload
           expect(mailchimp_datum.user_deleted?).to be_truthy
-          expect(mailchimp_datum.status).to eq "unsubscribed"
+          expect(mailchimp_datum.status).to eq "archived"
           expect(mailchimp_datum.user_id).to be_present
+        end
+        context "membership removed" do
+          it "is archived" do
+            mailchimp_datum = MailchimpDatum.find_or_create_for(user)
+            expect(mailchimp_datum.lists).to eq(["organization"])
+            expect(mailchimp_datum.subscribed?).to be_truthy
+            expect(mailchimp_datum.on_mailchimp?).to be_falsey
+            Sidekiq::Worker.clear_all
+            membership.destroy
+            expect(AfterUserChangeWorker.jobs.count).to eq 1
+            id = mailchimp_datum.id
+            mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
+            expect(mailchimp_datum.mailchimp_organization&.id).to be_blank
+            mailchimp_datum.update(updated_at: Time.current)
+            expect(mailchimp_datum.reload.lists).to eq([])
+            expect(mailchimp_datum.status).to eq "archived"
+          end
         end
       end
       context "organization member" do

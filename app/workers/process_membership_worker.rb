@@ -27,6 +27,7 @@ class ProcessMembershipWorker < ApplicationWorker
     return false unless user_id.present?
     membership.update_attributes(user_id: user_id)
     membership.reload
+    User.find_by_id(user_id)&.update(updated_at: Time.current)
   end
 
   def remove_duplicated_membership!(membership)

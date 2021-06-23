@@ -18,6 +18,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
   end
 
   def update_for_list(mailchimp_datum, list)
+    return archive_datum(mailchimp_datum, list) if mailchimp_datum.archived?
     return false unless mailchimp_datum.lists.include?(list)
     result = mailchimp_integration.update_member(mailchimp_datum, list)
     update_mailchimp_datum(mailchimp_datum, list, result)
@@ -32,10 +33,17 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated_at
       mailchimp_datum.mailchimp_updated_at = updated_at
     end
+    mailchimp_datum.status = data["status"] unless data["status"] == mailchimp_datum.status
     mailchimp_datum.data["lists"] += [list]
     mailchimp_datum.add_mailchimp_tags(list, data["tags"])
     mailchimp_datum.add_mailchimp_interests(list, data["interests"])
     mailchimp_datum.add_mailchimp_merge_fields(list, data["merge_fields"])
     mailchimp_datum.save!
+  end
+
+  def archive_datum(mailchimp_datum, list)
+    mailchimp_integration.archive_member(mailchimp_datum, list)
+    # archive_member just returns a success true response
+    mailchimp_datum
   end
 end

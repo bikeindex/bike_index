@@ -6,13 +6,14 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
   describe "perform" do
     context "organization" do
       let(:target_body) do
-        {email_address: "seth@bikeindex.org",
+        {email_address: email_address,
          full_name: "Seth Herr",
          interests: {"c5bbab099c" => true},
          merge_fields: target_merge_fields,
          status_if_new: "subscribed"}
       end
-      let(:user) { FactoryBot.create(:user, email: "seth@bikeindex.org", name: "Seth Herr") }
+      let(:email_address) { "seth@bikeindex.org" }
+      let(:user) { FactoryBot.create(:user, email: email_address, name: "Seth Herr") }
       let(:organization_created_at) { Time.at(1552072143) }
       let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Hogwarts", "O_AT" => organization_created_at.to_date.to_s} }
       let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Hogwarts", created_at: organization_created_at) }
@@ -31,7 +32,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           MailchimpValue.create(kind: "tag", name: "Not org creator", mailchimp_id: "1882022", list: "organization")
         end
         let(:target_tags) { %w[in_bike_index paid] }
-        it "updates mailchimp_datums" do
+        it "updates mailchimp_datum" do
           expect(membership.organization_creator?).to be_truthy
           organization.update(updated_at: Time.current)
           expect(mailchimp_datum).to be_valid
@@ -87,7 +88,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
            "most_recent_donation_at" => "2021-06-22",
            "organization_signed_up_at" => "2019-03-08"}
         end
-        it "updates mailchimp_datums" do
+        it "updates mailchimp_datum" do
           FactoryBot.create(:membership_claimed, organization: organization)
           organization.update(updated_at: Time.current)
           expect(organization.default_location&.id).to eq location.id
@@ -126,6 +127,53 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           end
           mailchimp_datum.reload
           expect(mailchimp_datum.data).to eq original_data
+        end
+      end
+      context "mailchimp_datum archived" do
+        let(:email_address) { "seth+archived@bikeindex.org" }
+        it "updates mailchimp_datum" do
+          expect(membership.organization_creator?).to be_truthy
+          expect(mailchimp_datum).to be_valid
+          mailchimp_datum.reload
+          expect(MailchimpDatum.count).to eq 1
+          expect(mailchimp_datum.reload.status).to eq "subscribed"
+          VCR.use_cassette("update_mailchimp_datum_worker-archived", match_requests_on: [:method]) do
+            Sidekiq::Worker.clear_all
+            instance.perform(mailchimp_datum.id)
+            expect(described_class.jobs.count).to eq 0
+
+            user.destroy
+            mailchimp_datum.update(updated_at: Time.current)
+            expect(mailchimp_datum.reload.status).to eq "archived"
+            expect(mailchimp_datum.should_update?).to be_truthy
+
+            Sidekiq::Worker.clear_all
+            instance.perform(mailchimp_datum.id)
+            expect(described_class.jobs.count).to eq 0
+          end
+          expect(mailchimp_datum.reload.status).to eq "archived"
+          # Check that we don't enqueue again
+          Sidekiq::Worker.clear_all
+          mailchimp_datum.update(mailchimp_updated_at: Time.current - 5.minutes)
+          expect(described_class.jobs.count).to eq 0
+        end
+      end
+      context "unsubscribed" do
+        let(:email_address) { "seth+unsubscribed@bikeindex.org" }
+        it "updates mailchimp_datum" do
+          expect(membership.organization_creator?).to be_truthy
+          expect(mailchimp_datum).to be_valid
+          mailchimp_datum.reload
+          expect(MailchimpDatum.count).to eq 1
+          expect(mailchimp_datum.reload.status).to eq "subscribed"
+          VCR.use_cassette("update_mailchimp_datum_worker-unsubscribed", match_requests_on: [:method]) do
+            # Ran once, which subscribed the user, then deleted the cassette
+            # Manually went in to mailchimp and set this user to be unsubscribed, and ran again
+            Sidekiq::Worker.clear_all
+            instance.perform(mailchimp_datum.id)
+            expect(described_class.jobs.count).to eq 0
+            expect(mailchimp_datum.reload.status).to eq "unsubscribed"
+          end
         end
       end
     end

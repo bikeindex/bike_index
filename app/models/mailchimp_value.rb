@@ -4,13 +4,13 @@ class MailchimpValue < ApplicationRecord
   LIST_ENUM = {
     organization: 0,
     individual: 1
-  }
+  }.freeze
   KIND_ENUM = {
     interest_category: 0,
     interest: 1, # AKA groups
     tag: 2,
     merge_field: 3
-  }
+  }.freeze
 
   validates_presence_of :slug, :list, :kind, :mailchimp_id
   validates_uniqueness_of :mailchimp_id, scope: %i[list kind]

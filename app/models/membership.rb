@@ -13,7 +13,7 @@ class Membership < ApplicationRecord
   validates_presence_of :role, :organization_id, :invited_email
 
   before_validation :set_calculated_attributes
-  after_commit :enqueue_processing_worker, if: :persisted?
+  after_commit :enqueue_processing_worker
 
   attr_accessor :skip_processing
 
@@ -77,7 +77,12 @@ class Membership < ApplicationRecord
 
   def enqueue_processing_worker
     return true if skip_processing
-    ProcessMembershipWorker.perform_async(id)
+    # We manually update the user, because ProcessMembershipWorker won't find this membership
+    if deleted? && user_id.present?
+      AfterUserChangeWorker.perform_async(user_id)
+    else
+      ProcessMembershipWorker.perform_async(id)
+    end
   end
 
   def set_calculated_attributes
