@@ -217,17 +217,22 @@
             = user_email.old_user_id
 
 %hr.mt-4
-%h4 Mailchimp data
-- if @user.mailchimp_datum.blank?
-  %p No mailchimp data
+- mailchimp_datum = @user.mailchimp_datum
+%h4
+  Mailchimp data
+  - if mailchimp_datum.present?
+    %em.small
+      %a.small{href: ".mailchimpRawData", "aria-expanded" => "false", "data-toggle" => "collapse"}
+        show raw data
+- if mailchimp_datum.blank?
+  %p No Mailchimp data
 - else
-  - mailchimp_datum = @user.mailchimp_datum
   .row
     .col-md-6
       %table.table-list
         %tbody
           - if display_dev_info?
-            %tr.only-dev-visible
+            %tr.only-dev-visible.collapse.mailchimpRawData
               %td.small ID
               %td.small= mailchimp_datum.id
           %tr
@@ -237,18 +242,16 @@
             %td Lists
             %td= @user.mailchimp_datum.lists.join(", ")
           %tr
-            %td Feedbacks
-            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
-          %tr
-            %td mailchimp updated
+            %td Mailchimp updated
             %td
               - if mailchimp_datum.mailchimp_updated_at.present?
                 %span.convertTime
                   = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
+          %tr.collapse.small.mailchimpRawData
+            %td Feedbacks
+            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
     .col-md-6
-      %a{href: "#mailchimpData", "aria-expanded" => "false", "data-toggle" => "collapse"}
-        Toggle data
-      .collapse.small#mailchimpData= pretty_print_json(mailchimp_datum.data)
+      .collapse.small.mailchimpRawData= pretty_print_json(mailchimp_datum.data)
 
 
 
