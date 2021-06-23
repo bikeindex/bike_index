@@ -178,6 +178,23 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           end
         end
       end
+      context "suspiscious email" do
+        let(:email_address) { "asdf891234123@sneakemail.com" }
+        it "updates mailchimp_datum" do
+          expect(membership.organization_creator?).to be_truthy
+          expect(mailchimp_datum).to be_valid
+          mailchimp_datum.reload
+          expect(MailchimpDatum.count).to eq 1
+          expect(mailchimp_datum.reload.status).to eq "subscribed"
+          VCR.use_cassette("update_mailchimp_datum_worker-fail", match_requests_on: [:method]) do
+            Sidekiq::Worker.clear_all
+            instance.perform(mailchimp_datum.id)
+            expect(described_class.jobs.count).to eq 0
+            expect(mailchimp_datum.reload.status).to eq "unsubscribed"
+            expect(mailchimp_datum.data["mailchimp_error"]).to match(/fake or invalid/i)
+          end
+        end
+      end
     end
   end
 end

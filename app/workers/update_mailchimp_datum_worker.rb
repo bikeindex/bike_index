@@ -29,6 +29,10 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
   end
 
   def update_mailchimp_datum(mailchimp_datum, list, data)
+    if data.key?("error").present?
+      mailchimp_datum.data["mailchimp_error"] = data["error"]
+      return mailchimp_datum.update(status: "unsubscribed")
+    end
     updated_at = TimeParser.parse(data["last_changed"])
     if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated_at
       mailchimp_datum.mailchimp_updated_at = updated_at
@@ -45,6 +49,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
     mailchimp_integration.archive_member(mailchimp_datum, list)
     # archive_member just returns a success true response
     # Add something to the data, so we don't attempt to archive endlessly
-    mailchimp_datum.update(data: mailchimp_datum.data.merge(mailchimp_archived_at: Time.current.to_s))
+    mailchimp_datum.data["mailchimp_archived_at"] = Time.current.to_s
+    mailchimp_datum.save
   end
 end
