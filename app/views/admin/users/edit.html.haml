@@ -231,6 +231,9 @@
               %td.small ID
               %td.small= mailchimp_datum.id
           %tr
+            %td Status
+            %td= @user.mailchimp_datum.status
+          %tr
             %td Lists
             %td= @user.mailchimp_datum.lists.join(", ")
           %tr
