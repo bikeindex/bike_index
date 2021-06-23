@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: put
+    uri: https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9
+    body:
+      encoding: UTF-8
+      string: '{"email_address":"seth+unsubscribed@bikeindex.org","full_name":"Seth
+        Herr","status_if_new":"subscribed","merge_fields":{},"interests":{}}'
+    headers:
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - openresty
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '3371'
+      Vary:
+      - Accept-Encoding
+      X-Request-Id:
+      - 3d348288-db5d-75f7-8b8f-b70f7d342552
+      Link:
+      - <https://us6.api.mailchimp.com/schema/3.0/Lists/Members/Instance.json>; rel="describedBy",
+        <https://us6.admin.mailchimp.com/lists/members/view?id=561669126>; rel="dashboard"
+      Date:
+      - Wed, 23 Jun 2021 17:58:16 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":"f5c52a3edc8dc3afa45d069788990ec9","email_address":"seth+unsubscribed@bikeindex.org","unique_email_id":"755840ed9c","full_name":"","web_id":561669126,"email_type":"html","status":"unsubscribed","unsubscribe_reason":"N/A
+        (Unsubscribed by admin)","merge_fields":{"PHONE":"","MMERGE5":"","MMERGE9":"","MMERGE10":"","NAME":"","O_NAME":"","O_AT":"","O_CITY":"","O_STATE":"","O_COUNTRY":"","SIGN_UP_AT":""},"interests":{"cbca7bf705":false,"11f66ed17a":false,"c5bbab099c":false},"stats":{"avg_open_rate":0,"avg_click_rate":0},"ip_signup":"","timestamp_signup":"","ip_opt":"23.115.138.69","timestamp_opt":"2021-06-23T17:54:51+00:00","member_rating":2,"last_changed":"2021-06-23T17:58:16+00:00","language":"","vip":false,"email_client":"","location":{"latitude":0,"longitude":0,"gmtoff":0,"dstoff":0,"country_code":"","timezone":""},"source":"API
+        - Generic","tags_count":0,"tags":[],"list_id":"b675299293","_links":[{"rel":"self","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json"},{"rel":"parent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/CollectionResponse.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Paths/Lists/Members/Collection.json"},{"rel":"update","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9","method":"PATCH","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PATCH.json"},{"rel":"upsert","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9","method":"PUT","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Response.json","schema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/PUT.json"},{"rel":"delete","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9","method":"DELETE"},{"rel":"activity","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9/activity","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Activity/Response.json"},{"rel":"goals","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9/goals","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Goals/Response.json"},{"rel":"notes","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9/notes","method":"GET","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Notes/CollectionResponse.json"},{"rel":"events","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9/events","method":"POST","targetSchema":"https://us6.api.mailchimp.com/schema/3.0/Definitions/Lists/Members/Events/POST.json"},{"rel":"delete_permanent","href":"https://us6.api.mailchimp.com/3.0/lists/b675299293/members/f5c52a3edc8dc3afa45d069788990ec9/actions/delete-permanent","method":"POST"}]}'
+    http_version:
+  recorded_at: Wed, 23 Jun 2021 17:58:16 GMT
+recorded_with: VCR 5.0.0

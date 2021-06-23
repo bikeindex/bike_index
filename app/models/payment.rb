@@ -59,6 +59,7 @@ class Payment < ApplicationRecord
     elsif email.present?
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
     end
+    self.organization_id ||= invoice&.organization_id
   end
 
   def send_invoice_email

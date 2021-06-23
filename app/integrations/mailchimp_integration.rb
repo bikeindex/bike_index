@@ -56,9 +56,17 @@ class MailchimpIntegration
   end
 
   def update_member(mailchimp_datum, list)
+    begin
     client.lists.set_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash,
       member_update_hash(mailchimp_datum, list))
       .except("_links")
+    rescue MailchimpMarketing::ApiError => e
+      if e.status == 400 && e.to_s.match(/looks fake/i)
+        # SHIT method to get error detail. e.detail returns nil
+        return {"error" => e.to_s.gsub(/\A.*detail/, "").gsub(/",.*/, "").gsub(/\\+/, "")}
+      end
+      raise e # re-raise if it isn't a 404
+    end
   end
 
   def member_update_hash(mailchimp_datum, list)
@@ -74,6 +82,13 @@ class MailchimpIntegration
   def update_member_tags(mailchimp_datum, list)
     client.lists.update_list_member_tags(self.class.list_id(list), mailchimp_datum.subscriber_hash,
       {tags: mailchimp_datum.mailchimp_tags(list)}.as_json)
+  end
+
+  def archive_member(mailchimp_datum, list)
+    client.lists.delete_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash)
+  rescue MailchimpMarketing::ApiError => e
+    return if e.status == 404
+    raise e # re-raise if it isn't a 404
   end
 
   def client

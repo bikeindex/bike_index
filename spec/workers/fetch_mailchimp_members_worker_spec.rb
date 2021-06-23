@@ -10,7 +10,7 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
           tags: ["In Bike Index"],
           interests: %w[cbca7bf705],
           lists: %w[organization],
-          merge_fields: {"MMERGE5" => "Ike's Bikes", "bikes" => 0, "number-of-donations" => 0}
+          merge_fields: {bikes: 0, number_of_donations: 0}
         }
       end
       let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T19:06:19+00:00") }
@@ -33,10 +33,10 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
     context "individual" do
       let(:target_data) do
         {
-          tags: %w[2020 in-bike-index],
+          tags: %w[2020 in_bike_index],
           interests: ["938bcefe9e"],
-          lists: %w[individual organization],
-          merge_fields: {"NAME" => "Seth Herr", "bikes" => 0, "number-of-donations" => 0}
+          lists: %w[],
+          merge_fields: {name: user.name, bikes: 0, number_of_donations: 0, signed_up_at: Time.current.to_date.to_s}
         }
       end
       let(:user) { FactoryBot.create(:user, email: "seth@bikeindex.org") }
@@ -44,18 +44,18 @@ RSpec.describe FetchMailchimpMembersWorker, type: :job do
       let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T20:11:41+00:00") }
       it "does not duplicate user" do
         expect(MailchimpDatum.count).to eq 1
-        expect(mailchimp_datum.reload.lists).to eq(["organization"])
+        expect(mailchimp_datum.reload.lists).to eq([])
         Sidekiq::Worker.clear_all
         VCR.use_cassette("fetch_mailchimp_members_worker-individual", match_requests_on: [:path]) do
           instance.perform("individual", 0, 1, true)
         end
         expect(MailchimpDatum.count).to eq 1
-        expect(mailchimp_datum.reload.lists).to eq(%w[individual organization])
         expect(mailchimp_datum.email).to eq "seth@bikeindex.org"
         expect(mailchimp_datum.user_id).to eq user.id
-        expect(mailchimp_datum.status).to eq "subscribed"
+        expect(mailchimp_datum.reload.lists).to eq([])
+        expect(mailchimp_datum.status).to eq "archived" # Because we don't have stuff in the db for this user
         expect(mailchimp_datum.data.except("merge_fields")).to eq target_data.except(:merge_fields).as_json
-        expect(mailchimp_datum.data["merge_fields"].slice("NAME", "bikes", "number-of-donations")).to eq target_data[:merge_fields].as_json
+        expect(mailchimp_datum.data["merge_fields"]).to eq target_data[:merge_fields].as_json
         expect(mailchimp_datum.mailchimp_updated_at).to be_within(1).of mailchimp_updated_at
 
         # Because we're enqueue_all_pages
