@@ -81,7 +81,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def should_update?
-    return false if id.blank?
+    return false if id.blank? || mailchimp_archived_at.present?
     return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
     status != calculated_status # If status doesn't match, we should update!
   end
@@ -92,6 +92,11 @@ class MailchimpDatum < ApplicationRecord
 
   def user_deleted?
     user_deleted_at.present?
+  end
+
+  def mailchimp_archived_at
+    t = data&.dig("mailchimp_archived_at")
+    t.present? ? TimeParser.parse(t) : nil
   end
 
   def on_mailchimp?

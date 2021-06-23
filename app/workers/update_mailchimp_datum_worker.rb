@@ -44,6 +44,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
   def archive_datum(mailchimp_datum, list)
     mailchimp_integration.archive_member(mailchimp_datum, list)
     # archive_member just returns a success true response
-    mailchimp_datum
+    # Add something to the data, so we don't attempt to archive endlessly
+    mailchimp_datum.update(data: mailchimp_datum.data.merge(mailchimp_archived_at: Time.current.to_s))
   end
 end

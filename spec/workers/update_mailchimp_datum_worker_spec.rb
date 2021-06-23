@@ -152,9 +152,11 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
             expect(described_class.jobs.count).to eq 0
           end
           expect(mailchimp_datum.reload.status).to eq "archived"
+          expect(mailchimp_datum.mailchimp_archived_at).to be > (Time.current - 1.minute)
           # Check that we don't enqueue again
           Sidekiq::Worker.clear_all
           mailchimp_datum.update(mailchimp_updated_at: Time.current - 5.minutes)
+          expect(mailchimp_datum.should_update?).to be_falsey
           expect(described_class.jobs.count).to eq 0
         end
       end

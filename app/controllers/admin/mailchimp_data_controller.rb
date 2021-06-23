@@ -40,6 +40,9 @@ class Admin::MailchimpDataController < Admin::BaseController
     if MailchimpDatum.statuses.include?(params[:search_status])
       @status = params[:search_status]
       m_mailchimp_data = m_mailchimp_data.where(status: @status)
+    elsif params[:search_status] == "not_subscribed"
+      @status = "not_subscribed"
+      m_mailchimp_data = m_mailchimp_data.where.not(status: "subscribed")
     else
       @status = "all"
     end

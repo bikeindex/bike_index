@@ -7,10 +7,6 @@ class Slugifyer
       .downcase
   end
 
-  def self.slugify_underscore(string)
-    slugify(string).tr("-", "_")
-  end
-
   def self.book_slug(string)
     slug = I18n.transliterate(string.to_s.downcase)
     key_hash = {

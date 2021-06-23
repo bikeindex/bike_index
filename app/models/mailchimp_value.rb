@@ -28,30 +28,9 @@ class MailchimpValue < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
-  def self.friendly_find(str, kind: nil, list: nil)
-    values = kind.present? ? where(kind: kind) : self
-    values = list.present? ? where(list: list) : values
-    mailchimp_value = values.find_by_mailchimp_id(str)
-    mailchimp_value ||= values.find_by_id(str) if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
-    mailchimp_value || values.find_by_slug(Slugifyer.slugify_underscore(str))
-  end
-
-  def set_calculated_attributes
-    self.data ||= {}
-    self.mailchimp_id ||= if merge_field?
-      data["tag"]
-    else
-      data["id"] || data["merge_id"]
-    end
-    self.name = calculated_name if calculated_name.present? # Mainly for specs
-    self.slug = Slugifyer.slugify_underscore(name)
-    self.slug = special_interest_slug if interest? && organization?
-  end
-
-  private
-
-  # Make the slugs match organization kinds
-  def special_interest_slug
+  def self.slugify(str)
+    slug = Slugifyer.slugify(str).tr("-", "_")
+    # Make the slugs match organization kinds
     if slug == "school__university"
       "school"
     elsif slug == "law_enforcement__municipality"
@@ -62,6 +41,27 @@ class MailchimpValue < ApplicationRecord
       slug
     end
   end
+
+  def self.friendly_find(str, kind: nil, list: nil)
+    values = kind.present? ? where(kind: kind) : self
+    values = list.present? ? where(list: list) : values
+    mailchimp_value = values.find_by_mailchimp_id(str)
+    mailchimp_value ||= values.find_by_id(str) if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
+    mailchimp_value || values.find_by_slug(slugify(str))
+  end
+
+  def set_calculated_attributes
+    self.data ||= {}
+    self.mailchimp_id ||= if merge_field?
+      data["tag"]
+    else
+      data["id"] || data["merge_id"]
+    end
+    self.name = calculated_name if calculated_name.present? # Mainly for specs
+    self.slug = self.class.slugify(name)
+  end
+
+  private
 
   def calculated_name
     data&.dig("title") || data&.dig("name") || ""
