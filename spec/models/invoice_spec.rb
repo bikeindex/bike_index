@@ -162,7 +162,6 @@ RSpec.describe Invoice, type: :model do
       expect(organization.paid?).to be_truthy
       expect(organization.paid_money?).to be_falsey
 
-      # invoice2.save
       invoice2.update_attributes(organization_feature_ids: [organization_feature2.id])
       invoice2.reload
       expect(invoice2.amount_due_cents).to eq 10000
