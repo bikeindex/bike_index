@@ -32,7 +32,7 @@ class OrganizedMailer < ApplicationMailer
       registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
     }
     @organization = @ownership.organization
-    @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.is_paid?)
+    @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
 
     I18n.with_locale(@user&.preferred_language) do

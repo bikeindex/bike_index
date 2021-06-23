@@ -6,7 +6,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
   def perform(id, force_update = false)
     return false unless UPDATE_MAILCHIMP
     mailchimp_datum = MailchimpDatum.find(id)
-    return mailchimp_datum unless mailchimp_datum.should_update? || force_update
+    return false unless mailchimp_datum.should_update? || force_update
     mailchimp_datum.skip_update = true
     update_for_list(mailchimp_datum, "organization")
     update_for_list(mailchimp_datum, "individual")
@@ -18,7 +18,7 @@ class UpdateMailchimpDatumWorker < ApplicationWorker
   end
 
   def update_for_list(mailchimp_datum, list)
-    return false unless mailchimp_datum.lists.include?("organization")
+    return false unless mailchimp_datum.lists.include?(list)
     result = mailchimp_integration.update_member(mailchimp_datum, list)
     update_mailchimp_datum(mailchimp_datum, list, result)
     mailchimp_datum.reload

@@ -7,7 +7,7 @@ class MailchimpDatum < ApplicationRecord
     cleaned: 4
   }
 
-  MANAGED_TAGS = %w[in-bike-index not-org-creator paid paid-previously pos-approved lightspeed ascend].freeze
+  MANAGED_TAGS = %w[in_bike_index not_org_creator paid paid_previously pos_approved lightspeed ascend].freeze
 
   belongs_to :user
   has_many :feedbacks
@@ -56,11 +56,13 @@ class MailchimpDatum < ApplicationRecord
   # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_membership
     return @mailchimp_organization_membership if defined?(@mailchimp_organization_membership)
-    memberships = user&.memberships&.admin&.reorder(:created_at)
+    memberships = user&.memberships&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
     return nil unless memberships.present? && memberships.any?
-    existing_name = data&.dig("merge_fields", "organization-name")
+    existing_name = data&.dig("merge_fields", "organization_name")
     existing_org = Organization.friendly_find(existing_name) if existing_name.present?
-    @mailchimp_organization_membership = memberships.where(organization_id: existing_org.id).last if existing_org.present?
+    if existing_org.present?
+      @mailchimp_organization_membership = memberships.find { |m| m.organization_id == existing_org.id }
+    end
     @mailchimp_organization_membership ||= memberships.last
   end
 
@@ -231,16 +233,16 @@ class MailchimpDatum < ApplicationRecord
 
   def managed_merge_fields
     {
-      "organization-name" => mailchimp_organization&.short_name,
-      "organization-signed-up-at" => mailchimp_date(mailchimp_organization&.created_at),
-      "bikes" => user&.bikes&.count || 0,
-      "name" => full_name,
-      "phone-number" => user&.phone,
-      "signed-up-at" => mailchimp_date(user&.created_at),
-      "most-recent-donation-at" => most_recent_donation_at,
-      "number-of-donations" => user&.payments&.donation&.count || 0,
-      "recovered-bike-at" => most_recent_recovery_at
-    }
+      organization_name: mailchimp_organization&.short_name,
+      organization_signed_up_at: mailchimp_date(mailchimp_organization&.created_at),
+      bikes: user&.bikes&.count || 0,
+      name: full_name,
+      phone_number: user&.phone,
+      signed_up_at: mailchimp_date(user&.created_at),
+      most_recent_donation_at: most_recent_donation_at,
+      number_of_donations: user&.payments&.donation&.count || 0,
+      recovered_bike_at: most_recent_recovery_at
+    }.as_json
   end
 
   def address_merge(list)
@@ -273,19 +275,19 @@ class MailchimpDatum < ApplicationRecord
   # or else it won't update mailchimp
   def calculated_tags
     updated_tags = tags.dup
-    updated_tags << "in-bike-index" if user.present?
+    updated_tags << "in_bike_index" if user.present?
     if mailchimp_organization.present?
       unless mailchimp_organization_membership.organization_creator?
-        updated_tags << "not-org-creator"
+        updated_tags << "not_org_creator"
       end
       if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
         updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")
-        updated_tags << "pos-approved"
+        updated_tags << "pos_approved"
       end
-      if mailchimp_organization.paid?
+      if mailchimp_organization.paid_money?
         updated_tags << "paid"
       elsif mailchimp_organization.paid_previously?
-        updated_tags << "paid-previously"
+        updated_tags << "paid_previously"
       end
     end
     updated_tags.uniq.sort
@@ -327,7 +329,7 @@ class MailchimpDatum < ApplicationRecord
         .map { |f| f.kind.gsub(/lead_for_/, "") }
     end
     updated_interests << "donors" if user&.payments&.donation&.any?
-    updated_interests << "recovered-bike-owners" if stolen_records_recovered.any?
+    updated_interests << "recovered_bike_owners" if stolen_records_recovered.any?
     updated_interests.uniq.sort
   end
 end

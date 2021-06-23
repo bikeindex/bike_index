@@ -54,7 +54,7 @@ RSpec.describe MailchimpIntegration do
   end
 
   describe "update_member_tags" do
-    let(:mailchimp_datum) { MailchimpDatum.new(data: {tags: %w[in-bike-index paid-previously]}, email: "seth@bikeindex.org") }
+    let(:mailchimp_datum) { MailchimpDatum.new(data: {tags: %w[in_bike_index paid_previously]}, email: "seth@bikeindex.org") }
     before do
       MailchimpValue.create(kind: "tag", name: "Paid", mailchimp_id: "1881982", list: "organization")
       MailchimpValue.create(kind: "tag", name: "Paid previously", mailchimp_id: "1889778", list: "organization")

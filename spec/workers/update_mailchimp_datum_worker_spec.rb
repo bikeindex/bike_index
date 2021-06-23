@@ -20,23 +20,23 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
 
       context "organization creator, create user" do
-        let!(:invoice) { FactoryBot.create(:invoice_paid, organization: organization) }
+        let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
         before do
           MailchimpValue.create(kind: "interest", name: "school", mailchimp_id: "c5bbab099c", list: "organization")
           MailchimpValue.create(kind: "merge_field", name: "name", mailchimp_id: "NAME", list: "organization")
-          MailchimpValue.create(kind: "merge_field", name: "organization-name", mailchimp_id: "O_NAME", list: "organization")
-          MailchimpValue.create(kind: "merge_field", name: "organization-signed-up-at", mailchimp_id: "O_AT", list: "organization")
+          MailchimpValue.create(kind: "merge_field", name: "organization_name", mailchimp_id: "O_NAME", list: "organization")
+          MailchimpValue.create(kind: "merge_field", name: "organization_signed_up_at", mailchimp_id: "O_AT", list: "organization")
           MailchimpValue.create(kind: "tag", name: "In Bike Index", mailchimp_id: "87306", list: "organization")
           MailchimpValue.create(kind: "tag", name: "paid", mailchimp_id: "1881982", list: "organization")
           MailchimpValue.create(kind: "tag", name: "Not org creator", mailchimp_id: "1882022", list: "organization")
         end
-        let(:target_tags) { ["in-bike-index", "paid"] }
+        let(:target_tags) { %w[in_bike_index paid] }
         it "updates mailchimp_datums" do
           expect(membership.organization_creator?).to be_truthy
           organization.update(updated_at: Time.current)
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
-          expect(mailchimp_datum.mailchimp_organization&.paid?).to be_truthy
+          expect(mailchimp_datum.mailchimp_organization&.paid_money?).to be_truthy
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.lists).to eq(["organization"])
           expect(mailchimp_datum.on_mailchimp?).to be_falsey
@@ -53,12 +53,12 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           end
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
-          expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e d14183c940 school])
+          expect(mailchimp_datum.lists).to eq(%w[organization])
+          expect(mailchimp_datum.interests).to eq(%w[school])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
           expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
-          expect(mailchimp_datum.tags).to match_array(["In Bike Index", "in-bike-index", "not-org-creator", "paid"])
+          expect(mailchimp_datum.tags).to match_array(["in_bike_index", "not_org_creator", "paid"])
         end
       end
       context "not creator, update user" do
@@ -71,7 +71,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
-        let(:target_tags) { ["In Bike Index", "in-bike-index", "Not org creator", "not-org-creator", "Paid", "Weird new tag", "weird other tag"] }
+        let(:target_tags) { ["In Bike Index", "in_bike_index", "Not org creator", "not_org_creator", "Paid", "Weird new tag", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }
         let(:target_merge_fields) do
           {"NAME" => "Seth Herr",
@@ -81,11 +81,11 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
            "bikes" => 0,
            "RECOVE_AT" => "2015-08-05",
            "SIGN_UP_AT" => "2013-07-14",
-           "signed-up-at" => "2021-06-22",
-           "organization-name" => "Hogwarts",
-           "number-of-donations" => 1,
-           "most-recent-donation-at" => "2021-06-22",
-           "organization-signed-up-at" => "2019-03-08"}
+           "signed_up_at" => "2021-06-22",
+           "organization_name" => "Hogwarts",
+           "number_of_donations" => 1,
+           "most_recent_donation_at" => "2021-06-22",
+           "organization_signed_up_at" => "2019-03-08"}
         end
         it "updates mailchimp_datums" do
           FactoryBot.create(:membership_claimed, organization: organization)
@@ -103,7 +103,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.on_mailchimp?).to be_truthy
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
-          expect(mailchimp_datum.tags).to eq(["in-bike-index", "not-org-creator", "weird other tag"])
+          expect(mailchimp_datum.tags).to eq(["in_bike_index", "not_org_creator", "weird other tag"])
           VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end

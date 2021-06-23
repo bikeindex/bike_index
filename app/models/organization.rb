@@ -229,12 +229,17 @@ class Organization < ApplicationRecord
     show_on_map && approved
   end
 
+  # TODO: rename - actually should be "enabled_features?" - because many orgs haven't actually paid
   def paid?
     is_paid
   end
 
+  def paid_money?
+    paid? && current_invoices.any? { |i| i.paid_money_in_full? }
+  end
+
   def paid_previously?
-    !paid? && invoices.expired.any? { |i| i.was_active? }
+    !paid_money? && invoices.expired.any? { |i| i.was_active? }
   end
 
   def display_avatar?

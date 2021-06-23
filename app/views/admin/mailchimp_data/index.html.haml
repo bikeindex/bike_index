@@ -52,22 +52,17 @@
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
   %thead.small-header.hidden-md-down
-    %th
-      Email
-    %th.small
-      Feedbacks
-    %th
-      = sortable "created_at"
-    %th.small
-      = sortable "updated_at"
-    %th
-      Lists
+    %th= sortable "Email"
+    %th.small Feedbacks
+    %th= sortable "created_at"
+    %th.small= sortable "updated_at"
+    %th Lists
     %th
       Groups
       - if display_dev_info?
-        %small.only-dev-visible interests
-    %th
-      = sortable "mailchimp_updated_at"
+        %small.only-dev-visible.d-none.d-xl-inline-block AKA interests
+    %th.small= sortable "status"
+    %th= sortable "mailchimp_updated_at"
     %th.collapse.data-cell-collapsed Data
 
   %tbody
@@ -89,7 +84,10 @@
         %td
           = mailchimp_datum.lists.join(", ")
         %td
-          = mailchimp_datum.interests.join(", ")
+          = mailchimp_datum.interests.map(&:humanize).join(", ")
+        %td
+          - unless mailchimp_datum.subscribed?
+            %small= mailchimp_datum.status&.humanize
         %td
           - if mailchimp_datum.mailchimp_updated_at.present?
             %span.convertTime

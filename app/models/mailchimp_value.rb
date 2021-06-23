@@ -33,7 +33,7 @@ class MailchimpValue < ApplicationRecord
     values = list.present? ? where(list: list) : values
     mailchimp_value = values.find_by_mailchimp_id(str)
     mailchimp_value ||= values.find_by_id(str) if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
-    mailchimp_value || values.find_by_slug(Slugifyer.slugify(str))
+    mailchimp_value || values.find_by_slug(Slugifyer.slugify_underscore(str))
   end
 
   def set_calculated_attributes
@@ -44,7 +44,7 @@ class MailchimpValue < ApplicationRecord
       data["id"] || data["merge_id"]
     end
     self.name = calculated_name if calculated_name.present? # Mainly for specs
-    self.slug = Slugifyer.slugify(name)
+    self.slug = Slugifyer.slugify_underscore(name)
     self.slug = special_interest_slug if interest? && organization?
   end
 
@@ -52,9 +52,9 @@ class MailchimpValue < ApplicationRecord
 
   # Make the slugs match organization kinds
   def special_interest_slug
-    if slug == "school--university"
+    if slug == "school__university"
       "school"
-    elsif slug == "law-enforcement--municipality"
+    elsif slug == "law_enforcement__municipality"
       "law_enforcement"
     else
       slug

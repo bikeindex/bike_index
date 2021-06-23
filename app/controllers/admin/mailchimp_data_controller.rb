@@ -15,7 +15,7 @@ class Admin::MailchimpDataController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[email created_at updated_at mailchimp_updated_at]
+    %w[created_at email updated_at mailchimp_updated_at status]
   end
 
   def earliest_period_date

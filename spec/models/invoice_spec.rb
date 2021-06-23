@@ -150,16 +150,33 @@ RSpec.describe Invoice, type: :model do
     let(:organization_feature2) { FactoryBot.create(:organization_feature, feature_slugs: ["extra_registration_number"]) }
     let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
-    let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.day, organization: organization) }
+    let(:invoice2) { FactoryBot.create(:invoice_with_payment, amount_due_cents: 10000, subscription_start_at: Time.current - 1.day, organization: organization) }
     it "adds the organization features" do
       invoice1.update_attributes(organization_feature_ids: [organization_feature1.id])
-      organization.save
-      expect(organization.enabled_feature_slugs).to eq(["bike_search"])
+      expect(invoice1.paid_in_full?).to be_truthy
+      expect(invoice1.paid_money_in_full?).to be_falsey
 
-      invoice2.save
+      organization.update(updated_at: Time.current)
+      organization.reload
+      expect(organization.enabled_feature_slugs).to eq(["bike_search"])
+      expect(organization.paid?).to be_truthy
+      expect(organization.paid_money?).to be_falsey
+
+      # invoice2.save
       invoice2.update_attributes(organization_feature_ids: [organization_feature2.id])
+      invoice2.reload
+      expect(invoice2.amount_due_cents).to eq 10000
+      expect(invoice2.payments.count).to eq 1
+      expect(invoice2.payments.first.amount_cents).to eq 10000
+      expect(invoice2.payments.first.organization_id).to eq organization.id
+      expect(invoice2.paid_in_full?).to be_truthy
+      expect(invoice2.paid_money_in_full?).to be_truthy
+
       organization.update_attributes(updated_at: Time.current)
+      organization.reload
       expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
+      expect(organization.paid?).to be_truthy
+      expect(organization.paid_money?).to be_truthy
     end
   end
 end

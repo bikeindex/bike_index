@@ -89,6 +89,10 @@ class Invoice < ApplicationRecord
     amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
   end
 
+  def paid_money_in_full?
+    paid_in_full? && amount_due_cents > 0
+  end
+
   def subscription_first_invoice_id
     first_invoice_id || id
   end
