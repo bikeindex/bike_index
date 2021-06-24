@@ -76,15 +76,16 @@ gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe", "~> 3.3.2" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
+gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
-gem "doorkeeper", "~> 5.2.5"
-gem "grape", "~> 0.19.1"
+gem "doorkeeper", "~> 5.2.5" # OAuth providing
+gem "grape", "~> 0.19.1" # API DSL
 gem "grape-active_model_serializers", "~> 1.4.0"
-gem "grape-swagger", "0.11"
+gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer"
+gem "wine_bouncer" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting

@@ -138,6 +138,10 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.1.8)
     connection_pool (2.2.3)
+    countries (3.1.0)
+      i18n_data (~> 0.11.0)
+      sixarm_ruby_unaccent (~> 1.1)
+      unicode_utils (~> 1.4)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.6)
@@ -167,6 +171,11 @@ GEM
     eventmachine (1.2.7)
     excon (0.76.0)
     execjs (2.7.0)
+    facebookbusiness (0.8.0.0)
+      countries (~> 3.0)
+      faraday (~> 0.15)
+      json (~> 2.2)
+      money (~> 6.13)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.1.1)
@@ -295,6 +304,7 @@ GEM
       rails-i18n
       rainbow (>= 2.2.2, < 4.0)
       terminal-table (>= 1.5.1)
+    i18n_data (0.11.0)
     i18n_generators (2.2.2)
       activerecord (>= 3.0.0)
       railties (>= 3.0.0)
@@ -607,6 +617,7 @@ GEM
       tilt (~> 2.0)
     sitemap_generator (6.1.2)
       builder (~> 3.0)
+    sixarm_ruby_unaccent (1.2.0)
     skylight (5.0.1)
       activesupport (>= 5.2.0)
     sprockets (4.0.0)
@@ -655,6 +666,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (1.7.0)
+    unicode_utils (1.4.0)
     uniform_notifier (1.13.0)
     user_agent_parser (2.5.2)
     vcr (5.0.0)
@@ -706,6 +718,7 @@ DEPENDENCIES
   dotenv-rails
   draper
   eventmachine
+  facebookbusiness
   factory_bot_rails
   faraday-request_response_logger!
   faraday_middleware
