@@ -4079,7 +4079,7 @@ en:
     embed:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Address
+      address: Complete address
       choose_color: Choose color
       choose_country: Choose country
       city: City
@@ -4134,7 +4134,7 @@ en:
     embed_extended:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Address
+      address: Complete address
       any_extra_words: Any extra words?
       choose_color: Choose color
       choose_handlebar: Choose handlebar
