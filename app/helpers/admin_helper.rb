@@ -54,7 +54,7 @@ module AdminHelper
       {title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
-    ] + dev_nav_select_links).sort { |a, b| a[:title] <=> b[:title] }
+    ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end
 
   def admin_nav_select_link_active
