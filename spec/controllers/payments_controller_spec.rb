@@ -7,7 +7,7 @@ RSpec.describe PaymentsController, type: :controller do
   describe "new" do
     context "with user" do
       before do
-        user.update(general_alerts: ["has_stolen_bikes_without_locations"])
+        user.update(alert_slugs: ["has_stolen_bikes_without_locations"])
         set_current_user(user)
       end
       it "renders" do

@@ -41,7 +41,7 @@ RSpec.describe UserPhonesController, type: :request do
         current_user.reload
         expect(current_user.user_phones.count).to eq 1
         expect(current_user.phone_waiting_confirmation?).to be_truthy
-        expect(current_user.general_alerts).to eq(["phone_waiting_confirmation"])
+        expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
         user_phone.reload
         expect(user_phone.confirmed?).to be_falsey
@@ -57,7 +57,7 @@ RSpec.describe UserPhonesController, type: :request do
         current_user.reload
         expect(current_user.phone_waiting_confirmation?).to be_falsey
         expect(current_user.user_phones.count).to eq 1
-        expect(current_user.general_alerts).to eq([])
+        expect(current_user.alert_slugs).to eq([])
 
         user_phone.reload
         expect(user_phone.confirmed?).to be_truthy
@@ -82,7 +82,7 @@ RSpec.describe UserPhonesController, type: :request do
         current_user.reload
         expect(current_user.phone_waiting_confirmation?).to be_falsey
         expect(current_user.user_phones.count).to eq 1
-        expect(current_user.general_alerts).to eq([])
+        expect(current_user.alert_slugs).to eq([])
 
         user_phone.reload
         expect(user_phone.confirmed?).to be_truthy

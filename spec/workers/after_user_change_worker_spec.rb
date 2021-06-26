@@ -59,10 +59,10 @@ RSpec.describe AfterUserChangeWorker, type: :job do
   describe "phone_waiting_confirmation" do
     let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
     let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
-    it "adds general_alerts" do
+    it "adds alert_slugs" do
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
     context "legacy_migration" do
       let!(:user_phone) { FactoryBot.create(:user_phone, user: user, confirmation_code: "legacy_migration") }
@@ -71,13 +71,13 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         expect(user.phone_waiting_confirmation?).to be_falsey
         instance.perform(user.id)
         user.reload
-        expect(user.general_alerts).to eq([])
+        expect(user.alert_slugs).to eq([])
         # Add another user phone, and it does add the alert though
         FactoryBot.create(:user_phone, user: user)
         expect(user.phone_waiting_confirmation?).to be_truthy
         instance.perform(user.id)
         user.reload
-        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
       end
     end
   end
@@ -129,23 +129,23 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       instance.perform(user.id)
 
       user.reload
-      expect(user.general_alerts).to eq(["stolen_bikes_without_locations"])
+      expect(user.alert_slugs).to eq(["stolen_bikes_without_locations"])
 
       FactoryBot.create(:theft_alert, stolen_record: stolen_record)
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq(%w[stolen_bikes_without_locations theft_alert_without_photo])
+      expect(user.alert_slugs).to eq(%w[stolen_bikes_without_locations theft_alert_without_photo])
 
       membership = FactoryBot.create(:membership_claimed, user: user, role: "admin")
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq(["theft_alert_without_photo"])
+      expect(user.alert_slugs).to eq(["theft_alert_without_photo"])
 
       membership.destroy
       user.update(superuser: true)
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq([])
+      expect(user.alert_slugs).to eq([])
     end
   end
 end
