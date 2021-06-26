@@ -25,6 +25,7 @@ class OrganizationFeature < ApplicationRecord
     unstolen_notifications
   ].freeze
 
+  # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
     avery_export
     bike_search
