@@ -8,19 +8,13 @@ FactoryBot.define do
         bike { FactoryBot.create(:bike) }
       end
       after(:create) do |bike_sticker, evaluator|
-        # # Have to set these things or previous_bike_id doesn't work correctly,
-        # # ... because transient doesn't actually work
-        # bike_claiming = bike_sticker.bike
-        # user_claiming = bike_sticker.user
-        # bike_sticker.bike_id = nil
-        # bike_sticker.user_id = nil
-        # bike_sticker.claim(bike: bike_claiming, user: user_claiming)
-
+        # Have to set these things or previous_bike_id doesn't work correctly,
+        # ... because transient doesn't actually work
         bike_claiming = evaluator.bike
         user_claiming = evaluator.user
         bike_sticker.bike_id = nil
         bike_sticker.user_id = nil
-        bike_sticker.claim(bike: bike_claiming, user: user_claiming)
+        bike_sticker.claim(bike: evaluator.bike, user: evaluator.user)
       end
     end
   end
