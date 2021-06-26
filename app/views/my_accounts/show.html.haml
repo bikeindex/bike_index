@@ -39,6 +39,19 @@
                     %ul.attr-list
                       = attr_list_item(bike.serial_display(current_user), t(".serial"))
                       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
+                      - if bike.bike_stickers.any?
+                        - sticker_count = bike.bike_stickers.count
+                        %li
+                          %strong= t(".bike_sticker").pluralize(sticker_count)
+                          - if sticker_count > 1
+                            %ul.multi-sticker
+                              - bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
+                                %li
+                                  %code.sticker-code= bike_sticker.pretty_code
+                          - else
+                            - bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
+                              %code.sticker-code= bike_sticker.pretty_code
+                      %br
                       - if bike.current_stolen_record.present?
                         = attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), t('.date_stolen'))
                         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))

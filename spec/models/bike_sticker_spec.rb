@@ -245,8 +245,9 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed) }
       let(:bike) { bike_sticker2.bike }
       it "does not permit claiming already claimed stickers" do
-        expect(bike_sticker1.claimable_by?(user)).to be_truthy
-        expect(bike_sticker2.claimable_by?(user)).to be_falsey
+        expect(bike_sticker1.reload.claimable_by?(user)).to be_truthy
+        expect(bike_sticker2.reload.claimed?).to be_truthy
+        expect(bike_sticker2.reload.claimable_by?(user)).to be_falsey
         # It's still claimable by the user after it has been claimed
         bike_sticker1.claim(user: user, bike: bike)
         expect(bike_sticker1.claimable_by?(user)).to be_truthy

@@ -38,9 +38,37 @@ class BikeStickerUpdate < ApplicationRecord
     CREATOR_KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.kind_humanized(str)
+    return "" unless str.present?
+    return str.tr("_", "-") if %w[re_claim un_claim].include?(str)
+    str.tr("_", " ")
+  end
+
+  def self.creator_kind_humanized(str)
+    return "" unless str.present?
+    str.gsub("creator_", "").tr("_", " ")
+  end
+
+  def self.organization_kind_humanized(str)
+    return "" unless str.present?
+    str.tr("_", " ")
+  end
+
   def previous_successful_updates
     BikeStickerUpdate.where(bike_sticker_id: bike_sticker_id).successful
       .where("created_at < ?", created_at || Time.current)
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
+  end
+
+  def creator_kind_humanized
+    self.class.creator_kind_humanized(creator_kind)
+  end
+
+  def organization_kind_humanized
+    self.class.organization_kind_humanized(organization_kind)
   end
 
   def unauthorized_organization?

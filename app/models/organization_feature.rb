@@ -18,7 +18,6 @@ class OrganizationFeature < ApplicationRecord
     reg_student_id
   ].freeze
 
-  # NOTE: slug:impound_bikes_public is enabled in organization. It isn't actually included here
   BIKE_ACTIONS = %w[
     additional_registrations_information
     impound_bikes
@@ -26,6 +25,7 @@ class OrganizationFeature < ApplicationRecord
     unstolen_notifications
   ].freeze
 
+  # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
     avery_export
     bike_search
@@ -36,6 +36,7 @@ class OrganizationFeature < ApplicationRecord
     graduated_notifications
     hot_sheet
     impound_bikes_locations
+    impound_bikes_public
     passwordless_users
     regional_bike_counts
     claimed_ownerships

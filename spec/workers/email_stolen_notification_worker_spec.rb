@@ -55,7 +55,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "sends customer an email" do
         user.reload
-        expect(user.send_unstolen_notifications?).to be_truthy
+        expect(user.enabled?("unstolen_notifications")).to be_truthy
         instance.perform(stolen_notification.id)
         expect_notification_sent(stolen_notification.sender.email)
       end
@@ -82,7 +82,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       before do
         user.reload
-        expect(user.send_unstolen_notifications?).to be_truthy
+        expect(user.enabled?("unstolen_notifications")).to be_truthy
       end
       it "sends to customer" do
         instance.perform(stolen_notification.id)

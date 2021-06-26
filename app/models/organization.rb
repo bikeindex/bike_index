@@ -381,10 +381,7 @@ class Organization < ApplicationRecord
 
   # Accepts string or array, tests that ALL are enabled
   def enabled?(feature_name)
-    features =
-      Array(feature_name)
-        .map { |name| name.strip.downcase.gsub(/\s/, "_") }
-
+    features = OrganizationFeature.matching_slugs(feature_name)
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
     features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end

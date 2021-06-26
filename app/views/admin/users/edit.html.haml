@@ -219,14 +219,14 @@
 %hr.mt-4
 - mailchimp_datum = @user.mailchimp_datum
 %h4
+  - if mailchimp_datum.blank?
+    No
   Mailchimp data
   - if mailchimp_datum.present?
     %em.small
       %a.small{href: ".mailchimpRawData", "aria-expanded" => "false", "data-toggle" => "collapse"}
         show raw data
-- if mailchimp_datum.blank?
-  %p No Mailchimp data
-- else
+- if mailchimp_datum.present?
   .row
     .col-md-6
       %table.table-list

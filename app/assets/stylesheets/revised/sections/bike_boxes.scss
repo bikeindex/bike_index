@@ -21,6 +21,17 @@ $bike-box-bg: $gray-lighter;
     }
   }
 
+  .sticker-code {
+    font-size: 90%;
+    color: $body-font-color;
+  }
+  .multi-sticker {
+    padding: 0 0 0 1.5rem;
+    li {
+      margin-top: 0.25rem;
+    }
+  }
+
   .bike-information {
     flex: 0 0 75%;
     padding: $vertical-height 0.9375rem;
@@ -95,7 +106,7 @@ $bike-box-bg: $gray-lighter;
 .thumb-overlay {
   background: #c2c2c2;
   height: 100%;
-  opacity: .8;
+  opacity: 0.8;
   position: absolute;
   text-align: center;
   width: 100%;
