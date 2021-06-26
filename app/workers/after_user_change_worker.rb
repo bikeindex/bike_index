@@ -23,6 +23,8 @@ class AfterUserChangeWorker < ApplicationWorker
 
     alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
 
+    alerts << "unassigned_bike_org" if alert_for_unassigned_bike_org(user)
+
     # Ignore alerts below for superusers
     return alerts if user.superuser
 
@@ -53,5 +55,9 @@ class AfterUserChangeWorker < ApplicationWorker
     UserPhoneConfirmationWorker.new.perform(user_phone.id, true)
     user.reload
     true
+  end
+
+  def alert_for_unassigned_bike_org(user)
+    # user.bike_organizations.alert_on_unassigned_bike
   end
 end
