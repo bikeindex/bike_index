@@ -141,6 +141,7 @@ RSpec.describe BikeDisplayer do
         expect(bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
         expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
         bike2.reload
+        expect(bike2.owner).to eq owner
         expect(bike2.bike_stickers.pluck(:id)).to eq([])
         expect(BikeDisplayer.display_sticker_edit?(bike2, owner)).to be_truthy
         bike_sticker.claim(bike: bike_other)
