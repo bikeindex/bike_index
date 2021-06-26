@@ -92,6 +92,19 @@ class BikeSticker < ApplicationRecord
     unclaimed.reorder(:id).where("id > ?", after_id || 1).first
   end
 
+  def self.user_can_claim_sticker?(user, bike_sticker = nil)
+    return false if user.blank?
+    return true if user.superuser?
+    unauthorized_sticker_ids = user.unauthorized_organization_update_bike_sticker_ids
+    if bike_sticker.present?
+      # If the user has already updated this sticker, they're allowed to update it again
+      return true if unauthorized_sticker_ids.include?(bike_sticker.id)
+      # if claimed, the sticker can only be updated if the user is authorized for the current bike
+      return bike_sticker.bike.authorized?(user) if bike_sticker.claimed?
+    end
+    unauthorized_sticker_ids.count < MAX_UNORGANIZED
+  end
+
   def claimed?
     bike_id.present? && bike.present?
   end
@@ -126,17 +139,13 @@ class BikeSticker < ApplicationRecord
 
   def claimable_by?(passed_user, passed_organization = nil)
     return false unless passed_user.present?
-    return true if passed_user.superuser?
     if passed_organization.present?
       return false unless passed_user.authorized?(passed_organization)
       return true if organization_authorized?(passed_organization)
     elsif passed_user.organizations.detect { |o| organization_authorized?(o) }
       return true
     end
-    unauthorized_sticker_ids = passed_user.unauthorized_organization_update_bike_sticker_ids
-    return true if unauthorized_sticker_ids.include?(id)
-    return bike.authorized?(passed_user) if claimed? # if user is authorized, they can edit
-    unauthorized_sticker_ids.count < MAX_UNORGANIZED
+    self.class.user_can_claim_sticker?(passed_user, self)
   end
 
   def claiming_bike_for_args(args)

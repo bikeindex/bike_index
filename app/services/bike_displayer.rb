@@ -14,5 +14,10 @@ class BikeDisplayer
       bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
         bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
+
+    # No need to pass user, because only visible on edit pages
+    def display_sticker_edit?(bike)
+      BikeSticker.user_can_claim_sticker?(current_user)
+    end
   end
 end

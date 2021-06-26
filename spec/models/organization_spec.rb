@@ -341,7 +341,7 @@ RSpec.describe Organization, type: :model do
         expect(regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
         bike.reload
         expect(bike.organizations).to eq([regional_child])
-        expect(bike.sticker_organizations).to eq([regional_child])
+        expect(bike.organizations.with_enabled_feature_slugs("bike_stickers")).to eq([regional_child])
       end
     end
   end

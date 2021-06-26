@@ -93,4 +93,50 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "display_sticker_edit?" do
+    let(:bike) { Bike.new }
+    let(:owner) { User.new }
+    it "is falsey if bike doesn't have stolen record" do
+      allow(bike).to receive(:owner) { owner }
+      expect(BikeDisplayer.display_sticker_edit?(bike)).to be_falsey
+    end
+    context "organization is a bike_sticker child" do
+      let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %[regional_bike_counts bike_stickers]) }
+      let(:organization2) { FactoryBot.create(:organization, :in_nyc) }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization2, can_edit_claimed: false) }
+      it "is truthy" do
+        organization2.reload
+        expect(organization2.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
+        bike.reload
+        expect(bike.organizations.pluck(:id)).to eq([organization2.id])
+        expect(BikeDisplayer.display_sticker_edit?(bike)).to be_truthy
+      end
+    end
+    context "bike has sticker, other user bike has sticker" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let(:owner) { bike.owner }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, user: user) }
+      let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+      let(:bike_other) { FactoryBot.create(:bike) }
+      it "is truthy" do
+        bike.reload
+        expect(bike.owner).to eq owner
+        expect(bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+        expect(BikeDisplayer.display_sticker_edit?(bike)).to be_truthy
+        bike2.reload
+        expect(bike2.bike_stickers.pluck(:id)).to eq([])
+        expect(BikeDisplayer.display_sticker_edit?(bike2)).to be_truthy
+        bike_sticker.claim(bike: bike_other)
+        bike.reload
+        expect(bike.bike_stickers.pluck(:id)).to eq([])
+        expect(BikeDisplayer.display_sticker_edit?(bike)).to be_truthy
+        bike2.reload
+        expect(BikeDisplayer.display_sticker_edit?(bike2)).to be_truthy
+      end
+    end
+    context "user can't add more stickers" do
+      it "is falsey"
+    end
+  end
 end
