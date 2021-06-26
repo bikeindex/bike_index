@@ -134,7 +134,7 @@
               .form-well-input
                 = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
 
-          - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_form?(@bike)
+          - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
             = render "shared/form_well_footer_save"
 
           - else
@@ -149,7 +149,7 @@
                     - @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
                       = bike_sticker.pretty_code
                       %br
-              - if BikeDisplayer.display_sticker_form?(@bike)
+              - if BikeDisplayer.display_sticker_edit?(@bike, current_user)
               .form-group.row.no-divider-row.mb-0
                 = label_tag :bike_sticker, class: "form-well-label" do
                   - sticker_information_link = link_to t(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
