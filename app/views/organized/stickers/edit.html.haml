@@ -58,3 +58,46 @@
   .row.mt-4
     .form-submit-button
       = f.submit t(".update"), class: "btn btn-success btn-lg"
+
+-# de-emphasize the updates
+- bike_sticker_updates = @bike_sticker.bike_sticker_updates
+%div{style: "opacity: 0.7;"}
+  %hr.mt-5
+
+  %h3.mt-4 Sticker assignments
+
+  - if bike_sticker_updates.none?
+    %p No updates
+  - else
+    %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+      %thead.small-header.hidden-md-down
+        %th Time
+        %th By
+        %th Who
+        %th Bike
+        %th Kind
+      %tbody
+        - bike_sticker_updates.reorder(created_at: :desc).each do |bike_sticker_update|
+          %tr
+            %td
+              %span.convertTime.preciseTime
+                = l(bike_sticker_update.created_at, format: :convert_time)
+            %td
+              = bike_sticker_update.creator_kind_humanized
+            %td
+              = bike_sticker_update.user&.display_name
+              - if bike_sticker_update.organization_id == current_organization.id
+                = current_organization.short_name
+              - else
+                %em
+                  - if bike_sticker_update.organization_id.present?
+                    (#{bike_sticker_update.organization&.short_name || bike_sticker_update.organization_id})
+                  - else
+                    (No organization)
+            %td
+              - if bike_sticker_update.bike.present?
+                = link_to(organized_bike_text(bike_sticker_update.bike), bike_path(bike_sticker_update.bike, organization_id: current_organization.to_param))
+              - elsif bike_sticker_update.bike_id.present?
+                %span.text-danger= t(".bike_is_unavailable")
+            %td
+              = bike_sticker_update.kind_humanized

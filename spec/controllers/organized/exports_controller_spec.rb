@@ -133,8 +133,8 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(flash[:success]).to be_present
           bike_sticker.reload
           expect([bike_sticker.claimed_at, bike_sticker.bike_id].count(&:present?)).to eq 0
-          expect(bike_sticker.bike_sticker_updates.count).to eq 1
-          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker.bike_sticker_updates.count).to eq 2
+          bike_sticker_update = bike_sticker.bike_sticker_updates.last
           expect(bike_sticker_update.creator_kind).to eq "creator_export"
           expect(bike_sticker_update.kind).to eq "un_claim"
         end

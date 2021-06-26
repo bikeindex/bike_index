@@ -209,8 +209,11 @@ class User < ApplicationRecord
     false
   end
 
-  def send_unstolen_notifications?
-    superuser || organizations.any? { |o| o.enabled?("unstolen_notifications") }
+  def enabled?(slugs, no_superuser_override: false)
+    features = OrganizationFeature.matching_slugs(slugs)
+    return false if features.blank?
+    return true if !no_superuser_override && superuser?
+    organizations.with_enabled_feature_slugs(features).any?
   end
 
   def auth_token_time(auth_token_type)

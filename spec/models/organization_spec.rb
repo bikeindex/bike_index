@@ -275,21 +275,24 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "#enabled?" do
-    context "given an ambassador organization and 'unstolen_notifications'" do
+    context "ambassador organization and 'unstolen_notifications'" do
+      let(:organization) { FactoryBot.create(:organization_ambassador) }
+      let(:user) { FactoryBot.create(:user, :with_organization, organization: organization) }
       it "returns true" do
-        ambassador_org = FactoryBot.create(:organization_ambassador)
-
-        enabled = ambassador_org.enabled?("unstolen_notifications")
-        expect(enabled).to eq(true)
-
-        enabled = ambassador_org.enabled?(["unstolen_notifications"])
-        expect(enabled).to eq(true)
-
-        enabled = ambassador_org.enabled?("unstolen notifications")
-        expect(enabled).to eq(true)
-
-        enabled = ambassador_org.enabled?("invalid feature name")
-        expect(enabled).to eq(false)
+        organization.reload
+        expect(organization.enabled?("unstolen_notifications")).to be_truthy
+        expect(organization.enabled?(["unstolen_notifications"])).to be_truthy
+        expect(organization.enabled?("bike_stickers")).to be_falsey
+        expect(organization.enabled?("invalid feature name")).to be_falsey
+        user.reload
+        expect(user.enabled?("unstolen_notifications")).to be_truthy
+        expect(user.enabled?("bike_stickers")).to be_falsey
+        expect(user.enabled?("invalid feature name")).to be_falsey
+        user.superuser = true
+        expect(user.enabled?("unstolen_notifications")).to be_truthy
+        expect(user.enabled?("unstolen_notifications", no_superuser_override: true)).to be_truthy
+        expect(user.enabled?(["bike_stickers"])).to be_truthy
+        expect(user.enabled?(["bike_stickers"], no_superuser_override: true)).to be_falsey
       end
     end
   end
@@ -341,7 +344,7 @@ RSpec.describe Organization, type: :model do
         expect(regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
         bike.reload
         expect(bike.organizations).to eq([regional_child])
-        expect(bike.sticker_organizations).to eq([regional_child])
+        expect(bike.organizations.with_enabled_feature_slugs("bike_stickers")).to eq([regional_child])
       end
     end
   end

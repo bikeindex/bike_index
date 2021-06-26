@@ -504,10 +504,6 @@ class Bike < ApplicationRecord
     authorized?(u)
   end
 
-  def sticker_organizations
-    organizations.with_enabled_feature_slugs("bike_stickers")
-  end
-
   # This method only accepts numerical org ids
   def bike_sticker?(organization_id = nil)
     bike_stickers.where(organization_id.present? ? {organization_id: organization_id} : {}).any?
@@ -517,7 +513,7 @@ class Bike < ApplicationRecord
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
-    return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
+    return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 

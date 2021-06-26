@@ -93,4 +93,85 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "display_sticker_edit?" do
+    let(:bike) { Bike.new }
+    let(:owner) { User.new }
+    it "is falsey" do
+      allow(bike).to receive(:owner) { owner }
+      expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_falsey
+      expect(BikeDisplayer.display_sticker_edit?(bike, User.new(superuser: true))).to be_truthy
+    end
+    context "organization is a bike_sticker child" do
+      let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:organization_regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization_regional_child, can_edit_claimed: false) }
+      let(:owner) { bike.owner }
+      let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
+      let(:user2) { FactoryBot.create(:user, :with_organization, organization: organization_regional_parent) }
+      it "is truthy" do
+        organization_regional_parent.update_attributes(updated_at: Time.current)
+        organization_regional_child.reload
+        organization_regional_child.update(updated_at: Time.current)
+        organization_regional_child.reload
+        expect(Organization.regional.pluck(:id)).to eq([organization_regional_parent.id])
+        expect(organization_regional_child.regional_parents.pluck(:id)).to eq([organization_regional_parent.id])
+        expect(organization_regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
+        bike.reload
+        expect(bike.organizations.pluck(:id)).to eq([organization_regional_child.id])
+        expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
+        # Organization member can edit bike stickers
+        expect(BikeDisplayer.display_sticker_edit?(bike, user2)).to be_truthy
+        expect(BikeDisplayer.display_sticker_edit?(bike, FactoryBot.create(:user))).to be_falsey
+        # Test that another bike of the user, without the organization, is truthy
+        bike2.reload
+        expect(bike2.organizations.pluck(:id)).to eq([])
+        expect(BikeDisplayer.display_sticker_edit?(bike2, owner)).to be_truthy
+      end
+    end
+    context "bike has sticker, other user bike has sticker" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let(:owner) { bike.owner }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike) }
+      let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
+      let(:bike_other) { FactoryBot.create(:bike) }
+      it "is truthy" do
+        bike.reload
+        expect(bike.owner).to eq owner
+        expect(bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+        expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
+        bike2.reload
+        expect(bike2.owner).to eq owner
+        expect(bike2.bike_stickers.pluck(:id)).to eq([])
+        expect(BikeDisplayer.display_sticker_edit?(bike2, owner)).to be_truthy
+        bike_sticker.claim(bike: bike_other)
+        bike.reload
+        expect(bike.bike_stickers.pluck(:id)).to eq([])
+        expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
+        bike2.reload
+        expect(BikeDisplayer.display_sticker_edit?(bike2, owner)).to be_truthy
+      end
+    end
+    context "user can't add more stickers" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let(:owner) { bike.owner }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker) }
+      let(:user2) { FactoryBot.create(:user_confirmed) }
+      let(:bike2) { FactoryBot.create(:bike) }
+      it "is falsey" do
+        bike_sticker.claim(user: owner, bike: bike)
+        expect(BikeSticker.where(user_id: owner.id).pluck(:id)).to eq([bike_sticker.id])
+        # Test that it's based on updates, not actual bike/sticker ownership
+        bike_sticker.claim(user: user2, bike: bike2)
+        bike_sticker.reload
+        expect(BikeSticker.where(user_id: owner.id).pluck(:id)).to eq([])
+        expect(BikeStickerUpdate.where(user_id: owner.id).pluck(:bike_sticker_id)).to eq([bike_sticker.id])
+        owner.reload
+        expect(owner.authorized?(bike_sticker.bike)).to be_falsey
+        expect(owner.bike_sticker_updates.count).to eq 1
+        expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
+        stub_const("BikeSticker::MAX_UNORGANIZED", 2)
+      end
+    end
+  end
 end
