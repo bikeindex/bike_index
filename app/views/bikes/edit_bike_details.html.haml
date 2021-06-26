@@ -134,7 +134,7 @@
               .form-well-input
                 = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
 
-          - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
+          - if !BikeDisplayer.display_sticker_edit?(@bike, current_user)
             = render "shared/form_well_footer_save"
 
           - else

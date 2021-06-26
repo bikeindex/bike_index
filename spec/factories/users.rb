@@ -38,8 +38,8 @@ FactoryBot.define do
 
       after(:create) do |user, evaluator|
         FactoryBot.create(:membership_claimed, user: user,
-          organization: evaluator.organization,
-          role: evaluator.role)
+                                               organization: evaluator.organization,
+                                               role: evaluator.role)
       end
     end
 

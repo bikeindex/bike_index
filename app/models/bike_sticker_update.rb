@@ -40,7 +40,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def self.kind_humanized(str)
     return "" unless str.present?
-    return str.gsub("_", "-") if %w[re_claim un_claim].include?(str)
+    return str.tr("_", "-") if %w[re_claim un_claim].include?(str)
     str.tr("_", " ")
   end
 

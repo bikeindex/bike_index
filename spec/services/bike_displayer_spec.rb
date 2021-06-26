@@ -119,7 +119,6 @@ RSpec.describe BikeDisplayer do
         expect(organization_regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
         bike.reload
         expect(bike.organizations.pluck(:id)).to eq([organization_regional_child.id])
-        pp owner
         expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
         # Organization member can edit bike stickers
         expect(BikeDisplayer.display_sticker_edit?(bike, user2)).to be_truthy
