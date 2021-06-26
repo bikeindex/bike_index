@@ -98,8 +98,13 @@ RSpec.describe Organized::StickersController, type: :controller do
         let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike_id: bike.id, organization_id: organization.id) }
         let(:bike2) { FactoryBot.create(:bike) }
         it "updates" do
+          bike_sticker.reload
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          expect(bike_sticker.previous_bike_id).to be_blank
+          expect(bike_sticker.bike_id).to eq bike.id
           bike2.reload
           expect(bike2.organizations.pluck(:id)).to eq([])
+          pp "------"
           expect {
             put :update, params: {id: bike_sticker.code, organization_id: organization.id, bike_sticker: {bike_id: "https://bikeindex.org/bikes/#{bike2.id} "}}
           }.to change(BikeStickerUpdate, :count).by 1
