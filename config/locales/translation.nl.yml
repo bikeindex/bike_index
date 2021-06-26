@@ -5882,6 +5882,7 @@ nl:
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
       date_found: Datum gevonden
+      bike_sticker: Fiets sticker
   org_public:
     impounded_bikes:
       index:
