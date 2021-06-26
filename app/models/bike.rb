@@ -513,7 +513,7 @@ class Bike < ApplicationRecord
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
-    return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
+    return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 

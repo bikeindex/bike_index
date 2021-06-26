@@ -104,13 +104,15 @@ RSpec.describe BikeDisplayer do
     end
     context "organization is a bike_sticker child" do
       let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %[regional_bike_counts bike_stickers]) }
-      let(:organization2) { FactoryBot.create(:organization, :in_nyc) }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization2, can_edit_claimed: false) }
+      let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc) }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization_regional_child, can_edit_claimed: false) }
       it "is truthy" do
-        organization2.reload
-        expect(organization2.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
+        organization_regional_child.reload
+        organization.update_attributes(updated_at: Time.current)
+        expect(organization_regional_child.regional_parents.pluck(:id)).to eq([organization.id])
+        expect(organization_regional_child.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
         bike.reload
-        expect(bike.organizations.pluck(:id)).to eq([organization2.id])
+        expect(bike.organizations.pluck(:id)).to eq([organization_regional_child.id])
         expect(BikeDisplayer.display_sticker_edit?(bike, owner)).to be_truthy
       end
     end
