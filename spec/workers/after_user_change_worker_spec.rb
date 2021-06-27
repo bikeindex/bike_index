@@ -123,7 +123,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(stolen_record.bike.user).to eq user
       expect(stolen_record_with_location.bike.user).to eq user
       expect(stolen_record_unclaimed.bike.user).to be_blank
-      # Unmemoize the stolen_bikes_without_locations
+      # Unmemoize the stolen_bike_without_location
       user_id = user.id
       user = User.find(user_id)
       user.save
@@ -134,12 +134,12 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       instance.perform(user.id)
 
       user.reload
-      expect(user.alert_slugs).to eq(["stolen_bikes_without_locations"])
+      expect(user.alert_slugs).to eq(["stolen_bike_without_location"])
 
-      FactoryBot.create(:theft_alert, stolen_record: stolen_record)
+      FactoryBot.create(:theft_alert, stolen_record: stolen_record, user: user)
       instance.perform(user.id)
       user.reload
-      expect(user.alert_slugs).to eq(%w[stolen_bikes_without_locations theft_alert_without_photo])
+      expect(user.alert_slugs).to eq(%w[stolen_bike_without_location theft_alert_without_photo])
 
       membership = FactoryBot.create(:membership_claimed, user: user, role: "admin")
       instance.perform(user.id)

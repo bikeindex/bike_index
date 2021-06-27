@@ -887,7 +887,7 @@ RSpec.describe BikesController, type: :controller do
       let(:user) { ownership.creator }
       context "revised" do
         before do
-          user.update_column :alert_slugs, ["stolen_bikes_without_locations"]
+          user.update_column :alert_slugs, ["stolen_bike_without_location"]
           set_current_user(user)
         end
         context "root" do

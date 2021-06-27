@@ -25,7 +25,7 @@
     -# Gross hack to force updating, the phone waiting for confirmation has expired
     - current_user.update(updated_at: Time.current, skip_update: false)
 
-- elsif current_user.alert_slugs.include?("stolen_bikes_without_locations")
+- elsif current_user.alert_slugs.include?("stolen_bike_without_location")
   - without_location_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.without_location? }
   - if without_location_bikes.present?
 

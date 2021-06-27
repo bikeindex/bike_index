@@ -2,7 +2,7 @@ class UserAlert < ApplicationRecord
   KIND_ENUM = {
     phone_waiting_confirmation: 0,
     theft_alert_without_photo: 1,
-    stolen_bikes_without_locations: 2,
+    stolen_bike_without_location: 2,
     unassigned_bike_org: 3
   }.freeze
 
@@ -13,7 +13,6 @@ class UserAlert < ApplicationRecord
   belongs_to :organization
 
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
-  validates :theft_alert_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
   # Probably not unique unless checking all references
   # validates :bike_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
   # validates :organization_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
@@ -26,16 +25,54 @@ class UserAlert < ApplicationRecord
   scope :resolved, -> { where.not(resolved_at: nil) }
   scope :inactive, -> { where.not(resolved_at: nil).or(where(dismissed_at: nil)) }
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
+  scope :ignored_admin_member, -> { where(kind: ignored_kinds_admin_member) }
+  scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
+
+  def self.ignored_kinds_admin_member
+    %w[stolen_bike_without_location]
+  end
+
+  def self.ignored_kinds_superuser
+    ignored_kinds_admin_member + %w[theft_alert_without_photo unassigned_bike_org]
+  end
 
   def self.find_or_build_by(attrs)
     where(attrs).first || new(attrs)
   end
 
-  def self.theft_alert_without_photo(user:, theft_alert:)
-    user_alert = UserAlert.find_or_build_by(kind: "theft_alert_without_photo",
+  def self.update_theft_alert_without_photo(user:, theft_alert:)
+    # scope to just active, alert if the theft alert once again has no image here because
+    user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
       user_id: user.id, theft_alert_id: theft_alert_id.id)
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike_id
+      user_alert.save
+    else
+      # Don't create if theft alert already has a photo
+      user_alert.id.blank? ? true : user_alert.resolve!
+    end
+  end
+
+  def self.update_stolen_bike_without_location(user: , bike:)
+    user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
+      user_id: user.id, bike_id: bike.id)
+    if bike.current_stolen_record&.without_location?
+      user_alert.save
+    else
+      # Don't create if theft alert already has a photo
+      user_alert.id.blank? ? true : user_alert.resolve!
+    end
+  end
+
+  def self.update_theft_alert_without_photo(user:, theft_alert:)
+    user_alert = UserAlert.find_or_build_by(kind: "theft_alert_without_photo",
+      user_id: user.id, theft_alert_id: theft_alert.id)
+    if theft_alert.missing_photo?
+      user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
     else
       # Don't create if theft alert already has a photo

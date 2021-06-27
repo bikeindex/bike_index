@@ -12,6 +12,7 @@ class AfterUserChangeWorker < ApplicationWorker
     # Create a new mailchimp datum if it's deserved
     MailchimpDatum.find_and_update_or_create_for(user)
 
+    update_user_alerts(user)
     current_alerts = user_alert_slugs(user)
     unless user.alert_slugs == current_alerts
       user.update_attributes(alert_slugs: current_alerts, skip_update: true)
@@ -19,7 +20,6 @@ class AfterUserChangeWorker < ApplicationWorker
   end
 
   def user_alert_slugs(user)
-    update_user_alerts(user)
     UserAlert.where(user_id: user.id).active.distinct.pluck(:kind).sort
   end
 
@@ -30,7 +30,10 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     # Ignore alerts below for superusers
-    return if user.superuser
+    if user.superuser?
+      user.user_alerts.active.ignored_superuser.each { |user_alert| user_alert.resolve! }
+      return
+    end
 
     # add_alerts_for_unassigned_bike_org(user)
 
@@ -38,12 +41,15 @@ class AfterUserChangeWorker < ApplicationWorker
       UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
     end
 
-    # Ignore stolen bikes without location for org admins
-    return if user.memberships.admin.any?
+    # Ignore alerts below for org admins, otherwise they might get a lot of useless ones
+    if user.memberships.admin.any?
+      user.user_alerts.active.ignored_admin_member.each { |user_alert| user_alert.resolve! }
+      return
+    end
 
-    # if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
-    #   alerts << "stolen_bikes_without_locations"
-    # end
+    user.rough_stolen_bikes.each do |bike|
+      UserAlert.update_stolen_bike_without_location(user: user, bike: bike)
+    end
   end
 
   def associate_feedbacks(user)
