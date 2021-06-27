@@ -21,7 +21,7 @@ class Admin::UserAlertsController < Admin::BaseController
     user_alerts = UserAlert
     if UserAlert.kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      user_alerts = user_alerts.where(kind: @search_kind)
+      user_alerts = user_alerts.where(kind: @kind)
     else
       @kind = "all"
     end
