@@ -73,19 +73,19 @@
         %td
           - if user_alert.bike.present?
             %span.d-block
-              bike:
+              %small bike:
               = link_to user_alert.bike_id, admin_bike_path(user_alert.bike_id)
           - if user_alert.user_phone.present?
             %span.d-block
-              user_phone: #{user_alert.user_phone_id}
+              %small user_phone: #{user_alert.user_phone_id}
           - if user_alert.theft_alert.present?
             %span.d-block
-              theft_alert:
+              %small theft_alert:
               = link_to user_alert.theft_alert_id, admin_theft_alert_path(user_alert.theft_alert_id)
           - if user_alert.organization.present?
             %span.d-block
-              organization:
-              = link_to user_alert.organization_id, admin_organization_path(user_alert.organization_id)
+              %small organization:
+              = link_to user_alert.organization&.short_name || user_alert.organization_id, admin_organization_path(user_alert.organization_id)
         %td
           - if user_alert.dismissed_at.present?
             %span.convertTime
