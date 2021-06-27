@@ -35,7 +35,11 @@ class AfterUserChangeWorker < ApplicationWorker
       return
     end
 
-    # add_alerts_for_unassigned_bike_org(user)
+    user.bike_organizations.select { |o| o.paid_money? }.each do |organization|
+      user.bikes.each do |bike|
+        UserAlert.update_unassigned_bike_org(user: user, organization: organization, bike: bike)
+      end
+    end
 
     user.theft_alerts.each do |theft_alert|
       UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)

@@ -331,6 +331,12 @@ class User < ApplicationRecord
     rough_approx_bikes.status_stolen.limit(10)
   end
 
+  # TODO: make this a little more efficient
+  def bike_organizations
+    bike_org_ids = BikeOrganization.where(bike_id: bike_ids).distinct.pluck(:organization_id)
+    Organization.where(id: bike_org_ids)
+  end
+
   def unauthorized_organization_update_bike_sticker_ids
     bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
   end

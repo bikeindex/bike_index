@@ -100,6 +100,43 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  context "unassigned bikes" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization, user: user) }
+    let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+    it "adds alerts for unassigned bikes" do
+      expect(organization.reload.paid?).to be_truthy
+      expect(organization.paid_money?).to be_falsey
+      expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
+      expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+      expect(user.reload.rough_approx_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(user.user_alerts.pluck(:kind)).to eq([])
+      instance.perform(user.id)
+      user.reload
+      expect(user.user_alerts.count).to eq 0
+      expect(user.alert_slugs).to eq([])
+    end
+    context "paid money org" do
+      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
+      it "adds alerts for unassigned bikes" do
+        expect(organization.reload.paid?).to be_truthy
+        expect(organization.paid_money?).to be_truthy
+        expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
+        expect(user.user_alerts.pluck(:kind)).to eq([])
+        instance.perform(user.id)
+        user.reload
+        expect(user.alert_slugs).to eq(["unassigned_bike_org"])
+        expect(user.user_alerts.count).to eq 1
+        user_alert = user.user_alerts.last
+        expect(user_alert.kind).to eq "unassigned_bike_org"
+        expect(user_alert.active?).to be_truthy
+        expect(user_alert.organization_id).to eq organization.id
+        expect(user_alert.bike_id).to eq bike2.id
+      end
+    end
+  end
+
   describe "stolen records missing locations" do
     let(:user) { FactoryBot.create(:user) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
