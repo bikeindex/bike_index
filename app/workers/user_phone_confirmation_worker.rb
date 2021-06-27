@@ -13,7 +13,7 @@ class UserPhoneConfirmationWorker < ApplicationWorker
       body: user_phone.confirmation_message)
 
     return true if skip_user_update
-    # Manually run after user change to add a general alert to the user
+    # Manually run after user change to add a user alert
     # (rather than spinning up a new worker)
     AfterUserChangeWorker.new.perform(user_phone.user_id, user_phone.user)
   end

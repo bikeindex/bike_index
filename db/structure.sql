@@ -2875,6 +2875,44 @@ ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.i
 
 
 --
+-- Name: user_alerts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_alerts (
+    id bigint NOT NULL,
+    user_id bigint,
+    user_phone_id bigint,
+    bike_id bigint,
+    organization_id bigint,
+    message text,
+    kind integer,
+    resolved_at timestamp without time zone,
+    dismissed_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: user_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_alerts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_alerts_id_seq OWNED BY public.user_alerts.id;
+
+
+--
 -- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2993,7 +3031,7 @@ CREATE TABLE public.users (
     preferred_language character varying,
     last_login_ip character varying,
     magic_link_token text,
-    general_alerts jsonb DEFAULT '[]'::jsonb,
+    alert_slugs jsonb DEFAULT '[]'::jsonb,
     address_set_manually boolean DEFAULT false
 );
 
@@ -3546,6 +3584,13 @@ ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweet
 --
 
 ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
+
+
+--
+-- Name: user_alerts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_alerts ALTER COLUMN id SET DEFAULT nextval('public.user_alerts_id_seq'::regclass);
 
 
 --
@@ -4150,6 +4195,14 @@ ALTER TABLE ONLY public.tweets
 
 ALTER TABLE ONLY public.twitter_accounts
     ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_alerts user_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_alerts
+    ADD CONSTRAINT user_alerts_pkey PRIMARY KEY (id);
 
 
 --
@@ -5151,6 +5204,34 @@ CREATE INDEX index_twitter_accounts_on_state_id ON public.twitter_accounts USING
 
 
 --
+-- Name: index_user_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_bike_id ON public.user_alerts USING btree (bike_id);
+
+
+--
+-- Name: index_user_alerts_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_organization_id ON public.user_alerts USING btree (organization_id);
+
+
+--
+-- Name: index_user_alerts_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_user_id ON public.user_alerts USING btree (user_id);
+
+
+--
+-- Name: index_user_alerts_on_user_phone_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_user_phone_id ON public.user_alerts USING btree (user_phone_id);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5750,6 +5831,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210601175924'),
 ('20210604191419'),
 ('20210610185925'),
-('20210614175711');
+('20210614175711'),
+('20210626220123');
 
 

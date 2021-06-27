@@ -60,7 +60,12 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
     let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
     it "adds alert_slugs" do
-      instance.perform(user.id)
+      expect {
+        instance.perform(user.id)
+      }.to change(UserAlert, :count).by 1
+      user_alert = user.user_alerts.last
+      expect(user_alert.active?).to be_truthy
+      expect(user_alert.kind).to eq "phone_waiting_confirmation"
       user.reload
       expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end

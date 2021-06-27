@@ -37,6 +37,7 @@ class User < ApplicationRecord
   has_many :locks, dependent: :destroy
   has_many :user_emails, dependent: :destroy
   has_many :user_phones, dependent: :destroy
+  has_many :user_alerts
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id

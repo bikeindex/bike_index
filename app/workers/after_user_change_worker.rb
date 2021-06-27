@@ -12,18 +12,25 @@ class AfterUserChangeWorker < ApplicationWorker
     # Create a new mailchimp datum if it's deserved
     MailchimpDatum.find_and_update_or_create_for(user)
 
-    current_alerts = user_general_alerts(user)
-    unless user.general_alerts == current_alerts
-      user.update_attributes(general_alerts: current_alerts, skip_update: true)
+    current_alerts = user_alert_slugs(user)
+    unless user.alert_slugs == current_alerts
+      user.update_attributes(alert_slugs: current_alerts, skip_update: true)
     end
   end
 
-  def user_general_alerts(user)
+  def user_alert_slugs(user)
+    (update_user_alerts(user) + UserAlert.where(user_id: user.id).active.distinct.pluck(:kind))
+      .uniq.sort
+  end
+
+  def update_user_alerts(user)
     alerts = []
-
-    alerts << "phone_waiting_confirmation" if user.phone_waiting_confirmation?
-
     alerts << "unassigned_bike_org" if alert_for_unassigned_bike_org(user)
+
+    # Add user phone alerts
+    user.user_phones.each do |user_phone|
+      UserAlert.update_phone_waiting_confirmation(user, user_phone)
+    end
 
     # Ignore alerts below for superusers
     return alerts if user.superuser
@@ -38,7 +45,7 @@ class AfterUserChangeWorker < ApplicationWorker
       alerts << "stolen_bikes_without_locations"
     end
 
-    alerts.sort
+    (alerts + UserAlert.where(user_id: user.id).active.distinct.pluck(:kind)).sort.uniq
   end
 
   def associate_feedbacks(user)
@@ -51,8 +58,9 @@ class AfterUserChangeWorker < ApplicationWorker
     return false if user.phone.blank?
     return false if user.user_phones.unscoped.where(phone: user.phone).present?
     user_phone = user.user_phones.create!(phone: user.phone)
-    # Run this in the same process, rather than a different worker, so we update the general alerts
+    # Run this in the same process, rather than a different worker, so we update the user alerts
     UserPhoneConfirmationWorker.new.perform(user_phone.id, true)
+
     user.reload
     true
   end
