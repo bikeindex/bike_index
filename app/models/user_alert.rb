@@ -6,8 +6,8 @@ class UserAlert < ApplicationRecord
     unassigned_bike_org: 3
   }.freeze
 
-  belongs_to :bike
   belongs_to :user
+  belongs_to :bike
   belongs_to :user_phone
   belongs_to :theft_alert
   belongs_to :organization
@@ -34,6 +34,11 @@ class UserAlert < ApplicationRecord
 
   def self.ignored_kinds_admin_member
     %w[stolen_bike_without_location]
+  end
+
+  def self.kind_humanized(str)
+    return "" unless str.present?
+    str.gsub("_", " ")
   end
 
   def self.ignored_kinds_superuser
@@ -89,6 +94,10 @@ class UserAlert < ApplicationRecord
     else
       user_alert.save unless user_phone.legacy?
     end
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def dismissed?
