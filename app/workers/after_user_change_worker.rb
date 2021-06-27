@@ -19,33 +19,31 @@ class AfterUserChangeWorker < ApplicationWorker
   end
 
   def user_alert_slugs(user)
-    (update_user_alerts(user) + UserAlert.where(user_id: user.id).active.distinct.pluck(:kind))
-      .uniq.sort
+    update_user_alerts(user)
+    UserAlert.where(user_id: user.id).active.distinct.pluck(:kind).sort
   end
 
   def update_user_alerts(user)
-    alerts = []
-    alerts << "unassigned_bike_org" if alert_for_unassigned_bike_org(user)
-
     # Add user phone alerts
     user.user_phones.each do |user_phone|
-      UserAlert.update_phone_waiting_confirmation(user, user_phone)
+      UserAlert.update_phone_waiting_confirmation(user: user, user_phone: user_phone)
     end
 
     # Ignore alerts below for superusers
-    return alerts if user.superuser
+    return if user.superuser
 
-    if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.theft_alert_missing_photo? }
-      alerts << "theft_alert_without_photo"
+    # add_alerts_for_unassigned_bike_org(user)
+
+    user.theft_alerts.each do |theft_alert|
+      UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
     end
 
-    return alerts if user.memberships.admin.any?
+    # Ignore stolen bikes without location for org admins
+    return if user.memberships.admin.any?
 
-    if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
-      alerts << "stolen_bikes_without_locations"
-    end
-
-    (alerts + UserAlert.where(user_id: user.id).active.distinct.pluck(:kind)).sort.uniq
+    # if user.rough_stolen_bikes.any? { |b| b&.current_stolen_record&.without_location? }
+    #   alerts << "stolen_bikes_without_locations"
+    # end
   end
 
   def associate_feedbacks(user)

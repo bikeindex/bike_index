@@ -5,7 +5,10 @@ RSpec.describe UserAlert, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:user_phone) { FactoryBot.create(:user_phone, user: user) }
     it "creates only once" do
-      user_alert = UserAlert.update_phone_waiting_confirmation(user, user_phone)
+      expect {
+        UserAlert.update_phone_waiting_confirmation(user: user, user_phone: user_phone)
+      }.to change(UserAlert, :count).by 1
+      user_alert = UserAlert.last
       expect(user_alert).to be_valid
       expect(user_alert.active?).to be_truthy
       expect(user_alert.kind).to eq "phone_waiting_confirmation"
@@ -13,7 +16,7 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.inactive?).to be_falsey
       # It doesn't create a second time
       expect {
-        UserAlert.update_phone_waiting_confirmation(user, user_phone)
+        UserAlert.update_phone_waiting_confirmation(user: user, user_phone: user_phone)
       }.to_not change(UserAlert, :count)
       expect(user.user_alerts.pluck(:id)).to eq([user_alert.id])
       # Dismissing

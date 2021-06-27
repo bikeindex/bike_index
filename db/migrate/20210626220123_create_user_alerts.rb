@@ -6,7 +6,8 @@ class CreateUserAlerts < ActiveRecord::Migration[5.2]
       t.references :user, index: true
       t.references :user_phone, index: true
       t.references :bike, index: true
-      t.references :organization
+      t.references :theft_alert, index: true
+      t.references :organization, index: true
 
       t.text :message
       t.integer :kind

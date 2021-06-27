@@ -2883,6 +2883,7 @@ CREATE TABLE public.user_alerts (
     user_id bigint,
     user_phone_id bigint,
     bike_id bigint,
+    theft_alert_id bigint,
     organization_id bigint,
     message text,
     kind integer,
@@ -5215,6 +5216,13 @@ CREATE INDEX index_user_alerts_on_bike_id ON public.user_alerts USING btree (bik
 --
 
 CREATE INDEX index_user_alerts_on_organization_id ON public.user_alerts USING btree (organization_id);
+
+
+--
+-- Name: index_user_alerts_on_theft_alert_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_theft_alert_id ON public.user_alerts USING btree (theft_alert_id);
 
 
 --

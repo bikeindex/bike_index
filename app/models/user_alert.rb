@@ -9,11 +9,14 @@ class UserAlert < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :user_phone
+  belongs_to :theft_alert
   belongs_to :organization
 
-  validates :bike_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
-  validates :organization_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
+  validates :theft_alert_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
+  # Probably not unique unless checking all references
+  # validates :bike_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
+  # validates :organization_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
 
   enum kind: KIND_ENUM
 
@@ -28,14 +31,26 @@ class UserAlert < ApplicationRecord
     where(attrs).first || new(attrs)
   end
 
-  def self.update_phone_waiting_confirmation(user, user_phone)
+  def self.theft_alert_without_photo(user:, theft_alert:)
+    user_alert = UserAlert.find_or_build_by(kind: "theft_alert_without_photo",
+      user_id: user.id, theft_alert_id: theft_alert_id.id)
+    if theft_alert.missing_photo?
+      user_alert.bike_id = theft_alert.bike_id
+      user_alert.save
+    else
+      # Don't create if theft alert already has a photo
+      user_alert.id.blank? ? true : user_alert.resolve!
+    end
+  end
+
+  def self.update_phone_waiting_confirmation(user:, user_phone:)
     user_alert = UserAlert.find_or_build_by(kind: "phone_waiting_confirmation",
       user_id: user.id, user_phone_id: user_phone.id)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
       user_alert.id.blank? ? true : user_alert.resolve!
     else
-      user_alert.save
+      user_alert.save unless user_phone.legacy?
     end
   end
 
