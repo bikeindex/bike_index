@@ -8,17 +8,17 @@
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@activeness != "all" ? "active" : "") }
           #{@activeness.titleize}
         .dropdown-menu
-          = link_to "All activenesss", url_for(sortable_search_params.merge(search_activeness: "all")), class: "dropdown-item #{@activeness == 'all' ? 'active' : '' }"
+          = link_to "All activenesss", url_for(sortable_search_params.merge(search_activeness: nil)), class: "dropdown-item #{@activeness == 'all' ? 'active' : '' }"
           = link_to "Only Active", url_for(sortable_search_params.merge(search_activeness: "active")), class: "dropdown-item #{@activeness == 'active' ? 'active' : '' }"
           = link_to "Only Inactive", url_for(sortable_search_params.merge(search_activeness: "inactive")), class: "dropdown-item #{@activeness == 'inactive' ? 'active' : '' }"
           .dropdown-divider
           = link_to "Resolved", url_for(sortable_search_params.merge(search_activeness: "resolved")), class: "dropdown-item #{@activeness == 'resolved' ? 'active' : '' }"
           = link_to "Dismissed", url_for(sortable_search_params.merge(search_activeness: "dismissed")), class: "dropdown-item #{@activeness == 'dismissed' ? 'active' : '' }"
-      %li.nav-item.dropdown
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@status != "kindn" ? "active" : "") }
+      %li.nav-item.dropdown.dropleft
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "") }
           #{@kind.titleize} #{@kind == "all" ? "kinds" : "kind"}
         .dropdown-menu
-          = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: "all")), class: "dropdown-item #{@kind == 'all' ? '' : 'active' }"
+          = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : '' }"
           .dropdown-divider
           - UserAlert.kinds.each do |kind|
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
