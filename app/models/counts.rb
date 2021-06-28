@@ -16,7 +16,7 @@ class Counts
     end
 
     def recovery_average_value
-      1599 # updated with calculated_recovery_average_value on 2020/12/1
+      1652 # updated with calculated_recovery_average_value on 2021-6-28
     end
 
     # This method isn't called in normal operation
