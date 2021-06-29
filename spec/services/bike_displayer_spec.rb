@@ -135,9 +135,10 @@ RSpec.describe BikeDisplayer do
         # test that adding a sticker from the organization, is still falsey
         bike3.reload
         expect(bike3.bike_stickers.pluck(:organization_id)).to eq([organization_regional_parent.id])
+        expect(BikeStickerUpdate.where(bike_id: bike3.id).pluck(:bike_sticker_id)).to eq([bike_sticker.id])
         expect(bike_sticker.reload.user_editable?).to be_falsey
         expect(bike3.owner).to be_present
-        expect(BikeDisplayer.display_sticker_edit?(bike3, owner)).to be_falsey
+        expect(BikeDisplayer.display_sticker_edit?(bike3, bike3.owner)).to be_falsey
       end
       context "organization has bike_stickers_user" do
         let(:enabled_feature_slugs) { %w[regional_bike_counts bike_stickers bike_stickers_user_editable] }

@@ -133,7 +133,9 @@
               = f.label :organization_affiliation, t(".organization_affiliation", org_name: organization_with_affiliation.short_name), class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
-
+          %h3
+            STICKER
+            = BikeDisplayer.display_sticker_edit?(@bike, current_user)
           - if !BikeDisplayer.display_sticker_edit?(@bike, current_user)
             = render "shared/form_well_footer_save"
 

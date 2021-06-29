@@ -47,6 +47,8 @@ class Bike < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
   has_many :bike_stickers
+  has_many :bike_sticker_updates
+  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
   has_many :duplicate_bikes_including_self, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
