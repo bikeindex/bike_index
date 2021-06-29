@@ -159,7 +159,7 @@ RSpec.describe BikeDisplayer do
           expect(bike3.bike_stickers.pluck(:organization_id)).to eq([organization_regional_parent.id])
           expect(bike_sticker.reload.user_editable?).to be_truthy
           expect(bike3.owner).to be_present
-          expect(BikeDisplayer.display_sticker_edit?(bike3, owner)).to be_truthy
+          expect(BikeDisplayer.display_sticker_edit?(bike3, bike3.owner)).to be_truthy
         end
       end
     end
