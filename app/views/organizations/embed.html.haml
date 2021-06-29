@@ -170,7 +170,7 @@
         .controls
           = f.text_field :student_id
 
-  - if include_field_reg_bike_sticker?(@organization)
+  - if include_field_reg_bike_sticker?(@organization, nil, true)
     .input-group
       .control-group
         = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"

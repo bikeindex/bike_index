@@ -178,7 +178,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }
-        it "is falsey" do
+        it "includes" do
           expect(user.phone).to be_present
           expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
           expect(include_field_reg_phone?(organization, user)).to be_falsey
@@ -186,6 +186,19 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(include_field_reg_address?(nil, user)).to be_falsey
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
+        end
+      end
+      context "stickers" do
+        it "includes" do
+          expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
+          expect(include_field_reg_bike_sticker?(organization, user, true)).to be_falsey
+        end
+        context "bike_stickers_user_editable" do
+          let(:feature_slugs) { %w[bike_stickers bike_stickers_user_editable reg_bike_sticker] }
+          it "includes" do
+            expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
+            expect(include_field_reg_bike_sticker?(organization, user, true)).to be_truthy
+          end
         end
       end
     end

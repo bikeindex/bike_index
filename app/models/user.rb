@@ -23,6 +23,7 @@ class User < ApplicationRecord
   has_many :organizations, through: :memberships
   has_many :ownerships
   has_many :bike_sticker_updates
+  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike

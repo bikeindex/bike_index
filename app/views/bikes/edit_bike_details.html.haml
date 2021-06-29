@@ -133,8 +133,8 @@
               = f.label :organization_affiliation, t(".organization_affiliation", org_name: organization_with_affiliation.short_name), class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
-
-          - if !BikeDisplayer.display_sticker_edit?(@bike, current_user)
+          -# need to check if any stickers, because maybe it has some that aren't user editable
+          - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
             = render "shared/form_well_footer_save"
 
           - else
@@ -155,6 +155,7 @@
                     - sticker_information_link = link_to t(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
                     = t(".add_a_sticker_label_html", sticker_information_link: sticker_information_link)
                   .form-well-input
+                    -# Not using "bike_stickers_user_editable here because if they have permission to see this field, we want to show them a compatible sticker
                     - bike_code_from_org = @bike.organizations.with_enabled_feature_slugs("bike_stickers").last&.bike_stickers&.claimed&.reorder(:code_integer)&.second&.pretty_code
                     = text_field_tag :bike_sticker, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
 

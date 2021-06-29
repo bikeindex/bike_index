@@ -118,6 +118,8 @@
         = f.label :student_id, label_student_id, class: "control-label"
         .controls
           = f.text_field :student_id
+
+  -# NOT checking bike_stickers_user_editable here - this embed form is for the organization
   - if include_field_reg_bike_sticker?(@organization)
     .input-group
       .control-group
