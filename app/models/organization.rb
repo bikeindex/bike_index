@@ -490,7 +490,10 @@ class Organization < ApplicationRecord
     fslugs = current_invoices.feature_slugs
     # If part of a region with bike_stickers, the organization receives the stickers organization feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
+      if regional_parents.any? { |o| o.enabled?("bike_stickers") }
+        fslugs += ["bike_stickers"]
+        fslugs += ["bike_stickers_user_editable"] if regional_parents.any? { |o| o.enabled?("bike_stickers_user_editable") }
+      end
     end
     # Ambassador orgs get unstolen_notifications
     fslugs += ["unstolen_notifications"] if ambassador?

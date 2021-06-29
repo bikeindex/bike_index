@@ -18,16 +18,19 @@ class BikeDisplayer
     def display_sticker_edit?(bike, user = nil)
       return false unless user.present?
       return true if user.superuser? || user.enabled?("bike_stickers")
-      # user_can_claim_sticker? checks if they've made to many sticker updates
+      # user_can_claim_sticker? checks if they've made too many sticker updates
       return false unless BikeSticker.user_can_claim_sticker?(user)
-      return true if bike.bike_stickers.any? || user.bike_sticker_updates.any?
+      return true if bike.bike_stickers.any?(&:user_editable?) ||
+        user.updated_bike_stickers.any?(&:user_editable?)
+
       bike_ids = user.rough_approx_bikes.pluck(:id)
-      # Any bikes with bike stickers
-      return false unless bike_ids.any?
-      return true if BikeStickerUpdate.where(bike_id: bike_ids).any?
+      # Return false if no bikes
+      return false if bike_ids.none?
+      sticker_ids = BikeStickerUpdate.where(bike_id: bike_ids).distinct.pluck(:bike_sticker_id)
+      return true if BikeSticker.where(id: sticker_ids).any?(&:user_editable?)
       # Any organizations, for any bikes from user, with stickers
       Organization.where(id: BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
-        .with_enabled_feature_slugs("bike_stickers").any?
+        .with_enabled_feature_slugs("bike_stickers_user_editable").any?
     end
   end
 end

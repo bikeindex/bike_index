@@ -176,7 +176,7 @@
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if include_field_reg_bike_sticker?(@organization, current_user)
+          - if include_field_reg_bike_sticker?(@organization, current_user, true)
             .form-group.row.unnested-field.no-divider-row
               = f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label"
               .form-well-input
