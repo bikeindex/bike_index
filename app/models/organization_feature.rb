@@ -30,6 +30,7 @@ class OrganizationFeature < ApplicationRecord
     avery_export
     bike_search
     bike_stickers
+    bike_stickers_user_editable
     child_organizations
     csv_exports
     customize_emails

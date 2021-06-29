@@ -105,6 +105,10 @@ class BikeSticker < ApplicationRecord
     unauthorized_sticker_ids.count < MAX_UNORGANIZED
   end
 
+  def user_editable?
+    organization.blank? || organization.enabled?("bike_stickers_user_editable")
+  end
+
   def claimed?
     bike_id.present? && bike.present?
   end
