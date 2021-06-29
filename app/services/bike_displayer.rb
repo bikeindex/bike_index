@@ -20,8 +20,9 @@ class BikeDisplayer
       return true if user.superuser? || user.enabled?("bike_stickers")
       # user_can_claim_sticker? checks if they've made too many sticker updates
       return false unless BikeSticker.user_can_claim_sticker?(user)
-      return true if bike.bike_stickers.any? { |b| b.user_editable? } ||
-        user.updated_bike_stickers.any? { |b| b.user_editable? }
+      return true if bike.bike_stickers.any?(&:user_editable?) ||
+        user.updated_bike_stickers.any?(&:user_editable?)
+
       bike_ids = user.rough_approx_bikes.pluck(:id)
       # Return false if no bikes
       return false if bike_ids.none?
