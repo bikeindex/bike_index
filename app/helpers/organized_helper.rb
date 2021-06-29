@@ -114,8 +114,8 @@ module OrganizedHelper
   def include_field_reg_bike_sticker?(organization = nil, user = nil, require_user_editable = false)
     reg_field = organization.present? &&
       organization.additional_registration_fields.include?("reg_bike_sticker")
-    return reg_field unless require_user_editable
-    reg_field && organization.enabled?("bike_stickers_user_editable")
+    return reg_field unless reg_field && require_user_editable
+    organization.enabled?("bike_stickers_user_editable")
   end
 
   def include_field_reg_student_id?(organization = nil, user = nil)
