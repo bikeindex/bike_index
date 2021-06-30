@@ -396,8 +396,6 @@ class BikesController < ApplicationController
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)
-    # enable adding and org, via
-    if params.dig(:bike, :add_editable_organization_id)
     organization_ids = Array(organization_ids).map(&:to_i)
     bike.bike_organizations.each do |bike_organization|
       bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)

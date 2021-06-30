@@ -5883,6 +5883,11 @@ nl:
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
       date_found: Datum gevonden
       bike_sticker: Fiets sticker
+      add_it_now: Voeg het nu toe!
+      generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met %{org_name},
+        maar deze niet. Over het algemeen sluit u al uw fietsen aan op %{org_name}
+        -
+      ignore: Negeren
   org_public:
     impounded_bikes:
       index:

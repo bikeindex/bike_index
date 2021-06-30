@@ -82,10 +82,10 @@
                   - alert = bike_alerts.find { |a| a.kind == "unassigned_bike_org" }
                   - if alert.present?
                     .account-user-alert.alert.alert-info.mb-0
-                      Some of your bikes are associated with #{alert.organization&.short_name}, but this one is not. Generally, you should connect all your bikes to #{alert.organization&.short_name} -
-                      = link_to "Add it now!", user_alert_path(id: alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success"
+                      = t(".generally_connect_to_org", org_name: alert.organization&.short_name)
+                      = link_to t(".add_it_now"), user_alert_path(id: alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success"
                       .small.less-strong.dismiss-wrapper
-                        = link_to "ignore", user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
+                        = link_to t(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
 
             .paginate-container.paginate-container-bottom
               = paginate @bikes
