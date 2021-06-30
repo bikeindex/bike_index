@@ -1,7 +1,7 @@
 require "rails_helper"
 
 base_url = "/admin/user_alerts"
-RSpec.describe Admin::UserAlertController, type: :request do
+RSpec.describe Admin::UserAlertsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do

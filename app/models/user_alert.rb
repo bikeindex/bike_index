@@ -13,9 +13,6 @@ class UserAlert < ApplicationRecord
   belongs_to :organization
 
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
-  # Probably not unique unless checking all references
-  # validates :bike_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
-  # validates :organization_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
 
   enum kind: KIND_ENUM
 
@@ -32,17 +29,29 @@ class UserAlert < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
-  def self.ignored_kinds_admin_member
-    %w[stolen_bike_without_location]
-  end
-
   def self.kind_humanized(str)
     return "" unless str.present?
-    str.gsub("_", " ")
+    str.tr("_", " ")
   end
 
   def self.ignored_kinds_superuser
     ignored_kinds_admin_member + %w[theft_alert_without_photo unassigned_bike_org]
+  end
+
+  def self.ignored_kinds_admin_member
+    %w[stolen_bike_without_location]
+  end
+
+  def self.general_kinds
+    %w[phone_waiting_confirmation theft_alert_without_photo stolen_bike_without_location]
+  end
+
+  def self.account_kinds
+    %w[unassigned_bike_org]
+  end
+
+  def self.placement(kind)
+    account_kinds.include?(kind) ? "account" : "general"
   end
 
   def self.find_or_build_by(attrs)
@@ -52,7 +61,7 @@ class UserAlert < ApplicationRecord
   def self.update_theft_alert_without_photo(user:, theft_alert:)
     # scope to just active, to alert if the theft alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
-      user_id: user.id, theft_alert_id: theft_alert.id)
+                                                   user_id: user.id, theft_alert_id: theft_alert.id)
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
@@ -62,9 +71,9 @@ class UserAlert < ApplicationRecord
     end
   end
 
-  def self.update_stolen_bike_without_location(user: , bike:)
+  def self.update_stolen_bike_without_location(user:, bike:)
     user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
-      user_id: user.id, bike_id: bike.id)
+                                            user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_location?
       user_alert.save
     else
@@ -75,7 +84,7 @@ class UserAlert < ApplicationRecord
 
   def self.update_unassigned_bike_org(user:, organization:, bike:)
     user_alert = UserAlert.find_or_build_by(kind: "unassigned_bike_org",
-      user_id: user.id, organization_id: organization.id, bike_id: bike.id)
+                                            user_id: user.id, organization_id: organization.id, bike_id: bike.id)
     if bike.organizations.where(id: organization.id).none?
       user_alert.save
     else
@@ -86,7 +95,7 @@ class UserAlert < ApplicationRecord
 
   def self.update_phone_waiting_confirmation(user:, user_phone:)
     user_alert = UserAlert.find_or_build_by(kind: "phone_waiting_confirmation",
-      user_id: user.id, user_phone_id: user_phone.id)
+                                            user_id: user.id, user_phone_id: user_phone.id)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
       user_alert.id.blank? ? true : user_alert.resolve!
@@ -97,6 +106,18 @@ class UserAlert < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def placement
+    self.class.placement(kind)
+  end
+
+  def general?
+    self.class.general_kinds.include?(kind)
+  end
+
+  def account?
+    self.class.account_kinds.include?(kind)
   end
 
   def dismissed?

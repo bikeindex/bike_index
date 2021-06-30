@@ -1,5 +1,6 @@
 -# Note: This should only ever render one alert - hence the elsif
 -# The alerts are in priority from highest to lowest
+-# We're manually rendering only the general alerts here
 
 - if current_user.alert_slugs.include?("phone_waiting_confirmation")
   - if current_user.phone_waiting_confirmation?

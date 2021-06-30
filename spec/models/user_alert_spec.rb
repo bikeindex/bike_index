@@ -12,6 +12,9 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert).to be_valid
       expect(user_alert.active?).to be_truthy
       expect(user_alert.kind).to eq "phone_waiting_confirmation"
+      expect(user_alert.placement).to eq "general"
+      expect(user_alert.general?).to be_truthy
+      expect(user_alert.account?).to be_falsey
       expect(user_alert.active?).to be_truthy
       expect(user_alert.inactive?).to be_falsey
       # It doesn't create a second time
@@ -29,4 +32,3 @@ RSpec.describe UserAlert, type: :model do
     end
   end
 end
-
