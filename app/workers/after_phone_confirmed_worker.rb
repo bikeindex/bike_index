@@ -10,7 +10,7 @@ class AfterPhoneConfirmedWorker < ApplicationWorker
       bike.current_ownership.create_user_registration_for_phone_registration!(user_phone.user)
     end
 
-    # Manually run after user change to update general alerts for the user
+    # Manually run after user change to update user alerts
     AfterUserChangeWorker.new.perform(user_phone.user_id, user_phone.user)
   end
 end

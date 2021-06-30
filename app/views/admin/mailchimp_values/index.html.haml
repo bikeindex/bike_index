@@ -8,7 +8,7 @@
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@list != "all" ? "active" : "") }
           #{@list.titleize} #{@list == "all" ? "lists" : "list"}
         .dropdown-menu
-          = link_to "All lists", url_for(sortable_search_params.merge(search_list: "all")), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
+          = link_to "All lists", url_for(sortable_search_params.merge(search_list: nil)), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
           = link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : '' }"
           = link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : '' }"
       %li.nav-item

@@ -59,10 +59,15 @@ RSpec.describe AfterUserChangeWorker, type: :job do
   describe "phone_waiting_confirmation" do
     let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
     let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
-    it "adds general_alerts" do
-      instance.perform(user.id)
+    it "adds alert_slugs" do
+      expect {
+        instance.perform(user.id)
+      }.to change(UserAlert, :count).by 1
+      user_alert = user.user_alerts.last
+      expect(user_alert.active?).to be_truthy
+      expect(user_alert.kind).to eq "phone_waiting_confirmation"
       user.reload
-      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
     context "legacy_migration" do
       let!(:user_phone) { FactoryBot.create(:user_phone, user: user, confirmation_code: "legacy_migration") }
@@ -71,13 +76,13 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         expect(user.phone_waiting_confirmation?).to be_falsey
         instance.perform(user.id)
         user.reload
-        expect(user.general_alerts).to eq([])
+        expect(user.alert_slugs).to eq([])
         # Add another user phone, and it does add the alert though
         FactoryBot.create(:user_phone, user: user)
         expect(user.phone_waiting_confirmation?).to be_truthy
         instance.perform(user.id)
         user.reload
-        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
       end
     end
   end
@@ -92,6 +97,43 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(feedback.reload.user_id).to be_blank
       instance.perform(user.id)
       expect(feedback.reload.user_id).to eq user.id
+    end
+  end
+
+  context "unassigned bikes" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization, user: user) }
+    let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+    it "adds alerts for unassigned bikes" do
+      expect(organization.reload.paid?).to be_truthy
+      expect(organization.paid_money?).to be_falsey
+      expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
+      expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+      expect(user.reload.rough_approx_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(user.user_alerts.pluck(:kind)).to eq([])
+      instance.perform(user.id)
+      user.reload
+      expect(user.user_alerts.count).to eq 0
+      expect(user.alert_slugs).to eq([])
+    end
+    context "paid money org" do
+      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
+      it "adds alerts for unassigned bikes" do
+        expect(organization.reload.paid?).to be_truthy
+        expect(organization.paid_money?).to be_truthy
+        expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
+        expect(user.user_alerts.pluck(:kind)).to eq([])
+        instance.perform(user.id)
+        user.reload
+        expect(user.alert_slugs).to eq(["unassigned_bike_org"])
+        expect(user.user_alerts.count).to eq 1
+        user_alert = user.user_alerts.last
+        expect(user_alert.kind).to eq "unassigned_bike_org"
+        expect(user_alert.active?).to be_truthy
+        expect(user_alert.organization_id).to eq organization.id
+        expect(user_alert.bike_id).to eq bike2.id
+      end
     end
   end
 
@@ -118,7 +160,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(stolen_record.bike.user).to eq user
       expect(stolen_record_with_location.bike.user).to eq user
       expect(stolen_record_unclaimed.bike.user).to be_blank
-      # Unmemoize the stolen_bikes_without_locations
+      # Unmemoize the stolen_bike_without_location
       user_id = user.id
       user = User.find(user_id)
       user.save
@@ -129,23 +171,23 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       instance.perform(user.id)
 
       user.reload
-      expect(user.general_alerts).to eq(["stolen_bikes_without_locations"])
+      expect(user.alert_slugs).to eq(["stolen_bike_without_location"])
 
-      FactoryBot.create(:theft_alert, stolen_record: stolen_record)
+      FactoryBot.create(:theft_alert, stolen_record: stolen_record, user: user)
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq(%w[stolen_bikes_without_locations theft_alert_without_photo])
+      expect(user.alert_slugs).to eq(%w[stolen_bike_without_location theft_alert_without_photo])
 
       membership = FactoryBot.create(:membership_claimed, user: user, role: "admin")
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq(["theft_alert_without_photo"])
+      expect(user.alert_slugs).to eq(["theft_alert_without_photo"])
 
       membership.destroy
       user.update(superuser: true)
       instance.perform(user.id)
       user.reload
-      expect(user.general_alerts).to eq([])
+      expect(user.alert_slugs).to eq([])
     end
   end
 end

@@ -564,7 +564,7 @@ RSpec.describe UsersController, type: :controller do
         expect(user.phone).to eq "15005550006"
         expect(user.user_phones.count).to eq 1
         expect(user.phone_waiting_confirmation?).to be_truthy
-        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
         user_phone = user.user_phones.reorder(:created_at).last
         expect(user_phone.phone).to eq "15005550006"
@@ -583,7 +583,7 @@ RSpec.describe UsersController, type: :controller do
           user.reload
           expect(user.phone).to eq "15005550006"
           expect(user.user_phones.count).to eq 0
-          expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+          expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
         end
       end
     end

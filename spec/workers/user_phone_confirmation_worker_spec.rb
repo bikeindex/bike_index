@@ -10,7 +10,7 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
     expect(user_phone.notifications.count).to eq 0
     user.reload
     expect(user.phone_waiting_confirmation?).to be_truthy
-    expect(user.general_alerts).to eq([])
+    expect(user.alert_slugs).to eq([])
     VCR.use_cassette("user_phone_confirmation_worker", match_requests_on: [:path]) do
       instance.perform(user_phone.id)
     end
@@ -20,6 +20,6 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
     user.reload
     expect(user.phone_waiting_confirmation?).to be_truthy
 
-    expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+    expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
   end
 end

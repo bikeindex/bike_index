@@ -38,6 +38,7 @@ class User < ApplicationRecord
   has_many :locks, dependent: :destroy
   has_many :user_emails, dependent: :destroy
   has_many :user_phones, dependent: :destroy
+  has_many :user_alerts
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
@@ -331,6 +332,12 @@ class User < ApplicationRecord
     rough_approx_bikes.status_stolen.limit(10)
   end
 
+  # TODO: make this a little more efficient
+  def bike_organizations
+    bike_org_ids = BikeOrganization.where(bike_id: bike_ids).distinct.pluck(:organization_id)
+    Organization.where(id: bike_org_ids)
+  end
+
   def unauthorized_organization_update_bike_sticker_ids
     bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
   end
@@ -355,9 +362,9 @@ class User < ApplicationRecord
   def set_calculated_attributes
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
-    if phone_changed? # Rather than waiting for twilio to send, immediately update general_alerts
-      self.general_alerts = (general_alerts || []) + ["phone_waiting_confirmation"]
-    end
+    self.alert_slugs = (alert_slugs || [])
+    # Rather than waiting for twilio to send, immediately update alert_slugs
+    self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?

@@ -38,6 +38,9 @@
         = link_to "Deleted", admin_show_deleted_organizations_url, class: "nav-link"
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
+
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Organizations" }
+
 .row.mb-4
   .col-md-5
     %p

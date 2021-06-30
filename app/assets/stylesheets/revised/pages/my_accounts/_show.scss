@@ -23,4 +23,15 @@
       text-align: center;
     }
   }
+
+  .account-user-alert {
+    .dismiss-wrapper {
+      line-height: 0;
+      margin-top: 1.6rem;
+      float: right;
+      a {
+        @extend .gray-link;
+      }
+    }
+  }
 }

@@ -887,7 +887,7 @@ RSpec.describe BikesController, type: :controller do
       let(:user) { ownership.creator }
       context "revised" do
         before do
-          user.update_column :general_alerts, ["stolen_bikes_without_locations"]
+          user.update_column :alert_slugs, ["stolen_bike_without_location"]
           set_current_user(user)
         end
         context "root" do
@@ -961,7 +961,7 @@ RSpec.describe BikesController, type: :controller do
           end
           context "with a purchased alert and stolen location" do
             it "does not render show_general_alert on photos" do
-              user.update_attributes(general_alerts: ["theft_alert_without_photo"])
+              user.update_attributes(alert_slugs: ["theft_alert_without_photo"])
 
               templates.each do |template|
                 get :edit, params: {id: bike.id, page: template}

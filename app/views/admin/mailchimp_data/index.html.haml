@@ -8,14 +8,14 @@
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@list != "all" ? "active" : "") }
           #{@list.titleize} #{@list == "all" ? "lists" : "list"}
         .dropdown-menu
-          = link_to "All lists", url_for(sortable_search_params.merge(search_list: "all")), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
+          = link_to "All lists", url_for(sortable_search_params.merge(search_list: nil)), class: "dropdown-item #{@list == 'all' ? 'active' : '' }"
           = link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : '' }"
           = link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : '' }"
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@status != "all" ? "active" : "") }
           #{@status.titleize} #{@status == "all" ? "statuses" : "status"}
         .dropdown-menu
-          = link_to "All statuses", url_for(sortable_search_params.merge(search_status: "all")), class: "dropdown-item #{@status == 'all' ? 'active' : '' }"
+          = link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : '' }"
           = link_to "Not subscribed status", url_for(sortable_search_params.merge(search_status: "not_subscribed")), class: "dropdown-item #{@status == 'not_subscribed' ? 'active' : '' }"
           .dropdown-divider
           - MailchimpDatum.statuses.each do |status|
@@ -27,18 +27,22 @@
           - else
             = @search_users.humanize
         .dropdown-menu
-          = link_to "With and without users", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "all")), class: "dropdown-item #{@search_users == 'all' ? 'active' : ''}"
+          = link_to "With and without users", url_for(sortable_search_params.merge(search_users: nil)), class: "dropdown-item #{@search_users == 'all' ? 'active' : ''}"
           .dropdown-divider
-          = link_to "With user", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "with_user")), class: "dropdown-item #{@search_users == 'with_user' ? 'active' : ''}"
-          = link_to "No user", admin_mailchimp_data_path(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}"
+          = link_to "With user", url_for(sortable_search_params.merge(search_users: "with_user")), class: "dropdown-item #{@search_users == 'with_user' ? 'active' : ''}"
+          = link_to "No user", url_for(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}"
 
       %li.nav-item
         %a.nav-link{href: ".data-cell-collapsed", "aria-expanded" => "false", "data-toggle" => "collapse"}
           Toggle data
       %li.nav-item
-        = link_to "graph", admin_mailchimp_data_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
 = render partial: "/shared/period_select"
+
+- if @render_chart
+  .col-12.mt-2
+    = column_chart time_range_counts(collection: matching_mailchimp_data, column: @time_range_column), stacked: true, thousands: ",", defer: true
 
 .row.mb-4.mt-4
   .col-sm-6.col-lg-4.mt-4

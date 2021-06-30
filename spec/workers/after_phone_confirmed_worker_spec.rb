@@ -18,7 +18,7 @@ RSpec.describe AfterPhoneConfirmedWorker, type: :job do
     context "it adds the bike to the user" do
       it "adds the bike" do
         AfterUserChangeWorker.new.perform(user.id, user)
-        expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
         bike.reload
         expect(bike.phone_registration?).to be_truthy

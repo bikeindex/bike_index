@@ -7,6 +7,7 @@ class Admin::MailchimpDataController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @mailchimp_data = matching_mailchimp_data.includes(:user, :feedbacks)
+      .order(sort_column + " " + sort_direction)
       .page(page).per(per_page)
   end
 
@@ -50,7 +51,7 @@ class Admin::MailchimpDataController < Admin::BaseController
     @time_range_column = sort_column if %w[updated_at mailchimp_updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
 
-    m_mailchimp_data.order(sort_column + " " + sort_direction)
+    m_mailchimp_data
       .where(@time_range_column => @time_range)
   end
 end
