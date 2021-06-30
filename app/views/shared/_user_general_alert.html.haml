@@ -2,7 +2,9 @@
 -# The alerts are in priority from highest to lowest
 -# We're manually rendering only the general alerts here
 
+
 - if current_user.alert_slugs.include?("phone_waiting_confirmation")
+  -# TODO: use existing user_alert to select correct phone
   - if current_user.phone_waiting_confirmation?
     - phone_number = current_user.user_phones.waiting_confirmation.reorder(:updated_at).last
 
@@ -27,6 +29,7 @@
     - current_user.update(updated_at: Time.current, skip_update: false)
 
 - elsif current_user.alert_slugs.include?("stolen_bike_without_location")
+  -# TODO: use existing user_alert to select correct stolen bike
   - without_location_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.without_location? }
   - if without_location_bikes.present?
 
@@ -44,6 +47,7 @@
     = render partial: "shared/modal", locals: { title: t(".stolen_missing_location_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true }
 
 - elsif current_user.alert_slugs.include?("theft_alert_without_photo")
+  -# TODO: use existing user_alert to select correct theft alert
   - missing_photo_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
   - if missing_photo_bikes.present?
 

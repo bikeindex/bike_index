@@ -20,6 +20,7 @@ class AfterUserChangeWorker < ApplicationWorker
   end
 
   def user_alert_slugs(user)
+    # Access via UserAlert query so we don't need to reload user
     UserAlert.where(user_id: user.id).active.distinct.pluck(:kind).sort
   end
 
