@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :user_alert do
-    user { FactoryBot.create(:user) }
+    user { FactoryBot.create(:user_confirmed) }
     kind { UserAlert.kinds.first }
     factory :user_alert_stolen_bike_without_location do
       kind { "stolen_bike_without_location" }

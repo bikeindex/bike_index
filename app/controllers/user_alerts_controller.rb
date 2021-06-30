@@ -1,19 +1,22 @@
-class MyAccountsController < ApplicationController
-  before_action :authenticate_user_for_user_alerts_controller, only: [:show, :choose_registration]
+class UserAlertsController < ApplicationController
+  before_action :authenticate_user_for_user_alerts_controller
 
   def update
-    page = params[:page] || 1
-    @locks_active_tab = params[:active_tab] == "locks"
-    @per_page = params[:per_page] || 20
-    # If there are over 100 bikes created by the user, we'll have problems loading and sorting them
-    if current_user.creation_states.limit(101).count > 100
-      bikes = current_user.rough_approx_bikes.page(page).per(@per_page)
-      @bikes = bikes.decorate
+    user_alert = current_user.user_alerts.find_by_id(params[:id])
+    if user_alert.present?
+      if params[:action] == "dismiss"
+        if user_alert.dismissable?
+          user_alert.dismiss! if user_alert.active?
+        else
+          flash[:error] = "We're sorry, you can't hide that alert"
+        end
+      else
+        flash[:error] = "Unknown alert action!"
+      end
     else
-      bikes = Kaminari.paginate_array(current_user.bikes).page(page).per(@per_page)
-      @bikes = BikeDecorator.decorate_collection(bikes)
+      flash[:error] = "Unable to find that alert"
     end
-    @locks = LockDecorator.decorate_collection(current_user.locks)
+    redirect_back(fallback_location: user_root_url)
   end
 
   private

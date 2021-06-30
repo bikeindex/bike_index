@@ -26,6 +26,7 @@ class UserAlert < ApplicationRecord
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
+  scope :dismissable, -> { where(kind: dismissable_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -115,7 +116,7 @@ class UserAlert < ApplicationRecord
   end
 
   def dismissable?
-    self.class.dismissable_kinds(kind).include?(kind)
+    self.class.dismissable_kinds.include?(kind)
   end
 
   def placement
