@@ -33,11 +33,15 @@ class @AdDisplayer
     # TODO: don't use jquery here for the element iterating
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
+        # Temporarily removing because maxtracker
+        # @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
+        @renderedAds.push @renderAdElement(el, index, el_klass, [])
 
     for el_klass in ads_sm_rectangle
       $(".#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
+        # Temporarily removing because maxtracker
+        # @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
+        @renderedAds.push @renderAdElement(el, index, el_klass, [])
 
     for el_klass in ads_full_width
       $(".#{el_klass}").each (index, el) =>
