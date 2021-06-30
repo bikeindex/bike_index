@@ -7,6 +7,16 @@ RSpec.describe BikesController, type: :request do
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
 
+  describe "index" do
+    context "stolen subdomain" do
+      it "redirects to non-subdomain" do
+        host! "stolen.bikeindex.org"
+        get base_url
+        expect(response).to redirect_to bikes_url(subdomain: false)
+      end
+    end
+  end
+
   describe "show" do
     context "example bike" do
       it "shows the bike" do

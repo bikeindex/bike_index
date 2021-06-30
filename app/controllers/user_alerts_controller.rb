@@ -4,7 +4,7 @@ class UserAlertsController < ApplicationController
   def update
     user_alert = current_user.user_alerts.find_by_id(params[:id])
     if user_alert.present?
-      if params[:action] == "dismiss"
+      if params[:alert_action] == "dismiss"
         if user_alert.dismissable?
           user_alert.dismiss! if user_alert.active?
         else
