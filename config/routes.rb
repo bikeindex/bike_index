@@ -115,6 +115,7 @@ Rails.application.routes.draw do
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
+  resources :user_alerts, only: %i[update]
   resources :user_embeds, only: [:show]
   resources :user_phones, only: %i[update destroy]
   resources :user_emails, only: [:destroy] do

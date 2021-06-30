@@ -21,7 +21,7 @@
             - user_alerts = current_user.alert_slugs.any? ? current_user.user_alerts.active.account : []
             %ul.bike-boxes
               - @bikes.each do |bike|
-                - user_alerts = user_alerts.select { |ua| ua.bike_id == bike.id }
+                - bike_alerts = user_alerts.select { |ua| ua.bike_id == bike.id }
                 %li.bike-box-item
                   - cache(bike) do
                     - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, page: 'photos')
@@ -78,9 +78,9 @@
                           %li
                             = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 
-                    - if user_alerts.any?
-                      .alert.alert-info
-                        %h3 Party
+                  - if bike_alerts.any?
+                    .alert.alert-info
+                      %h3 Party
 
             .paginate-container.paginate-container-bottom
               = paginate @bikes

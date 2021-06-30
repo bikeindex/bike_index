@@ -44,6 +44,10 @@ class UserAlert < ApplicationRecord
     %w[stolen_bike_without_location]
   end
 
+  def self.dismissable_kinds
+    %w[unassigned_bike_org]
+  end
+
   def self.general_kinds
     %w[phone_waiting_confirmation theft_alert_without_photo stolen_bike_without_location]
   end
@@ -108,6 +112,10 @@ class UserAlert < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def dismissable?
+    self.class.dismissable_kinds(kind).include?(kind)
   end
 
   def placement
