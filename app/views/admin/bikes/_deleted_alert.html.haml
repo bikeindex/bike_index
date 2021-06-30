@@ -1,0 +1,11 @@
+- if bike.deleted?
+  .row.mt-2
+    .col-md-6.offset-md-3
+      .alert.alert-danger
+        %h2
+          %em= bike.title_string
+          is deleted!
+        %p
+          Bike was deleted at
+          %span.convertTime.preciseTime
+            = l bike.deleted_at, format: :convert_time

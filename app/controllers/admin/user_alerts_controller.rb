@@ -32,8 +32,12 @@ class Admin::UserAlertsController < Admin::BaseController
       @activeness = "all"
     end
     if params[:user_id].present?
-      @user = User.friendly_find(params[:user_id])
+      @user = User.unscoped.friendly_find(params[:user_id])
       user_alerts = user_alerts.where(user_id: @user.id) if @user.present?
+    end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.find(params[:search_bike_id])
+      user_alerts = user_alerts.where(search_bike_id: @bike.id) if @bike.present?
     end
     @time_range_column = sort_column if %w[updated_at resolved_at dismissed_at].include?(sort_column)
     @time_range_column ||= "created_at"

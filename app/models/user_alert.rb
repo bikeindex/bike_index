@@ -24,6 +24,8 @@ class UserAlert < ApplicationRecord
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
   scope :ignored_admin_member, -> { where(kind: ignored_kinds_admin_member) }
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
+  scope :general, -> { where(kind: general_kinds) }
+  scope :account, -> { where(kind: account_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
