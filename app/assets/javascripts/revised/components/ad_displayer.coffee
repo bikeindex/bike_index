@@ -37,12 +37,10 @@ class @AdDisplayer
         # @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
         @renderedAds.push @renderAdElement(el, index, el_klass, [])
 
-    # This ad is aggressive, hiding for now
+    # This ad is aggressively big, hiding until maxtracker is back
     # for el_klass in ads_sm_rectangle
     #   $(".#{el_klass}").each (index, el) =>
-    #     # Temporarily removing because maxtracker
-    #     # @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
-    #     @renderedAds.push @renderAdElement(el, index, el_klass, [])
+    #     @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
 
     for el_klass in ads_full_width
       $(".#{el_klass}").each (index, el) =>
