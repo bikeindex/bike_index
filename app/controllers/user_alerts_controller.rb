@@ -31,7 +31,7 @@ class UserAlertsController < ApplicationController
   def add_bike_organization
     if @user_alert.user.authorized?(@user_alert.bike)
       bike_organization = BikeOrganization.find_or_create_by(bike_id: @user_alert.bike_id,
-        organization_id: @user_alert.organization_id)
+                                                             organization_id: @user_alert.organization_id)
       @user_alert.resolve! if bike_organization.valid?
       AfterUserChangeWorker.perform_async(@user_alert.user_id)
     else
