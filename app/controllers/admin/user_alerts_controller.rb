@@ -39,9 +39,14 @@ class Admin::UserAlertsController < Admin::BaseController
       @bike = Bike.unscoped.find(params[:search_bike_id])
       user_alerts = user_alerts.where(search_bike_id: @bike.id) if @bike.present?
     end
+    if params[:organization_id].present? && current_organization.present?
+      user_alerts = user_alerts.where(organization_id: current_organization.id)
+    end
     @time_range_column = sort_column if %w[updated_at resolved_at dismissed_at].include?(sort_column)
     @time_range_column ||= "created_at"
 
+    # I don't know why this isn't working - see also notifications
+    # user_alerts.where(@time_range_colum => @time_range)
     user_alerts.where(created_at: @time_range)
   end
 

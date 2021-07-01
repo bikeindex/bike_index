@@ -15,7 +15,7 @@ RSpec.describe UserAlertsController, type: :request do
         expect(user_alert.dismissable?).to be_truthy
         expect(user_alert.user_id).to be_present
         expect(user_alert.dismissed?).to be_falsey
-        patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" }
+        patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"}
         expect(response).to redirect_to "/session/new"
         expect(flash).to be_present
         expect(user_alert.reload.dismissed?).to be_falsey
@@ -26,7 +26,7 @@ RSpec.describe UserAlertsController, type: :request do
           expect(user_alert.dismissable?).to be_truthy
           expect(user_alert.user_id).to_not eq current_user.id
           expect(user_alert.dismissed?).to be_falsey
-          patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" }
+          patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"}
           expect(response).to redirect_to "/my_account"
           expect(flash[:error]).to be_present
           expect(user_alert.reload.dismissed?).to be_falsey
@@ -37,20 +37,20 @@ RSpec.describe UserAlertsController, type: :request do
             expect(user_alert.dismissable?).to be_truthy
             expect(user_alert.user_id).to eq current_user.id
             expect(user_alert.dismissed?).to be_falsey
-            patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" }
+            patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"}
             expect(response).to redirect_to "/my_account"
             expect(flash).to be_blank
             expect(user_alert.reload.dismissed?).to be_truthy
             dismissed_time = Time.current - 1.day
             user_alert.update(dismissed_at: dismissed_time)
             # And dismiss without failing again
-            patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" },
-              headers: { "HTTP_REFERER" => "http://bikeindex.org/bikes" }
+            patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"},
+                                                  headers: {"HTTP_REFERER" => "http://bikeindex.org/bikes"}
             expect(response).to redirect_to "/bikes"
             expect(flash).to be_blank
             expect(user_alert.reload.dismissed_at).to be_within(1).of dismissed_time
             # And unknown action errors
-            patch "#{base_url}/#{user_alert.id}", params: { alert_action: "party" }
+            patch "#{base_url}/#{user_alert.id}", params: {alert_action: "party"}
             expect(response).to redirect_to "/my_account"
             expect(flash[:error]).to be_present
           end
@@ -60,7 +60,7 @@ RSpec.describe UserAlertsController, type: :request do
               user_alert.resolve!
               expect(user_alert.reload.resolved?).to be_truthy
               expect(user_alert.dismissed?).to be_falsey
-              patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" }
+              patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"}
               expect(response).to redirect_to "/my_account"
               expect(flash).to be_blank
               expect(user_alert.reload.resolved?).to be_truthy
@@ -73,7 +73,7 @@ RSpec.describe UserAlertsController, type: :request do
               expect(user_alert.reload.dismissable?).to be_falsey
               expect(user_alert.dismissed?).to be_falsey
               expect(user_alert.user_id).to eq current_user.id
-              patch "#{base_url}/#{user_alert.id}", params: { alert_action: "dismiss" }
+              patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"}
               expect(response).to redirect_to "/my_account"
               expect(flash[:error]).to be_present
               expect(user_alert.dismissed?).to be_falsey
@@ -103,7 +103,7 @@ RSpec.describe UserAlertsController, type: :request do
         expect(current_user.alert_slugs).to eq(["unassigned_bike_org"])
         Sidekiq::Worker.clear_all
         patch "#{base_url}/#{user_alert.to_param}", params: {add_bike_organization: "true"},
-          headers: { "HTTP_REFERER" => "http://bikeindex.org/my_account" }
+                                                    headers: {"HTTP_REFERER" => "http://bikeindex.org/my_account"}
         expect(AfterUserChangeWorker.jobs.count).to eq 1
         expect(response).to redirect_to "/my_account"
         expect(flash).to be_blank

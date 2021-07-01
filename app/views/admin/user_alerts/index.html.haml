@@ -23,7 +23,7 @@
           - UserAlert.kinds.each do |kind|
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
-        = link_to "graph", admin_user_alerts_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: { viewing: "User Alerts" }
 
 - if @render_chart
@@ -34,7 +34,7 @@
 
 .row.mb-4.mt-4
   .col-sm-6.col-lg-4.mt-4
-    = number_with_delimiter(matching_user_alerts.count)
+    / = number_with_delimiter(matching_user_alerts.count)
     = "matching User Alert".pluralize(matching_user_alerts.count)
     %em
       = humanized_time_range_column(@time_range_column)
@@ -52,8 +52,6 @@
     %th Object
     %th= sortable "dismissed_at"
     %th= sortable "resolved_at"
-    %th.collapse.data-cell-collapsed Data
-
   %tbody
     - @user_alerts.each do |user_alert|
       %tr
@@ -67,19 +65,21 @@
         %td
           - if user_alert.user_id.present?
             - if user_alert.user.present?
-              = link_to user_alert.user.email, url_for(sortable_search_params.merge(user_id: user_alert.user_id))
+              = link_to user_alert.user.email, admin_user_path(user_alert.user_id)
             - else # Handle deleted users
               - user = User.unscoped.find_by_id(user_alert.user_id)
               - if user.present?
-                = link_to user.email, url_for(sortable_search_params.merge(user_id: user.id))
+                = link_to user.email, admin_user_path(user_alert.user_id)
                 %small.text-danger user deleted
               - else
                 %small.text-danger missing user: #{user_alert.user_id}
+            = link_to "alerts", url_for(sortable_search_params.merge(user_id: user_alert.user_id)), class: "small gray-link"
         %td
           - if user_alert.bike_id.present?
             %span.d-block
               %small bike:
-              = link_to user_alert.bike_id, url_for(sortable_search_params.merge(search_bike_id: user_alert.bike_id))
+              = link_to user_alert.bike_id, admin_bike_path(user_alert.bike_id)
+              = link_to "alerts", url_for(sortable_search_params.merge(bike_id: user_alert.bike_id)), class: "small gray-link"
           - if user_alert.user_phone.present?
             %span.d-block
               %small user_phone: #{user_alert.user_phone_id}
@@ -90,7 +90,8 @@
           - if user_alert.organization.present?
             %span.d-block
               %small organization:
-              = link_to user_alert.organization&.short_name || user_alert.organization_id, url_for(sortable_search_params.merge(organization_id: user_alert.organization_id))
+              = link_to user_alert.organization&.short_name || user_alert.organization_id, admin_organization_path(user_alert.organization_id)
+              = link_to "alerts", url_for(sortable_search_params.merge(organization_id: user_alert.organization_id)), class: "small gray-link"
         %td
           - if user_alert.dismissed_at.present?
             %span.convertTime

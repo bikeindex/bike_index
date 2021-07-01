@@ -36,20 +36,20 @@ class AfterUserChangeWorker < ApplicationWorker
       return
     end
 
-    user.bike_organizations.select { |o| o.paid_money? }.each do |organization|
-      user.bikes.each do |bike|
-        UserAlert.update_unassigned_bike_org(user: user, organization: organization, bike: bike)
-      end
-    end
-
     user.theft_alerts.each do |theft_alert|
       UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
     end
 
-    # Ignore alerts below for org admins, otherwise they might get a lot of useless ones
-    if user.memberships.admin.any?
-      user.user_alerts.active.ignored_admin_member.each { |user_alert| user_alert.resolve! }
+    # Ignore alerts below for org members, otherwise they might get a lot of useless ones
+    if user.memberships.any?
+      user.user_alerts.active.ignored_member.each { |user_alert| user_alert.resolve! }
       return
+    end
+
+    user.bike_organizations.select { |o| o.paid_money? }.each do |organization|
+      user.bikes.each do |bike|
+        UserAlert.update_unassigned_bike_org(user: user, organization: organization, bike: bike)
+      end
     end
 
     user.rough_stolen_bikes.each do |bike|
