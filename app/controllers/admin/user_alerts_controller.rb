@@ -5,7 +5,7 @@ class Admin::UserAlertsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @user_alerts = matching_user_alerts.reorder("user_alerts.#{sort_column} #{sort_direction}")
+    @user_alerts = matching_user_alerts.order(sort_column => sort_direction)
       .page(page).per(per_page)
   end
 
@@ -46,8 +46,8 @@ class Admin::UserAlertsController < Admin::BaseController
     @time_range_column ||= "created_at"
 
     # I don't know why this isn't working - see also notifications
-    # user_alerts.where(@time_range_colum => @time_range)
-    user_alerts.where(created_at: @time_range)
+    user_alerts.where(@time_range_colum => @time_range).order(:id)
+    # user_alerts.where(created_at: @time_range)
   end
 
   def earliest_period_date
