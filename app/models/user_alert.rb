@@ -42,7 +42,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.ignored_kinds_admin_member
-    %w[stolen_bike_without_location]
+    %w[stolen_bike_without_location unassigned_bike_org]
   end
 
   def self.dismissable_kinds
