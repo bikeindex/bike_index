@@ -14,7 +14,7 @@
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "User Alerts" }
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Notifications" }
 
 - if @render_chart
   .col-12.mt-2
@@ -25,7 +25,7 @@
 .row.mb-4.mt-4
   .col-sm-6.col-lg-4.mt-4
     = number_with_delimiter(matching_notifications.count)
-    = "matching User Alert".pluralize(matching_notifications.count)
+    = "matching Notification".pluralize(matching_notifications.count)
     %em
       = humanized_time_range_column(@time_range_column)
       = humanized_time_range(@time_range)
@@ -39,7 +39,7 @@
     %th.small= sortable "updated_at"
     %th= sortable "kind"
     %th= sortable "user_id"
-    %th Object
+    %th Delivered?
   %tbody
     - @notifications.each do |notification|
       %tr
@@ -61,7 +61,7 @@
                 %small.text-danger user deleted
               - else
                 %small.text-danger missing user: #{notification.user_id}
-            = link_to "alerts", url_for(sortable_search_params.merge(user_id: notification.user_id)), class: "small gray-link"
+            = link_to "notifications", url_for(sortable_search_params.merge(user_id: notification.user_id)), class: "small gray-link"
         %td
           - unless notification.delivered?
             = notification.delivered?

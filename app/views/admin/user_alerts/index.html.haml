@@ -34,7 +34,7 @@
 
 .row.mb-4.mt-4
   .col-sm-6.col-lg-4.mt-4
-    / = number_with_delimiter(matching_user_alerts.count)
+    = number_with_delimiter(matching_user_alerts.count)
     = "matching User Alert".pluralize(matching_user_alerts.count)
     %em
       = humanized_time_range_column(@time_range_column)
