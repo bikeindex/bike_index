@@ -17,6 +17,10 @@ class Admin::NotificationsController < Admin::BaseController
     %w[created_at updated_at kind user_id]
   end
 
+  def earliest_period_date
+    Time.at(1593464621)
+  end
+
   def matching_notifications
     notifications = Notification
     if Notification.kinds.include?(params[:search_kind])
