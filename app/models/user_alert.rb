@@ -22,7 +22,7 @@ class UserAlert < ApplicationRecord
   scope :resolved, -> { where.not(resolved_at: nil) }
   scope :inactive, -> { where.not(resolved_at: nil).or(where(dismissed_at: nil)) }
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
-  scope :ignored_admin_member, -> { where(kind: ignored_kinds_admin_member) }
+  scope :ignored_member, -> { where(kind: ignored_kinds_member) }
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
@@ -38,10 +38,10 @@ class UserAlert < ApplicationRecord
   end
 
   def self.ignored_kinds_superuser
-    ignored_kinds_admin_member + %w[theft_alert_without_photo unassigned_bike_org]
+    ignored_kinds_member + %w[theft_alert_without_photo unassigned_bike_org]
   end
 
-  def self.ignored_kinds_admin_member
+  def self.ignored_kinds_member
     %w[stolen_bike_without_location unassigned_bike_org]
   end
 
