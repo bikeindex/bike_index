@@ -29,7 +29,11 @@ class PaymentsController < ApplicationController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-
+    images = @payment.donation?
+      ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"]
+    else
+      []
+    end
     stripe_session = Stripe::Checkout::Session.create(current_customer_data.merge(
       submit_type: @payment.donation? ? "donate" : "pay",
       payment_method_types: ["card"],
@@ -39,7 +43,7 @@ class PaymentsController < ApplicationController
           currency: @payment.currency,
           product_data: {
             name: @payment.kind,
-            images: ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"],
+            images: images,
           },
         },
         quantity: 1,
