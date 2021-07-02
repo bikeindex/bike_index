@@ -65,7 +65,8 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.stripe_id).to be_present
         expect(payment.kind).to eq "payment"
         expect(payment.currency).to eq "USD"
-        expect(payment.first_payment_date).to be_present
+        expect(payment.amount_cents).to eq 4000
+        expect(payment.first_payment_date).to be_blank # Ensure this gets set
         expect(payment.last_payment_date).to_not be_present
       end
     end

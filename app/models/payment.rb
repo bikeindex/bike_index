@@ -7,6 +7,7 @@ class Payment < ApplicationRecord
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
+  scope :paid, -> { where.not(first_payment_date: nil) }
 
   enum payment_method: PAYMENT_METHOD_ENUM
   enum kind: KIND_ENUM
@@ -44,6 +45,10 @@ class Payment < ApplicationRecord
     kind.humanize
   end
 
+  def paid?
+    first_payment_date.present?
+  end
+
   def non_donation?
     !donation?
   end
@@ -62,18 +67,17 @@ class Payment < ApplicationRecord
     self.organization_id ||= invoice&.organization_id
   end
 
-  def send_invoice_email
-    EmailReceiptWorker.perform_async(id) if payment_method == "stripe"
-  end
-
   def email_or_organization_present
-    return if email.present? || organization_id.present?
+    return if email.present? || organization_id.present? || stripe_id.present?
     errors.add(:organization, :requires_email_or_org)
     errors.add(:email, :requires_email_or_org)
   end
 
   def update_associations
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
+    if payment_method == "stripe" && paid?
+      EmailReceiptWorker.perform_async(id)
+    end
     return true unless invoice.present?
     invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
   end

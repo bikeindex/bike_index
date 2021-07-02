@@ -14,31 +14,29 @@ class PaymentsController < ApplicationController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
+
     stripe_session = Stripe::Checkout::Session.create({
-      submit_type: @payment.donation? ? "Donate" : "Pay",
+      submit_type: @payment.donation? ? "donate" : "pay",
       payment_method_types: ["card"],
       line_items: [{
-        price: @payment.amount_cents
-        quantity: 1
-        currency: @payment.currency
-      #   price_data: {
-      #     unit_amount: params[:stripe_amount],
-      #     currency: "usd",
-      #     product_data: {
-      #       name: "Stubborn Attachments",
-      #       images: ["https://i.imgur.com/EHyR2nP.png"],
-      #     },
-      #   },
-      #   quantity: 1,
-      # }],
+        price_data: {
+          unit_amount: @payment.amount_cents,
+          currency: @payment.currency,
+          product_data: {
+            name: @payment.kind,
+            # images: ["https://i.imgur.com/EHyR2nP.png"],
+          },
+        },
+        quantity: 1,
+      }],
       mode: "payment",
       success_url: "#{ENV['BASE_URL']}/payments/success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: new_payment_url,
     })
 
-    pp stripe_session
+    @payment.update(stripe_id: stripe_session.id)
 
-    # redirect stripe_session.url, 303
+    redirect_to stripe_session.url
   end
 
   def legacy_create
