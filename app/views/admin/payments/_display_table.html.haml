@@ -29,6 +29,14 @@
           %span.convertTime.preciseTime
             = l payment.created_at, format: :convert_time
       %tr
+        %td Paid
+        %td
+          - if payment.paid?
+            %span.convertTime.preciseTime
+              = l payment.first_payment_date, format: :convert_time
+          - else
+            %span.text-danger Incomplete!
+      %tr
         %td User
         %td
           - if payment.user.present?

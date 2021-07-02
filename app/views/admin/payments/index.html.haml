@@ -6,6 +6,17 @@
     %ul
       %li.nav-item
         = link_to "New payment", new_admin_payment_url, class: "nav-link"
+      %li.nav-item.dropdown.dropleft
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@incompleteness != "paid" ? "active" : "") }
+          - if @incompleteness == "all"
+            Paid and Incomplete
+          - else
+            #{@incompleteness.titleize} only
+        .dropdown-menu
+          = link_to "Paid and Incomplete", url_for(sortable_search_params.merge(search_incompleteness: "all")), class: "dropdown-item #{@incompleteness == 'all' ? 'active' : '' }"
+          .dropdown-divider
+          = link_to "Paid only", url_for(sortable_search_params.merge(search_incompleteness: "paid")), class: "dropdown-item #{@incompleteness == 'paid' ? 'active' : '' }"
+          = link_to "Incomplete only", url_for(sortable_search_params.merge(search_incompleteness: "incomplete")), class: "dropdown-item #{@incompleteness == 'incomplete' ? 'active' : '' }"
       %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 :ruby
@@ -33,8 +44,13 @@
 
 .row.mb-4
   .col-sm
-    %h4.mt-2
-      = pluralize(number_with_delimiter(matching_payments.count), "matching payment")
+    %p.mt-2
+      %strong
+        = number_with_delimiter(matching_payments.count)
+        = "matching payment".pluralize(matching_payments.count)
+      %em
+        = humanized_time_range_column(@time_range_column)
+        = humanized_time_range(@time_range)
       %small
         for a total of
         = Payment.money_formatted(matching_payments.sum(:amount_cents))
@@ -68,7 +84,9 @@
   %table.table.table-striped.table-bordered.sortable.table-sm
     %thead.thead-light
       %th
-        = sortable "created_at", "Paid"
+        = sortable "created_at"
+      - if @incompleteness != "paid"
+        %th.small= sortable "first_payment_date", "Paid"
       %th
         = sortable "user_id"
       %th
@@ -87,6 +105,11 @@
           %td
             %a.convertTime{ href: edit_admin_payment_path(payment) }
               = l payment.created_at, format: :convert_time
+          - if @incompleteness != "paid"
+            %td
+              - if payment.first_payment_date.present?
+                %small.convertTime
+                  = l payment.first_payment_date, format: :convert_time
           %td
             - if payment.user.present?
               = link_to payment.user.display_name, edit_admin_user_path(payment.user)

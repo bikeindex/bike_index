@@ -7,6 +7,7 @@ class Payment < ApplicationRecord
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
+  scope :incomplete, -> { where(first_payment_date: nil) }
   scope :paid, -> { where.not(first_payment_date: nil) }
 
   enum payment_method: PAYMENT_METHOD_ENUM
@@ -24,7 +25,6 @@ class Payment < ApplicationRecord
   validates :currency, presence: true
 
   before_validation :set_calculated_attributes
-  after_create :send_invoice_email
   after_commit :update_associations
 
   def self.payment_methods
@@ -49,6 +49,10 @@ class Payment < ApplicationRecord
     first_payment_date.present?
   end
 
+  def incomplete?
+    !paid?
+  end
+
   def non_donation?
     !donation?
   end
@@ -65,6 +69,16 @@ class Payment < ApplicationRecord
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
     end
     self.organization_id ||= invoice&.organization_id
+  end
+
+  def stripe_session
+    return nil unless stripe? && stripe_id.present?
+    @stripe_session ||= Stripe::Checkout::Session.retrieve(stripe_id)
+  end
+
+  def stripe_customer
+    return nil unless stripe_session.present?
+    @stripe_customer ||= stripe_session.customer.present? ? Stripe::Customer.retrieve(stripe_session.customer) : nil
   end
 
   def email_or_organization_present
