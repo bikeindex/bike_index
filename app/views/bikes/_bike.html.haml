@@ -1,12 +1,14 @@
 -# somewhat gross hack to make it possible to show serial_display for the current user
 - skip_cache ||= false
 
+-# For some reason, we're getting the ip address, rather than the TLD URL. Ugly hack to fix that
+- bike_link_target = "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}"
 %li.bike-box-item
-  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
+  %a.bike-list-image{ href: bike_link_target, class: ('hover-expand' if bike.thumb_path) }
     = bike.thumb_image
   .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
     %h5.title-link
-      %a{ href: bike_url(bike) }
+      %a{ href: bike_link_target }
         %strong
           = bike.type unless bike.type == 'bike'
           = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')

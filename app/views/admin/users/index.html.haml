@@ -2,9 +2,10 @@
   .col-5
     %h1
       Manage
-    - if display_dev_info?
-      %em.less-strong.only-dev-visible
-        current_user ##{current_user.id}
+      - if display_dev_info?
+        %small.less-strong.only-dev-visible{ style: "font-size: 50%;" }
+          current_user id:
+          = link_to current_user.id, admin_user_path(current_user)
   .col-7
     %ul
       - if display_dev_info?
