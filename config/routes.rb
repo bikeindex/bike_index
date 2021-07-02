@@ -72,7 +72,9 @@ Rails.application.routes.draw do
   end
   get "logout", to: "sessions#destroy"
 
-  resources :payments
+  resources :payments, only: %i[new create] do
+    collection { get :success }
+  end
   resources :theft_alerts, only: [:create]
   resources :documentation, only: [:index] do
     collection do

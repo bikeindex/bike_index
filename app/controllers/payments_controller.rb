@@ -4,7 +4,44 @@ class PaymentsController < ApplicationController
   def new
   end
 
+  def success
+    @payment = if params[:payment_id].present?
+      Payment.where(id: params[:payment_id], user_id: current_user&.id).first
+    else
+      nil
+    end
+  end
+
   def create
+    @payment = Payment.new(permitted_create_parameters)
+    stripe_session = Stripe::Checkout::Session.create({
+      submit_type: @payment.donation? ? "Donate" : "Pay",
+      payment_method_types: ["card"],
+      line_items: [{
+        price: @payment.amount_cents
+        quantity: 1
+        currency: @payment.currency
+      #   price_data: {
+      #     unit_amount: params[:stripe_amount],
+      #     currency: "usd",
+      #     product_data: {
+      #       name: "Stubborn Attachments",
+      #       images: ["https://i.imgur.com/EHyR2nP.png"],
+      #     },
+      #   },
+      #   quantity: 1,
+      # }],
+      mode: "payment",
+      success_url: "#{ENV['BASE_URL']}/payments/success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: new_payment_url,
+    })
+
+    pp stripe_session
+
+    # redirect stripe_session.url, 303
+  end
+
+  def legacy_create
     amount_cents = params[:stripe_amount]
     subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
     user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
@@ -59,5 +96,12 @@ class PaymentsController < ApplicationController
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to(new_payment_path) && return
+  end
+
+  private
+
+  def permitted_create_parameters
+    params.require(:payment)
+      .permit(:kind, :amount_cents, :email, :currency)
   end
 end

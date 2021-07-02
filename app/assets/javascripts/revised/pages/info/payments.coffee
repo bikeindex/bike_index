@@ -4,11 +4,9 @@ class BikeIndex.Payments extends BikeIndex
     @t = window.BikeIndex.translator("payments");
 
   initializeEventListeners: ->
-    $('#bikeindex-stripe-initial-form').submit (e) =>
-      @submitDonation()
-      # For giving tuesday modal
-      localStorage.setItem("hideDonationModal", "true")
-      return false
+    $('#new-payment-form').submit (e) =>
+      return @submitDonation()
+
     $('.amount-list a').click (e) =>
       @selectPaymentOption(e)
 
@@ -41,11 +39,17 @@ class BikeIndex.Payments extends BikeIndex
 
   submitDonation: ->
     amount_cents = @getAmountCentsSelected()
-    return true unless amount_cents
+    return false unless amount_cents
+
     # Remove alerts if they're around - because we've got a value now!
     $('.primary-alert-block .alert').remove()
-    is_arbitrary = $('.amount-list input.active').length > 0
-    @openStripeForm(is_arbitrary, amount_cents)
+    # We're submitting the form now, so hide the modal
+    localStorage.setItem("hideDonationModal", "true")
+
+    $("#new-payment-form #is_arbitrary").val($('.amount-list input.active').length > 0)
+    $("#new-payment-form #payment_amount_cents").val(amount_cents)
+    true
+    # @openStripeForm(is_arbitrary, amount_cents)
 
   openStripeForm: (is_arbitrary, amount_cents) ->
     $stripe_form = $('#stripe_form')

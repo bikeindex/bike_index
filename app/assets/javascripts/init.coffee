@@ -192,7 +192,7 @@ renderDonationModal = ->
     # Because caching, we set email in the template - so set it up now if possible
     email = $("#navUserSettingLink")?.attr("data-email")
     if email
-      $("#donationModal #stripe_form").attr("data-email", email)
+      $("#new-payment-form #email").attr("data-email", email)
     $("#donationModal").modal("show")
     new BikeIndex.Payments
     # NOTE: This is also set in payments.coffee on payment submission

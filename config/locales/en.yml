@@ -4772,7 +4772,7 @@ en:
           You're just a few steps away from registering your bike on the world's most
           comprehensive bike registry.
   payments:
-    create:
+    success:
       bike_index_team: Bike Index team
       thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
       we_received_your_payment_of: We received your payment of %{amount}
