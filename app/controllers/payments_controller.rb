@@ -29,7 +29,7 @@ class PaymentsController < ApplicationController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-    images = @payment.donation?
+    images = if @payment.donation?
       ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"]
     else
       []
@@ -49,8 +49,8 @@ class PaymentsController < ApplicationController
         quantity: 1,
       }],
       mode: "payment",
-      success_url: "#{ENV['BASE_URL']}/payments/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: new_payment_url))
+      success_url: @payment.stripe_success_url,
+      cancel_url: @payment.stripe_cancel_url))
 
     @payment.update(stripe_id: stripe_session.id)
     redirect_to stripe_session.url
@@ -67,6 +67,6 @@ class PaymentsController < ApplicationController
   def permitted_create_parameters
     params.require(:payment)
       .permit(:kind, :amount_cents, :email, :currency)
-      .merge(user_id: current_user&.id)
+      .merge(user_id: current_user&.id, stripe_kind: "stripe_session")
   end
 end

@@ -5236,10 +5236,8 @@ nl:
     donation_form:
       501c3_nonprofit: 501 (c) (3) non-profit
       bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
-      donate_to_bike_index: Doneer aan Bike Index
       next: volgende>
       other_amount: Ander bedrag (USD)
-      payment_to_bike_index: Betaling aan fietsindex
       skip: Overslaan
       what_does_your_donation_do: Wat doet uw schenking?
       subheader_1: Als non-profitorganisatie rekenen we op uw steun
@@ -5526,7 +5524,10 @@ nl:
       whoops_that_link_isnt_connected_to_a_bike: Oeps, die link is niet verbonden
         met een fiets
   payments:
-    create:
+    form:
+      pay_bike_index: Pay Bike Index
+      donation_header: Red een fiets in 2021
+    success:
       bike_index_team: Bike Index Team
       thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
         Index!
@@ -5534,9 +5535,6 @@ nl:
       xoxo: XOXO,
       your_donation_saved_bikes: Uw donatie van € %{amount} heeft zojuist de fietsen
         gered.
-    form:
-      pay_bike_index: Pay Bike Index
-      donation_header: Red een fiets in 2021
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien

@@ -23,6 +23,7 @@ module TheftAlertPaymentCreator
         kind: "theft_alert",
         is_current: true,
         stripe_id: charge.id,
+        stripe_kind: "stripe_charge",
         first_payment_date: Time.at(charge.created).utc.to_datetime,
         amount_cents: stripe_amount,
         currency: stripe_currency

@@ -2,6 +2,7 @@ class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
+  STRIPE_KIND_ENUM = {stripe_charge: 0, stripe_session: 1}
 
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
@@ -12,6 +13,7 @@ class Payment < ApplicationRecord
 
   enum payment_method: PAYMENT_METHOD_ENUM
   enum kind: KIND_ENUM
+  enum stripe_kind: STRIPE_KIND_ENUM
 
   belongs_to :user
   belongs_to :organization
@@ -59,6 +61,14 @@ class Payment < ApplicationRecord
 
   def display_kind
     self.class.display_kind(kind)
+  end
+
+  def stripe_success_url
+    "#{ENV['BASE_URL']}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+  end
+
+  def stripe_cancel_url
+    "#{ENV['BASE_URL']}/payments/new"
   end
 
   def set_calculated_attributes

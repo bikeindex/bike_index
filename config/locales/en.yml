@@ -4772,15 +4772,15 @@ en:
           You're just a few steps away from registering your bike on the world's most
           comprehensive bike registry.
   payments:
+    form:
+      donation_header: Help support our efforts!
+      pay_bike_index: Pay Bike Index
     success:
       bike_index_team: Bike Index team
       thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
       we_received_your_payment_of: We received your payment of %{amount}
       xoxo: XOXO,
       your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
-    form:
-      donation_header: Help support our efforts!
-      pay_bike_index: Pay Bike Index
   plan_features:
     automatic_registration_through_pos: Automatic registration through your POS
     campus_bike_management_suite: >-
@@ -4943,10 +4943,8 @@ en:
     donation_form:
       501c3_nonprofit: 501(c)(3) nonprofit
       bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
-      donate_to_bike_index: Donate to Bike Index
       next: next  >
       other_amount: Other amount (USD)
-      payment_to_bike_index: Payment to Bike Index
       skip: No donation
       subheader_1: As a non-profit, we rely on your support
       subheader_2: Select an amount (in USD)
