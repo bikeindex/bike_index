@@ -11,6 +11,7 @@ class PaymentsController < ApplicationController
       nil
     end
 
+    # Update the stripe info
     if @payment.present? && @payment.stripe? && @payment.incomplete?
       if @payment.stripe_session.payment_status == "paid"
         @payment.update(first_payment_date: Time.current,
@@ -18,7 +19,7 @@ class PaymentsController < ApplicationController
         # Update email if we can
         if @payment.user.blank? && @payment.stripe_customer.present?
           @payment.update(email: @payment.stripe_customer.email)
-          if current_user.stripe_id.blank?
+          if current_user.present? && current_user.stripe_id.blank?
             current_user.update(stripe_id: @payment.stripe_customer.id)
           end
         end
@@ -38,7 +39,7 @@ class PaymentsController < ApplicationController
           currency: @payment.currency,
           product_data: {
             name: @payment.kind,
-            # images: ["https://i.imgur.com/EHyR2nP.png"],
+            images: ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"],
           },
         },
         quantity: 1,
@@ -48,65 +49,7 @@ class PaymentsController < ApplicationController
       cancel_url: new_payment_url))
 
     @payment.update(stripe_id: stripe_session.id)
-
     redirect_to stripe_session.url
-  end
-
-  def legacy_create
-    amount_cents = params[:stripe_amount]
-    subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
-    user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
-    email = params[:stripe_email].strip.downcase
-    if user.present? && user.stripe_id.present?
-      customer = Stripe::Customer.retrieve(user.stripe_id)
-      customer.card = params[:stripe_token]
-      customer.save
-    elsif user.present?
-      customer = Stripe::Customer.create(
-        email: email,
-        card: params[:stripe_token]
-      )
-      user.update_attribute :stripe_id, customer.id
-    else
-      customer = Stripe::Customer.all.detect { |c| c[:email].match(email).present? }
-      if customer.present?
-        customer.card = params[:stripe_token]
-        customer.save
-      else
-        customer = Stripe::Customer.create(
-          email: email,
-          card: params[:stripe_token]
-        )
-      end
-    end
-    if subscription
-      charge = customer.subscriptions.create(plan: params[:stripe_plan])
-      charge_time = charge.current_period_start
-    else
-      charge = Stripe::Charge.create(
-        customer: customer.id,
-        amount: amount_cents,
-        description: "Bike Index customer",
-        currency: "usd"
-      )
-      charge_time = charge.created
-    end
-    @payment = Payment.new(
-      user_id: (user.id if user.present?),
-      email: email,
-      is_current: true,
-      stripe_id: charge.id,
-      first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount_cents: amount_cents
-    )
-    @payment.is_recurring = true if subscription
-    @payment.kind = "payment" if ParamsNormalizer.boolean(params[:is_payment])
-    unless @payment.save
-      raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
-    end
-  rescue Stripe::CardError => e
-    flash[:error] = e.message
-    redirect_to(new_payment_path) && return
   end
 
   private

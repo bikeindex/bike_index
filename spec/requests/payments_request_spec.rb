@@ -85,7 +85,7 @@ RSpec.describe PaymentsController, type: :request do
   end
 
   describe "create" do
-    it "makes a onetime donation" do
+    it "makes a onetime payment" do
       VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:path], re_record_interval: re_record_interval) do
         expect {
           post base_url, params: {
@@ -165,9 +165,6 @@ RSpec.describe PaymentsController, type: :request do
           end
         end
       end
-      # context "payment" do
-
-      # end
     end
   end
 end
