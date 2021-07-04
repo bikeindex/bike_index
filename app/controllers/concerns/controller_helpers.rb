@@ -94,8 +94,8 @@ module ControllerHelpers
   end
 
   def show_general_alert
-    return @show_general_alert = false if @skip_general_alert
-    return @show_general_alert = false unless current_user.present? && current_user.general_alerts.any?
+    return @show_general_alert = false if @skip_general_alert || current_user.blank?
+    return @show_general_alert = false unless current_user.alert_slugs.any?
 
     @show_general_alert = if %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
       false

@@ -72,7 +72,10 @@ Rails.application.routes.draw do
   end
   get "logout", to: "sessions#destroy"
 
-  resources :payments
+  resources :payments, only: %i[new create] do
+    collection { get :success }
+  end
+  get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
   resources :theft_alerts, only: [:create]
   resources :documentation, only: [:index] do
     collection do
@@ -115,6 +118,7 @@ Rails.application.routes.draw do
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
   get :accept_terms, to: "users#accept_terms"
+  resources :user_alerts, only: %i[update]
   resources :user_embeds, only: [:show]
   resources :user_phones, only: %i[update destroy]
   resources :user_emails, only: [:destroy] do
@@ -190,7 +194,8 @@ Rails.application.routes.draw do
     resources :memberships, :bulk_imports, :exports, :bike_stickers, :bike_sticker_updates,
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
-      :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data
+      :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
+      :notifications
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]

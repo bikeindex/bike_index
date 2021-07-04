@@ -11,7 +11,8 @@ RSpec.describe Admin::BikeStickerUpdatesController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:bike_sticker_updates)).to eq([bike_sticker_update])
+      expect(bike_sticker_update.bike_sticker.bike_sticker_updates.count).to eq 2
+      expect(assigns(:bike_sticker_updates).pluck(:id)).to match_array bike_sticker_update.bike_sticker.bike_sticker_updates.pluck(:id)
     end
   end
 end

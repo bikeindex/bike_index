@@ -8,9 +8,11 @@ http_interactions:
       string: card[number]=4000000000000002&card[exp_month]=12&card[exp_year]=2025&card[cvc]=314
     headers:
       User-Agent:
-      - Stripe/v1 RubyBindings/3.3.2
+      - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_T43pWesT3HeaKF","request_duration_ms":413}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 22 Jun 2019 00:38:40 GMT
+      - Fri, 02 Jul 2021 21:00:02 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '782'
+      - '801'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -43,19 +45,21 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_JYQbXo0okeM3FW
+      - req_YodUZbs6jBA33E
       Stripe-Version:
       - '2014-12-08'
+      X-Stripe-C-Cost:
+      - '5'
       Strict-Transport-Security:
       - max-age=31556926; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |
         {
-          "id": "tok_FIYMDqclthxq4O",
+          "id": "tok_0J8tSwm0T0GBfX0vL6u4VnbE",
           "object": "token",
           "card": {
-            "id": "card_FIYMgYt3vDkQve",
+            "id": "card_0J8tSvm0T0GBfX0v8RtQ2TRZ",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -80,25 +84,27 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "client_ip": "100.37.244.206",
-          "created": 1561163920,
+          "client_ip": "23.115.138.69",
+          "created": 1625259602,
           "livemode": false,
           "type": "card",
           "used": false
         }
-    http_version: 
-  recorded_at: Sat, 22 Jun 2019 00:38:40 GMT
+    http_version:
+  recorded_at: Fri, 02 Jul 2021 21:00:02 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/customers
     body:
       encoding: UTF-8
-      string: email=user3s%40bikeiasdndex.org&card=tok_FIYMDqclthxq4O
+      string: email=user3s%40bikeiasdndex.org&card=tok_0J8tSwm0T0GBfX0vL6u4VnbE
     headers:
       User-Agent:
-      - Stripe/v1 RubyBindings/3.3.2
+      - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_YodUZbs6jBA33E","request_duration_ms":652}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -111,7 +117,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 22 Jun 2019 00:38:40 GMT
+      - Fri, 02 Jul 2021 21:00:03 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -131,9 +137,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_Ps1sxyZaWQs6Dv
+      - req_dQPmY3088mg1xX
       Stripe-Version:
       - '2014-12-08'
+      X-Stripe-C-Cost:
+      - '5'
       Strict-Transport-Security:
       - max-age=31556926; includeSubDomains; preload
     body:
@@ -149,6 +157,6 @@ http_interactions:
             "type": "card_error"
           }
         }
-    http_version: 
-  recorded_at: Sat, 22 Jun 2019 00:38:40 GMT
-recorded_with: VCR 4.0.0
+    http_version:
+  recorded_at: Fri, 02 Jul 2021 21:00:03 GMT
+recorded_with: VCR 5.0.0

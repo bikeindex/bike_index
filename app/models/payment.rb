@@ -2,14 +2,18 @@ class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
+  STRIPE_KIND_ENUM = {stripe_charge: 0, stripe_session: 1}
 
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
+  scope :incomplete, -> { where(first_payment_date: nil) }
+  scope :paid, -> { where.not(first_payment_date: nil) }
 
   enum payment_method: PAYMENT_METHOD_ENUM
   enum kind: KIND_ENUM
+  enum stripe_kind: STRIPE_KIND_ENUM
 
   belongs_to :user
   belongs_to :organization
@@ -23,7 +27,6 @@ class Payment < ApplicationRecord
   validates :currency, presence: true
 
   before_validation :set_calculated_attributes
-  after_create :send_invoice_email
   after_commit :update_associations
 
   def self.payment_methods
@@ -44,12 +47,28 @@ class Payment < ApplicationRecord
     kind.humanize
   end
 
+  def paid?
+    first_payment_date.present?
+  end
+
+  def incomplete?
+    !paid?
+  end
+
   def non_donation?
     !donation?
   end
 
   def display_kind
     self.class.display_kind(kind)
+  end
+
+  def stripe_success_url
+    "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+  end
+
+  def stripe_cancel_url
+    "#{ENV["BASE_URL"]}/payments/new"
   end
 
   def set_calculated_attributes
@@ -62,18 +81,27 @@ class Payment < ApplicationRecord
     self.organization_id ||= invoice&.organization_id
   end
 
-  def send_invoice_email
-    EmailReceiptWorker.perform_async(id) if payment_method == "stripe"
+  def stripe_session
+    return nil unless stripe? && stripe_id.present?
+    @stripe_session ||= Stripe::Checkout::Session.retrieve(stripe_id)
+  end
+
+  def stripe_customer
+    return nil unless stripe_session.present?
+    @stripe_customer ||= stripe_session.customer.present? ? Stripe::Customer.retrieve(stripe_session.customer) : nil
   end
 
   def email_or_organization_present
-    return if email.present? || organization_id.present?
+    return if email.present? || organization_id.present? || stripe_id.present?
     errors.add(:organization, :requires_email_or_org)
     errors.add(:email, :requires_email_or_org)
   end
 
   def update_associations
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
+    if payment_method == "stripe" && paid? && email.present?
+      EmailReceiptWorker.perform_async(id)
+    end
     return true unless invoice.present?
     invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
   end

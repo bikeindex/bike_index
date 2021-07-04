@@ -111,8 +111,10 @@
                   = phone_display(user_phone.phone)
                   %small.less-strong{ class: user_phone.confirmed? ? "text-success" : "text-warning" }
                     = user_phone.confirmed? ? "confirmed" : "unconfirmed"
+                  %small.less-strong.convertTime.withPreposition= l user_phone.created_at, format: :convert_time
                   - if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone)
                     - display_phone = false
+
               - if display_phone
                 %li
                   = phone_display(@user.phone)
@@ -219,14 +221,14 @@
 %hr.mt-4
 - mailchimp_datum = @user.mailchimp_datum
 %h4
+  - if mailchimp_datum.blank?
+    No
   Mailchimp data
   - if mailchimp_datum.present?
     %em.small
       %a.small{href: ".mailchimpRawData", "aria-expanded" => "false", "data-toggle" => "collapse"}
         show raw data
-- if mailchimp_datum.blank?
-  %p No Mailchimp data
-- else
+- if mailchimp_datum.present?
   .row
     .col-md-6
       %table.table-list

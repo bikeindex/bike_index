@@ -73,7 +73,7 @@ gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more
 gem "simple_spark" # Sparkpost gem - we use it to send newsletters
 gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
-gem "stripe", "~> 3.3.2" # Payments
+gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts

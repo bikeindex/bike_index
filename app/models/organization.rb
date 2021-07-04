@@ -381,10 +381,7 @@ class Organization < ApplicationRecord
 
   # Accepts string or array, tests that ALL are enabled
   def enabled?(feature_name)
-    features =
-      Array(feature_name)
-        .map { |name| name.strip.downcase.gsub(/\s/, "_") }
-
+    features = OrganizationFeature.matching_slugs(feature_name)
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
     features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end
@@ -493,7 +490,10 @@ class Organization < ApplicationRecord
     fslugs = current_invoices.feature_slugs
     # If part of a region with bike_stickers, the organization receives the stickers organization feature
     if regional_parents.any?
-      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.enabled?("bike_stickers") }
+      if regional_parents.any? { |o| o.enabled?("bike_stickers") }
+        fslugs += ["bike_stickers"]
+        fslugs += ["bike_stickers_user_editable"] if regional_parents.any? { |o| o.enabled?("bike_stickers_user_editable") }
+      end
     end
     # Ambassador orgs get unstolen_notifications
     fslugs += ["unstolen_notifications"] if ambassador?

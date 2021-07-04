@@ -92,7 +92,7 @@ RSpec.describe MyAccountsController, type: :request do
           end
         end
         context "with user_phone" do
-          before { current_user.update_column :general_alerts, ["phone_waiting_confirmation"] }
+          before { current_user.update_column :alert_slugs, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
             get base_url
 

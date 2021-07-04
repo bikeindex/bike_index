@@ -116,7 +116,7 @@
                     placeholder: t(".street_address"),
                     class: 'form-control'
 
-                  %span.below-input-help
+                  %span.below-input-help.text-warning
                     = t(".your_full_address_is_required", org_name: @organization.short_name)
 
               .form-group.row
@@ -176,7 +176,7 @@
                   autocapitalize: "off",
                   class: "form-control"
 
-          - if include_field_reg_bike_sticker?(@organization, current_user)
+          - if include_field_reg_bike_sticker?(@organization, current_user, true)
             .form-group.row.unnested-field.no-divider-row
               = f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label"
               .form-well-input

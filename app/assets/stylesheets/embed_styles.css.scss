@@ -71,6 +71,11 @@ $newStolenColor: #d25627;
   }
 }
 
+label.strong {
+  font-size: 110%;
+  color: $contentTextColor;
+}
+
 .input-group .absent-serial {
   background: darken(white, 10%);
   color: $grayLight;

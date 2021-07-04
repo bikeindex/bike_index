@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :theft_alert do
-    stolen_record { create(:stolen_record) }
+    stolen_record { FactoryBot.create(:stolen_record) }
     theft_alert_plan { FactoryBot.create(:theft_alert_plan) }
     user { FactoryBot.create(:user_confirmed) }
     status { "pending" }

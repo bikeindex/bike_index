@@ -11,7 +11,7 @@ class EmailReceiptWorker < ApplicationWorker
     notification.update(delivery_status: "email_success", message_channel: "email")
 
     if payment.donation?
-      EmailDonationWorker.perform_in(1.hour + (rand(9..55) * 60), payment.id)
+      EmailDonationWorker.perform_in(1.2.hours + (rand(9..55) * 60), payment.id)
     end
   end
 end

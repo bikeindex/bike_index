@@ -4,11 +4,9 @@ class BikeIndex.Payments extends BikeIndex
     @t = window.BikeIndex.translator("payments");
 
   initializeEventListeners: ->
-    $('#bikeindex-stripe-initial-form').submit (e) =>
-      @submitDonation()
-      # For giving tuesday modal
-      localStorage.setItem("hideDonationModal", "true")
-      return false
+    $('#new-payment-form').submit (e) =>
+      return @submitDonation()
+
     $('.amount-list a').click (e) =>
       @selectPaymentOption(e)
 
@@ -41,33 +39,13 @@ class BikeIndex.Payments extends BikeIndex
 
   submitDonation: ->
     amount_cents = @getAmountCentsSelected()
-    return true unless amount_cents
+    return false unless amount_cents
+
     # Remove alerts if they're around - because we've got a value now!
     $('.primary-alert-block .alert').remove()
-    is_arbitrary = $('.amount-list input.active').length > 0
-    @openStripeForm(is_arbitrary, amount_cents)
+    # We're submitting the form now, so hide the modal
+    localStorage.setItem("hideDonationModal", "true")
 
-  openStripeForm: (is_arbitrary, amount_cents) ->
-    $stripe_form = $('#stripe_form')
-    # Checkout integration custom: https://stripe.com/docs/checkout#integration-custom
-    # Use the token to create the charge with a server-side script.
-    # You can access the token ID with `token.id`
-    handler = StripeCheckout.configure(
-      key: $stripe_form.attr('data-key')
-      image: '/apple_touch_icon.png'
-      token: (token) ->
-        $('#stripe_token').val(token.id)
-        $('#stripe_email').val(token.email)
-        $('#stripe_form').submit()
-    )
-
-    $('#stripe_amount').val(amount_cents)
-    handler.open
-      name: 'Bike Index'
-      description: $stripe_form.data('description')
-      amount: amount_cents
-      currency: $stripe_form.data('currency')
-      email: $stripe_form.data('email')
-      allowRememberMe: false
-      panelLabel: $stripe_form.data('type')
-    return
+    $("#new-payment-form #is_arbitrary").val($('.amount-list input.active').length > 0)
+    $("#new-payment-form #payment_amount_cents").val(amount_cents)
+    true

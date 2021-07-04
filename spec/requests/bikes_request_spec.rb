@@ -7,6 +7,16 @@ RSpec.describe BikesController, type: :request do
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
 
+  describe "index" do
+    context "stolen subdomain" do
+      it "redirects to non-subdomain" do
+        host! "stolen.bikeindex.org"
+        get base_url
+        expect(response).to redirect_to bikes_url(subdomain: false)
+      end
+    end
+  end
+
   describe "show" do
     context "example bike" do
       it "shows the bike" do
@@ -1288,6 +1298,8 @@ RSpec.describe BikesController, type: :request do
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.authorized?(current_user)).to be_truthy
+        AfterUserChangeWorker.new.perform(current_user.id)
+        expect(current_user.reload.alert_slugs).to eq([])
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
@@ -1311,6 +1323,9 @@ RSpec.describe BikesController, type: :request do
         expect(stolen_record.date_stolen).to be_within(5).of Time.current
         expect(stolen_record.phone).to be_blank
         expect(stolen_record.country_id).to eq Country.united_states.id
+
+        # No alert, because bike isn't claimed
+        expect(current_user.reload.alert_slugs).to eq([])
       end
       context "no sidekiq" do
         it "redirects correctly" do
@@ -1354,8 +1369,13 @@ RSpec.describe BikesController, type: :request do
           expect(bike.status_stolen?).to be_falsey
           expect(bike.claimed?).to be_falsey
           expect(bike.user&.id).to eq current_user.id
+          AfterUserChangeWorker.new.perform(current_user.id)
+          expect(current_user.reload.alert_slugs).to eq([])
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
+            # get edit because it should claim the bike
+            get "#{base_url}/#{bike.id}/edit"
+            expect(bike.reload.claimed?).to be_truthy
             patch "#{base_url}/#{bike.id}", params: {
               edit_template: "report_stolen", bike: {date_stolen: time.to_i}
             }
@@ -1370,6 +1390,8 @@ RSpec.describe BikesController, type: :request do
           expect(bike.status).to eq "status_stolen"
           expect(bike.to_coordinates.compact).to eq([])
           expect(bike.user&.id).to eq current_user.id
+          expect(bike.claimed?).to be_truthy
+          expect(bike.owner&.id).to eq current_user.id
           expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
 
           stolen_record = bike.current_stolen_record
@@ -1378,6 +1400,8 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.date_stolen).to be_within(2).of time
           expect(stolen_record.phone).to eq "2221114444"
           expect(stolen_record.country_id).to eq Country.united_states.id
+
+          expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         end
       end
     end
@@ -1455,8 +1479,7 @@ RSpec.describe BikesController, type: :request do
       end
     end
     context "adding location to a stolen bike" do
-      let(:bike) { FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg") }
-      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg", user: current_user) }
       let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
       let(:stolen_params) do
@@ -1489,7 +1512,8 @@ RSpec.describe BikesController, type: :request do
       it "clears the existing alert image" do
         # Cassette required for alert image
         VCR.use_cassette("bike_request-stolen", match_requests_on: [:path], re_record_interval: 1.month) do
-          bike.reload
+          expect(bike.reload.claimed?).to be_truthy
+          expect(bike.owner&.id).to eq current_user.id
           stolen_record.current_alert_image
           stolen_record.reload
           expect(bike.current_stolen_record).to eq stolen_record
@@ -1501,6 +1525,8 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.phone_for_users).to be_truthy
           expect(stolen_record.phone_for_shops).to be_truthy
           expect(stolen_record.phone_for_police).to be_truthy
+          AfterUserChangeWorker.new.perform(current_user.id)
+          expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{bike.id}", params: {
@@ -1538,6 +1564,8 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.alert_image).to be_present
           expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
         end
+
+        expect(current_user.reload.alert_slugs).to eq([])
       end
     end
     context "updating impound_record" do

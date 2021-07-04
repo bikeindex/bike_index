@@ -14,15 +14,20 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
 
     context "given the theft alert and payment both succeed" do
       it "redirects to purchase confirmation template" do
-        post "/theft_alerts",
-          params: {
-            theft_alert_plan_id: theft_alert_plan.id,
-            bike_id: bike.id,
-            stripe_token: stripe_token.id,
-            stripe_amount: 100,
-            stripe_email: current_user.email,
-            stripe_currency: "USD"
-          }
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(Notification.count).to eq 0
+        Sidekiq::Testing.inline! do
+          post "/theft_alerts",
+            params: {
+              theft_alert_plan_id: theft_alert_plan.id,
+              bike_id: bike.id,
+              stripe_token: stripe_token.id,
+              stripe_amount: 100,
+              stripe_email: current_user.email,
+              stripe_currency: "USD"
+            }
+        end
 
         expect(Payment.count).to eq(1)
         expect(TheftAlert.count).to eq(1)
@@ -30,9 +35,16 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         new_theft_alert = TheftAlert.first
         expect(new_theft_alert.status).to eq("pending")
         expect(new_theft_alert.payment).to be_a(Payment)
+        expect(new_theft_alert.payment.stripe_kind).to eq "stripe_charge"
 
         purchase_confirmation = edit_bike_url(bike, params: {page: :alert_purchase_confirmation})
         expect(response).to redirect_to(purchase_confirmation)
+
+        expect(Notification.count).to eq 1
+        expect(Notification.pluck(:kind)).to eq(["receipt"])
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to eq "Thank you for supporting Bike Index!"
       end
     end
 
@@ -79,6 +91,9 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
 
         expect(response).to redirect_to(edit_bike_url(bike, params: {page: :alert_purchase}))
         expect(flash[:error]).to match(/unable to complete payment/i)
+
+        expect(Notification.count).to eq 0
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
 

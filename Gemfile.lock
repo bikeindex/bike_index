@@ -181,7 +181,7 @@ GEM
     factory_bot_rails (5.1.1)
       factory_bot (~> 5.1.0)
       railties (>= 4.2.0)
-    faraday (0.17.3)
+    faraday (0.17.4)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.13.1)
       faraday (>= 0.7.4, < 1.0)
@@ -631,8 +631,7 @@ GEM
     standard (1.0.4)
       rubocop (= 1.11.0)
       rubocop-performance (= 1.10.1)
-    stripe (3.3.2)
-      faraday (~> 0.9)
+    stripe (5.35.0)
     temple (0.8.2)
     terminal-notifier (2.0.0)
     terminal-table (1.8.0)
@@ -811,7 +810,7 @@ DEPENDENCIES
   sprockets-rails
   stackprof
   standard
-  stripe (~> 3.3.2)
+  stripe
   swagger-ui_rails!
   terminal-notifier
   thor

@@ -6,7 +6,9 @@ module AdminHelper
       {title: "Impound Claims", path: admin_impound_claims_path, match_controller: true},
       {title: "Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
       {title: "Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
-      {title: "Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true}
+      {title: "Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
+      {title: "User Alerts", path: admin_user_alerts_path, match_controller: true},
+      {title: "Notifications", path: admin_notifications_path, match_controller: true}
     ]
   end
 
@@ -54,7 +56,7 @@ module AdminHelper
       {title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
-    ] + dev_nav_select_links).sort { |a, b| a[:title] <=> b[:title] }
+    ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end
 
   def admin_nav_select_link_active

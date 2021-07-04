@@ -312,9 +312,9 @@ RSpec.describe User, type: :model do
     before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") } }
     it "updates general alerts without background processing" do
       user.reload
-      expect(user.general_alerts).to be_blank
+      expect(user.alert_slugs).to be_blank
       user.update(phone: "6669996666")
-      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
     it "adds user phone, if blank" do
       user.reload
@@ -330,7 +330,7 @@ RSpec.describe User, type: :model do
       user.reload
       expect(user.phone).to eq "6669996666"
       expect(user.user_phones.count).to eq 1
-      expect(user.general_alerts).to eq(["phone_waiting_confirmation"])
+      expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
       user_phone = user.user_phones.reorder(:created_at).last
       expect(user_phone.phone).to eq "6669996666"
       expect(user_phone.confirmed?).to be_falsey
@@ -548,17 +548,29 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "send_unstolen_notifications?" do
+  describe "enabled" do
+    let(:user) { User.new }
+    let(:superuser) { User.new(superuser: true) }
+    it "is falsey, truthy for superuser" do
+      expect(user.enabled?("unstolen_notifications")).to be_falsey
+      expect(superuser.enabled?("unstolen_notifications")).to be_truthy
+      expect(superuser.enabled?("unstolen_notifications", no_superuser_override: true)).to be_falsey
+
+      expect(superuser.enabled?("invalid feature name")).to be_falsey
+    end
+  end
+
+  describe "unstolen_notifications enabled?" do
     let(:user) { User.new }
     it "is falsey, truthy for superuser" do
-      expect(user.send_unstolen_notifications?).to be_falsey
+      expect(user.enabled?("unstolen_notifications")).to be_falsey
       user.superuser = true
-      expect(user.send_unstolen_notifications?).to be_truthy
+      expect(user.enabled?("unstolen_notifications")).to be_truthy
     end
 
     it "returns true for an ambassador" do
       ambassador = FactoryBot.create(:ambassador)
-      expect(ambassador.send_unstolen_notifications?).to eq(true)
+      expect(ambassador.enabled?("unstolen_notifications")).to eq(true)
     end
 
     context "organization" do
@@ -568,14 +580,14 @@ RSpec.describe User, type: :model do
       let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
       it "is true if the organization has that organization feature" do
         expect(user.render_donation_request).to be_nil
-        expect(user.send_unstolen_notifications?).to be_falsey
+        expect(user.enabled?("unstolen_notifications")).to be_falsey
 
         invoice.update_attributes(organization_feature_ids: [organization_feature.id])
         organization.save
 
         expect(organization.bike_actions?).to be_truthy
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
-        expect(user.reload.send_unstolen_notifications?).to be_truthy
+        expect(user.reload.enabled?("unstolen_notifications")).to be_truthy
       end
     end
   end

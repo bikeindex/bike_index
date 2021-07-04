@@ -81,12 +81,13 @@
         = f.email_field :owner_email, required: true
   - if include_field_reg_address?(@organization)
     - label_address = registration_field_label(@organization, "reg_address") || t(".owners_street_address")
+    - label_address_class = registration_field_label(@organization, "reg_address").present? ? "strong" : ""
     / Set all the bike address attrs
     - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
     - @bike.country_id ||= @organization.country_id || Country.united_states.id
     .input-group.with-optional-blocks
       #address-fields
-        = f.label :street, label_address
+        = f.label :street, label_address, class: label_address_class
         .street-control
           = f.text_field :street, required: true, placeholder: t(".address")
         .control-group
@@ -117,6 +118,8 @@
         = f.label :student_id, label_student_id, class: "control-label"
         .controls
           = f.text_field :student_id
+
+  -# NOT checking bike_stickers_user_editable here - this embed form is for the organization
   - if include_field_reg_bike_sticker?(@organization)
     .input-group
       .control-group
