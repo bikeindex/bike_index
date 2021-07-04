@@ -64,11 +64,11 @@ class Payment < ApplicationRecord
   end
 
   def stripe_success_url
-    "#{ENV['BASE_URL']}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+    "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
   end
 
   def stripe_cancel_url
-    "#{ENV['BASE_URL']}/payments/new"
+    "#{ENV["BASE_URL"]}/payments/new"
   end
 
   def set_calculated_attributes

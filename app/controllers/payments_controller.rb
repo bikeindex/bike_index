@@ -5,20 +5,19 @@ class PaymentsController < ApplicationController
   end
 
   def apple_verification
+    render layout: false
   end
 
   def success
     @payment = if params[:session_id].present?
       Payment.where(stripe_id: params[:session_id]).first
-    else
-      nil
     end
 
     # Update the stripe info
     if @payment.present? && @payment.stripe? && @payment.incomplete?
       if @payment.stripe_session.payment_status == "paid"
         @payment.update(first_payment_date: Time.current,
-          amount_cents: @payment.stripe_session.amount_total)
+                        amount_cents: @payment.stripe_session.amount_total)
         # Update email if we can
         if @payment.user.blank? && @payment.stripe_customer.present?
           @payment.update(email: @payment.stripe_customer.email)
@@ -46,14 +45,15 @@ class PaymentsController < ApplicationController
           currency: @payment.currency,
           product_data: {
             name: @payment.kind,
-            images: images,
-          },
+            images: images
+          }
         },
-        quantity: 1,
+        quantity: 1
       }],
       mode: "payment",
       success_url: @payment.stripe_success_url,
-      cancel_url: @payment.stripe_cancel_url))
+      cancel_url: @payment.stripe_cancel_url
+    ))
 
     @payment.update(stripe_id: stripe_session.id)
     redirect_to stripe_session.url

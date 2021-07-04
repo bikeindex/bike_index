@@ -26,7 +26,7 @@ class TheftAlertsController < ApplicationController
     flash[:error] = translation(:order_is_pending)
     redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
   else
-    # No longer sending an email about successful promoted alerts
+    # Previously we sent an email about successful promoted alerts, no longer doing that
     redirect_to edit_bike_url(@bike, params: {page: :alert_purchase_confirmation})
   end
 
