@@ -45,11 +45,11 @@ class ExternalRegistryClient
   def conn
     @conn ||= Faraday.new(url: base_url) { |conn|
       conn.response :json, content_type: /\bjson$/
-      if Rails.env.development?
-        conn.use Faraday::RequestResponseLogger::Middleware,
-          logger_level: :info,
-          logger: Rails.logger
-      end
+      # if Rails.env.development?
+      #   conn.use Faraday::RequestResponseLogger::Middleware,
+      #     logger_level: :info,
+      #     logger: Rails.logger
+      # end
       conn.adapter Faraday.default_adapter
       conn.options.timeout = TIMEOUT_SECS
     }

@@ -5,7 +5,7 @@ RSpec.describe FacebookAdsIntegration do
 
   it "gets account" do
     VCR.use_cassette("facebook_ads_integration-get_account", match_requests_on: [:path]) do
-      pp instance.account.name
+      # pp instance.account.name
     end
   end
 
