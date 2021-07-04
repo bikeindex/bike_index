@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://graph.facebook.com/v11.0/act_62935371?access_token=<FACEBOOK_AD_TOKEN>&fields=id,name
+    uri: https://graph.facebook.com/v11.0/6250389631214?access_token=<FACEBOOK_AD_TOKEN>&fields=id,objective
     body:
       encoding: US-ASCII
       string: ''
@@ -19,13 +19,13 @@ http_interactions:
       message: OK
     headers:
       Etag:
-      - '"79d77c8cd32748036f30cfcbf9ff637976a5ea73"'
+      - '"d80b63fa3de6ac878ea1b810e07d3ae769fe3341"'
       Content-Type:
       - application/json; charset=UTF-8
       Vary:
       - Origin
       X-Business-Use-Case-Usage:
-      - '{"62935371":[{"type":"ads_management","call_count":0,"total_cputime":0,"total_time":0,"estimated_time_to_regain_access":0}]}'
+      - '{"62935371":[{"type":"ads_management","call_count":5,"total_cputime":8,"total_time":7,"estimated_time_to_regain_access":0}]}'
       X-Fb-Rlafr:
       - '0'
       Access-Control-Allow-Origin:
@@ -41,15 +41,15 @@ http_interactions:
       Expires:
       - Sat, 01 Jan 2000 00:00:00 GMT
       X-Fb-Request-Id:
-      - A23u_kc90aFXaAif_BJWui3
+      - Atj_-7UGLMtbgbLW9odOTJJ
       X-Fb-Trace-Id:
-      - FKBuKQu4tcl
+      - EOFC7sCrNyp
       X-Fb-Rev:
       - '1004076336'
       X-Fb-Debug:
-      - KeDxbcBTtnPRcEMjTh9dGKEgJnWU4ybzeXCh7tZqGptlPCDl4g3Bc8SfGaHlXZr49ABHpY91JXY0YhDjNs08Uw==
+      - 9Gw1WVsxXiTKIYE4jrF5LiMrtfEWmKqiIJB9F8PE70rT84a4Socqrk1QU/4TdjVFNUq6xRJVBfznW7FL5DrssQ==
       Date:
-      - Sun, 04 Jul 2021 18:39:34 GMT
+      - Sun, 04 Jul 2021 19:33:36 GMT
       Priority:
       - u=3,i
       Alt-Svc:
@@ -57,10 +57,10 @@ http_interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '41'
+      - '42'
     body:
       encoding: UTF-8
-      string: '{"id":"act_62935371","name":"Bike Index"}'
+      string: '{"id":"6250389631214","objective":"REACH"}'
     http_version:
-  recorded_at: Sun, 04 Jul 2021 18:39:34 GMT
+  recorded_at: Sun, 04 Jul 2021 19:33:36 GMT
 recorded_with: VCR 5.0.0
