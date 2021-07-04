@@ -2721,7 +2721,8 @@ CREATE TABLE public.theft_alert_plans (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     language integer DEFAULT 0 NOT NULL,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency character varying DEFAULT 'USD'::character varying NOT NULL,
+    amount_cents_facebook integer
 );
 
 
@@ -2760,7 +2761,8 @@ CREATE TABLE public.theft_alerts (
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    notes text
+    notes text,
+    facebook_data jsonb
 );
 
 
@@ -5842,6 +5844,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210610185925'),
 ('20210614175711'),
 ('20210626220123'),
-('20210702204848');
+('20210702204848'),
+('20210704190719');
 
 

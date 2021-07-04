@@ -131,21 +131,12 @@
                 = [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first
             %td.table-cell-check
               = check_mark if stolen_record.approved
-              - if bike.present?
-                - if bike.owner&.donor?
-                  <span class="donor-icon">D</span>
-                - elsif bike.owner&.paid_org?
-                  <span class="paid-org-icon">O</span>
+              = user_icon(bike&.user)
           - else
             %td
             %td
             %td
             %td
-              - if bike.present?
-                - if bike.owner&.donor?
-                  <span class="donor-icon">D</span>
-                - elsif bike.owner&.paid_org?
-                  <span class="paid-org-icon">O</span>
-
+              = user_icon(bike&.user)
 
 = paginate @stolen_records, views_prefix: "admin"
