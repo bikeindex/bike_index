@@ -27,6 +27,13 @@ RSpec.describe PaymentsController, type: :request do
     end
   end
 
+  describe "apple verification" do
+    it "responds with verification" do
+      get "/.well-known/apple-developer-merchantid-domain-association"
+      expect(response.code).to eq "200"
+    end
+  end
+
   describe "success" do
     it "renders" do
       get "#{base_url}/success"
@@ -37,7 +44,8 @@ RSpec.describe PaymentsController, type: :request do
     end
     context "with stripe_id" do
       let(:stripe_id) { "cs_test_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV" }
-      let(:payment) { Payment.create(stripe_id: stripe_id, payment_method: "stripe", amount: nil, kind: "donation") }
+      let(:kind) { "donation" }
+      let(:payment) { Payment.create(stripe_id: stripe_id, payment_method: "stripe", amount: nil, kind: kind) }
       it "renders" do
         expect(payment).to be_valid
         expect(payment.reload.email).to be_blank
@@ -45,7 +53,12 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.kind).to eq "donation"
         expect(payment.amount_cents).to eq 0
         VCR.use_cassette("payments_controller-success", match_requests_on: [:path], re_record_interval: re_record_interval) do
-          get "#{base_url}/success?session_id=#{stripe_id}"
+          Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
+          expect(Notification.count).to eq 0
+          Sidekiq::Testing.inline! do
+            get "#{base_url}/success?session_id=#{stripe_id}"
+          end
           expect(response.code).to eq("200")
           expect(response).to render_template("success")
           expect(flash).to_not be_present
@@ -55,12 +68,17 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.paid?).to be_truthy
           expect(payment.kind).to eq "donation"
           expect(payment.amount_cents).to eq 5000
+
+          expect(ActionMailer::Base.deliveries.count).to eq 2
+          expect(Notification.count).to eq 2
+          expect(Notification.pluck(:kind)).to match_array(%w[receipt donation_standard])
         end
       end
       context "with current_user" do
         include_context :request_spec_logged_in_as_user
         let(:stripe_id) { "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa" }
         let(:customer_stripe_id) { "cus_JmR9ccDp8JD2Mo" }
+        let(:kind) { "payment" }
         it "renders" do
           expect(current_user.reload.stripe_id).to be_blank
           expect(payment).to be_valid
@@ -68,7 +86,12 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.paid?).to be_falsey
           expect(payment.amount_cents).to eq 0
           VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:path], re_record_interval: re_record_interval) do
-            get "#{base_url}/success?session_id=#{stripe_id}"
+            Sidekiq::Worker.clear_all
+            ActionMailer::Base.deliveries = []
+            expect(Notification.count).to eq 0
+            Sidekiq::Testing.inline! do
+              get "#{base_url}/success?session_id=#{stripe_id}"
+            end
             expect(response.code).to eq("200")
             expect(response).to render_template("success")
             expect(flash).to_not be_present
@@ -79,6 +102,10 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.amount_cents).to eq 500000
           end
           expect(current_user.reload.stripe_id).to eq customer_stripe_id
+
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(Notification.count).to eq 1
+          expect(Notification.pluck(:kind)).to match_array(%w[receipt])
         end
       end
     end
@@ -87,16 +114,21 @@ RSpec.describe PaymentsController, type: :request do
   describe "create" do
     it "makes a onetime payment" do
       VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:path], re_record_interval: re_record_interval) do
-        expect {
-          post base_url, params: {
-            is_arbitrary: false,
-            payment: {
-              amount_cents: 4000,
-              currency: "USD",
-              kind: "payment"
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(Notification.count).to eq 0
+        Sidekiq::Testing.inline! do
+          expect {
+            post base_url, params: {
+              is_arbitrary: false,
+              payment: {
+                amount_cents: 4000,
+                currency: "USD",
+                kind: "payment"
+              }
             }
-          }
-        }.to change(Payment, :count).by(1)
+          }.to change(Payment, :count).by(1)
+        end
         payment = Payment.last
         expect(payment.user_id).to be_blank
         expect(payment.stripe_id).to be_present
@@ -107,6 +139,9 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.first_payment_date).to be_blank # Ensure this gets set
         expect(payment.last_payment_date).to be_blank
         expect(payment.paid?).to be_falsey
+
+        # No deliveries, because the payment hasn't been completed
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
     context "with user" do

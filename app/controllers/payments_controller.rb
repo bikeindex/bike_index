@@ -4,6 +4,9 @@ class PaymentsController < ApplicationController
   def new
   end
 
+  def apple_verification
+  end
+
   def success
     @payment = if params[:session_id].present?
       Payment.where(stripe_id: params[:session_id]).first
