@@ -63,4 +63,47 @@ RSpec.describe AdminHelper, type: :helper do
       expect(credibility_scorer_color(80)).to eq "#28a745"
     end
   end
+
+  describe "user_icon" do
+    it "returns empty" do
+      expect(user_icon(User.new)).to be_blank
+    end
+    context "donor" do
+      let(:payment) { FactoryBot.create(:payment, kind: "donation") }
+      let(:user) { payment.user }
+      let(:target) { "<span><span class=\"donor-icon ml-1\">D</span></span>" }
+      let(:target_full_text) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"less-strong\">onor</span></span>" }
+      it "returns donor" do
+        expect(user.donor?).to be_truthy
+        expect(user_icon(user)).to eq target
+        expect(user_icon(user, full_text: true)).to eq target_full_text
+      end
+      context "theft alert" do
+        let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user) }
+        let(:target) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"theft-alert-icon ml-1\">T</span></span>" }
+        let(:target_full_text) do
+          "<span><span class=\"donor-icon ml-1\">D</span><span class=\"less-strong\">onor</span>" +
+          "<span class=\"theft-alert-icon ml-1\">T</span><span class=\"less-strong\">heft alert</span>" +
+          "</span>"
+        end
+        it "returns donor and theft alert" do
+          expect(user.donor?).to be_truthy
+          expect(user.theft_alert_purchaser?).to be_truthy
+          expect(user_icon(user)).to eq target
+          expect(user_icon(user, full_text: true)).to eq target_full_text
+        end
+      end
+    end
+    context "organization" do
+      let(:organization) { FactoryBot.create(:organization, :organization_features) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:target) { "<span><span class=\"paid-org-icon ml-1\">O</span></span>" }
+      let(:target_full_text) { "<span><span class=\"paid-org-icon ml-1\">O</span><span class=\"less-strong\">rganization member</span></span>" }
+      it "returns paid_org" do
+        expect(user.paid_org?).to be_truthy
+        expect(user_icon(user)).to eq target
+        expect(user_icon(user, full_text: true)).to eq target_full_text
+      end
+    end
+  end
 end

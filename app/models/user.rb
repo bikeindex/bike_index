@@ -192,11 +192,15 @@ class User < ApplicationRecord
   end
 
   def donations
-    payments.sum(:amount_cents)
+    payments.donation.sum(:amount_cents)
   end
 
   def donor?
     donations > 900
+  end
+
+  def theft_alert_purchaser?
+    theft_alerts.paid.any?
   end
 
   def paid_org?
