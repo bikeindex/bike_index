@@ -1,33 +1,43 @@
 = form_for record, url: action, method: method, html: { class: "form" } do |f|
-  = f.label :name, "Name", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.text_field :name, class: "form-control"
-
-  = f.label :amount_cents, "Price (cents)", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.number_field :amount_cents, class: "form-control"
-
-  %fieldset
-    = f.label :currency, "Currency", class: "form-label font-weight-bold mt-2 mb-0"
-    = f.select :currency, options_for_select(available_currencies, selected: record.currency), class: "form-control"
-
-  = f.label :views, "Views Provided", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.number_field :views, class: "form-control"
-
-  = f.label :duration_days, "Duration (days)", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.number_field :duration_days, class: "form-control"
-
-  = f.label :active, "Active?", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.check_box :active, class: "form-control"
-
-  %fieldset
-    %div
-      = f.label :language, class: "control-label font-weight-bold mt-2"
-    = f.select :language,
-      options_for_select(language_choices, selected: record.language),
-      {},
-      class: "form-control"
-
-  = f.label :description, "Description", class: "form-label font-weight-bold mt-2 mb-0"
-  = f.text_area :description, class: "form-control", rows: "10"
+  .row
+    .col-sm-6
+      .form-group
+        = f.label :name, "Name", class: "form-label"
+        = f.text_field :name, class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :currency, "Currency"
+        = f.select :currency, options_for_select(available_currencies, selected: record.currency), {},  class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :views, "Views Provided", class: "form-label"
+        = f.number_field :views, class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :duration_days, "Duration (days)", class: "form-label"
+        = f.number_field :duration_days, class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :amount_cents, "Price (cents)", class: "form-label"
+        = f.number_field :amount_cents, class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :amount_cents_facebook, "Facebook ad buy (cents)", class: "form-label"
+        = f.number_field :amount_cents_facebook, class: "form-control"
+    .col-sm-6
+      .form-group.mt-4
+        = f.check_box :active, class: ""
+        = f.label :active, "Active?", class: "form-check-label"
+    .col-sm-6
+      .form-group
+        = f.label :language
+        = f.select :language,
+          options_for_select(language_choices, selected: record.language),
+          {},
+          class: "form-control"
+  .form-group
+    = f.label :description, "Description", class: "form-label"
+    = f.text_area :description, class: "form-control", rows: "5"
 
   .float-right
     [

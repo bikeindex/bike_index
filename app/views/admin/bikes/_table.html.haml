@@ -54,11 +54,7 @@
                   Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
             %td.d-none.d-md-table-cell
               = bike.owner_email
-              - if bike.user?
-                - if bike.owner.donor?
-                  <span class="donor-icon">D</span>
-                - elsif bike.owner.paid_org?
-                  <span class="paid-org-icon">O</span>
+              = user_icon(bike.user)
             %td
               - if bike.manufacturer_other.present?
                 %span.text-warning

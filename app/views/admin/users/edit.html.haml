@@ -11,14 +11,9 @@
       %tbody
         %tr
           %td
-            Donor
+            Payment?
           %td
-            - if @user.donor?
-              <span class="donor-icon">D</span><span class="less-strong">onor</span>
-              - if @user.paid_org?
-                %br
-            - if @user.paid_org?
-              <span class="less-strong">Paid</span> <span class="paid-org-icon">O</span><span class="less-strong">rganization member</span>
+            = user_icon(@user, full_text: true)
         %tr
           %td
             Email: Newsletters
