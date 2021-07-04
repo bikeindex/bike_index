@@ -8,7 +8,16 @@
     %strong= t(".subheader_1")
     %br
     = t(".subheader_2")
-%form#bikeindex-stripe-initial-form
+= form_for Payment.new, html: {id: "new-payment-form"} do |f|
+  = hidden_field_tag :is_arbitrary, false
+  = f.hidden_field :amount_cents
+  = f.hidden_field :kind, value: (is_payment ? "payment" : "donation")
+  = f.hidden_field :currency, value: "USD"
+  / -# If this is rendering from cache, don't include email because caching
+  - email = is_cached ? nil : current_user&.email
+  = f.hidden_field :email, value: email
+
+
   %ul.row.amount-list
     - if is_payment # If payment, have one non-arbitrary button
       %li.col-xs-6.offset-sm-3
@@ -42,20 +51,6 @@
   %small
     - nonprofit_link = link_to t(".501c3_nonprofit"), news_url("bike-index--now-a-nonprofit"), target: "_blank"
     = t(".bike_index_is_a_nonprofit_html", nonprofit_link: nonprofit_link)
-
-  <script src="https://checkout.stripe.com/checkout.js"></script>
-  - payment_type = is_payment ? 'Pay' : 'Donate'
-  - description = is_payment ? t(".payment_to_bike_index") : t(".donate_to_bike_index")
-  -# If this is rendering from cache, don't include email because it breaks things
-  - email = is_cached ? nil : current_user&.email
-  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: email, type: payment_type, currency: default_currency, description: description } }
-
-  = form_tag payments_path, stripe_form_hash do
-    = hidden_field_tag :stripe_token
-    = hidden_field_tag :stripe_amount
-    = hidden_field_tag :stripe_currency, default_currency
-    = hidden_field_tag :stripe_email
-    = hidden_field_tag :is_payment, is_payment
 
 -# add a google event for tracking when this is loaded - useful for comparison with donation modal
 <script>ga("send", {hitType: "event", eventCategory: "donation-form", eventAction: "form-load", eventLabel: "donation_#{kind}"});</script>

@@ -3,6 +3,7 @@ FactoryBot.define do
     user { FactoryBot.create(:user) }
     amount_cents { 999 }
     payment_method { "stripe" }
+    first_payment_date { Time.current }
     factory :payment_check do
       payment_method { "check" }
     end
