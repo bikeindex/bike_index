@@ -15,7 +15,11 @@ class FacebookAdsIntegration
     FacebookAds::AdAccount.get("act_#{ACCOUNT_ID}")
   end
 
-  def list_campaigns
+  def get_campaign(id)
+    FacebookAds::Campaign.get(id)
+  end
 
+  def create_campaign
+    # account.
   end
 end

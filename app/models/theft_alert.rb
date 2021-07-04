@@ -39,6 +39,10 @@ class TheftAlert < ApplicationRecord
     !stolen_record&.current_alert_image.present?
   end
 
+  def campaign_name
+    id
+  end
+
   private
 
   def alert_cannot_begin_in_past_or_after_ends
