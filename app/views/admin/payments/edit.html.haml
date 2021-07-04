@@ -23,18 +23,3 @@
 
   = f.submit "Submit", class: 'btn btn-success float-right'
 
-- if display_dev_info? && @payment.stripe?
-  .only-dev-visible.mt-5.mb-3
-    %h3 Stripe data
-  - if @payment.stripe_session?
-    .row
-      .col-sm-6
-        %h5 Stripe session
-        = pretty_print_json(@payment.stripe_session.as_json)
-      .col-sm-6
-        %h5 Stripe customer
-        = pretty_print_json(@payment.stripe_customer.as_json)
-
-  - else
-    No extra data for
-    %code= @payment.stripe_kind
