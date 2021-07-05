@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe FacebookAdsIntegration do
+RSpec.describe Facebook::AdsIntegration do
   let(:instance) { described_class.new }
 
   it "gets account" do
@@ -31,10 +31,10 @@ RSpec.describe FacebookAdsIntegration do
     end
   end
 
-  describe "create_ad" do
+  describe "create_adset" do
     let(:theft_alert) { TheftAlert.new(id: 12, facebook_data: {campaign_id: "6250389631214"}) }
     xit "creates an ad" do
-      VCR.use_cassette("facebook_ads_integration-create_ad", match_requests_on: [:path]) do
+      VCR.use_cassette("facebook_ads_integration-create_adset", match_requests_on: [:path]) do
         ad = instance.create_ad(theft_alert)
       end
     end

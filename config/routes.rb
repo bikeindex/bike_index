@@ -195,7 +195,7 @@ Rails.application.routes.draw do
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
       :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
-      :notifications, :facebook_targetings
+      :notifications
 
     resources :invoices, only: [:index]
     resources :theft_alerts, only: %i[show index edit update]
