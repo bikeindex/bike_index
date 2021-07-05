@@ -8,8 +8,7 @@ module AdminHelper
       {title: "Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
       {title: "Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
       {title: "User Alerts", path: admin_user_alerts_path, match_controller: true},
-      {title: "Notifications", path: admin_notifications_path, match_controller: true},
-      {title: "Facebook Targeting", path: admin_facebook_targetings_path, match_controller: true},
+      {title: "Notifications", path: admin_notifications_path, match_controller: true}
     ]
   end
 
