@@ -19,7 +19,23 @@ class FacebookAdsIntegration
     FacebookAds::Campaign.get(id)
   end
 
-  def create_campaign
-    # account.
+  def create_campaign(theft_alert)
+    account.campaigns.create({
+      name: theft_alert.campaign_name,
+      objective: "REACH",
+      special_ad_categories: []
+    })
+  end
+
+  def create_ad(theft_alert)
+    account.ads.create({
+
+    })
+  end
+
+  def new_ad
+    {
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP",
+    }
   end
 end

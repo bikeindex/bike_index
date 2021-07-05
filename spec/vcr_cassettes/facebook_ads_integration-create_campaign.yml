@@ -1,0 +1,62 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://graph.facebook.com/v11.0/act_62935371/campaigns?access_token=<FACEBOOK_AD_TOKEN>
+    body:
+      encoding: UTF-8
+      string: name=12&objective=REACH&special_ad_categories=%5B%5D
+    headers:
+      User-Agent:
+      - fbbizsdk-ruby-v0.11.0.0
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      X-Business-Use-Case-Usage:
+      - '{"62935371":[{"type":"ads_management","call_count":1,"total_cputime":1,"total_time":1,"estimated_time_to_regain_access":0}]}'
+      X-Fb-Rlafr:
+      - '0'
+      Access-Control-Allow-Origin:
+      - "*"
+      Facebook-Api-Version:
+      - v11.0
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Pragma:
+      - no-cache
+      Cache-Control:
+      - private, no-cache, no-store, must-revalidate
+      Expires:
+      - Sat, 01 Jan 2000 00:00:00 GMT
+      X-Fb-Request-Id:
+      - AF0VeFeYYWIGb9VICkFAN4e
+      X-Fb-Trace-Id:
+      - FQVykOEG54u
+      X-Fb-Rev:
+      - '1004076360'
+      X-Fb-Debug:
+      - WgHBmycw1Oz11IqdNo+r7QIowWrbvxDDLA0PCFIR2iJhNs2AfUzEqGkP+Go5r8G3nrQPa/3ncBs4L3SFvYpIXw==
+      Date:
+      - Sun, 04 Jul 2021 20:19:54 GMT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '22'
+    body:
+      encoding: UTF-8
+      string: '{"id":"6250395558414"}'
+    http_version:
+  recorded_at: Sun, 04 Jul 2021 20:19:54 GMT
+recorded_with: VCR 5.0.0

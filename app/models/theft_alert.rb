@@ -39,8 +39,16 @@ class TheftAlert < ApplicationRecord
     !stolen_record&.current_alert_image.present?
   end
 
-  def campaign_name
+  def facebook_name
     id
+  end
+
+  def calculated_begin_at
+    begin_at.present? ? begin_at : Time.current
+  end
+
+  def calculated_end_time
+    calculated_begin_at + (theft_alert_plan&.duration_days_facebook).days
   end
 
   private

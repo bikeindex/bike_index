@@ -21,4 +21,9 @@ class TheftAlertPlan < ApplicationRecord
   def description_html
     Kramdown::Document.new(description).to_html
   end
+
+  # Because it takes a little while to get the ad started
+  def duration_days_facebook
+    duration_days + 1
+  end
 end

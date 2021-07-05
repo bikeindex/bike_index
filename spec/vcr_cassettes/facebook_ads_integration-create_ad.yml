@@ -1,0 +1,65 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://graph.facebook.com/v11.0/act_62935371/ads?access_token=<FACEBOOK_AD_TOKEN>
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - fbbizsdk-ruby-v0.11.0.0
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Vary:
+      - Origin
+      Access-Control-Allow-Origin:
+      - "*"
+      X-App-Usage:
+      - '{"call_count":0,"total_cputime":0,"total_time":0}'
+      X-Fb-Rlafr:
+      - '0'
+      Content-Type:
+      - application/json; charset=UTF-8
+      Www-Authenticate:
+      - OAuth "Facebook Platform" "invalid_request" "(#100) The parameter creative
+        is required"
+      Facebook-Api-Version:
+      - v11.0
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Pragma:
+      - no-cache
+      Cache-Control:
+      - no-store
+      Expires:
+      - Sat, 01 Jan 2000 00:00:00 GMT
+      X-Fb-Request-Id:
+      - AYm93vzL5Gv6m6BnUtClJ9y
+      X-Fb-Trace-Id:
+      - Foc8w2zRwQS
+      X-Fb-Rev:
+      - '1004076360'
+      X-Fb-Debug:
+      - 8VkO+2G0RfkcJjA/nh9ubuIZX7clTgejAOZrXmtC9qid29UGwkmv7Khz6yTWig2FKvD0JakxmZUAWHPVRCEiuQ==
+      Date:
+      - Sun, 04 Jul 2021 20:54:28 GMT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+    body:
+      encoding: UTF-8
+      string: '{"error":{"message":"(#100) The parameter creative is required","type":"OAuthException","code":100,"fbtrace_id":"AYm93vzL5Gv6m6BnUtClJ9y"}}'
+    http_version:
+  recorded_at: Sun, 04 Jul 2021 20:54:28 GMT
+recorded_with: VCR 5.0.0
