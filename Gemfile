@@ -43,7 +43,7 @@ gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocompl
 
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
-# gem "faraday_middleware" # Manage faraday request flow
+gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder"
 gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"

@@ -194,6 +194,8 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
+    faraday_middleware (1.0.0)
+      faraday (~> 1.0)
     fast_blank (1.0.0)
     ffi (1.13.1)
     ffi-compiler (1.0.1)
@@ -729,6 +731,7 @@ DEPENDENCIES
   eventmachine
   facebookbusiness (~> 0.11.0)!
   factory_bot_rails
+  faraday_middleware
   fast_blank (~> 1.0)
   flamegraph
   flipper
