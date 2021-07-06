@@ -80,10 +80,10 @@ RSpec.describe AdminHelper, type: :helper do
       end
       context "theft alert" do
         let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user) }
-        let(:target) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"theft-alert-icon ml-1\">T</span></span>" }
+        let(:target) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"theft-alert-icon ml-1\">P</span></span>" }
         let(:target_full_text) do
           "<span><span class=\"donor-icon ml-1\">D</span><span class=\"less-strong\">onor</span>" +
-          "<span class=\"theft-alert-icon ml-1\">T</span><span class=\"less-strong\">heft alert</span>" +
+          "<span class=\"theft-alert-icon ml-1\">P</span><span class=\"less-strong\">romoted alert</span>" +
           "</span>"
         end
         it "returns donor and theft alert" do
