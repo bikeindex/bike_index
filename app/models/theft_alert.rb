@@ -48,7 +48,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def facebook_name
-    id
+    "Theft Alert #{id}"
   end
 
   def campaign_id
