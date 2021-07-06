@@ -53,11 +53,17 @@
           = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
 
   .form-group
-    = f.label :facebook_post_url
-    = f.text_field :facebook_post_url, class: "form-control"
-  .form-group
     = f.label :notes
     = f.text_area :notes, rows: 3, class: "form-control"
 
   .form-group
     = submit_tag "Save", class: "btn btn-info"
+
+
+- if @theft_alert.facebook_data.present?
+  - if @theft_alert.facebook_post_url.present?
+    %strong
+      = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+  .row
+    .col-sm-6
+      = pretty_print_json(@theft_alert.facebook_data)

@@ -2756,7 +2756,6 @@ CREATE TABLE public.theft_alerts (
     payment_id integer,
     user_id integer,
     status integer DEFAULT 0 NOT NULL,
-    facebook_post_url character varying DEFAULT ''::character varying NOT NULL,
     begin_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
@@ -5845,6 +5844,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210614175711'),
 ('20210626220123'),
 ('20210702204848'),
-('20210704190719');
+('20210704190719'),
+('20210706220349');
 
 

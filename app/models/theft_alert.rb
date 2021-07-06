@@ -51,12 +51,21 @@ class TheftAlert < ApplicationRecord
     "Theft Alert #{id}"
   end
 
+  def facebook_post_url
+    return nil unless facebook_data&.dig("effective_object_story_id").present?
+    "https://facebook.com/#{facebook_data&.dig('effective_object_story_id')}"
+  end
+
   def campaign_id
     facebook_data&.dig("campaign_id")
   end
 
   def adset_id
     facebook_data&.dig("adset_id")
+  end
+
+  def ad_id
+    facebook_data&.dig("ad_id")
   end
 
   def message

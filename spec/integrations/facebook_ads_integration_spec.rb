@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe Facebook::AdsIntegration do
   let(:instance) { described_class.new }
 
-  if defined?(Facebook::AdsIntegration) && Facebook::AdsIntegration::TOKEN.present?
+  # Not set up to run on CI currently
+  if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
     it "gets account" do
       VCR.use_cassette("facebook/ads_integration-get_account", match_requests_on: [:method]) do
         expect(instance.account.name).to eq "Bike Index"
@@ -82,11 +83,26 @@ RSpec.describe Facebook::AdsIntegration do
             ad = instance.create_ad(theft_alert)
             expect(ad).to be_present
             expect(ad.id).to be_present
-            pp ad.creative.effective_object_story_id
+          end
+        end
+
+        describe "create_for" do
+          let(:theft_alert) { FactoryBot.create(:theft_alert, theft_alert_plan: theft_alert_plan) }
+          it "creates an ad and saves the data" do
+            expect(theft_alert.message).to eq message
+            expect(theft_alert).to be_valid
+            expect(theft_alert.facebook_data).to be_blank
+            VCR.use_cassette("facebook/ads_integration-create_for", match_requests_on: [:method]) do
+              instance.create_for(theft_alert)
+              theft_alert.reload
+              expect(theft_alert.campaign_id).to be_present
+              expect(theft_alert.adset_id).to be_present
+              expect(theft_alert.ad_id).to be_present
+              expect(theft_alert.facebook_post_url).to be_present
+            end
           end
         end
       end
-
     end
   end
 end

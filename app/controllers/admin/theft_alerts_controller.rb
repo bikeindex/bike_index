@@ -43,7 +43,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     params.require(:theft_alert).permit(
       :begin_at,
       :end_at,
-      :facebook_post_url,
       :notes,
       :status,
       :theft_alert_plan_id

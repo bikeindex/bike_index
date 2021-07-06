@@ -74,7 +74,6 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           params: {
             theft_alert: {
               status: "active",
-              facebook_post_url: "https://facebook.com/example/post/1",
               theft_alert_plan_id: alert.theft_alert_plan.id,
               notes: "Some notes"
             }
@@ -84,7 +83,6 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(flash[:success]).to match(/success/i)
         expect(flash[:errors]).to be_blank
         expect(alert.reload.status).to eq("active")
-        expect(alert.facebook_post_url).to eq("https://facebook.com/example/post/1")
         expect(alert.notes).to eq("Some notes")
       end
 
@@ -98,7 +96,6 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           params: {
             theft_alert: {
               status: "active",
-              facebook_post_url: "https://facebook.com/example/post/1",
               theft_alert_plan_id: alert.theft_alert_plan.id
             }
           }
@@ -120,7 +117,6 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           params: {
             theft_alert: {
               status: "pending",
-              facebook_post_url: "https://facebook.com/example/post/1",
               theft_alert_plan_id: alert.theft_alert_plan.id,
               notes: "updated note"
             }
@@ -142,7 +138,6 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           params: {
             theft_alert: {
               status: "active",
-              facebook_post_url: "https://facebook.com/example/post/1",
               theft_alert_plan_id: alert.theft_alert_plan.id,
               begin_at: now,
               end_at: now + 1.day
