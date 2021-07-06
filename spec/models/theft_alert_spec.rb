@@ -33,4 +33,13 @@ RSpec.describe TheftAlert, type: :model do
       expect(StolenRecord.recovered.with_theft_alerts.pluck(:id)).to eq([stolen_record.id])
     end
   end
+
+  describe "postable?" do
+    let(:theft_alert) { FactoryBot.create(:theft_alert) }
+    it "is false" do
+      expect(theft_alert.postable?).to be_falsey
+      expect(theft_alert.missing_location?).to be_truthy
+      expect(theft_alert.missing_photo?).to be_truthy
+    end
+  end
 end

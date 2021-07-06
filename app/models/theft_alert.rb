@@ -31,8 +31,16 @@ class TheftAlert < ApplicationRecord
     stolen_record&.bike
   end
 
+  def postable?
+    !missing_photo? && !missing_location?
+  end
+
   def recovered?
     stolen_record&.recovered?
+  end
+
+  def missing_location?
+    stolen_record.without_location?
   end
 
   def missing_photo?
@@ -41,6 +49,18 @@ class TheftAlert < ApplicationRecord
 
   def facebook_name
     id
+  end
+
+  def campaign_id
+    facebook_data&.dig("campaign_id")
+  end
+
+  def adset_id
+    facebook_data&.dig("adset_id")
+  end
+
+  def message
+    "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
 
   def calculated_begin_at

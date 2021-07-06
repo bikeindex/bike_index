@@ -5,7 +5,7 @@ RSpec.describe Facebook::AdsIntegration do
 
   if Facebook::AdsIntegration::TOKEN.present?
     it "gets account" do
-      VCR.use_cassette("facebook/ads_integration-get_account", match_requests_on: [:path]) do
+      VCR.use_cassette("facebook/ads_integration-get_account", match_requests_on: [:method]) do
         expect(instance.account.name).to eq "Bike Index"
       end
     end
@@ -13,11 +13,8 @@ RSpec.describe Facebook::AdsIntegration do
     describe "get_campaign" do
       let(:campaign_id) { "6250389631214" }
       it "get_campaign" do
-        VCR.use_cassette("facebook/ads_integration-get_campaign", match_requests_on: [:path]) do
+        VCR.use_cassette("facebook/ads_integration-get_campaign", match_requests_on: [:method]) do
           campaign = instance.get_campaign(campaign_id)
-          pp campaign, campaign.objective
-          pp campaign.special_ad_categories
-          pp campaign.ads.first.creative
         end
       end
     end
@@ -25,20 +22,56 @@ RSpec.describe Facebook::AdsIntegration do
     describe "create_campaign" do
       let(:theft_alert) { TheftAlert.new(id: 12) }
       it "creates a campaign" do
-        VCR.use_cassette("facebook/ads_integration-create_campaign", match_requests_on: [:path]) do
+        VCR.use_cassette("facebook/ads_integration-create_campaign", match_requests_on: [:method]) do
           campaign = instance.create_campaign(theft_alert)
           expect(campaign).to be_present
+          expect(campaign.id).to be_present
         end
       end
     end
 
-    describe "create_adset" do
-      let(:theft_alert) { TheftAlert.new(id: 12, facebook_data: {campaign_id: "6250389631214"}) }
-      xit "creates an ad" do
-        VCR.use_cassette("facebook/ads_integration-create_adset", match_requests_on: [:path]) do
-          ad = instance.create_ad(theft_alert)
+    context "with theft_alert" do
+      let(:campaign_id) { "6250583328814" }
+      let(:adset_id) { "6250585497014" }
+      let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
+      let(:bike) { Bike.new(id: 32, mnfg_name: "Surly") } # Manually stubbing so test has a valid URL
+      let(:stolen_record) { StolenRecord.new(bike: bike, latitude: 37.8297171, longitude: -122.2803456, city: "Oakland") }
+      let(:theft_alert) do
+        TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
+          stolen_record: stolen_record,
+          facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
+      end
+      # Required because default scope override in theft_alert
+      before { allow(theft_alert).to receive(:stolen_record) { stolen_record } }
+
+      describe "create_adset" do
+        it "creates an adset" do
+          expect(theft_alert.campaign_id).to eq campaign_id
+          VCR.use_cassette("facebook/ads_integration-create_adset", match_requests_on: [:method]) do
+            adset = instance.create_adset(theft_alert)
+            expect(adset).to be_present
+            expect(adset.id).to be_present
+            pp adset.id
+          end
         end
       end
+
+      describe "create_ad" do
+        let(:message) { "Oakland: Keep an eye out for this stolen Surly. If you see it, let the owner know on Bike Index!" }
+        it "creates an adset" do
+          expect(theft_alert.bike).to eq bike
+          expect(theft_alert.adset_id).to eq adset_id
+          expect(theft_alert.message).to eq message
+          VCR.use_cassette("facebook/ads_integration-create_ad", match_requests_on: [:method]) do
+            ad = instance.create_ad(theft_alert)
+            expect(ad).to be_present
+            expect(ad.id).to be_present
+          end
+        end
+      end
+
+
+
     end
   end
 end
