@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Facebook::AdsIntegration do
   let(:instance) { described_class.new }
 
-  if Facebook::AdsIntegration::TOKEN.present?
+  if defined?(Facebook::AdsIntegration) && Facebook::AdsIntegration::TOKEN.present?
     it "gets account" do
       VCR.use_cassette("facebook/ads_integration-get_account", match_requests_on: [:method]) do
         expect(instance.account.name).to eq "Bike Index"
@@ -82,6 +82,7 @@ RSpec.describe Facebook::AdsIntegration do
             ad = instance.create_ad(theft_alert)
             expect(ad).to be_present
             expect(ad.id).to be_present
+            pp ad.creative.effective_object_story_id
           end
         end
       end
