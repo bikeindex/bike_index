@@ -1,10 +1,9 @@
 require "rails_helper"
 
-RSpec.describe Facebook::AdsIntegration do
-  let(:instance) { described_class.new }
-
-  # Not set up to run on CI currently
-  if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
+# Not set up to run on CI currently
+if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
+  RSpec.describe Facebook::AdsIntegration do
+    let(:instance) { described_class.new }
     it "gets account" do
       VCR.use_cassette("facebook/ads_integration-get_account", match_requests_on: [:method]) do
         expect(instance.account.name).to eq "Bike Index"
