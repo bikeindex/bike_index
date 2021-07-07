@@ -93,8 +93,9 @@ class TheftAlert < ApplicationRecord
     begin_at.present? ? begin_at : Time.current
   end
 
+  # Default to 3 days, because something
   def calculated_end_at
-    calculated_begin_at + theft_alert_plan&.duration_days_facebook.days
+    calculated_begin_at + (theft_alert_plan&.duration_days_facebook || 3).days
   end
 
   private
