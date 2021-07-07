@@ -62,7 +62,7 @@
       .form-group
         = f.label :status
         = f.select :status,
-          options_for_select(TheftAlert.statuses.keys, @theft_alert.status),
+          options_for_select(TheftAlert.statuses, @theft_alert.status),
           {},
           class: "form-control"
     .col-sm-6
