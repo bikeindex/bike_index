@@ -28,7 +28,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif ParamsNormalizer.boolean(params[:update_theft_alert])
       UpdateTheftAlertFacebookWorker.perform_async(@theft_alert.id)
-      flash[:success] = "Updating facebook_data"
+      flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
     elsif @theft_alert.update(set_alert_timestamps(theft_alert_params))
       flash[:success] = "Success!"
