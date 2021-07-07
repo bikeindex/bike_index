@@ -682,7 +682,6 @@ nl:
       theft_alert:
         begin_at: Begin bij
         end_at: Eindig op
-        facebook_post_url: Facebook-post-URL
         notes: Notes
         status: Toestand
       theft_alert_plan:
