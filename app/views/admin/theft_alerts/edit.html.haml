@@ -95,11 +95,12 @@
 
 
 - if @theft_alert.facebook_data.present?
+  .mt-4
   - if @theft_alert.facebook_post_url.present?
-    %strong.mt-4
+    %strong
       = link_to "link to Facebook post", @theft_alert.facebook_post_url, target: "_blank"
   - else
-    = link_to "Update data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success"
+    = link_to "Update facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success"
   .row.mt-2
     .col-sm-6
       = pretty_print_json(@theft_alert.facebook_data)
