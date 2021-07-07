@@ -167,6 +167,28 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.reload.status).to eq("pending")
       end
     end
+
+    describe "enqueing jobs" do
+      let(:theft_alert) { FactoryBot.create(:theft_alert, status: "pending") }
+      context "activate_theft_alert" do
+        it "enqueues the activate_theft_alert job" do
+          expect(theft_alert.reload.activating_at).to be_blank
+          Sidekiq::Worker.clear_all
+          patch "/admin/theft_alerts/#{theft_alert.id}", params: {activate_theft_alert: 1}
+          expect(ActivateTheftAlertWorker.jobs.count).to eq 1
+          expect(theft_alert.reload.activating_at).to be_present
+        end
+      end
+      context "update_theft_alert" do
+        it "enqueues the job" do
+          expect(theft_alert.reload.activating_at).to be_blank
+          Sidekiq::Worker.clear_all
+          patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
+          expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
+          expect(theft_alert.reload.activating_at).to be_blank
+        end
+      end
+    end
   end
 
   context "given a logged-in non-superuser" do
