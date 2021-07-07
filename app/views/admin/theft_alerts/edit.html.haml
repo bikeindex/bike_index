@@ -62,8 +62,8 @@
 
 - if @theft_alert.facebook_data.present?
   - if @theft_alert.facebook_post_url.present?
-    %strong
-      = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
-  .row
+    %strong.mt-4
+      = link_to "link to Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+  .row.mt-2
     .col-sm-6
       = pretty_print_json(@theft_alert.facebook_data)

@@ -41,8 +41,8 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
       let(:stolen_record) { StolenRecord.new(bike: bike, latitude: 37.8297171, longitude: -122.2803456, city: "Oakland") }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
-          stolen_record: stolen_record,
-          facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
+                       stolen_record: stolen_record,
+                       facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
       end
       before do
         # Required because default scope override in theft_alert

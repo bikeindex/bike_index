@@ -53,7 +53,7 @@ class TheftAlert < ApplicationRecord
 
   def facebook_post_url
     return nil unless facebook_data&.dig("effective_object_story_id").present?
-    "https://facebook.com/#{facebook_data&.dig('effective_object_story_id')}"
+    "https://facebook.com/#{facebook_data&.dig("effective_object_story_id")}"
   end
 
   def campaign_id
@@ -77,7 +77,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def calculated_end_time
-    calculated_begin_at + (theft_alert_plan&.duration_days_facebook).days
+    calculated_begin_at + theft_alert_plan&.duration_days_facebook.days
   end
 
   private
