@@ -8,6 +8,6 @@ class DeactivateExpiredTheftAlertWorker < ScheduledWorker
   def perform
     TheftAlert
       .should_expire
-      .update_all(status: TheftAlert.statuses[:inactive])
+      .update_all(status: "inactive")
   end
 end

@@ -14,10 +14,44 @@
 = render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
 
 
+- if @theft_alert.pending?
+  .row.mt-4.mb-4
+    .col-xl-4.offset-xl-4.col-md-6.offset-md-3
+      .card
+        .card-body
+          - if @theft_alert.activateable?
+            %h4.text-center Theft alert can be activated!
+
+            - if @theft_alert.activating_at.present?
+              %h2.mt-3.text-center
+                %span.text-warning Activation in process
+
+              %p
+                Activation started at:
+                %span.convertTime= l( @theft_alert.activating_at, format: :convert_time)
+
+              %p
+                %strong Don't activate again
+                unless activation started a while ago
+
+            .text-center.mt-4
+              = link_to "Activate!", admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
+          - else
+            %h4.text-center
+              Theft alert
+              %span.text-danger can not
+              be activated
+            %ul.mt-4
+              - unless @theft_alert.paid?
+                %li Alert is not paid
+              - if @theft_alert.missing_photo?
+                %li Alert is missing photo
+              - if @theft_alert.missing_location?
+                %li Alert is missing location
+
 .admin-subnav.midpage-subnav
   .col-12
-    %h1
-      Edit Promoted Alert
+    %h1 Edit Promoted Alert
 
 = form_for @theft_alert,
   url: admin_theft_alert_path(@theft_alert),
@@ -28,7 +62,7 @@
       .form-group
         = f.label :status
         = f.select :status,
-          options_for_select(TheftAlert.statuses.keys, @theft_alert.status),
+          options_for_select(TheftAlert.statuses, @theft_alert.status),
           {},
           class: "form-control"
     .col-sm-6
@@ -53,11 +87,20 @@
           = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
 
   .form-group
-    = f.label :facebook_post_url
-    = f.text_field :facebook_post_url, class: "form-control"
-  .form-group
     = f.label :notes
     = f.text_area :notes, rows: 3, class: "form-control"
 
   .form-group
     = submit_tag "Save", class: "btn btn-info"
+
+
+- if @theft_alert.facebook_data.present?
+  .mt-4
+  - if @theft_alert.facebook_post_url.present?
+    %strong
+      = link_to "link to Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+  - else
+    = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success"
+  .row.mt-2
+    .col-sm-6
+      = pretty_print_json(@theft_alert.facebook_data)

@@ -20,7 +20,17 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def update
-    if @theft_alert.update(set_alert_timestamps(theft_alert_params))
+    if ParamsNormalizer.boolean(params[:activate_theft_alert])
+      new_data = @theft_alert.facebook_data || {}
+      @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
+      ActivateTheftAlertWorker.perform_async(@theft_alert.id)
+      flash[:success] = "Activating, please wait"
+      redirect_to admin_theft_alert_path(@theft_alert)
+    elsif ParamsNormalizer.boolean(params[:update_theft_alert])
+      UpdateTheftAlertFacebookWorker.perform_async(@theft_alert.id)
+      flash[:success] = "Updating Facebook data"
+      redirect_to admin_theft_alerts_path
+    elsif @theft_alert.update(set_alert_timestamps(theft_alert_params))
       flash[:success] = "Success!"
       redirect_to admin_theft_alerts_path
     else
@@ -43,7 +53,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     params.require(:theft_alert).permit(
       :begin_at,
       :end_at,
-      :facebook_post_url,
       :notes,
       :status,
       :theft_alert_plan_id
@@ -61,15 +70,23 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def matching_theft_alerts
     @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
-    if @search_recovered
+    theft_alerts = if @search_recovered
       stolen_record_ids = StolenRecord.recovered.with_theft_alerts
         .where(theft_alerts: {created_at: @time_range}).pluck(:id)
       TheftAlert.where(stolen_record_id: stolen_record_ids)
     else
-      TheftAlert.where(created_at: @time_range)
+      TheftAlert
     end
+    if TheftAlert.statuses.include?(params[:search_status])
+      @status = params[:search_status]
+      theft_alerts = theft_alerts.where(status: @status)
+    else
+      @status = "all"
+    end
+    theft_alerts.where(created_at: @time_range)
   end
 
+  # Deprecated - should be removed soon.
   def set_alert_timestamps(theft_alert_attrs)
     currently_pending = @theft_alert.status == "pending"
     transitioning_to_active = theft_alert_attrs[:status] == "active"

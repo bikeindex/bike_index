@@ -1,6 +1,8 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
-  enum status: {pending: 0, active: 1, inactive: 2}.freeze
+  STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+
+  enum status: STATUS_ENUM
 
   validates :theft_alert_plan,
     :status,
@@ -21,6 +23,10 @@ class TheftAlert < ApplicationRecord
   delegate :duration_days, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
+
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
@@ -31,12 +37,65 @@ class TheftAlert < ApplicationRecord
     stolen_record&.bike
   end
 
+  def paid?
+    payment&.paid? || false
+  end
+
+  def activateable?
+    !missing_photo? && !missing_location? && paid?
+  end
+
   def recovered?
     stolen_record&.recovered?
   end
 
+  def missing_location?
+    stolen_record.without_location?
+  end
+
   def missing_photo?
     !stolen_record&.current_alert_image.present?
+  end
+
+  def facebook_name(kind = "campaign")
+    n = "Theft Alert #{id} - #{theft_alert_plan.amount_facebook}"
+    return n if kind == "campaign"
+    "#{n} - #{kind}"
+  end
+
+  def activating_at
+    t = facebook_data&.dig("activating_at")
+    t.present? ? TimeParser.parse(t) : nil
+  end
+
+  def facebook_post_url
+    return nil unless facebook_data&.dig("effective_object_story_id").present?
+    "https://facebook.com/#{facebook_data&.dig("effective_object_story_id")}"
+  end
+
+  def campaign_id
+    facebook_data&.dig("campaign_id")
+  end
+
+  def adset_id
+    facebook_data&.dig("adset_id")
+  end
+
+  def ad_id
+    facebook_data&.dig("ad_id")
+  end
+
+  def message
+    "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
+  end
+
+  def calculated_begin_at
+    begin_at.present? ? begin_at : Time.current
+  end
+
+  # Default to 3 days, because something
+  def calculated_end_at
+    calculated_begin_at + (theft_alert_plan&.duration_days_facebook || 3).days
   end
 
   private

@@ -18,7 +18,7 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {
     email: 0,
     text: 1
-  }
+  }.freeze
 
   belongs_to :user
   belongs_to :notifiable, polymorphic: true

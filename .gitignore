@@ -52,3 +52,5 @@ coverage
 test-results/
 spec/examples.txt
 public/javascripts
+
+spec/vcr_cassettes/facebook/*

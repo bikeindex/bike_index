@@ -43,7 +43,7 @@ gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocompl
 
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
-gem "faraday_middleware"
+gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder"
 gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"
@@ -76,15 +76,17 @@ gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
+gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts
+# gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
-gem "doorkeeper", "~> 5.2.5"
-gem "grape", "~> 0.19.1"
+gem "doorkeeper", "~> 5.2.5" # OAuth providing
+gem "grape", "~> 0.19.1" # API DSL
 gem "grape-active_model_serializers", "~> 1.4.0"
-gem "grape-swagger", "0.11"
+gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer"
+gem "wine_bouncer" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting
@@ -141,7 +143,9 @@ end
 
 group :development do
   gem "bullet"
-  gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
+  # Extra faraday response logging. Used in exchange rate api client and external registry
+  # Commented out because of facebook upgrade
+  # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
   gem "guard-rubocop", require: false

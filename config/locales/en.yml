@@ -596,7 +596,6 @@ en:
         begin_at: Begin at
         creator: :activerecord.models.creator
         end_at: End at
-        facebook_post_url: Facebook post url
         notes: Notes
         payment: :activerecord.models.payment
         status: Status
