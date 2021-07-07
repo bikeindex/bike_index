@@ -43,4 +43,15 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.paid?).to be_falsey
     end
   end
+
+  describe "facebook names" do
+    let(:theft_alert_plan) { TheftAlertPlan.new(amount_cents_facebook: 1999) }
+    let(:theft_alert) { TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan) }
+    let(:facebook_name) { "Theft Alert 12 - $19.99" }
+    it "returns the theft alert plan" do
+      expect(theft_alert.facebook_name("campaign")).to eq facebook_name
+      expect(theft_alert.facebook_name("adset")).to eq "#{facebook_name} - adset"
+      expect(theft_alert.facebook_name("ad")).to eq "#{facebook_name} - ad"
+    end
+  end
 end

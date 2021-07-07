@@ -57,8 +57,10 @@ class TheftAlert < ApplicationRecord
     !stolen_record&.current_alert_image.present?
   end
 
-  def facebook_name
-    "Theft Alert #{id}"
+  def facebook_name(kind = "campaign")
+    n = "Theft Alert #{id} - #{theft_alert_plan.amount_facebook}"
+    return n if kind == "campaign"
+    "#{n} - #{kind}"
   end
 
   def activating_at

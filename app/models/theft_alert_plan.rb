@@ -26,4 +26,8 @@ class TheftAlertPlan < ApplicationRecord
   def duration_days_facebook
     duration_days + 1
   end
+
+  def amount_facebook
+    self.class.money_formatted(amount_cents_facebook)
+  end
 end
