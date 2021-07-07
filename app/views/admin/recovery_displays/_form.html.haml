@@ -22,6 +22,20 @@
             Remove any references to race, class, homelessness, etc. of the thief
           %li
             Fix typos and grammar
+
+- if @bike&.manufacturer.present?
+  %p.mt-4
+    #{@bike.type.titleize} manufacturer
+    = link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank"
+    \ - Twitter:
+    - if @bike.manufacturer.blank? || @bike.manufacturer.other?
+      %em.less-strong "other" manufacturer, no twitter
+    - elsif @bike.manufacturer.twitter_name.present?
+      %strong @#{@bike.manufacturer.twitter_name}
+    - else
+      %em.small.less-strong Not stored
+      = link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank"
+
 %hr.mb-4
 
 = form_for [:admin, @recovery_display] do |f|
