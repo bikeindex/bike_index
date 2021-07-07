@@ -21,7 +21,7 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def update
     if ParamsNormalizer.boolean(params[:activate_theft_alert])
-      new_data = theft_alert.facebook_data || {}
+      new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
       ActivateTheftAlertWorker.perform_async(@theft_alert.id)
       flash[:success] = "Activating, please wait"
