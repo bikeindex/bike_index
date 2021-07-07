@@ -1,6 +1,8 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
-  enum status: {pending: 0, active: 1, inactive: 2}.freeze
+  STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+
+  enum status: STATUS_ENUM
 
   validates :theft_alert_plan,
     :status,
@@ -20,6 +22,10 @@ class TheftAlert < ApplicationRecord
 
   delegate :duration_days, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
+
+  def self.statuses
+    STATUS_ENUM.keys.map(&:to_s)
+  end
 
   # Override because of recovered bikes not being in default scope
   def stolen_record

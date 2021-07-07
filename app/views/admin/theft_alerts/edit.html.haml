@@ -18,12 +18,12 @@
   .row.mt-4.mb-4
     .col-xl-4.offset-xl-4.col-md-6.offset-md-3
       .card
-        .card-body.text-center
+        .card-body
           - if @theft_alert.activateable?
-            %h4 Theft alert can be activated!
+            %h4.text-center Theft alert can be activated!
 
             - if @theft_alert.activating_at.present?
-              %h2.mt-3
+              %h2.mt-3.text-center
                 %span.text-warning Activation in process
 
               %p
@@ -34,9 +34,10 @@
                 %strong Don't activate again
                 unless activation started a while ago
 
-            = link_to "Activate!", admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success mt-4"
+            .text-center.mt-4
+              = link_to "Activate!", admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
           - else
-            %h4
+            %h4.text-center
               Theft alert
               %span.text-danger can not
               be activated
