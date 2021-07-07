@@ -20,7 +20,13 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def update
-    if @theft_alert.update(set_alert_timestamps(theft_alert_params))
+    if ParamsNormalizer.boolean(params[:activate_theft_alert])
+      new_data = theft_alert.facebook_data || {}
+      @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
+      ActivateTheftAlertWorker.perform_async(@theft_alert.id)
+      flash[:success] = "Activating, please wait"
+      redirect_to admin_theft_alert_path(@theft_alert)
+    elsif @theft_alert.update(set_alert_timestamps(theft_alert_params))
       flash[:success] = "Success!"
       redirect_to admin_theft_alerts_path
     else

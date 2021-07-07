@@ -15,6 +15,7 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
       it "get_campaign" do
         VCR.use_cassette("facebook/ads_integration-get_campaign", match_requests_on: [:method]) do
           campaign = instance.get_campaign(campaign_id)
+          expect(campaign.id).to be_present
         end
       end
     end

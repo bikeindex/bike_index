@@ -31,8 +31,12 @@ class TheftAlert < ApplicationRecord
     stolen_record&.bike
   end
 
-  def postable?
-    !missing_photo? && !missing_location?
+  def paid?
+    payment&.paid? || false
+  end
+
+  def activateable?
+    !missing_photo? && !missing_location? && paid?
   end
 
   def recovered?
@@ -49,6 +53,11 @@ class TheftAlert < ApplicationRecord
 
   def facebook_name
     "Theft Alert #{id}"
+  end
+
+  def activating_at
+    t = facebook_data&.dig("activating_at")
+    t.present? ? TimeParser.parse(t) : nil
   end
 
   def facebook_post_url
@@ -76,7 +85,7 @@ class TheftAlert < ApplicationRecord
     begin_at.present? ? begin_at : Time.current
   end
 
-  def calculated_end_time
+  def calculated_end_at
     calculated_begin_at + theft_alert_plan&.duration_days_facebook.days
   end
 

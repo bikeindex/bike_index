@@ -82,3 +82,5 @@
           %td
             %small
               = theft_alert.notes
+              - if theft_alert.facebook_post_url.present?
+                %small.d-block= link_to "facebook", theft_alert.facebook_post_url

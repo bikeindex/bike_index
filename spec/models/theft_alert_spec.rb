@@ -34,12 +34,13 @@ RSpec.describe TheftAlert, type: :model do
     end
   end
 
-  describe "postable?" do
+  describe "activateable?" do
     let(:theft_alert) { FactoryBot.create(:theft_alert) }
     it "is false" do
-      expect(theft_alert.postable?).to be_falsey
+      expect(theft_alert.activateable?).to be_falsey
       expect(theft_alert.missing_location?).to be_truthy
       expect(theft_alert.missing_photo?).to be_truthy
+      expect(theft_alert.paid?).to be_falsey
     end
   end
 end
