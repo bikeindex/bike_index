@@ -6,40 +6,40 @@
         = f.text_field :name, class: "form-control"
     .col-sm-6
       .form-group
-        = f.label :currency, "Currency"
-        = f.select :currency, options_for_select(available_currencies, selected: record.currency), {},  class: "form-control"
-    .col-sm-6
-      .form-group
-        = f.label :views, "Views Provided", class: "form-label"
-        = f.number_field :views, class: "form-control"
-    .col-sm-6
-      .form-group
-        = f.label :duration_days, "Duration (days)", class: "form-label"
-        = f.number_field :duration_days, class: "form-control"
-    .col-sm-6
-      .form-group
-        = f.label :amount_cents, "Price (cents)", class: "form-label"
-        = f.number_field :amount_cents, class: "form-control"
-    .col-sm-6
-      .form-group
-        = f.label :amount_cents_facebook, "Facebook ad buy (cents)", class: "form-label"
-        = f.number_field :amount_cents_facebook, class: "form-control"
-    .col-sm-6
-      .form-group.mt-4
-        = f.check_box :active, class: ""
-        = f.label :active, "Active?", class: "form-check-label"
-    .col-sm-6
-      .form-group
         = f.label :language
         = f.select :language,
           options_for_select(language_choices, selected: record.language),
           {},
           class: "form-control"
-  .form-group
+    .col-sm-4.col-6
+      .form-group
+        = f.label :currency, "Currency"
+        = f.select :currency, options_for_select(available_currencies, selected: record.currency), {},  class: "form-control"
+    .col-sm-4.col-6
+      .form-group
+        = f.label :amount_cents, "Price (cents)", class: "form-label"
+        = f.number_field :amount_cents, class: "form-control"
+    .col-sm-4.col-6
+      .form-group
+        = f.label :amount_cents_facebook, "Facebook ad buy (cents)", class: "form-label"
+        = f.number_field :amount_cents_facebook, class: "form-control"
+    .col-sm-4.col-6
+      .form-group
+        = f.label :views, "Views Provided", class: "form-label"
+        = f.number_field :views, class: "form-control"
+    .col-sm-4.col-6
+      .form-group
+        = f.label :duration_days, "Duration (days)", class: "form-label"
+        = f.number_field :duration_days, class: "form-control"
+    .col-sm-4.col-6
+      .form-group
+        = f.label :ad_radius_miles, class: "form-label"
+        = f.number_field :ad_radius_miles, class: "form-control"
+  .form-group.mb-0
     = f.label :description, "Description", class: "form-label"
     = f.text_area :description, class: "form-control", rows: "5"
 
-  .float-right
+  .float-right.mt-0
     [
     = link_to "Markdown",
       "https://www.markdownguide.org/getting-started",
@@ -47,6 +47,11 @@
       tabindex: -1
     permitted
     ]
-
-  %br
-  = submit_tag submit_label, class: "btn btn-success btn-lg"
+  .row.mt-4
+    .col-6
+      .form-group
+        = submit_tag submit_label, class: "btn btn-success btn-lg"
+    .col-sm-6
+      .form-group.mt-4
+        = f.check_box :active, class: ""
+        = f.label :active, "Active?", class: "form-check-label"

@@ -16,11 +16,14 @@ class TheftAlert < ApplicationRecord
   belongs_to :payment
   belongs_to :user
 
+  before_validation :set_calculated_attributes
+
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { where.not(payment_id: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
-  delegate :duration_days, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :amount_facebook, :amount_cents_facebook,
+    :ad_radius_miles, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   def self.statuses
@@ -58,7 +61,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def facebook_name(kind = "campaign")
-    n = "Theft Alert #{id} - #{theft_alert_plan.amount_facebook}"
+    n = "Theft Alert #{id} - #{amount_facebook}"
     return n if kind == "campaign"
     "#{n} - #{kind}"
   end
@@ -85,6 +88,10 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("ad_id")
   end
 
+  def ad_radius_miles
+    25
+  end
+
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
@@ -95,7 +102,14 @@ class TheftAlert < ApplicationRecord
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_begin_at + (theft_alert_plan&.duration_days_facebook || 3).days
+    calculated_begin_at + (duration_days_facebook || 3).days
+  end
+
+  def set_calculated_attributes
+    if stolen_record&.latitude.present?
+      self.latitude = stolen_record.latitude
+      self.longitude = stolen_record.longitude
+    end
   end
 
   private

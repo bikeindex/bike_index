@@ -147,32 +147,23 @@
 .row.mt-4
   .col-md-6
     %h4
-      User has #{ pluralize(@bikescount, "bike") }
+      User has #{pluralize(number_with_delimiter(@bikescount), "bike")}
   .col-md-6.text-right
     = link_to "Show all user bikes", admin_bikes_path(user_id: @user.id)
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 
+- payments = @user.payments.reorder(created_at: :desc)
 %h4.mt-4
   Donations/payments
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead
-      %th
-        Date
-      %th
-        Amount
-      %th
-        Payment?
-    - @user.payments.reorder(created_at: :desc).each do |payment|
-      %tr
-        %td
-          = link_to l(payment.created_at, format: :convert_time), admin_payment_path(payment), class: "convertTime"
-          %small.convertTimezone.preciseTime
-        %td
-          = payment.amount
-        %td
-          = payment.display_kind
+  %small
+    = link_to "view all", admin_payments_path(user_id: @user.id)
+    %em
+      = pluralize(number_with_delimiter(payments.count), "payments")
+      - if payments.count > 5
+        %small.less-strong (only first 5 shown)
+
+= render partial: "/admin/payments/table", locals: { payments: payments.limit(5), skip_user: true }
 
 .row
   .col-md-6

@@ -3,6 +3,20 @@ require "rails_helper"
 RSpec.describe Admin::TheftAlertPlansController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
+    let(:valid_params) do
+      {
+        name: "New Plan",
+        amount_cents: 22_00,
+        views: 5_000,
+        duration_days: 7,
+        amount_cents_facebook: 2200,
+        ad_radius_miles: 25,
+        active: true,
+        description: "Cool plan that is cool",
+        language: "en",
+      }
+    end
+    let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
 
     describe "GET /admin/theft_alert_plans" do
       it "responds with 200 OK and renders the index template" do
@@ -31,19 +45,12 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         expect(TheftAlertPlan.count).to eq(0)
 
         post "/admin/theft_alert_plans",
-          params: {
-            theft_alert_plan: {
-              name: "New Plan",
-              amount_cents: 22_00,
-              views: 5_000,
-              duration_days: 7
-            }
-          }
-
+          params: {theft_alert_plan: valid_params}
         expect(TheftAlertPlan.count).to eq(1)
-        new_plan = TheftAlertPlan.first
-        expect(response).to redirect_to(edit_admin_theft_alert_plan_path(new_plan))
+        theft_alert_plan = TheftAlertPlan.first
+        expect(response).to redirect_to(edit_admin_theft_alert_plan_path(theft_alert_plan))
         expect(flash[:errors]).to be_blank
+        expect_attrs_to_match_hash(theft_alert_plan, valid_params)
       end
 
       it "re-renders the edit template with a flash on update failure" do
@@ -55,32 +62,27 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
 
     describe "GET /admin/theft_alert_plans/:id/edit" do
       it "responds with 200 OK and renders the edit template" do
-        plan = FactoryBot.create(:theft_alert_plan)
-
-        get "/admin/theft_alert_plans/#{plan.id}/edit"
+        get "/admin/theft_alert_plans/#{theft_alert_plan.id}/edit"
 
         expect(response).to be_ok
         expect(response).to render_template(:edit)
-        expect(response.body).to include(plan.name)
+        expect(response.body).to include(theft_alert_plan.name)
       end
     end
 
     describe "PATCH /admin/theft_alert_plans/:id" do
       it "redirects to the index route on update success" do
-        plan = FactoryBot.create(:theft_alert_plan, name: "Old Name")
-
-        patch "/admin/theft_alert_plans/#{plan.id}",
-          params: {theft_alert_plan: {name: "New Name"}}
+        patch "/admin/theft_alert_plans/#{theft_alert_plan.id}",
+          params: {theft_alert_plan: valid_params}
 
         expect(response).to redirect_to(admin_theft_alert_plans_path)
         expect(flash[:errors]).to be_blank
-        expect(plan.reload.name).to eq("New Name")
+        theft_alert_plan.reload
+        expect_attrs_to_match_hash(theft_alert_plan, valid_params)
       end
 
       it "re-renders the edit template with a flash on update failure" do
-        plan = FactoryBot.create(:theft_alert_plan)
-
-        patch "/admin/theft_alert_plans/#{plan.id}",
+        patch "/admin/theft_alert_plans/#{theft_alert_plan.id}",
           params: {theft_alert_plan: {name: ""}}
 
         expect(response).to be_ok

@@ -11,13 +11,11 @@ class ActivateTheftAlertWorker < ApplicationWorker
     end
     Facebook::AdsIntegration.new.create_for(theft_alert)
     theft_alert.reload
-    # If the post_url is blank, run create_for again to try to get the story id
-    if theft_alert.facebook_post_url.blank?
-      Facebook::AdsIntegration.new.create_for(theft_alert)
-    end
     # And mark the theft alert active
     theft_alert.update(begin_at: theft_alert.calculated_begin_at,
                        end_at: theft_alert.calculated_end_at,
                        status: "active")
+    # Generally, there is information that didn't get saved when the ad was created, so enqueue update
+    UpdateTheftAlertFacebookWorker.perform_in(15.seconds, theft_alert.id)
   end
 end

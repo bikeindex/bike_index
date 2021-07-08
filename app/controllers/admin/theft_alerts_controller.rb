@@ -7,7 +7,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def index
     @theft_alerts =
       matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-        .includes(:theft_alert_plan)
+        .includes(:theft_alert_plan, :stolen_record)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
@@ -82,6 +82,10 @@ class Admin::TheftAlertsController < Admin::BaseController
       theft_alerts = theft_alerts.where(status: @status)
     else
       @status = "all"
+    end
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
     end
     theft_alerts.where(created_at: @time_range)
   end

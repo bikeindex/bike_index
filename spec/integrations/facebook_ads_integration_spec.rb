@@ -39,10 +39,11 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
       let(:adset_id) { "6250590722014" }
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
       let(:bike) { Bike.new(id: 32, mnfg_name: "Surly") } # Manually stubbing so test has a valid URL
-      let(:stolen_record) { StolenRecord.new(bike: bike, latitude: 37.8297171, longitude: -122.2803456, city: "Oakland") }
+      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Oakland") }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
                        stolen_record: stolen_record,
+                       latitude: 37.8297171, longitude: -122.2803456,
                        facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
       end
       before do

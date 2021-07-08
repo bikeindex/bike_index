@@ -19,6 +19,8 @@
           = link_to "Incomplete only", url_for(sortable_search_params.merge(search_incompleteness: "incomplete")), class: "dropdown-item #{@incompleteness == 'incomplete' ? 'active' : '' }"
       %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Payments" }
+
 :ruby
   payments_counts = Payment.kinds.map do |kind|
     payments_of_kind = matching_payments.where(kind: kind)
@@ -79,64 +81,6 @@
 
 = paginate @payments, views_prefix: "admin"
 
+= render partial: "table", locals: { payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid" }
 
-.full-screen-table
-  %table.table.table-striped.table-bordered.sortable.table-sm
-    %thead.thead-light
-      %th
-        = sortable "created_at"
-      - if @incompleteness != "paid"
-        %th.small= sortable "first_payment_date", "Paid"
-      %th
-        = sortable "user_id"
-      %th
-        = sortable "kind"
-      %th
-        %small= sortable "organization_id"
-      %th
-        %small= sortable "invoice_id"
-      %th
-        %small= sortable "payment_method", "method"
-      %th
-        = sortable "amount_cents", "Amount"
-    %tbody
-      - @payments.each do |payment|
-        %tr
-          %td
-            %a.convertTime{ href: edit_admin_payment_path(payment) }
-              = l payment.created_at, format: :convert_time
-          - if @incompleteness != "paid"
-            %td
-              - if payment.first_payment_date.present?
-                %small.convertTime
-                  = l payment.first_payment_date, format: :convert_time
-          %td
-            - if payment.user.present?
-              = link_to payment.user.display_name, edit_admin_user_path(payment.user)
-            - elsif payment.email.present?
-              = payment.email
-              %small.less-strong
-                no user
-          %td
-            - if payment.theft_alert?
-              = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
-            - else
-              = payment.display_kind
-          %td
-            - if payment.organization.present?
-              = link_to payment.organization.short_name, admin_organization_path(payment.organization)
-          %td
-            - if payment.invoice.present? && payment.organization.present?
-              #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization.to_param, id: payment.invoice.id)}
-              - if payment.invoice.subscription_start_at
-                %small.convertTime
-                  = l payment.invoice.subscription_start_at, format: :convert_time
-          %td
-            %small
-              - if payment.stripe?
-                = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
-              - else
-                = payment.payment_method.humanize.downcase
-          %td
-            = payment.amount_formatted
 = paginate @payments, views_prefix: "admin"
