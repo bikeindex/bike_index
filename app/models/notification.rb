@@ -12,7 +12,8 @@ class Notification < ApplicationRecord
     donation_theft_alert: 15,
     impound_claim_submitting: 16,
     impound_claim_approved: 17,
-    impound_claim_denied: 18
+    impound_claim_denied: 18,
+    theft_alert_posted: 19
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {

@@ -22,6 +22,7 @@ class TheftAlert < ApplicationRecord
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { where.not(payment_id: nil) }
+  scope :posted, -> { where.not(begin_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
   delegate :duration_days, :duration_days_facebook, :amount_facebook, :amount_cents_facebook,
@@ -46,8 +47,13 @@ class TheftAlert < ApplicationRecord
     payment&.paid? || false
   end
 
+  # Active or has been active
+  def posted?
+    begin_at.present?
+  end
+
   def activateable?
-    !missing_photo? && !missing_location? && paid?
+    !missing_photo? && !missing_location? && paid? && stolen_record_approved?
   end
 
   def recovered?
@@ -56,6 +62,10 @@ class TheftAlert < ApplicationRecord
 
   def missing_location?
     latitude.blank? && longitude.blank?
+  end
+
+  def stolen_record_approved?
+    stolen_record&.approved? || false
   end
 
   def missing_photo?

@@ -13,7 +13,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         ad_radius_miles: 25,
         active: true,
         description: "Cool plan that is cool",
-        language: "en",
+        language: "en"
       }
     end
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }

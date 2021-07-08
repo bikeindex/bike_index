@@ -7,16 +7,15 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 3999) }
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
     let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, theft_alert_plan: theft_alert_plan, stolen_record: stolen_record, facebook_data: facebook_data) }
-    let(:facebook_data) { {campaign_id: "222", adset_id: "333", ad_id: "444", activating_at: Time.current.to_i}}
-    before do
-      # Stub class so it works in CI
-      class Facebook::AdsIntegration
-        def update_facebook_data(theft_alert)
-          new_data = theft_alert.facebook_data || {}
-          theft_alert.update(facebook_data: new_data.merge(effective_object_story_id: "NEEWWW"))
-        end
+    let(:facebook_data) { {campaign_id: "222", adset_id: "333", ad_id: "444", activating_at: Time.current.to_i} }
+
+    # Stub class so it works in CI
+    class Facebook::AdsIntegration
+      def update_facebook_data(theft_alert)
+        new_data = theft_alert.facebook_data || {}
+        theft_alert.update(facebook_data: new_data.merge(effective_object_story_id: "NEEWWW"))
       end
     end
 
@@ -41,6 +40,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
 
       expect(ActionMailer::Base.deliveries.count).to eq 1
       notification = theft_alert.notifications.first
+      expect(notification.kind).to eq "theft_alert_posted"
     end
   end
 end
