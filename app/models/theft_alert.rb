@@ -16,6 +16,8 @@ class TheftAlert < ApplicationRecord
   belongs_to :payment
   belongs_to :user
 
+  has_many :notifications, as: :notifiable
+
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
@@ -53,7 +55,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def missing_location?
-    stolen_record.without_location?
+    latitude.blank? && longitude.blank?
   end
 
   def missing_photo?
