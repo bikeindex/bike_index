@@ -70,7 +70,8 @@ class BParam < ApplicationRecord
     # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
     %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
       stolen abandoned revised_new
-      is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country]
+      is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country
+      bike_code]
   end
 
   def self.email_search(str)
@@ -213,7 +214,7 @@ class BParam < ApplicationRecord
     bike["no_duplicate"] || false
   end
 
-  def bike_sticker
+  def bike_sticker_code
     bike["bike_sticker"].presence || bike["bike_code"].presence
   end
 
