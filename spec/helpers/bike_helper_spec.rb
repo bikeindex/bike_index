@@ -30,8 +30,14 @@ RSpec.describe BikeHelper, type: :helper do
     end
     context "html frame_model" do
       let(:bike) { Bike.new(frame_model: "escape tags?</p>") }
+      it "removes bs the HTML" do
+        expect(bike_title_html(bike)).to eq("<span><strong></strong> escape tags?&lt;/p&gt;</span>")
+      end
+    end
+    context "html frame_model" do
+      let(:bike) { Bike.new(frame_model: "Bullit 'Love Ride'") }
       it "escapes the HTML" do
-        expect(bike_title_html(bike)).to eq("<span><strong></strong> escape tags?&amp;lt;&amp;#x2F;p&amp;gt;</span>")
+        expect(bike_title_html(bike)).to eq("<span><strong></strong> Bullit &#39;Love Ride&#39;</span>")
       end
     end
   end

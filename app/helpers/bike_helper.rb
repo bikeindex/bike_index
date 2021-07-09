@@ -23,7 +23,7 @@ module BikeHelper
     content_tag(:span) do
       concat("#{bike.year} ") if bike.year.present?
       concat(content_tag(:strong, bike.mnfg_name))
-      concat(Rack::Utils.escape_html(" #{bike.frame_model_truncated}")) if bike.frame_model.present?
+      concat(" #{bike.frame_model_truncated}") if bike.frame_model.present?
       concat(" #{bike.type}") if bike.type != "bike"
     end
   end
