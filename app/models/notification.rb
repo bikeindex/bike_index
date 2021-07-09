@@ -1,5 +1,8 @@
-# This is a stub. It needs to be expanded to include all the notifications that we send to users
-# (other than graduated_notifications and parking_notifications)
+# TODO: combine (or subclass?) all the notification models:
+# - graduated_notifications
+# - parking_notifications
+# - stolen_notifications
+
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
@@ -23,6 +26,7 @@ class Notification < ApplicationRecord
   }.freeze
 
   belongs_to :user
+  belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
   before_validation :set_calculated_attributes
