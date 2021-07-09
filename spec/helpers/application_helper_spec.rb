@@ -67,6 +67,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     let(:bike) { Bike.new(serial_number: "adasdfasdf") }
     it "returns nil if not there" do
       expect(attr_list_item(bike.mnfg_name, "Manufacturer")).to be_blank
+      expect(attr_list_item(" ", "title")).to be_blank
     end
     context "with matching element" do
       let(:target) { "<li><strong class=\"attr-title\">Serial </strong><span>adasdfasdf</span></li>" }

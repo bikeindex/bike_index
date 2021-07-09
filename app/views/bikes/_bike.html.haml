@@ -5,7 +5,7 @@
 - bike_link_target = "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}"
 %li.bike-box-item
   %a.bike-list-image{ href: bike_link_target, class: ('hover-expand' if bike.thumb_path) }
-    = bike.thumb_image
+    = bike_thumb_image(bike)
   .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
     %h5.title-link
       %a{ href: bike_link_target }
@@ -29,14 +29,14 @@
     - if bike.current_stolen_record.present?
       %ul.attr-list
         %li
-          = bike.status_html
+          = bike_status_span(bike)
           %span.convertTime
             = l bike.current_stolen_record.date_stolen, format: :convert_time
         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
     - if bike.current_impound_record.present?
       %ul.attr-list
         %li
-          = bike.status_html
+          = bike_status_span(bike)
           %span.convertTime
             = l bike.current_impound_record.impounded_at, format: :convert_time
         = attr_list_item(bike.current_impound_record.address, t(".location"))

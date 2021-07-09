@@ -1,7 +1,7 @@
-# Contains methods used for display. Trying this out instead of decorators
-# ... obviously, this adds one more place to look for methods on bikes, but whatever
+# Contains methods used for display, which don't return HTML.
+# Use BikeHelper for methods that do return HTML
 class BikeDisplayer
-  # Not sure if I like everything being class methods, but doing that for now anyway
+  # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
     def display_contact_owner?(bike, user = nil)
       bike.current_stolen_record.present?
