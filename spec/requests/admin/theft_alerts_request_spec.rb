@@ -173,10 +173,12 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       context "activate_theft_alert" do
         it "enqueues the activate_theft_alert job" do
           expect(theft_alert.reload.activating_at).to be_blank
+          expect(theft_alert.activating?).to be_falsey
           Sidekiq::Worker.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {activate_theft_alert: 1}
           expect(ActivateTheftAlertWorker.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_present
+          expect(theft_alert.activating?).to be_truthy
         end
       end
       context "update_theft_alert" do
