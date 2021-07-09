@@ -57,6 +57,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
     end
     context "receive_notifications? false" do
       it "does not create a notification" do
+        expect(theft_alert).to be_present
         stolen_record.update(receive_notifications: false)
         expect(theft_alert.reload.notify?).to be_falsey
         expect {
@@ -66,7 +67,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
     end
     context "earlier theft_alert" do
       it "does not create a notification" do
-        stolen_record.update(created_at: TimeParser.parse("2021-7-6"))
+        theft_alert.update(created_at: TimeParser.parse("2021-7-6"))
         expect(theft_alert.reload.notify?).to be_falsey
         expect {
           instance.perform(theft_alert.id)
