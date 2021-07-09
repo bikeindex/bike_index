@@ -6,7 +6,6 @@ if ENV["COVERAGE"]
     add_filter "/config/"
     add_filter "/vendor/"
 
-    add_group "Decorators", "app/decorators"
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
     add_group "Uploaders", "app/uploaders"

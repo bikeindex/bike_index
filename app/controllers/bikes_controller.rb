@@ -21,7 +21,7 @@ class BikesController < ApplicationController
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
 
-    @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
+    @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10)
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 
@@ -43,7 +43,6 @@ class BikesController < ApplicationController
     # These ivars are here primarily to make testing possible
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
-    @bike = @bike.decorate
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
@@ -58,7 +57,6 @@ class BikesController < ApplicationController
     if @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record
     end
-    @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: "bikes/pdf"
@@ -219,7 +217,7 @@ class BikesController < ApplicationController
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
-    @bike = @bike.reload.decorate
+    @bike = @bike.reload
 
     if @bike.errors.any? || flash[:error].present?
       @edit_templates = nil # So when we render edit it includes templates if the bike state has changed

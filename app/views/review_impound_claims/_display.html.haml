@@ -63,7 +63,7 @@
   .col-md-6
     - if @bike_submitting.present?
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: @bike_submitting.decorate, skip_cache: true }
+        = render partial: "/bikes/bike", locals: { bike: @bike_submitting, skip_cache: true }
     %p.mt-4
       %strong.d-block
         Message from
@@ -164,4 +164,4 @@
   - if @bike_claimed.present?
     .col-md-6
       .bike-boxes.mt-0
-        = render partial: "/bikes/bike", locals: { bike: @bike_claimed.decorate, skip_cache: true }
+        = render partial: "/bikes/bike", locals: { bike: @bike_claimed, skip_cache: true }

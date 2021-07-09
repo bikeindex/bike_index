@@ -10,6 +10,6 @@ class UserEmbedsController < ApplicationController
       @text = "Most Recent Indexed Bikes"
       bikes = Bike.where("thumb_path IS NOT NULL").limit(5)
     end
-    @bikes = BikeDecorator.decorate_collection(bikes)
+    @bikes = bikes
   end
 end

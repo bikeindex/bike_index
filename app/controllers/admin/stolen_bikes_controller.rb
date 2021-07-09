@@ -25,7 +25,6 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def edit
     @customer_contact = CustomerContact.new(user_email: @bike.owner_email)
-    @bike = @bike.decorate
   end
 
   def update
@@ -33,7 +32,6 @@ class Admin::StolenBikesController < Admin::BaseController
       update_image
     else
       BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
-      @bike = @bike.decorate
       if @bike.update_attributes(permitted_parameters)
         SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."

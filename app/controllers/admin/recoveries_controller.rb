@@ -16,8 +16,7 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def edit
     @recovery ||= StolenRecord.unscoped.find(params[:id])
-    bike = Bike.unscoped.find_by_id(@recovery.bike_id)
-    @bike = bike&.decorate
+    @bike = Bike.unscoped.find_by_id(@recovery.bike_id)
   end
 
   def update

@@ -28,7 +28,7 @@
             = bike.type
 
       .card-body
-        - bike_submitting = impound_claim.bike_submitting&.decorate
+        - bike_submitting = impound_claim.bike_submitting
         - if impound_claim.id.blank? || bike_submitting.blank? # bike_submitting.blank? should only occur in testing
           - bikes = current_user.rough_approx_bikes.status_stolen.reorder(created_at: :desc).limit(10)
           - if bikes.none?

@@ -107,8 +107,7 @@ class UsersController < ApplicationController
     end
     @page = params[:page] || 1
     @per_page = params[:per_page] || 9
-    bikes = user.bikes(true).page(@page).per(@per_page)
-    @bikes = BikeDecorator.decorate_collection(bikes)
+    @bikes = user.bikes(true).page(@page).per(@per_page)
   end
 
   def edit
