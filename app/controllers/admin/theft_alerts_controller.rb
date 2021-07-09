@@ -7,7 +7,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def index
     @theft_alerts =
       matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-        .includes(:theft_alert_plan)
+        .includes(:theft_alert_plan, :stolen_record)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
@@ -39,7 +39,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_theft_alerts
+  helper_method :matching_theft_alerts, :available_statuses
 
   private
 
@@ -68,6 +68,10 @@ class Admin::TheftAlertsController < Admin::BaseController
     %w[created_at theft_alert_plan_id status begin_at end_at]
   end
 
+  def available_statuses
+    TheftAlert.statuses + ["posted"]
+  end
+
   def matching_theft_alerts
     @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
     theft_alerts = if @search_recovered
@@ -77,11 +81,19 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
-    if TheftAlert.statuses.include?(params[:search_status])
+    if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
-      theft_alerts = theft_alerts.where(status: @status)
+      theft_alerts = if @status == "posted"
+        theft_alerts.posted
+      else
+        theft_alerts.where(status: @status)
+      end
     else
       @status = "all"
+    end
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
     end
     theft_alerts.where(created_at: @time_range)
   end

@@ -37,12 +37,13 @@ class Admin::StolenBikesController < Admin::BaseController
       if @bike.update_attributes(permitted_parameters)
         SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
-        redirect_to edit_admin_stolen_bike_url(@bike)
       else
         flash[:error] = "Unable to update!"
         render action: "edit"
+        return
       end
     end
+    redirect_back(fallback_location: edit_admin_stolen_bike_url(@bike))
   end
 
   protected
@@ -84,7 +85,6 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       flash[:error] = "Unknown action!"
     end
-    redirect_to edit_admin_stolen_bike_url(@bike)
   end
 
   def available_stolen_records

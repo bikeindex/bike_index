@@ -1,0 +1,22 @@
+- bike = @theft_alert.bike
+%h2
+  Your Facebook Ad is live!
+
+%p
+  We've published the Facebook ad for your stolen #{bike&.title_string || "bike"}.
+
+%p
+  %strong
+    #{link_to "Check out the ad here", @theft_alert.facebook_post_url}.
+
+%p We recommend sharing it to spread the word! We hope you find your #{bike&.type || "bike"}.
+
+%hr.mt-5{style: "border-top: 1px solid #DDD;"}
+
+%p
+  %em
+    P.S. We started offering promoted alerts 2 years ago and they have consistently improved the odds of bike recovery - but there is always room to improve! If you have a minute, would you give me some feedback on your experience with the promoted alert process?
+    %br
+    Best, Seth Herr, Bike Index Cofounder
+
+

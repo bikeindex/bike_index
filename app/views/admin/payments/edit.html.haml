@@ -3,7 +3,7 @@
     %h1
       Edit Payment
 
-= render partial: "/admin/payments/display_table", locals: { payment: @payment }
+= render partial: "/admin/payments/display", locals: { payment: @payment }
 
 
 = form_for [:admin, @payment] do |f|

@@ -78,6 +78,15 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def theft_alert_email(theft_alert, notification)
+    @theft_alert = theft_alert
+    @notification = notification
+    title = if @notification.kind == "theft_alert_posted"
+      "Your promoted alert advertisement is live!"
+    end
+    mail(to: @notification.user.email, subject: title, from: "seth@bikeindex.org")
+  end
+
   def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
     @user = customer_contact.user

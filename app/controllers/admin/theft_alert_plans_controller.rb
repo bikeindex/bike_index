@@ -39,6 +39,6 @@ class Admin::TheftAlertPlansController < Admin::BaseController
     params
       .require(:theft_alert_plan)
       .permit(:name, :amount_cents, :views, :duration_days, :description, :active, :language,
-        :currency, :amount_cents_facebook)
+        :currency, :amount_cents_facebook, :ad_radius_miles)
   end
 end

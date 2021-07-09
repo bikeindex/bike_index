@@ -1,7 +1,7 @@
 - viewing ||= controller_name.humanize
 
 
-- header_present = params[:user_id].present? || params[:organization_id].present?
+- header_present = params[:user_id].present? || params[:organization_id].present? || params[:search_bike_id].present?
 
 - if header_present
   .col-12.mt-4

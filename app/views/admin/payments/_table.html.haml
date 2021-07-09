@@ -1,0 +1,93 @@
+- render_sortable ||= false
+- skip_user ||= false
+- skip_paid_at ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.sortable.table-sm
+    %thead.thead-light
+      %th
+        - if render_sortable
+          = sortable "created_at"
+        - else
+          Created
+      - unless skip_paid_at
+        %th.small
+          - if render_sortable
+            = sortable "first_payment_date", "Paid"
+          - else
+            Paid
+      - unless skip_user
+        %th
+          - if render_sortable
+            = sortable "user_id"
+          - else
+            User
+      %th
+        - if render_sortable
+          = sortable "kind"
+        - else
+          Kind
+      %th
+        %small
+          - if render_sortable
+            = sortable "organization_id"
+          - else
+            Organization
+      %th
+        %small
+          - if render_sortable
+            = sortable "invoice_id"
+          - else
+            Invoice
+      %th
+        %small
+          - if render_sortable
+            = sortable "payment_method", "method"
+          - else
+            Method
+      %th
+        - if render_sortable
+          = sortable "amount_cents", "Amount"
+        - else
+          Amount
+    %tbody
+      - payments.each do |payment|
+        %tr
+          %td
+            %a.convertTime{ href: edit_admin_payment_path(payment) }
+              = l payment.created_at, format: :convert_time
+          - unless skip_paid_at
+            %td
+              - if payment.first_payment_date.present?
+                %small.convertTime
+                  = l payment.first_payment_date, format: :convert_time
+          - unless skip_user
+            %td
+              - if payment.user.present?
+                = link_to payment.user.display_name, edit_admin_user_path(payment.user)
+              - elsif payment.email.present?
+                = payment.email
+                %small.less-strong
+                  no user
+          %td
+            - if payment.theft_alert?
+              = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+            - else
+              = payment.display_kind
+          %td
+            - if payment.organization.present?
+              = link_to payment.organization.short_name, admin_organization_path(payment.organization)
+          %td
+            - if payment.invoice.present? && payment.organization.present?
+              #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization.to_param, id: payment.invoice.id)}
+              - if payment.invoice.subscription_start_at
+                %small.convertTime
+                  = l payment.invoice.subscription_start_at, format: :convert_time
+          %td
+            %small
+              - if payment.stripe?
+                = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+              - else
+                = payment.payment_method.humanize.downcase
+          %td
+            = payment.amount_formatted

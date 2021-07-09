@@ -9,12 +9,13 @@
         .dropdown-menu
           = link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : '' }"
           .dropdown-divider
-          - TheftAlert.statuses.each do |status|
+          - available_statuses.each do |status|
             = link_to "#{status.humanize} alerts", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : '' }"
       %li.nav-item
         = link_to "recovered", url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), class: "nav-link #{@search_recovered ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Promoted Alerts" }
 
 - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
 - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {created_at: @time_range})
@@ -49,10 +50,6 @@
       - if sortable_search_params?
         Matching
       Promoted Alerts
-      - if @user.present?
-        %strong
-          Owned by
-          = link_to "#{@user.email}", admin_user_path(@user)
       %em
         = humanized_time_range(@time_range)
   - if theft_alert_plans.present?

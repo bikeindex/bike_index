@@ -1,6 +1,8 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+  # Timestamp for when notification functionality was added
+  NOTIFY_AFTER = 1625757882 # 2021-7-8
 
   enum status: STATUS_ENUM
 
@@ -16,11 +18,17 @@ class TheftAlert < ApplicationRecord
   belongs_to :payment
   belongs_to :user
 
+  has_many :notifications, as: :notifiable
+
+  before_validation :set_calculated_attributes
+
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { where.not(payment_id: nil) }
+  scope :posted, -> { where.not(begin_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
-  delegate :duration_days, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :amount_facebook, :amount_cents_facebook,
+    :ad_radius_miles, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   def self.statuses
@@ -37,12 +45,22 @@ class TheftAlert < ApplicationRecord
     stolen_record&.bike
   end
 
+  def notify?
+    return false unless (created_at || Time.current).to_i > NOTIFY_AFTER
+    stolen_record.present? && stolen_record.receive_notifications?
+  end
+
   def paid?
     payment&.paid? || false
   end
 
+  # Active or has been active
+  def posted?
+    begin_at.present?
+  end
+
   def activateable?
-    !missing_photo? && !missing_location? && paid?
+    !missing_photo? && !missing_location? && paid? && stolen_record_approved?
   end
 
   def recovered?
@@ -50,7 +68,11 @@ class TheftAlert < ApplicationRecord
   end
 
   def missing_location?
-    stolen_record.without_location?
+    latitude.blank? && longitude.blank?
+  end
+
+  def stolen_record_approved?
+    stolen_record&.approved? || false
   end
 
   def missing_photo?
@@ -58,7 +80,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def facebook_name(kind = "campaign")
-    n = "Theft Alert #{id} - #{theft_alert_plan.amount_facebook}"
+    n = "Theft Alert #{id} - #{amount_facebook}"
     return n if kind == "campaign"
     "#{n} - #{kind}"
   end
@@ -85,6 +107,10 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("ad_id")
   end
 
+  def ad_radius_miles
+    25
+  end
+
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
@@ -95,7 +121,14 @@ class TheftAlert < ApplicationRecord
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_begin_at + (theft_alert_plan&.duration_days_facebook || 3).days
+    calculated_begin_at + (duration_days_facebook || 3).days
+  end
+
+  def set_calculated_attributes
+    if stolen_record&.latitude.present?
+      self.latitude = stolen_record.latitude
+      self.longitude = stolen_record.longitude
+    end
   end
 
   private

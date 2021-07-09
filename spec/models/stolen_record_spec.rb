@@ -86,6 +86,7 @@ RSpec.describe StolenRecord, type: :model do
 
         expect(result).to be_an_instance_of(AlertImage)
         expect(stolen_record.alert_image).to eq(result)
+        stolen_record.skip_update = false # Make sure we aren't blocking
         expect(AlertImage.count).to eq(1)
         expect(stolen_record.theft_alert_missing_photo?).to be_falsey
         FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
@@ -594,14 +595,18 @@ RSpec.describe StolenRecord, type: :model do
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        stolen_record = FactoryBot.create(:stolen_record, :in_chicago)
+        theft_alert = FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
         stolen_record.reload
         expect(stolen_record.theft_alert_missing_photo?).to be_truthy
+        expect(theft_alert.missing_location?).to be_falsey
+        og_updated_at = theft_alert.updated_at
 
         Sidekiq::Testing.inline! do
           expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)
         end
+        theft_alert.reload
+        expect(theft_alert.updated_at).to be > og_updated_at
       end
     end
   end

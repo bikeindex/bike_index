@@ -239,7 +239,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           expect(stolen_record.can_share_recovery).to be_truthy
           expect(ActionMailer::Base.deliveries.count).to eq 2
           mail_subjects = ActionMailer::Base.deliveries.map(&:subject)
-          expect(mail_subjects).to match_array(["Bike Recovery", "Promoted Alert recovered: #{theft_alert.id}"])
+          expect(mail_subjects).to match_array(["Bike Recovery", "RECOVERED Promoted Alert: #{theft_alert.id}"])
         end
       end
     end

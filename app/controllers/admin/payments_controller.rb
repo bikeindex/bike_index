@@ -74,6 +74,10 @@ class Admin::PaymentsController < Admin::BaseController
       @matching_payments = @matching_payments.paid
     end
     @matching_payments = @matching_payments.where(kind: params[:search_kind]) if params[:search_kind].present?
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      @matching_payments = @matching_payments.where(user_id: @user.id) if @user.present?
+    end
     @matching_payments = @matching_payments.where(created_at: @time_range)
   end
 

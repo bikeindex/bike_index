@@ -7,7 +7,7 @@
       = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
 
 - if @theft_alert.payment.present?
-  = render partial: "/admin/payments/display_table", locals: { payment: @theft_alert.payment }
+  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
 - else
   No payment present!
 
@@ -42,6 +42,9 @@
               %span.text-danger can not
               be activated
             %ul.mt-4
+              !missing_photo? && !missing_location? && paid? && stolen_record_approved?
+              - unless @theft_alert.stolen_record_approved?
+                %li Stolen Record is not approved
               - unless @theft_alert.paid?
                 %li Alert is not paid
               - if @theft_alert.missing_photo?

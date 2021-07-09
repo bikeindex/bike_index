@@ -300,6 +300,7 @@ class StolenRecord < ApplicationRecord
     end
   end
 
+  # TODO: maybe background some of this stuff?
   def update_associations
     return true if skip_update
     remove_outdated_alert_images
@@ -308,6 +309,7 @@ class StolenRecord < ApplicationRecord
       update_not_current_records
       bike&.update_attributes(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
+    theft_alerts.each { |t| t.update(updated_at: Time.current) }
     bike&.user&.update_attributes(updated_at: Time.current)
   end
 
@@ -317,7 +319,7 @@ class StolenRecord < ApplicationRecord
     return unless recovered? && theft_alerts.any?
 
     EmailTheftAlertNotificationWorker
-      .perform_async(theft_alerts.last.id, :recovered)
+      .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 
   # If the bike has been recovered, remove the alert_image
