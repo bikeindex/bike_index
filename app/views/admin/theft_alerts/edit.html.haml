@@ -22,7 +22,7 @@
           - if @theft_alert.activateable?
             %h4.text-center Theft alert can be activated!
 
-            - if @theft_alert.activating_at.present?
+            - if @theft_alert.activating?
               %h2.mt-3.text-center
                 %span.text-warning Activation in process
 
@@ -51,7 +51,9 @@
                 %li Alert is missing photo
               - if @theft_alert.missing_location?
                 %li Alert is missing location
-
+- if @theft_alert.notifications.any?
+  %h3 Notifications
+  = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
 .admin-subnav.midpage-subnav
   .col-12
     %h1 Edit Promoted Alert

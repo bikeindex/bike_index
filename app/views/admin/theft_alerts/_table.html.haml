@@ -45,15 +45,18 @@
           %td
             - if theft_alert.recovered?
               = link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success"
-            - unless theft_alert.recovered? && theft_alert.inactive?
-              - text_class = "text-info" if theft_alert.active?
-              - text_class ||= "text-warning" if theft_alert.pending?
-              - text_class ||= "less-strong small" if theft_alert.inactive?
-              - text_class += " small" if theft_alert.recovered?
-              %span{ class: text_class || "" }
-                = theft_alert.status
-            - if theft_alert.pending? && theft_alert.activateable?
-              %em.small.text-success activateable
+            - if theft_alert.activating?
+              %span.text-success activating!
+            - else
+              - unless theft_alert.recovered? && theft_alert.inactive?
+                - text_class = "text-info" if theft_alert.active?
+                - text_class ||= "text-warning" if theft_alert.pending?
+                - text_class ||= "less-strong small" if theft_alert.inactive?
+                - text_class += " small" if theft_alert.recovered?
+                %span{ class: text_class || "" }
+                  = theft_alert.status
+              - if theft_alert.pending? && theft_alert.activateable?
+                %em.small.text-success activateable
           - unless skip_bike
             %td
               - if theft_alert.bike.present?

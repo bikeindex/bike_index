@@ -63,6 +63,10 @@ class TheftAlert < ApplicationRecord
     !missing_photo? && !missing_location? && paid? && stolen_record_approved?
   end
 
+  def activating?
+    pending? && activating_at.present?
+  end
+
   def recovered?
     stolen_record&.recovered?
   end
