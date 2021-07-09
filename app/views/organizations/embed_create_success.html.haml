@@ -3,7 +3,7 @@
   %h1
     = t(".your_bike_has_been_added_to_bike_index", bike_type: @bike.type)
   %p
-    - bike_link = link_to @bike.title, bike_url(@bike), target: "_blank"
+    - bike_link = link_to bike_title_html(@bike), bike_url(@bike), target: "_blank"
     = t(".bike_was_registered_to_you_html", bike_link: bike_link, org_name: @organization.name)
   %p
     = t(".you_will_receive_an_email_confirmation")

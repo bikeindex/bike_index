@@ -45,7 +45,7 @@
         %tr
           %td Status
           %td
-            = BikeDecorator.new(@bike).status_html
+            = bike_status_span(@bike)
         %tr
           %td Date Stolen
           %td.convertTime= l @bike.date_stolen, format: :convert_time

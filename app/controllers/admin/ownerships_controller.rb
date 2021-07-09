@@ -33,7 +33,7 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def find_ownership
     @ownership = Ownership.find(params[:id])
-    @bike = Bike.unscoped.find(@ownership.bike_id).decorate
+    @bike = Bike.unscoped.find(@ownership.bike_id)
     @users = User.all
   end
 

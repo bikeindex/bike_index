@@ -45,8 +45,7 @@ class Admin::UsersController < Admin::BaseController
         @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
         redirect_to admin_users_url, notice: "User Updated"
       else
-        bikes = @user.bikes
-        @bikes = BikeDecorator.decorate_collection(bikes)
+        @bikes = @user.bikes
         render action: :edit
       end
     end

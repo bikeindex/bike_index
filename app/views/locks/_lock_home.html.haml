@@ -14,10 +14,10 @@
             = image_tag("locks/#{lock.lock_type.slug}.jpg")
         .blist-primary-group
           %dl.dl-horizontal
-            = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), t(".lock_type"))
-            = lock.dl_list_item(lock.mnfg_name, t(".manufacturer"))
-            = lock.dl_from_attribute("key_serial")
-            = lock.dl_from_attribute("combination")
+            = attr_list_item(link_to(lock.lock_type_name, lock_url(lock)), t(".lock_type"))
+            = attr_list_item(lock.mnfg_name, t(".manufacturer"))
+            = attr_list_item(lock.key_serial, "Key serial")
+            = attr_list_item(lock.combination, "Combination")
 - else
   %h2= t(".save_information_about_your_bike_lock")
   %p= t(".lock_keys_often_have_serial_numbers_so_yo")

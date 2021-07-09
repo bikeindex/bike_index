@@ -145,7 +145,7 @@ RSpec.describe BikesController, type: :controller do
       get :show, params: {id: bike.id}
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
-      expect(assigns(:bike)).to be_decorated
+      expect(assigns(:bike)).to be_present
       expect(flash).to_not be_present
     end
     context "illegally set passive_organization" do
@@ -156,7 +156,7 @@ RSpec.describe BikesController, type: :controller do
         get :show, params: {id: bike.id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         expect(flash).to_not be_present
         expect(assigns[:current_organization]).to be_nil
         expect(assigns[:passive_organization]).to be_nil
@@ -165,7 +165,7 @@ RSpec.describe BikesController, type: :controller do
         get :show, params: {id: bike.id, sign_in_if_not: true, organization_id: organization.id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         expect(flash).to_not be_present
         expect(assigns[:current_organization]).to be_nil
         expect(assigns[:passive_organization]).to be_nil
@@ -199,7 +199,7 @@ RSpec.describe BikesController, type: :controller do
         get :show, params: {id: bike.id, organization_id: organization.name}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         expect(flash).to_not be_present
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:passive_organization)).to eq organization
@@ -215,7 +215,7 @@ RSpec.describe BikesController, type: :controller do
         get :show, params: {id: bike.id, scanned_id: "ED009999", organization_id: organization.id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         expect(flash).to_not be_present
         expect(assigns(:bike_sticker)).to eq bike_sticker
         expect(user.authorized?(assigns(:bike_sticker))).to be_truthy
@@ -227,7 +227,7 @@ RSpec.describe BikesController, type: :controller do
           get :show, params: {id: bike.id, scanned_id: "ED009999", organization_id: organization.id}
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
-          expect(assigns(:bike)).to be_decorated
+          expect(assigns(:bike)).to be_present
           expect(flash).to_not be_present
           expect(assigns(:bike_sticker)).to eq bike_sticker
           expect(user.authorized?(assigns(:bike_sticker))).to be_falsey
@@ -1055,7 +1055,7 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to redirect_to edit_bike_url(bike)
           expect(bike.handlebar_type).to eq other_handlebar_type
           expect(bike.handlebar_type_other).to eq "Joysticks"
-          expect(assigns(:bike)).to be_decorated
+          expect(assigns(:bike)).to be_present
           expect(bike.hidden).to be_falsey
           expect(bike.country&.name).to eq(Country.netherlands.name)
           expect(bike.zipcode).to eq "3035"
@@ -1397,7 +1397,7 @@ RSpec.describe BikesController, type: :controller do
       it "updates the bike with the allowed_attributes" do
         put :update, params: {id: bike.id, bike: allowed_attributes, organization_ids_can_edit_claimed: [organization2.id]}
         expect(response).to redirect_to edit_bike_url(bike)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         bike.reload
         expect(bike.hidden).to be_falsey
         allowed_attributes.except(*skipped_attrs).each do |key, value|
@@ -1412,7 +1412,7 @@ RSpec.describe BikesController, type: :controller do
         it "updates the bike with the allowed_attributes, marks no organizations can edit claimed" do
           put :update, params: {id: bike.id, bike: allowed_attributes, organization_ids_can_edit_claimed_present: "1"}
           expect(response).to redirect_to edit_bike_url(bike)
-          expect(assigns(:bike)).to be_decorated
+          expect(assigns(:bike)).to be_present
           bike.reload
           expect(bike.hidden).to be_falsey
           allowed_attributes.except(*skipped_attrs).each do |key, value|
@@ -1433,7 +1433,7 @@ RSpec.describe BikesController, type: :controller do
                          bike_organization_ids: organization2.id.to_s
                        }}
             expect(response).to redirect_to edit_bike_url(bike, page: "groups")
-            expect(assigns(:bike)).to be_decorated
+            expect(assigns(:bike)).to be_present
             bike.reload
             expect(bike.creation_organization_id).to eq organization.id
             expect(bike.bike_organization_ids).to match_array([organization2.id])
@@ -1462,7 +1462,7 @@ RSpec.describe BikesController, type: :controller do
           frame_size_unit: "cm"
         }}
         expect(response).to redirect_to edit_bike_url(bike)
-        expect(assigns(:bike)).to be_decorated
+        expect(assigns(:bike)).to be_present
         bike.reload
         expect(bike.hidden).to be_falsey
         expect(bike.description).to eq "new description"

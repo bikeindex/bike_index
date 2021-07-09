@@ -67,7 +67,6 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def edit
-    @bike = @bike.decorate
     @recoveries = @bike.recovered_records
     @organizations = Organization.all
   end
@@ -76,7 +75,6 @@ class Admin::BikesController < Admin::BaseController
     updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}.as_json)
     updator.update_ownership
     updator.update_stolen_record
-    @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
       @bike.current_stolen_record.add_recovery_information(
         recovered_description: params[:mark_recovered_reason],

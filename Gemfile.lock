@@ -76,10 +76,6 @@ GEM
       globalid (>= 0.3.6)
     activemodel (5.2.5)
       activesupport (= 5.2.5)
-    activemodel-serializers-xml (1.0.2)
-      activemodel (> 5.x)
-      activesupport (> 5.x)
-      builder (~> 3.1)
     activerecord (5.2.5)
       activemodel (= 5.2.5)
       activesupport (= 5.2.5)
@@ -165,12 +161,6 @@ GEM
     dotenv-rails (2.7.5)
       dotenv (= 2.7.5)
       railties (>= 3.2, < 6.1)
-    draper (3.1.0)
-      actionpack (>= 5.0)
-      activemodel (>= 5.0)
-      activemodel-serializers-xml (>= 1.0)
-      activesupport (>= 5.0)
-      request_store (>= 1.0)
     equalizer (0.0.11)
     erubi (1.10.0)
     eventmachine (1.2.7)
@@ -727,7 +717,6 @@ DEPENDENCIES
   database_cleaner
   doorkeeper (~> 5.2.5)
   dotenv-rails
-  draper
   eventmachine
   facebookbusiness (~> 0.11.0)!
   factory_bot_rails

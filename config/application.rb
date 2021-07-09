@@ -27,8 +27,6 @@ module Bikeindex
 
     # Use our custom error pages
     config.exceptions_app = routes
-    require "draper"
-    Draper::Railtie.initializers.delete_if { |initializer| initializer.name == "draper.setup_active_model_serializers" }
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
@@ -65,7 +63,6 @@ module Bikeindex
     config.generators do |g|
       g.factory_bot "true"
       g.helper nil
-      g.decorator nil
       g.javascripts nil
       g.stylesheets nil
       g.template_engine nil

@@ -36,13 +36,13 @@
               - @bikes.each do |bike|
                 .card
                   %a.bike-list-image{ href: bike_url(bike) }
-                    = bike.thumb_image
+                    = bike_thumb_image(bike)
                     - if bike.status_stolen?
                       %span.personal-page-stolen-tag
                         = t(".stolen")
                   .card-title
                     %h4
-                      = link_to bike.title_string, bike.list_link_url(bike)
+                      = link_to bike.title_string, bike_path(bike)
           .row.paginate-container-row
             .col-md-12
               .paginate-container.paginate-container-bottom

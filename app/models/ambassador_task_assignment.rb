@@ -19,8 +19,8 @@ class AmbassadorTaskAssignment < ApplicationRecord
   after_commit :update_associated_user
 
   delegate :description, :description_html, :title, to: :ambassador_task
-  delegate :name, to: :ambassador, prefix: true
-  delegate :name, to: :organization, prefix: true
+  delegate :name, to: :ambassador, prefix: true, allow_nil: true
+  delegate :name, to: :organization, prefix: true, allow_nil: true
 
   # Find completed assignments, filtering and sorting by columns on associated
   # models. The inner join is necessary because our data model permits multiple
