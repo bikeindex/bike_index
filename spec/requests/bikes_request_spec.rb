@@ -751,6 +751,42 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+    context "no existing b_param, bike_code" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED00001") }}
+      it "creates and adds the bike code" do
+        expect {
+          post base_url, params: {
+            bike: {
+              b_param_id_token: "",
+              embeded: "true"
+              creation_organization_id: organization.id,
+              embeded_extended: true,
+              serial_number: "example serial",
+              manufacturer_id: manufacturer.slug,
+              manufacturer_other: "",
+              primary_frame_color_id: color.id.to_s,
+              secondary_frame_color_id: "",
+              tertiary_frame_color_id: "",
+              owner_email: "something@stuff.COM   ",
+              phone: "312.379.9513",
+              date_stolen: Time.current.to_i
+            }
+          }
+        }.to change(Bike, :count).by(1)
+        expect(flash[:success]).to be_present
+        bike = Bike.last
+        expect(bike.creation_organization&.id).to eq organization.id
+        expect(bike.creation_state.origin).to eq "embed_extended"
+        expect(bike.owner_email).to eq "something@stuff.com"
+        expect(bike.owner).to be_blank
+        expect(bike.phone).to eq "312.379.9513"
+        expect(bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+        expect(bike_sticker.reload.claimed?).to be_truthy
+        expect(bike_sticker.bike&.id).to eq bike.id
+        expect(bike_sticker.bike_sticker_updates.count).to eq 2
+      end
+    end
     context "existing b_param, no bike" do
       let(:bike_params) do
         basic_bike_params.merge(cycle_type: "cargo-rear",
