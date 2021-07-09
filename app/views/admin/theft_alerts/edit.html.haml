@@ -42,7 +42,6 @@
               %span.text-danger can not
               be activated
             %ul.mt-4
-              !missing_photo? && !missing_location? && paid? && stolen_record_approved?
               - unless @theft_alert.stolen_record_approved?
                 %li Stolen Record is not approved
               - unless @theft_alert.paid?
