@@ -264,7 +264,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.address("state")).to eq "CA"
 
       expect(b_param.fetch_formatted_address).to eq target_address
-      expect(b_param.bike_sticker).to eq "xxxx"
+      expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
       expect(b_param.external_image_urls).to eq(["xxxxx"])
@@ -287,7 +287,7 @@ RSpec.describe BParam, type: :model do
       end
       it "has the expected fields" do
         expect(b_param.fetch_formatted_address).to eq target_address
-        expect(b_param.bike_sticker).to eq "xxxx"
+        expect(b_param.bike_sticker_code).to eq "xxxx"
         expect(b_param.organization_affiliation).to eq "employee"
         expect(b_param.phone).to eq "919929333"
         expect(b_param.address("address")).to eq "123 Main St"

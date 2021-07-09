@@ -654,7 +654,7 @@ RSpec.describe BikesController, type: :request do
         include_context :geocoder_real
         it "creates a bike and doesn't create a b_param" do
           bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
-          VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+          VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:method]) do
             bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're
@@ -702,7 +702,7 @@ RSpec.describe BikesController, type: :request do
         include_context :geocoder_real
         let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
         it "creates a new ownership and impound_record" do
-          VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
+          VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:method]) do
             expect {
               post base_url, params: {bike: bike_params, impound_record: impound_params}
               expect(assigns(:bike).errors&.full_messages).to_not be_present
@@ -735,7 +735,7 @@ RSpec.describe BikesController, type: :request do
         end
         context "failure" do
           it "assigns a bike and a impound record with the attrs passed" do
-            VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:path]) do
+            VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:method]) do
               expect {
                 post base_url, params: {bike: bike_params.except(:manufacturer_id), impound_record: impound_params}
               }.to change(Bike, :count).by(0)
@@ -753,13 +753,17 @@ RSpec.describe BikesController, type: :request do
     end
     context "no existing b_param, bike_code" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED00001") }}
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED00001") }
+      # Created the same way that organizations controller creates a b_param
+      let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true, bike: {}}) }
       it "creates and adds the bike code" do
+        b_param.reload
+        expect(b_param.created_bike_id).to be_blank
         expect {
           post base_url, params: {
             bike: {
-              b_param_id_token: "",
-              embeded: "true"
+              b_param_id_token: b_param.id_token,
+              embeded: "true",
               creation_organization_id: organization.id,
               embeded_extended: true,
               serial_number: "example serial",
@@ -770,21 +774,28 @@ RSpec.describe BikesController, type: :request do
               tertiary_frame_color_id: "",
               owner_email: "something@stuff.COM   ",
               phone: "312.379.9513",
-              date_stolen: Time.current.to_i
+              bike_code: "ed001"
             }
           }
         }.to change(Bike, :count).by(1)
         expect(flash[:success]).to be_present
-        bike = Bike.last
-        expect(bike.creation_organization&.id).to eq organization.id
-        expect(bike.creation_state.origin).to eq "embed_extended"
+
+        b_param.reload
+        expect(b_param.bike_sticker_code).to eq "ed001"
+        expect(b_param.created_bike_id).to be_present
+        bike = b_param.created_bike
         expect(bike.owner_email).to eq "something@stuff.com"
-        expect(bike.owner).to be_blank
-        expect(bike.phone).to eq "312.379.9513"
+        expect(bike.user).to be_blank
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.phone).to eq "3123799513"
+
+        expect(bike.creation_state.organization&.id).to eq organization.id
+        expect(bike.creation_state.origin).to eq "embed_extended"
+
         expect(bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
         expect(bike_sticker.reload.claimed?).to be_truthy
         expect(bike_sticker.bike&.id).to eq bike.id
-        expect(bike_sticker.bike_sticker_updates.count).to eq 2
+        expect(bike_sticker.bike_sticker_updates.count).to eq 1
       end
     end
     context "existing b_param, no bike" do
@@ -1547,7 +1558,7 @@ RSpec.describe BikesController, type: :request do
 
       it "clears the existing alert image" do
         # Cassette required for alert image
-        VCR.use_cassette("bike_request-stolen", match_requests_on: [:path], re_record_interval: 1.month) do
+        VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do
           expect(bike.reload.claimed?).to be_truthy
           expect(bike.owner&.id).to eq current_user.id
           stolen_record.current_alert_image
