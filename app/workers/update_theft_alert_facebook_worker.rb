@@ -8,8 +8,7 @@ class UpdateTheftAlertFacebookWorker < ApplicationWorker
     return true unless theft_alert.notify? &&
       theft_alert.notifications.theft_alert_posted.none?
 
-    # Temporary pause on notification
     # Perform inline rather than re-querying for objects
-    # EmailTheftAlertNotificationWorker.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
+    EmailTheftAlertNotificationWorker.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
   end
 end

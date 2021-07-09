@@ -1,4 +1,4 @@
-# TODO: combine (or subclass?) all the notification models:
+# TODO: combine all the notification models - or subclass? Or create Notifications for each?
 # - graduated_notifications
 # - parking_notifications
 # - stolen_notifications

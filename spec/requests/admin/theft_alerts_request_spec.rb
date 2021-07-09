@@ -186,7 +186,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect(theft_alert.reload.activating_at).to be_blank
           Sidekiq::Worker.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
-          # expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
+          expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_blank
         end
       end
