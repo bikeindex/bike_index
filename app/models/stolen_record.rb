@@ -319,7 +319,7 @@ class StolenRecord < ApplicationRecord
     return unless recovered? && theft_alerts.any?
 
     EmailTheftAlertNotificationWorker
-      .perform_async(theft_alerts.last.id, :recovered)
+      .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 
   # If the bike has been recovered, remove the alert_image

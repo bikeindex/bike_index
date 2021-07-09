@@ -13,7 +13,8 @@ class Notification < ApplicationRecord
     impound_claim_submitting: 16,
     impound_claim_approved: 17,
     impound_claim_denied: 18,
-    theft_alert_posted: 19
+    theft_alert_recovered: 19,
+    theft_alert_posted: 20
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -38,7 +39,11 @@ class Notification < ApplicationRecord
   end
 
   def self.donation_kinds
-    %w[donation_standard donation_second donation_stolen donation_recovered donation_theft_alert]
+    kinds.select { |k| k.start_with?("donation_") }.freeze
+  end
+
+  def self.theft_alert_kinds
+    kinds.select { |k| k.start_with?("theft_alert_") }.freeze
   end
 
   # TODO: update with twilio delivery status, update scope too

@@ -35,13 +35,15 @@ RSpec.describe TheftAlert, type: :model do
   end
 
   describe "activateable?" do
-    let(:theft_alert) { FactoryBot.create(:theft_alert) }
+    let(:theft_alert) { FactoryBot.create(:theft_alert, created_at: TimeParser.parse("2021-7-1")) }
     it "is false" do
       expect(theft_alert.missing_location?).to be_truthy
       expect(theft_alert.missing_photo?).to be_truthy
       expect(theft_alert.stolen_record_approved?).to be_falsey
       expect(theft_alert.paid?).to be_falsey
       expect(theft_alert.activateable?).to be_falsey
+      expect(theft_alert.posted?).to be_falsey
+      expect(theft_alert.notify?).to be_falsey
     end
     context "is activateable" do
       let(:bike) { FactoryBot.create(:bike) }
@@ -54,6 +56,11 @@ RSpec.describe TheftAlert, type: :model do
         expect(theft_alert.paid?).to be_truthy
         expect(theft_alert.activateable?).to be_truthy
         expect(theft_alert.posted?).to be_falsey
+        # Also, test notify? in here too
+        expect(theft_alert.notify?).to be_truthy
+        stolen_record.update(receive_notifications: false)
+        theft_alert.reload
+        expect(theft_alert.notify?).to be_falsey
       end
     end
   end

@@ -112,42 +112,10 @@ RSpec.describe AdminMailer, type: :mailer do
   end
 
   describe "#theft_alert_notification" do
-    it "renders email" do
-      theft_alert = FactoryBot.create(:theft_alert_paid)
-
-      mail = described_class.theft_alert_notification(theft_alert)
-
-      expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-      expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
-      body = mail.body.encoded
-      expect(body).to include(theft_alert.user.name)
-      expect(body).to include(theft_alert.user.email)
-      expect(body).to include(theft_alert.theft_alert_plan.name)
-      expect(body).to include(theft_alert.bike.title_string)
-      expect(body).to include("payments/#{theft_alert.payment.id}/edit")
-    end
-
-    context "given a purchase with a payment failure" do
-      it "notes the failure in the email" do
-        theft_alert = FactoryBot.create(:theft_alert_unpaid)
-
-        mail = described_class.theft_alert_notification(theft_alert, notification_type: :purchased)
-
-        expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-        expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
-        body = mail.body.encoded
-        expect(body).to include(theft_alert.user.name)
-        expect(body).to include(theft_alert.user.email)
-        expect(body).to include(theft_alert.theft_alert_plan.name)
-        expect(body).to include(theft_alert.bike.title_string)
-        expect(body).to include("Payment Failed")
-      end
-    end
-
     context "given notify_of_recovered true" do
       it "renders email with recovered notification" do
         theft_alert = FactoryBot.create(:theft_alert_paid)
-        mail = described_class.theft_alert_notification(theft_alert, notification_type: :recovered)
+        mail = described_class.theft_alert_notification(theft_alert, notification_type: "theft_alert_recovered")
 
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
         expect(mail.subject).to match("RECOVERED Promoted Alert: #{theft_alert.id}")
@@ -156,3 +124,5 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 end
+
+

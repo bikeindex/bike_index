@@ -41,16 +41,14 @@ class AdminMailer < ApplicationMailer
     mail(to: "admin@bikeindex.org", subject: "Api Notification sent!")
   end
 
-  def theft_alert_notification(theft_alert, notification_type: :purchased)
+  def theft_alert_notification(theft_alert, notification_type: nil)
     @theft_alert = theft_alert
     @theft_alert_plan = theft_alert.theft_alert_plan
     @user = theft_alert.user
     @bike = theft_alert.bike
-    if notification_type == :recovered
+    if notification_type == "theft_alert_recovered"
       @recovered = true
       msg_subject = "RECOVERED Promoted Alert: #{@theft_alert.id}"
-    else
-      msg_subject = "Promoted Alert #{notification_type}: #{@theft_alert.id}"
     end
     @message = "#{notification_type.upcase} - a Promoted Alert bike was just #{notification_type}"
 

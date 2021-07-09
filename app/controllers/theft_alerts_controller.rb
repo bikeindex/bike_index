@@ -22,7 +22,6 @@ class TheftAlertsController < ApplicationController
     flash[:error] = translation(:unable_to_process_order)
     redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
   rescue Stripe::CardError
-    EmailTheftAlertNotificationWorker.perform_async(theft_alert.id)
     flash[:error] = translation(:order_is_pending)
     redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
   else

@@ -1,6 +1,8 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+  # Timestamp for when notification functionality was added
+  NOTIFY_AFTER = 1625757882 # 2021-7-8
 
   enum status: STATUS_ENUM
 
@@ -41,6 +43,11 @@ class TheftAlert < ApplicationRecord
 
   def bike
     stolen_record&.bike
+  end
+
+  def notify?
+    return false unless (created_at || Time.current).to_i > NOTIFY_AFTER
+    stolen_record.present? && stolen_record.receive_notifications?
   end
 
   def paid?
