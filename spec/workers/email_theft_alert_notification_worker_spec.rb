@@ -42,7 +42,7 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq "Your promoted alert advertisement is live!"
         expect(mail.from.count).to eq(1)
-        expect(mail.from.first).to eq("contact@bikeindex.org")
+        expect(mail.from.first).to eq("seth@bikeindex.org")
         expect(mail.body.encoded).to match(facebook_data[:effective_object_story_id])
 
         # Doesn't redeliver
