@@ -1980,7 +1980,8 @@ CREATE TABLE public.notifications (
     notifiable_type character varying,
     notifiable_id bigint,
     message_channel integer DEFAULT 0,
-    twilio_sid text
+    twilio_sid text,
+    bike_id bigint
 );
 
 
@@ -2764,7 +2765,8 @@ CREATE TABLE public.theft_alerts (
     notes text,
     facebook_data jsonb,
     latitude double precision,
-    longitude double precision
+    longitude double precision,
+    reach integer
 );
 
 
@@ -4874,6 +4876,13 @@ CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON publ
 
 
 --
+-- Name: index_notifications_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_bike_id ON public.notifications USING btree (bike_id);
+
+
+--
 -- Name: index_notifications_on_notifiable_type_and_notifiable_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5849,6 +5858,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210702204848'),
 ('20210704190719'),
 ('20210706220349'),
-('20210708151750');
+('20210708151750'),
+('20210709164954');
 
 
