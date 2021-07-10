@@ -328,9 +328,12 @@ class MailchimpDatum < ApplicationRecord
     elsif mailchimp_organization_membership.present?
       c_list << "organization"
     end
-    if user&.present?
-      c_list << "individual" if user.payments.donation.any?
-      c_list << "individual" if stolen_records_recovered.any?
+    # users aren't added to the individual list if they're on the organization list
+    unless c_list.include?("organization")
+      if user&.present?
+        c_list << "individual" if user.payments.donation.any?
+        c_list << "individual" if stolen_records_recovered.any?
+      end
     end
     c_list.uniq.sort
   end

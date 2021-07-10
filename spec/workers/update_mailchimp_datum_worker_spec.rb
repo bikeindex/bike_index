@@ -72,7 +72,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         end
         let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
-        let(:target_tags) { ["In Bike Index", "in_bike_index", "Not org creator", "not_org_creator", "Paid", "Weird new tag", "weird other tag"] }
+        let(:target_tags) { ["In Bike Index", "in_bike_index", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }
         let(:target_merge_fields) do
           {"NAME" => "Seth Herr",
@@ -88,45 +88,79 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
            "most_recent_donation_at" => "2021-06-22",
            "organization_signed_up_at" => "2019-03-08"}
         end
-        it "updates mailchimp_datum" do
-          FactoryBot.create(:membership_claimed, organization: organization)
-          organization.update(updated_at: Time.current)
-          expect(organization.default_location&.id).to eq location.id
-          expect(membership.reload.organization_creator?).to be_falsey
-          expect(organization.reload.paid?).to be_falsey
+        it "individual only" do
           mailchimp_datum.data["tags"] += ["weird other tag"]
           mailchimp_datum.update(updated_at: Time.current, mailchimp_updated_at: Time.current)
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(mailchimp_datum.should_update?).to be_falsey
           expect(MailchimpDatum.count).to eq 1
-          expect(mailchimp_datum.reload.lists).to eq(%w[individual organization])
+          expect(mailchimp_datum.reload.lists).to eq(["individual"])
           expect(mailchimp_datum.on_mailchimp?).to be_truthy
-          expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
-          expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
-          expect(mailchimp_datum.tags).to eq(["in_bike_index", "not_org_creator", "weird other tag"])
-          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
+          expect(mailchimp_datum.mailchimp_interests("individual")).to eq({})
+          expect(mailchimp_datum.tags).to eq(["in_bike_index", "weird other tag"])
+          VCR.use_cassette("update_mailchimp_datum_worker-individual-update", match_requests_on: [:method]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end
           expect(MailchimpDatum.count).to eq 1
           expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
-          expect(mailchimp_datum.lists).to eq(%w[individual organization])
-          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e c5bbab099c d14183c940 donors school])
-          expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
+          expect(mailchimp_datum.lists).to eq(["individual"])
+          expect(mailchimp_datum.interests).to eq(%w[938bcefe9e d14183c940 donors])
           expect(mailchimp_datum.should_update?).to be_falsey
-          target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
-          expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
           expect(mailchimp_datum.tags).to match_array target_tags
 
-          expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
+          expect(MailchimpDatum.list("organization").pluck(:id)).to eq([])
           expect(MailchimpDatum.list("individual").pluck(:id)).to eq([mailchimp_datum.id])
           # Make sure we aren't needlessly churning
           original_data = mailchimp_datum.data
-          VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
+          VCR.use_cassette("update_mailchimp_datum_worker-individual-update", match_requests_on: [:method]) do
             instance.perform(mailchimp_datum.id, true) # Force update
           end
           mailchimp_datum.reload
           expect(mailchimp_datum.data).to eq original_data
+        end
+        context "organization and individual" do
+          let(:target_tags) { ["In Bike Index", "in_bike_index", "Not org creator", "not_org_creator", "Paid", "weird other tag"] }
+          it "updates mailchimp_datum" do
+            FactoryBot.create(:membership_claimed, organization: organization)
+            organization.update(updated_at: Time.current)
+            expect(organization.default_location&.id).to eq location.id
+            expect(membership.reload.organization_creator?).to be_falsey
+            expect(organization.reload.paid?).to be_falsey
+            mailchimp_datum.data["tags"] += ["weird other tag"]
+            mailchimp_datum.update(updated_at: Time.current, mailchimp_updated_at: Time.current)
+            expect(mailchimp_datum).to be_valid
+            mailchimp_datum.reload
+            expect(mailchimp_datum.should_update?).to be_falsey
+            expect(MailchimpDatum.count).to eq 1
+            expect(mailchimp_datum.reload.lists).to eq(["organization"])
+            expect(mailchimp_datum.on_mailchimp?).to be_truthy
+            expect(mailchimp_datum.mailchimp_interests("organization")).to eq({})
+            expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
+            expect(mailchimp_datum.tags).to eq(["in_bike_index", "not_org_creator", "weird other tag"])
+            VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
+              instance.perform(mailchimp_datum.id, true) # Force update
+            end
+            expect(MailchimpDatum.count).to eq 1
+            expect(mailchimp_datum.reload.on_mailchimp?).to be_truthy
+            expect(mailchimp_datum.lists).to eq(["organization"])
+            expect(mailchimp_datum.interests).to eq(%w[c5bbab099c donors school])
+            expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
+            expect(mailchimp_datum.should_update?).to be_falsey
+            target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
+            expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
+            expect(mailchimp_datum.tags).to match_array target_tags
+
+            expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
+            expect(MailchimpDatum.list("individual").pluck(:id)).to eq([])
+            # Make sure we aren't needlessly churning
+            original_data = mailchimp_datum.data
+            VCR.use_cassette("update_mailchimp_datum_worker-organization-update", match_requests_on: [:method]) do
+              instance.perform(mailchimp_datum.id, true) # Force update
+            end
+            mailchimp_datum.reload
+            expect(mailchimp_datum.data).to eq original_data
+          end
         end
       end
       context "mailchimp_datum archived" do
