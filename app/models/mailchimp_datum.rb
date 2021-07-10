@@ -81,7 +81,8 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def should_update?
-    return false if id.blank? || mailchimp_archived_at.present?
+    # Somehow, some things end up archived without an archived_at. So handle that
+    return false if id.blank? || mailchimp_archived_at.present? || archived?
     return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
     status != calculated_status # If status doesn't match, we should update!
   end
