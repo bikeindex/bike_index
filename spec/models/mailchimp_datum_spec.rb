@@ -291,7 +291,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq combined_merge_fields.as_json
           expect(mailchimp_datum.lists).to eq(["organization"])
           target_combined = target.merge(interests: %w[bike_shop donors],
-            merge_fields: combined_merge_fields.except(:recovered_bike_at, :phone_number))
+                                         merge_fields: combined_merge_fields.except(:recovered_bike_at, :phone_number))
           expect(mailchimp_datum.calculated_data.as_json).to eq target_combined.as_json
         end
       end
