@@ -23,7 +23,7 @@ class AddBikeToNotificationWorker < ApplicationWorker
 
   def bike_for_notification(notification)
     if notification.theft_alert?
-      notification.notifiable&.bike&.id
+      notification.notifiable&.bike
     elsif notification.impound_claim?
       notification.notifiable&.bike_claimed
     elsif notification.kind == "donation_recovered"

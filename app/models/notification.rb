@@ -87,7 +87,7 @@ class Notification < ApplicationRecord
 
   def notifiable_display_name
     return nil if notifiable.blank?
-    "#{notifiable.class.name.humanize} ##{notifiable_id}"
+    "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
   end
 
   def set_calculated_attributes
