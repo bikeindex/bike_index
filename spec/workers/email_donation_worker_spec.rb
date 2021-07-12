@@ -56,6 +56,7 @@ RSpec.describe EmailDonationWorker, type: :job do
     it "sends a donation_stolen message" do
       user.reload
       expect(user.theft_alerts.count).to eq 1
+      expect(instance.bike_for_notification(payment, "donation_stolen")&.id).to eq bike1.id
       expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
       expect(payment.notifications.count).to eq 0
       ActionMailer::Base.deliveries = []
@@ -73,6 +74,7 @@ RSpec.describe EmailDonationWorker, type: :job do
         user.reload
         expect(user.theft_alerts.count).to eq 1
         expect(stolen_record2.date_stolen).to be < stolen_record1.date_stolen
+        expect(instance.bike_for_notification(payment, "donation_stolen")&.id).to eq bike1.id
         expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
         expect(payment.notifications.count).to eq 0
         ActionMailer::Base.deliveries = []
@@ -111,6 +113,7 @@ RSpec.describe EmailDonationWorker, type: :job do
     it "sends a donation_stolen message if recovery is old" do
       expect(stolen_record1).to be_present
       payment.reload
+      expect(instance.bike_for_notification(payment, "donation_stolen")&.id).to eq bike1.id
       expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
       expect(payment.notifications.count).to eq 0
       ActionMailer::Base.deliveries = []
