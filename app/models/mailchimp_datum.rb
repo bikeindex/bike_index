@@ -80,11 +80,11 @@ class MailchimpDatum < ApplicationRecord
     StolenRecord.recovered.where(index_helped_recovery: true, bike_id: user.ownerships.pluck(:bike_id))
   end
 
-  def should_update?
-    # Somehow, some things end up archived without an archived_at. So handle that
-    return false if id.blank? || mailchimp_archived_at.present? || archived?
+  def should_update?(prev_status = nil)
+    return false if id.blank? || mailchimp_archived_at.present?
     return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
-    status != calculated_status # If status doesn't match, we should update!
+    prev_status ||= status # Enable passing previous_status in after_commit
+    prev_status != calculated_status # If status doesn't match, we should update!
   end
 
   def with_user?
@@ -219,7 +219,7 @@ class MailchimpDatum < ApplicationRecord
       next if f.mailchimp_datum_id.present?
       f.update(mailchimp_datum_id: id)
     end
-    return true unless should_update?
+    return true unless should_update?(@previous_status)
     return true if data == @previous_data && status == @previous_status
     UpdateMailchimpDatumWorker.perform_async(id)
   end
