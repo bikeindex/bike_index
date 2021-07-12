@@ -50,5 +50,6 @@ class Admin::ImpoundRecordsController < Admin::BaseController
 
   def find_impound_record
     @impound_record = ImpoundRecord.friendly_find(params[:id])
+    @bike = @impound_record.bike
   end
 end
