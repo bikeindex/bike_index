@@ -88,8 +88,8 @@
     - @impound_claims.each do |impound_claim|
       %tr
         %td
-          - impound_link_url = impound_claim.organization_id.present? ? organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) : review_impound_claim_path(impound_claim.id)
-          %a.convertTime.preciseTime{href: impound_link_url}
+          -# impound_link_url = impound_claim.organization_id.present? ? organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) : review_impound_claim_path(impound_claim.id)
+          %a.convertTime.preciseTime{href: admin_impound_claim_path(impound_claim) }
             = l(impound_claim.created_at, format: :convert_time)
         %td
           %span.convertTime.preciseTime

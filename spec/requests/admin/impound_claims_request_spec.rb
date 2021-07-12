@@ -13,4 +13,13 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
       expect(assigns(:impound_claims)).to eq([impound_claim])
     end
   end
+
+  describe "show" do
+    let!(:impound_claim) { FactoryBot.create(:impound_claim) }
+    it "renders" do
+      get "#{base_url}/#{impound_claim.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+  end
 end

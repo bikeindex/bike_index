@@ -1,0 +1,24 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      #{@impound_claim.claim_kind_humanized.titleize} for
+      = link_to "impound record ##{@impound_record.display_id}", admin_impound_record_path("pkey-#{@impound_record.display_id}")
+
+- @bike_claimed = @impound_claim.bike_claimed
+- @bike_submitting = @impound_claim.bike_submitting
+
+.organized-page-header
+  %h1.uncap
+    #{@impound_claim.claim_kind_humanized.titleize} for
+    = link_to "impound record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+
+= render partial: "/review_impound_claims/display", locals: { update_url: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id) }
+
+- if @parking_notification.present?
+  %hr.mt-4
+  %h2.uncap
+    Impounded by
+    %em
+      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
+
+  = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }

@@ -13,4 +13,13 @@ RSpec.describe Admin::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records)).to eq([impound_record])
     end
   end
+
+  describe "show" do
+    let!(:impound_record) { FactoryBot.create(:impound_record) }
+    it "renders" do
+      get "#{base_url}/#{impound_record.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+  end
 end

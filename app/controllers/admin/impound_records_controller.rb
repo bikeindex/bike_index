@@ -1,7 +1,7 @@
 class Admin::ImpoundRecordsController < Admin::BaseController
   include SortableTable
-
   before_action :set_period, only: [:index]
+  before_action :find_impound_record, except: [:index]
 
   def index
     page = params[:page] || 1
@@ -9,6 +9,9 @@ class Admin::ImpoundRecordsController < Admin::BaseController
     @impound_records = matching_impound_records.includes(:user, :organization, :bike)
       .order(sort_column + " " + sort_direction)
       .page(page).per(per_page)
+  end
+
+  def show
   end
 
   helper_method :matching_impound_records, :available_statuses
@@ -43,5 +46,9 @@ class Admin::ImpoundRecordsController < Admin::BaseController
 
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
     impound_records.where(created_at: @time_range)
+  end
+
+  def find_impound_record
+    @impound_record = ImpoundRecord.friendly_find(params[:id])
   end
 end
