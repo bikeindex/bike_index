@@ -38,6 +38,10 @@ class Admin::NotificationsController < Admin::BaseController
       @with_bike = true
       notifications = notifications.with_bike
     end
+    if ParamsNormalizer.boolean(params[:search_undelivered])
+      @undelivered = true
+      notifications = notifications.undelivered
+    end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
       notifications = notifications.where(user_id: @user.id) if @user.present?
