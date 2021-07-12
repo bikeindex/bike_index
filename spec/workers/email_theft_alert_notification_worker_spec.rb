@@ -20,6 +20,7 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
       expect(notification.kind).to eq "theft_alert_recovered"
       expect(notification.delivered?).to be_truthy
       expect(notification.bike_id).to eq theft_alert.stolen_record.bike_id
+      expect(notification.theft_alert?).to be_truthy
 
       # Doesn't redeliver
       expect {
