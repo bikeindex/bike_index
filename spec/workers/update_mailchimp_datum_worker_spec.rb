@@ -194,6 +194,22 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(described_class.jobs.count).to eq 0
         end
       end
+      context "archived on mailchimp" do
+        let(:email_address) { "seth+archived@bikeindex.org" }
+        it "marks as archived" do
+          expect(membership.organization_creator?).to be_truthy
+          expect(mailchimp_datum).to be_valid
+          mailchimp_datum.reload
+          expect(MailchimpDatum.count).to eq 1
+          expect(mailchimp_datum.reload.status).to eq "subscribed"
+          VCR.use_cassette("update_mailchimp_datum_worker-archived_on_mailchimp", match_requests_on: [:method]) do
+            instance.perform(mailchimp_datum.id, true)
+
+            expect(mailchimp_datum.reload.status).to eq "archived"
+            expect(mailchimp_datum.mailchimp_archived_at).to be < Time.current
+          end
+        end
+      end
       context "unsubscribed" do
         let(:email_address) { "seth+unsubscribed@bikeindex.org" }
         it "updates mailchimp_datum" do
