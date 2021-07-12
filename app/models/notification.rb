@@ -1,4 +1,4 @@
-# TODO: combine (or subclass?) all the notification models:
+# TODO: combine all the notification models - or subclass? Or create Notifications for each?
 # - graduated_notifications
 # - parking_notifications
 # - stolen_notifications
@@ -37,6 +37,9 @@ class Notification < ApplicationRecord
   scope :email_success, -> { where(delivery_status: "email_success") }
   scope :delivered, -> { where(delivery_status: "email_success").or(where(delivery_status: "text_success")) }
   scope :undelivered, -> { where(delivery_status: nil) }
+  scope :with_bike, -> { where.not(bike_id: nil) }
+  scope :donation, -> { where(kind: donation_kinds) }
+  scope :theft_alert, -> { where(kind: theft_alert_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -47,7 +50,8 @@ class Notification < ApplicationRecord
   end
 
   def self.theft_alert_kinds
-    kinds.select { |k| k.start_with?("theft_alert_") }.freeze
+    (kinds.select { |k| k.start_with?("theft_alert_") } + ["donation_theft_alert"])
+      .freeze
   end
 
   # TODO: update with twilio delivery status, update scope too
@@ -62,6 +66,11 @@ class Notification < ApplicationRecord
   def twilio_response
     return nil unless twilio_sid.present?
     TwilioIntegration.new.get_message(twilio_sid)
+  end
+
+  def notifiable_display_name
+    return nil if notifiable.blank?
+    "#{notifiable.class.name.humanize} ##{notifiable_id}"
   end
 
   def set_calculated_attributes

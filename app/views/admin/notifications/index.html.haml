@@ -4,14 +4,19 @@
       Notifications
   .col-md-7
     %ul
-      %li.nav-item.dropdown.dropleft
+      %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "") }
           #{@kind.titleize} #{@kind == "all" ? "kinds" : "kind"}
         .dropdown-menu
           = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : '' }"
+          = link_to "Donation kinds", url_for(sortable_search_params.merge(search_kind: "donation")), class: "dropdown-item #{@kind == 'donation' ? 'active' : '' }"
+          = link_to "Theft Alert kinds", url_for(sortable_search_params.merge(search_kind: "theft_alert")), class: "dropdown-item #{@kind == 'theft_alert' ? 'active' : '' }"
+          = link_to "With bike", url_for(sortable_search_params.merge(search_kind: "with_bike")), class: "dropdown-item #{@kind == 'with_bike' ? 'active' : '' }"
           .dropdown-divider
           - Notification.kinds.each do |kind|
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
+      %li.nav-item
+        = link_to "With bike", url_for(sortable_search_params.merge(search_with_bike: !@with_bike)), class: "nav-link #{@with_bike ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: { viewing: "Notifications" }

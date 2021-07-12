@@ -17,6 +17,7 @@ RSpec.describe EmailDonationWorker, type: :job do
     payment.reload
     expect(payment.notifications.count).to eq 1
     expect(payment.notifications.first.kind).to eq "donation_standard"
+    expect(payment.notifications.first.bike_id).to be_blank
     # But it doesn't send again
     instance.perform(payment.id)
     expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -46,6 +47,7 @@ RSpec.describe EmailDonationWorker, type: :job do
       payment_second.reload
       expect(payment_second.notifications.count).to eq 1
       expect(payment_second.notifications.first.kind).to eq "donation_second"
+      expect(payment_second.notifications.first.bike_id).to be_blank
     end
   end
 
@@ -62,6 +64,26 @@ RSpec.describe EmailDonationWorker, type: :job do
       payment.reload
       expect(payment.notifications.count).to eq 1
       expect(payment.notifications.first.kind).to eq "donation_stolen"
+      expect(payment.notifications.first.bike_id).to be_present
+      expect(payment.notifications.first.bike_id).to eq bike1.id
+    end
+    context "older stolen record" do
+      let(:stolen_record2) { FactoryBot.create(:stolen_record, bike: bike2, date_stolen: Time.current - 2.weeks) }
+      it "is the more recent stolen_record" do
+        user.reload
+        expect(user.theft_alerts.count).to eq 1
+        expect(stolen_record2.date_stolen).to be < stolen_record1.date_stolen
+        expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
+        expect(payment.notifications.count).to eq 0
+        ActionMailer::Base.deliveries = []
+        instance.perform(payment.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        payment.reload
+        expect(payment.notifications.count).to eq 1
+        expect(payment.notifications.first.kind).to eq "donation_stolen"
+        expect(payment.notifications.first.bike_id).to be_present
+        expect(payment.notifications.first.bike_id).to eq bike1.id
+      end
     end
   end
 
@@ -79,6 +101,8 @@ RSpec.describe EmailDonationWorker, type: :job do
       payment_second.reload
       expect(payment_second.notifications.count).to eq 1
       expect(payment_second.notifications.first.kind).to eq "donation_theft_alert"
+      expect(payment_second.notifications.first.bike_id).to be_present
+      expect(payment_second.notifications.first.bike_id).to eq theft_alert.bike&.id
     end
   end
 
@@ -95,6 +119,8 @@ RSpec.describe EmailDonationWorker, type: :job do
       payment.reload
       expect(payment.notifications.count).to eq 1
       expect(payment.notifications.first.kind).to eq "donation_stolen"
+      expect(payment.notifications.first.bike_id).to be_present
+      expect(payment.notifications.first.bike_id).to eq stolen_record1.bike&.id
     end
     context "with active theft alert" do
       let!(:theft_alert) { FactoryBot.create(:theft_alert_begun, user: user) }
@@ -111,6 +137,8 @@ RSpec.describe EmailDonationWorker, type: :job do
         payment.reload
         expect(payment.notifications.count).to eq 1
         expect(payment.notifications.first.kind).to eq "donation_recovered"
+        expect(payment.notifications.first.bike_id).to be_present
+        expect(payment.notifications.first.bike_id).to eq recovery2.bike&.id
       end
     end
   end

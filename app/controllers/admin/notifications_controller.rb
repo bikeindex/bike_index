@@ -21,13 +21,21 @@ class Admin::NotificationsController < Admin::BaseController
     Time.at(1593464621)
   end
 
+  def permitted_scopes
+    Notification.kinds + %w[donation theft_alert]
+  end
+
   def matching_notifications
     notifications = Notification
-    if Notification.kinds.include?(params[:search_kind])
+    if permitted_scopes.include?(params[:search_kind])
       @kind = params[:search_kind]
-      notifications = notifications.where(kind: @kind)
+      notifications = notifications.send(@kind)
     else
       @kind = "all"
+    end
+    if ParamsNormalizer.boolean(params[:search_with_bike])
+      @with_bike = true
+      notifications = notifications.with_bike
     end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
