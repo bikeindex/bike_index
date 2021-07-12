@@ -109,7 +109,7 @@ RSpec.describe AdminHelper, type: :helper do
 
   describe "admin_path_for_object" do
     it "returns blank" do
-      expect(admin_path_for_object()).to be_blank
+      expect(admin_path_for_object).to be_blank
     end
     context "theft_alert" do
       it "returns" do

@@ -10,7 +10,7 @@ class EmailDonationWorker < ApplicationWorker
     # If already delivered, skip out!
     return true if notification&.delivered?
     notification ||= Notification.create(kind: notification_kind, notifiable: payment,
-        bike: bike_for_notification(payment, notification_kind))
+                                         bike: bike_for_notification(payment, notification_kind))
 
     DonationMailer.donation_email(notification_kind, payment).deliver_now
     notification.update(delivery_status: "email_success", message_channel: "email")
@@ -68,7 +68,7 @@ class EmailDonationWorker < ApplicationWorker
     return [] if payment.user.blank?
     payment.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
       .select { |s| relevant_period(payment).include?(s.date_stolen) }
-      .sort { |a, b| a.date_stolen <=> b.date_stolen } # most recent stolen
+      .sort_by(&:date_stolen) # most recent stolen
       .map(&:bike)
   end
 

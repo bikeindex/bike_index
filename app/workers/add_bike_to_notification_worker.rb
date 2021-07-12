@@ -49,7 +49,7 @@ class AddBikeToNotificationWorker < ApplicationWorker
     return [] if notification.user.blank?
     notification.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
       .select { |s| relevant_period(notification).include?(s.date_stolen) }
-      .sort { |a, b| a.date_stolen <=> b.date_stolen } # most recent stolen
+      .sort_by(&:date_stolen) # most recent stolen
       .map(&:bike)
   end
 
