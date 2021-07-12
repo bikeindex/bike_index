@@ -121,4 +121,17 @@ module AdminHelper
       end
     end
   end
+
+  def admin_path_for_object(obj = nil)
+    return nil unless obj&.id.present?
+    if obj.class == StolenRecord
+      admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
+    elsif obj.class == ImpoundRecord
+      admin_impound_record_path("pkey-#{obj.id}")
+    elsif obj.class == UserPhone
+      admin_user_path(obj.user_id)
+    else
+      "/admin/#{obj.class.to_s.underscore.pluralize}/#{obj.id}"
+    end
+  end
 end

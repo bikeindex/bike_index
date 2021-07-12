@@ -1,42 +1,19 @@
-class EmailDonationWorker < ApplicationWorker
-  sidekiq_options queue: "notify", retry: 3
+# Notification.without_bike.where(kind: AddBikeToNotificationWorker.bike_kinds).pluck(:id).each { |i| AddBikeToNotificationWorker.perform_async(i) }
 
-  def perform(id)
-    payment = Payment.find(id)
-    return unless payment.present? && payment.donation?
-    @user = payment.user
-    notification_kind = calculated_notification_kind(payment)
-    notification = payment.notifications.where(kind: notification_kind).first
-    # If already delivered, skip out!
-    return true if notification&.delivered?
-    notification ||= Notification.create(kind: notification_kind, notifiable: payment,
-        bike: bike_for_notification(payment, notification_kind))
+class AddBikeToNotificationWorker < ApplicationWorker
+  sidekiq_options queue: "low_priority", retry: false
 
-    DonationMailer.donation_email(notification_kind, payment).deliver_now
-    notification.update(delivery_status: "email_success", message_channel: "email")
+  def self.bike_kinds
+    %w[donation_recovered donation_stolen donation_theft_alert] +
+      Notification.impound_claim_kinds + Notification.theft_alert_kinds
   end
 
-  def calculated_notification_kind(payment)
-    user = payment.user
-    return "donation_standard" if user.blank?
-
-    # Return recovered if there's a relevant recovery - higher priority than theft_alert
-    if matching_recovered_bikes(payment).any?
-      return "donation_recovered"
-    end
-
-    # theft_alert is higher priority than anything else
-    if user.theft_alerts.paid.where(created_at: relevant_period(payment)).any?
-      return "donation_theft_alert"
-    end
-
-    if matching_stolen_bikes(payment).any?
-      "donation_stolen"
-    elsif user.payments.donation.where("id < ?", payment.id).any?
-      "donation_second"
-    else
-      "donation_standard"
-    end
+  def perform(id)
+    notification = Notification.find(id)
+    return unless notification.present? && notification.bike_id.blank?
+    bike = bike_for_notification(notification)
+    return unless bike.present?
+    notification.update(bike: bike)
   end
 
   def relevant_period(obj = nil)
@@ -44,37 +21,41 @@ class EmailDonationWorker < ApplicationWorker
     (time - 50.days)..(time + 1.day)
   end
 
-  def bike_for_notification(payment, notification_kind)
-    if notification_kind == "donation_recovered"
-      matching_recovered_bikes(payment).last
-    elsif notification_kind == "donation_stolen"
-      matching_stolen_bikes(payment).last
-    elsif notification_kind == "donation_theft_alert"
-      matching_theft_alert_bikes(payment).last
+  def bike_for_notification(notification)
+    if notification.theft_alert?
+      notification.notifiable&.bike&.id
+    elsif notification.impound_claim?
+      notification.notifiable&.bike_claimed
+    elsif notification.kind == "donation_recovered"
+      matching_recovered_bikes(notification).last
+    elsif notification.kind == "donation_stolen"
+      matching_stolen_bikes(notification).last
+    elsif notification.kind == "donation_theft_alert"
+      matching_theft_alert_bikes(notification).last
     end
   end
 
-  def matching_recovered_bikes(payment)
-    return [] if payment.user.blank?
-    payment.user.bikes.select do |b|
-      b.stolen_recovery? && b.recovered_records.where(recovered_at: relevant_period(payment)).any?
+  def matching_recovered_bikes(notification)
+    return [] if notification.user.blank?
+    notification.user.bikes.select do |b|
+      b.stolen_recovery? && b.recovered_records.where(recovered_at: relevant_period(notification)).any?
     end.sort do |a, b|
       # most recent recovery
-      a.recovered_records.last.recovered_at <=> b.recovered_records.recovered_at
+      a.recovered_records.last.recovered_at <=> b.recovered_records.last.recovered_at
     end
   end
 
-  def matching_stolen_bikes(payment)
-    return [] if payment.user.blank?
-    payment.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
-      .select { |s| relevant_period(payment).include?(s.date_stolen) }
+  def matching_stolen_bikes(notification)
+    return [] if notification.user.blank?
+    notification.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
+      .select { |s| relevant_period(notification).include?(s.date_stolen) }
       .sort { |a, b| a.date_stolen <=> b.date_stolen } # most recent stolen
       .map(&:bike)
   end
 
-  def matching_theft_alert_bikes(payment)
-    return [] if payment.user.blank?
-    payment.user.theft_alerts.paid.where(created_at: relevant_period(payment)).order(:created_at)
+  def matching_theft_alert_bikes(notification)
+    return [] if notification.user.blank?
+    notification.user.theft_alerts.paid.where(created_at: relevant_period(notification)).order(:created_at)
       .map(&:bike)
   end
 end

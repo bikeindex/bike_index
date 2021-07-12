@@ -6,6 +6,7 @@ class Admin::NotificationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @notifications = matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
+      .includes(:bike, :notifiable, :user)
       .page(page).per(per_page)
   end
 
@@ -14,7 +15,7 @@ class Admin::NotificationsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at kind user_id]
+    %w[created_at updated_at kind user_id bike_id]
   end
 
   def earliest_period_date
@@ -22,7 +23,7 @@ class Admin::NotificationsController < Admin::BaseController
   end
 
   def permitted_scopes
-    Notification.kinds + %w[donation theft_alert]
+    Notification.kinds + %w[donation theft_alert impound_claim]
   end
 
   def matching_notifications

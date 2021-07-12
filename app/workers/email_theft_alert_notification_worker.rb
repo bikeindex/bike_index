@@ -8,7 +8,8 @@ class EmailTheftAlertNotificationWorker < ApplicationWorker
     notification ||= Notification.create(user: theft_alert.user,
                                          kind: kind,
                                          message_channel: "email",
-                                         notifiable: theft_alert)
+                                         notifiable: theft_alert,
+                                         bike: theft_alert.bike)
     return true if notification.delivered?
 
     if kind == "theft_alert_recovered"

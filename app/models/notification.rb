@@ -38,8 +38,10 @@ class Notification < ApplicationRecord
   scope :delivered, -> { where(delivery_status: "email_success").or(where(delivery_status: "text_success")) }
   scope :undelivered, -> { where(delivery_status: nil) }
   scope :with_bike, -> { where.not(bike_id: nil) }
+  scope :without_bike, -> { where(bike_id: nil) }
   scope :donation, -> { where(kind: donation_kinds) }
   scope :theft_alert, -> { where(kind: theft_alert_kinds) }
+  scope :impound_claim, -> { where(kind: impound_claim_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -50,8 +52,11 @@ class Notification < ApplicationRecord
   end
 
   def self.theft_alert_kinds
-    (kinds.select { |k| k.start_with?("theft_alert_") } + ["donation_theft_alert"])
-      .freeze
+    kinds.select { |k| k.start_with?("theft_alert_") }.freeze
+  end
+
+  def self.impound_claim_kinds
+    kinds.select { |k| k.start_with?("impound_claim_") }.freeze
   end
 
   # TODO: update with twilio delivery status, update scope too
@@ -61,6 +66,18 @@ class Notification < ApplicationRecord
 
   def email_success?
     delivery_status == "email_success"
+  end
+
+  def theft_alert?
+    self.class.theft_alert_kinds.include?(kind)
+  end
+
+  def donation?
+    self.class.donation_kinds.include?(kind)
+  end
+
+  def impound_claim?
+    self.class.impound_claim_kinds.include?(kind)
   end
 
   def twilio_response

@@ -102,9 +102,12 @@ RSpec.describe EmailDonationWorker, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 1
       payment_second.reload
       expect(payment_second.notifications.count).to eq 1
-      expect(payment_second.notifications.first.kind).to eq "donation_theft_alert"
-      expect(payment_second.notifications.first.bike_id).to be_present
-      expect(payment_second.notifications.first.bike_id).to eq theft_alert.bike&.id
+      notification = payment_second.notifications.first
+      expect(notification.kind).to eq "donation_theft_alert"
+      expect(notification.bike_id).to be_present
+      expect(notification.bike_id).to eq theft_alert.bike&.id
+      expect(notification.theft_alert?).to be_falsey
+      expect(notification.donation?).to be_truthy
     end
   end
 

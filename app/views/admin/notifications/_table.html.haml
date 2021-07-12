@@ -1,5 +1,6 @@
 - render_sortable ||= false
 - skip_user ||= false
+- skip_bike ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -25,7 +26,15 @@
             = sortable "user_id"
           - else
             User
-      %th Delivered?
+      - unless skip_bike
+        %th
+          - if render_sortable
+            = sortable "bike_id"
+          - else
+            Bike
+      %th
+        Not Delivered?
+      %th Object
     %tbody
       - notifications.each do |notification|
         %tr
@@ -49,12 +58,18 @@
                   - else
                     %small.text-danger missing user: #{notification.user_id}
                 = link_to "notifications", url_for(sortable_search_params.merge(user_id: notification.user_id)), class: "small gray-link"
-          %td
-            - if notification.bike_id.present?
-              %small= link_to notification.bike&.title || notification.bike_id, admin_bike_path(notification.bike_id)
-          %td
-            - if notification.notifiable.present?
-              #{notification.notifiable.class.titleize}
+          - unless skip_bike
+            %td
+              - if notification.bike_id.present?
+                %small
+                  = link_to admin_bike_path(notification.bike_id) do
+                    - if notification.bike.present?
+                      = organized_bike_text(notification.bike)
+                    - else
+                      \##{notification.bike_id}
           %td
             - unless notification.delivered?
               = notification.delivered?
+          %td
+            - if notification.notifiable.present?
+              = link_to notification.notifiable_display_name, admin_path_for_object(notification.notifiable)
