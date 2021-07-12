@@ -7,18 +7,56 @@
 - @bike_claimed = @impound_claim.bike_claimed
 - @bike_submitting = @impound_claim.bike_submitting
 
-.organized-page-header
-  %h1.uncap
-    #{@impound_claim.claim_kind_humanized.titleize} for
-    = link_to "impound record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
+- organization_name = @impound_claim.organization.present? ? @impound_claim.organization.name : @impound_claim.organization_id
 
-= render partial: "/review_impound_claims/display", locals: { update_url: organization_impound_claim_path(@impound_claim.id, organization_id: current_organization.id) }
-
-- if @parking_notification.present?
-  %hr.mt-4
-  %h2.uncap
-    Impounded by
-    %em
-      = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)
-
-  = render partial: "/organized/parking_notifications/show_details", locals: { viewing_impound_record: true }
+- if organization_name.present?
+  %h4= link_to "View in organization", organization_impound_claim_path(@impound_claim.id, organization_id: impound_claim.organization_id)
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime.preciseTime
+              = l(@impound_claim.created_at, format: :convert_time)
+        %tr
+          %td Updated
+          %td
+            %span.convertTime.preciseTime
+              = l(@impound_claim.updated_at, format: :convert_time)
+        %tr
+          %td Status
+          %td
+            %em
+              = status_display(@impound_claim.status_humanized)
+        %tr
+          %td Organization
+          %td
+            - if organization_name.present?
+              = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Bike
+            %td
+              - if @bike_submitting.present?
+                = link_to organized_bike_text(@bike_submitting), bike_path(@impound_claim.bike_submitting, organization_id: impound_claim.organization_id)
+        %tr
+          %td Impound record
+            %td
+              - if @impound_record.present?
+                = link_to @impound_record.display_id, admin_impound_record_path("pkey-#{@impound_record.id}")
+                - if organization_name.present?
+                  %small.less-strong= link_to "view in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_claim.organization_id)
+        %tr
+          %td User
+          %td
+            = @impound_claim.user&.display_name&.truncate(20)
+        %tr
+          %td Resolved
+          %td
+            - if @impound_claim.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(@impound_claim.resolved_at, format: :convert_time)
