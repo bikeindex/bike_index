@@ -69,7 +69,7 @@
                 = notification.calculated_email
           %td.text-center
             - if notification.delivered?
-              %small= check_mark
+              %small.less-strong= check_mark
             - else
               %span.text-danger= notification.delivered?
           - unless skip_bike
