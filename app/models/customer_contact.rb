@@ -2,6 +2,7 @@ class CustomerContact < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :creator, class_name: "User"
+  has_one :notification, as: :notifiable
 
   KIND_ENUM = {
     stolen_contact: 0,
@@ -21,6 +22,11 @@ class CustomerContact < ApplicationRecord
     presence: true
 
   before_save :normalize_emails_and_find_users
+  after_commit :create_notification, if: :persisted?
+
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s).freeze
+  end
 
   # Given a Bike `bike` and a corresponding matching record `match` (a Bike or
   # ExternalRegistryBike), determine if an email has been sent alerting the
@@ -28,7 +34,7 @@ class CustomerContact < ApplicationRecord
   def self.possibly_found_notification_sent?(bike, match)
     return false unless bike.present? && match.present?
 
-    where(kind: kinds["bike_possibly_found"], bike: bike, user_email: bike.owner_email)
+    where(kind: "bike_possibly_found", bike: bike, user_email: bike.owner_email)
       .where("info_hash->>'match_id' = ?", match.id.to_s)
       .where("info_hash->>'match_type' = ?", match.class.to_s)
       .where("info_hash->>'stolen_record_id' = ?", bike&.current_stolen_record&.id.to_s)
@@ -49,7 +55,7 @@ class CustomerContact < ApplicationRecord
   #
   def self.build_bike_possibly_found_notification(bike, match)
     new(bike: bike,
-        kind: kinds["bike_possibly_found"],
+        kind: "bike_possibly_found",
         info_hash: {
           stolen_record_id: bike&.current_stolen_record&.id.to_s,
           match_type: match.class.to_s,
@@ -87,7 +93,9 @@ class CustomerContact < ApplicationRecord
 
     self.creator_email = EmailNormalizer.normalize(creator_email)
     self.creator ||= User.fuzzy_confirmed_or_unconfirmed_email_find(creator_email)
+  end
 
-    true
+  def create_notification
+    CustomerContactNotificationCreateWorker.perform_async(id)
   end
 end

@@ -21,6 +21,8 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
       expect(notification.delivered?).to be_truthy
       expect(notification.bike_id).to eq theft_alert.stolen_record.bike_id
       expect(notification.theft_alert?).to be_truthy
+      expect(notification.sender&.id).to be_blank
+      expect(notification.sender_display_name).to eq "auto"
 
       # Doesn't redeliver
       expect {

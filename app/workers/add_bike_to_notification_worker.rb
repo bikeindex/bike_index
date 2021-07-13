@@ -1,3 +1,4 @@
+# TODO: remove once migrated post #2013
 # Notification.without_bike.where(kind: AddBikeToNotificationWorker.bike_kinds).pluck(:id).each { |i| AddBikeToNotificationWorker.perform_async(i) }
 
 class AddBikeToNotificationWorker < ApplicationWorker

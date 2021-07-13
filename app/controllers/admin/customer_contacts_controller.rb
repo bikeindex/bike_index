@@ -1,4 +1,8 @@
 class Admin::CustomerContactsController < Admin::BaseController
+  def show
+    @customer_contact = CustomerContact.find(params[:id])
+  end
+
   def create
     @customer_contact = CustomerContact.new(permitted_parameters)
     if @customer_contact.save

@@ -23,8 +23,12 @@ RSpec.describe EmailImpoundClaimWorker, type: :job do
       notification = Notification.last
       expect(impound_claim.reload.notifications.pluck(:id)).to eq([notification.id])
       expect(impound_claim.bike_claimed_id).to be_present
-      expect(impound_claim.notifications.first.bike_id).to eq impound_claim.bike_claimed_id
+
+      expect(notification.bike_id).to eq impound_claim.bike_claimed_id
       expect(notification.kind).to eq "impound_claim_submitting"
+      expect(notification.sender&.id).to eq impound_claim.user_id
+      expect(notification.sender_display_name).to eq impound_claim.user.display_name
+
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end

@@ -2,6 +2,7 @@
 - skip_user ||= false
 - skip_bike ||= false
 - skip_channel ||= false
+- skip_sender ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -37,6 +38,8 @@
           - else
             Bike
       %th Object
+      - unless skip_sender
+        %th Sender
     %tbody
       - notifications.each do |notification|
         %tr
@@ -62,6 +65,8 @@
                   - else
                     %small.text-danger missing user: #{notification.user_id}
                 = link_to "notifications", url_for(sortable_search_params.merge(user_id: notification.user_id)), class: "small gray-link"
+              - else
+                = notification.calculated_email
           %td.text-center
             - if notification.delivered?
               %small= check_mark
@@ -79,3 +84,8 @@
           %td
             - if notification.notifiable.present?
               = link_to notification.notifiable_display_name, admin_path_for_object(notification.notifiable)
+          %td
+            - sender_display_name = notification.sender_display_name
+            %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
+              = notification.sender_display_name
+

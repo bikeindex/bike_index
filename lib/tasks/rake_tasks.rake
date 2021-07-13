@@ -1,3 +1,12 @@
+# TODO: remove once migrated, post #2013
+task create_contact_notifications: :environment do
+  earliest_id = Notification.where(notifiable_type: "CustomerContact").minimum(:notifiable_id)
+  return if earliest_id == CustomerContact.minimum(:id)
+  queue_id = earliest_id - 1000
+  queue_id = 1 if queue_id < 1
+  Array(queue_id..(earliest_id - 1)).each { |i| CustomerContactNotificationCreateWorker.perform_async(i) }
+end
+
 task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end

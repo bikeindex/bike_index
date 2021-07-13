@@ -1,0 +1,46 @@
+-# TODO: make this better. Leaves much to be desired
+
+.admin-subnav
+  .col-12
+    %h1
+      Customer Contact
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime.preciseTime
+              = l(@customer_contact.created_at, format: :convert_time)
+        %tr
+          %td.small Updated
+          %td.small
+            %span.convertTime.preciseTime
+              = l(@customer_contact.updated_at, format: :convert_time)
+        %tr
+          %td Sender
+          %td
+            %em
+              = @customer_contact.creator&.display_name
+        %tr
+          %td Kind
+          %td
+            %em
+              = @customer_contact.kind.humanize
+        %tr
+          %td Bike
+          %td
+            - if @customer_contact.bike.present?
+              = link_to organized_bike_text(@customer_contact.bike), edit_admin_bike_path(@customer_contact.bike)
+            - else
+              %small.less-strong Bike ID: @customer_contact.bike_id
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Title
+          %td= @customer_contact.title
+        %tr
+          %td Body
+          %td= @customer_contact.body

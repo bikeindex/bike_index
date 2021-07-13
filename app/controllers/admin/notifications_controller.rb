@@ -10,7 +10,7 @@ class Admin::NotificationsController < Admin::BaseController
       .page(page).per(per_page)
   end
 
-  helper_method :matching_notifications
+  helper_method :matching_notifications, :special_kind_scopes
 
   private
 
@@ -22,8 +22,12 @@ class Admin::NotificationsController < Admin::BaseController
     Time.at(1593464621)
   end
 
+  def special_kind_scopes
+    %w[donation theft_alert impound_claim customer_contact]
+  end
+
   def permitted_scopes
-    Notification.kinds + %w[donation theft_alert impound_claim]
+    Notification.kinds + special_kind_scopes
   end
 
   def matching_notifications

@@ -17,7 +17,10 @@ class Notification < ApplicationRecord
     impound_claim_approved: 17,
     impound_claim_denied: 18,
     theft_alert_recovered: 19,
-    theft_alert_posted: 20
+    theft_alert_posted: 20,
+    stolen_contact: 21,
+    stolen_twitter_alerter: 2,
+    bike_possibly_found: 23
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -42,6 +45,7 @@ class Notification < ApplicationRecord
   scope :donation, -> { where(kind: donation_kinds) }
   scope :theft_alert, -> { where(kind: theft_alert_kinds) }
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
+  scope :customer_contact, -> { where(kind: customer_contact_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -57,6 +61,14 @@ class Notification < ApplicationRecord
 
   def self.impound_claim_kinds
     kinds.select { |k| k.start_with?("impound_claim_") }.freeze
+  end
+
+  def self.customer_contact_kinds
+    %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
+  end
+
+  def self.sender_auto_kinds
+    donation_kinds + theft_alert_kinds + %w[stolen_twitter_alerter bike_possibly_found]
   end
 
   # TODO: update with twilio delivery status, update scope too
@@ -80,6 +92,15 @@ class Notification < ApplicationRecord
     self.class.impound_claim_kinds.include?(kind)
   end
 
+  def customer_contact?
+    self.class.customer_contact_kinds.include?(kind)
+  end
+
+  def calculated_email
+    return user&.email if user.present?
+    notifiable&.user_email if customer_contact?
+  end
+
   def twilio_response
     return nil unless twilio_sid.present?
     TwilioIntegration.new.get_message(twilio_sid)
@@ -88,6 +109,20 @@ class Notification < ApplicationRecord
   def notifiable_display_name
     return nil if notifiable.blank?
     "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
+  end
+
+  def sender
+    return nil if self.class.sender_auto_kinds.include?(kind)
+    if notifiable_type == "CustomerContact"
+      notifiable&.creator
+    elsif impound_claim?
+      notifiable&.user
+    end
+  end
+
+  def sender_display_name
+    return "auto" if self.class.sender_auto_kinds.include?(kind)
+    sender&.display_name
   end
 
   def set_calculated_attributes
