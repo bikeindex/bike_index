@@ -1,5 +1,8 @@
 - render_sortable ||= false
 - skip_user ||= false
+- skip_bike ||= false
+- skip_channel ||= false
+- skip_sender ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -19,13 +22,24 @@
           = sortable "kind"
         - else
           Kind
+      - unless skip_channel
+        %th.small Method
       - unless skip_user
         %th
           - if render_sortable
             = sortable "user_id"
           - else
             User
-      %th Delivered?
+      %th.small Delivered?
+      - unless skip_bike
+        %th
+          - if render_sortable
+            = sortable "bike_id"
+          - else
+            Bike
+      %th Object
+      - unless skip_sender
+        %th Sender
     %tbody
       - notifications.each do |notification|
         %tr
@@ -36,6 +50,8 @@
             %small.convertTime
               = l(notification.updated_at, format: :convert_time)
           %td= notification.kind&.titleize
+          %td
+            %small.less-strong= notification.message_channel
           - unless skip_user
             %td
               - if notification.user_id.present?
@@ -49,6 +65,27 @@
                   - else
                     %small.text-danger missing user: #{notification.user_id}
                 = link_to "notifications", url_for(sortable_search_params.merge(user_id: notification.user_id)), class: "small gray-link"
+              - else
+                = notification.calculated_email
+          %td.text-center
+            - if notification.delivered?
+              %small= check_mark
+            - else
+              %span.text-danger= notification.delivered?
+          - unless skip_bike
+            %td
+              - if notification.bike_id.present?
+                %small
+                  = link_to admin_bike_path(notification.bike_id) do
+                    - if notification.bike.present?
+                      = organized_bike_text(notification.bike)
+                    - else
+                      \##{notification.bike_id}
           %td
-            - unless notification.delivered?
-              = notification.delivered?
+            - if notification.notifiable.present?
+              = link_to notification.notifiable_display_name, admin_path_for_object(notification.notifiable)
+          %td
+            - sender_display_name = notification.sender_display_name
+            %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
+              = notification.sender_display_name
+

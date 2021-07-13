@@ -1,6 +1,12 @@
 require "rails_helper"
 
 RSpec.describe CustomerContact, type: :model do
+  describe "kinds" do
+    it "has kinds included in notification" do
+      kinds = CustomerContact.kinds
+      expect((kinds & Notification.kinds).count).to eq kinds.count
+    end
+  end
   describe "#possibly_found_notification_sent?" do
     context "given a blank bike" do
       it "returns false" do

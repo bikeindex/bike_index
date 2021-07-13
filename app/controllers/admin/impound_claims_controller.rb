@@ -1,7 +1,7 @@
 class Admin::ImpoundClaimsController < Admin::BaseController
   include SortableTable
-
   before_action :set_period, only: [:index]
+  before_action :find_impound_claim, except: [:index]
 
   def index
     page = params[:page] || 1
@@ -9,6 +9,9 @@ class Admin::ImpoundClaimsController < Admin::BaseController
     @impound_claims = matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
       .order(sort_column + " " + sort_direction)
       .page(page).per(per_page)
+  end
+
+  def show
   end
 
   helper_method :matching_impound_claims, :available_statuses
@@ -43,5 +46,11 @@ class Admin::ImpoundClaimsController < Admin::BaseController
 
     impound_claims = impound_claims.where(organization_id: current_organization.id) if current_organization.present?
     impound_claims.where(created_at: @time_range)
+  end
+
+  def find_impound_claim
+    @impound_claim = ImpoundClaim.find(params[:id])
+    @impound_record = @impound_claim.impound_record
+    @parking_notification = @impound_record.parking_notification
   end
 end

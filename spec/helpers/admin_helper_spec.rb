@@ -106,4 +106,40 @@ RSpec.describe AdminHelper, type: :helper do
       end
     end
   end
+
+  describe "admin_path_for_object" do
+    it "returns blank" do
+      expect(admin_path_for_object).to be_blank
+    end
+    context "theft_alert" do
+      it "returns" do
+        expect(admin_path_for_object(TheftAlert.new(id: 69))).to eq admin_theft_alert_path(69)
+      end
+    end
+    context "user_phone" do
+      it "returns" do
+        expect(admin_path_for_object(UserPhone.new(id: 2, user_id: 42))).to eq admin_user_path(42)
+      end
+    end
+    context "stolen_record" do
+      it "returns" do
+        expect(admin_path_for_object(StolenRecord.new(id: 22))).to eq admin_stolen_bike_path(22, stolen_record_id: 22)
+      end
+    end
+    context "payment" do
+      it "returns" do
+        expect(admin_path_for_object(Payment.new(id: 412))).to eq admin_payment_path(412)
+      end
+    end
+    context "impound_claim" do
+      it "returns" do
+        expect(admin_path_for_object(ImpoundClaim.new(id: 12))).to eq admin_impound_claim_path(12)
+      end
+    end
+    context "impound_record" do
+      it "returns" do
+        expect(admin_path_for_object(ImpoundRecord.new(id: 11))).to eq admin_impound_record_path("pkey-11")
+      end
+    end
+  end
 end

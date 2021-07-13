@@ -211,7 +211,7 @@ Rails.application.routes.draw do
     resources :stolen_bikes do
       member { post :approve }
     end
-    resources :customer_contacts, only: [:create]
+    resources :customer_contacts, only: %i[create show]
     resources :recoveries do
       collection { post :approve }
     end

@@ -64,7 +64,6 @@
                 = l bike_sticker.claimed_at, format: :convert_time
           %td
             - if bike_sticker.claimed?
-              / For these, use bike_id to avoid loading association
               = organized_bike_text(bike_sticker.bike)
           %td
             %strong

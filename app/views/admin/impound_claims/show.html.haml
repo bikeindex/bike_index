@@ -1,0 +1,72 @@
+-# TODO: make this better. Leaves much to be desired
+
+- impound_record_id = @impound_record.display_id || @impound_record.id
+- @bike_claimed = @impound_claim.bike_claimed
+- @bike_submitting = @impound_claim.bike_submitting
+- organization_name = @impound_claim.organization.present? ? @impound_claim.organization.name : @impound_claim.organization_id
+
+.admin-subnav
+  .col-12
+    %h1
+      #{@impound_claim.claim_kind_humanized.titleize} for
+      = link_to "impound record ##{impound_record_id}", admin_impound_record_path("pkey-#{@impound_record.id}")
+
+    - if organization_name.present?
+      %h2.mt-4
+        %em= link_to "View claim in organization", organization_impound_claim_path(@impound_claim.id, organization_id: @impound_claim.organization_id)
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime.preciseTime
+              = l(@impound_claim.created_at, format: :convert_time)
+        %tr
+          %td Updated
+          %td
+            %span.convertTime.preciseTime
+              = l(@impound_claim.updated_at, format: :convert_time)
+        %tr
+          %td Status
+          %td
+            %em
+              = status_display(@impound_claim.status_humanized)
+        %tr
+          %td Organization
+          %td
+            - if organization_name.present?
+              = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
+            - else
+              %small.less-strong NO organization
+        %tr
+          %td Bike claimed
+          %td
+            - if @bike_claimed.present?
+              = link_to organized_bike_text(@bike_claimed), edit_admin_bike_path(@bike_claimed)
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Bike Submitted
+          %td
+            - if @bike_submitting.present?
+              = link_to organized_bike_text(@bike_submitting), edit_admin_bike_path(@bike_submitting)
+        %tr
+          %td Impound record
+          %td
+            - if @impound_record.present?
+              = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")
+              - if organization_name.present?
+                %small.less-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
+        %tr
+          %td User
+          %td
+            = @impound_claim.user&.display_name&.truncate(20)
+        %tr
+          %td Resolved
+          %td
+            - if @impound_claim.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(@impound_claim.resolved_at, format: :convert_time)
