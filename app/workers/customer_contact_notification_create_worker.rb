@@ -10,6 +10,6 @@ class CustomerContactNotificationCreateWorker < ApplicationWorker
       user_id: customer_contact.user_id,
       bike_id: customer_contact.bike_id,
       kind: customer_contact.kind)
-    notification.update(created_at: customer_contact.create_at) if legacy_migration
+    notification.update(created_at: customer_contact.created_at) if legacy_migration
   end
 end
