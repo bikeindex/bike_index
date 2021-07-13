@@ -19,7 +19,7 @@ class Admin::NotificationsController < Admin::BaseController
   end
 
   def earliest_period_date
-    Time.at(1593464621)
+    Time.at(1401122000)
   end
 
   def special_kind_scopes
