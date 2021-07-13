@@ -1,7 +1,12 @@
-# NOTE: if you want to import a text based copy of the database using psql, you have to install it
-# sudo apt-get install postgresql-client -y
-# Additionally - when building a new C66 stack, you may have to fix the environmental database variables
 production:
+  # Install postgres 13 client, to be able to db:structure:load
+  first_thing:
+    - command: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && sudo apt-get update && sudo apt-get -y install postgresql-13
+      target: rails
+      run_on: rails
+      sudo: true
+      apply_during: build_only
+
   after_symlink:
     # Make the uploads cache folder writable
     - command: chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod -R 775 $RAILS_STACK_PATH/tmp/cache

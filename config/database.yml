@@ -20,8 +20,3 @@ staging:
 
 production:
   <<: *default
-  database: <%= ENV["POSTGRESQL_DATABASE"] %>
-  username: <%= ENV["POSTGRESQL_USERNAME"] %>
-  password: <%= ENV["POSTGRESQL_PASSWORD"] %>
-  host: <%= ENV["POSTGRESQL_HOST"] %>
-  port: <%= ENV["POSTGRESQL_PORT"] %>
