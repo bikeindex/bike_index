@@ -46,6 +46,8 @@
           %td
             %span.convertTime
               = l(notification.created_at, format: :convert_time)
+            - if display_dev_info?
+              %code.small.only-dev-visible= notification.id
           %td
             %small.convertTime
               = l(notification.updated_at, format: :convert_time)
