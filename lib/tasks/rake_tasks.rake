@@ -4,7 +4,7 @@ task create_contact_notifications: :environment do
   return if earliest_id == CustomerContact.minimum(:id)
   queue_id = earliest_id - 1000
   queue_id = 1 if queue_id < 1
-  Array(queue_id..(earliest_id - 1)).each { |i| CustomerContactNotificationCreateWorker.perform_async(i) }
+  Array(queue_id..(earliest_id - 1)).each { |i| CustomerContactNotificationCreateWorker.perform_async(i, true) }
 end
 
 task run_scheduler: :environment do
