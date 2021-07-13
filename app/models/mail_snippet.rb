@@ -7,7 +7,7 @@ class MailSnippet < ApplicationRecord
     welcome: 2,
     footer: 3,
     security: 4,
-    location_triggered: 5,
+    is_location_triggered: 5,
     partial: 6,
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
