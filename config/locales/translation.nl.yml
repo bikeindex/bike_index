@@ -2052,6 +2052,7 @@ nl:
         overeenkomen met seriële segmenten:'
       additional_registrations_registered_at: Geregistreerd bij
       additional_registrations_this_bike: Deze %{bike_type}
+      creation_description: Bron
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial

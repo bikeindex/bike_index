@@ -1290,6 +1290,7 @@ en:
       city: City
       claimed: Claimed
       contact_the_owner: Contact the owner
+      creation_description: Source
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
@@ -1313,7 +1314,7 @@ en:
       parking_notification_notes_html: "%{org_name} internal notes <small>not shown
         to user</small>"
       permission: Permission
-      registered: 'Registered:'
+      registered: Registered
       send_message: Send message
       state: State
       sticker: Sticker
