@@ -107,8 +107,12 @@
                   %td= t(".creator")
                   %td
                     = @bike.creator&.display_name
+                %tr
+                  %td= t(".creation_description")
+                  %td
                     %em.less-strong
                       = origin_display(@bike.creation_description)
+
                 -# Bike Stickers are handled separately, so skip it
                 - (passive_organization.additional_registration_fields - ["reg_bike_sticker"]).each do |reg_field|
                   - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
@@ -219,6 +223,8 @@
                   %th
                     = t(".additional_registrations_registered_at")
                   %th
+                    = t(".creation_description")
+                  %th
 
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
                   %tr
@@ -226,10 +232,13 @@
                       %span.convertTime
                         = l other_bike.created_at, format: :convert_time
                     %td
+                      %em.less-strong
+                        = origin_display(@bike.creation_description)
+                    %td
                       - if other_bike.id == @bike.id
                         %em.less-strong= t(".additional_registrations_this_bike", bike_type: @bike.type)
                       - else
-                        = link_to organized_bike_text(other_bike), bike_path(other_bike)
+                        = link_to organized_bike_text(other_bike, skip_creation: true), bike_path(other_bike)
             - if other_user_bikes.count > 25
               %p.text-center.less-strong.m-0
                 User has #{other_user_bikes.count} registrations, only 25 most recent shown.
