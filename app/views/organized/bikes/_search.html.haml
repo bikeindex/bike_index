@@ -43,6 +43,7 @@
     "model_cell" => "Model",
     "color_cell" => "Color",
     "owner_email_cell" => "Sent to",
+    "creation_description_cell" => "Source",
     "owner_name_cell" => "Owner name",
     "reg_organization_affiliation_cell" => "Affiliation",
     "reg_extra_registration_number_cell" => "Secondary#",
@@ -61,7 +62,8 @@
     color_cell
     owner_email_cell
     updated_at_cell
-    owner_name_cell]
+    owner_name_cell
+    creation_description_cell]
   # We handle bike stickers separately, so exclude that
   additional_registration_fields = current_organization.additional_registration_fields - ["reg_bike_sticker"]
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
@@ -156,6 +158,8 @@
             = t(".mfg_model_color_html")
             %br
           = sortable "owner_email", t(".sent_to")
+        %th.hiddenColumn.creation_description_cell
+          Source
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
           %small
             = t(".owner_name")
@@ -206,6 +210,7 @@
               - else
                 %em.less-strong
                   = t(".email_hidden")
+            %td.hiddenColumn.creation_description_cell
               - if bike.creation_description
                 %small.less-strong
                   = origin_display(bike.creation_description)

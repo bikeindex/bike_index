@@ -1313,7 +1313,8 @@ en:
       parking_notification_notes_html: "%{org_name} internal notes <small>not shown
         to user</small>"
       permission: Permission
-      registered: 'Registered:'
+      registered: Registered
+      creation_description: Source
       send_message: Send message
       state: State
       sticker: Sticker
