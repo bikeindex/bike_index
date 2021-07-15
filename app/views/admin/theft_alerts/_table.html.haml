@@ -55,8 +55,19 @@
                 - text_class += " small" if theft_alert.recovered?
                 %span{ class: text_class || "" }
                   = theft_alert.status
-              - if theft_alert.pending? && theft_alert.activateable?
-                %em.small.text-success activateable
+              - if theft_alert.pending?
+                - if theft_alert.activateable?
+                  %em.small.text-success activateable
+                - else
+                  %em.small.d-block
+                    %span.text-danger missing:
+                    - missing = []
+                    - missing << "photo" if theft_alert.missing_photo?
+                    - missing << "location" if theft_alert.missing_location?
+                    - missing << "payment" unless theft_alert.paid?
+                    - missing << "approval" unless theft_alert.stolen_record_approved?
+                    = missing.join(", ")
+
           - unless skip_bike
             %td
               - if theft_alert.bike.present?

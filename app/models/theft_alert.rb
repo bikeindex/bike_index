@@ -59,8 +59,14 @@ class TheftAlert < ApplicationRecord
     begin_at.present?
   end
 
+  # literally CAN NOT activate
+  def activateable_except_approval?
+    !missing_photo? && !missing_location? && paid?
+  end
+
+  # Probably don't want to activate
   def activateable?
-    !missing_photo? && !missing_location? && paid? && stolen_record_approved?
+    activateable_except_approval? && stolen_record_approved?
   end
 
   def activating?
