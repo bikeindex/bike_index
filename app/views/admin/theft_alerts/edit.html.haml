@@ -24,8 +24,8 @@
               - if @theft_alert.activateable?
                 Theft alert can be activated!
               - else
-                This stolen record is NOT approved
-                %em.small.text-warning.d-block.mt-2
+                %span.text-warning This stolen record is NOT approved
+                %em.small.d-block.mt-2
                   You can still activate if you're sure you want to
 
             - if @theft_alert.activating?

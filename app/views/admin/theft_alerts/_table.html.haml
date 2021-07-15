@@ -59,16 +59,15 @@
                 - if theft_alert.activateable?
                   %em.small.text-success activateable
                 - else
-                  %small.d-block
+                  %em.small.d-block
                     %span.text-danger missing:
-                    - if !theft_alert.missing_photo?
-                      photo
-                    - if !theft_alert.missing_location?
-                      location
-                    - if theft_alert.paid?
-                      payment
-                    - if !theft_alert.stolen_record_approved?
-                      approval
+                    - missing = []
+                    - missing << "photo" if theft_alert.missing_photo?
+                    - missing << "location" if theft_alert.missing_location?
+                    - missing << "payment" unless theft_alert.paid?
+                    - missing << "approval" unless theft_alert.stolen_record_approved?
+                    = missing.join(", ")
+
           - unless skip_bike
             %td
               - if theft_alert.bike.present?
