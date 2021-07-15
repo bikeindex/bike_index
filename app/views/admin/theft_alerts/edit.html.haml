@@ -19,8 +19,14 @@
     .col-xl-4.offset-xl-4.col-md-6.offset-md-3
       .card
         .card-body
-          - if @theft_alert.activateable?
-            %h4.text-center Theft alert can be activated!
+          - if @theft_alert.activateable_except_approval?
+            %h4.text-center
+              - if @theft_alert.activateable?
+                Theft alert can be activated!
+              - else
+                This stolen record is NOT approved
+                %em.small.text-warning.d-block.mt-2
+                  You can still activate if you're sure you want to
 
             - if @theft_alert.activating?
               %h2.mt-3.text-center
