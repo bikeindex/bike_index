@@ -90,7 +90,7 @@
               = active_link t(".sign_up_your_organization"), new_organization_path
 
         .ad-block.ad-binx.ad300x600.d-none.d-md-block
-        .ad-block.ad-google.ad300x600.mt-3.d-none.d-md-block
+        = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-3 d-none d-md-block"}
 
   - if render_get_your_stolen_bike_back
     .root-landing-recovery-stories.mt-4
@@ -104,5 +104,3 @@
   - if @blog.present? && current_user&.superuser?
     .text-center.mt-4.less-strong
       = link_to "edit post", edit_admin_news_path(@blog), class: "btn btn-outline-primary"
-
-= render partial: "/shared/google_ad_script"

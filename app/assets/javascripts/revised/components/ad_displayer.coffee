@@ -18,13 +18,9 @@ class @AdDisplayer
     }
   }
 
-  googleAds = {
-    "ad300x600": "4203947975",
-    "adFullWidth": "3828489557"
-  }
-
   skyscrapers = ["max_tracker_300"]
   sm_rectangles = ["max_tracker_468"]
+  full_width = []
 
   constructor: ->
     @renderedAds = []
@@ -43,13 +39,11 @@ class @AdDisplayer
     # ads_full_width are only google right now
     # for el_klass in ads_full_width
     #   $(".ad-binx.#{el_klass}").each (index, el) =>
-    #     # Passing empty array so it always renders google
-    #     @renderedAds.push @renderAdElement(el, index, el_klass, [])
+    #     @renderedAds.push @renderAdElement(el, index, el_klass, full_width)
 
     # Remove undefined ads (ie they weren't rendered)
     @renderedAds = @renderedAds.filter (x) ->
       x != undefined
-
 
     # TODO: not tracking google ad loading. Should be tracking it too.
     # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
@@ -68,22 +62,6 @@ class @AdDisplayer
       el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
       adArray[index]
 
-    else
-      @initializeGoogleAds() unless @renderedGoogleAd
-      adId = googleAds[klass]
-      el.innerHTML = "<ins class=\"adsbygoogle\" style=\"display:block;width:100%;height:100%;\" data-ad-client=\"ca-pub-8140931939249510\" data-ad-slot=\"#{adId}\" data-ad-format=\"auto\" data-full-width-responsive=\"true\"></ins>"
-      (adsbygoogle = window.adsbygoogle || []).push({});
-      "google_ad-#{adId}"
-
-  initializeGoogleAds: ->
-    # For some reason, doesn't work to dynamically add the script, so I added it to all the pages with ads
-    # Ideally, we'd be able to dynamically add the script tag, but... just getting it working for now
-
-    # googleadscript = document.createElement('script');
-    # googleadscript.setAttribute("src", "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-    # googleadscript.setAttribute("async", true)
-    # document.head.appendChild(googleadscript)
-    @renderedGoogleAd = true
 
   # geolocatedAd: ->
   #   location = localStorage.getItem('location')

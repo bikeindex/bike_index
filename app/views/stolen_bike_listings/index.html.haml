@@ -153,9 +153,9 @@
 
   .row
     .col-md-8.mt-4.offset-md-2
-      .ad-block.ad-google.adFullWidth
+      = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
 
 -# include javascript pack for the time period select
 = javascript_pack_tag "application"
 
-= render partial: "/shared/google_ad_script"
+
