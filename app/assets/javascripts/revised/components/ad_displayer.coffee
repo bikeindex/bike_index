@@ -4,16 +4,16 @@ class @AdDisplayer
   ads_full_width = ["adFullWidth"]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
-  max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
-  max_tracker_468 = "<a id=\"binxad-max_tracker_468\" href=\"https://landing.mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
+  max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
+  max_tracker_468 = "<a id=\"binxad-max_tracker_468\" href=\"https://mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
 
   internalAds = {
     "max_tracker_300": {
-      "href": "https://landing.mymaxtracker.com",
+      "href": "https://mymaxtracker.com",
       "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
     },
     "max_tracker_468": {
-      "href": "https://landing.mymaxtracker.com",
+      "href": "https://mymaxtracker.com",
       "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
     }
   }
@@ -33,14 +33,12 @@ class @AdDisplayer
     # TODO: don't use jquery here for the element iterating
     for el_klass in ads_skyscraper
       $(".#{el_klass}").each (index, el) =>
-        # Temporarily removing because maxtracker
-        # @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
-        @renderedAds.push @renderAdElement(el, index, el_klass, [])
+        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
+        # @renderedAds.push @renderAdElement(el, index, el_klass, [])
 
-    # This ad is aggressively big, hiding until maxtracker is back
-    # for el_klass in ads_sm_rectangle
-    #   $(".#{el_klass}").each (index, el) =>
-    #     @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
+    for el_klass in ads_sm_rectangle
+      $(".#{el_klass}").each (index, el) =>
+        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
 
     for el_klass in ads_full_width
       $(".#{el_klass}").each (index, el) =>
