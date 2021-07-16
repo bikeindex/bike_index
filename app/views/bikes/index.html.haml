@@ -58,13 +58,13 @@
           = render partial: 'bikes/bike', collection: @bikes, cached: true
         .row
           .col-md-4.mt-4.offset-md-2
-            .ad-block.ad468x60
+            .ad-block.ad-binx.ad468x60
           .col-md-8.col-lg-4.mt-4
             .paginate-container.paginate-container-bottom
               = paginate @bikes
         .row
           .col-md-8.mt-4.offset-md-2
-            .ad-block.adFullWidth
+            .ad-block.ad-google.adFullWidth
       - else
         %h3.no-exact-results
           = t(".no_bikes_matched")
@@ -80,4 +80,4 @@
 - cache("donation_modal1") do
   = render partial: "/shared/donation_modal"
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+= render partial: "/shared/google_ad_script"
