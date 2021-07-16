@@ -100,7 +100,7 @@
           = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
 
     .col-md-4.ad-col
-      .ad-block.ad468x60
+      .ad-block.ad-binx.ad468x60
   .row
     -# Bike Photo!
     .col-md-8
@@ -317,7 +317,5 @@
           %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
             Open claim
 
-      .ad-block.ad300x600
-      .ad-block.ad300x600.mt-2
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      .ad-block.ad-binx.ad300x600
+      = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-2"}
