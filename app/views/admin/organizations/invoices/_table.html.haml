@@ -2,13 +2,14 @@
 - display_organization ||= false
 
 .full-screen-table
-  %table.table.table-striped.table-bordered.sortable{ class: render_sortable ? "" : "table-sm" }
+  %table.table.table-striped.table-bordered.table-sm.sortable{ class: render_sortable ? "" : "table-sm" }
     %thead.thead-light
       %th
         - if render_sortable
           = sortable "id", "#"
         - else
           \#
+      %th.small Active
       - if display_organization
         %th
           - if render_sortable
@@ -46,12 +47,13 @@
         %tr
           %td
             - if organization.present?
-              = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: organization.to_param, id: invoice.to_param)
+              = link_to invoice.display_name.gsub(/invoice\s?/i, ""), edit_admin_organization_invoice_path(organization_id: organization.to_param, id: invoice.to_param)
+          %td.small
             - if invoice.active?
-              %small.text-success{ style: "display: block;" }
+              %small.text-success.d-block
                 Active
             - if invoice.previous_invoice.present?
-              %small.less-strong{ style: "display: block; margin-top: 1rem;" }
+              %small.less-strong.d-block.mt-1
                 Follows ##{invoice.previous_invoice.id}
           - if display_organization
             %td
@@ -86,12 +88,12 @@
             %span{ class: invoice.discount_cents > 0 ? "text-danger" : "" }
               = invoice.discount_formatted
           %td
-            %ul{ style: "font-size: 80%;" }
+            %ul.mt-1.mb-1.pl-3{ style: "font-size: 80%;" }
               - invoice.organization_features.each do |organization_feature|
                 %li
                   = link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature)
-                  %em{ style: "font-size: 70%;" }
-                    = organization_feature.kind
+                  -# %em{ style: "font-size: 70%;" }
+                  -#   = organization_feature.description
 
             %small
               = safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
