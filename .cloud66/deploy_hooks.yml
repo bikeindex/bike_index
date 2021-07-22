@@ -8,12 +8,12 @@ production:
 
   after_symlink:
     # Make skylight pid & daemon files writable
-    - command: chown nginx:app_writers /tmp/skylight* && chmod -R 775 /tmp/skylight*
+    - command: sudo chown nginx:app_writers /tmp/skylight* && chmod -R 775 /tmp/skylight*
       target: rails
       run_on: all_servers
       sudo: true
     # Make the uploads cache folder writable
-    - command: chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod -R 775 $RAILS_STACK_PATH/tmp/cache
+    - command: sudo chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod -R 775 $RAILS_STACK_PATH/tmp/cache
       target: rails
       run_on: all_servers
       sudo: true
