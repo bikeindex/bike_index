@@ -122,6 +122,13 @@ FactoryBot.define do
         bike.reload
       end
     end
+    factory :older_stolen_bike, traits: [:stolen_trait] do
+      after(:create) do |bike|
+        create(:stolen_record, :in_chicago, bike: bike)
+        bike.update_attributes(:updated_at => Time.now - 1.year)
+        bike.reload
+      end
+    end
 
     trait :organized_bikes do # don't use this trait, use the factories it's included with
       transient do
