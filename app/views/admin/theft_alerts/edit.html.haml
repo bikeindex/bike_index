@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", stolen_record: @stolen_record}
 
 %h2.mt-4
   Payment

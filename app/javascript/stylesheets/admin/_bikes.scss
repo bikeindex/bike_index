@@ -36,13 +36,16 @@
     }
   }
 
-  .nav-tabs {
+  #bike-tab-wrapper {
     padding-top: 0.5rem;
-    padding: 0.5rem 0.5rem 0;
     margin-top: 0.5rem;
     margin-left: -15px;
     margin-right: -15px;
-    &,
+    overflow-x: scroll;
+  }
+  .nav-tabs {
+    padding: 0.5rem 0.5rem 0; // if adjusting, need to update in binx_admin.js
+    border-bottom: 2px solid rgba(#ccc, 0.8);
     .nav-link {
       border-bottom: 2px solid rgba(#ccc, 0.8);
     }
@@ -53,9 +56,12 @@
     .nav-link {
       background: #fff;
       margin-top: 0.5rem;
-      margin-right: 3px;
+      margin-right: 3px; // if adjusting, need to update in binx_admin.js
       margin-bottom: -1px;
-      // margin: 0.5rem 3px -1px 0;
+      // This is to make sure the tabs don't get covered by scrollbars
+      @include media-breakpoint-down(md) {
+        padding-bottom: 1rem;
+      }
     }
   }
 }
