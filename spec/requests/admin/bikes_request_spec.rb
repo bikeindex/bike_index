@@ -48,6 +48,22 @@ RSpec.describe Admin::BikesController, type: :request do
     end
   end
 
+  describe "show" do
+    it "renders if given active_tab" do
+      # Redirects if no active tab
+      get "#{base_url}/#{bike.id}"
+      expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+      # Otherwise, it renders
+      get "#{base_url}/#{bike.id}?active_tab=messages"
+      expect(response.code).to eq("200")
+      expect(flash).to_not be_present
+      get "#{base_url}/#{bike.id}?active_tab=stickers"
+      expect(response.code).to eq("200")
+      get "#{base_url}/#{bike.id}?active_tab=ownerships"
+      expect(response.code).to eq("200")
+    end
+  end
+
   describe "update" do
     it "updates the user email, without sending email" do
       expect(bike.current_ownership).to be_present

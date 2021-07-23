@@ -1,0 +1,58 @@
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "bikes-#{@active_tab}" }
+
+%h1.mt-5.mb-4
+  = @active_tab.titleize
+
+- if @active_tab == "ownerships"
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
+        %th
+          Created&nbsp;<small class="convertTimezone"></small>
+        %th
+          Creator
+        %th
+          Owner email
+        %th
+          Current?
+        %th
+          Claimed?
+        %th.d-none.d-md-table-cell
+          User hidden
+      %tbody
+        - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
+          %tr
+            %td
+              %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
+                = l ownership.created_at, format: :convert_time
+              - if display_dev_info?
+                %small.less-strong.only-dev-visible
+                  = ownership.id
+            %td
+              - creator = ownership.creator
+              - if creator.blank?
+                %em.text-warning user deleted
+                - if display_dev_info?
+                  %span.only-dev-visible
+                    \##{ownership.creator_id}
+              - elsif creator.name.present?
+                = creator.name
+              - else
+                = creator.email
+            %td
+              = ownership.owner_email
+            %td.table-cell-check
+              = check_mark if ownership.current
+            %td.table-cell-check
+              = check_mark if ownership.claimed
+            %td.table-cell-check.d-none.d-md-table-cell
+              = check_mark if ownership.user_hidden
+
+- elsif @active_tab == "stickers"
+  = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @bike.bike_stickers }
+
+
+
+- elsif @active_tab == "messages"
+  @notifications = @bike.notifications.order(created_at: :desc)
+  @feedbacks = Feedback.bike(@bike.id).order(created_at: :desc)

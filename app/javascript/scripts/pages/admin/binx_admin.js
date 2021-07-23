@@ -15,6 +15,7 @@ function BinxAdmin() {
   return {
     init() {
       this.initAdminSearchSelect();
+      this.initBikeTabs();
 
       // Enable utilities
       window.bikeIndexUtilities = new BikeIndexUtilities();
@@ -82,6 +83,14 @@ function BinxAdmin() {
           location.href = newValue;
         }
       });
+    },
+
+    initBikeTabs() {
+      if ($("#bikeNavTabs").length) {
+        $(`#bikeNavTabs .${$("#bikeNavTabs").attr("data-activetab")}`).addClass(
+          "active"
+        );
+      }
     },
 
     // Orgs location adding method
