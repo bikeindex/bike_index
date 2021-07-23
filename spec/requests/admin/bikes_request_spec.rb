@@ -61,6 +61,8 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response.code).to eq("200")
       get "#{base_url}/#{bike.id}?active_tab=ownerships"
       expect(response.code).to eq("200")
+      get "#{base_url}/#{bike.id}?active_tab=recoveries"
+      expect(response.code).to eq("200")
     end
   end
 

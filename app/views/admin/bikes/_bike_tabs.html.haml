@@ -164,13 +164,6 @@
     %h4.mt-2
       %span.text-danger
         Theft information
-      - unless controller_name == "stolen_bikes"
-        %span.float-right
-          = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true) do
-            - if stolen_record.approved?
-              Stolen message/photos
-            - else
-              Stolen message/approval
     .row
       .col-md-6.pr-md-0
         %table.table-list
@@ -219,7 +212,10 @@
               %td
                 Approved?
               %td
-                = check_mark if stolen_record.approved
+                - if stolen_record.approved
+                  = check_mark
+                - else
+                  %small.less-strong nope
             %tr
               %td
                 Estimated $
@@ -253,11 +249,9 @@
               %td
                 = stolen_record.police_report_number
   - if display_recovery && stolen_record.present? && stolen_record.recovered?
-    %h4.mt-2
+    %h4.mt-2.text-success
       Recovery Information
-      - unless controller_name == "recoveries"
-        %small{ style: "font-size: 80%;" }
-          = link_to "admin recovery view", admin_recovery_path(stolen_record.to_param), class: "text-muted"
+      = link_to "view", admin_recovery_path(stolen_record.to_param), class: "small"
     .row
       .col-sm-12.col-lg-6
         %table.table-list
@@ -310,6 +304,12 @@
     -# cache(["admin_bike_tabs", bike]) do
     .nav-item
       = link_to "Edit", edit_admin_bike_path(bike), class: "nav-link bikes-edit"
+    - if stolen_record.present?
+      .nav-item
+        = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true), class: "nav-link stolen_bikes-edit" do
+          Stolen
+          %span{ class: (stolen_record.approved? ? "text-success" : "text-danger")}
+            = stolen_record.approved? ? "✅" : "❌"
     .nav-item
       = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
         Messages
@@ -326,3 +326,11 @@
         Stickers
         %small
           (#{admin_number_display(bike.bike_stickers.count)})
+    .nav-item
+      = link_to admin_bike_path(bike, active_tab: "recoveries"), class: "nav-link bikes-recoveries recoveries-edit" do
+        Recoveries
+    -# NOTE: not cached, only renders when looking at recoveries
+    - if display_recovery
+      .nav-item
+        = link_to admin_recovery_displays_path(search_bike_id: bike.id), class: "nav-link recovery_displays" do
+          Recovery displays

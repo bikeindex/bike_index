@@ -31,7 +31,7 @@
 
 .row.mb-4.mt-4
   .col-sm-6.col-lg-4.mt-4
-    = number_with_delimiter(matching_notifications.count)
+    = admin_number_display(matching_notifications.count)
     = "matching Notification".pluralize(matching_notifications.count)
     %em
       = humanized_time_range_column(@time_range_column)

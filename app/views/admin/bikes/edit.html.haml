@@ -187,10 +187,8 @@
                 = check_box_tag :can_share_recovery, true
                 Can Share
 .row.mt-4.mb-4
-  .col-6
-    = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
   - unless @bike.deleted?
-    .col-6.text-right
+    .col.text-right
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
 #BParamsView.mt-4.collapse
