@@ -4,13 +4,13 @@
   font-style: italic;
 }
 
-.admin-bike-partial {
+.admin-bike-tabs {
   margin: -1.5rem -15px 0;
-  padding: 1.5rem 15px;
-  overflow-x: hidden;
+  padding: 1.5rem 15px 0;
+  overflow-x: scroll;
   background: $gray-900;
   position: relative;
-  border-bottom: 1px solid #ccc;
+  // border-bottom: 1px solid #ccc;
   h1,
   h2,
   h3,
@@ -33,6 +33,35 @@
     h3 {
       text-align: center;
       color: #ccc;
+    }
+  }
+
+  #bike-tab-wrapper {
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    margin-left: -15px;
+    margin-right: -15px;
+    overflow-x: scroll;
+  }
+  .nav-tabs {
+    padding: 0.5rem 0.5rem 0; // if adjusting, need to update in binx_admin.js
+    border-bottom: 2px solid rgba(#ccc, 0.8);
+    .nav-link {
+      border-bottom: 2px solid rgba(#ccc, 0.8);
+    }
+    .nav-link.active,
+    .nav-link:active {
+      border-bottom-color: #fff;
+    }
+    .nav-link {
+      background: #fff;
+      margin-top: 0.5rem;
+      margin-right: 3px; // if adjusting, need to update in binx_admin.js
+      margin-bottom: -1px;
+      // This is to make sure the tabs don't get covered by scrollbars
+      @include media-breakpoint-down(md) {
+        padding-bottom: 1rem;
+      }
     }
   }
 }

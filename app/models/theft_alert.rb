@@ -139,6 +139,7 @@ class TheftAlert < ApplicationRecord
       self.latitude = stolen_record.latitude
       self.longitude = stolen_record.longitude
     end
+    self.bike_id = stolen_record&.bike_id
   end
 
   private

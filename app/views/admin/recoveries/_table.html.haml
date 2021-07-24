@@ -3,12 +3,12 @@
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light.sortable
+    %thead.sortable
       %th
         - if render_sortable
           = sortable "recovered_at"
         - else
-          Date recovered
+          Recovered
       %th
         - if render_sortable
           = sortable "recovery_display_status", "Status"

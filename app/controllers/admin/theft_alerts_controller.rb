@@ -95,6 +95,10 @@ class Admin::TheftAlertsController < Admin::BaseController
       @user = User.unscoped.friendly_find(params[:user_id])
       theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
     end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
+      theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
+    end
     theft_alerts.where(created_at: @time_range)
   end
 

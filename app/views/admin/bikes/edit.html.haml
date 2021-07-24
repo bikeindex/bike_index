@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
+= render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "bikes-edit" }
 
 .d-none{ data: { url: ENV['BASE_URL'] } }
 
@@ -186,62 +186,9 @@
               = label_tag :can_share_recovery do
                 = check_box_tag :can_share_recovery, true
                 Can Share
-%h3.mt-4
-  Ownerships
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th
-        Created&nbsp;<small class="convertTimezone"></small>
-      %th
-        Creator
-      %th
-        Owner email
-      %th
-        Current?
-      %th
-        Claimed?
-      %th.d-none.d-md-table-cell
-        User hidden
-    %tbody
-      - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
-        %tr
-          %td
-            %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
-              = l ownership.created_at, format: :convert_time
-            - if display_dev_info?
-              %small.less-strong.only-dev-visible
-                = ownership.id
-          %td
-            - creator = ownership.creator
-            - if creator.blank?
-              %em.text-warning user deleted
-              - if display_dev_info?
-                %span.only-dev-visible
-                  \##{ownership.creator_id}
-            - elsif creator.name.present?
-              = creator.name
-            - else
-              = creator.email
-          %td
-            = ownership.owner_email
-          %td.table-cell-check
-            = check_mark if ownership.current
-          %td.table-cell-check
-            = check_mark if ownership.claimed
-          %td.table-cell-check.d-none.d-md-table-cell
-            = check_mark if ownership.user_hidden
-
-- if @bike.bike_stickers.present?
-  %h3.mt-4
-    Stickers
-  = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @bike.bike_stickers }
-
 .row.mt-4.mb-4
-  .col-6
-    = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
   - unless @bike.deleted?
-    .col-6.text-right
+    .col.text-right
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
 #BParamsView.mt-4.collapse
