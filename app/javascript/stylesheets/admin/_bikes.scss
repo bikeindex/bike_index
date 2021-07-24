@@ -48,19 +48,17 @@
     border-bottom: 2px solid rgba(#ccc, 0.8);
     .nav-link {
       border-bottom: 2px solid rgba(#ccc, 0.8);
-    }
-    .nav-link.active,
-    .nav-link:active {
-      border-bottom-color: #fff;
-    }
-    .nav-link {
       background: #fff;
       margin-top: 0.5rem;
       margin-right: 3px; // if adjusting, need to update in binx_admin.js
-      margin-bottom: -1px;
+      margin-bottom: -2px;
       // This is to make sure the tabs don't get covered by scrollbars
       @include media-breakpoint-down(md) {
         padding-bottom: 1rem;
+      }
+      &.active,
+      &:active {
+        border-bottom-color: #fff;
       }
     }
   }
