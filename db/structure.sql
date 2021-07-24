@@ -2766,7 +2766,8 @@ CREATE TABLE public.theft_alerts (
     facebook_data jsonb,
     latitude double precision,
     longitude double precision,
-    reach integer
+    reach integer,
+    bike_id bigint
 );
 
 
@@ -5142,6 +5143,13 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
+-- Name: index_theft_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_theft_alerts_on_bike_id ON public.theft_alerts USING btree (bike_id);
+
+
+--
 -- Name: index_theft_alerts_on_payment_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5859,6 +5867,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210704190719'),
 ('20210706220349'),
 ('20210708151750'),
-('20210709164954');
+('20210709164954'),
+('20210723222942');
 
 

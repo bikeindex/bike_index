@@ -50,6 +50,10 @@ class Admin::NotificationsController < Admin::BaseController
       @user = User.unscoped.friendly_find(params[:user_id])
       notifications = notifications.where(user_id: @user.id) if @user.present?
     end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
+      notifications = notifications.where(bike_id: @bike.id) if @bike.present?
+    end
     # I don't know why this isn't working - see also user_alerts - ignoring and forcing created_at
     # @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"

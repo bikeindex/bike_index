@@ -22,7 +22,7 @@
       %p
         - if bike_subject.present?
           #{viewing} for
-          = link_to bike_subject.title, admin_bike_path(bike_subject)
+          = link_to bike_subject.title_string, admin_bike_path(bike_subject)
           - if bike_subject.deleted?
             = render partial: "/admin/bikes/deleted_alert", locals: { bike: bike_subject }
         - else

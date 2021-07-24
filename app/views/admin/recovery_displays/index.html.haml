@@ -1,25 +1,46 @@
-.admin-subnav
-  .col-md-6
-    %h1
-      Recovery displays
+- if @bike.present?
+  = render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "recovery_displays", display_recovery: true }
+  %h1.mt-5.mb-4 Recovery displays
 
-  .col-md-6
-    %ul
-      %li.nav-item
-        = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
-      %li.nav-item
-        = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
-%p
-  #{pluralize(RecoveryDisplay.count, "recovery display")}
+- else
+  .admin-subnav
+    .col-md-6
+      %h1
+        Recovery displays
+    .col-md-6
+      %ul
+        %li.nav-item
+          = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
+        %li.nav-item
+          = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
+        %li.nav-item
+          = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-= paginate @recovery_displays, views_prefix: "admin"
+  - if @render_chart
+    .col-12.mt-2
+      = column_chart time_range_counts(collection: matching_recovery_displays, column: "recovery_displays.#{@time_range_column}"), stacked: true, thousands: ",", defer: true
+
+  = render partial: "/shared/period_select"
+
+  .row.mb-4.mt-4
+    .col-sm-6.col-lg-4.mt-4
+      = admin_number_display(matching_recovery_displays.count)
+      = "recovery display".pluralize(matching_recovery_displays.count)
+      %em
+        = humanized_time_range_column(@time_range_column)
+        = humanized_time_range(@time_range)
+    .col-lg-4
+      = paginate @recovery_displays, views_prefix: "admin"
+
 .full-screen-table
   %table.table.table-striped.table-bordered.padded.table-sm
     %thead.thead-light
+      %th.small.less-strong
+        = sortable "created_at"
       %th
-        Date&nbsp;<small class="convertTimezone"></small>
-      %th
-        Updated
+        = sortable "recovered_at"
+      %th.small
+        = sortable "updated_at"
       %th
         Quote
       %th

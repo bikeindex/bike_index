@@ -1,0 +1,72 @@
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "bikes-#{@active_tab}", display_recovery: @active_tab == "recoveries" }
+
+%h1.mt-5.mb-4
+  = @active_tab.titleize
+
+- if @active_tab == "ownerships"
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
+        %th
+          Created&nbsp;<small class="convertTimezone"></small>
+        %th
+          Creator
+        %th
+          Owner email
+        %th
+          Current?
+        %th
+          Claimed?
+        %th.d-none.d-md-table-cell
+          User hidden
+      %tbody
+        - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
+          %tr
+            %td
+              %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
+                = l ownership.created_at, format: :convert_time
+              - if display_dev_info?
+                %small.less-strong.only-dev-visible
+                  = ownership.id
+            %td
+              - creator = ownership.creator
+              - if creator.blank?
+                %em.text-warning user deleted
+                - if display_dev_info?
+                  %span.only-dev-visible
+                    \##{ownership.creator_id}
+              - elsif creator.name.present?
+                = creator.name
+              - else
+                = creator.email
+            %td
+              = ownership.owner_email
+            %td.table-cell-check
+              = check_mark if ownership.current
+            %td.table-cell-check
+              = check_mark if ownership.claimed
+            %td.table-cell-check.d-none.d-md-table-cell
+              = check_mark if ownership.user_hidden
+
+- elsif @active_tab == "stickers"
+  = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @bike.bike_stickers }
+
+
+
+- elsif @active_tab == "messages"
+  %h3.mt-4
+    Notifications
+    %small.less-strong
+      = link_to admin_number_display(@bike.notifications.count), admin_notifications_path(search_bike_id: @bike.id)
+  = render partial: "/admin/notifications/table", locals: { notifications: @bike.notifications.order(created_at: :desc), skip_bike: true }
+
+  - feedbacks = Feedback.bike(@bike.id).order(created_at: :desc)
+  %h3.mt-5
+    Feedbacks
+    %small.less-strong
+      = link_to admin_number_display(feedbacks.count), admin_feedbacks_path(search_bike_id: @bike.id)
+  = render partial: "/admin/feedbacks/table", locals: { feedbacks: feedbacks.order(created_at: :desc), skip_bike: true }
+
+- elsif @active_tab == "recoveries"
+
+  = render partial: "/admin/recoveries/table", locals: { recoveries: @bike.recovered_records, skip_bike: true }

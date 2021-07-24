@@ -1,6 +1,6 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
-  before_action :find_bike, only: [:edit, :destroy, :update, :get_destroy]
+  before_action :find_bike, only: %i[edit destroy update get_destroy show]
   before_action :set_period, only: [:index]
 
   def index
@@ -63,7 +63,11 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_bike_path
+    @active_tab = params[:active_tab]
+    unless @active_tab.present?
+      redirect_to edit_admin_bike_path
+      return
+    end
   end
 
   def edit

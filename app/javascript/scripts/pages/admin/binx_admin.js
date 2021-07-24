@@ -15,6 +15,7 @@ function BinxAdmin() {
   return {
     init() {
       this.initAdminSearchSelect();
+      this.initBikeTabs();
 
       // Enable utilities
       window.bikeIndexUtilities = new BikeIndexUtilities();
@@ -82,6 +83,24 @@ function BinxAdmin() {
           location.href = newValue;
         }
       });
+    },
+
+    initBikeTabs() {
+      if ($("#bike-tab-wrapper").length) {
+        $(
+          `#bike-tab-wrapper .${$("#bike-tab-wrapper").attr("data-activetab")}`
+        ).addClass("active");
+      }
+      // Add margin too
+      let width = $("#bike-tab-wrapper .nav-link")
+        .map(function () {
+          return $(this).outerWidth();
+        })
+        .get();
+      log.debug(width);
+      const widthSum = width.reduce((a, b) => a + b + 5, 0);
+
+      $("#bike-tab-wrapper .nav-tabs").css("min-width", `${widthSum + 22}px`);
     },
 
     // Orgs location adding method
