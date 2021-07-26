@@ -5,28 +5,69 @@
       Recoveries
   .col-md-7
     %ul
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@recovery_display_status != "waiting_on_decision" ? "active" : "") }
+          #{@recovery_display_status.titleize} #{@recovery_display_status == "all" ? "statuses" : ""}
+        .dropdown-menu
+          = link_to "All statuses", url_for(sortable_search_params.merge(search_recovery_display_status: "all")), class: "dropdown-item #{@recovery_display_status == 'all' ? 'active' : '' }"
+          .dropdown-divider
+          - StolenRecord.recovery_display_statuses.each do |recovery_display_status|
+            = link_to recovery_display_status.to_s.humanize, url_for(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), class: "dropdown-item #{recovery_display_status == @recovery_display_status ? "active" : ""}"
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (params[:search_displayed].present? ? "active" : "") }
+          - if params[:search_displayed].present?
+            Only #{params[:search_displayed].titleize}
+          - else
+            Displayed and not
+        .dropdown-menu
+          = link_to "Displayed and not", url_for(sortable_search_params.merge(search_displayed: nil)), class: "dropdown-item #{params[:search_displayed].blank? ? 'active' : '' }"
+          = link_to "Only Displayed", url_for(sortable_search_params.merge(search_displayed: "displayed")), class: "dropdown-item #{params[:search_displayed] == 'posted' ? 'active' : '' }"
+          = link_to "Only not displayed", url_for(sortable_search_params.merge(search_displayed: "not_displayed")), class: "dropdown-item #{params[:search_displayed] == 'not_displayed' ? 'active' : '' }"
       %li.nav-item
-        - all_recoveries_active = params[:search_recovery_display_status] == "all"
-        = link_to "All", admin_recoveries_path(sortable_search_params.merge(search_recovery_display_status: "all")), class: "nav-link #{all_recoveries_active ? "active" : ""}"
-      - StolenRecord.recovery_display_statuses.each do |recovery_display_status|
-        - active = recovery_display_status_searched == recovery_display_status
-        %li.nav-item
-          = link_to recovery_display_status.to_s.humanize, admin_recoveries_path(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), class: "nav-link #{active ? "active" : ""}"
+        = link_to "Shareable", url_for(sortable_search_params.merge(search_shareable: !@shareable)), class: "nav-link #{@shareable ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Index Helped", url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), class: "nav-link #{@index_helped_recovery ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_recoveries_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-%h4
-  = number_with_delimiter(@recoveries.total_count)
-  matching recoveries
-  %em
-    = humanized_time_range(@time_range)
-
 - if @render_chart
-  = column_chart time_range_counts(collection: available_recoveries), stacked: true, thousands: ",", defer: true
+  .mt-2.mb-4
+    = column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: ",", defer: true
+  .row.mt-4.mb-4
+    .col-sm-6.offset-sm-3
+      %table.table-list.wide-definition.no-italic-definition
+        -# duplicates some stuff from counts.rb
+        - valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?)
+        - recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value
+        %tbody
+          %tr.small
+            %td With user entered value
+            %td= admin_number_display(valued_recoveries.count)
+          %tr.small
+            %td Total user entered value
+            %td
+              $#{admin_number_display(valued_recoveries.sum)}
+          %tr.small
+            %td Average stolen value
+            %td
+              $#{admin_number_display(Counts.recovery_average_value)}
+          %tr
+            %td Total estimated value
+            %td
+              $#{admin_number_display(recovery_amount)}
+
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"
 
+.row.mb-4.mt-4
+  .col-sm-6.col-lg-4.mt-4
+    = admin_number_display(available_recoveries.count)
+    = "matching recovery".pluralize(available_recoveries.count)
+    %em
+      = humanized_time_range_column(@time_range_column)
+      = humanized_time_range(@time_range)
+  .col-lg-4
 = paginate @recoveries, views_prefix: "admin"
 = render partial: "table", locals: { recoveries: @recoveries, render_sortable: true }
 = paginate @recoveries, views_prefix: "admin"

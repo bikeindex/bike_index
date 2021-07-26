@@ -187,9 +187,6 @@ RSpec.describe StolenRecord, type: :model do
     it "scopes displayable" do
       expect(StolenRecord.displayable.to_sql).to eq(StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("recovered_at desc").to_sql)
     end
-    it "scopes recovery_unposted" do
-      expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
-    end
     it "scopes tsv_today" do
       stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.current)
       stolen2 = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
@@ -272,6 +269,8 @@ RSpec.describe StolenRecord, type: :model do
           recovery_display: recovery_display)
 
         expect(stolen_record.recovery_display_status).to eq "displayed"
+        expect(StolenRecord.recovered.with_recovery_display.pluck(:id)).to eq([stolen_record.id])
+        expect(StolenRecord.recovered.without_recovery_display.pluck(:id)).to eq([])
       end
     end
     context "stolen_record is not_displayed" do
@@ -280,6 +279,9 @@ RSpec.describe StolenRecord, type: :model do
           recovery_display_status: "not_displayed",
           can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
+        expect(StolenRecord.recovered.pluck(:id)).to eq([stolen_record.id])
+        expect(StolenRecord.recovered.with_recovery_display.pluck(:id)).to eq([])
+        expect(StolenRecord.recovered.without_recovery_display.pluck(:id)).to eq([stolen_record.id])
       end
     end
   end

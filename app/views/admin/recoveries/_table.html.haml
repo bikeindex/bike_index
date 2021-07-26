@@ -9,6 +9,11 @@
           = sortable "recovered_at"
         - else
           Recovered
+      %th.small
+        - if render_sortable
+          = sortable "date_stolen", "Stolen"
+        - else
+          Stolen
       %th
         - if render_sortable
           = sortable "recovery_display_status", "Status"
@@ -44,6 +49,9 @@
                   no recovery date
               %span.convertTime
                 = l date, format: :convert_time
+          %td
+            %small.convertTime
+              = l recovery.date_stolen, format: :convert_time
           %td
             %small
               = recovery.recovery_display_status.gsub("_", "&nbsp;").html_safe

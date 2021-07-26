@@ -70,6 +70,11 @@
       width: 70%;
     }
   }
+  &.no-italic-definition tr td {
+    &:first-child {
+      font-style: normal;
+    }
+  }
   .inline-images img {
     display: inline-block;
     width: 31%;
