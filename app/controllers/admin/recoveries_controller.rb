@@ -3,10 +3,13 @@ class Admin::RecoveriesController < Admin::BaseController
 
   before_action :set_period, only: [:index]
 
+  helper_method :available_recoveries
+
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+      .includes(:bike)
       .page(page).per(per_page)
   end
 
@@ -38,24 +41,45 @@ class Admin::RecoveriesController < Admin::BaseController
     end
   end
 
-  helper_method :recovery_display_status_searched, :available_recoveries
-
   private
 
   def sortable_columns
-    %w[recovered_at recovery_display_status]
-  end
-
-  def recovery_display_status_searched
-    return StolenRecord.recovery_display_statuses if params[:search_recovery_display_status] == "all"
-    return params[:search_recovery_display_status] if StolenRecord.recovery_display_statuses.include?(params[:search_recovery_display_status])
-    # default to waiting_on_decision
-    "waiting_on_decision"
+    %w[recovered_at date_stolen created_at recovery_display_status]
   end
 
   def available_recoveries
-    recoveries = StolenRecord.recovered.where(recovery_display_status: recovery_display_status_searched)
-    recoveries.includes(:bike).where(created_at: @time_range)
+    recoveries = StolenRecord.recovered
+
+    if params[:search_recovery_display_status] == "all"
+      @recovery_display_status = "all"
+    else
+      # Default to waiting_on_decision
+      @recovery_display_status = params[:search_recovery_display_status]
+      @recovery_display_status = "waiting_on_decision" unless StolenRecord.recovery_display_statuses.include?(@recovery_display_status)
+      recoveries = recoveries.where(recovery_display_status: @recovery_display_status)
+    end
+
+    if ParamsNormalizer.boolean(params[:search_shareable])
+      @shareable = true
+      recoveries = recoveries.can_share_recovery
+    end
+
+    if ParamsNormalizer.boolean(params[:search_index_helped_recovery])
+      @index_helped_recovery = true
+      recoveries = recoveries.where(index_helped_recovery: true)
+    end
+
+    if params[:search_displayed].present?
+      recoveries = if params[:search_displayed] == "displayed"
+        recoveries.with_recovery_display
+      else
+        recoveries.without_recovery_display
+      end
+    end
+
+    @time_range_column = sort_column if %w[date_stolen created_at].include?(sort_column)
+    @time_range_column ||= "recovered_at"
+    recoveries.where(@time_range_column => @time_range)
   end
 
   def permitted_parameters
