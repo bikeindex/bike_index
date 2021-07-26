@@ -9,6 +9,7 @@ class UpdateTheftAlertFacebookWorker < ApplicationWorker
       theft_alert.notifications.theft_alert_posted.none?
 
     # Temporary pause on notification
+    theft_alert.update(facebook_data: theft_alert.facebook_data.merge(no_notify: true))
     # Perform inline rather than re-querying for objects
     # EmailTheftAlertNotificationWorker.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
   end

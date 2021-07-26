@@ -36,7 +36,7 @@
           %strong
             = @invoice.paid_in_full? ? "Yes" : "No"
           %span.less-strong
-            = Invoice.money_formatted(@invoice.amount_paid_cents, @invoice.currency)
+            = MoneyFormater.money_format(@invoice.amount_paid_cents, @invoice.currency)
           %ul
             - @invoice.payments.each do |payment|
               %li

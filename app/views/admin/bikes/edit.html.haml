@@ -2,16 +2,6 @@
 
 .d-none{ data: { url: ENV['BASE_URL'] } }
 
-- if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
-  %h4.mt-2
-    Promoted Alerts
-  = render partial: "/admin/theft_alerts/table", locals: { theft_alerts: @bike.current_stolen_record.theft_alerts, skip_bike: true }
-
-- if @recoveries.present?
-  %h3.mt-4
-    Recoveries
-  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
-
 .admin-subnav.midpage-subnav
   .col-4.col-md-6
     %h1

@@ -27,8 +27,7 @@ class TheftAlert < ApplicationRecord
   scope :posted, -> { where.not(begin_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
-  delegate :duration_days, :duration_days_facebook, :amount_facebook, :amount_cents_facebook,
-    :ad_radius_miles, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :ad_radius_miles, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   def self.statuses
@@ -46,7 +45,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def notify?
-    return false unless (created_at || Time.current).to_i > NOTIFY_AFTER
+    return false if facebook_data&.dig("no_notify").present?
     stolen_record.present? && stolen_record.receive_notifications?
   end
 
@@ -95,8 +94,22 @@ class TheftAlert < ApplicationRecord
     "#{n} - #{kind}"
   end
 
+  def amount_cents_facebook
+    return facebook_data["amount_cents"] if facebook_data&.dig("amount_cents").present?
+    theft_alert_plan&.amount_cents_facebook
+  end
+
+  def amount_facebook
+    MoneyFormater.money_format(amount_cents_facebook)
+  end
+
   def activating_at
     t = facebook_data&.dig("activating_at")
+    t.present? ? TimeParser.parse(t) : nil
+  end
+
+  def facebook_updated_at
+    t = facebook_data&.dig("updated_at")
     t.present? ? TimeParser.parse(t) : nil
   end
 

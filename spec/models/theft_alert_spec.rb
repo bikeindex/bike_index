@@ -35,7 +35,7 @@ RSpec.describe TheftAlert, type: :model do
   end
 
   describe "activateable?" do
-    let(:theft_alert) { FactoryBot.create(:theft_alert, created_at: TimeParser.parse("2021-7-1")) }
+    let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {no_notify: true}) }
     it "is false" do
       expect(theft_alert.missing_location?).to be_truthy
       expect(theft_alert.missing_photo?).to be_truthy
@@ -73,6 +73,11 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.facebook_name("campaign")).to eq facebook_name
       expect(theft_alert.facebook_name("adset")).to eq "#{facebook_name} - adset"
       expect(theft_alert.facebook_name("ad")).to eq "#{facebook_name} - ad"
+      expect(theft_alert.amount_cents_facebook).to eq 1999
+      # Setting facebook_data overrides
+      theft_alert.facebook_data = {"amount_cents" => 2909}
+      expect(theft_alert.amount_cents_facebook).to eq 2909
+      expect(theft_alert.facebook_name("ad")).to eq "Theft Alert 12 - $29.09 - ad"
     end
   end
 end

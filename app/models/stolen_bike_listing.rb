@@ -54,7 +54,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   def amount_usd_formatted
     cents_usd = data["amount_cents_usd"] || calculated_amount_cents_usd
-    self.class.money_formatted_without_cents(cents_usd, :USD)
+    MoneyFormater.money_format_without_cents(cents_usd, :USD)
   end
 
   def calculated_amount_cents_usd
