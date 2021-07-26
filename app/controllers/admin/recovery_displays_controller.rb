@@ -24,7 +24,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def show
     if params[:id] == "bust_cache"
       flash[:success] = "Recovery Display Cache busted"
-      redirect_to admin_recovery_displays_url
+      redirect_to admin_recovery_displays_path
     else
       redirect_to edit_admin_recovery_display_url
     end
@@ -38,7 +38,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def update
     if @recovery_display.update_attributes(permitted_parameters)
       flash[:success] = "Recovery display saved!"
-      redirect_to admin_recovery_displays_url
+      redirect_to admin_recovery_displays_path
     else
       render action: :edit
     end
@@ -48,7 +48,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     @recovery_display = RecoveryDisplay.create(permitted_parameters)
     if @recovery_display.save
       flash[:success] = "Recovery display created!"
-      redirect_to admin_recovery_displays_url
+      redirect_to admin_recoveries_path
     else
       render action: :new
     end
@@ -56,7 +56,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def destroy
     @recovery_display.destroy
-    redirect_to admin_recovery_displays_url
+    redirect_to admin_recovery_displays_path
   end
 
   protected
