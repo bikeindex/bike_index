@@ -66,7 +66,7 @@ class Admin::BikesController < Admin::BaseController
     @active_tab = params[:active_tab]
     unless @active_tab.present?
       redirect_to edit_admin_bike_path
-      return
+      nil
     end
   end
 
