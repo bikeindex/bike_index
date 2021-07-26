@@ -53,6 +53,11 @@ class TheftAlert < ApplicationRecord
     payment&.paid? || false
   end
 
+  def live?
+    posted? && facebook_data&.dig("effective_object_story_id").present? &&
+      end_at > Time.current
+  end
+
   # Active or has been active
   def posted?
     begin_at.present?
