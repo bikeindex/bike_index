@@ -78,4 +78,4 @@
   .col-lg-4
     = paginate @user_alerts, views_prefix: "admin"
 
-= render partial: "/admin/user_alerts/table", locals: {user_alerts: @user_alerts, render_sortable: true}
+= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

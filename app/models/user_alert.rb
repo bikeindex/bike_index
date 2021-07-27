@@ -28,7 +28,7 @@ class UserAlert < ApplicationRecord
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
-  scope :create_notification, -> { where(kind: notification_kinds).where(notification_id: nil).where("updated_at < ?", notify_if_updated_before) }
+  scope :create_notification, -> { where(kind: notification_kinds).where(notification_id: nil).where(updated_at: notify_period) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -65,6 +65,10 @@ class UserAlert < ApplicationRecord
 
   def self.placement(kind)
     account_kinds.include?(kind) ? "account" : "general"
+  end
+
+  def self.notify_period
+    (Time.current - 2.weeks)..(Time.current - 1.hour)
   end
 
   def self.find_or_build_by(attrs)
@@ -117,10 +121,6 @@ class UserAlert < ApplicationRecord
     end
   end
 
-  def self.notify_if_updated_before
-    Time.current - 1.hour
-  end
-
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -169,11 +169,11 @@ class UserAlert < ApplicationRecord
 
   def create_notification?
     return false if inactive? || notification_id.present? ||
-      updated_at > self.class.notify_if_updated_before ||
+      self.class.notify_period.exclude?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
-      return false if bike.updated_at > self.class.notify_if_updated_before
+      return false if self.class.notify_period.exclude?(bike.updated_at)
     end
     true
   end

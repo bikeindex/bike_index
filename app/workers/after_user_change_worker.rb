@@ -81,8 +81,4 @@ class AfterUserChangeWorker < ApplicationWorker
     user.reload
     true
   end
-
-  def alert_for_unassigned_bike_org(user)
-    # user.bike_organizations.alert_on_unassigned_bike
-  end
 end
