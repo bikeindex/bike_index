@@ -50,18 +50,43 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       it "updates the bike and stolen_record and enqueues the job" do
         bike.reload
         stolen_record.reload
-        expect(bike.approved_stolen).to be_falsey
         expect(stolen_record.approved).to be_falsey
         Sidekiq::Worker.clear_all
         post "#{base_url}/#{bike.id}/approve"
         bike.reload
         stolen_record.reload
-        expect(bike.approved_stolen).to be_truthy
         expect(stolen_record.approved).to be_truthy
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(ApproveStolenListingWorker.jobs.count).to eq 1
         expect(ApproveStolenListingWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
+      end
+      context "with a theft_alert" do
+        let!(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record: stolen_record) }
+        let(:theft_alert) { FactoryBot.create(:theft_alert_paid, stolen_record: stolen_record) }
+        xit "updates the bike and stolen_record and enqueues the jobs" do
+          expect(theft_alert.reload.bike_id).to eq bike.id
+          expect(theft_alert.activateable?).to be_falsey
+          expect(theft_alert.activateable_except_approval?).to be_truthy
+          bike.reload
+          stolen_record.reload
+          expect(stolen_record.approved).to be_falsey
+          Sidekiq::Worker.clear_all
+          post "#{base_url}/#{bike.id}/approve"
+          bike.reload
+          stolen_record.reload
+          expect(stolen_record.approved).to be_truthy
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to(:edit_admin_stolen_bike)
+          expect(ApproveStolenListingWorker.jobs.count).to eq 1
+          expect(ApproveStolenListingWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
+
+          expect(AfterUserChangeWorker.jobs.count).to eq 1
+          AfterUserChangeWorker.drain
+
+          expect(ActivateTheftAlertWorker.jobs.count).to eq 1
+          expect(ApproveStolenListingWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
+        end
       end
     end
 

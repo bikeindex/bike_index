@@ -147,7 +147,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def engagement
-    facebook_data&.dig("engagement")
+    facebook_data&.dig("engagement") || {}
   end
 
   def ad_radius_miles

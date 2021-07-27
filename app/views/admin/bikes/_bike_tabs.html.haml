@@ -7,6 +7,14 @@
     %h1.text-danger
       No Bike present
   - else
+    - if bike.deleted?
+      .row.mb-4
+        .col-sm-6.offset-sm-3
+          .alert.alert-danger
+            %h4.text-danger #{bike.type.titleize} Deleted
+            Deleted:
+            %span.convertTime.preciseTime
+              = l bike.deleted_at, format: :convert_time
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb

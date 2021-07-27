@@ -411,7 +411,6 @@ CREATE TABLE public.bikes (
     stock_photo_url character varying(255),
     current_stolen_record_id integer,
     listing_order integer,
-    approved_stolen boolean,
     all_description text,
     mnfg_name character varying(255),
     hidden boolean DEFAULT false NOT NULL,
@@ -5870,6 +5869,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210708151750'),
 ('20210709164954'),
 ('20210723222942'),
-('20210727011722');
+('20210727011722'),
+('20210727021013');
 
 

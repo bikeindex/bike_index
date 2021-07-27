@@ -13,7 +13,6 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def approve
     @bike.current_stolen_record.update_attribute :approved, true
-    @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
     flash[:success] = "Stolen Bike was approved"
     redirect_to edit_admin_stolen_bike_url(@bike)
@@ -89,9 +88,7 @@ class Admin::StolenBikesController < Admin::BaseController
     return @available_stolen_records if defined?(@available_stolen_records)
     @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
     if @unapproved_only
-      # maintain previous functionality, by gross query (see PR#1545)
-      stolen_record_ids = Bike.status_stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
-      available_stolen_records = StolenRecord.where(id: stolen_record_ids)
+      available_stolen_records = StolenRecord.current.where(approved: false).joins(:bike).where.not(bikes: {id: nil})
       @only_with_location = !ParamsNormalizer.boolean(params[:without_location])
       if @only_with_location
         @unapproved_without_location_count = available_stolen_records.without_location.count

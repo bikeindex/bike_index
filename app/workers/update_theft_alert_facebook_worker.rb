@@ -30,7 +30,7 @@ class UpdateTheftAlertFacebookWorker < ScheduledWorker
     TheftAlert.should_update_facebook.where(facebook_updated_at: nil).pluck(:id)
       .each { |i| UpdateTheftAlertFacebookWorker.perform_async(i) }
     # Try to avoid overrunning our rate limits
-    TheftAlert.should_update_facebook.where.not(facebook_updated_at: nil).order(:facebook_updated_at).limit(10)
+    TheftAlert.should_update_facebook.where.not(facebook_updated_at: nil).order(:facebook_updated_at).limit(10).pluck(:id)
       .each { |i| UpdateTheftAlertFacebookWorker.perform_async(i) }
   end
 end

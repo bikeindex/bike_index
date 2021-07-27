@@ -134,6 +134,25 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
             expect_hashes_to_match(theft_alert.engagement, target_engagement)
           end
         end
+        context "other failure" do
+          let(:facebook_data) { {ad_id:"6252401122014", adset_id:"6252319938614", campaign_id:"6252319937814", activating_at: Time.current.to_i, effective_object_story_id:"500198263370025_4357215287668284"} }
+          it "updates and sets the data" do
+            expect(theft_alert).to be_valid
+            expect(theft_alert.id).to be_present
+            expect_hashes_to_match(theft_alert.facebook_data, facebook_data)
+            expect(theft_alert.reload.reach).to be_blank
+            VCR.use_cassette("facebook/ads_integration-update_facebook_data-2", match_requests_on: [:method]) do
+              instance.update_facebook_data(theft_alert)
+              theft_alert.reload
+              expect(theft_alert.facebook_updated_at).to be_within(2).of Time.current
+              expect(theft_alert.facebook_data["effective_object_story_id"]).to eq facebook_data[:effective_object_story_id]
+              expect(theft_alert.facebook_data["amount_cents"]).to eq 999
+              expect(theft_alert.facebook_data["spend_cents"]).to be_blank
+              expect(theft_alert.reach).to be_blank
+              expect(theft_alert.engagement).to eq({})
+            end
+          end
+        end
       end
     end
   end
