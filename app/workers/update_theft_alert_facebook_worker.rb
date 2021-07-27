@@ -14,7 +14,7 @@ class UpdateTheftAlertFacebookWorker < ScheduledWorker
     if theft_alert.facebook_data&.dig("ad_id").blank?
       return ActivateTheftAlertWorker.perform_async(theft_alert_id)
     end
-    i = Facebook::AdsIntegration.new.update_facebook_data(theft_alert)
+    Facebook::AdsIntegration.new.update_facebook_data(theft_alert)
     return true unless theft_alert.notify? &&
       theft_alert.notifications.theft_alert_posted.none?
 

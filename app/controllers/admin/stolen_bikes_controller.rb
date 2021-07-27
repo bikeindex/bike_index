@@ -88,7 +88,7 @@ class Admin::StolenBikesController < Admin::BaseController
     return @available_stolen_records if defined?(@available_stolen_records)
     @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
     if @unapproved_only
-      available_stolen_records = StolenRecord.current.where(approved: false).joins(:bike).where.not(bikes: {id: nil})
+      available_stolen_records = StolenRecord.current.unapproved
       @only_with_location = !ParamsNormalizer.boolean(params[:without_location])
       if @only_with_location
         @unapproved_without_location_count = available_stolen_records.without_location.count
@@ -97,6 +97,9 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       available_stolen_records = StolenRecord
     end
-    @available_stolen_records = available_stolen_records.where(created_at: @time_range)
+
+    @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
+    @time_range_column ||= "created_at"
+    @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
   end
 end

@@ -44,7 +44,7 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
                        stolen_record: stolen_record,
                        latitude: 37.8297171, longitude: -122.2803456,
-                       facebook_data: {campaign_id: campaign_id, adset_id: adset_id} )
+                       facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
       end
       before do
         # Required because default scope override in theft_alert
@@ -113,9 +113,9 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
         let(:theft_alert) do
           # id: 1633
           TheftAlert.create(theft_alert_plan: theft_alert_plan,
-                           stolen_record: stolen_record,
-                           user: bike.user,
-                           facebook_data: facebook_data)
+                            stolen_record: stolen_record,
+                            user: bike.user,
+                            facebook_data: facebook_data)
         end
         let(:target_engagement) { {post: "2", comment: "1", link_click: "4", post_reaction: "1", unique_clicks: "16", page_engagement: "8", post_engagement: "8", landing_page_view: "2"} }
         it "updates and sets the data" do
@@ -135,7 +135,7 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
           end
         end
         context "other failure" do
-          let(:facebook_data) { {ad_id:"6252401122014", adset_id:"6252319938614", campaign_id:"6252319937814", activating_at: Time.current.to_i, effective_object_story_id:"500198263370025_4357215287668284"} }
+          let(:facebook_data) { {ad_id: "6252401122014", adset_id: "6252319938614", campaign_id: "6252319937814", activating_at: Time.current.to_i, effective_object_story_id: "500198263370025_4357215287668284"} }
           it "updates and sets the data" do
             expect(theft_alert).to be_valid
             expect(theft_alert.id).to be_present
@@ -157,5 +157,3 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
     end
   end
 end
-
-

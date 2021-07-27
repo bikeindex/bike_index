@@ -51,6 +51,7 @@ class StolenRecord < ApplicationRecord
 
   default_scope { current }
   scope :current, -> { where(current: true) }
+  scope :unapproved, -> { where(approved: false).joins(:bike).where.not(bikes: {id: nil}) } # Make sure bike isn't deleted
   scope :approveds, -> { where(approved: true) }
   scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }

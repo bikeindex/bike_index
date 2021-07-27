@@ -52,7 +52,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
 
       ActionMailer::Base.deliveries = []
       # expect {
-        instance.perform(theft_alert.id)
+      instance.perform(theft_alert.id)
       # }.to change(Notification, :count).by 1
       theft_alert.reload
       expect(theft_alert.facebook_post_url).to be_present
