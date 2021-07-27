@@ -49,7 +49,7 @@
               = check_mark if ownership.user_hidden
 
 - elsif @active_tab == "stickers"
-  = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @bike.bike_stickers }
+  = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers}
 
 
 
@@ -58,18 +58,25 @@
     Notifications
     %small.less-strong
       = link_to admin_number_display(@bike.notifications.count), admin_notifications_path(search_bike_id: @bike.id)
-  = render partial: "/admin/notifications/table", locals: { notifications: @bike.notifications.order(created_at: :desc), skip_bike: true }
+  = render partial: "/admin/notifications/table", locals: {notifications: @bike.notifications.order(created_at: :desc), skip_bike: true}
 
   - feedbacks = Feedback.bike(@bike.id).order(created_at: :desc)
   %h3.mt-5
     Feedbacks
     %small.less-strong
       = link_to admin_number_display(feedbacks.count), admin_feedbacks_path(search_bike_id: @bike.id)
-  = render partial: "/admin/feedbacks/table", locals: { feedbacks: feedbacks.order(created_at: :desc), skip_bike: true }
+  = render partial: "/admin/feedbacks/table", locals: {feedbacks: feedbacks, skip_bike: true}
+
+  - user_alerts = UserAlert.where(bike_id: @bike.id).order(created_at: :desc)
+  %h3.mt-5
+    User Alerts
+    %small.less-strong
+      = link_to admin_number_display(user_alerts.count), admin_user_alerts_path(search_bike_id: @bike.id)
+  = render partial: "/admin/user_alerts/table", locals: {user_alerts: user_alerts}
 
 - elsif @active_tab == "recoveries"
 
-  = render partial: "/admin/recoveries/table", locals: { recoveries: @bike.recovered_records, skip_bike: true }
+  = render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true}
 
   %h3.mt-5 Other stolen records
   - if @bike.stolen_records.none?

@@ -2898,7 +2898,8 @@ CREATE TABLE public.user_alerts (
     resolved_at timestamp without time zone,
     dismissed_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    notification_id bigint
 );
 
 
@@ -5234,6 +5235,13 @@ CREATE INDEX index_user_alerts_on_bike_id ON public.user_alerts USING btree (bik
 
 
 --
+-- Name: index_user_alerts_on_notification_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_notification_id ON public.user_alerts USING btree (notification_id);
+
+
+--
 -- Name: index_user_alerts_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5870,6 +5878,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210709164954'),
 ('20210723222942'),
 ('20210727011722'),
-('20210727021013');
+('20210727021013'),
+('20210727174230');
 
 

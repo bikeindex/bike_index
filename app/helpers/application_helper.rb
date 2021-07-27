@@ -135,7 +135,14 @@ module ApplicationHelper
   end
 
   def sortable(column, title = nil, html_options = {})
+    if title.is_a?(Hash) # If title is a hash, it wasn't passed
+      html_options = title
+      title = nil
+    end
     title ||= column.gsub(/_(id|at)\z/, "").titleize
+    # Check for render_sortable - otherwise default to rendering
+    render_sortable = html_options.key?(:render_sortable) ? html_options[:render_sortable] : !html_options[:skip_sortable]
+    return title unless render_sortable
     html_options[:class] = "#{html_options[:class]} sortable-link"
     direction = column == sort_column && sort_direction == "desc" ? "asc" : "desc"
     if column == sort_column

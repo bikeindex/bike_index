@@ -20,6 +20,7 @@ RSpec.describe UserAlert, type: :model do
       end
     end
   end
+
   describe "update_phone_waiting_confirmation" do
     let(:user) { FactoryBot.create(:user) }
     let(:user_phone) { FactoryBot.create(:user_phone, user: user) }
@@ -48,6 +49,46 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.active?).to be_falsey
       expect(user_alert.inactive?).to be_truthy
       expect(user_alert.resolved?).to be_falsey
+    end
+  end
+
+  describe "create_notification?" do
+    context "stolen bike without location" do
+      let(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location) }
+      before do
+        user_alert.update_column :updated_at, Time.current - 2.hours
+        user_alert&.bike&.update_column :updated_at, Time.current - 2.hours
+      end
+      it "is truthy if not updated" do
+        expect(user_alert.reload.updated_at).to be < Time.current - 119.minutes
+        expect(user_alert.create_notification?).to be_truthy
+        expect(UserAlert.create_notification.pluck(:id)).to eq([user_alert.id])
+        user_alert.update(updated_at: Time.current)
+        expect(user_alert.create_notification?).to be_falsey
+        expect(UserAlert.create_notification.pluck(:id)).to eq([])
+      end
+      context "bike updated since" do
+        it "is false" do
+          expect(user_alert.create_notification?).to be_truthy
+          user_alert.bike.update_column :updated_at, Time.current - 30.minutes
+          expect(user_alert.reload.create_notification?).to be_falsey
+        end
+      end
+      context "resolved" do
+        it "is false" do
+          user_alert.resolve!
+          expect(user_alert.reload.create_notification?).to be_falsey
+          expect(UserAlert.create_notification.pluck(:id)).to eq([])
+        end
+      end
+      context "with notification" do
+        let(:notification) { FactoryBot.create(:notification) }
+        it "is false" do
+          user_alert.update(notification: notification)
+          expect(user_alert.reload.create_notification?).to be_falsey
+          expect(UserAlert.create_notification.pluck(:id)).to eq([])
+        end
+      end
     end
   end
 end

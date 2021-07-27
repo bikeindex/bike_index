@@ -11,6 +11,7 @@ class UserAlert < ApplicationRecord
   belongs_to :user_phone
   belongs_to :theft_alert
   belongs_to :organization
+  belongs_to :notification
 
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
 
@@ -27,6 +28,7 @@ class UserAlert < ApplicationRecord
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
+  scope :create_notification, -> { where(kind: notification_kinds).where(notification_id: nil).where("updated_at < ?", notify_if_updated_before) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -55,6 +57,10 @@ class UserAlert < ApplicationRecord
 
   def self.account_kinds
     %w[unassigned_bike_org]
+  end
+
+  def self.notification_kinds
+    %w[theft_alert_without_photo stolen_bike_without_location]
   end
 
   def self.placement(kind)
@@ -111,6 +117,10 @@ class UserAlert < ApplicationRecord
     end
   end
 
+  def self.notify_if_updated_before
+    Time.current - 1.hour
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -157,6 +167,18 @@ class UserAlert < ApplicationRecord
     update(resolved_at: Time.current)
   end
 
+  def create_notification?
+    return false if inactive? || notification_id.present? ||
+      updated_at > self.class.notify_if_updated_before ||
+      self.class.notification_kinds.exclude?(kind)
+    # Check if the relevant object is updated since
+    if theft_alert_without_photo? || stolen_bike_without_location?
+      return false if bike.updated_at > self.class.notify_if_updated_before
+    end
+    true
+  end
+
   def set_calculated_attributes
+    self.message = nil if message.blank?
   end
 end

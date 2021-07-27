@@ -1,0 +1,69 @@
+- render_sortable ||= false
+- skip_user ||= false
+- render_message ||= false # Hidden by default, I don't think this is really a thing
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+    %thead.small-header.hidden-md-down
+      %th= sortable "created_at", render_sortable: render_sortable
+      %th.small= sortable "updated_at", render_sortable: render_sortable
+      %th= sortable "kind", render_sortable: render_sortable
+      - unless skip_user
+        %th= sortable "user_id", render_sortable: render_sortable
+      %th Object
+      %th= sortable "dismissed_at", render_sortable: render_sortable
+      %th= sortable "resolved_at", render_sortable: render_sortable
+      - unless render_message
+        %th.small Message
+    %tbody
+      - user_alerts.each do |user_alert|
+        %tr
+          %td
+            %span.convertTime
+              = l(user_alert.created_at, format: :convert_time)
+          %td
+            %small.convertTime
+              = l(user_alert.updated_at, format: :convert_time)
+          %td= user_alert.kind_humanized
+          - unless skip_user
+            %td
+              - if user_alert.user_id.present?
+                - if user_alert.user.present?
+                  = link_to user_alert.user.email, admin_user_path(user_alert.user_id)
+                - else # Handle deleted users
+                  - user = User.unscoped.find_by_id(user_alert.user_id)
+                  - if user.present?
+                    = link_to user.email, admin_user_path(user_alert.user_id)
+                    %small.text-danger user deleted
+                  - else
+                    %small.text-danger missing user: #{user_alert.user_id}
+                = link_to "alerts", url_for(sortable_search_params.merge(user_id: user_alert.user_id)), class: "small gray-link"
+          %td
+            - if user_alert.bike_id.present?
+              %span.d-block
+                %small bike:
+                = link_to user_alert.bike_id, admin_bike_path(user_alert.bike_id)
+                = link_to "alerts", url_for(sortable_search_params.merge(bike_id: user_alert.bike_id)), class: "small gray-link"
+            - if user_alert.user_phone.present?
+              %span.d-block
+                %small user_phone: #{user_alert.user_phone_id}
+            - if user_alert.theft_alert.present?
+              %span.d-block
+                %small theft_alert:
+                = link_to user_alert.theft_alert_id, admin_theft_alert_path(user_alert.theft_alert_id)
+            - if user_alert.organization.present?
+              %span.d-block
+                %small organization:
+                = link_to user_alert.organization&.short_name || user_alert.organization_id, admin_organization_path(user_alert.organization_id)
+                = link_to "alerts", url_for(sortable_search_params.merge(organization_id: user_alert.organization_id)), class: "small gray-link"
+          %td
+            - if user_alert.dismissed_at.present?
+              %span.convertTime
+                = l(user_alert.dismissed_at, format: :convert_time)
+          %td
+            - if user_alert.resolved_at.present?
+              %span.convertTime
+                = l(user_alert.resolved_at, format: :convert_time)
+          - unless render_message
+            %td
+              %small= user_alert.message
