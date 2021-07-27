@@ -63,11 +63,12 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       end
       context "with a theft_alert" do
         let!(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record: stolen_record) }
-        let(:theft_alert) { FactoryBot.create(:theft_alert_paid, stolen_record: stolen_record) }
-        xit "updates the bike and stolen_record and enqueues the jobs" do
+        let(:theft_alert) { FactoryBot.create(:theft_alert_paid, stolen_record: stolen_record, user: bike.user) }
+        it "updates the bike and stolen_record and enqueues the jobs" do
           expect(theft_alert.reload.bike_id).to eq bike.id
           expect(theft_alert.activateable?).to be_falsey
           expect(theft_alert.activateable_except_approval?).to be_truthy
+          expect(theft_alert.begin_at).to be_blank
           bike.reload
           stolen_record.reload
           expect(stolen_record.approved).to be_falsey
@@ -85,7 +86,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           AfterUserChangeWorker.drain
 
           expect(ActivateTheftAlertWorker.jobs.count).to eq 1
-          expect(ApproveStolenListingWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
+          expect(ActivateTheftAlertWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
         end
       end
     end
