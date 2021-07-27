@@ -33,6 +33,12 @@
             = sortable "end_at"
           - else
             End
+        %th
+          - if render_sortable
+            = sortable "reach"
+          - else
+            Reach
+        %th.small Clicks
         %th City
         %th Notes
     %tbody
@@ -77,16 +83,16 @@
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small
-              = link_to theft_alert_plan.name, edit_admin_theft_alert_plan_path(theft_alert_plan)
-              - if theft_alert.payment.present?
-                = link_to theft_alert_plan.amount_formatted, admin_payment_path(theft_alert.payment_id), class: "less-strong"
-              - else
-                %span.less-strong
-                  = theft_alert_plan.amount_formatted
+              = theft_alert.amount_facebook
+              %span.less-strong= theft_alert_plan.name
           %td
             %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td
             %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
+          %td
+            = admin_number_display(theft_alert.reach)
+          %td
+            %small= admin_number_display(theft_alert.engagement&.dig("unique_clicks"))
           %td
             = theft_alert.city
             - if theft_alert.state.present?

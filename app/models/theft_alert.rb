@@ -26,12 +26,18 @@ class TheftAlert < ApplicationRecord
   scope :paid, -> { where.not(payment_id: nil) }
   scope :posted, -> { where.not(begin_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
+  scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
+  scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
 
   delegate :duration_days, :duration_days_facebook, :ad_radius_miles, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
+  end
+
+  def self.update_end_buffer
+    Time.current - 2.days
   end
 
   # Override because of recovered bikes not being in default scope
@@ -64,7 +70,13 @@ class TheftAlert < ApplicationRecord
   end
 
   def facebook_updateable?
-    facebook_data["campaign_id"].present?
+    campaign_id.present?
+  end
+
+  def should_update_facebook?
+    return false unless facebook_updateable?
+    return false if end_at < self.class.update_end_buffer
+    facebook_updated_at.blank? || facebook_updated_at < Time.current - 6.hours
   end
 
   # literally CAN NOT activate
@@ -114,11 +126,6 @@ class TheftAlert < ApplicationRecord
 
   def activating_at
     t = facebook_data&.dig("activating_at")
-    t.present? ? TimeParser.parse(t) : nil
-  end
-
-  def facebook_updated_at
-    t = facebook_data&.dig("updated_at")
     t.present? ? TimeParser.parse(t) : nil
   end
 

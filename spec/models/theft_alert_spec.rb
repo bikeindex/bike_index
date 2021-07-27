@@ -80,4 +80,34 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.facebook_name("ad")).to eq "Theft Alert 12 - $29.09 - ad"
     end
   end
+
+  describe "facebook_updateable? and should_update_facebook?" do
+    let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {}) }
+    it "is falsey for no campaign_id" do
+      expect(theft_alert.reload.facebook_updateable?).to be_falsey
+      expect(theft_alert.should_update_facebook?).to be_falsey
+      expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
+    end
+    context "campaign_id" do
+      let(:end_at) { Time.current - 1.hour }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, begin_at: Time.current - 1.week, end_at: end_at) }
+      it "is truthy" do
+        expect(theft_alert.reload.facebook_updateable?).to be_truthy
+        expect(theft_alert.live?).to be_falsey
+        expect(theft_alert.should_update_facebook?).to be_truthy
+        expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
+        theft_alert.update(facebook_updated_at: Time.current - 1.hour)
+        expect(theft_alert.reload.should_update_facebook?).to be_falsey
+        expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
+      end
+      context "really ended" do
+        let(:end_at) { Time.current - 3.days }
+        it "is falsey" do
+          expect(theft_alert.live?).to be_falsey
+          expect(theft_alert.should_update_facebook?).to be_falsey
+          expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
+        end
+      end
+    end
+  end
 end

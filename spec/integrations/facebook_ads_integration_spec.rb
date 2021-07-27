@@ -126,28 +126,12 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
           VCR.use_cassette("facebook/ads_integration-update_facebook_data", match_requests_on: [:method]) do
             instance.update_facebook_data(theft_alert)
             theft_alert.reload
+            expect(theft_alert.facebook_updated_at).to be_within(2).of Time.current
             expect(theft_alert.facebook_data["effective_object_story_id"]).to eq effective_object_story_id
             expect(theft_alert.facebook_data["amount_cents"]).to eq 999
-            expect(theft_alert.facebook_data["updated_at"]).to be_within(5).of Time.current.to_i
             expect(theft_alert.facebook_data["spend_cents"]).to eq 649
             expect(theft_alert.reach).to eq 2428
             expect_hashes_to_match(theft_alert.engagement, target_engagement)
-          end
-        end
-        context "with effective_object_story_id present" do
-          let(:facebook_data) { {ad_id: "6250596761214", adset_id: "6250596755814", campaign_id: "6250596474814", effective_object_story_id: "500198263370025_4299715976751549"} }
-          it "does the same thing" do
-            expect(theft_alert.reload.reach).to be_blank
-            VCR.use_cassette("facebook/ads_integration-update_facebook_data", match_requests_on: [:method]) do
-              instance.update_facebook_data(theft_alert)
-              theft_alert.reload
-              expect(theft_alert.facebook_data["effective_object_story_id"]).to eq effective_object_story_id
-              expect(theft_alert.facebook_data["amount_cents"]).to eq 999
-              expect(theft_alert.facebook_data["updated_at"]).to be_within(5).of Time.current.to_i
-              expect(theft_alert.facebook_data["spend_cents"]).to eq 649
-              expect(theft_alert.reach).to eq 2428
-              expect_hashes_to_match(theft_alert.engagement, target_engagement)
-            end
           end
         end
       end

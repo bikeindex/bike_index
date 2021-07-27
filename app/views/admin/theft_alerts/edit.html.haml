@@ -27,7 +27,7 @@
                 %span.convertTime
                   = l @theft_alert.activating_at, format: :convert_time
           %tr
-            %td Last update
+            %td last FB update
             %td
               - if @theft_alert.facebook_updated_at.present?
                 %span.convertTime
@@ -46,25 +46,25 @@
                   %span.text-warning DOESN'T receive notifications
               - else
                 %span.text-danger Something is missing!
-
+          %tr
+            %td Target Spend
+            %td= @theft_alert.amount_facebook
+          %tr
+            %td Actual Spend
+            %td
+              = MoneyFormater.money_format(@theft_alert.facebook_data&.dig("spend_cents"))
+              %span.text-warning
+                = @theft_alert.live? ? "so far" : "total"
     .col-sm-6
-      .mt-2
-      = pretty_print_json(@theft_alert.facebook_data)
-
-
-%h2.mt-4
-  Payment
-  %small
-    - if @theft_alert.payment.present?
-      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
-
-- if @theft_alert.payment.present?
-  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
-- else
-  No payment present!
-
-= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
-
+      %table.table-list
+        %tbody
+          %tr
+            %td Reach
+            %td= @theft_alert.reach
+          - @theft_alert.engagement.each do |k, v|
+            %tr
+              %td= k.titleize
+              %td= v
 
 - if @theft_alert.pending?
   .row.mt-4.mb-4
@@ -108,6 +108,21 @@
                 %li Alert is missing photo
               - if @theft_alert.missing_location?
                 %li Alert is missing location
+
+%h2.mt-4
+  Payment
+  %small
+    - if @theft_alert.payment.present?
+      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+
+- if @theft_alert.payment.present?
+  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
+- else
+  No payment present!
+
+= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+
+
 - if @theft_alert.notifications.any?
   %h3 Notifications
   = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
@@ -154,3 +169,8 @@
 
   .form-group
     = submit_tag "Save", class: "btn btn-info"
+
+- if display_dev_info?
+  .mt-5.mb-1.only-dev-visible
+    %h2 Raw facebook data
+  = pretty_print_json(@theft_alert.facebook_data)
