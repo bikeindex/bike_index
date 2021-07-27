@@ -1,6 +1,58 @@
 = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", stolen_record: @stolen_record}
 
 %h2.mt-4
+  Facebook data
+  %small
+    - if @theft_alert.facebook_updateable?
+      = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+    - else
+      %em.text-warning can't update facebook
+      maybe this alert was created before automation?
+
+- if @theft_alert.facebook_data.present?
+  .row.mt-2
+    .col-sm-6
+      %table.table-list
+        %tbody
+          %tr
+            %td Link
+            %td
+              - if @theft_alert.facebook_post_url.present?
+                %strong
+                  = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+          %tr
+            %td Activation began
+            %td
+              - if @theft_alert.activating_at.present?
+                %span.convertTime
+                  = l @theft_alert.activating_at, format: :convert_time
+          %tr
+            %td Last update
+            %td
+              - if @theft_alert.facebook_updated_at.present?
+                %span.convertTime
+                  = l @theft_alert.facebook_updated_at, format: :convert_time
+          %tr
+            %td Notify?
+            %td
+              = @theft_alert.notify? ? "✅" : "❌"
+              - if @theft_alert.facebook_data["no_notify"].present?
+                %em.less-strong manually disabled
+              - elsif @theft_alert.stolen_record.present?
+                Stolen record
+                - if @theft_alert.stolen_record.receive_notifications?
+                  %span.text-info receives notifications
+                - else
+                  %span.text-warning DOESN'T receive notifications
+              - else
+                %span.text-danger Something is missing!
+
+    .col-sm-6
+      .mt-2
+      = pretty_print_json(@theft_alert.facebook_data)
+
+
+%h2.mt-4
   Payment
   %small
     - if @theft_alert.payment.present?
@@ -102,47 +154,3 @@
 
   .form-group
     = submit_tag "Save", class: "btn btn-info"
-
-
-- if @theft_alert.facebook_data.present?
-  .row.mt-5
-    .col-sm-6
-      %table.table-list
-        %tbody
-          %tr
-            %td Link
-            %td
-              - if @theft_alert.facebook_post_url.present?
-                %strong
-                  = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
-          %tr
-            %td Activation began
-            %td
-              - if @theft_alert.activating_at.present?
-                %span.convertTime
-                  = l @theft_alert.activating_at, format: :convert_time
-          %tr
-            %td Last update
-            %td
-              - if @theft_alert.facebook_updated_at.present?
-                %span.convertTime
-                  = l @theft_alert.facebook_updated_at, format: :convert_time
-          %tr
-            %td Notify?
-            %td
-              - if @theft_alert.facebook_data["no_notify"].present?
-                No notify set
-              - elsif @theft_alert.stolen_record.present?
-                Stolen record
-                - if @theft_alert.stolen_record.receive_notifications?
-                  %span.text-info receives notifications
-                - else
-                  %span.text-warning DOESN'T receive notifications
-              - else
-                %span.text-danger Something is missing!
-
-    .col-sm-6
-      = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success"
-
-      .mt-2
-      = pretty_print_json(@theft_alert.facebook_data)

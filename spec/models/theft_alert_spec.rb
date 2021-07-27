@@ -48,7 +48,7 @@ RSpec.describe TheftAlert, type: :model do
     context "is activateable" do
       let(:bike) { FactoryBot.create(:bike) }
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {campaign_id: "xxxx"}) }
       it "is truthy" do
         expect(theft_alert.missing_location?).to be_falsey
         expect(theft_alert.missing_photo?).to be_falsey

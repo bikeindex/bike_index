@@ -45,7 +45,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def notify?
-    return false if facebook_data&.dig("no_notify").present?
+    return false if facebook_data.blank? || facebook_data&.dig("no_notify").present?
     stolen_record.present? && stolen_record.receive_notifications?
   end
 
@@ -61,6 +61,10 @@ class TheftAlert < ApplicationRecord
   # Active or has been active
   def posted?
     begin_at.present?
+  end
+
+  def facebook_updateable?
+    facebook_data["campaign_id"].present?
   end
 
   # literally CAN NOT activate
@@ -133,6 +137,10 @@ class TheftAlert < ApplicationRecord
 
   def ad_id
     facebook_data&.dig("ad_id")
+  end
+
+  def engagement
+    facebook_data&.dig("engagement")
   end
 
   def ad_radius_miles
