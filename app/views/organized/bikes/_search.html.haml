@@ -22,10 +22,8 @@
       = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
         :plain
           <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
-    = hidden_field_tag :stolenness, @stolenness
-    = hidden_field_tag :organization_id, passive_organization&.to_param
-    = hidden_field_tag :sort, params[:sort]
-    = hidden_field_tag :direction, params[:direction]
+
+    = render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search"}
     = hidden_field_tag :search_stickers, params[:search_stickers]
     = hidden_field_tag :search_address, params[:search_address]
 

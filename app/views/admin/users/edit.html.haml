@@ -237,7 +237,7 @@
                   = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
           %tr.collapse.small.mailchimpRawData
             %td Feedbacks
-            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
+            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ")
     .col-md-6
       .collapse.small.mailchimpRawData= pretty_print_json(mailchimp_datum.data)
 

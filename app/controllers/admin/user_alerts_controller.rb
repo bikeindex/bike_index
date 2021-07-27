@@ -7,6 +7,7 @@ class Admin::UserAlertsController < Admin::BaseController
     per_page = params[:per_page] || 50
     @user_alerts = matching_user_alerts.order(sort_column => sort_direction)
       .page(page).per(per_page)
+    @render_kind_counts = ParamsNormalizer.boolean(params[:search_kind_counts])
   end
 
   helper_method :matching_user_alerts
