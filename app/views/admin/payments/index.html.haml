@@ -31,7 +31,7 @@
       data: time_range_counts(collection: payments_of_kind),
       data_money: time_range_amounts(collection: payments_of_kind),
       count: payments_of_kind.count,
-      money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
+      money: MoneyFormater.money_format(payments_of_kind.sum(:amount_cents)),
     }
   end.compact
 
@@ -55,7 +55,7 @@
         = humanized_time_range(@time_range)
       %small
         for a total of
-        = Payment.money_formatted(matching_payments.sum(:amount_cents))
+        = MoneyFormater.money_format(matching_payments.sum(:amount_cents))
   - if payments_counts.present?
     .col-sm
       .full-screen-table

@@ -71,8 +71,8 @@ RSpec.describe AdminHelper, type: :helper do
     context "donor" do
       let(:payment) { FactoryBot.create(:payment, kind: "donation") }
       let(:user) { payment.user }
-      let(:target) { "<span><span class=\"donor-icon ml-1\">D</span></span>" }
-      let(:target_full_text) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"less-strong\">onor</span></span>" }
+      let(:target) { "<span><span class=\"donor-icon ml-1\" title=\"Donor\">D</span></span>" }
+      let(:target_full_text) { "<span><span class=\"donor-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span></span>" }
       it "returns donor" do
         expect(user.donor?).to be_truthy
         expect(user_icon(user)).to eq target
@@ -80,10 +80,10 @@ RSpec.describe AdminHelper, type: :helper do
       end
       context "theft alert" do
         let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user) }
-        let(:target) { "<span><span class=\"donor-icon ml-1\">D</span><span class=\"theft-alert-icon ml-1\">P</span></span>" }
+        let(:target) { "<span><span class=\"donor-icon ml-1\" title=\"Donor\">D</span><span class=\"theft-alert-icon ml-1\" title=\"Promoted alert purchaser\">P</span></span>" }
         let(:target_full_text) do
-          "<span><span class=\"donor-icon ml-1\">D</span><span class=\"less-strong\">onor</span>" \
-            "<span class=\"theft-alert-icon ml-1\">P</span><span class=\"less-strong\">romoted alert</span>" \
+          "<span><span class=\"donor-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span>" \
+            "<span class=\"theft-alert-icon ml-1\" title=\"Promoted alert purchaser\">P</span><span class=\"less-strong\">romoted alert</span>" \
             "</span>"
         end
         it "returns donor and theft alert" do
@@ -97,8 +97,8 @@ RSpec.describe AdminHelper, type: :helper do
     context "organization" do
       let(:organization) { FactoryBot.create(:organization, :organization_features) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:target) { "<span><span class=\"paid-org-icon ml-1\">O</span></span>" }
-      let(:target_full_text) { "<span><span class=\"paid-org-icon ml-1\">O</span><span class=\"less-strong\">rganization member</span></span>" }
+      let(:target) { "<span><span class=\"paid-org-icon ml-1\" title=\"Paid organization member\">O</span></span>" }
+      let(:target_full_text) { "<span><span class=\"paid-org-icon ml-1\" title=\"Paid organization member\">O</span><span class=\"less-strong\">rganization member</span></span>" }
       it "returns paid_org" do
         expect(user.paid_org?).to be_truthy
         expect(user_icon(user)).to eq target

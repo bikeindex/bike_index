@@ -23,11 +23,11 @@ class Admin::TheftAlertsController < Admin::BaseController
     if ParamsNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
-      ActivateTheftAlertWorker.perform_async(@theft_alert.id)
+      ActivateTheftAlertWorker.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif ParamsNormalizer.boolean(params[:update_theft_alert])
-      UpdateTheftAlertFacebookWorker.perform_async(@theft_alert.id)
+      UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
     elsif @theft_alert.update(set_alert_timestamps(theft_alert_params))
@@ -65,7 +65,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at theft_alert_plan_id status begin_at end_at]
+    %w[created_at theft_alert_plan_id reach status begin_at end_at]
   end
 
   def available_statuses

@@ -1,18 +1,70 @@
 = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", stolen_record: @stolen_record}
 
 %h2.mt-4
-  Payment
+  Facebook data
   %small
-    - if @theft_alert.payment.present?
-      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+    - if @theft_alert.facebook_updateable?
+      = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+    - else
+      %em.text-warning can't update facebook
+      maybe this alert was created before automation?
 
-- if @theft_alert.payment.present?
-  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
-- else
-  No payment present!
-
-= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
-
+- if @theft_alert.facebook_data.present?
+  .row.mt-2
+    .col-sm-6
+      %table.table-list
+        %tbody
+          %tr
+            %td Link
+            %td
+              - if @theft_alert.facebook_post_url.present?
+                %strong
+                  = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+          %tr
+            %td Activation began
+            %td
+              - if @theft_alert.activating_at.present?
+                %span.convertTime
+                  = l @theft_alert.activating_at, format: :convert_time
+          %tr
+            %td last FB update
+            %td
+              - if @theft_alert.facebook_updated_at.present?
+                %span.convertTime
+                  = l @theft_alert.facebook_updated_at, format: :convert_time
+          %tr
+            %td Notify?
+            %td
+              = @theft_alert.notify? ? "✅" : "❌"
+              - if @theft_alert.facebook_data["no_notify"].present?
+                %em.less-strong manually disabled
+              - elsif @theft_alert.stolen_record.present?
+                Stolen record
+                - if @theft_alert.stolen_record.receive_notifications?
+                  %span.text-info receives notifications
+                - else
+                  %span.text-warning DOESN'T receive notifications
+              - else
+                %span.text-danger Something is missing!
+          %tr
+            %td Target Spend
+            %td= @theft_alert.amount_facebook
+          %tr
+            %td Actual Spend
+            %td
+              = MoneyFormater.money_format(@theft_alert.facebook_data&.dig("spend_cents"))
+              %span.text-warning
+                = @theft_alert.live? ? "so far" : "total"
+    .col-sm-6
+      %table.table-list
+        %tbody
+          %tr
+            %td Reach
+            %td= @theft_alert.reach
+          - @theft_alert.engagement.each do |k, v|
+            %tr
+              %td= k.titleize
+              %td= v
 
 - if @theft_alert.pending?
   .row.mt-4.mb-4
@@ -56,6 +108,21 @@
                 %li Alert is missing photo
               - if @theft_alert.missing_location?
                 %li Alert is missing location
+
+%h2.mt-4
+  Payment
+  %small
+    - if @theft_alert.payment.present?
+      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+
+- if @theft_alert.payment.present?
+  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
+- else
+  No payment present!
+
+= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+
+
 - if @theft_alert.notifications.any?
   %h3 Notifications
   = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
@@ -103,14 +170,7 @@
   .form-group
     = submit_tag "Save", class: "btn btn-info"
 
-
-- if @theft_alert.facebook_data.present?
-  .mt-4
-  - if @theft_alert.facebook_post_url.present?
-    %strong
-      = link_to "link to Facebook post", @theft_alert.facebook_post_url, target: "_blank"
-  - else
-    = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success"
-  .row.mt-2
-    .col-sm-6
-      = pretty_print_json(@theft_alert.facebook_data)
+- if display_dev_info?
+  .mt-5.mb-1.only-dev-visible
+    %h2 Raw facebook data
+  = pretty_print_json(@theft_alert.facebook_data)

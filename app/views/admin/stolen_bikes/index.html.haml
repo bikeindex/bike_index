@@ -29,12 +29,13 @@
 -# Show traditional counts unless viewing the default (only unapproved) scoped view
 - if !@unapproved_only || @render_chart
   = render partial: "/shared/period_select"
-  %p.mt-4
-    %strong
-      = number_with_delimiter(available_stolen_records.count)
-    Matching Stolen Bikes
+  %p
+    = admin_number_display(available_stolen_records.count)
+    = "matching stolen bike".pluralize(available_stolen_records.count)
     %em
+      = humanized_time_range_column(@time_range_column)
       = humanized_time_range(@time_range)
+
 - else
   %p.mt-4
     = number_with_delimiter(Bike.status_stolen.count)
@@ -90,18 +91,17 @@
         - bike = stolen_record.bike || Bike.unscoped.find(stolen_record.bike_id)
         %tr
           %td
-            .less-strong-hold
-              %span.less-strong-right
-                - if bike&.example
-                  %span.text-danger
-                    = bike.id
-                - else
-                  = bike&.id
-              %small
-                %a{ href: edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true) }
-                  - created_date = stolen_record&.created_at || bike&.created_at
-                  %span.convertTime
-                    = l created_date, format: :convert_time
+            / .less-strong-hold
+            /   %span.less-strong-right
+            /     - if bike&.example
+            /       %span.text-danger
+            /         = bike.id
+            /     - else
+            /       = bike&.id
+            %a.small{ href: edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true) }
+              - created_date = stolen_record&.created_at || bike&.created_at
+              %span.convertTime
+                = l created_date, format: :convert_time
           %td
             - if stolen_record&.date_stolen&.present?
               %small.convertTime

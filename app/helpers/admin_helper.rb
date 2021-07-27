@@ -108,15 +108,15 @@ module AdminHelper
     return "" if user.blank? || !user.donor? && !user.paid_org? && !user.theft_alert_purchaser?
     content_tag :span do
       if user.donor?
-        concat(content_tag(:span, "D", class: "donor-icon ml-1"))
+        concat(content_tag(:span, "D", class: "donor-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
       end
       if user.theft_alert_purchaser?
-        concat(content_tag(:span, "P", class: "theft-alert-icon ml-1"))
+        concat(content_tag(:span, "P", class: "theft-alert-icon ml-1", title: "Promoted alert purchaser"))
         concat(content_tag(:span, "romoted alert", class: "less-strong")) if full_text
       end
       if user.paid_org?
-        concat(content_tag(:span, "O", class: "paid-org-icon ml-1"))
+        concat(content_tag(:span, "O", class: "paid-org-icon ml-1", title: "Paid organization member"))
         concat(content_tag(:span, "rganization member", class: "less-strong")) if full_text
       end
     end

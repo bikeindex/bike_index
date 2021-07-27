@@ -13,7 +13,6 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def approve
     @bike.current_stolen_record.update_attribute :approved, true
-    @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
     flash[:success] = "Stolen Bike was approved"
     redirect_to edit_admin_stolen_bike_url(@bike)
@@ -89,9 +88,7 @@ class Admin::StolenBikesController < Admin::BaseController
     return @available_stolen_records if defined?(@available_stolen_records)
     @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
     if @unapproved_only
-      # maintain previous functionality, by gross query (see PR#1545)
-      stolen_record_ids = Bike.status_stolen.where("approved_stolen IS NOT TRUE").pluck(:current_stolen_record_id)
-      available_stolen_records = StolenRecord.where(id: stolen_record_ids)
+      available_stolen_records = StolenRecord.current.unapproved
       @only_with_location = !ParamsNormalizer.boolean(params[:without_location])
       if @only_with_location
         @unapproved_without_location_count = available_stolen_records.without_location.count
@@ -100,6 +97,9 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       available_stolen_records = StolenRecord
     end
-    @available_stolen_records = available_stolen_records.where(created_at: @time_range)
+
+    @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
+    @time_range_column ||= "created_at"
+    @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
   end
 end

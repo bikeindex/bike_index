@@ -2,25 +2,10 @@
 
 .d-none{ data: { url: ENV['BASE_URL'] } }
 
-- if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
-  %h4.mt-2
-    Promoted Alerts
-  = render partial: "/admin/theft_alerts/table", locals: { theft_alerts: @bike.current_stolen_record.theft_alerts, skip_bike: true }
-
-- if @recoveries.present?
-  %h3.mt-4
-    Recoveries
-  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
-
 .admin-subnav.midpage-subnav
   .col-4.col-md-6
     %h1
       Edit Bike
-      - if @bike.deleted?
-        %small.text-danger
-          Deleted at:
-          %span.convertTime.preciseTime
-            = l @bike.deleted_at, format: :convert_time
       = link_to "user edit", edit_bike_path(@bike, return_to: url_for), class: "user-edit-link"
   .col-8.col-md-6.text-right
     = render partial: "/bikes/credibility_score", locals: { bike: @bike }

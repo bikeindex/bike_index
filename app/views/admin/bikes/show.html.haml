@@ -70,3 +70,14 @@
 - elsif @active_tab == "recoveries"
 
   = render partial: "/admin/recoveries/table", locals: { recoveries: @bike.recovered_records, skip_bike: true }
+
+  %h3.mt-5 Other stolen records
+  - if @bike.stolen_records.none?
+    No other stolen records
+  - else
+    %ul
+      - @bike.stolen_records.each do |stolen_record|
+        %li
+          Stolen on
+          %a.convertTime{href: edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true)}
+            = l stolen_record.date_stolen, format: :convert_time

@@ -7,8 +7,16 @@
     %h1.text-danger
       No Bike present
   - else
+    - if bike.deleted?
+      .row.mb-4
+        .col-sm-6.offset-sm-3
+          .alert.alert-danger
+            %h4.text-danger #{bike.type.titleize} Deleted
+            Deleted:
+            %span.convertTime.preciseTime
+              = l bike.deleted_at, format: :convert_time
     .row
-      - cache(["admin_bike_main", bike]) do
+      - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
           %a{ href: edit_admin_bike_path(bike.to_param) }
             - if bike.thumb_path.present?
@@ -302,7 +310,7 @@
   - if bike.present?
     #bike-tab-wrapper{"data-activetab" => active_tab}
       .nav.nav-tabs
-        - cache(["admin_bike_tabs", bike]) do
+        - cache(["admin_bike_tabs", bike, stolen_record]) do
           .nav-item
             = link_to "Edit", edit_admin_bike_path(bike), class: "nav-link bikes-edit"
           .nav-item

@@ -17,6 +17,12 @@ class AfterUserChangeWorker < ApplicationWorker
     unless user.alert_slugs == current_alerts
       user.update_attributes(alert_slugs: current_alerts, skip_update: true)
     end
+
+    # Activate activateable theft alerts!
+    user.theft_alerts.paid.where(begin_at: nil).each do |theft_alert|
+      next unless theft_alert.activateable?
+      ActivateTheftAlertWorker.perform_async(theft_alert.id)
+    end
   end
 
   def user_alert_slugs(user)
