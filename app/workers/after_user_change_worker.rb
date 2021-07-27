@@ -4,6 +4,8 @@ class AfterUserChangeWorker < ApplicationWorker
   def perform(user_id, user = nil)
     user ||= User.find_by_id(user_id)
     return false unless user.present?
+    # Bump updated_at to bust cache
+    user.update(updated_at: Time.current, skip_update: true)
 
     add_phones_for_verification(user)
 

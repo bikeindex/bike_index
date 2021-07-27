@@ -1574,6 +1574,7 @@ RSpec.describe BikesController, type: :request do
           expect(stolen_record.phone_for_police).to be_truthy
           AfterUserChangeWorker.new.perform(current_user.id)
           expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
+          current_user.update_column :updated_at, Time.current - 5.minutes
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{bike.id}", params: {
@@ -1613,6 +1614,8 @@ RSpec.describe BikesController, type: :request do
         end
 
         expect(current_user.reload.alert_slugs).to eq([])
+        # Test that we're bumping user, to bust cache
+        expect(current_user.updated_at).to be > Time.current - 5
       end
     end
     context "updating impound_record" do
