@@ -1,4 +1,5 @@
 class UpdateTheftAlertFacebookWorker < ScheduledWorker
+  prepend ScheduledWorkerRecorder
   sidekiq_options queue: "low_priority", retry: 4 # It will retry because of scheduling
 
   def self.frequency
