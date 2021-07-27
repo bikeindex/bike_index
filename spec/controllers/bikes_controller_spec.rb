@@ -1275,6 +1275,7 @@ RSpec.describe BikesController, type: :controller do
               expect(stolen_record.date_stolen).to be_present
               expect(stolen_record.proof_of_ownership).to be_falsey
               expect(stolen_record.receive_notifications).to be_truthy
+              expect(stolen_record.no_notify).to be_falsey
 
               bike.reload
               expect(bike.current_stolen_record).to eq stolen_record
@@ -1295,6 +1296,7 @@ RSpec.describe BikesController, type: :controller do
               expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
               expect(current_stolen_record.proof_of_ownership).to be_truthy
               expect(current_stolen_record.receive_notifications).to be_falsey
+              expect(stolen_record.no_notify).to be_truthy
               expect(current_stolen_record.estimated_value).to eq 1200
               stolen_attrs.except(*skipped_attrs).each do |key, value|
                 pp key unless current_stolen_record.send(key) == value
