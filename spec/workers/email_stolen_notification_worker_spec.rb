@@ -41,23 +41,55 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
   context "second notification sent notifications" do
     let!(:stolen_notification2) { FactoryBot.create(:stolen_notification, sender: user) }
     it "sends blocked message to admin" do
-      instance.perform(stolen_notification.id)
+      expect {
+        instance.perform(stolen_notification.id)
+      }.to change(Notification, :count).by 1
       expect_notification_blocked(stolen_notification.sender.email)
+      notification = Notification.last
+      expect(notification.kind).to eq "stolen_notification_blocked"
+      expect(notification.bike_id).to eq bike.id
+      expect(notification.user_id).to eq user.id
+      expect(notification.calculated_email).to eq stolen_notification.receiver_email
+      expect(notification.notifiable_id).to eq stolen_notification.id
+      expect(notification.notifiable_type).to eq "StolenNotification"
     end
     context "with can_send_many_stolen_notifications" do
       let(:user) { FactoryBot.create(:user, can_send_many_stolen_notifications: true) }
       it "sends customer an email" do
-        instance.perform(stolen_notification.id)
+        expect {
+          instance.perform(stolen_notification.id)
+        }.to change(Notification, :count).by 1
         expect_notification_sent(stolen_notification.sender.email)
+
+        notification = Notification.last
+        expect(notification.kind).to eq "stolen_notification_sent"
+        expect(notification.bike_id).to eq bike.id
+        expect(notification.user_id).to eq user.id
+        expect(notification.calculated_email).to eq stolen_notification.receiver_email
+        expect(notification.notifiable_id).to eq stolen_notification.id
+        expect(notification.notifiable_type).to eq "StolenNotification"
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect {
+          instance.perform(stolen_notification.id)
+        }.to change(Notification, :count).by 0
+        expect(ActionMailer::Base.deliveries.count).to eq 1
       end
     end
     context "user belongs to organization with unstolen_notifications" do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "sends customer an email" do
+        notification = Notification.find_or_create_by(user_id: user.id,
+          notifiable: stolen_notification,
+          kind: "stolen_notification_sent")
+        expect(notification.reload.delivery_status).to be_blank
+        expect(notification.bike_id).to eq bike.id
         user.reload
         expect(user.enabled?("unstolen_notifications")).to be_truthy
-        instance.perform(stolen_notification.id)
+        expect {
+          instance.perform(stolen_notification.id)
+        }.to change(Notification, :count).by 0
         expect_notification_sent(stolen_notification.sender.email)
+        expect(notification.reload.delivery_status).to "email_success"
       end
     end
   end
