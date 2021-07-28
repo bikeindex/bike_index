@@ -3,8 +3,7 @@ class EmailStolenNotificationWorker < ApplicationWorker
 
   def perform(stolen_notification_id)
     stolen_notification = StolenNotification.find(stolen_notification_id)
-    notification = Notification.find_or_create_by(user_id: stolen_notification.sender_id,
-      notifiable: stolen_notification)
+    notification = Notification.find_or_create_by(notifiable: stolen_notification)
     return true if notification.delivered?
     if stolen_notification.permitted_send?
       notification.kind = "stolen_notification_sent"

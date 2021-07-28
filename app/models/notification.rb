@@ -7,8 +7,8 @@ class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     receipt: 1,
-    stolen_notification_sent: 6,
-    stolen_notification_blocked: 7,
+    stolen_notification_sent: 3,
+    stolen_notification_blocked: 4,
     phone_verification: 5,
     donation_standard: 11,
     donation_second: 12,
@@ -30,7 +30,7 @@ class Notification < ApplicationRecord
     text: 1
   }.freeze
 
-  belongs_to :user
+  belongs_to :user # This is ALWAYS the receiver of the notification
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
@@ -107,7 +107,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_email
-    notifiable&.receiver_email if stolen_notification?
+    return notifiable&.receiver_email if stolen_notification?
     return user&.email if user.present?
     notifiable&.user_email if customer_contact?
   end
@@ -126,6 +126,8 @@ class Notification < ApplicationRecord
     return nil if self.class.sender_auto_kinds.include?(kind)
     if notifiable_type == "CustomerContact"
       notifiable&.creator
+    elsif notifiable_type == "StolenNotification"
+      notifiable&.sender
     elsif impound_claim?
       notifiable&.user
     end
@@ -137,8 +139,15 @@ class Notification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.user_id ||= notifiable&.user_id if defined?(notifiable.user_id)
+    self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status = nil if delivery_status.blank?
+  end
+
+  private
+
+  def calculated_user_id
+    return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    notifiable&.user_id if defined?(notifiable.user_id)
   end
 end

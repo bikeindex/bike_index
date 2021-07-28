@@ -7,6 +7,7 @@ class Admin::UserAlertsController < Admin::BaseController
     per_page = params[:per_page] || 50
     @user_alerts = matching_user_alerts.order(sort_column => sort_direction)
       .page(page).per(per_page)
+    @render_kind_counts = ParamsNormalizer.boolean(params[:search_kind_counts])
   end
 
   helper_method :matching_user_alerts
@@ -42,11 +43,9 @@ class Admin::UserAlertsController < Admin::BaseController
     if params[:organization_id].present? && current_organization.present?
       user_alerts = user_alerts.where(organization_id: current_organization.id)
     end
-    # I don't know why this isn't working - see also notifications - ignoring and forcing created_at
-    # @time_range_column = sort_column if %w[updated_at resolved_at dismissed_at].include?(sort_column)
+    @time_range_column = sort_column if %w[updated_at resolved_at dismissed_at].include?(sort_column)
     @time_range_column ||= "created_at"
-    # user_alerts.where(@time_range_colum => @time_range).order(:id)
-    user_alerts.where(created_at: @time_range)
+    user_alerts.where(@time_range_column => @time_range)
   end
 
   def earliest_period_date

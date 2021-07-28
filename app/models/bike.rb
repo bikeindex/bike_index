@@ -340,6 +340,10 @@ class Bike < ApplicationRecord
     current_ownership&.user
   end
 
+  def user_id
+    current_ownership&.user_id
+  end
+
   def user?
     user.present?
   end
