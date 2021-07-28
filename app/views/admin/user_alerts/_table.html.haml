@@ -1,6 +1,6 @@
 - render_sortable ||= false
 - skip_user ||= false
-- render_message ||= false # Hidden by default, I don't think this is really a thing
+-# render_message ||= false # Hidden by default, I don't think this is really a thing
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -13,8 +13,9 @@
       %th Object
       %th= sortable "dismissed_at", render_sortable: render_sortable
       %th= sortable "resolved_at", render_sortable: render_sortable
-      - unless render_message
-        %th.small Message
+      %th.small Notified
+      -#- unless render_message
+      -#  %th.small Message
     %tbody
       - user_alerts.each do |user_alert|
         %tr
@@ -64,6 +65,8 @@
             - if user_alert.resolved_at.present?
               %span.convertTime
                 = l(user_alert.resolved_at, format: :convert_time)
-          - unless render_message
-            %td
-              %small= user_alert.message
+          %td
+            = check_mark if user_alert.notification_id.present?
+          -#- unless render_message
+          -#  %td
+          -#    %small= user_alert.message

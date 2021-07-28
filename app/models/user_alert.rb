@@ -63,12 +63,12 @@ class UserAlert < ApplicationRecord
     %w[theft_alert_without_photo stolen_bike_without_location]
   end
 
-  def self.placement(kind)
-    account_kinds.include?(kind) ? "account" : "general"
-  end
-
   def self.notify_period
     (Time.current - 2.weeks)..(Time.current - 1.hour)
+  end
+
+  def self.placement(kind)
+    account_kinds.include?(kind) ? "account" : "general"
   end
 
   def self.find_or_build_by(attrs)
@@ -173,7 +173,8 @@ class UserAlert < ApplicationRecord
       self.class.notification_kinds.exclude?(kind)
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
-      return false if self.class.notify_period.exclude?(bike.updated_at)
+      return false if bike.blank? || self.class.notify_period.exclude?(bike.updated_at) ||
+        !bike.current_stolen_record&.receive_notifications
     end
     true
   end

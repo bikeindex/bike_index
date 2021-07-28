@@ -1,20 +1,25 @@
-class ScheduleBikePossiblyFoundNotificationWorker < ScheduledWorker
+class CreateUserAlertNotificationWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency
-    23.hours
+    33.minutes
   end
 
-  def perform
-    bikes_with_matches.each do |bike, match|
-      EmailBikePossiblyFoundNotificationWorker
-        .perform_async(bike.id, match.class.to_s, match.id)
-    end
+  def perform(user_alert_id = nil)
+    return enqueue_workers if user_alert_id.blank?
+    user_alert = UserAlert.find(user_alert_id)
+    return unless user_alert.create_notification?
+
+    notification = Notification.create(user_id: user_alert.user_id,
+                        bike_id: user_alert.bike_id,
+                        kind: "user_alert_#{user_alert.kind}")
+    CustomerMailer.donation_email(notification_kind, payment).deliver_now
+    notification.update(delivery_status: "email_success")
+    # Assign afterward so that it the alert is notification found
+    user_alert.update(notification_id: notification.id)
   end
 
-  def bikes_with_matches
-    internal_matches = Bike.possibly_found_with_match
-    external_matches = Bike.possibly_found_externally_with_match
-    internal_matches.concat(external_matches)
+  def enqueue_workers
+    UserAlert.create_notification.pluck(:id).each { |i| CreateUserAlertNotificationWorker.perform_async(i) }
   end
 end

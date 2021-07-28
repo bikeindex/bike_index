@@ -34,8 +34,10 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
 
   it "sends customer an email" do
     expect(bike.claimed?).to be_truthy
+    expect(Notification.count).to eq 0
     instance.perform(stolen_notification.id)
     expect_notification_sent(stolen_notification.sender.email)
+    expect(Notification.count).to eq 1
   end
 
   context "second notification sent notifications" do

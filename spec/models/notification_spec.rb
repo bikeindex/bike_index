@@ -26,4 +26,11 @@ RSpec.describe Notification, type: :model do
       expect(notification.calculated_email).to be_blank
     end
   end
+
+  describe "kind sanity checks" do
+    it "doesn't have duplicates" do
+      expect(Notification::KIND_ENUM.values.count).to eq Notification::KIND_ENUM.values.uniq.count
+      expect(Notification::KIND_ENUM.keys.count).to eq Notification::KIND_ENUM.keys.uniq.count
+    end
+  end
 end

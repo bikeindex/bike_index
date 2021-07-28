@@ -1,12 +1,12 @@
 # TODO: combine all the notification models - or subclass? Or create Notifications for each?
 # - graduated_notifications
 # - parking_notifications
-# - stolen_notifications
 
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     receipt: 1,
+    stolen_notification: 3,
     phone_verification: 5,
     donation_standard: 11,
     donation_second: 12,
@@ -20,7 +20,9 @@ class Notification < ApplicationRecord
     theft_alert_posted: 20,
     stolen_contact: 21,
     stolen_twitter_alerter: 2,
-    bike_possibly_found: 23
+    bike_possibly_found: 23,
+    user_alert_theft_alert_without_photo: 24,
+    user_alert_stolen_bike_without_location: 25
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -61,6 +63,10 @@ class Notification < ApplicationRecord
 
   def self.impound_claim_kinds
     kinds.select { |k| k.start_with?("impound_claim_") }.freeze
+  end
+
+  def self.user_alert_kinds
+    kinds.select { |k| k.start_with?("user_alert_") }.freeze
   end
 
   def self.customer_contact_kinds

@@ -1,33 +1,37 @@
 require "rails_helper"
 
-RSpec.describe ScheduleBikePossiblyFoundNotificationWorker, type: :job do
-  context "given no bikes with matches" do
-    it "does not enqueue any notification jobs" do
-      allow(Bike).to receive(:possibly_found_with_match).and_return([])
-      allow(Bike).to receive(:possibly_found_externally_with_match).and_return([])
-      expect(EmailBikePossiblyFoundNotificationWorker.jobs.length).to eq(0)
+RSpec.describe CreateUserAlertNotificationWorker, type: :job do
+  let(:instance) { described_class.new }
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
 
-      described_class.new.perform
+  before do
+    user_alert.update_column :updated_at, Time.current - 2.hours
+    bike&.update_column :updated_at, Time.current - 2.hours
+    user_alert.reload
+  end
 
-      expect(EmailBikePossiblyFoundNotificationWorker.jobs.length).to eq(0)
+  context "stolen_bike_without_location" do
+    let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location) }
+    let(:bike) { user_alert.bike }
+    it "creates and sends notifications" do
+      expect(user_alert.create_notification?).to be_truthy
+      ActionMailer::Base.deliveries = []
+      expect {
+        instance.perform(user_alert.id)
+      }.to change(Notification, :count).by 1
+      notification = Notification.last
+      expect(user_alert.reload.notification_id).to eq notification.id
+      expect(notification.delivered?).to be_truthy
+
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([customer_contact.user_email])
+      expect(mail.subject).to eq "CUSTOM CUSTOMER contact Title"
     end
   end
 
-  context "given bikes with matches" do
-    it "enqueues a notification job for each match" do
-      FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "hello")
-      abandoned_bike = FactoryBot.create(:bike, serial_number: "hel1o")
-      FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification", bike: abandoned_bike)
-      FactoryBot.create(:external_registry_bike, serial_number: "he1l0")
-      expect(EmailBikePossiblyFoundNotificationWorker.jobs.length).to eq(0)
-      abandoned_bike.reload
-      expect(abandoned_bike.parking_notifications.active.appears_abandoned_notification.any?).to be_truthy
-      expect(abandoned_bike.status_abandoned?).to be_truthy
-      expect(Bike.status_abandoned.pluck(:id)).to eq([abandoned_bike.id])
-
-      described_class.new.perform
-
-      expect(EmailBikePossiblyFoundNotificationWorker.jobs.length).to eq(2)
-    end
+  context "stolen_bike_without_location" do
+    it "creates and sends notification"
   end
 end

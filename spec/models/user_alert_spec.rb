@@ -53,6 +53,10 @@ RSpec.describe UserAlert, type: :model do
   end
 
   describe "create_notification?" do
+    it "notification has the kinds" do
+      kinds = UserAlert.notification_kinds.map { |k| "user_alert_#{k}" }
+      expect((Notification.kinds & kinds).count).to eq UserAlert.notification_kinds.count
+    end
     context "stolen bike without location" do
       let(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location) }
       let(:bike_updated_at) { Time.current - 2.hours}
@@ -97,7 +101,7 @@ RSpec.describe UserAlert, type: :model do
       end
       context "stolen bike no_notify" do
         it "is false" do
-          user_alert.bike.current_stolen_record.update(no_notify: true)
+          user_alert.bike.current_stolen_record.update(receive_notifications: false)
           expect(user_alert.reload.create_notification?).to be_falsey
         end
       end
