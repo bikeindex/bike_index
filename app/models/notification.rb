@@ -7,6 +7,8 @@ class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     receipt: 1,
+    stolen_notification_sent: 3,
+    stolen_notification_blocked: 4,
     phone_verification: 5,
     donation_standard: 11,
     donation_second: 12,
@@ -28,7 +30,7 @@ class Notification < ApplicationRecord
     text: 1
   }.freeze
 
-  belongs_to :user
+  belongs_to :user # ALWAYS receiver of the notification (unless it's a stolen_notification_blocked, which is sent to admin instead)
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
@@ -63,6 +65,10 @@ class Notification < ApplicationRecord
     kinds.select { |k| k.start_with?("impound_claim_") }.freeze
   end
 
+  def self.stolen_notification_kinds
+    kinds.select { |k| k.start_with?("stolen_notification_") }.freeze
+  end
+
   def self.customer_contact_kinds
     %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
   end
@@ -84,6 +90,10 @@ class Notification < ApplicationRecord
     self.class.theft_alert_kinds.include?(kind)
   end
 
+  def stolen_notification?
+    self.class.stolen_notification_kinds.include?(kind)
+  end
+
   def donation?
     self.class.donation_kinds.include?(kind)
   end
@@ -97,6 +107,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_email
+    return notifiable&.receiver_email if stolen_notification?
     return user&.email if user.present?
     notifiable&.user_email if customer_contact?
   end
@@ -115,6 +126,8 @@ class Notification < ApplicationRecord
     return nil if self.class.sender_auto_kinds.include?(kind)
     if notifiable_type == "CustomerContact"
       notifiable&.creator
+    elsif notifiable_type == "StolenNotification"
+      notifiable&.sender
     elsif impound_claim?
       notifiable&.user
     end
@@ -126,7 +139,15 @@ class Notification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.user_id ||= notifiable&.user_id
+    self.user_id ||= calculated_user_id
+    self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status = nil if delivery_status.blank?
+  end
+
+  private
+
+  def calculated_user_id
+    return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    notifiable&.user_id if defined?(notifiable.user_id)
   end
 end

@@ -26,4 +26,38 @@ RSpec.describe Notification, type: :model do
       expect(notification.calculated_email).to be_blank
     end
   end
+
+  describe "kind sanity checks" do
+    it "doesn't have duplicates" do
+      expect(Notification::KIND_ENUM.values.count).to eq Notification::KIND_ENUM.values.uniq.count
+      expect(Notification::KIND_ENUM.keys.count).to eq Notification::KIND_ENUM.keys.uniq.count
+    end
+  end
+
+  describe "sender" do
+    let(:notification) { Notification.new(notifiable: notifiable, kind: kind) }
+    context "donation" do
+      let(:notifiable) { Payment.new }
+      let(:kind) { "donation_stolen" }
+      it "is auto" do
+        expect(notification.sender).to be_blank
+      end
+    end
+    context "customer_contact" do
+      let(:user) { User.new(id: 12) }
+      let(:notifiable) { CustomerContact.new(creator: user) }
+      let(:kind) { "stolen_contact" }
+      it "is auto" do
+        expect(notification.sender).to eq user
+      end
+    end
+    context "stolen_notification" do
+      let(:user) { User.new(id: 12) }
+      let(:notifiable) { StolenNotification.new(sender: user) }
+      let(:kind) { "stolen_notification_sent" }
+      it "is auto" do
+        expect(notification.sender).to eq user
+      end
+    end
+  end
 end
