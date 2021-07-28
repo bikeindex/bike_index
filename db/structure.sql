@@ -2683,7 +2683,8 @@ CREATE TABLE public.stolen_records (
     recovery_link_token text,
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
-    neighborhood character varying
+    neighborhood character varying,
+    no_notify boolean DEFAULT false
 );
 
 
@@ -5879,6 +5880,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210723222942'),
 ('20210727011722'),
 ('20210727021013'),
-('20210727174230');
+('20210727174230'),
+('20210727212502');
 
 
