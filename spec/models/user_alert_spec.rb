@@ -59,7 +59,7 @@ RSpec.describe UserAlert, type: :model do
     end
     context "stolen bike without location" do
       let(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location) }
-      let(:bike_updated_at) { Time.current - 2.hours}
+      let(:bike_updated_at) { Time.current - 2.hours }
       before do
         user_alert.update_column :updated_at, Time.current - 2.hours
         user_alert&.bike&.update_column :updated_at, bike_updated_at

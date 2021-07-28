@@ -59,5 +59,12 @@ RSpec.describe Notification, type: :model do
         expect(notification.sender).to eq user
       end
     end
+    context "user_alert" do
+      let(:notifiable) { UserAlert.new(id: 12) }
+      let(:kind) { "stolen_notification_sent" }
+      it "is auto" do
+        expect(notification.sender).to be_blank
+      end
+    end
   end
 end

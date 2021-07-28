@@ -6,7 +6,7 @@
     %ul
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "") }
-          #{@kind.titleize} #{@kind == "all" ? "kinds" : "kind"}
+          #{@kind.titleize} #{(special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : ""}
         .dropdown-menu
           = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : '' }"
           - special_kind_scopes.each do |kind|
@@ -14,18 +14,52 @@
 
           .dropdown-divider
           - Notification.kinds.each do |kind|
-            = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
+            = link_to kind.humanize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
         = link_to "Only undelivered", url_for(sortable_search_params.merge(search_undelivered: !@undelivered)), class: "nav-link #{@undelivered ? 'active' : ''}"
       %li.nav-item
         = link_to "With bike", url_for(sortable_search_params.merge(search_with_bike: !@with_bike)), class: "nav-link #{@with_bike ? 'active' : ''}"
       %li.nav-item
+        = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: { viewing: "Notifications" }
 
+
+-# Only render stacked kinds if rendering type counts
+- colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
 - if @render_chart
-  .col-12.mt-2
-    = column_chart time_range_counts(collection: matching_notifications, column: @time_range_column), stacked: true, thousands: ",", defer: true
+  - if @render_kind_counts
+    - user_alert_counts = Notification.kinds.map { |k| {name: Notification.kind_humanized(k), data: time_range_counts(collection: matching_notifications.where(kind: k), column: @time_range_column)} }
+  - else
+    - user_alert_counts = time_range_counts(collection: matching_notifications)
+  = column_chart user_alert_counts, stacked: true, thousands: ",", defer: true, colors: colors
+
+- if @render_kind_counts
+  .row.mt-4.mb-4
+    .col-md-6.offset-md-3
+      .card
+        .card-body
+          %h3 Kinds
+          %table.table-list.wide-definition
+            %tbody
+              - Notification.kinds.each_with_index do |kind, index|
+                - count = matching_notifications.where(kind: kind).count
+                - next unless count > 0
+                %tr
+                  %td
+                    - color = colors[index]
+                    %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
+                    = link_to Notification.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind))
+                  %td
+                    = admin_number_display(count)
+              - nil_count = matching_notifications.where(kind: nil).count
+              - if nil_count > 0
+                %tr
+                  %td
+                    Nil
+                  %td
+                    = admin_number_display(nil_count)
 
 = render partial: "/shared/period_select"
 

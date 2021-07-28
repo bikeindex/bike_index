@@ -11,7 +11,8 @@ class UserAlert < ApplicationRecord
   belongs_to :user_phone
   belongs_to :theft_alert
   belongs_to :organization
-  belongs_to :notification
+
+  has_one :notification, as: :notifiable
 
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
 
@@ -28,7 +29,10 @@ class UserAlert < ApplicationRecord
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
-  scope :create_notification, -> { where(kind: notification_kinds).where(notification_id: nil).where(updated_at: notify_period) }
+  scope :create_notification, -> {
+    where(kind: notification_kinds, updated_at: notify_period)
+      .left_joins(:notification).where(notifications: {id: nil})
+  }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -168,7 +172,7 @@ class UserAlert < ApplicationRecord
   end
 
   def create_notification?
-    return false if inactive? || notification_id.present? ||
+    return false if inactive? || notification.present? ||
       self.class.notify_period.exclude?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
     # Check if the relevant object is updated since
@@ -177,6 +181,16 @@ class UserAlert < ApplicationRecord
         !bike.current_stolen_record&.receive_notifications
     end
     true
+  end
+
+  def email_subject
+    if kind == "theft_alert_without_photo"
+      "Please add a photo to your stolen #{bike.cycle_type}"
+    elsif kind == "stolen_bike_without_location"
+      "Your stolen #{bike.cycle_type} is missing its location"
+    else
+      kind_humanized
+    end
   end
 
   def set_calculated_attributes

@@ -51,7 +51,7 @@
           %td
             %small.convertTime
               = l(notification.updated_at, format: :convert_time)
-          %td= notification.kind&.titleize
+          %td= notification.kind_humanized&.titleize
           %td
             %small.less-strong= notification.message_channel
           - unless skip_user

@@ -66,7 +66,7 @@
               %span.convertTime
                 = l(user_alert.resolved_at, format: :convert_time)
           %td
-            = check_mark if user_alert.notification_id.present?
+            = check_mark if user_alert.notification.present?
           -#- unless render_message
           -#  %td
           -#    %small= user_alert.message

@@ -56,6 +56,11 @@ class Notification < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.kind_humanized(str)
+    return "" unless str.present?
+    str.tr("_", " ")
+  end
+
   def self.donation_kinds
     kinds.select { |k| k.start_with?("donation_") }.freeze
   end
@@ -81,7 +86,8 @@ class Notification < ApplicationRecord
   end
 
   def self.sender_auto_kinds
-    donation_kinds + theft_alert_kinds + %w[stolen_twitter_alerter bike_possibly_found]
+    donation_kinds + theft_alert_kinds + user_alert_kinds +
+      %w[stolen_twitter_alerter bike_possibly_found]
   end
 
   # TODO: update with twilio delivery status, update scope too
@@ -111,6 +117,10 @@ class Notification < ApplicationRecord
 
   def customer_contact?
     self.class.customer_contact_kinds.include?(kind)
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def calculated_email
