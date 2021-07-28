@@ -30,7 +30,7 @@ class Notification < ApplicationRecord
     text: 1
   }.freeze
 
-  belongs_to :user # This is ALWAYS the receiver of the notification
+  belongs_to :user # ALWAYS receiver of the notification (unless it's a stolen_notification_blocked, which is sent to admin instead)
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
