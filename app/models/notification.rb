@@ -1,12 +1,13 @@
-# TODO: combine all the notification models - or subclass? Or create Notifications for each?
+# TODO: create notifications for each other notification model:
 # - graduated_notifications
 # - parking_notifications
+# We're creating notifications for other notification models (e.g. StolenNotification),
+# with the long term goal of moving all the notification/emailing logic here and removing it from other models
 
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     receipt: 1,
-    stolen_notification: 3,
     phone_verification: 5,
     donation_standard: 11,
     donation_second: 12,
