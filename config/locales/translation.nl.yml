@@ -2833,6 +2833,10 @@ nl:
         we_think_your_stolen_bike: We hebben mogelijk uw gestolen %{bike_title} gevonden!
         bike: 'Fiets:'
         bike_registry: 'Fietsregister:'
+    user_alert_email:
+      html:
+        this_email_is_about_the_biketype_register: Deze e-mail gaat over de %{biketype}
+          geregistreerd op Bike Index op %{date}
   info:
     about:
       about_bike_index: Over Bike Index
