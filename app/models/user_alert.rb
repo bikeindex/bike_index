@@ -29,6 +29,7 @@ class UserAlert < ApplicationRecord
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
+  scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
   scope :create_notification, -> {
     where(kind: notification_kinds, updated_at: notify_period)
       .left_joins(:notification).where(notifications: {id: nil})

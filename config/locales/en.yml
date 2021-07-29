@@ -2034,6 +2034,10 @@ en:
           a Bike Index stolen bike alerter:'
         were_spreading_the_word_about_your_stolen: We are spreading the word about
           your stolen %{bike_type}!
+    user_alert_email:
+      html:
+        this_email_is_about_the_biketype_register: This email is about the %{biketype}
+          registered on Bike Index on %{date}  
     stolen_notification_email:
       html:
         if_you_believe_this_email_is_illegitimate: If you believe this email is illegitimate,

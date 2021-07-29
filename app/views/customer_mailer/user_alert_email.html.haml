@@ -1,19 +1,34 @@
 - @bike = @user_alert.bike
 
-.stolen-notification-from
 
-%p
-/ - if @stolen_notification.sender.name.present?
-/   %p{ style: 'color: #ccc; margin: 1em 0 2em 1em;' }
-/     = @stolen_notification.sender.name
+- if @user_alert.kind == "stolen_bike_without_location"
+  %h2
+    Your stolen #{@bike.cycle_type} is missing location
 
-%hr{ style: 'margin: 40px 0;' }
+  %p
+    People searching for stolen bikes in the area won't find your bike - <em>which is how most bikes are recovered</em>.
 
-%p.less-strong.center-text
-  - date = l @bike.created_at, format: :dotted
-  -#= t(".html.this_email_is_about_the_biketype_register", biketype: @bike.type, date: date)
+  %p
+    %strong
+      - if @bike.theft_alerts.paid.any?
+        We can't turn on your promoted alert
+      - else
+        We can't alert anyone about your bike being stolen
+      %span.text-red{style: "color: rgb(231, 76, 60);"}
+        until you add a location.
+
+  %h3.mt-5.mb-5.uncap
+    Please - #{link_to "add the location to your #{@bike.type}!", edit_bike_url(@bike, page: "theft_details")}
+
+- if @bike.present?
+
+  %hr{ style: "margin: 40px 0;" }
+
+  %p.less-strong.center-text
+    - date = l @bike.created_at, format: :dotted
+    = t(".html.this_email_is_about_the_biketype_register", biketype: @bike.type, date: date)
 
 
-= render partial: 'shared/email_bike_box'
+  = render partial: 'shared/email_bike_box'
 
-.less-strong{ style: "line-height: 1.25em; text-align: center;" }
+  .less-strong{ style: "line-height: 1.25em; text-align: center;" }
