@@ -91,6 +91,15 @@ RSpec.describe UserAlert, type: :model do
           expect(UserAlert.create_notification.pluck(:id)).to eq([])
         end
       end
+      context "with another user_alert" do
+        let(:user_alert2) { FactoryBot.create(:user_alert, user: user_alert.user, bike: user_alert.bike, kind: "theft_alert_without_photo") }
+        let!(:notification) { FactoryBot.create(:notification, notifiable: user_alert2, kind: "user_alert_theft_alert_without_photo") }
+        it "is false" do
+          expect(user_alert2.reload.notification.present?).to be_truthy
+          expect(user_alert2.create_notification?).to be_falsey
+          expect(user_alert.reload.create_notification?).to be_falsey
+        end
+      end
       context "with notification" do
         let(:notification) { FactoryBot.create(:notification) }
         it "is false" do

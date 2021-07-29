@@ -87,8 +87,7 @@ class UserAlert < ApplicationRecord
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
-    else
-      # Don't create if theft alert already has a photo
+    else # Don't create just to resolve
       user_alert.id.blank? ? true : user_alert.resolve!
     end
   end
@@ -98,8 +97,7 @@ class UserAlert < ApplicationRecord
                                             user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_location?
       user_alert.save
-    else
-      # Don't create if theft alert already has a photo
+    else # Don't create just to resolve
       user_alert.id.blank? ? true : user_alert.resolve!
     end
   end
@@ -181,12 +179,13 @@ class UserAlert < ApplicationRecord
       return false if bike.blank? || self.class.notify_period.exclude?(bike.updated_at) ||
         !bike.current_stolen_record&.receive_notifications
     end
-    true
+    # don't send a user alert notification if user has an outstanding user alert notification
+    UserAlert.active.where(user_id: user_id).with_notification.none?
   end
 
   def email_subject
     if kind == "theft_alert_without_photo"
-      "Please add a photo to your stolen #{bike.cycle_type}"
+      "Your stolen #{bike.cycle_type} needs a photo"
     elsif kind == "stolen_bike_without_location"
       "Your stolen #{bike.cycle_type} is missing its location"
     else

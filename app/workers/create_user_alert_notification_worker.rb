@@ -7,9 +7,9 @@ class CreateUserAlertNotificationWorker < ScheduledWorker
 
   def perform(user_alert_id = nil)
     return enqueue_workers if user_alert_id.blank?
+
     user_alert = UserAlert.find(user_alert_id)
     return unless user_alert.create_notification?
-
     notification = Notification.find_or_create_by(notifiable: user_alert,
                                                   kind: "user_alert_#{user_alert.kind}")
 

@@ -1,5 +1,20 @@
 - @bike = @user_alert.bike
 
+- if @user_alert.kind == "theft_alert_without_photo"
+  %h2
+    Your stolen #{@bike.type} doesn't have a photo
+
+  %p
+    To be able to create a promoted alert for your #{@bike.type}, we need to have a photo.
+
+  %p
+    %strong
+      We can't turn on your promoted alert
+      %span.stolen-color
+        until you add a photo.
+
+  %h3.mt-5.mb-5.uncap
+    Please - #{link_to "add a photo of your #{@bike.type}!", edit_bike_url(@bike, page: "theft_details")}
 
 - if @user_alert.kind == "stolen_bike_without_location"
   %h2
@@ -14,7 +29,7 @@
         We can't turn on your promoted alert
       - else
         We can't alert anyone about your bike being stolen
-      %span.text-red{style: "color: rgb(231, 76, 60);"}
+      %span.stolen-color
         until you add a location.
 
   %h3.mt-5.mb-5.uncap
