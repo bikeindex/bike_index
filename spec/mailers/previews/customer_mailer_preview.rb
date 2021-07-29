@@ -46,6 +46,12 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.stolen_bike_alert_email(customer_contact)
   end
 
+  def user_alert_email
+    user_alert = UserAlert.where(kind: UserAlert.notification_kinds).last
+
+    CustomerMailer.user_alert_email(user_alert)
+  end
+
   def theft_alert_posted
     theft_alert = TheftAlert.reorder(:created_at).last
     notification = theft_alert.notifications.where(kind: "theft_alert_posted").first

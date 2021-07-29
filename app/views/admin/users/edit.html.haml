@@ -153,15 +153,30 @@
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 
+.row.mt-4
+  - user_alerts = @user.user_alerts.order(created_at: :desc)
+  .col-md-6
+    %h4
+      = pluralize(number_with_delimiter(user_alerts.active.count), "Active Alert")
+      %small.less-strong #{user_alerts.count} total
+  .col-md-6.text-right
+    = link_to "Show all alerts", admin_user_alerts_path(user_id: @user.id)
+- if user_alerts.any?
+  = render partial: "admin/user_alerts/table", locals: { user_alerts: user_alerts.active, skip_user: true }
+
+
 - payments = @user.payments.reorder(created_at: :desc)
-%h4.mt-4
-  Donations/payments
-  %small
+.row.mt-4
+  .col-md-6
+    %h4
+      Donations/payments
+      %small
+        %em
+          = pluralize(number_with_delimiter(payments.count), "payments")
+          - if payments.count > 5
+            %small.less-strong (only first 5 shown)
+  .col-md-6.text-right
     = link_to "view all", admin_payments_path(user_id: @user.id)
-    %em
-      = pluralize(number_with_delimiter(payments.count), "payments")
-      - if payments.count > 5
-        %small.less-strong (only first 5 shown)
 
 = render partial: "/admin/payments/table", locals: { payments: payments.limit(5), skip_user: true }
 
@@ -237,7 +252,7 @@
                   = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
           %tr.collapse.small.mailchimpRawData
             %td Feedbacks
-            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.humanized_kind, admin_feedback_path(f), class: "small") }, ", ")
+            %td= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ")
     .col-md-6
       .collapse.small.mailchimpRawData= pretty_print_json(mailchimp_datum.data)
 

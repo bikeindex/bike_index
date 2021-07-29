@@ -67,7 +67,7 @@ class Feedback < ApplicationRecord
     %w[tip_stolen_bike tip_chop_shop]
   end
 
-  def self.humanized_kind(str)
+  def self.kind_humanized(str)
     return nil unless str.present?
     return "#{str.gsub(/lead_for_/, "").strip.humanize} lead" if str.match?("lead")
     str.gsub("_request", "").strip.humanize
@@ -126,13 +126,13 @@ class Feedback < ApplicationRecord
     (feedback_hash || {})["phone_number"]
   end
 
-  def humanized_kind
-    self.class.humanized_kind(kind)
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
-  # Legacy method - TODO: replace with humanized_kind
+  # Legacy method - TODO: replace with kind_humanized
   def humanized_type
-    humanized_kind
+    kind_humanized
   end
 
   def set_calculated_attributes

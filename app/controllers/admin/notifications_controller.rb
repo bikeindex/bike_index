@@ -8,6 +8,7 @@ class Admin::NotificationsController < Admin::BaseController
     @notifications = matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
       .includes(:bike, :notifiable, :user)
       .page(page).per(per_page)
+    @render_kind_counts = ParamsNormalizer.boolean(params[:search_kind_counts])
   end
 
   helper_method :matching_notifications, :special_kind_scopes

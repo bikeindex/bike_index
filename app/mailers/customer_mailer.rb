@@ -121,6 +121,19 @@ class CustomerMailer < ApplicationMailer
     stolen_notification.update_attribute :send_dates, dates
   end
 
+  def user_alert_email(user_alert)
+    @user_alert = user_alert
+    @user = @user_alert.user
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user_alert.user.email,
+        from: "bryan@bikeindex.org",
+        subject: @user_alert.email_subject
+      )
+    end
+  end
+
   def bike_possibly_found_email(contact)
     @bike = contact.bike
     @user = User.fuzzy_email_find(@bike.owner_email)

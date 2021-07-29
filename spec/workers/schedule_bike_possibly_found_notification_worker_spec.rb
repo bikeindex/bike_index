@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe ScheduleBikePossiblyFoundNotificationWorker, type: :job do
+  let(:instance) { described_class.new }
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
+
   context "given no bikes with matches" do
     it "does not enqueue any notification jobs" do
       allow(Bike).to receive(:possibly_found_with_match).and_return([])

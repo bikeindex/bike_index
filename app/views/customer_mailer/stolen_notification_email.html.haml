@@ -4,7 +4,7 @@
   - sender_email = @stolen_notification.sender.email
   %p
     - if @bike.status_stolen?
-      = link = link_to t(".html.stolen_biketype", biketype: @bike.type), bike_url(@bike)
+      - link = link_to t(".html.stolen_biketype", biketype: @bike.type), bike_url(@bike)
       = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link)
 
     - else

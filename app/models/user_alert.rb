@@ -12,6 +12,8 @@ class UserAlert < ApplicationRecord
   belongs_to :theft_alert
   belongs_to :organization
 
+  has_one :notification, as: :notifiable
+
   validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
 
   enum kind: KIND_ENUM
@@ -27,6 +29,11 @@ class UserAlert < ApplicationRecord
   scope :general, -> { where(kind: general_kinds) }
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
+  scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
+  scope :create_notification, -> {
+    where(kind: notification_kinds, updated_at: notify_period)
+      .left_joins(:notification).where(notifications: {id: nil})
+  }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -57,6 +64,14 @@ class UserAlert < ApplicationRecord
     %w[unassigned_bike_org]
   end
 
+  def self.notification_kinds
+    %w[theft_alert_without_photo stolen_bike_without_location]
+  end
+
+  def self.notify_period
+    (Time.current - 2.weeks)..(Time.current - 1.hour)
+  end
+
   def self.placement(kind)
     account_kinds.include?(kind) ? "account" : "general"
   end
@@ -72,8 +87,7 @@ class UserAlert < ApplicationRecord
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
-    else
-      # Don't create if theft alert already has a photo
+    else # Don't create just to resolve
       user_alert.id.blank? ? true : user_alert.resolve!
     end
   end
@@ -83,8 +97,7 @@ class UserAlert < ApplicationRecord
                                             user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_location?
       user_alert.save
-    else
-      # Don't create if theft alert already has a photo
+    else # Don't create just to resolve
       user_alert.id.blank? ? true : user_alert.resolve!
     end
   end
@@ -157,6 +170,30 @@ class UserAlert < ApplicationRecord
     update(resolved_at: Time.current)
   end
 
+  def create_notification?
+    return false if inactive? || notification.present? ||
+      self.class.notify_period.exclude?(updated_at) ||
+      self.class.notification_kinds.exclude?(kind)
+    # Check if the relevant object is updated since
+    if theft_alert_without_photo? || stolen_bike_without_location?
+      return false if bike.blank? || self.class.notify_period.exclude?(bike.updated_at) ||
+        !bike.current_stolen_record&.receive_notifications
+    end
+    # don't send a user alert notification if user has an outstanding user alert notification
+    UserAlert.active.where(user_id: user_id).with_notification.none?
+  end
+
+  def email_subject
+    if kind == "theft_alert_without_photo"
+      "Your stolen #{bike.cycle_type} needs a photo"
+    elsif kind == "stolen_bike_without_location"
+      "Your stolen #{bike.cycle_type} is missing its location"
+    else
+      kind_humanized
+    end
+  end
+
   def set_calculated_attributes
+    self.message = nil if message.blank?
   end
 end

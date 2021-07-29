@@ -314,7 +314,7 @@ class StolenRecord < ApplicationRecord
       bike&.update_attributes(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     theft_alerts.each { |t| t.update(updated_at: Time.current) }
-    bike&.user&.update_attributes(updated_at: Time.current)
+    AfterUserChangeWorker.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private

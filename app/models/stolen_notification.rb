@@ -3,6 +3,8 @@ class StolenNotification < ApplicationRecord
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
 
+  has_one :notification
+
   validates_presence_of :sender, :bike, :message
 
   before_validation :set_calculated_attributes

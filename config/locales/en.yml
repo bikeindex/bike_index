@@ -2121,6 +2121,10 @@ en:
           a nonprofit helps us get there. You can read more at %{url}
         you_may_not_know_but_bike_index_recently_: You may not know, but Bike Index
           recently became a 501(c)(3) nonprofit.
+    user_alert_email:
+      html:
+        this_email_is_about_the_biketype_register: This email is about the %{biketype}
+          registered on Bike Index on %{date}
     welcome_email:
       html:
         add_some_information_about_your_bikes_whe: Add some information about your

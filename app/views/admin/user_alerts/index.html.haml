@@ -6,15 +6,18 @@
     %ul
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@activeness != "all" ? "active" : "") }
-          #{@activeness.titleize}
+          - if @activeness == "all"
+            Active and Inactive
+          - else
+            = @activeness.titleize
         .dropdown-menu
-          = link_to "All activenesss", url_for(sortable_search_params.merge(search_activeness: nil)), class: "dropdown-item #{@activeness == 'all' ? 'active' : '' }"
+          = link_to "Active and Inactive", url_for(sortable_search_params.merge(search_activeness: nil)), class: "dropdown-item #{@activeness == 'all' ? 'active' : '' }"
           = link_to "Only Active", url_for(sortable_search_params.merge(search_activeness: "active")), class: "dropdown-item #{@activeness == 'active' ? 'active' : '' }"
           = link_to "Only Inactive", url_for(sortable_search_params.merge(search_activeness: "inactive")), class: "dropdown-item #{@activeness == 'inactive' ? 'active' : '' }"
           .dropdown-divider
           = link_to "Resolved", url_for(sortable_search_params.merge(search_activeness: "resolved")), class: "dropdown-item #{@activeness == 'resolved' ? 'active' : '' }"
           = link_to "Dismissed", url_for(sortable_search_params.merge(search_activeness: "dismissed")), class: "dropdown-item #{@activeness == 'dismissed' ? 'active' : '' }"
-      %li.nav-item.dropdown.dropleft
+      %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "") }
           #{@kind.titleize} #{@kind == "all" ? "kinds" : "kind"}
         .dropdown-menu
@@ -23,12 +26,45 @@
           - UserAlert.kinds.each do |kind|
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
+        = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: { viewing: "User Alerts" }
 
+-# Only render stacked kinds if rendering type counts
+- colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
 - if @render_chart
-  .col-12.mt-2
-    = column_chart time_range_counts(collection: matching_user_alerts, column: @time_range_column), stacked: true, thousands: ",", defer: true
+  - if @render_kind_counts
+    - user_alert_counts = UserAlert.kinds.map { |k| {name: UserAlert.kind_humanized(k), data: time_range_counts(collection: matching_user_alerts.where(kind: k), column: @time_range_column)} }
+  - else
+    - user_alert_counts = time_range_counts(collection: matching_user_alerts)
+  = column_chart user_alert_counts, stacked: true, thousands: ",", defer: true, colors: colors
+
+- if @render_kind_counts
+  .row.mt-4.mb-4
+    .col-md-6.offset-md-3
+      .card
+        .card-body
+          %h3 Kinds
+          %table.table-list.wide-definition
+            %tbody
+              - UserAlert.kinds.each_with_index do |kind, index|
+                - count = matching_user_alerts.where(kind: kind).count
+                - next unless count > 0
+                %tr
+                  %td
+                    - color = colors[index]
+                    %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
+                    = link_to UserAlert.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind))
+                  %td
+                    = admin_number_display(count)
+              - nil_count = matching_user_alerts.where(kind: nil).count
+              - if nil_count > 0
+                %tr
+                  %td
+                    Nil
+                  %td
+                    = admin_number_display(nil_count)
 
 = render partial: "/shared/period_select"
 
@@ -42,61 +78,4 @@
   .col-lg-4
     = paginate @user_alerts, views_prefix: "admin"
 
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
-    %thead.small-header.hidden-md-down
-      %th= sortable "created_at"
-      %th.small= sortable "updated_at"
-      %th= sortable "kind"
-      %th= sortable "user_id"
-      %th Object
-      %th= sortable "dismissed_at"
-      %th= sortable "resolved_at"
-    %tbody
-      - @user_alerts.each do |user_alert|
-        %tr
-          %td
-            %span.convertTime
-              = l(user_alert.created_at, format: :convert_time)
-          %td
-            %small.convertTime
-              = l(user_alert.updated_at, format: :convert_time)
-          %td= user_alert.kind_humanized
-          %td
-            - if user_alert.user_id.present?
-              - if user_alert.user.present?
-                = link_to user_alert.user.email, admin_user_path(user_alert.user_id)
-              - else # Handle deleted users
-                - user = User.unscoped.find_by_id(user_alert.user_id)
-                - if user.present?
-                  = link_to user.email, admin_user_path(user_alert.user_id)
-                  %small.text-danger user deleted
-                - else
-                  %small.text-danger missing user: #{user_alert.user_id}
-              = link_to "alerts", url_for(sortable_search_params.merge(user_id: user_alert.user_id)), class: "small gray-link"
-          %td
-            - if user_alert.bike_id.present?
-              %span.d-block
-                %small bike:
-                = link_to user_alert.bike_id, admin_bike_path(user_alert.bike_id)
-                = link_to "alerts", url_for(sortable_search_params.merge(bike_id: user_alert.bike_id)), class: "small gray-link"
-            - if user_alert.user_phone.present?
-              %span.d-block
-                %small user_phone: #{user_alert.user_phone_id}
-            - if user_alert.theft_alert.present?
-              %span.d-block
-                %small theft_alert:
-                = link_to user_alert.theft_alert_id, admin_theft_alert_path(user_alert.theft_alert_id)
-            - if user_alert.organization.present?
-              %span.d-block
-                %small organization:
-                = link_to user_alert.organization&.short_name || user_alert.organization_id, admin_organization_path(user_alert.organization_id)
-                = link_to "alerts", url_for(sortable_search_params.merge(organization_id: user_alert.organization_id)), class: "small gray-link"
-          %td
-            - if user_alert.dismissed_at.present?
-              %span.convertTime
-                = l(user_alert.dismissed_at, format: :convert_time)
-          %td
-            - if user_alert.resolved_at.present?
-              %span.convertTime
-                = l(user_alert.resolved_at, format: :convert_time)
+= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

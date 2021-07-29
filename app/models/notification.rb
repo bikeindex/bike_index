@@ -1,7 +1,8 @@
-# TODO: combine all the notification models - or subclass? Or create Notifications for each?
+# TODO: create notifications for each other notification model:
 # - graduated_notifications
 # - parking_notifications
-# - stolen_notifications
+# We're creating notifications for other notification models (e.g. StolenNotification),
+# with the long term goal of moving all the notification/emailing logic here and removing it from other models
 
 class Notification < ApplicationRecord
   KIND_ENUM = {
@@ -22,7 +23,9 @@ class Notification < ApplicationRecord
     theft_alert_posted: 20,
     stolen_contact: 21,
     stolen_twitter_alerter: 2,
-    bike_possibly_found: 23
+    bike_possibly_found: 23,
+    user_alert_theft_alert_without_photo: 24,
+    user_alert_stolen_bike_without_location: 25
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -53,6 +56,11 @@ class Notification < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.kind_humanized(str)
+    return "" unless str.present?
+    str.tr("_", " ")
+  end
+
   def self.donation_kinds
     kinds.select { |k| k.start_with?("donation_") }.freeze
   end
@@ -69,12 +77,17 @@ class Notification < ApplicationRecord
     kinds.select { |k| k.start_with?("stolen_notification_") }.freeze
   end
 
+  def self.user_alert_kinds
+    kinds.select { |k| k.start_with?("user_alert_") }.freeze
+  end
+
   def self.customer_contact_kinds
     %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
   end
 
   def self.sender_auto_kinds
-    donation_kinds + theft_alert_kinds + %w[stolen_twitter_alerter bike_possibly_found]
+    donation_kinds + theft_alert_kinds + user_alert_kinds +
+      %w[stolen_twitter_alerter bike_possibly_found]
   end
 
   # TODO: update with twilio delivery status, update scope too
@@ -104,6 +117,10 @@ class Notification < ApplicationRecord
 
   def customer_contact?
     self.class.customer_contact_kinds.include?(kind)
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def calculated_email
