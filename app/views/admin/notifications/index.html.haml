@@ -14,7 +14,7 @@
 
           .dropdown-divider
           - Notification.kinds.each do |kind|
-            = link_to kind.humanize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
+            = link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
         = link_to "Only undelivered", url_for(sortable_search_params.merge(search_undelivered: !@undelivered)), class: "nav-link #{@undelivered ? 'active' : ''}"
       %li.nav-item
@@ -28,9 +28,22 @@
 
 -# Only render stacked kinds if rendering type counts
 - colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
+-# Added 6 random colors - created via 6.times.map { "##{Random.bytes(3).unpack1('H*')}" }
+- colors += ["#3f3a44", "#d54692", "#168124", "#9b6b3b", "#e0b70f", "#a79be8"]
+
 - if @render_chart
   - if @render_kind_counts
-    - user_alert_counts = Notification.kinds.map { |k| {name: Notification.kind_humanized(k), data: time_range_counts(collection: matching_notifications.where(kind: k), column: @time_range_column)} }
+    -# THIS IS SOME HACKY SHIT, sorry
+    :ruby
+      user_alert_counts = Notification.kinds.each_with_index.map do |k, i|
+        if matching_notifications.where(kind: k).any?
+          {name: Notification.kind_humanized(k).titleize, data: time_range_counts(collection: matching_notifications.where(kind: k), column: @time_range_column)}
+        else
+          colors -= [colors[i]]
+          nil
+        end
+      end.compact
+
   - else
     - user_alert_counts = time_range_counts(collection: matching_notifications)
   = column_chart user_alert_counts, stacked: true, thousands: ",", defer: true, colors: colors
@@ -50,7 +63,7 @@
                   %td
                     - color = colors[index]
                     %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
-                    = link_to Notification.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind))
+                    = link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind))
                   %td
                     = admin_number_display(count)
               - nil_count = matching_notifications.where(kind: nil).count
