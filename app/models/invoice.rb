@@ -178,15 +178,15 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due_formatted
-    self.class.money_formatted(amount_due_cents, currency)
+    MoneyFormater.money_format(amount_due_cents, currency)
   end
 
   def amount_paid_formatted
-    self.class.money_formatted(amount_paid_cents, currency)
+    MoneyFormater.money_format(amount_paid_cents, currency)
   end
 
   def discount_formatted
-    self.class.money_formatted(-(discount_cents || 0), currency)
+    MoneyFormater.money_format(-(discount_cents || 0), currency)
   end
 
   def previous_invoice
