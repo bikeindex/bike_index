@@ -172,7 +172,7 @@ class CredibilityScorer
   private
 
   def calculated_badges
-    self.class.creation_badges(@bike.creation_state) +
+    self.class.creation_badges(@bike.current_creation_state) +
       self.class.ownership_badges(@bike) +
       self.class.bike_user_badges(@bike) +
       self.class.bike_badges(@bike)

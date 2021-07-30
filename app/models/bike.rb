@@ -291,31 +291,27 @@ class Bike < ApplicationRecord
     CredibilityScorer.new(self)
   end
 
-  def creation_state
-    creation_states.first
-  end
-
   def creation_description
-    creation_state&.creation_description
+    current_creation_state&.creation_description
   end
 
   def bulk_import
-    creation_state&.bulk_import
+    current_creation_state&.bulk_import
   end
 
   def pos_kind
-    creation_state&.pos_kind
+    current_creation_state&.pos_kind
   end
 
   def creator_unregistered_parking_notification?
-    creation_state&.creator_unregistered_parking_notification?
+    current_creation_state&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
-    return false if creation_state.blank?
-    %w[unregistered_parking_notification impound_import].include?(creation_state.origin) ||
-      creation_state.status == "status_impounded"
+    return false if current_creation_state.blank?
+    %w[unregistered_parking_notification impound_import].include?(current_creation_state.origin) ||
+      current_creation_state.status == "status_impounded"
   end
 
   def pos?

@@ -534,9 +534,9 @@ RSpec.describe BikesController, type: :controller do
           }.to change(Ownership, :count).by 1
           bike = Bike.reorder(:created_at).last
           expect(bike.country.name).to eq("United States")
-          expect(bike.creation_state.origin).to eq "embed"
-          expect(bike.creation_state.organization).to eq organization
-          expect(bike.creation_state.creator).to eq organization.auto_user
+          expect(bike.current_creation_state.origin).to eq "embed"
+          expect(bike.current_creation_state.organization).to eq organization
+          expect(bike.current_creation_state.creator).to eq organization.auto_user
         end
       end
       context "non-stolen" do
@@ -548,10 +548,10 @@ RSpec.describe BikesController, type: :controller do
           }.to change(Ownership, :count).by 1
           bike = Bike.last
           expect(bike.country.name).to eq("United States")
-          expect(bike.creation_state.origin).to eq "embed"
-          expect(bike.creation_state.organization).to eq organization
+          expect(bike.current_creation_state.origin).to eq "embed"
+          expect(bike.current_creation_state.organization).to eq organization
           expect(bike.creator_id).to eq organization.auto_user_id
-          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.current_creation_state.creator).to eq bike.creator
           expect(bike.cycle_type).to eq "tricycle"
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
@@ -578,8 +578,8 @@ RSpec.describe BikesController, type: :controller do
           }.to change(Ownership, :count).by 1
           bike = Bike.last
           expect(bike.country.name).to eq("United States")
-          expect(bike.creation_state.origin).to eq "embed"
-          expect(bike.creation_state.organization).to eq organization
+          expect(bike.current_creation_state.origin).to eq "embed"
+          expect(bike.current_creation_state.organization).to eq organization
           expect(ParkingNotification.count).to eq 0
         end
       end
@@ -607,9 +607,9 @@ RSpec.describe BikesController, type: :controller do
                 }.to change(Ownership, :count).by 1
                 bike = Bike.last
                 expect(bike).to be_present
-                expect(bike.creation_state.origin).to eq "embed"
-                expect(bike.creation_state.organization).to eq organization
-                expect(bike.creation_state.creator).to eq bike.creator
+                expect(bike.current_creation_state.origin).to eq "embed"
+                expect(bike.current_creation_state.organization).to eq organization
+                expect(bike.current_creation_state.creator).to eq bike.creator
                 expect(bike.status).to eq "status_stolen"
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
                 stolen_record = bike.current_stolen_record
@@ -628,9 +628,9 @@ RSpec.describe BikesController, type: :controller do
                 }.to change(Ownership, :count).by 1
                 bike = Bike.last
                 expect(bike).to be_present
-                expect(bike.creation_state.origin).to eq "embed"
-                expect(bike.creation_state.organization).to eq organization
-                expect(bike.creation_state.creator).to eq bike.creator
+                expect(bike.current_creation_state.origin).to eq "embed"
+                expect(bike.current_creation_state.organization).to eq organization
+                expect(bike.current_creation_state.creator).to eq bike.creator
                 expect(bike.status).to eq "status_stolen"
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
                 stolen_record = bike.current_stolen_record
@@ -696,9 +696,9 @@ RSpec.describe BikesController, type: :controller do
             ImageAssociatorWorker.new.perform
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
-            expect(bike.creation_state.origin).to eq "embed_extended"
-            expect(bike.creation_state.organization).to eq organization
-            expect(bike.creation_state.creator).to eq bike.creator
+            expect(bike.current_creation_state.origin).to eq "embed_extended"
+            expect(bike.current_creation_state.organization).to eq organization
+            expect(bike.current_creation_state.creator).to eq bike.creator
             expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.public_images.count).to eq 1
@@ -716,9 +716,9 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns[:persist_email]).to be_truthy
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
           bike = Bike.last
-          expect(bike.creation_state.origin).to eq "embed_extended"
-          expect(bike.creation_state.organization).to eq organization
-          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.current_creation_state.origin).to eq "embed_extended"
+          expect(bike.current_creation_state.organization).to eq organization
+          expect(bike.current_creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq "A crazy different thing"
           expect(bike.creator_id).to eq organization.auto_user_id # It isn't registered to the signed in user
@@ -734,10 +734,10 @@ RSpec.describe BikesController, type: :controller do
           post :create, params: {bike: bike_params.merge(bike_sticker: "AAA")}
           expect(response).to redirect_to(embed_extended_organization_url(organization))
           bike = Bike.last
-          expect(bike.creation_state.origin).to eq "embed_extended"
-          expect(bike.creation_state.organization).to eq organization
-          expect(bike.creation_state.creator).to eq bike.creator
-          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.current_creation_state.origin).to eq "embed_extended"
+          expect(bike.current_creation_state.organization).to eq organization
+          expect(bike.current_creation_state.creator).to eq bike.creator
+          expect(bike.current_creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq manufacturer
           expect(bike.creator_id).to eq user.id
           bike_sticker.reload

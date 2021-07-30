@@ -78,12 +78,12 @@
                     %em
                       Via
                       = origin_display(bike.creation_description)
-                  - if bike.creation_state&.bulk_import.present?
+                  - if bike.current_creation_state&.bulk_import.present?
                     %br
                     Import
-                    = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
-                      \##{bike.creation_state.bulk_import_id}
-                      - if bike.creation_state.bulk_import.ascend?
+                    = link_to admin_bulk_import_path(bike.current_creation_state.bulk_import.to_param) do
+                      \##{bike.current_creation_state.bulk_import_id}
+                      - if bike.current_creation_state.bulk_import.ascend?
                         %small
                           Ascend
               %tr

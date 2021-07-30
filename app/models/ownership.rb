@@ -134,7 +134,7 @@ class Ownership < ApplicationRecord
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
-    return false unless bike.creation_state.present?
-    %w[lightspeed_pos ascend_pos].include?(bike.creation_state.pos_kind)
+    return false unless bike.current_creation_state.present?
+    %w[lightspeed_pos ascend_pos].include?(bike.current_creation_state.pos_kind)
   end
 end

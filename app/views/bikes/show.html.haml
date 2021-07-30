@@ -80,7 +80,7 @@
       - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
         -# This should only show up if the bike isn't registered
         %strong.text-warning= t(".not_registered_by_user")
-        - if @bike.creation_state&.origin == "unregistered_parking_notification"
+        - if @bike.current_creation_state&.origin == "unregistered_parking_notification"
           %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
 
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?

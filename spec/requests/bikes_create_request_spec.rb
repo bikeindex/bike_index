@@ -202,11 +202,11 @@ RSpec.describe BikesController, type: :request do
       let(:bike_params_with_address) do
         {
           b_param_id_token: "",
-          creation_organization_id: "#{organization.id}",
+          creation_organization_id: organization.id.to_s,
           cycle_type: "bike",
           serial_number: "141212",
           made_without_serial: false,
-          manufacturer_id: "#{manufacturer.slug}",
+          manufacturer_id: manufacturer.slug.to_s,
           manufacturer_other: "",
           year: "2021",
           frame_model: "purple rain",
@@ -223,7 +223,7 @@ RSpec.describe BikesController, type: :request do
       end
       # Make bike_params without address because it's used more often
       let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
-      xit "creates with address" do
+      it "creates with address" do
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
