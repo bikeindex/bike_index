@@ -40,6 +40,8 @@ class Admin::UserAlertsController < Admin::BaseController
       @bike = Bike.unscoped.find(params[:search_bike_id])
       user_alerts = user_alerts.where(search_bike_id: @bike.id) if @bike.present?
     end
+    @with_notification = ParamsNormalizer.boolean(params[:search_with_notification])
+    user_alerts = user_alerts.with_notification if @with_notification
     if params[:organization_id].present? && current_organization.present?
       user_alerts = user_alerts.where(organization_id: current_organization.id)
     end

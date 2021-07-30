@@ -61,13 +61,25 @@
   = render partial: "/shared/period_select"
 
 .row.mb-4.mt-4
-  .col-sm-6.col-lg-4.mt-4
+  .col-md-5
     = admin_number_display(available_recoveries.count)
     = "matching recovery".pluralize(available_recoveries.count)
     %em
       = humanized_time_range_column(@time_range_column)
       = humanized_time_range(@time_range)
-  .col-lg-4
+  .col-md-7
+    = form_tag admin_recoveries_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :search_recovery_display_status, @recovery_display_status
+      = hidden_field_tag :search_index_helped_recovery, params[:search_index_helped_recovery]
+      = hidden_field_tag :search_displayed, params[:search_displayed]
+      = render partial: "/shared/hidden_search_fields"
+      .form-group.ml-auto.mr-1.mb-2
+        %em.small.less-strong.mr-1.d-md-inline.d-none within
+        = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
+        %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
+      .form-group.mr-2.mb-2
+        = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 = paginate @recoveries, views_prefix: "admin"
 = render partial: "table", locals: { recoveries: @recoveries, render_sortable: true }
 = paginate @recoveries, views_prefix: "admin"

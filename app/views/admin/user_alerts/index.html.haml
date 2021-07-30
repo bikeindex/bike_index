@@ -26,6 +26,8 @@
           - UserAlert.kinds.each do |kind|
             = link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : '' }"
       %li.nav-item
+        = link_to "Notified", url_for(sortable_search_params.merge(search_with_notification: !@with_notification)), class: "nav-link #{@with_notification ? 'active' : ''}"
+      %li.nav-item
         = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
