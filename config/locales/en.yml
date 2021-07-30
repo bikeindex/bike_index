@@ -2655,8 +2655,9 @@ en:
         - email %{link} if you're having trouble.
       in_this_picture_html: >-
         In this picture <em>200910427-2A</em> is a manufacturer number and not a serial
-        number. However, to make bikes as easy as possible to find, feel free to enter
-        all numbers you encounter.
+        number. We recommend <strong>not</strong> including the manufacturer number
+        when registering. If it looks like you've included a manufacturer number,
+        we'll let you know!
       jump_back_to_footnote: Jump back to footnote %{num} in the text.
       look_serial: Look serial number
       most_bicycles_have_their_serial_number_en: >-
