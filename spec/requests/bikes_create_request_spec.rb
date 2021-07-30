@@ -243,14 +243,18 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template("bikes/edit_bike_details")
 
         new_bike.reload
+        expect(new_bike.b_params.count).to eq 0
         expect(testable_bike_params.keys.count).to be > 10
         expect_attrs_to_match_hash(new_bike, testable_bike_params)
         expect(new_bike.manufacturer).to eq manufacturer
-        expect(new_bike.current_creation_state.origin).to eq "web"
-        expect(new_bike.current_creation_state.creator_id).to eq current_user.id
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
         expect(new_bike.current_ownership.self_made?).to be_truthy
+
+        creation_state = new_bike.current_creation_state
+        expect(creation_state.origin).to eq "web"
+        expect(creation_state.creator_id).to eq current_user.id
+        expect_hashes_to_match(creation_state.registration_info, bike_params_with_address.slice(:organization_affiliation, :street, :city, :zipcode, :state))
 
         expect(new_bike.registration_address).to eq "1400 32nd St, Oakland, 94608, CA, US"
         expect(new_bike.latitude).to eq 3333
@@ -269,11 +273,14 @@ RSpec.describe BikesController, type: :request do
           new_bike = Bike.last
           expect_attrs_to_match_hash(new_bike, testable_bike_params)
           expect(new_bike.manufacturer).to eq manufacturer
-          expect(new_bike.current_creation_state.origin).to eq "web"
-          expect(new_bike.current_creation_state.creator_id).to eq current_user.id
           expect(new_bike.user_id).to eq current_user.id
           expect(new_bike.ownerships.count).to eq 1
           expect(new_bike.current_ownership.self_made?).to be_truthy
+
+          creation_state = new_bike.current_creation_state
+          expect(creation_state.origin).to eq "web"
+          expect(creation_state.creator_id).to eq current_user.id
+          expect(creation_state.registration_info).to eq({"organization_affiliation" => "community_member"})
           # It doesn't have a registration address! But it does have an address - which is just the organization
           expect(new_bike.registration_address).to be_blank
           expect(new_bike.address).to be_present
