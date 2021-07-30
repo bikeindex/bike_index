@@ -9,5 +9,7 @@ class CustomerContactNotificationCreateWorker < ApplicationWorker
                         user_id: customer_contact.user_id,
                         bike_id: customer_contact.bike_id,
                         kind: customer_contact.kind)
+    # Bump the bike to break caches
+    bike.update(updated_at: Time.current) if customer_contact.bike.present?
   end
 end
