@@ -142,7 +142,6 @@ class BikeCreator
 
   def save_bike(bike)
     bike.set_location_info
-    bike.attributes = Geohelper.address_hash_from_geocoder_result(@location) unless bike.latitude.present?
     bike.save
     @bike = associate(bike)
     validate_record(@bike)
@@ -160,6 +159,9 @@ class BikeCreator
         # We skipped setting address, with default_parking_notification_attrs, notification will update it
         ParkingNotification.create!(@b_param.parking_notification_params)
       end
+      # Check if the bike has a location, use passed location if no
+      @bike.reload
+      @bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless @bike.latitude.present?
     end
 
     @bike

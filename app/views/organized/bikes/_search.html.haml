@@ -220,10 +220,11 @@
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
-                - if bike_attr == "registration_address"
-                  - if bike.registration_address.present?
-                    %small
-                      = bike.registration_address["street"]
+                - if bike_attr == "address"
+                  -# Don't show organization address
+                  - if bike.valid_address_present?
+                    %small{style: "line-height: 1.5;"}
+                      = bike.address_hash["street"]
                 - elsif bike_attr == "organization_affiliation"
                   = bike.organization_affiliation.humanize
                 - else

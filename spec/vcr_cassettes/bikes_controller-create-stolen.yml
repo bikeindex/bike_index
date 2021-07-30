@@ -681,4 +681,124 @@ http_interactions:
         }
     http_version:
   recorded_at: Fri, 06 Sep 2019 19:41:06 GMT
-recorded_with: VCR 4.0.0
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=66666666%20foo%20street,%20Chicago,%20IL%2060647,%20US&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Fri, 30 Jul 2021 23:01:13 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Chicago, IL
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=704
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443";
+        ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443";
+        ma=2592000; v="46,43"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "2442",
+                       "short_name" : "2442",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Moffat Street",
+                       "short_name" : "W Moffat St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Logan Square",
+                       "short_name" : "Logan Square",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60647",
+                       "short_name" : "60647",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "2442 W Moffat St, Chicago, IL 60647, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9150411,
+                       "lng" : -87.68925540000001
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.91639008029149,
+                          "lng" : -87.68790641970851
+                       },
+                       "southwest" : {
+                          "lat" : 41.91369211970849,
+                          "lng" : -87.69060438029152
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJsxIlFzvTD4gRFdl6FfXUzzs",
+                 "types" : [ "establishment", "point_of_interest" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version:
+  recorded_at: Fri, 30 Jul 2021 23:01:13 GMT
+recorded_with: VCR 5.0.0

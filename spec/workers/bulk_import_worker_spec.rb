@@ -198,7 +198,8 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
-          expect(bike1.registration_address).to eq default_location_registration_address
+          pp bike1.address_hash, bike1.registration_address, bike1.current_creation_state.registration_info
+          expect(bike1.address).to eq default_location_registration_address
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
 

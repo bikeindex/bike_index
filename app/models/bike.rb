@@ -354,7 +354,7 @@ class Bike < ApplicationRecord
   end
 
   def avery_exportable?
-    !impounded? && owner_name.present? && valid_registration_address_present?
+    !impounded? && owner_name.present? && valid_address_present?
   end
 
   def current_parking_notification
@@ -774,9 +774,11 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
-  def valid_registration_address_present?
+  def valid_address_present?
     return false if registration_address.blank?
-    registration_address["street"].present? && registration_address["city"].present?
+    return false if registration_address["street"].blank? && registration_address["city"].blank?
+    return true if creation_organization&.default_location.blank?
+    creation_organization.default_location.address_hash != address_hash
   end
 
   def registration_address_source
@@ -959,7 +961,8 @@ class Bike < ApplicationRecord
 
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    return false if skip_geocoding? || address_set_manually
+    # pp "#{skip_geocoding?} #{address_changed?} #{address}"
+    return false if skip_geocoding?
     address_changed?
   end
 
@@ -982,15 +985,26 @@ class Bike < ApplicationRecord
   # 2. The bike owner's address, if available
   # 3. registration_address
   # 4. The creation organization, if one is present
+  # - prefer something with a street address, fallback to anything with a latitude
   def location_record_address_hash
-    l_hash = [
+    # l_hash = [
+    #   current_impound_record&.address_hash,
+    #   current_parking_notification&.address_hash,
+    #   owner&.address_hash,
+    #   current_creation_state&.address_hash,
+    #   b_params_address, # TODO: drop this once #2035 is merged
+    #   creation_organization&.default_location&.address_hash,
+    # ].compact.find { |rec| rec&.dig("street").present? || rec&.dig("latitude").present? }
+    l_hashes = [
       current_impound_record&.address_hash,
       current_parking_notification&.address_hash,
       owner&.address_hash,
       current_creation_state&.address_hash,
       b_params_address, # TODO: drop this once #2035 is merged
       creation_organization&.default_location&.address_hash,
-    ].compact.find { |rec| rec&.dig("street").present? || rec&.dig("latitude").present? }
+    ].compact
+    l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
+      l_hashes.find { |rec| rec&.dig("latitude").present? }
     return {} unless l_hash.present?
     # If the location record has coordinates, skip geocoding
     l_hash.merge(skip_geocoding: l_hash["latitude"].present?)

@@ -1901,8 +1901,11 @@ RSpec.describe Bike, type: :model do
         city = "New York"
         zipcode = "10011"
         user = FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city)
+        expect(user.reload.street).to be_blank
         ownership = FactoryBot.create(:ownership, user: user, creator: user)
         bike = ownership.bike
+        FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city})
+        expect(bike.reload.registration_address["zipcode"]).to eq "99999"
         expect(user.to_coordinates.compact.length).to eq 2
 
         bike.reload
@@ -1913,6 +1916,16 @@ RSpec.describe Bike, type: :model do
         expect(bike.city).to eq(city)
         expect(bike.zipcode).to eq(zipcode)
         expect(bike.country).to eq(usa)
+        expect(bike.street).to be_blank
+
+        # BUT! If there is a street address on the creation_state, prefer that
+        bike.current_creation_state.update(registration_info: bike.current_creation_state.registration_info.merge(street: "main main street"))
+        bike.set_location_info
+        expect(bike.skip_geocoding).to be_falsey
+        expect(bike.city).to eq(city)
+        expect(bike.zipcode).to eq "99999"
+        expect(bike.country).to eq(usa)
+        expect(bike.street).to eq "main main street"
       end
     end
   end
