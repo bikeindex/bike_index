@@ -17,7 +17,7 @@
     %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
     %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
   - else
-    %h1
+    %h1.uncap
       - if @organization.present?
         = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
       - else
