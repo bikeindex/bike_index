@@ -3,10 +3,10 @@
 
 %p#fnref-all-bikes-serials
   = t(".all_bikes")
+  = t(".all_have_unique_serial_numbers")
   %sup
     %a.footnote-ref{ href: '#fn-all-bikes-serials' }
       1
-  = t(".all_have_unique_serial_numbers")
 
 %h3.header-font-uncap#find-serial-number.mt-4
   = t(".finding_a_bicycle_serial_number")
@@ -34,7 +34,7 @@
     = link_to image_tag('serials/serial_pinsch.jpg', alt: t('.doberman_serial')), image_path('serials/serial_pinsch.jpg'), class: 'serial-image'
     %p= t(".a_serial_number_located_on_a_html")
 
-  %li#fnref-all-bikes-serials
+  %li#fnref-second-serial-number
     = link_to image_tag('serials/serial_look.jpg', alt: t('.look_serial')), image_path('serials/serial_look.jpg'), class: 'serial-image'
     %p
       = t(".some_bikes_have_multiple_html")
