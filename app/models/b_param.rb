@@ -74,6 +74,11 @@ class BParam < ApplicationRecord
       bike_code]
   end
 
+  def self.registration_info_attrs
+    %w[bike_sticker bike_code phone organization_affiliation student_id
+      accuracy street city state zipcode state country] # Also uses address_hash to get legacy address attributes
+  end
+
   def self.email_search(str)
     return all unless str.present?
     where("email ilike ?", "%#{str.strip}%")
@@ -153,6 +158,12 @@ class BParam < ApplicationRecord
       s_attrs = nested_params.values.reject(&:blank?).last
     end
     s_attrs
+  end
+
+  def registration_info_attrs
+    ria = params["bike"]&.slice(*self.class.registration_info_attrs) || {}
+    # Include legacy address attributes
+    (ria.key?("street") ? ria : ria.merge(address_hash)).reject { |_k, v| v.blank? }.to_h
   end
 
   def status

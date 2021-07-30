@@ -112,7 +112,7 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
 
   include PgSearch::Model
   pg_search_scope :pg_search, against: {
@@ -784,6 +784,8 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
+    elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation
+      "initial_creation_state"
     elsif b_params_address.present?
       "initial_creation"
     end
@@ -796,6 +798,7 @@ class Bike < ApplicationRecord
     when "user" then user&.address_hash
     when "bike_update" then address_hash
     when "initial_creation" then b_params_address
+    when "initial_creation_state" then current_creation_state.address_hash
     else
       {}
     end
@@ -956,7 +959,7 @@ class Bike < ApplicationRecord
 
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    return false if skip_geocoding? || !address_set_manually
+    return false if skip_geocoding? || address_set_manually
     address_changed?
   end
 
@@ -975,18 +978,22 @@ class Bike < ApplicationRecord
   # Select the source from which to derive location data, in the following order
   # of precedence:
   #
-  # 1. The current parking notification, if one is present
-  # 2. The creation organization, if one is present
-  # 3. The bike owner's address, if available
-  # 4. registration_address from b_param if available
+  # 1. The current parking notification/impound record, if one is present
+  # 2. The bike owner's address, if available
+  # 3. registration_address
+  # 4. The creation organization, if one is present
   def location_record_address_hash
-    location_record = [
-      current_parking_notification,
-      current_impound_record,
-      creation_organization&.default_location,
-      owner
-    ].compact.find { |rec| rec.latitude.present? }
-    location_record.present? ? location_record.address_hash : b_params_address
+    l_hash = [
+      current_impound_record&.address_hash,
+      current_parking_notification&.address_hash,
+      owner&.address_hash,
+      current_creation_state&.address_hash,
+      b_params_address, # TODO: drop this once #2035 is merged
+      creation_organization&.default_location&.address_hash,
+    ].compact.find { |rec| rec&.dig("street").present? || rec&.dig("latitude").present? }
+    return {} unless l_hash.present?
+    # If the location record has coordinates, skip geocoding
+    l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
   end
 
   def b_params_address

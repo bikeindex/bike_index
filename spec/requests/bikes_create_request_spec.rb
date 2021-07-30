@@ -223,43 +223,48 @@ RSpec.describe BikesController, type: :request do
       end
       # Make bike_params without address because it's used more often
       let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
+      include_context :geocoder_real
       it "creates with address" do
-        organization.reload
-        expect(organization.location_latitude.to_i).to eq 34
-        expect(organization.default_location).to be_present
-        expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
-        Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          expect {
-            post base_url, params: {bike: bike_params_with_address}
-          }.to change(Bike, :count).by(1)
+        VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
+          organization.reload
+          expect(organization.location_latitude.to_i).to eq 34
+          expect(organization.default_location).to be_present
+          expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            expect {
+              post base_url, params: {bike: bike_params_with_address}
+            }.to change(Bike, :count).by(1)
+          end
+          expect(flash[:success]).to be_present
+          new_bike = Bike.last
+
+          # Make sure things render
+          expect(response).to redirect_to(edit_bike_path(new_bike))
+          get edit_bike_path(new_bike) # Should make the bike claim
+          expect(response).to render_template("bikes/edit_bike_details")
+
+          new_bike.reload
+          expect(new_bike.b_params.count).to eq 0
+          expect(testable_bike_params.keys.count).to be > 10
+          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect(new_bike.manufacturer).to eq manufacturer
+          expect(new_bike.user_id).to eq current_user.id
+          expect(new_bike.ownerships.count).to eq 1
+          expect(new_bike.current_ownership.self_made?).to be_truthy
+
+          creation_state = new_bike.current_creation_state
+          expect(creation_state.origin).to eq "web"
+          expect(creation_state.creator_id).to eq current_user.id
+          reg_hash = bike_params_with_address.slice(:organization_affiliation, :street, :city, :zipcode, :state)
+          expect_hashes_to_match(creation_state.registration_info, reg_hash)
+
+          expect_hashes_to_match(new_bike.registration_address, reg_hash.except(:organization_affiliation))
+          expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
+          expect(new_bike.street).to eq "1400 32nd St"
+          expect(new_bike.latitude.to_i).to eq 37
+          expect(new_bike.longitude.to_i).to eq(-122)
         end
-        expect(flash[:success]).to be_present
-        new_bike = Bike.last
-
-        # Make sure things render
-        expect(response).to redirect_to(edit_bike_path(new_bike))
-        get edit_bike_path(new_bike) # Should make the bike claim
-        expect(response).to render_template("bikes/edit_bike_details")
-
-        new_bike.reload
-        expect(new_bike.b_params.count).to eq 0
-        expect(testable_bike_params.keys.count).to be > 10
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
-        expect(new_bike.manufacturer).to eq manufacturer
-        expect(new_bike.user_id).to eq current_user.id
-        expect(new_bike.ownerships.count).to eq 1
-        expect(new_bike.current_ownership.self_made?).to be_truthy
-
-        creation_state = new_bike.current_creation_state
-        expect(creation_state.origin).to eq "web"
-        expect(creation_state.creator_id).to eq current_user.id
-        expect_hashes_to_match(creation_state.registration_info, bike_params_with_address.slice(:organization_affiliation, :street, :city, :zipcode, :state))
-
-        expect(new_bike.registration_address).to eq "1400 32nd St, Oakland, 94608, CA, US"
-        expect(new_bike.latitude).to eq 3333
-        expect(new_bike.longitude).to eq 3333
-        expect(new_bike.address).to eq new_bike.registration_address
       end
       context "no address passed" do
         it "does not have address" do
@@ -360,7 +365,7 @@ RSpec.describe BikesController, type: :request do
             bike: {
               manufacturer_id: manufacturer.slug,
               b_param_id_token: b_param.id_token,
-              address: default_location[:address],
+              street: default_location[:formatted_address_no_country],
               extra_registration_number: "XXXZZZ",
               organization_affiliation: "employee",
               student_id: "999888",
@@ -378,7 +383,8 @@ RSpec.describe BikesController, type: :request do
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.current_creation_state.origin).to eq "embed_partial"
         expect(new_bike.current_creation_state.creator).to eq new_bike.creator
-        expect(new_bike.registration_address).to eq target_address.as_json
+        expect(new_bike.registration_address).to eq({"street" => default_location[:formatted_address_no_country]})
+        expect(new_bike.address_hash).to eq target_address.as_json
         expect(new_bike.extra_registration_number).to eq "XXXZZZ"
         expect(new_bike.organization_affiliation).to eq "employee"
         expect(new_bike.student_id).to eq "999888"
