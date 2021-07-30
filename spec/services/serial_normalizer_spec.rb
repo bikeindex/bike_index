@@ -8,6 +8,8 @@ RSpec.describe SerialNormalizer do
       expect(SerialNormalizer.unknown_and_absent_corrected("   787CC???WTu ")).to eq "787CC???WTu"
       # Also, check that we don't mark things unknown that look sort of like unknown but aren't
       expect(SerialNormalizer.unknown_and_absent_corrected("Kno1111")).to eq "Kno1111"
+      # Don't throw away a serial if it includes tbd
+      expect(SerialNormalizer.unknown_and_absent_corrected("vyxcvurtbds")).to eq "vyxcvurtbds"
     end
 
     it "normalizes blank and strips" do
@@ -22,7 +24,7 @@ RSpec.describe SerialNormalizer do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
           "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
-          "n/a", "do not have", "idk", "unkown", "none", "no serial"
+          "n/a", "do not have", "idk", "unkown", "none", "no serial", "TbD "
         ]
       end
       it "normalizes a bunch of misentries" do
