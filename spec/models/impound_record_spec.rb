@@ -400,7 +400,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:impounded_time) { time + 1.hour }
     it "is falsey" do
       expect(CreationState.where(bike_id: bike.id).count).to eq 1
-      expect(bike.creation_state.status).to eq "status_with_owner"
+      expect(bike.current_creation_state.status).to eq "status_with_owner"
       expect(bike.created_by_notification_or_impounding?).to be_falsey
       expect(impound_record.send("calculated_unregistered_bike?")).to be_falsey
     end
@@ -408,7 +408,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, status: "status_impounded") }
       it "is truthy if bike creation state is status_impounded" do
         expect(CreationState.where(bike_id: bike.id).count).to eq 1
-        expect(bike.creation_state.status).to eq "status_impounded"
+        expect(bike.current_creation_state.status).to eq "status_impounded"
         expect(bike.created_by_notification_or_impounding?).to be_truthy
         expect(impound_record.reload.send("calculated_unregistered_bike?")).to be_truthy
       end

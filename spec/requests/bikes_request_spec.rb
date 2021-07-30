@@ -256,9 +256,9 @@ RSpec.describe BikesController, type: :request do
           expect(bike.owner).to_not eq current_user
           expect(bike.b_params.count).to eq 0
           expect(bike.status).to eq "unregistered_parking_notification"
-          expect(bike.creation_state).to be_present
-          expect(bike.creation_state.status).to eq "unregistered_parking_notification"
-          expect(bike.creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
+          expect(bike.current_creation_state).to be_present
+          expect(bike.current_creation_state.status).to eq "unregistered_parking_notification"
+          expect(bike.current_creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
           get "#{base_url}/#{bike.id}"
           expect(response.status).to eq(200)
           expect(assigns(:bike)).to eq bike

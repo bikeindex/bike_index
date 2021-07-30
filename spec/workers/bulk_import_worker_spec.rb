@@ -464,7 +464,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike.frame_model).to eq "Midnight Special"
           expect(bike.primary_frame_color).to eq black
 
-          creation_state = bike.creation_state
+          creation_state = bike.current_creation_state
           expect(creation_state.is_bulk).to be_truthy
           expect(creation_state.origin).to eq "bulk_import_worker"
           expect(creation_state.organization).to eq organization

@@ -129,7 +129,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(ownership.send_email).to be_falsey
         expect(ownership.owner_email).to eq auto_user.email
 
-        creation_state = bike.creation_state
+        creation_state = bike.current_creation_state
         expect(creation_state.organization).to eq current_organization
         expect(creation_state.creator).to eq bike.creator
         expect(creation_state.status).to eq "unregistered_parking_notification"
@@ -218,7 +218,7 @@ RSpec.describe Organized::BikesController, type: :request do
           # expect(ownership.claimed?).to be_truthy
           expect(ownership.owner_email).to eq auto_user.email
 
-          creation_state = bike.creation_state
+          creation_state = bike.current_creation_state
           expect(creation_state.organization).to eq current_organization
           expect(creation_state.creator).to eq bike.creator
           expect(creation_state.status).to eq "unregistered_parking_notification"
