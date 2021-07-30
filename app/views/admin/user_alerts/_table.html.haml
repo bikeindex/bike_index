@@ -44,7 +44,7 @@
               %span.d-block
                 %small bike:
                 = link_to user_alert.bike_id, admin_bike_path(user_alert.bike_id)
-                = link_to "alerts", url_for(sortable_search_params.merge(bike_id: user_alert.bike_id)), class: "small gray-link"
+                = link_to "alerts", url_for(sortable_search_params.merge(search_bike_id: user_alert.bike_id)), class: "small gray-link"
             - if user_alert.user_phone.present?
               %span.d-block
                 %small user_phone: #{user_alert.user_phone_id}
