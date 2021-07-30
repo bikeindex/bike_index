@@ -961,7 +961,7 @@ class Bike < ApplicationRecord
 
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    # pp "#{skip_geocoding?} #{address_changed?} #{address}"
+    pp "#{skip_geocoding?} #{address_changed?} #{address}"
     return false if skip_geocoding?
     address_changed?
   end
@@ -985,26 +985,21 @@ class Bike < ApplicationRecord
   # 2. The bike owner's address, if available
   # 3. registration_address
   # 4. The creation organization, if one is present
-  # - prefer something with a street address, fallback to anything with a latitude
+  # - prefer something with a street address, fallback to anything with a latitude, uses hashes because registration address
   def location_record_address_hash
-    # l_hash = [
-    #   current_impound_record&.address_hash,
-    #   current_parking_notification&.address_hash,
-    #   owner&.address_hash,
-    #   current_creation_state&.address_hash,
-    #   b_params_address, # TODO: drop this once #2035 is merged
-    #   creation_organization&.default_location&.address_hash,
-    # ].compact.find { |rec| rec&.dig("street").present? || rec&.dig("latitude").present? }
     l_hashes = [
       current_impound_record&.address_hash,
       current_parking_notification&.address_hash,
       owner&.address_hash,
       current_creation_state&.address_hash,
       b_params_address, # TODO: drop this once #2035 is merged
-      creation_organization&.default_location&.address_hash,
+      creation_organization&.default_location&.address_hash
     ].compact
     l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
       l_hashes.find { |rec| rec&.dig("latitude").present? }
+
+    pp l_hash
+
     return {} unless l_hash.present?
     # If the location record has coordinates, skip geocoding
     l_hash.merge(skip_geocoding: l_hash["latitude"].present?)

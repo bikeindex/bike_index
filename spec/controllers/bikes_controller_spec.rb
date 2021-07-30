@@ -645,7 +645,7 @@ RSpec.describe BikesController, type: :controller do
             target_path = embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
 
             expect {
-              post :create, params: {bike: bike_params.merge(serial_number: nil), stolen_record: stolen_params}
+              post :create, params: {bike: bike_params.merge(manufacturer_id: nil), stolen_record: stolen_params}
 
               expect(assigns(:bike).errors&.full_messages).to be_present
             }.to change(Ownership, :count).by(0)
