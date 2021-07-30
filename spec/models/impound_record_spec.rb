@@ -398,6 +398,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:impound_record) { FactoryBot.create(:impound_record, created_at: impounded_time, bike: bike) }
     let(:time) { Time.current - 1.week }
     let(:impounded_time) { time + 1.hour }
+    before { bike.reload }
     it "is falsey" do
       expect(CreationState.where(bike_id: bike.id).count).to eq 1
       expect(bike.current_creation_state.status).to eq "status_with_owner"

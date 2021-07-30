@@ -74,6 +74,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:organization) { parking_notification.organization }
     let(:bike) { parking_notification.bike }
     it "is unregistered" do
+      bike.reload
       parking_notification.reload
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.bike.creator_unregistered_parking_notification?).to be_truthy

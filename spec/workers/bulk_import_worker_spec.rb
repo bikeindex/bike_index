@@ -188,8 +188,8 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.serial_number).to eq "xyz_test"
           expect(bike1.owner_email).to eq "test@bikeindex.org"
           expect(bike1.manufacturer).to eq trek
-          expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-          expect(bike1.creation_state.status).to eq "status_with_owner"
+          expect(bike1.current_creation_state.origin).to eq "bulk_import_worker"
+          expect(bike1.current_creation_state.status).to eq "status_with_owner"
           expect(bike1.creator).to eq organization.auto_user
           expect(bike1.creation_organization).to eq organization
           expect(bike1.year).to eq 2019
@@ -207,7 +207,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.serial_number).to eq "example"
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
-          expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike2.current_creation_state.origin).to eq "bulk_import_worker"
           expect(bike2.creator).to eq organization.auto_user
           expect(bike2.creation_organization).to eq organization
           expect(bike2.year).to_not be_present
@@ -246,8 +246,8 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1.serial_number).to eq "xyz_test"
             expect(bike1.owner_email).to eq "test@bikeindex.org"
             expect(bike1.manufacturer).to eq trek
-            expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike1.current_creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.current_creation_state.status).to eq "status_impounded"
             expect(bike1.creator).to eq organization.auto_user
             expect(bike1.creation_organization).to eq organization
             expect(bike1.year).to eq 2019
@@ -280,8 +280,8 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2.serial_number).to eq "example"
             expect(bike2.owner_email).to eq "test2@bikeindex.org"
             expect(bike2.manufacturer).to eq surly
-            expect(bike2.creation_state.origin).to eq "bulk_import_worker"
-            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike2.current_creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.current_creation_state.status).to eq "status_impounded"
             expect(bike2.creator).to eq organization.auto_user
             expect(bike2.creation_organization).to eq organization
             expect(bike2.year).to_not be_present
