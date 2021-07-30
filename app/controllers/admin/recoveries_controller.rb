@@ -69,6 +69,14 @@ class Admin::RecoveriesController < Admin::BaseController
       recoveries = recoveries.where(index_helped_recovery: true)
     end
 
+    # We always render distance
+    distance = params[:search_distance].to_i
+    @distance = distance.present? && distance > 0 ? distance : 50
+    if params[:search_location].present?
+      bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
+      recoveries = recoveries.within_bounding_box(bounding_box)
+    end
+
     if params[:search_displayed].present?
       recoveries = if params[:search_displayed] == "displayed"
         recoveries.with_recovery_display
