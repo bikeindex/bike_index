@@ -418,7 +418,7 @@ CREATE TABLE public.bikes (
     updator_id integer,
     is_for_sale boolean DEFAULT false NOT NULL,
     made_without_serial boolean DEFAULT false NOT NULL,
-    creation_state_id integer,
+    current_creation_state_id integer,
     frame_material integer,
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
@@ -768,7 +768,8 @@ CREATE TABLE public.creation_states (
     bulk_import_id integer,
     pos_kind integer,
     status integer,
-    origin_enum integer
+    origin_enum integer,
+    registration_info jsonb
 );
 
 
@@ -4374,10 +4375,10 @@ CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_sti
 
 
 --
--- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bikes_on_current_creation_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_creation_state_id ON public.bikes USING btree (creation_state_id);
+CREATE INDEX index_bikes_on_current_creation_state_id ON public.bikes USING btree (current_creation_state_id);
 
 
 --
@@ -5872,6 +5873,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210723222942'),
 ('20210727011722'),
 ('20210727021013'),
-('20210727212502');
+('20210727212502'),
+('20210730172142');
 
 

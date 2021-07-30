@@ -154,11 +154,7 @@ RSpec.describe CreationState, type: :model do
       creation_state = FactoryBot.create(:creation_state)
       bike = creation_state.bike
       bike.reload
-      expect(bike.creation_state_id).to eq creation_state.id
-    end
-    it "has an after_save callback" do
-      expect(CreationState._save_callbacks.select { |cb| cb.kind.eql?(:after) }
-        .map(&:raw_filter).include?(:set_reflexive_association)).to eq(true)
+      expect(bike.current_creation_state_id).to eq creation_state.id
     end
   end
 end

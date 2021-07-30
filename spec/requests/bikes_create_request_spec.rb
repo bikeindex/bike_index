@@ -223,14 +223,42 @@ RSpec.describe BikesController, type: :request do
       end
       # Make bike_params without address because it's used more often
       let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
-      it "creates with address" do
+      xit "creates with address" do
+        organization.reload
+        expect(organization.location_latitude.to_i).to eq 34
+        expect(organization.default_location).to be_present
+        expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          expect {
+            post base_url, params: {bike: bike_params_with_address}
+          }.to change(Bike, :count).by(1)
+        end
+        expect(flash[:success]).to be_present
+        new_bike = Bike.last
+
+        # Make sure things render
+        expect(response).to redirect_to(edit_bike_path(new_bike))
+        get edit_bike_path(new_bike) # Should make the bike claim
+        expect(response).to render_template("bikes/edit_bike_details")
+
+        new_bike.reload
+        expect(testable_bike_params.keys.count).to be > 10
+        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect(new_bike.manufacturer).to eq manufacturer
+        expect(new_bike.creation_state.origin).to eq "web"
+        expect(new_bike.creation_state.creator_id).to eq current_user.id
+        expect(new_bike.user_id).to eq current_user.id
+        expect(new_bike.ownerships.count).to eq 1
+        expect(new_bike.current_ownership.self_made?).to be_truthy
+
+        expect(new_bike.registration_address).to eq "1400 32nd St, Oakland, 94608, CA, US"
+        expect(new_bike.latitude).to eq 3333
+        expect(new_bike.longitude).to eq 3333
+        expect(new_bike.address).to eq new_bike.registration_address
       end
       context "no address passed" do
         it "does not have address" do
-          organization.reload
-          expect(organization.location_latitude.to_i).to eq 34
-          expect(organization.default_location).to be_present
-          expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
             expect {
@@ -239,24 +267,17 @@ RSpec.describe BikesController, type: :request do
           end
           expect(flash[:success]).to be_present
           new_bike = Bike.last
-
-          # Make sure things render
-          expect(response).to redirect_to(edit_bike_path(new_bike))
-          get edit_bike_path(new_bike) # Should make the bike claim
-          expect(response).to render_template("bikes/edit_bike_details")
-
-          new_bike.reload
-          expect(testable_bike_params.keys.count).to be > 10
           expect_attrs_to_match_hash(new_bike, testable_bike_params)
           expect(new_bike.manufacturer).to eq manufacturer
           expect(new_bike.creation_state.origin).to eq "web"
           expect(new_bike.creation_state.creator_id).to eq current_user.id
           expect(new_bike.user_id).to eq current_user.id
+          expect(new_bike.ownerships.count).to eq 1
+          expect(new_bike.current_ownership.self_made?).to be_truthy
+          # It doesn't have a registration address! But it does have an address - which is just the organization
           expect(new_bike.registration_address).to be_blank
           expect(new_bike.address).to be_present
           expect(new_bike.address).to eq organization.address.gsub("United States", "US")
-          expect(new_bike.ownerships.count).to eq 1
-          expect(new_bike.current_ownership.self_made?).to be_truthy
         end
       end
     end
