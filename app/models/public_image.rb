@@ -39,7 +39,8 @@ class PublicImage < ApplicationRecord
 
   # Method to make create_revised.js easier to handle
   def bike_type
-    bike? && imageable.type
+    return false unless bike?
+    imageable.present? ? imageable.cycle_type : "bike" # hidden bike handling
   end
 
   def enqueue_after_commit_jobs

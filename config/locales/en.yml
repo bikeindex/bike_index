@@ -3319,6 +3319,7 @@ en:
       absent: Absent
       color: Color
       hidden: Hidden
+      impounded: Impounded
       location: Location
       registry: Registry
       registry_id: Registry ID

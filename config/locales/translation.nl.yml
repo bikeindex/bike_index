@@ -5847,6 +5847,7 @@ nl:
         searching_html: Zoeken naar fietsen met serienummers vergelijkbaar met %{serial}
           ...
       serial_search: 'Serienummer: %{serial}'
+      impounded: In beslag genomen fietsen
     payments:
       enter_the_minimum_amount: Voer een bedrag groter dan 1 in
       select_or_enter_amount: Selecteer of voer een bedrag in

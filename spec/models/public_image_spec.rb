@@ -59,6 +59,9 @@ RSpec.describe PublicImage, type: :model do
       let(:bike) { FactoryBot.create(:bike) }
       let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png") }
       it "enqueues, not after_bike_save_worker" do
+        bike.destroy
+        expect(bike.cycle_type).to eq "bike"
+        expect(public_image.bike_type).to eq "bike"
         expect {
           expect(public_image.save).to be_truthy
         }.to change(ExternalImageUrlStoreWorker.jobs, :size).by(1)
