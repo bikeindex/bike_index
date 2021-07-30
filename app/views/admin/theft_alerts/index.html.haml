@@ -22,7 +22,7 @@
     = render partial: "/shared/admin_current_header", locals: { viewing: "Promoted Alerts" }
 
   - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
-  - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {created_at: @time_range})
+  - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: matching_theft_alerts.pluck(:id)})
 
   - if @render_chart
     :ruby
