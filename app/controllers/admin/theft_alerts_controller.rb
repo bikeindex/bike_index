@@ -10,6 +10,7 @@ class Admin::TheftAlertsController < Admin::BaseController
         .includes(:theft_alert_plan, :stolen_record)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
+    @page_title = "Admin | Promoted alerts"
   end
 
   def show
