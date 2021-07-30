@@ -130,6 +130,8 @@ module AdminHelper
       admin_impound_record_path("pkey-#{obj.id}")
     elsif obj.instance_of?(UserPhone)
       admin_user_path(obj.user_id)
+    elsif obj.instance_of?(UserAlert)
+      admin_user_alerts_path(user_id: obj.user_id)
     else
       "/admin/#{obj.class.to_s.underscore.pluralize}/#{obj.id}"
     end

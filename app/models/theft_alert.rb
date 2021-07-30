@@ -32,6 +32,8 @@ class TheftAlert < ApplicationRecord
   delegate :duration_days, :duration_days_facebook, :ad_radius_miles, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
+  geocoded_by nil
+
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
   end
@@ -48,6 +50,11 @@ class TheftAlert < ApplicationRecord
 
   def bike
     stolen_record&.bike
+  end
+
+  # never geocode, use calculated lat/long
+  def should_be_geocoded?
+    false
   end
 
   def notify?

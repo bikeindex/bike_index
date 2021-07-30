@@ -22,7 +22,7 @@
     = render partial: "/shared/admin_current_header", locals: { viewing: "Promoted Alerts" }
 
   - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
-  - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {created_at: @time_range})
+  - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: matching_theft_alerts.pluck(:id)})
 
   - if @render_chart
     :ruby
@@ -45,6 +45,18 @@
         = column_chart alerts_recoveries_graph, stacked: true, thousands: ",", defer: true
 
   = render partial: "/shared/period_select"
+
+  .mt-4.mb-4
+    = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :search_recovery_display_status, @search_recovered
+      = render partial: "/shared/hidden_search_fields"
+      .form-group.ml-auto.mr-1.mb-2
+        %em.small.less-strong.mr-1.d-md-inline.d-none within
+        = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
+        %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
+      .form-group.mr-2.mb-2
+        = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
   .row.mb-4{ style: "margin-top: 30px;" }
     .col
