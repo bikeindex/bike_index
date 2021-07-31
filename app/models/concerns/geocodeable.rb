@@ -137,9 +137,9 @@ module Geocodeable
 
   # default address hash. Probably could be used more often/better
   def address_hash
-    address_attrs = Geocodeable.location_attrs - %w[country_id state_id neighborhood]
+    address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
     attributes.slice(*address_attrs)
-      .merge(state: state&.abbreviation, country: country&.iso)
+      .merge(state: state_abbr, country: country_abbr)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
       .with_indifferent_access
   end
@@ -153,12 +153,20 @@ module Geocodeable
     end
   end
 
+  def state_abbr
+    state&.abbreviation
+  end
+
   def country=(val)
     if val.is_a?(String)
       self.country = Country.fuzzy_find(val)
     else
       super
     end
+  end
+
+  def country_abbr
+    country&.iso
   end
 
   def metric_units?

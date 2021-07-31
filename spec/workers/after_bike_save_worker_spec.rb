@@ -96,10 +96,11 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     let(:bike) { FactoryBot.create(:bike, owner_email: "stuff@things.com") }
     let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@things.com") }
     let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user) }
+    before { bike.reload } # Because current_creation_state
     it "assigns the partial registration" do
       expect(bike.creation_organization_id).to be_blank
-      expect(bike.creation_state.organization_id).to be_blank
-      expect(bike.creation_state.origin).to eq "web"
+      expect(bike.current_creation_state.organization_id).to be_blank
+      expect(bike.current_creation_state.origin).to eq "web"
       expect(partial_registration.partial_registration?).to be_truthy
       expect(partial_registration.with_bike?).to be_falsey
       instance.perform(bike.id)
@@ -108,8 +109,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       expect(partial_registration.created_bike).to eq bike
       bike.reload
       expect(bike.creation_organization_id).to eq organization.id # TODO: Remove when creation_organization_id deleted
-      expect(bike.creation_state.organization_id).to eq organization.id
-      expect(bike.creation_state.origin).to eq "embed_partial"
+      expect(bike.current_creation_state.organization_id).to eq organization.id
+      expect(bike.current_creation_state.origin).to eq "embed_partial"
       expect(bike.organizations.pluck(:id)).to eq([organization.id])
       expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
     end
@@ -117,8 +118,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
       it "does not assign" do
         og_organization_id = creation_state.organization_id
-        expect(bike.creation_state.organization_id).to be_present
-        expect(bike.creation_state.origin).to eq "web"
+        expect(bike.current_creation_state.organization_id).to be_present
+        expect(bike.current_creation_state.origin).to eq "web"
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
@@ -126,16 +127,16 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(partial_registration.with_bike?).to be_truthy
         expect(partial_registration.created_bike).to eq bike
         bike.reload
-        expect(bike.creation_state.organization_id).to eq og_organization_id
-        expect(bike.creation_state.origin).to eq "web"
+        expect(bike.current_creation_state.organization_id).to eq og_organization_id
+        expect(bike.current_creation_state.origin).to eq "web"
       end
     end
     context "creation state isn't web" do
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, creator: user, origin: "api_v2") }
       it "doesn't assign" do
         expect(bike.creation_organization_id).to be_blank
-        expect(bike.creation_state.organization_id).to be_blank
-        expect(bike.creation_state.origin).to eq "api_v2"
+        expect(bike.current_creation_state.organization_id).to be_blank
+        expect(bike.current_creation_state.origin).to eq "api_v2"
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
@@ -143,8 +144,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(partial_registration.with_bike?).to be_truthy
         expect(partial_registration.created_bike).to eq bike
         bike.reload
-        expect(bike.creation_state.organization_id).to be_blank
-        expect(bike.creation_state.origin).to eq "api_v2"
+        expect(bike.current_creation_state.organization_id).to be_blank
+        expect(bike.current_creation_state.origin).to eq "api_v2"
         expect(bike.organizations.pluck(:id)).to eq([])
       end
     end
@@ -163,7 +164,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(partial_registration_accurate.with_bike?).to be_truthy
         expect(partial_registration_accurate.created_bike).to eq bike
         bike.reload
-        expect(bike.creation_state.origin).to eq "embed_partial"
+        expect(bike.current_creation_state.origin).to eq "embed_partial"
       end
     end
   end

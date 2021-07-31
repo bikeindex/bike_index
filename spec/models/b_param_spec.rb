@@ -269,7 +269,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.phone).to eq "919929333"
       expect(b_param.external_image_urls).to eq(["xxxxx"])
       expect(bike.registration_address).to be_present
-      expect(bike.valid_registration_address_present?).to be_truthy
+      expect(bike.valid_mailing_address?).to be_truthy
     end
     context "legacy address 1 (street -> address)" do
       let(:bike_params) do
@@ -296,7 +296,7 @@ RSpec.describe BParam, type: :model do
         expect(b_param.address("state")).to eq "CA"
         expect(b_param.external_image_urls).to eq(["xxxxx"])
         expect(bike.registration_address).to be_present
-        expect(bike.valid_registration_address_present?).to be_truthy
+        expect(bike.valid_mailing_address?).to be_truthy
       end
     end
     context "legacy address 2" do
@@ -318,7 +318,8 @@ RSpec.describe BParam, type: :model do
           b_param.reload
           expect(b_param.params["formatted_address"]).to be_present
           expect(bike.registration_address).to be_present
-          expect(bike.valid_registration_address_present?).to be_falsey
+
+          expect(bike.valid_mailing_address?).to be_falsey
         end
       end
     end

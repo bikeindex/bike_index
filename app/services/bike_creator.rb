@@ -79,7 +79,7 @@ class BikeCreator
       creator_id: @b_param.creator_id,
       can_edit_claimed: @bike.creation_organization_id.present?,
       organization_id: @bike.creation_organization_id
-    }
+    }.merge(registration_info: @b_param.registration_info_attrs)
   end
 
   # Previously all of this stuff was public.
@@ -142,13 +142,12 @@ class BikeCreator
 
   def save_bike(bike)
     bike.set_location_info
-    bike.attributes = Geohelper.address_hash_from_geocoder_result(@location) unless bike.latitude.present?
     bike.save
     @bike = associate(bike)
     validate_record(@bike)
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
-    if @bike.present? && @bike.id.present? && @bike.creation_state.blank?
+    if @bike.present? && @bike.id.present? && @bike.current_creation_state.blank?
       # Only place creation_state should be created (except in testing)
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
@@ -160,6 +159,9 @@ class BikeCreator
         # We skipped setting address, with default_parking_notification_attrs, notification will update it
         ParkingNotification.create!(@b_param.parking_notification_params)
       end
+      # Check if the bike has a location, update with passed location if no
+      @bike.reload
+      @bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless @bike.latitude.present?
     end
 
     @bike

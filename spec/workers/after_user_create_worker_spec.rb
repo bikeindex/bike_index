@@ -116,7 +116,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         expect(user).to be_present
         bike.reload
         bike.update_attributes(updated_at: Time.current)
-        expect(bike.send("location_record_address_hash")).to eq target_address_hash.as_json
+        expect_hashes_to_match(bike.send("location_record_address_hash"), target_address_hash.merge(skip_geocoding: true))
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload

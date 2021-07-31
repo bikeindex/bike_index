@@ -188,8 +188,8 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.serial_number).to eq "xyz_test"
           expect(bike1.owner_email).to eq "test@bikeindex.org"
           expect(bike1.manufacturer).to eq trek
-          expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-          expect(bike1.creation_state.status).to eq "status_with_owner"
+          expect(bike1.current_creation_state.origin).to eq "bulk_import_worker"
+          expect(bike1.current_creation_state.status).to eq "status_with_owner"
           expect(bike1.creator).to eq organization.auto_user
           expect(bike1.creation_organization).to eq organization
           expect(bike1.year).to eq 2019
@@ -198,7 +198,10 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
-          expect(bike1.registration_address).to eq default_location_registration_address
+          # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
+          expect(bike1.registration_address).to eq({"street" => default_location[:address]})
+          target_address_hash = default_location.slice(:latitude, :longitude).merge(street: default_location[:address])
+          expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
 
@@ -207,7 +210,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.serial_number).to eq "example"
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
-          expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike2.current_creation_state.origin).to eq "bulk_import_worker"
           expect(bike2.creator).to eq organization.auto_user
           expect(bike2.creation_organization).to eq organization
           expect(bike2.year).to_not be_present
@@ -246,8 +249,8 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1.serial_number).to eq "xyz_test"
             expect(bike1.owner_email).to eq "test@bikeindex.org"
             expect(bike1.manufacturer).to eq trek
-            expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike1.current_creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.current_creation_state.status).to eq "status_impounded"
             expect(bike1.creator).to eq organization.auto_user
             expect(bike1.creation_organization).to eq organization
             expect(bike1.year).to eq 2019
@@ -280,8 +283,8 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2.serial_number).to eq "example"
             expect(bike2.owner_email).to eq "test2@bikeindex.org"
             expect(bike2.manufacturer).to eq surly
-            expect(bike2.creation_state.origin).to eq "bulk_import_worker"
-            expect(bike1.creation_state.status).to eq "status_impounded"
+            expect(bike2.current_creation_state.origin).to eq "bulk_import_worker"
+            expect(bike1.current_creation_state.status).to eq "status_impounded"
             expect(bike2.creator).to eq organization.auto_user
             expect(bike2.creation_organization).to eq organization
             expect(bike2.year).to_not be_present
@@ -464,7 +467,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike.frame_model).to eq "Midnight Special"
           expect(bike.primary_frame_color).to eq black
 
-          creation_state = bike.creation_state
+          creation_state = bike.current_creation_state
           expect(creation_state.is_bulk).to be_truthy
           expect(creation_state.origin).to eq "bulk_import_worker"
           expect(creation_state.organization).to eq organization

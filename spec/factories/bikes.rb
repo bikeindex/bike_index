@@ -148,6 +148,7 @@ FactoryBot.define do
                                   is_pos: true,
                                   pos_kind: "lightspeed_pos",
                                   organization: bike.creation_organization)
+          bike.reload # reflexively sets bike.current_creation_state
         end
       end
 
@@ -163,6 +164,7 @@ FactoryBot.define do
                                   pos_kind: "ascend_pos",
                                   bulk_import: evaluator.bulk_import,
                                   organization: bike.creation_organization)
+          bike.reload # reflexively sets bike.current_creation_state
         end
       end
     end

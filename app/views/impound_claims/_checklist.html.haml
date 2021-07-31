@@ -42,12 +42,12 @@
         - if render_optional
           %em.small.less-strong optional
 
-    - if bike_submitting.creation_state&.is_pos
+    - if bike_submitting.current_creation_state&.is_pos
       %li.completed-item
         %span.checklist-checkbox
           &#10003;
         %span.checklist-text
-          Verified purchase (registered at Point Of Sale by #{bike_submitting.creation_state.organization.display_name})
+          Verified purchase (registered at Point Of Sale by #{bike_submitting.current_creation_state.organization.display_name})
           - if render_optional
             %em.small.less-strong
               optional

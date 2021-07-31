@@ -230,11 +230,10 @@ RSpec.describe Ownership, type: :model do
   describe "spam_risky_email?" do
     # hotmail and yahoo have been delaying our emails. In an effort to ensure delivery of really important emails (e.g. password resets)
     # skip sending ownership invitations for POS registrations, just in case
-    let(:bike) { Bike.new(owner_email: email) }
+    let(:bike) { Bike.new(owner_email: email, current_creation_state: creation_state) }
     let(:ownership) { Ownership.new(bike: bike, owner_email: email) }
     let(:creation_state) { CreationState.new(pos_kind: pos_kind) }
     let(:pos_kind) { "lightspeed_pos" }
-    before { allow(bike).to receive(:creation_state) { creation_state } }
     context "gmail email" do
       let(:email) { "test@gmail.com" }
       it "false, calculated_send_email: true" do

@@ -24,7 +24,7 @@ class CreationState < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_create :create_bike_organization
-  after_save :set_reflexive_association
+  after_commit :set_reflexive_association
 
   attr_accessor :can_edit_claimed
 
@@ -74,8 +74,12 @@ class CreationState < ApplicationRecord
   def set_reflexive_association
     # TODO: stop doing this, it was suppose to be temporary, to make migration easier
     b = Bike.unscoped.where(id: bike_id).first
-    b.update_attribute(:current_creation_state_id, id) if b.present? && b&.current_creation_state_id != id
+    b.update(current_creation_state_id: id) if b.present? && b&.current_creation_state_id.blank?
     true
+  end
+
+  def address_hash
+    (registration_info || {}).slice("address", "street", "city", "state", "zipcode", "state", "country")
   end
 
   # TODO: added in #1879, but turns out it hasn't been happening for a while

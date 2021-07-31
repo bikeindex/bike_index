@@ -69,6 +69,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           ]
         end
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a1111") }
+        let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
           expect(bike_sticker.claimed?).to be_falsey
@@ -78,6 +79,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
+            bike_for_avery.update(updated_at: Time.current)
+            expect(bike_for_avery.reload.avery_exportable?).to be_truthy
+            expect(bike_for_avery.address_hash).to eq bike_for_avery.registration_address
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place
             expect(bike_not_avery.registration_address["street"].present?).to be_falsey

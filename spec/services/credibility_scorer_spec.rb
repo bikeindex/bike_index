@@ -78,15 +78,15 @@ RSpec.describe CredibilityScorer do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
       it "returns with created_at_point_of_sale" do
-        expect(subject.creation_badges(bike_lightspeed_pos.creation_state)).to include(:created_at_point_of_sale)
-        expect(subject.creation_badges(bike_ascend_pos.creation_state)).to match_array([:created_at_point_of_sale])
+        expect(subject.creation_badges(bike_lightspeed_pos.current_creation_state)).to include(:created_at_point_of_sale)
+        expect(subject.creation_badges(bike_ascend_pos.current_creation_state)).to match_array([:created_at_point_of_sale])
       end
     end
     context "with organization" do
       let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: created_at) }
       let(:created_at) { Time.current - 20.days }
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
-      let(:creation_state) { bike.creation_state }
+      let(:creation_state) { bike.current_creation_state }
       it "returns created this month" do
         expect(creation_state).to be_present
         expect(subject.creation_badges(creation_state)).to eq([:created_this_month])
@@ -128,8 +128,9 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "registered 2 years ago" do
-      let(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 1.day - 2.years, bike: bike) }
+      let!(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 1.day - 2.years, bike: bike) }
       it "returns long_time_registration" do
+        bike.reload
         expect(subject.creation_age_badge(creation_state)).to eq :long_time_registration
         expect(subject.creation_badges(creation_state)).to eq([:long_time_registration])
         expect(instance.score).to eq(60)
@@ -167,6 +168,7 @@ RSpec.describe CredibilityScorer do
     let!(:creation_state) { FactoryBot.create(:creation_state, creator: user, bike: bike, created_at: ownership1.created_at) }
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
+    before { bike.reload } # Because current_creation_state
     it "returns []" do
       expect(subject.bike_user_badges(bike)).to eq([])
     end

@@ -112,7 +112,7 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
 
   include PgSearch::Model
   pg_search_scope :pg_search, against: {
@@ -291,31 +291,27 @@ class Bike < ApplicationRecord
     CredibilityScorer.new(self)
   end
 
-  def creation_state
-    creation_states.first
-  end
-
   def creation_description
-    creation_state&.creation_description
+    current_creation_state&.creation_description
   end
 
   def bulk_import
-    creation_state&.bulk_import
+    current_creation_state&.bulk_import
   end
 
   def pos_kind
-    creation_state&.pos_kind
+    current_creation_state&.pos_kind
   end
 
   def creator_unregistered_parking_notification?
-    creation_state&.creator_unregistered_parking_notification?
+    current_creation_state&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
-    return false if creation_state.blank?
-    %w[unregistered_parking_notification impound_import].include?(creation_state.origin) ||
-      creation_state.status == "status_impounded"
+    return false if current_creation_state.blank?
+    %w[unregistered_parking_notification impound_import].include?(current_creation_state.origin) ||
+      current_creation_state.status == "status_impounded"
   end
 
   def pos?
@@ -358,7 +354,7 @@ class Bike < ApplicationRecord
   end
 
   def avery_exportable?
-    !impounded? && owner_name.present? && valid_registration_address_present?
+    !impounded? && owner_name.present? && valid_mailing_address?
   end
 
   def current_parking_notification
@@ -778,9 +774,20 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
-  def valid_registration_address_present?
-    return false if registration_address.blank?
-    registration_address["street"].present? && registration_address["city"].present?
+  # THIS IS FUCKING ABNOXIOUS.
+  # Somehow we need to get rid of needing to have this method. country should default to optional
+  def address
+    Geocodeable.address(self, country: [:optional])
+  end
+
+  def valid_mailing_address?
+    # Prefer address over registration address, since it can be updated
+    addy = address_hash if address_hash.values.any?(&:present?)
+    addy ||= registration_address
+    return false if addy.blank? || addy.values.all?(&:blank?)
+    return false if addy["street"].blank? || addy["city"].blank?
+    return true if creation_organization&.default_location.blank?
+    creation_organization.default_location.address_hash != addy
   end
 
   def registration_address_source
@@ -788,6 +795,8 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
+    elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
+      "initial_creation_state"
     elsif b_params_address.present?
       "initial_creation"
     end
@@ -800,6 +809,7 @@ class Bike < ApplicationRecord
     when "user" then user&.address_hash
     when "bike_update" then address_hash
     when "initial_creation" then b_params_address
+    when "initial_creation_state" then current_creation_state.address_hash
     else
       {}
     end
@@ -832,7 +842,7 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    # TODO: make conditional_information hold more things
+    # TODO: make conditional_information hold more things, post #2035
     o_affiliation = conditional_information["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
@@ -846,8 +856,8 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    # TODO: make conditional_information hold more things
-    s_id = conditional_information["student_id"]
+    # TODO: migrate conditional information into registration_info, post #2035
+    s_id = conditional_information["student_id"] || current_creation_state&.registration_info&.dig("student_id")
     return s_id if s_id.present?
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
     return "" unless previous_s_id.present?
@@ -960,7 +970,7 @@ class Bike < ApplicationRecord
 
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    return false if skip_geocoding? || !address_set_manually
+    return false if skip_geocoding?
     address_changed?
   end
 
@@ -979,18 +989,25 @@ class Bike < ApplicationRecord
   # Select the source from which to derive location data, in the following order
   # of precedence:
   #
-  # 1. The current parking notification, if one is present
-  # 2. The creation organization, if one is present
-  # 3. The bike owner's address, if available
-  # 4. registration_address from b_param if available
+  # 1. The current parking notification/impound record, if one is present
+  # 2. The bike owner's address, if available
+  # 3. registration_address
+  # 4. The creation organization, if one is present
+  # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
   def location_record_address_hash
-    location_record = [
-      current_parking_notification,
-      current_impound_record,
-      creation_organization&.default_location,
-      owner
-    ].compact.find { |rec| rec.latitude.present? }
-    location_record.present? ? location_record.address_hash : b_params_address
+    l_hashes = [
+      current_impound_record&.address_hash,
+      current_parking_notification&.address_hash,
+      owner&.address_hash,
+      current_creation_state&.address_hash,
+      b_params_address, # TODO: drop this once #2035 is merged
+      creation_organization&.default_location&.address_hash
+    ].compact
+    l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
+      l_hashes.find { |rec| rec&.dig("latitude").present? }
+    return {} unless l_hash.present?
+    # If the location record has coordinates, skip geocoding
+    l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
   end
 
   def b_params_address

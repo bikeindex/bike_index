@@ -120,18 +120,20 @@
                     %tr
                       %td= t(".address")
                       %td
-                        - address = @bike.registration_address
-                        - if @bike.valid_registration_address_present?
+                        - address = @bike.address_hash
+                        - if @bike.valid_mailing_address?
                           = address["street"]
                           %br
                           = [address["city"], address["state"]].reject(&:blank?).join(", ")
                           = address['zipcode']
                         - else
-                          - address.except("latitude", "longitude").each do |k, v|
-                            %span.less-strong
-                              #{k == "address" ? "street" : k}:
-                            = v
-                            %br
+                          -# Don't show address if it's the organizations default address
+                          - unless address == passive_organization.default_location&.address_hash
+                            - address.except("latitude", "longitude", "country").each do |k, v|
+                              %span.less-strong
+                                #{k == "address" ? "street" : k}:
+                              = v
+                              %br
                           %span.text-warning
                             %small invalid address
                         - if @bike.registration_address_source.present?
@@ -163,7 +165,7 @@
                         %small.em
                           - unless @bike.owner_name.present?
                             = t(".missing_owner_name")
-                          - unless @bike.valid_registration_address_present?
+                          - unless @bike.valid_mailing_address?
                             = t(".missing_address")
 
           - if !@passive_organization_registered # Apologize, bike isn't organizations
