@@ -1,7 +1,7 @@
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
-    submitting: 1,
+    submitting: 1, # TOD: change this to submitted
     approved: 2,
     denied: 3,
     canceled: 4,
@@ -30,6 +30,7 @@ class ImpoundClaim < ApplicationRecord
   scope :submitted, -> { where.not(submitted_at: nil) }
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
+  scope :not_rejected, -> { where.not(status: %w[canceled denied]) }
 
   attr_accessor :skip_update
 
@@ -47,7 +48,11 @@ class ImpoundClaim < ApplicationRecord
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.tr("_", " ")
+    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+  end
+
+  def self.involving_bike_id(bike_id)
+    where(bike_submitting_id: bike_id).or(where(bike_claimed_id: bike_id))
   end
 
   def kind

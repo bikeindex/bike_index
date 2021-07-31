@@ -44,7 +44,11 @@ class Admin::ImpoundClaimsController < Admin::BaseController
       end
     end
 
+    if params[:search_bike_id].present?
+      impound_claims = impound_claims.involving_bike_id(params[:search_bike_id])
+    end
     impound_claims = impound_claims.where(organization_id: current_organization.id) if current_organization.present?
+
     impound_claims.where(created_at: @time_range)
   end
 

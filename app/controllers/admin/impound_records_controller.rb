@@ -6,8 +6,8 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @impound_records = matching_impound_records.includes(:user, :organization, :bike)
-      .order(sort_column + " " + sort_direction)
+    @impound_records = matching_impound_records.includes(:user, :organization, :bike, :impound_claims)
+      .order("impound_records.#{sort_column}" + " " + sort_direction)
       .page(page).per(per_page)
   end
 
@@ -43,7 +43,11 @@ class Admin::ImpoundRecordsController < Admin::BaseController
         impound_records.send(@search_status)
       end
     end
-
+    @with_claims = ParamsNormalizer.boolean(params[:search_with_claims])
+    impound_records = impound_records.with_claims if @with_claims
+    if params[:search_bike_id].present?
+      impound_records = impound_records.where(bike_id: params[:search_bike_id])
+    end
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
     impound_records.where(created_at: @time_range)
   end

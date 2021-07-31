@@ -88,3 +88,19 @@
           Stolen on
           %a.convertTime{href: edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true)}
             = l stolen_record.date_stolen, format: :convert_time
+
+- elsif @active_tab == "impound"
+
+  %h3.mt-4
+    Impound records for this bike
+    %small.less-strong
+      = link_to admin_number_display(@bike.impound_records.count), admin_impound_records_path(search_bike_id: @bike.id)
+  = render partial: "/admin/impound_records/table", locals: {impound_records: @bike.impound_records.reorder(created_at: :desc), skip_claims: true}
+
+  - impound_claims = ImpoundClaim.involving_bike_id(@bike.id).reorder(created_at: :desc)
+  %h3.mt-4
+    Impound claims involving this bike
+    %small.less-strong
+      = link_to admin_number_display(impound_claims.count), admin_impound_claims_path(search_bike_id: @bike.id)
+
+  = render partial: "/admin/impound_claims/table", locals: {impound_claims: impound_claims}

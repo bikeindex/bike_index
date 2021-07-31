@@ -311,6 +311,8 @@
     #bike-tab-wrapper{"data-activetab" => active_tab}
       .nav.nav-tabs
         - cache(["admin_bike_tabs", bike, stolen_record]) do
+          - impound_count = bike.impound_records.count + ImpoundClaim.involving_bike_id(bike.id).count
+
           .nav-item
             = link_to "Edit", edit_admin_bike_path(bike), class: "nav-link bikes-edit"
           .nav-item
@@ -345,6 +347,13 @@
               R<span class="d-none d-md-inline">ecoveries</span>
               %small
                 (#{admin_number_display(bike.recovered_records.count)})
+          - if impound_count > 0
+            .nav-item
+              = link_to admin_bike_path(bike, active_tab: "impound"), class: "nav-link bikes-impound" do
+                I<span class="d-none d-md-inline">mpoundings</span>
+                %small
+                  (#{admin_number_display(impound_count)})
+
         -# NOTE: not cached, only renders when looking at recoveries
         - if display_recovery
           .nav-item

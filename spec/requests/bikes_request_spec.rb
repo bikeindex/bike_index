@@ -502,15 +502,40 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "current_user has submitting_impound_claim" do
-        let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, bike: bike, user: current_user) }
+        let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record: impound_record, user: current_user) }
         it "uses impound_claim" do
+          expect(impound_claim.reload.bike_claimed_id).to eq bike.id
+          expect(impound_claim.bike_submitting_id).to_not eq bike.id
+          expect(impound_claim.status).to eq "pending"
           bike.reload
-          expect(bike.impound_claims_submitting.pluck(:id)).to eq([impound_claim.id])
+          expect(bike.impound_claims_claimed.pluck(:id)).to eq([impound_claim.id])
           expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
           get "#{base_url}/#{bike.id}"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+          # It renders if submitting
+          impound_claim.update(status: "submitting")
+          expect(impound_claim.reload.status).to eq "submitting"
+          expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+          # It renders if approved
+          impound_claim.update(status: "approved")
+          expect(impound_claim.reload.status).to eq "approved"
+          expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:impound_claim)&.id).to eq impound_claim.id
+
+          impound_claim.update(status: "denied")
+          expect(impound_claim.reload.status).to eq "denied"
+          expect(BikeDisplayer.display_impound_claim?(bike, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          expect(flash).to be_blank
+          expect(assigns(:impound_claim)&.id).to be_blank
+          expect(assigns(:impound_claim)).to be_present # But it is rendered
         end
       end
     end
