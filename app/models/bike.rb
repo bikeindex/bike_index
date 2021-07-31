@@ -795,7 +795,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation
+    elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
       "initial_creation_state"
     elsif b_params_address.present?
       "initial_creation"
@@ -842,7 +842,7 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    # TODO: make conditional_information hold more things
+    # TODO: make conditional_information hold more things, post #2035
     o_affiliation = conditional_information["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
@@ -856,7 +856,7 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    # TODO: migrate conditional information into registration_info
+    # TODO: migrate conditional information into registration_info, post #2035
     s_id = conditional_information["student_id"] || current_creation_state&.registration_info&.dig("student_id")
     return s_id if s_id.present?
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
@@ -993,7 +993,7 @@ class Bike < ApplicationRecord
   # 2. The bike owner's address, if available
   # 3. registration_address
   # 4. The creation organization, if one is present
-  # - prefer something with a street address, fallback to anything with a latitude, uses hashes because registration address
+  # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
   def location_record_address_hash
     l_hashes = [
       current_impound_record&.address_hash,
