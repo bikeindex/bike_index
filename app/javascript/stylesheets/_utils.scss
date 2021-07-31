@@ -16,6 +16,11 @@
   }
 }
 
+.less-less-strong {
+  @extend .less-strong;
+  opacity: 0.3;
+}
+
 .gray-link {
   a,
   & {

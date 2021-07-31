@@ -1,7 +1,7 @@
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
-    submitting: 1,
+    submitting: 1, # TOD: change this to submitted
     approved: 2,
     denied: 3,
     canceled: 4,
@@ -30,6 +30,7 @@ class ImpoundClaim < ApplicationRecord
   scope :submitted, -> { where.not(submitted_at: nil) }
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
+  scope :not_rejected, -> { where.not(status: rejected_statuses) }
 
   attr_accessor :skip_update
 
@@ -41,13 +42,25 @@ class ImpoundClaim < ApplicationRecord
     %w[denied canceled retrieved]
   end
 
+  def self.rejected_statuses
+    %w[denied canceled]
+  end
+
+  def self.successful_statuses
+    %w[approved retrieved]
+  end
+
   def self.active_statuses
     statuses - resolved_statuses
   end
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.tr("_", " ")
+    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+  end
+
+  def self.involving_bike_id(bike_id)
+    where(bike_submitting_id: bike_id).or(where(bike_claimed_id: bike_id))
   end
 
   def kind
@@ -78,6 +91,14 @@ class ImpoundClaim < ApplicationRecord
 
   def active?
     self.class.active_statuses.include?(status)
+  end
+
+  def rejected?
+    self.class.rejected_statuses.include?(status)
+  end
+
+  def successful?
+    self.class.successful_statuses.include?(status)
   end
 
   # Get it not current too, because retrieved notifications

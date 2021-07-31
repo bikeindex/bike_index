@@ -35,8 +35,7 @@ class BikesController < ApplicationController
     if current_user.present? && BikeDisplayer.display_impound_claim?(@bike, current_user)
       impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
       @contact_owner_open = params[:contact_owner].present?
-      @impound_claim = impound_claims.unsubmitted.last
-      @impound_claim ||= @bike.impound_claims_submitting.where(user_id: current_user.id).last
+      @impound_claim = impound_claims.not_rejected.last
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end

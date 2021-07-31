@@ -19,6 +19,11 @@ class ImpoundClaimsController < ApplicationController
     elsif stolen_record.user != current_user
       errors << "It doesn't look like you own the #{bike_type} you're claiming matches the #{impound_type}"
     end
+    existing_impound_claim = current_user.impound_claims.not_rejected
+      .where(impound_record_id: @impound_claim.impound_record_id).first
+    if existing_impound_claim
+      errors << "You already have a #{existing_impound_claim.status_humanized} claim for that #{impound_type}!"
+    end
     if errors.blank?
       @impound_claim.save
       if @impound_claim.valid?

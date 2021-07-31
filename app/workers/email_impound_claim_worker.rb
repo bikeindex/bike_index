@@ -15,6 +15,7 @@ class EmailImpoundClaimWorker < ApplicationWorker
       OrganizedMailer.impound_claim_approved_or_denied(impound_claim).deliver_now
     end
     notification.update(delivery_status: "email_success", message_channel: "email")
+    AfterUserChangeWorker.perform_async(impound_claim.user_id)
   end
 
   def calculated_email_to_send(impound_claim)

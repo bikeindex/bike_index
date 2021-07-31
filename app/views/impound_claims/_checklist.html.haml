@@ -12,7 +12,11 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if verified_phone_number
       %span.checklist-text
-        Verified phone number
+        - verified_phone_number_text = "Verified phone number"
+        - if verified_phone_number
+          = verified_phone_number_text
+        - else
+          = link_to(verified_phone_number_text, edit_my_account_url)
 
     - theft_information = bike_submitting.current_stolen_record.street.present? && bike_submitting.current_stolen_record.date_stolen.present?
     %li{ class: theft_information ? "completed-item" : "" }
@@ -27,7 +31,11 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if police_report_present
       %span.checklist-text
-        = link_to("Loss/theft reported to police", edit_bike_url(id: bike_submitting.to_param, page: "theft_details"))
+        - police_report_text = "Loss/theft reported to police"
+        - if police_report_present
+          = police_report_text
+        - else
+          = link_to(police_report_text, edit_bike_url(id: bike_submitting.to_param, page: "theft_details"))
         - if render_optional
           %em.small.less-strong optional
 
@@ -57,7 +65,11 @@
         %span.checklist-checkbox
           = "&#10003;".html_safe if proof_of_purchase_photo
         %span.checklist-text
-          = link_to "Photo of the receipt", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+          - proof_of_purchase_photo_text = "Photo of the receipt"
+          - if proof_of_purchase_photo
+            = proof_of_purchase_photo_text
+          - else
+            = link_to proof_of_purchase_photo_text, edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
           - if render_optional
             %em.small.less-strong
               optional
@@ -67,7 +79,11 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if photo_of_you_and_bike
       %span.checklist-text
-        = link_to "Photo of you with the #{bike_submitting.type}", edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+        - photo_of_you_and_bike_text = "Photo of you with the #{bike_submitting.type}"
+        - if photo_of_you_and_bike # Don't link if the photo exists
+          = photo_of_you_and_bike_text
+        - else
+          = link_to photo_of_you_and_bike_text, edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
         - if render_optional
           %em.small.less-strong optional
 

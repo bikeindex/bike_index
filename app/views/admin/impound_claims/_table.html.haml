@@ -1,0 +1,60 @@
+- render_sortable ||= false
+- skip_organization ||= false
+- skip_status ||= false
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "created_at"
+    %th
+      = sortable "updated_at"
+    - unless skip_organization
+      %th
+        = sortable "organization_id"
+    %th
+      %small= sortable "impound_record_id", "Impound ID"
+    %th Claimed
+    %th Submitted
+    %th
+      = sortable "status"
+    %th
+      = sortable "user_id"
+    - unless skip_status
+      %th
+        = sortable "resolved_at"
+  %tbody
+    - impound_claims.each do |impound_claim|
+      %tr
+        %td
+          %a.convertTime.preciseTime{href: admin_impound_claim_path(impound_claim) }
+            = l(impound_claim.created_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(impound_claim.updated_at, format: :convert_time)
+        - unless skip_organization
+          %td
+            - if impound_claim.organization_id.present?
+              = link_to impound_claim.organization&.short_name || impound_claim.organization_id, admin_impound_claims_path(sortable_search_params.merge(organization_id: impound_claim.organization_id))
+        %td
+          - if impound_claim.impound_record
+            - if impound_claim.organization.present?
+              = link_to "##{impound_claim.impound_record.display_id}", organization_impound_record_path(impound_claim.impound_record.display_id, organization_id: impound_claim.organization_id)
+            - elsif display_dev_info?
+              %small.only-dev-visible= impound_claim.impound_record.id
+
+        %td
+          - if impound_claim.bike_claimed.present?
+            = link_to organized_bike_text(impound_claim.bike_claimed), admin_bike_path(impound_claim.bike_claimed)
+        %td
+          - if impound_claim.bike_submitting.present?
+            = link_to organized_bike_text(impound_claim.bike_submitting), admin_bike_path(impound_claim.bike_submitting)
+        %td
+          %em
+            = status_display(impound_claim.status_humanized)
+        %td
+          = impound_claim.user&.display_name&.truncate(20)
+        - unless skip_status
+          %td
+            - if impound_claim.resolved_at.present?
+              %span.convertTime.preciseTime
+                = l(impound_claim.resolved_at, format: :convert_time)

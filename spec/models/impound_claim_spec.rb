@@ -32,6 +32,8 @@ RSpec.describe ImpoundClaim, type: :model do
         expect(impound_claim.stolen_record.user&.id).to eq impound_claim.user.id
         expect(impound_claim.impound_record.organization&.id).to eq organization.id
         expect(organization.public_impound_bikes?).to be_falsey # There can be claims on records, even if organization isn't enabled
+        expect(ImpoundClaim.involving_bike_id(impound_claim.bike_claimed_id).pluck(:id)).to eq([impound_claim.id])
+        expect(ImpoundClaim.involving_bike_id(impound_claim.bike_submitting_id).pluck(:id)).to eq([impound_claim.id])
       end
     end
     describe "impound_claim_resolved" do

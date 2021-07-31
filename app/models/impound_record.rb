@@ -1,7 +1,7 @@
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :user
   belongs_to :organization
   belongs_to :location # organization location
@@ -24,6 +24,7 @@ class ImpoundRecord < ApplicationRecord
   scope :organized, -> { where.not(organization_id: nil) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :registered_bike, -> { where(unregistered_bike: false) }
+  scope :with_claims, -> { joins(:impound_claims).where.not(impound_claims: {id: nil}) }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 

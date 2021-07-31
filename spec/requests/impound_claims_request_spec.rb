@@ -44,6 +44,65 @@ RSpec.describe ImpoundClaimsController, type: :request do
         expect(flash[:error]).to eq "That found bike record has been marked 'Owner retrieved bike' and cannot be claimed"
       end
     end
+    context "user has a submitting claim" do
+      let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record: impound_record, user: current_user, status: status) }
+      (ImpoundClaim.statuses - %w[denied canceled]).each do |checked_status|
+        context "status: #{checked_status}" do
+          let(:status) { checked_status }
+          it "errors" do
+            expect(impound_claim.status).to eq status
+            expect(impound_claim.bike_claimed_id).to eq bike_claimed.id
+            expect {
+              post base_url, params: {
+                impound_claim: {
+                  impound_record_id: impound_record.id,
+                  stolen_record_id: stolen_record.id
+                }
+              }
+            }.to_not change(ImpoundClaim, :count)
+            expect(flash[:error]).to eq "You already have a #{ImpoundClaim.status_humanized(status)} claim for that found bike!"
+          end
+        end
+      end
+      context "status: denied" do
+        let(:status) { "denied" }
+        it "creates" do
+          expect {
+            post base_url, params: {
+              impound_claim: {
+                impound_record_id: impound_record.id,
+                stolen_record_id: stolen_record.id
+              }
+            }
+          }.to change(ImpoundClaim, :count).by 1
+          expect(flash[:success]).to be_present
+          impound_claim = ImpoundClaim.last
+          expect(impound_claim.status).to eq "pending"
+          expect(impound_claim.user&.id).to eq current_user.id
+          expect(impound_claim.bike_submitting&.id).to eq bike_submitting.id
+          expect(impound_claim.bike_claimed&.id).to eq bike_claimed.id
+        end
+      end
+      context "status: canceled" do
+        let(:status) { "canceled" }
+        it "creates" do
+          expect {
+            post base_url, params: {
+              impound_claim: {
+                impound_record_id: impound_record.id,
+                stolen_record_id: stolen_record.id
+              }
+            }
+          }.to change(ImpoundClaim, :count).by 1
+          expect(flash[:success]).to be_present
+          impound_claim = ImpoundClaim.last
+          expect(impound_claim.status).to eq "pending"
+          expect(impound_claim.user&.id).to eq current_user.id
+          expect(impound_claim.bike_submitting&.id).to eq bike_submitting.id
+          expect(impound_claim.bike_claimed&.id).to eq bike_claimed.id
+        end
+      end
+    end
     context "not users stolen bike" do
       let(:bike_submitting) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
       it "errors" do
