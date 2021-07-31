@@ -121,7 +121,7 @@
                       %td= t(".address")
                       %td
                         - address = @bike.address_hash
-                        - if @bike.valid_address_present?
+                        - if @bike.valid_mailing_address?
                           = address["street"]
                           %br
                           = [address["city"], address["state"]].reject(&:blank?).join(", ")
@@ -165,7 +165,7 @@
                         %small.em
                           - unless @bike.owner_name.present?
                             = t(".missing_owner_name")
-                          - unless @bike.valid_address_present?
+                          - unless @bike.valid_mailing_address?
                             = t(".missing_address")
 
           - if !@passive_organization_registered # Apologize, bike isn't organizations

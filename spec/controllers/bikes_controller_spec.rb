@@ -654,7 +654,7 @@ RSpec.describe BikesController, type: :controller do
             expect(b_param.reload.status).to eq "status_stolen"
             bike = assigns(:bike)
             testable_bike_params
-              .except(:serial_number)
+              .except(:manufacturer_id)
               .each { |k, v| expect(bike.send(k).to_s).to eq(v.to_s) }
             expect(b_param.status).to eq "status_stolen"
             # we retain the stolen record attrs, it would be great to test that they are

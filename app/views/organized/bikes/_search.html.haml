@@ -222,7 +222,7 @@
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "address"
                   -# Don't show organization address
-                  - if bike.valid_address_present?
+                  - if bike.valid_mailing_address?
                     %small{style: "line-height: 1.5;"}
                       = bike.address_hash["street"]
                 - elsif bike_attr == "organization_affiliation"

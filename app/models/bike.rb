@@ -354,7 +354,7 @@ class Bike < ApplicationRecord
   end
 
   def avery_exportable?
-    !impounded? && owner_name.present? && valid_address_present?
+    !impounded? && owner_name.present? && valid_mailing_address?
   end
 
   def current_parking_notification
@@ -774,11 +774,14 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
-  def valid_address_present?
-    return false if registration_address.blank?
-    return false if registration_address["street"].blank? && registration_address["city"].blank?
+  def valid_mailing_address?
+    # Prefer address over registration address, since it can be updated
+    addy = address_hash if address_hash.values.any?(&:present?)
+    addy ||= registration_address
+    return false if addy.blank? || addy.values.all?(&:blank?)
+    return false if addy["street"].blank? || addy["city"].blank?
     return true if creation_organization&.default_location.blank?
-    creation_organization.default_location.address_hash != address_hash
+    creation_organization.default_location.address_hash != addy
   end
 
   def registration_address_source
@@ -824,6 +827,10 @@ class Bike < ApplicationRecord
       return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
       address_attrs = location_record_address_hash
       return true unless address_attrs.present? # No address hash present so skip
+      # pp changed_attributes
+      # Manually handle dirtiness because this happens in a validation callback and doesn't seem to trigger AR Dirty
+      # pp [street, city] != [address_attrs["street"], address_attrs["city"]], [street, city, address_attrs["street"], address_attrs["city"]]
+      @force_geocoding = [street, city] != [address_attrs["street"], address_attrs["city"]]
       self.attributes = address_attrs
     end
   end
@@ -847,8 +854,8 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    # TODO: make conditional_information hold more things
-    s_id = conditional_information["student_id"]
+    # TODO: migrate conditional information into registration_info
+    s_id = conditional_information["student_id"] || current_creation_state&.registration_info&.dig("student_id")
     return s_id if s_id.present?
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
     return "" unless previous_s_id.present?
@@ -961,9 +968,8 @@ class Bike < ApplicationRecord
 
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
-    pp "#{skip_geocoding?} #{address_changed?} #{address}"
     return false if skip_geocoding?
-    address_changed?
+    address_changed? || @force_geocoding
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
@@ -997,9 +1003,6 @@ class Bike < ApplicationRecord
     ].compact
     l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
       l_hashes.find { |rec| rec&.dig("latitude").present? }
-
-    pp l_hash
-
     return {} unless l_hash.present?
     # If the location record has coordinates, skip geocoding
     l_hash.merge(skip_geocoding: l_hash["latitude"].present?)

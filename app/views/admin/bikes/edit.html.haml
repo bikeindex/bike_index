@@ -207,6 +207,9 @@
               %td
                 %span.convertTime
                   = l bike_organization.created_at, format: :convert_time
+                - if display_dev_info?
+                  %code.only-dev-visible.small.ml-2
+                    ID: #{bike_organization.id}
             %tr
               %td Edit claimed?
               %td= bike_organization.can_edit_claimed
@@ -217,13 +220,21 @@
           %tbody
             %tr
               %td Kind
-              %td CreationState
+              %td
+                CreationState
+                - if @bike.current_creation_state_id == creation_state.id
+                  %span.text-success Current creation state
+                - else
+                  %span.text-danger NOT CURRENT!
             %tr
               %td
                 Created
               %td
                 %span.convertTime
                   = l creation_state.created_at, format: :convert_time
+                - if display_dev_info?
+                  %code.only-dev-visible.small.ml-2
+                    ID: #{creation_state.id}
             %tr
               %td
                 Updated
@@ -244,6 +255,11 @@
                 - if creation_state.creator_id.present?
                   - creator_display_name = creation_state.creator&.display_name || creation_state.creator_id
                   = link_to creator_display_name, admin_user_path(creation_state.creator_id)
+            - if creation_state.registration_info.present?
+              - creation_state.registration_info.each do |k, v|
+                %tr
+                  %td= k
+                  %td= v
       .col-md-6.mt-2
         = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"))
 
@@ -262,6 +278,9 @@
                 %td
                   %span.convertTime
                     = l b_param.created_at, format: :convert_time
+                  - if display_dev_info?
+                    %code.only-dev-visible.small.ml-2
+                      ID: #{b_param.id}
               %tr
                 %td
                   Updated

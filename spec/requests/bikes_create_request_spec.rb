@@ -264,7 +264,7 @@ RSpec.describe BikesController, type: :request do
           expect(new_bike.street).to eq "1400 32nd St"
           expect(new_bike.latitude.to_i).to eq 37
           expect(new_bike.longitude.to_i).to eq(-122)
-          expect(new_bike.valid_address_present?).to be_truthy
+          expect(new_bike.valid_mailing_address?).to be_truthy
         end
       end
       context "no address passed" do
@@ -292,7 +292,7 @@ RSpec.describe BikesController, type: :request do
           expect(new_bike.address).to be_present
           expect(new_bike.address).to eq organization.address.gsub("United States", "US")
           # Because the address is the same as the organization
-          expect(new_bike.valid_address_present?).to be_falsey
+          expect(new_bike.valid_mailing_address?).to be_falsey
         end
       end
     end
