@@ -21,10 +21,10 @@ class MigrateRegistrationInfoWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    offset = (Time.current.to_i - OFFSET_TIMESTAMP)/self.class.frequency.to_i
-    offset = (Time.current.to_i - MigrateRegistrationInfoWorker::OFFSET_TIMESTAMP)/MigrateRegistrationInfoWorker.frequency.to_i
+    offset = (Time.current.to_i - OFFSET_TIMESTAMP) / self.class.frequency.to_i
     limit = 10_000
-    CreationState.where("id < ?", (offset + 1)*limit).where("id > ?", offset*limit)
+    CreationState.where("id < ?", (offset + 1) * limit).where("id > ?", offset * limit)
+      .where(registration_info: nil)
       .pluck(:id).each { |i| MigrateRegistrationInfoWorker.perform_async(i) }
   end
 end

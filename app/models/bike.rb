@@ -833,7 +833,6 @@ class Bike < ApplicationRecord
       return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
       address_attrs = location_record_address_hash
       return true unless address_attrs.present? # No address hash present so skip
-      # Manually handle dirtiness because this happens in a validation callback and doesn't seem to trigger AR Dirty
       self.attributes = address_attrs
     end
   end
