@@ -387,7 +387,7 @@ RSpec.describe BikesController, type: :request do
         expect(new_bike.current_creation_state.origin).to eq "embed_partial"
         expect(new_bike.current_creation_state.creator).to eq new_bike.creator
         expect(new_bike.registration_address).to eq({"street" => default_location[:formatted_address_no_country]})
-        expect(new_bike.street).to eq default_location[:formatted_address_no_country]
+        expect(new_bike.address).to eq default_location[:formatted_address_no_country]
         expect(new_bike.latitude).to eq target_address[:latitude]
         expect(new_bike.longitude).to eq target_address[:longitude]
         expect(new_bike.extra_registration_number).to eq "XXXZZZ"

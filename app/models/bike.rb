@@ -774,6 +774,12 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
+  # THIS IS FUCKING ABNOXIOUS.
+  # Somehow we need to get rid of needing to have this method. country should default to optional
+  def address
+    Geocodeable.address(self, country: [:optional])
+  end
+
   def valid_mailing_address?
     # Prefer address over registration address, since it can be updated
     addy = address_hash if address_hash.values.any?(&:present?)
@@ -827,10 +833,7 @@ class Bike < ApplicationRecord
       return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
       address_attrs = location_record_address_hash
       return true unless address_attrs.present? # No address hash present so skip
-      # pp changed_attributes
       # Manually handle dirtiness because this happens in a validation callback and doesn't seem to trigger AR Dirty
-      # pp [street, city] != [address_attrs["street"], address_attrs["city"]], [street, city, address_attrs["street"], address_attrs["city"]]
-      @force_geocoding = [street, city] != [address_attrs["street"], address_attrs["city"]]
       self.attributes = address_attrs
     end
   end
@@ -969,7 +972,7 @@ class Bike < ApplicationRecord
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
     return false if skip_geocoding?
-    address_changed? || @force_geocoding
+    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
