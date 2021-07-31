@@ -12,7 +12,11 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if verified_phone_number
       %span.checklist-text
-        Verified phone number
+        - verified_phone_number_text = "Verified phone number"
+        - if verified_phone_number
+          = verified_phone_number_text
+        - else
+          = link_to(verified_phone_number_text, edit_my_account_url)
 
     - theft_information = bike_submitting.current_stolen_record.street.present? && bike_submitting.current_stolen_record.date_stolen.present?
     %li{ class: theft_information ? "completed-item" : "" }
