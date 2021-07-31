@@ -74,6 +74,12 @@
                       This claim was submitted
                       %span.convertTime.withPreposition
                         = l impound_claim.created_at, format: :convert_time
+                  - if impound_claim.successful?
+                    %p
+                      %strong
+                        Your claim was
+                        %span.text-success #{impound_claim.status_humanized}.
+                      You should have received an email with next steps.
               - unless impound_claim.submitted?
                 .col-lg-4
                   %p

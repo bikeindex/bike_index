@@ -30,7 +30,7 @@ class ImpoundClaim < ApplicationRecord
   scope :submitted, -> { where.not(submitted_at: nil) }
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
-  scope :not_rejected, -> { where.not(status: %w[canceled denied]) }
+  scope :not_rejected, -> { where.not(status: rejected_statuses) }
 
   attr_accessor :skip_update
 
@@ -40,6 +40,14 @@ class ImpoundClaim < ApplicationRecord
 
   def self.resolved_statuses
     %w[denied canceled retrieved]
+  end
+
+  def self.rejected_statuses
+    %w[denied canceled]
+  end
+
+  def self.successful_statuses
+    %w[approved retrieved]
   end
 
   def self.active_statuses
@@ -83,6 +91,14 @@ class ImpoundClaim < ApplicationRecord
 
   def active?
     self.class.active_statuses.include?(status)
+  end
+
+  def rejected?
+    self.class.rejected_statuses.include?(status)
+  end
+
+  def successful?
+    self.class.successful_statuses.include?(status)
   end
 
   # Get it not current too, because retrieved notifications
