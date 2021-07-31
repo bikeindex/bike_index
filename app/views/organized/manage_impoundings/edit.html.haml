@@ -5,8 +5,7 @@
 = form_for @impound_configuration, { url: organization_manage_impounding_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
 
   .form-group.row.mt-2.small-line-height
-    %label.org-form-label
-      Public search
+    %label.org-form-label.mt-md-1 Public search
     .col-sm-4
       .checkbox.mt-0
         %label
@@ -18,7 +17,7 @@
 
   - if @organization.enabled?("impound_bikes_locations")
     .form-group.row.mt-2.small-line-height
-      %label.org-form-label Impound location
+      %label.org-form-label.mt-2 Impound location
       .col-sm-4
         - if @organization.default_impound_location.present?
           Bikes are impounded with locations
@@ -31,7 +30,7 @@
         - else
           = link_to "Set impound locations", locations_organization_manage_path(organization_id: @organization.to_param)
   .form-group.row.small-line-height
-    = f.label :email, "Impound email", class: 'org-form-label'
+    = f.label :email, "Impound email", class: "org-form-label mt-md-2"
     .col-sm-4
       = f.email_field :email, placeholder: @organization.auto_user&.email, class: "form-control"
       %span.below-input-help
@@ -39,7 +38,7 @@
         %em If blank, uses the default organization email
 
   .form-group.row.mt-4.small-line-height
-    = f.label :display_id_prefix, class: 'org-form-label' do
+    = f.label :display_id_prefix, class: "org-form-label mt-md-4" do
       ID prefix
     .col-sm-4
       .d-block.less-strong
