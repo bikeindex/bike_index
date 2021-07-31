@@ -3,7 +3,7 @@
 class MigrateRegistrationInfoWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
-  OFFSET_TIMESTAMP = ENV["MIGRATE_REGISTRATION_INFO_OFFSET"] || Time.current.to_i
+  OFFSET_TIMESTAMP = ENV["MIGRATE_REGISTRATION_INFO_OFFSET"] || Time.current
 
   def self.frequency
     5.minutes
@@ -21,7 +21,7 @@ class MigrateRegistrationInfoWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    offset = (Time.current.to_i - OFFSET_TIMESTAMP) / self.class.frequency.to_i
+    offset = (Time.current.to_i - OFFSET_TIMESTAMP.to_i) / self.class.frequency.to_i
     limit = 10_000
     CreationState.where("id < ?", (offset + 1) * limit).where("id > ?", offset * limit)
       .where(registration_info: nil)
