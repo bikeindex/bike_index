@@ -61,6 +61,7 @@ class Bike < ApplicationRecord
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
+  accepts_nested_attributes_for :current_creation_state
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
@@ -301,6 +302,10 @@ class Bike < ApplicationRecord
 
   def pos_kind
     current_creation_state&.pos_kind
+  end
+
+  def registration_info
+    current_creation_state&.registration_info || {}
   end
 
   def creator_unregistered_parking_notification?
@@ -853,11 +858,12 @@ class Bike < ApplicationRecord
 
   def student_id=(val)
     conditional_information["student_id"] = val
+
   end
 
   def student_id
     # TODO: migrate conditional information into registration_info, post #2035
-    s_id = conditional_information["student_id"] || current_creation_state&.registration_info&.dig("student_id")
+    s_id = conditional_information["student_id"] || registration_info["student_id"]
     return s_id if s_id.present?
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
     return "" unless previous_s_id.present?
@@ -909,6 +915,7 @@ class Bike < ApplicationRecord
     normalize_emails
     normalize_serial_number
     set_paints
+    add_conditional_information_to_creation_state
     cache_bike
   end
 
@@ -984,6 +991,16 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
+  # TODO: better handling of this post handling of #2035
+  def fetch_current_creation_state
+    return current_creation_state if current_creation_state.present?
+    self.current_creation_state = creation_states.build
+    # Pull in information from b_params. Should probably be done somewhere else?
+    r_info = b_params.map { |b| b.registration_info_attrs }.reject(&:blank?)
+    current_creation_state.registration_info = r_info.inject(&:merge) if r_info.present?
+    current_creation_state
+  end
+
   private
 
   # Select the source from which to derive location data, in the following order
@@ -1017,6 +1034,12 @@ class Bike < ApplicationRecord
       break if bp_address.present?
     end
     bp_address
+  end
+
+  # TODO: drop this once #2035 is merged
+  def add_conditional_information_to_creation_state
+    return true if conditional_information.blank? || conditional_information == registration_info
+    fetch_current_creation_state.update(registration_info: registration_info.merge(conditional_information))
   end
 
   def fetch_current_impound_record

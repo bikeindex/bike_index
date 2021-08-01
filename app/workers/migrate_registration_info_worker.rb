@@ -6,7 +6,7 @@ class MigrateRegistrationInfoWorker < ScheduledWorker
   OFFSET_TIMESTAMP = ENV["MIGRATE_REGISTRATION_INFO_OFFSET"] || Time.current
 
   def self.frequency
-    5.minutes
+    10.hours
   end
 
   def perform(id = nil)
@@ -16,7 +16,7 @@ class MigrateRegistrationInfoWorker < ScheduledWorker
     return unless bike.present? && bike.b_params.any?
     info_hashes = bike.b_params.order(created_at: :asc).map { |b| b.registration_info_attrs }.reject(&:blank?)
     if info_hashes.any?
-      creation_state.update(registration_info: info_hashes.inject(&:merge))
+      creation_state.update(registration_info: info_hashes.inject(&:merge).merge(bike.conditional_information))
     end
   end
 
