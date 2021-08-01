@@ -6,7 +6,7 @@ class MigrateRegistrationInfoWorker < ScheduledWorker
   OFFSET_TIMESTAMP = ENV["MIGRATE_REGISTRATION_INFO_OFFSET"] || Time.current
 
   def self.frequency
-    10.hours
+    3.days
   end
 
   def perform(id = nil)

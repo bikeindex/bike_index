@@ -289,6 +289,7 @@ RSpec.describe Bike, type: :model do
 
   describe "organization_affiliation" do
     let(:bike) { FactoryBot.create(:bike) }
+    before { bike.fetch_current_creation_state }
     it "sets if searched" do
       expect(bike.organization_affiliation).to eq "" # We expect it to be a string
       expect(bike.conditional_information).to eq({})
@@ -296,12 +297,13 @@ RSpec.describe Bike, type: :model do
       bike.update(organization_affiliation: "community_member")
       bike.reload
       expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
-      expect(bike.registration_info).to eq({organization_affiliation: "community_member"}.as_json)
+      expect(bike.registration_info).to eq({})
       expect(bike.organization_affiliation).to eq "community_member"
     end
     context "with b_param value" do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"}} }
+      let(:target_registration_attrs) { {street: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"}.as_json }
       it "gets b_param value" do
         bike.reload
         expect(b_param.organization_affiliation).to eq "employee"
@@ -309,14 +311,32 @@ RSpec.describe Bike, type: :model do
         expect(bike.registration_info).to eq({})
         expect(bike.organization_affiliation).to eq "employee"
         expect(bike.conditional_information).to eq({"organization_affiliation" => "employee"})
-        expect(bike.registration_info).to eq({"organization_affiliation" => "employee"})
         bike.update(organization_affiliation: "student")
         bike.reload
         b_param.reload
         expect(bike.organization_affiliation).to eq "student"
         expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
-        expect(bike.registration_info).to eq({"organization_affiliation" => "student"})
         expect(b_param.organization_affiliation).to eq "employee"
+      end
+      context "with creation_state" do
+        it "uses current_creation_state" do
+          bike.reload
+          bike.fetch_current_creation_state
+          bike.save
+          bike.reload
+          expect(b_param.organization_affiliation).to eq "employee"
+          expect(bike.conditional_information).to eq({})
+          expect(bike.registration_info).to eq target_registration_attrs
+          expect(bike.organization_affiliation).to eq "employee"
+          expect(bike.conditional_information).to eq({})
+          bike.update(organization_affiliation: "student")
+          bike.reload
+          b_param.reload
+          expect(bike.organization_affiliation).to eq "student"
+          expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
+          expect(bike.registration_info).to eq target_registration_attrs
+          expect(b_param.organization_affiliation).to eq "employee"
+        end
       end
     end
   end
@@ -330,27 +350,31 @@ RSpec.describe Bike, type: :model do
       bike.update(student_id: "424242")
       bike.reload
       expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
-      expect(bike.registration_info).to eq({student_id: "424242"}.as_json)
+      expect(bike.registration_info).to eq({})
       expect(bike.student_id).to eq "424242"
     end
     context "with b_param value" do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", student_id: "CCCIIIIBBBBB"}} }
-      let(:target_reg_info) { {student_id: "CCCIIIIBBBBB", phone: "717.742.3423", street: "717 Market St, SF"} }
+      let(:target_registration_attrs) { b_param_params[:bike].except(:address).merge(street: b_param_params[:bike][:address]) }
       it "gets b_param value" do
+        bike.reload
+        bike.fetch_current_creation_state
+        bike.save
+        expect(bike.current_creation_state_id).to be_present
         bike.reload
         expect(b_param.student_id).to eq "CCCIIIIBBBBB"
         expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq({})
+        expect(bike.registration_info).to eq target_registration_attrs.as_json
         expect(bike.student_id).to eq "CCCIIIIBBBBB"
-        expect(bike.conditional_information).to eq({"student_id" => "CCCIIIIBBBBB"})
-        expect(bike.registration_info).to eq(b_param_params.as_json)
+        expect(bike.conditional_information).to eq({})
+        expect(bike.registration_info).to eq target_registration_attrs.as_json
         bike.update(student_id: "66")
         bike.reload
         b_param.reload
         expect(bike.student_id).to eq "66"
         expect(bike.conditional_information).to eq({"student_id" => "66"})
-        expect(bike.registration_info).to eq b_param_params.as_json.merge({"student_id" => "66"})
+        expect(bike.registration_info).to eq target_registration_attrs.as_json
         expect(b_param.student_id).to eq "CCCIIIIBBBBB"
       end
     end

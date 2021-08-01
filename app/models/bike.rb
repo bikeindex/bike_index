@@ -848,7 +848,7 @@ class Bike < ApplicationRecord
 
   def organization_affiliation
     # TODO: make conditional_information hold more things, post #2035
-    o_affiliation = conditional_information["organization_affiliation"]
+    o_affiliation = conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
     return "" unless previous_o_affiliation.present?
@@ -915,7 +915,6 @@ class Bike < ApplicationRecord
     normalize_emails
     normalize_serial_number
     set_paints
-    add_conditional_information_to_creation_state
     cache_bike
   end
 
@@ -991,10 +990,10 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
-  # TODO: better handling of this post handling of #2035
+  # TODO post handling of #2035 - not sure this should still exist. Useful for testing - but BikeCreator handles for real
   def fetch_current_creation_state
     return current_creation_state if current_creation_state.present?
-    self.current_creation_state = creation_states.build
+    self.current_creation_state = creation_states.first || creation_states.build
     # Pull in information from b_params. Should probably be done somewhere else?
     r_info = b_params.map { |b| b.registration_info_attrs }.reject(&:blank?)
     current_creation_state.registration_info = r_info.inject(&:merge) if r_info.present?
@@ -1034,12 +1033,6 @@ class Bike < ApplicationRecord
       break if bp_address.present?
     end
     bp_address
-  end
-
-  # TODO: drop this once #2035 is merged
-  def add_conditional_information_to_creation_state
-    return true if conditional_information.blank? || conditional_information == registration_info
-    fetch_current_creation_state.update(registration_info: registration_info.merge(conditional_information))
   end
 
   def fetch_current_impound_record
