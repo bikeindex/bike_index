@@ -75,7 +75,7 @@ class BParam < ApplicationRecord
   end
 
   def self.registration_info_attrs
-    %w[bike_sticker bike_code phone organization_affiliation student_id
+    %w[bike_sticker bike_code phone organization_affiliation student_id user_name
       accuracy street city state zipcode state country] # Also uses address_hash to get legacy address attributes
   end
 

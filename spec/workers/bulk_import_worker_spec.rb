@@ -211,6 +211,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
           expect(bike2.current_creation_state.origin).to eq "bulk_import_worker"
+          expect(bike2.current_creation_state.registration_info).to eq({"user_name" => "Sally"})
           expect(bike2.creator).to eq organization.auto_user
           expect(bike2.creation_organization).to eq organization
           expect(bike2.year).to_not be_present
