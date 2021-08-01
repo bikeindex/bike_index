@@ -34,7 +34,6 @@ class ScheduledWorkerRunner < ScheduledWorker
 
   def self.scheduled_workers
     [
-      MigrateRegistrationInfoWorker,
       CreateUserAlertNotificationWorker,
       UpdateInvoiceWorker,
       UpdateCountsWorker,
