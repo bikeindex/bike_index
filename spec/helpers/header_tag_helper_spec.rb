@@ -107,7 +107,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         let(:controller_name) { "bikes" }
         let(:action_name) { "index" }
         it "returns prepended title" do
-          expect(helper.auto_title).to eq "Admin | Bikes"
+          expect(helper.auto_title).to eq "🧰 Bikes"
         end
       end
     end

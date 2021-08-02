@@ -179,7 +179,7 @@ RSpec.describe PublicImagesController, type: :request do
           expect {
             delete "#{base_url}/#{public_image.id}?page=redirect_page"
           }.to change(PublicImage, :count).by(-1)
-          expect(response).to redirect_to(edit_bike_path(bike, page: "redirect_page"))
+          expect(response).to redirect_to(edit_bike_path(bike, edit_template: "redirect_page"))
         end
       end
     end

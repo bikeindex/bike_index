@@ -1,6 +1,6 @@
-- is_disabled ||= false
+- no_save_button ||= false
 
-%nav.primary-edit-form-well-menu
+%nav.primary-edit-form-well-menu{class: (no_save_button ? "no-save-button" : "")}
   - if @permitted_return_to.present?
     %span#permittedReturnTo{ "data-path" => @permitted_return_to }
   - if @bike.status_stolen?
@@ -32,4 +32,4 @@
 
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
-    = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges', disabled: is_disabled
+    = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'
