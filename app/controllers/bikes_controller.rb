@@ -7,7 +7,6 @@ class BikesController < Bikes::BaseController
   before_action :render_ad, only: %i[index show]
   before_action :remove_subdomain, only: %i[index]
 
-
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
@@ -217,7 +216,7 @@ class BikesController < Bikes::BaseController
 
     @edit_templates = nil # update templates in case bike state has changed
     if @bike.errors.any? || flash[:error].present?
-      return edit
+      edit
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
