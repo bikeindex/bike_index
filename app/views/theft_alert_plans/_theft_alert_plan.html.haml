@@ -2,7 +2,7 @@
 - is_preferred = (theft_alert_plan == preferred_plan) if preferred_plan.present?
 
 .col-md-12.col-lg-4
-  .detail-card-container.js-plan-container{class: "#{'selected' if is_selected}"}
+  .detail-card-container.js-plan-container{class: "#{'selected' if is_selected}", data: {cents: theft_alert_plan.amount_cents, id: theft_alert_plan.id}}
     .detail-card-title
       = theft_alert_plan.name
       - if is_preferred

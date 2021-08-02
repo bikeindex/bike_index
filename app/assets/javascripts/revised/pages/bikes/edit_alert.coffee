@@ -51,6 +51,11 @@ class BikeIndex.BikesEditAlert extends BikeIndex
      $(".primary-alert-block .alert").remove()
 
   openStripeForm: () =>
+    $selectedPlan = $(".detail-card-container.selected")
+
+    price = $selectedPlan.attr("data-cents")
+    plan_id = $selectedPlan.attr("data-id")
+
     $planConfirmationForm = $("#js-confirm-plan-form")
     # Checkout integration custom:
     # https://stripe.com/docs/checkout#integration-custom
@@ -64,7 +69,6 @@ class BikeIndex.BikesEditAlert extends BikeIndex
         $planConfirmationForm.find("#stripe_email").val(token.email)
         $planConfirmationForm.submit()
 
-    price = $planConfirmationForm.find("#stripe_amount").val()
     handler.open
       name: "Bike Index"
       description: $planConfirmationForm.data("description")
