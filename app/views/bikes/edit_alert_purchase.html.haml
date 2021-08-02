@@ -49,7 +49,7 @@
                   &check;
                   = t(".confirm")
 
-                = link_to edit_bike_path(@bike, page: :alert), method: :get do
+                = link_to edit_bike_path(@bike, edit_template: :alert), method: :get do
                   %button.btn.btn-lg.btn-secondary
                     %span.times &times;
                     = t(".cancel")

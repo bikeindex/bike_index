@@ -11,9 +11,9 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   initializeEventListeners: ->
-    $('#mark-stolen-btn').click (e) =>
-      e.preventDefault()
-      @markStolen(e)
+    # $('#mark-stolen-btn').click (e) =>
+    #   e.preventDefault()
+    #   @markStolen(e)
 
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()

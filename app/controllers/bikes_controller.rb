@@ -155,10 +155,11 @@ class BikesController < Bikes::BaseController
     @page_errors = @bike.errors
     @edit_templates = edit_templates
     @permitted_return_to = permitted_return_to
-    requested_page = target_edit_template(requested_page: params[:page])
+    # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
+    requested_page = target_edit_template(requested_page: params[:edit_template] || params[:page])
     @edit_template = requested_page[:template]
     unless requested_page[:is_valid]
-      redirect_to(edit_bike_url(@bike, page: @edit_template)) && return
+      redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
     end
 
     @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)
@@ -172,7 +173,7 @@ class BikesController < Bikes::BaseController
           .where(is_private: true)
     when /alert/
       unless @bike&.current_stolen_record.present?
-        redirect_to(edit_bike_url(@bike, page: @edit_template)) && return
+        redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
       end
       @skip_general_alert = true
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
@@ -214,13 +215,16 @@ class BikesController < Bikes::BaseController
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
     @bike = @bike.reload
 
+    @edit_templates = nil # update templates in case bike state has changed
     if @bike.errors.any? || flash[:error].present?
-      @edit_templates = nil # So when we render edit it includes templates if the bike state has changed
-      edit && return
+      return edit
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
-      redirect_to(edit_bike_url(@bike, page: next_edit_template)) && return
+      # Go directly to theft_details after reporting stolen
+      next_template = params[:edit_template] || params[:page]
+      next_template = "theft_details" if next_template == "report_stolen" && @bike.status_stolen?
+      redirect_to(edit_bike_url(@bike, edit_template: next_template)) && return
     end
   end
 

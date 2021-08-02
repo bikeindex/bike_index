@@ -24,7 +24,7 @@
                 - bike_alerts = user_alerts.select { |ua| ua.bike_id == bike.id }
                 %li.bike-box-item
                   - cache(bike) do
-                    - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, page: 'photos')
+                    - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, edit_template: 'photos')
                     %a.bike-list-image{ href: image_link, class: ('hover-expand' if bike.thumb_path) }
                       - unless bike.thumb_path
                         .thumb-overlay
@@ -76,7 +76,7 @@
                               = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type}", bike_path(impound_claim.bike_claimed)
                         - elsif bike.status_with_owner?
                           %li
-                            = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
+                            = link_to t(".mark_bike_stolen"), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
 
                 - if bike_alerts.any?
                   - alert = bike_alerts.find { |a| a.kind == "unassigned_bike_org" }

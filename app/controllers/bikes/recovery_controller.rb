@@ -31,12 +31,6 @@ class Bikes::RecoveryController < Bikes::BaseController
     ).merge(recovering_user_id: current_user&.id)
   end
 
-  def find_bike
-    @bike = Bike.unscoped.find(params[:bike_id])
-  rescue ActiveRecord::StatementInvalid => e
-    raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-  end
-
   def ensure_token_match!
     @stolen_record = StolenRecord.find_matching_token(bike_id: @bike&.id,
                                                       recovery_link_token: params[:token])

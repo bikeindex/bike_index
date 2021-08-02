@@ -160,7 +160,8 @@ class UsersController < ApplicationController
       end
       if successfully_updated
         flash[:success] ||= translation(:successfully_updated)
-        redirect_back(fallback_location: edit_my_account_url(page: params[:page])) && return
+        # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
+        redirect_back(fallback_location: edit_my_account_url(edit_template: template_param)) && return
       end
     end
     @page_errors = @user.errors.full_messages
@@ -223,8 +224,12 @@ class UsersController < ApplicationController
     }.as_json
   end
 
+  def template_param
+    params[:edit_template] || params[:page]
+  end
+
   def assign_edit_template
-    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+    @edit_template = edit_templates[template_param].present? ? template_param : edit_templates.keys.first
   end
 
   def update_hot_sheet_notifications

@@ -70,15 +70,6 @@ class Bikes::BaseController < ApplicationController
     end
   end
 
-  # Ensure rendering theft details after marking stolen. Also other things in the future maybe!
-  def next_edit_template
-    next_template = params[:edit_template] || params[:page]
-    pp "TEMPLATEddd: #{next_template} #{params[:edit_template]} #{params[:page]} - #{@bike.status_stolen?}"
-    return next_template unless next_template == "report_stolen" && @bike.status_stolen?
-    pp "788888889333333- below next_template"
-    "theft_details"
-  end
-
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   # Also provides testable protection against seeing organization info on bikes
   def assign_current_organization
@@ -103,7 +94,7 @@ class Bikes::BaseController < ApplicationController
 
   def find_bike
     begin
-      @bike = Bike.unscoped.find(params[:id])
+      @bike = Bike.unscoped.find(params[:bike_id] || params[:id])
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end

@@ -9,7 +9,7 @@
       - @theft_templates.each do |template, description|
         %li{ class: "edit-menu-#{template}" }
           - is_active = 'active' if @edit_template.match(/#{template}/)
-          %a{ href: edit_bike_path(page: template), class: is_active }
+          %a{ href: edit_bike_path(edit_template: template), class: is_active }
             %h4= description
   - if @bike.status_stolen?
     %h3.nav-group-header
@@ -18,7 +18,7 @@
     - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }
         - is_active = 'active' if @edit_template.match(/#{template}/)
-        %a{ href: edit_bike_path(id: @bike.to_param, page: template), class: is_active }
+        %a{ href: edit_bike_path(id: @bike.to_param, edit_template: template), class: is_active }
           %h4= description
 
   .form-well-edit-page-select
@@ -27,7 +27,7 @@
     -# ignore this select in dirty forms
     %select.dirtyignore
       - @edit_templates.each do |template, description|
-        %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
+        %option{ selected: (@edit_template == template), value: edit_bike_path(edit_template: template) }
           = description
 
   .edit-form-well-submit-wrapper

@@ -226,7 +226,7 @@ module HeaderTagHelper
 
   def auto_namespace_title
     if controller_namespace == "admin"
-      "Admin |"
+      "🧰"
     elsif controller_namespace == "organized"
       current_organization.short_name
     end

@@ -66,7 +66,7 @@ class PublicImagesController < ApplicationController
     @public_image.destroy
     flash[:success] = translation(:image_deleted)
     if params[:page].present?
-      redirect_to(edit_bike_url(imageable_id, page: params[:page])) && return
+      redirect_to(edit_bike_url(imageable_id, edit_template: params[:edit_template])) && return
     elsif imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return
     else

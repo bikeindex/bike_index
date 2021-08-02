@@ -39,7 +39,7 @@
           = t(".location_critical_html", bike_type: without_location_bikes.first.type)
         - without_location_bikes.each do |bike|
           %p
-            = link_to t(".add_location_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, page: "theft_details", anchor: "where-theft-happened")
+            = link_to t(".add_location_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, edit_template: "theft_details", anchor: "where-theft-happened")
         %p
           %em.less-strong
             = t(".without_location_all_is_lost", bike_type: without_location_bikes.first.type)
@@ -57,7 +57,7 @@
           = t(".photo_critical_html", bike_type: missing_photo_bikes.first.type)
         - missing_photo_bikes.each do |bike|
           %p
-            = link_to t(".add_photo_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, page: "photos")
+            = link_to t(".add_photo_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, edit_template: "photos")
         %p
           %em.less-strong
             = t(".without_photo_all_is_lost", bike_type: missing_photo_bikes.first.type)
