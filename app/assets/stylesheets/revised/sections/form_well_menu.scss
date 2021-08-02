@@ -105,6 +105,16 @@ $menu-select-overlay-line-height: 12px;
       top: 4px;
     }
   }
+
+  &.no-save-button {
+    .form-well-edit-page-select {
+      float: left;
+      width: 100%;
+    }
+    .edit-form-well-submit-wrapper {
+      display: none;
+    }
+  }
 }
 
 //

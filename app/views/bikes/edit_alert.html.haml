@@ -1,7 +1,7 @@
 .primary-edit-bike-form
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+  .form-well-container.container{ class: "edit-bike-edit_template-#{@edit_template}" }
     .row
-      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
+      = render partial: "bikes/edit_primary_menu", locals: {no_save_button: true}
 
       .col-md-8.form-well
         .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
@@ -15,7 +15,7 @@
               %p= t(".bike_index_can_help", bike_type: @bike.type)
 
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
-            = hidden_field_tag :page, :alert_purchase
+            = hidden_field_tag :edit_template, :alert_purchase
             = hidden_field_tag :selected_plan_id
             = hidden_field_tag :selected_bike_image_id
             = hidden_field_tag :locale, params[:locale] if params[:locale].present?
@@ -32,7 +32,7 @@
               %h3.text-center.w-100= t(".select_an_image")
               .col-sm-12
                 - if @bike.public_images.none?
-                  %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, page: :photos)))
+                  %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos)))
                 - else
                   .image-selection-container#js-select-image-container
                     -# Promoted Alert Image Preview

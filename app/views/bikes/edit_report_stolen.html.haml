@@ -7,7 +7,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "bikes/edit_primary_menu"
+      = render partial: "bikes/edit_primary_menu", locals: {no_save_button: true}
 
       - unless @bike.fetch_current_stolen_record.present?
         .col-md-8.form-well#form_well_wrap
@@ -16,5 +16,4 @@
               -# Report Stolen or Missing
               %h3= @edit_templates[@edit_template]
             .no-divider-row.full-width-button
-              %a.btn.btn-danger.btn-lg#mark-stolen-btn
-                = t(".this_bike_type_is_stolen_or_missing", bike_type: @bike.type)
+              = submit_tag t(".this_bike_type_is_stolen_or_missing", bike_type: @bike.type), class: "btn btn-danger btn-lg"

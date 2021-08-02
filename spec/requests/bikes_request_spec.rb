@@ -852,10 +852,10 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:edit_theft_details)
         expect(assigns(:bike).id).to eq bike.id
         bike.current_stolen_record.add_recovery_information
-        # And if the bike is recovered, it redirects without page
-        get "#{base_url}/#{bike.id}/edit?page=theft_details"
+        # And if the bike is recovered, it redirects
+        get "#{base_url}/#{bike.id}/edit?edit_template=theft_details"
         expect(flash).to be_blank
-        expect(response).to redirect_to(edit_bike_path(bike.id, page: "bike_details"))
+        expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
       end
     end
     context "with impound_record" do
@@ -870,7 +870,7 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:edit_bike_details)
         expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
         # it also renders the found bike page
-        get "#{base_url}/#{bike.id}/edit?page=found_details"
+        get "#{base_url}/#{bike.id}/edit?edit_template=found_details"
         expect(flash).to be_blank
         expect(response).to render_template(:edit_found_details)
         expect(assigns(:edit_templates).keys).to match_array(target_edit_templates)
@@ -1004,11 +1004,8 @@ RSpec.describe BikesController, type: :request do
             edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
           }
           expect(flash[:success]).to be_present
-          # Redirects to same page passed
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-          # ... and that page redirects to theft_details
-          get edit_bike_path(bike.to_param, page: "report_stolen")
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
+          # Redirects to theft_details
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "theft_details"))
         end
         bike.reload
         expect(bike.status).to eq "status_stolen"
@@ -1033,11 +1030,9 @@ RSpec.describe BikesController, type: :request do
           }
           expect(flash[:success]).to be_present
           expect(assigns(:edit_templates)).to be_nil
-          # Redirects to same page passed
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-          # ... and that page redirects to theft_details
-          get edit_bike_path(bike.to_param, page: "report_stolen")
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
+          # Redirects to theft_details
+          expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "theft_details"))
+
           bike.reload
           expect(bike.status).to eq "status_stolen"
           expect(bike.to_coordinates.compact).to eq([])
@@ -1078,11 +1073,8 @@ RSpec.describe BikesController, type: :request do
               edit_template: "report_stolen", bike: {date_stolen: time.to_i}
             }
             expect(flash[:success]).to be_present
-            # Redirects to same page passed
-            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-            # ... and that page redirects to theft_details
-            get edit_bike_path(bike.to_param, page: "report_stolen")
-            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
+            # Redirects to theft_details
+            expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "theft_details"))
           end
           bike.reload
           expect(bike.status).to eq "status_stolen"
@@ -1294,7 +1286,7 @@ RSpec.describe BikesController, type: :request do
           edit_template: "found_details"
         }
         expect(flash[:success]).to be_present
-        expect(response).to redirect_to(edit_bike_path(bike, page: "found_details"))
+        expect(response).to redirect_to(edit_bike_path(bike, edit_template: "found_details"))
         impound_record.reload
         expect(impound_record.latitude).to be_present
         expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800

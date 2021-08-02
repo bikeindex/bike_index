@@ -35,7 +35,7 @@
         - if police_report_present
           = police_report_text
         - else
-          = link_to(police_report_text, edit_bike_url(id: bike_submitting.to_param, page: "theft_details"))
+          = link_to(police_report_text, edit_bike_url(id: bike_submitting.to_param, edit_template: "theft_details"))
         - if render_optional
           %em.small.less-strong optional
 
@@ -46,7 +46,7 @@
       %span.checklist-text
         #{bike_submitting.type.titleize} has serial number
         - unless serial_known
-          = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, page: "bike_details", return_to: current_path), class: "small"
+          = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, edit_template: "bike_details", return_to: current_path), class: "small"
         - if render_optional
           %em.small.less-strong optional
 
@@ -69,7 +69,7 @@
           - if proof_of_purchase_photo
             = proof_of_purchase_photo_text
           - else
-            = link_to proof_of_purchase_photo_text, edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+            = link_to proof_of_purchase_photo_text, edit_bike_url(id: bike_submitting.to_param, edit_template: "photos", return_to: current_path)
           - if render_optional
             %em.small.less-strong
               optional
@@ -83,7 +83,7 @@
         - if photo_of_you_and_bike # Don't link if the photo exists
           = photo_of_you_and_bike_text
         - else
-          = link_to photo_of_you_and_bike_text, edit_bike_url(id: bike_submitting.to_param, page: "photos", return_to: current_path)
+          = link_to photo_of_you_and_bike_text, edit_bike_url(id: bike_submitting.to_param, edit_template: "photos", return_to: current_path)
         - if render_optional
           %em.small.less-strong optional
 

@@ -14,7 +14,7 @@
         until you add a photo.
 
   %h3.mt-5.mb-5.uncap
-    Please - #{link_to "add a photo of your #{@bike.type}!", edit_bike_url(@bike, page: "theft_details")}
+    Please - #{link_to "add a photo of your #{@bike.type}!", edit_bike_url(@bike, edit_template: "theft_details")}
 
 - if @user_alert.kind == "stolen_bike_without_location"
   %h2
@@ -33,7 +33,7 @@
         until you add a location.
 
   %h3.mt-5.mb-5.uncap
-    Please - #{link_to "add the location to your #{@bike.type}!", edit_bike_url(@bike, page: "theft_details")}
+    Please - #{link_to "add the location to your #{@bike.type}!", edit_bike_url(@bike, edit_template: "theft_details")}
 
 - if @bike.present?
 

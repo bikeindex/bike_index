@@ -918,8 +918,8 @@ RSpec.describe BikesController, type: :controller do
           end
           context "unknown template" do
             it "renders the bike_details template" do
-              get :edit, params: {id: bike.id, page: "root_party"}
-              expect(response).to redirect_to(edit_bike_url(bike, params: {page: :bike_details}))
+              get :edit, params: {id: bike.id, edit_template: "root_party"}
+              expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :bike_details}))
               expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
             end
@@ -946,7 +946,7 @@ RSpec.describe BikesController, type: :controller do
             expect(stolen_record.theft_alert_missing_photo?).to be_falsey
 
             templates.each do |template|
-              get :edit, params: {id: bike.id, page: template}
+              get :edit, params: {id: bike.id, edit_template: template}
 
               expect(response.status).to eq(200)
               expect(response).to render_template("edit_#{template}")
@@ -964,7 +964,7 @@ RSpec.describe BikesController, type: :controller do
               user.update_attributes(alert_slugs: ["theft_alert_without_photo"])
 
               templates.each do |template|
-                get :edit, params: {id: bike.id, page: template}
+                get :edit, params: {id: bike.id, edit_template: template}
 
                 expect(response.status).to eq(200)
                 expect(response).to render_template("edit_#{template}")
@@ -1283,7 +1283,7 @@ RSpec.describe BikesController, type: :controller do
 
               put :update, params: {id: bike.id, bike: bike_attrs, edit_template: "fancy_template"}
               expect(flash[:error]).to_not be_present
-              expect(response).to redirect_to edit_bike_url(page: "fancy_template")
+              expect(response).to redirect_to edit_bike_url(edit_template: "fancy_template")
               bike.reload
               expect(bike.status).to eq "status_stolen"
 
@@ -1335,7 +1335,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(bike.fetch_current_stolen_record).to eq stolen_record
                 put :update, params: {id: bike.id, bike: bike_attrs, edit_template: "fancy_template"}
                 expect(flash[:error]).to_not be_present
-                expect(response).to redirect_to edit_bike_url(page: "fancy_template")
+                expect(response).to redirect_to edit_bike_url(edit_template: "fancy_template")
                 bike.reload
                 expect(bike.status).to eq "status_stolen"
                 # Stupid cheat because we're creating an extra record here for fuck all reason
@@ -1434,7 +1434,7 @@ RSpec.describe BikesController, type: :controller do
                        bike: {
                          bike_organization_ids: organization2.id.to_s
                        }}
-            expect(response).to redirect_to edit_bike_url(bike, page: "groups")
+            expect(response).to redirect_to edit_bike_url(bike, edit_template: "groups")
             expect(assigns(:bike)).to be_present
             bike.reload
             expect(bike.creation_organization_id).to eq organization.id
