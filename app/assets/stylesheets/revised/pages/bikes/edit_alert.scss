@@ -8,7 +8,7 @@
 
     .times {
       font-size: 150%;
-      line-height: .8em;
+      line-height: 0.8em;
       vertical-align: middle;
     }
   }
@@ -35,7 +35,7 @@
         list-style-type: none;
 
         &::before {
-          content: '\2713  ';
+          content: "\2713  ";
         }
       }
     }
@@ -69,7 +69,7 @@
     }
 
     .selection-preview-image-template {
-      background-image: image-url('promoted_alerts/facebook-template.png');
+      background-image: image-url("promoted_alerts/facebook-template.png");
       background-size: cover;
       margin: auto;
       max-width: 420px;
@@ -112,7 +112,7 @@
   @media (max-width: $grid-breakpoint-md) {
     .image-selection-container {
       .selection-preview-caption {
-        font-size: .70rem;
+        font-size: 0.7rem;
       }
     }
   }
@@ -221,16 +221,16 @@
     font-weight: 500;
     left: 0;
     line-height: 27px;
-    padding: .618em;
+    padding: 0.618em;
     right: 0;
     transition: all 125ms ease-in-out;
+    cursor: pointer;
 
     &::before {
       background-color: $white;
       border: 2px solid #919197;
       border-radius: 50%;
-      content: '';
-      cursor: pointer;
+      content: "";
       display: inline-block;
       height: 2em;
       vertical-align: middle;
@@ -247,8 +247,8 @@
       background-color: $blue;
       border-color: $white;
       color: $white;
-      content: '\2713';
-      font-family: 'zp-icons';
+      content: "\2713";
+      font-family: "zp-icons";
       font-style: normal;
       font-variant: normal;
       font-weight: normal;

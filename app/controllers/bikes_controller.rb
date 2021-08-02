@@ -181,7 +181,7 @@ class BikesController < Bikes::BaseController
       @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
       @selected_theft_alert_plan =
         @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-        @theft_alert_plans.min_by(&:amount_cents)
+        @theft_alert_plans.order(:amount_cents).second
 
       @theft_alerts =
         @bike

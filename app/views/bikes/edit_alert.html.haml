@@ -1,7 +1,7 @@
 .primary-edit-bike-form
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "bikes/edit_primary_menu", locals: {no_save_button: true}
+      = render partial: "bikes/edit_primary_menu", locals: {purchase_plan_button: true}
 
       .col-md-8.form-well
         .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
@@ -23,7 +23,7 @@
             -# Select a Plan
             .row
               %h3.text-center.w-100
-                = t(".select_plan")
+                = t(".purchase_alert")
             .row
               = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
 
@@ -54,14 +54,31 @@
                           data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
                           = image_tag image.image_url(:medium)
 
-            -# Submit form / Select a plan
-            .row
-              .text-center.w-100.mt-2
-                %button.btn.btn-lg.btn-primary
-                  = t(".select_plan")
+            -# Submit form / purchase a plan - force display even on small screens
+            .extra-footer-save.d-block.text-center
+              %button.btn.btn-lg.btn-primary.purchaseAlert
+                = t(".purchase_alert")
 
 
 
       .col-md-8.form-well
         .mt-4
           = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
+
+  = form_tag theft_alerts_path,
+    method: :post,
+    id: "js-confirm-plan-form",
+    data: { key: ENV["STRIPE_PUBLISHABLE_KEY"],
+    email: current_user.email,
+    type:  "Pay",
+    currency: default_currency,
+    description: t(".bike_index_promoted_alert") },
+    class: "confirm-form" do
+    = hidden_field_tag :stripe_amount, @selected_theft_alert_plan.amount_cents
+    = hidden_field_tag :stripe_currency, default_currency
+    = hidden_field_tag :stripe_email
+    = hidden_field_tag :stripe_token
+    = hidden_field_tag :bike_id, @bike.id
+    = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan.id
+
+  %script{ src: "https://checkout.stripe.com/checkout.js", async: true }

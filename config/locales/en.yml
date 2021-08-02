@@ -1018,19 +1018,12 @@ en:
       select_an_image_to_see_preview: >-
         Select an image of your bike to see a preview of what your promoted alert
         will look like:
-      select_plan: Select Plan
+      purchase_alert: Purchase Alert
+      select_alert: Select Alert
       targeted_sharing_html: >-
         We've found targeted sharing on social media to have a <em>huge</em> effect
         on recovering stolen bikes.
-    edit_alert_purchase:
       bike_index_promoted_alert: Bike Index Promoted Alert
-      cancel: Cancel
-      charge: 'Charge: %{price}'
-      confirm: Confirm
-      confirm_your_plan: Confirm your plan
-      here_is_what_youll_get: 'Here is what you''ll get with the %{plan_name} plan:'
-      youve_made_an_excellent_choice: You've made an excellent choice! Please confirm
-        it below.
     edit_alert_purchase_confirmation:
       stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
         processed your alert.
@@ -1124,6 +1117,7 @@ en:
       save_changes: Save changes
       theft_information: Theft Information
       you_are_editing: You are editing
+      purchase_alert: Purchase Alert
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!

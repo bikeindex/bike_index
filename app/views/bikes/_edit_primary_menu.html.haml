@@ -1,4 +1,5 @@
 - no_save_button ||= false
+- purchase_plan_button ||= false
 
 %nav.primary-edit-form-well-menu{class: (no_save_button ? "no-save-button" : "")}
   - if @permitted_return_to.present?
@@ -32,4 +33,8 @@
 
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
-    = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'
+    - if purchase_plan_button
+      %button.btn.btn-lg.btn-primary.purchaseAlert
+        = t(".purchase_alert")
+    - else
+      = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'

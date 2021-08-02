@@ -14,6 +14,11 @@ class BikeIndex.BikesEditAlert extends BikeIndex
       @setSelectedImageId($selectedImage)
       @previewSelectedImage($selectedImage)
 
+    $("body").on "click", ".purchaseAlert", (event) =>
+      event.preventDefault()
+      @clearAlerts()
+      @openStripeForm()
+
   highlightSelectedImage: ($selectedImage) =>
     $allImages = $selectedImage.siblings(".js-image-select").removeClass("selected")
     $selectedImage.addClass("selected")
@@ -28,11 +33,6 @@ class BikeIndex.BikesEditAlert extends BikeIndex
     @$planSelectionForm.find("#selected_bike_image_id").val(selectedImageId)
 
   highlightSelectedPlan: (event) =>
-    third = event.target.offsetWidth / 3
-    click_in_center_third = Math.ceil(third) < event.offsetX < Math.floor(third * 2)
-    if not click_in_center_third
-      return false
-
     # clear selections
     @$planSelectionForm.find(".js-plan-container").removeClass("selected")
     @$planSelectionForm.find(".js-plan-select").removeClass("selected")
@@ -46,3 +46,31 @@ class BikeIndex.BikesEditAlert extends BikeIndex
     # set selected plan
     selected_plan_id = $footer.data("theft-alert-plan-id")
     @$planSelectionForm.find("#selected_plan_id").val(selected_plan_id)
+
+  clearAlerts: () =>
+     $(".primary-alert-block .alert").remove()
+
+  openStripeForm: () =>
+    $planConfirmationForm = $("#js-confirm-plan-form")
+    # Checkout integration custom:
+    # https://stripe.com/docs/checkout#integration-custom
+    # Use the token to create the charge with a server-side script.
+    # You can access the token ID with `token.id`
+    handler = window.StripeCheckout.configure
+      key: $planConfirmationForm.attr("data-key")
+      image: "/apple_touch_icon.png"
+      token: (token) ->
+        $planConfirmationForm.find("#stripe_token").val(token.id)
+        $planConfirmationForm.find("#stripe_email").val(token.email)
+        $planConfirmationForm.submit()
+
+    price = $planConfirmationForm.find("#stripe_amount").val()
+    handler.open
+      name: "Bike Index"
+      description: $planConfirmationForm.data("description")
+      currency: $planConfirmationForm.data("currency")
+      amount: parseInt(price, 10)
+      email: $planConfirmationForm.data("email")
+      allowRememberMe: false
+      panelLabel: $planConfirmationForm.data("type")
+    return
