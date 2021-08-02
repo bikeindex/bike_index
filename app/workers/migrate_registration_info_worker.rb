@@ -1,6 +1,8 @@
 # TODO: remove once this has finished migrating, post merging #2035
 
 class MigrateRegistrationInfoWorker < ApplicationWorker
+  sidekiq_options retry: false, queue: "low_priority"
+
   def perform(creation_state_id = nil, bike_id = nil)
     if creation_state_id.present?
       creation_state = CreationState.find_by_id(creation_state_id)
