@@ -1008,22 +1008,22 @@ en:
       bike_index_can_help: >-
         Bike Index can help by purchasing targeted ads on Facebook to spread the word
         about your stolen %{bike_type}.
+      bike_index_promoted_alert: Bike Index Promoted Alert
       city_state_country: City, State - Country
       here: here
       no_photos_add_photos_here_html: >-
         Uh oh. We don't have any photos of your bike available. Upload one %{link}
         to set up a promoted alert!
       preview: Promoted Alert Preview
+      purchase_alert: Purchase Alert
+      select_alert: Select Alert
       select_an_image: Select an image
       select_an_image_to_see_preview: >-
         Select an image of your bike to see a preview of what your promoted alert
         will look like:
-      purchase_alert: Purchase Alert
-      select_alert: Select Alert
       targeted_sharing_html: >-
         We've found targeted sharing on social media to have a <em>huge</em> effect
         on recovering stolen bikes.
-      bike_index_promoted_alert: Bike Index Promoted Alert
     edit_alert_purchase_confirmation:
       stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
         processed your alert.
@@ -1114,10 +1114,10 @@ en:
       finished_uploading: Finished uploading
     edit_primary_menu:
       bike_type_information: "%{bike_type} Information"
+      purchase_alert: Purchase Alert
       save_changes: Save changes
       theft_information: Theft Information
       you_are_editing: You are editing
-      purchase_alert: Purchase Alert
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!

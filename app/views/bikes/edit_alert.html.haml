@@ -23,7 +23,7 @@
             -# Select a Plan
             .row
               %h3.text-center.w-100
-                = t(".purchase_alert")
+                = t(".select_alert")
             .row
               = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
 

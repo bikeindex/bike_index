@@ -22,7 +22,7 @@ class Bikes::BaseController < ApplicationController
   # Return a Hash with keys :is_valid (boolean), :template (string)
   def target_edit_template(requested_page:)
     result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
+    valid_pages = [*edit_templates.keys, "alert_purchase_confirmation"]
     default_page = @bike.status_stolen? ? :theft_details : :bike_details
 
     if requested_page.blank?
