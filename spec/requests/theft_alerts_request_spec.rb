@@ -37,7 +37,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         expect(new_theft_alert.payment).to be_a(Payment)
         expect(new_theft_alert.payment.stripe_kind).to eq "stripe_charge"
 
-        purchase_confirmation = edit_bike_url(bike, params: {page: :alert_purchase_confirmation})
+        purchase_confirmation = edit_bike_url(bike, params: {edit_template: :alert_purchase_confirmation})
         expect(response).to redirect_to(purchase_confirmation)
 
         expect(Notification.count).to eq 1
@@ -49,7 +49,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
     end
 
     context "given the creation request fails" do
-      it "redirects to the bike edit page with a flash message" do
+      it "redirects to the bike edit edit_template with a flash message" do
         invalid_plan_id = 999
 
         post "/theft_alerts",
@@ -65,13 +65,13 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         expect(Payment.count).to eq(0)
         expect(TheftAlert.count).to eq(0)
 
-        expect(response).to redirect_to(edit_bike_url(bike, params: {page: :alert_purchase}))
+        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert_purchase}))
         expect(flash[:error]).to match(/unable to process your order/i)
       end
     end
 
     context "given the payment request fails" do
-      it "redirects to the bike edit page with a flash message" do
+      it "redirects to the bike edit edit_template with a flash message" do
         post "/theft_alerts",
           params: {
             theft_alert_plan_id: theft_alert_plan.id,
@@ -89,7 +89,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         expect(new_theft_alert.status).to eq("pending")
         expect(new_theft_alert.payment).to eq(nil)
 
-        expect(response).to redirect_to(edit_bike_url(bike, params: {page: :alert_purchase}))
+        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert_purchase}))
         expect(flash[:error]).to match(/unable to complete payment/i)
 
         expect(Notification.count).to eq 0

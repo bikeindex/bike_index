@@ -20,13 +20,13 @@ class TheftAlertsController < ApplicationController
     theft_alert.update(payment: payment)
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
     flash[:error] = translation(:unable_to_process_order)
-    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
+    redirect_to edit_bike_url(@bike, params: {edit_template: :alert_purchase})
   rescue Stripe::CardError
     flash[:error] = translation(:order_is_pending)
-    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase})
+    redirect_to edit_bike_url(@bike, params: {edit_template: :alert_purchase})
   else
     # Previously we sent an email about successful promoted alerts, no longer doing that
-    redirect_to edit_bike_url(@bike, params: {page: :alert_purchase_confirmation})
+    redirect_to edit_bike_url(@bike, params: {edit_template: :alert_purchase_confirmation})
   end
 
   private
