@@ -1,17 +1,12 @@
-class OwnershipNotSavedError < StandardError
-end
+class BikesController < Bikes::BaseController
+  skip_before_action :verify_authenticity_token, only: %i[create]
+  before_action :sign_in_if_not!, only: %i[show]
+  before_action :find_bike, only: %i[show edit update pdf resolve_token]
+  before_action :assign_current_organization, only: %i[index show edit]
+  before_action :ensure_user_allowed_to_edit, only: %i[edit update pdf]
+  before_action :render_ad, only: %i[index show]
+  before_action :remove_subdomain, only: %i[index]
 
-class BikeUpdatorError < StandardError
-end
-
-class BikesController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create]
-  before_action :sign_in_if_not!, only: [:show]
-  before_action :find_bike, only: [:show, :edit, :update, :pdf, :resolve_token]
-  before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
-  before_action :render_ad, only: [:index, :show]
-  before_action :remove_subdomain, only: [:index]
-  before_action :assign_current_organization, only: [:index, :show, :edit]
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
@@ -212,6 +207,7 @@ class BikesController < ApplicationController
         raise e unless Rails.env.production?
       end
     end
+
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
@@ -224,15 +220,8 @@ class BikesController < ApplicationController
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
-      redirect_to(edit_bike_url(@bike, page: params[:edit_template])) && return
+      redirect_to(edit_bike_url(@bike, page: next_edit_template)) && return
     end
-  end
-
-  def edit_templates
-    return @edit_templates if @edit_templates.present?
-    @theft_templates = @bike.status_stolen? ? theft_templates : {}
-    @bike_templates = bike_templates
-    @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
   def resolve_token
@@ -268,184 +257,11 @@ class BikesController < ApplicationController
 
   protected
 
-  # Determine the appropriate edit template to use in the edit view.
-  #
-  # If provided an invalid template name, return the default page for a stolen /
-  # unstolen bike and `:is_valid` mapped to false.
-  #
-  # Return a Hash with keys :is_valid (boolean), :template (string)
-  def target_edit_template(requested_page:)
-    result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
-    default_page = @bike.status_stolen? ? :theft_details : :bike_details
-
-    if requested_page.blank?
-      result[:is_valid] = true
-      result[:template] = default_page.to_s
-    elsif requested_page.in?(valid_pages)
-      result[:is_valid] = true
-      result[:template] = requested_page.to_s
-    else
-      result[:is_valid] = false
-      result[:template] = default_page.to_s
-    end
-
-    result
-  end
-
-  # NB: Hash insertion order here determines how nav links are displayed in the
-  # UI. Keys also correspond to template names and query parameters, and values
-  # are used as haml header tag text in the corresponding templates.
-  def theft_templates
-    {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:theft_details, controller_method: :edit)
-      h[:publicize] = translation(:publicize, controller_method: :edit)
-      h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
-    end
-  end
-
-  # NB: Hash insertion order here determines how nav links are displayed in the
-  # UI. Keys also correspond to template names and query parameters, and values
-  # are used as haml header tag text in the corresponding templates.
-  def bike_templates
-    {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, controller_method: :edit)
-      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
-      h[:photos] = translation(:photos, controller_method: :edit)
-      h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
-      h[:accessories] = translation(:accessories, controller_method: :edit)
-      h[:ownership] = translation(:ownership, controller_method: :edit)
-      h[:groups] = translation(:groups, controller_method: :edit)
-      h[:remove] = translation(:remove, controller_method: :edit)
-      unless @bike.status_stolen_or_impounded?
-        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
-      end
-    end
-  end
-
-  # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
-  # Also provides testable protection against seeing organization info on bikes
-  def assign_current_organization
-    org = current_organization || passive_organization # actually call #current_organization first
-    # If forced false, or no user present, skip everything else
-    return true if @current_organization_force_blank || current_user.blank?
-    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
-    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-    if current_user.default_organization.present? && params[:organization_id].present?
-      return true if org.present? && current_user.authorized?(org)
-      set_passive_organization(current_user.default_organization)
-    else
-      # If current_user isn't authorized for the organization, force assign nil
-      return true if org.blank? || org.present? && current_user.authorized?(org)
-      set_passive_organization(nil)
-    end
-  end
-
-  def permitted_search_params
-    params.permit(*Bike.permitted_search_params)
-  end
-
-  def find_bike
-    begin
-      @bike = Bike.unscoped.find(params[:id])
-    rescue ActiveRecord::StatementInvalid => e
-      raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-    end
-    if @bike.hidden || @bike.deleted?
-      return @bike if current_user.present? && @bike.visible_by?(current_user)
-      fail ActiveRecord::RecordNotFound
-    end
-  end
-
-  def find_or_new_b_param
-    token = params[:b_param_token]
-    token ||= params.dig(:bike, :b_param_id_token)
-    @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id)
-  end
-
-  def ensure_user_allowed_to_edit
-    @current_ownership = @bike.current_ownership
-    type = @bike&.type || "bike"
-
-    return true if @bike.authorize_and_claim_for_user(current_user)
-
-    if @bike.current_impound_record.present?
-      error = if @bike.current_impound_record.organized?
-        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name)
-      else
-        translation(:bike_impounded, bike_type: type)
-      end
-    elsif current_user.present?
-      error = translation(:you_dont_own_that, bike_type: type)
-    else
-      store_return_to
-      error = if @current_ownership && @bike.current_ownership.claimed
-        translation(:you_have_to_sign_in, bike_type: type)
-      else
-        translation(:bike_has_not_been_claimed_yet, bike_type: type)
-      end
-    end
-
-    return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
-    flash[:error] = error
-    redirect_to(bike_path(@bike)) && return
-  end
-
-  def update_organizations_can_edit_claimed(bike, organization_ids)
-    organization_ids = Array(organization_ids).map(&:to_i)
-    bike.bike_organizations.each do |bike_organization|
-      bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
-    end
-  end
-
-  def assign_bike_stickers(bike_sticker)
-    bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
-    return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker) unless bike_sticker.present?
-    bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
-    if bike_sticker.errors.any?
-      flash[:error] = bike_sticker.errors.full_messages
-    else
-      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
-    end
-  end
-
-  def find_token
-    # First, deal with claim_token
-    if params[:t].present? && @bike.current_ownership.token == params[:t]
-      @claim_message = @bike.current_ownership&.claim_message
-    end
-    # Then deal with parking notification and graduated notification tokens
-    @token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence
-    return false if @token.blank?
-    if params[:parking_notification_retrieved].present?
-      @matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first
-      @token_type = @matching_notification&.kind
-    elsif params[:graduated_notification_remaining].present?
-      @matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: @token).first
-      @token_type = "graduated_notification"
-    end
-    @token_type ||= "parked_incorrectly_notification" # Fallback
-  end
-
   def render_ad
     @ad = true
   end
 
-  def scanned_id
-    params[:id] || params[:scanned_id] || params[:card_id]
-  end
-
   def remove_subdomain
     redirect_to bikes_url(subdomain: false) if request.subdomain.present?
-  end
-
-  def permitted_bike_params
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
-  end
-
-  # still manually managing permission of params, so skip it
-  def permitted_bparams
-    params.except(:parking_notification).as_json # We only want to include parking_notification in authorized endpoints
   end
 end

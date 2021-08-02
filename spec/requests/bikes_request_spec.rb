@@ -1004,10 +1004,7 @@ RSpec.describe BikesController, type: :request do
             edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
           }
           expect(flash[:success]).to be_present
-          # Redirects to same page passed
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-          # ... and that page redirects to theft_details
-          get edit_bike_path(bike.to_param, page: "report_stolen")
+          # Redirects to theft_details
           expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
         end
         bike.reload
@@ -1029,14 +1026,11 @@ RSpec.describe BikesController, type: :request do
         it "redirects correctly" do
           bike.reload
           patch "#{base_url}/#{bike.id}", params: {
-            edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
+            page: "report_stolen", bike: {date_stolen: Time.current.to_i}
           }
           expect(flash[:success]).to be_present
           expect(assigns(:edit_templates)).to be_nil
-          # Redirects to same page passed
-          expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-          # ... and that page redirects to theft_details
-          get edit_bike_path(bike.to_param, page: "report_stolen")
+          # Redirects to theft_details
           expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
           bike.reload
           expect(bike.status).to eq "status_stolen"
@@ -1078,10 +1072,7 @@ RSpec.describe BikesController, type: :request do
               edit_template: "report_stolen", bike: {date_stolen: time.to_i}
             }
             expect(flash[:success]).to be_present
-            # Redirects to same page passed
-            expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "report_stolen"))
-            # ... and that page redirects to theft_details
-            get edit_bike_path(bike.to_param, page: "report_stolen")
+            # Redirects to theft_details
             expect(response).to redirect_to(edit_bike_path(bike.to_param, page: "theft_details"))
           end
           bike.reload
