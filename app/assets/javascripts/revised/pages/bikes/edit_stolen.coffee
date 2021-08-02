@@ -11,21 +11,13 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   initializeEventListeners: ->
-    # $('#mark-stolen-btn').click (e) =>
-    #   e.preventDefault()
-    #   @markStolen(e)
-
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
       @markRecovered()
-      # Safari blocks re-submission, FUCK THAT
       setTimeout (->
-        $("#toggle-stolen input[type=submit]").attr("disabled", false)
+        # Should redirect to the default page - which should no longer be a stolen page
+        window.location = window.location.pathname
       ), 500
-
-  markStolen: (e) ->
-    $('#bike_stolen').val('true')
-    window.pageScript.submitBikeEditForm()
 
   recoveredRequestCallback: (message, success) ->
     if success
