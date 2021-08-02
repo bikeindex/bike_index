@@ -65,7 +65,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         expect(Payment.count).to eq(0)
         expect(TheftAlert.count).to eq(0)
 
-        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert_purchase}))
+        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert}))
         expect(flash[:error]).to match(/unable to process your order/i)
       end
     end
@@ -89,7 +89,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         expect(new_theft_alert.status).to eq("pending")
         expect(new_theft_alert.payment).to eq(nil)
 
-        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert_purchase}))
+        expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :alert}))
         expect(flash[:error]).to match(/unable to complete payment/i)
 
         expect(Notification.count).to eq 0
