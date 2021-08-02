@@ -61,6 +61,7 @@ class Bike < ApplicationRecord
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
+  accepts_nested_attributes_for :current_creation_state
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
@@ -301,6 +302,10 @@ class Bike < ApplicationRecord
 
   def pos_kind
     current_creation_state&.pos_kind
+  end
+
+  def registration_info
+    current_creation_state&.registration_info || {}
   end
 
   def creator_unregistered_parking_notification?
@@ -843,7 +848,7 @@ class Bike < ApplicationRecord
 
   def organization_affiliation
     # TODO: make conditional_information hold more things, post #2035
-    o_affiliation = conditional_information["organization_affiliation"]
+    o_affiliation = conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
     return "" unless previous_o_affiliation.present?
@@ -853,11 +858,12 @@ class Bike < ApplicationRecord
 
   def student_id=(val)
     conditional_information["student_id"] = val
+
   end
 
   def student_id
     # TODO: migrate conditional information into registration_info, post #2035
-    s_id = conditional_information["student_id"] || current_creation_state&.registration_info&.dig("student_id")
+    s_id = conditional_information["student_id"] || registration_info["student_id"]
     return s_id if s_id.present?
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
     return "" unless previous_s_id.present?
@@ -982,6 +988,16 @@ class Bike < ApplicationRecord
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
+  end
+
+  # TODO post handling of #2035 - not sure this should still exist. Useful for testing - but BikeCreator handles for real
+  def fetch_current_creation_state
+    return current_creation_state if current_creation_state.present?
+    self.current_creation_state = creation_states.first || creation_states.build
+    # Pull in information from b_params. Should probably be done somewhere else?
+    r_info = b_params.map { |b| b.registration_info_attrs }.reject(&:blank?)
+    current_creation_state.registration_info = r_info.inject(&:merge) if r_info.present?
+    current_creation_state
   end
 
   private
