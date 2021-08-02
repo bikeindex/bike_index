@@ -28,13 +28,14 @@ function BinxAppOrgBikes() {
         $("#stolenness").val(stolenness);
         return $("#bikes_search_form").submit();
       });
-      // When the avery cell is checked, add it to the params.
+      // When the avery cell is checked, add it to the params and make the search settings open
       $("#avery_cell").on("change", function (e) {
         let urlParams = new URLSearchParams(window.location.search);
         urlParams.delete("avery_export");
         urlParams.delete("search_open");
-        urlParams.append("avery_export", $("#avery_cell").prop("checked"));
-        urlParams.append("search_open", true);
+        const averySearch = $("#avery_cell").prop("checked");
+        urlParams.append("avery_export", averySearch);
+        urlParams.append("search_open", averySearch);
         window.location = `${location.pathname}?${urlParams.toString()}`;
       });
       $("#per_page_select").on("change", function (e) {
@@ -49,13 +50,14 @@ function BinxAppOrgBikes() {
       const defaultCells = JSON.parse(
         $("#organizedSearchSettings").attr("data-defaultcols")
       );
-      let visibleCells = localStorage.getItem("organizationBikeColumns");
+      let visibleCells = localStorage.getItem("orgBikeColumns");
       // If we have stored cells, select them.
       if (typeof visibleCells === "string") {
-        visibleCells = JSON.parse(visibleCells);
+        visibleCells = visibleCells.split(",").filter(Boolean); // removes empty elements from the array
       }
       // Unless we have an array with at least one item, make it default
-      if (typeof visibleCells !== "array" || visibleCells.length < 1) {
+      if (!Array.isArray(visibleCells) || visibleCells.length < 1) {
+        log.debug("Overriding visibleCells with defaultCells");
         visibleCells = defaultCells;
       }
 
@@ -75,10 +77,7 @@ function BinxAppOrgBikes() {
         $(`.${cellClass}`).removeClass("hiddenColumn")
       );
       // Then store the enabled columns
-      localStorage.setItem(
-        "organizationBikeColumns",
-        JSON.stringify(enabledCells)
-      );
+      localStorage.setItem("orgBikeColumns", enabledCells.join(","));
     },
   };
 }

@@ -4349,7 +4349,7 @@ en:
         bike: bike
         color: Color
         email_hidden: email hidden
-        impounded: Impounded
+        impounded: 'Impounded:'
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
