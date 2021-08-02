@@ -847,9 +847,9 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    # TODO: make conditional_information hold more things, post #2035
     o_affiliation = conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
     return o_affiliation if o_affiliation.present?
+    # TODO: remove this b_params stuff, post #2035 update
     previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
     return "" unless previous_o_affiliation.present?
     update(organization_affiliation: previous_o_affiliation)
@@ -858,13 +858,12 @@ class Bike < ApplicationRecord
 
   def student_id=(val)
     conditional_information["student_id"] = val
-
   end
 
   def student_id
-    # TODO: migrate conditional information into registration_info, post #2035
     s_id = conditional_information["student_id"] || registration_info["student_id"]
     return s_id if s_id.present?
+    # TODO: remove this b_params stuff, post #2035 update
     previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
     return "" unless previous_s_id.present?
     update(student_id: previous_s_id)
@@ -991,6 +990,7 @@ class Bike < ApplicationRecord
   end
 
   # TODO post handling of #2035 - not sure this should still exist. Useful for testing - but BikeCreator handles for real
+  # NOTE: 2021-8-2 - after shipping #2035 - there were 35 bikes without creation state, I used fetch_current_creation_state to create
   def fetch_current_creation_state
     return current_creation_state if current_creation_state.present?
     self.current_creation_state = creation_states.first || creation_states.build
