@@ -94,38 +94,35 @@
             .form-well-input
               = f.text_field :extra_registration_number, class: 'form-control'
 
-          -# If the user has set their address, that's the only way to update bike addresses
-          -# parking notifications, impounded, stolen etc use the associated record for their address
-          - skip_address_fields = %w[status_impounded unregistered_parking_notification status_stolen].include?(@bike.status) || @bike.user&.address_set_manually || @bike.current_stolen_record.present?
-          - unless skip_address_fields
+          - if BikeDisplayer.display_edit_address_fields?(@bike, current_user)
             .related-fields.no-divider-row
+              - if @bike.street.present? || @bike.creation_organization&.enabled?("reg_address")
+                .form-group.row
+                  = f.label :street, class: 'form-well-label'
+                  .form-well-input
+                    = f.text_field :street, class: 'form-control', required: true, placeholder: t(".street")
+              .form-group.row
+                = f.label :city, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :city, class: 'form-control', required: true, placeholder: t(".city")
+
+              .form-group.row
+                = f.label :zipcode, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
+
               .form-group.row.fancy-select-placeholder.unfancy#us_id_data{ data: { usid: Country.united_states.id } }
                 = f.label :country_id, class: 'form-well-label'
                 .form-well-input
                   = f.select :country_id, Country.select_options,
                     { required: true, prompt: t(".choose_country") },
                     { class: 'country-select-input form-control' }
-              .form-group.row
-                = f.label :city, class: 'form-well-label'
-                .form-well-input
-                  = f.text_field :city, class: 'form-control', required: true, placeholder: t(".city")
 
               - if @bike.state.present?
                 .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
                   = f.label :state_id, class: 'form-well-label'
                   .form-well-input
                     = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
-
-              - if @bike.street.present? || @bike.creation_organization&.enabled?("reg_address")
-                .form-group.row
-                  = f.label :street, class: 'form-well-label'
-                  .form-well-input
-                    = f.text_field :street, class: 'form-control', required: true, placeholder: t(".street")
-
-              .form-group.row
-                = f.label :zipcode, class: 'form-well-label'
-                .form-well-input
-                  = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
 
           - organization_with_affiliation = @bike.organizations.with_enabled_feature_slugs("organization_affiliation").first
           - if organization_with_affiliation.present?

@@ -63,7 +63,6 @@ FactoryBot.define do
     trait :impounded do
       after(:create) do |bike, _evaluator|
         FactoryBot.create(:impound_record, bike: bike)
-        bike.update(updated_at: Time.current) # bump bike status
       end
     end
 

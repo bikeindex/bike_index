@@ -542,6 +542,17 @@ RSpec.describe BikesController, type: :request do
   end
 
   describe "new" do
+    it "renders" do
+      get "#{base_url}/new"
+      expect(response.code).to eq("200")
+      expect(assigns(:b_param).revised_new?).to be_truthy
+      bike = assigns(:bike)
+      expect(bike.status).to eq "status_with_owner"
+      expect(bike.stolen_records.last).to be_blank
+      expect(response).to render_template(:new)
+      # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
+      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"
@@ -552,6 +563,8 @@ RSpec.describe BikesController, type: :request do
         expect(bike.stolen_records.last).to be_present
         expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
         expect(response).to render_template(:new)
+        # Make sure it renders without address fields for a stolen bikes
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
       it "renders a new stolen bike from status" do
         country = FactoryBot.create(:country_canada)
@@ -842,6 +855,8 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
       expect(assigns(:edit_templates).keys).to match_array(default_edit_templates)
+      expect(bike.user_id).to_not eq current_user.id
+      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
     end
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
@@ -851,11 +866,15 @@ RSpec.describe BikesController, type: :request do
         expect(flash).to be_blank
         expect(response).to render_template(:edit_theft_details)
         expect(assigns(:bike).id).to eq bike.id
+        expect(bike.user_id).to eq current_user.id
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
         bike.current_stolen_record.add_recovery_information
         # And if the bike is recovered, it redirects
         get "#{base_url}/#{bike.id}/edit?edit_template=theft_details"
         expect(flash).to be_blank
         expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+        expect(bike.reload.user_id).to eq current_user.id
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
       end
     end
     context "with impound_record" do
