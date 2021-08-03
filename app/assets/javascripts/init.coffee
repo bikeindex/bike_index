@@ -208,4 +208,6 @@ $(document).ready ->
   warnIfUnsupportedBrowser()
   if $("#donationModal").length
     renderDonationModal()
-  window.adDisplayer = new window.AdDisplayer
+
+  # Turned off ads for test - #2044
+  # window.adDisplayer = new window.AdDisplayer
