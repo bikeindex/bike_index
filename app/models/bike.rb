@@ -786,7 +786,6 @@ class Bike < ApplicationRecord
   end
 
   def valid_mailing_address?
-    # Prefer address over registration address, since it can be updated
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
     return false if addy["street"].blank? || addy["city"].blank?
@@ -795,6 +794,8 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
+    # NOTE: User address is the preferred address!
+    # If user address is set, address fields don't show up on Bike!
     if user&.address_set_manually
       "user"
     elsif address_set_manually
@@ -806,9 +807,9 @@ class Bike < ApplicationRecord
     end
   end
 
-  # Goes along with organization additional_registration_fields
-  def registration_address
-    return @registration_address if defined?(@registration_address)
+  def registration_address(unmemoize = false)
+    # unmemoize is necessary during save, because things may have changed
+    return @registration_address if !unmemoize && defined?(@registration_address)
     @registration_address = case registration_address_source
     when "user" then user&.address_hash
     when "bike_update" then address_hash
@@ -1005,17 +1006,14 @@ class Bike < ApplicationRecord
   # of precedence:
   #
   # 1. The current parking notification/impound record, if one is present
-  # 2. The bike owner's address, if available
-  # 3. registration_address
-  # 4. The creation organization, if one is present
+  # 2. registration_address (which prioritizes user address)
+  # 3. The creation organization, if one is present
   # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
   def location_record_address_hash
     l_hashes = [
       current_impound_record&.address_hash,
       current_parking_notification&.address_hash,
-      owner&.address_hash,
-      current_creation_state&.address_hash,
-      b_params_address, # TODO: drop this once #2035 is merged
+      registration_address(true),
       creation_organization&.default_location&.address_hash
     ].compact
     l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||

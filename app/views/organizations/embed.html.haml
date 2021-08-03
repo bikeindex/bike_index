@@ -136,6 +136,7 @@
                 = t(".receive_notifications_from_bike_index", bike_type: @bike.type)
                 %span
                   = t(".eg_if_we_tweet_about_or_someone_searches")
+  -# Note: Don't check display_edit_address_fields? because current_user is probably not owner
   - if include_field_reg_address?(@organization)
     - label_address = registration_field_label(@organization, "reg_address") || t(".owners_street_address")
     - label_address_class = registration_field_label(@organization, "reg_address").present? ? "strong" : ""

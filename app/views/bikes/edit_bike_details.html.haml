@@ -94,10 +94,7 @@
             .form-well-input
               = f.text_field :extra_registration_number, class: 'form-control'
 
-          -# If the user has set their address, that's the only way to update bike addresses
-          -# parking notifications, impounded, stolen etc use the associated record for their address
-          - skip_address_fields = %w[status_impounded unregistered_parking_notification status_stolen].include?(@bike.status) || @bike.user&.address_set_manually || @bike.current_stolen_record.present?
-          - unless skip_address_fields
+          - if BikeDisplayer.display_edit_address_fields?(@bike, current_user)
             .related-fields.no-divider-row
               - if @bike.street.present? || @bike.creation_organization&.enabled?("reg_address")
                 .form-group.row

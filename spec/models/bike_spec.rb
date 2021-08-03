@@ -1265,7 +1265,7 @@ RSpec.describe Bike, type: :model do
           bike.reload
           expect(bike.registration_address_source).to eq "user"
           expect(bike.address_hash["city"]).to eq "Lancaster" # Because it's set on the bike
-          expect(bike.registration_address).to eq user.address_hash
+          expect(bike.registration_address(true)).to eq user.address_hash
           expect(bike.registration_address["city"]).to eq "Vancouver"
         end
       end
@@ -1329,7 +1329,7 @@ RSpec.describe Bike, type: :model do
         expect(user.address_hash).to eq default_location_registration_address
         bike.reload
         expect(bike.registration_address_source).to eq "user"
-        expect(bike.registration_address).to eq default_location_registration_address
+        expect(bike.registration_address(true)).to eq default_location_registration_address
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
@@ -1355,7 +1355,7 @@ RSpec.describe Bike, type: :model do
         bike.reload
         VCR.use_cassette("bike-fetch_formatted_address") do
           expect(bike.registration_address_source).to eq "initial_creation"
-          expect(bike.registration_address).to eq target.as_json
+          expect(bike.registration_address(true)).to eq target.as_json
           bike.update_attributes(updated_at: Time.current) # To bump address
 
           bike.reload
@@ -1376,7 +1376,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.b_params.pluck(:id)).to eq([b_param.id])
           bike.reload
           VCR.use_cassette("bike-fetch_formatted_address") do
-            expect(bike.registration_address).to eq target.as_json
+            expect(bike.registration_address(true)).to eq target.as_json
           end
           b_param.reload
           # Just check that we stored it, since lazily not testing this anywhere else
@@ -1390,7 +1390,7 @@ RSpec.describe Bike, type: :model do
           bike.reload
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           expect(bike.registration_address_source).to eq "initial_creation"
-          expect(bike.registration_address).to eq target.as_json
+          expect(bike.registration_address(true)).to eq target.as_json
         end
         context "with address_set_manually" do
           let(:target) { {street: "1313 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "66666", country: "US", latitude: 43.9, longitude: -88.7} }
@@ -1399,9 +1399,10 @@ RSpec.describe Bike, type: :model do
             bike.update(target.merge(address_set_manually: true))
             bike.reload
             expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
-            expect(bike.registration_address).to eq target.as_json
-            expect(bike.address_set_manually).to be_truthy
             expect(bike.registration_address_source).to eq "bike_update"
+            expect(bike.address_hash).to eq target.as_json
+            expect(bike.registration_address(true)).to eq target.as_json
+            expect(bike.address_set_manually).to be_truthy
           end
         end
       end
@@ -1935,35 +1936,49 @@ RSpec.describe Bike, type: :model do
     end
 
     context "given no creation org location" do
-      it "takes location from the owner location" do
-        city = "New York"
-        zipcode = "10011"
-        user = FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city)
+      let(:city) { "New York" }
+      let(:zipcode) { "10011" }
+      let(:user) { FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city) }
+      let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user) }
+      let(:bike) { ownership.bike }
+      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"})}
+      it "takes location from the creation state" do
         expect(user.reload.street).to be_blank
-        ownership = FactoryBot.create(:ownership, user: user, creator: user)
-        bike = ownership.bike
-        FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city})
-        expect(bike.reload.registration_address["zipcode"]).to eq "99999"
-        expect(user.to_coordinates.compact.length).to eq 2
+        expect(user.address_set_manually).to be_falsey
+        expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
+        expect(creation_state).to be_present
+        expect(bike.reload.current_creation_state_id).to eq creation_state.id
+        expect(bike.current_creation_state.address_hash[:latitude]).to be_blank
+        expect(bike.registration_address_source).to eq "initial_creation_state"
+        expect(bike.registration_address(true)["zipcode"]).to eq "99999"
 
         bike.reload
         bike.skip_geocoding = false
         bike.set_location_info
-        expect(bike.skip_geocoding).to be_truthy
-
-        expect(bike.city).to eq(city)
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-        expect(bike.street).to be_blank
-
-        # BUT! If there is a street address on the creation_state, prefer that
-        bike.current_creation_state.update(registration_info: bike.current_creation_state.registration_info.merge(street: "main main street"))
-        bike.set_location_info
         expect(bike.skip_geocoding).to be_falsey
+
         expect(bike.city).to eq(city)
-        expect(bike.zipcode).to eq "99999"
+        expect(bike.zipcode).to eq("99999")
         expect(bike.country).to eq(usa)
         expect(bike.street).to eq "main main street"
+      end
+      context "user street is present" do
+        let(:user) { FactoryBot.create(:user_confirmed, :in_nyc) }
+        it 'uses user address' do
+          expect(user.reload.street).to be_present
+          expect(user.address_set_manually).to be_truthy
+          expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
+          expect(creation_state).to be_present
+          expect(bike.reload.current_creation_state_id).to eq creation_state.id
+          expect(bike.registration_address_source).to eq "user"
+
+          bike.reload
+          bike.skip_geocoding = false
+          bike.set_location_info
+          expect(bike.skip_geocoding).to be_truthy
+
+          expect(bike.address_hash).to eq user.address_hash
+        end
       end
     end
   end
