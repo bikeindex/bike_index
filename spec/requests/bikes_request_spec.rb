@@ -855,7 +855,8 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
       expect(assigns(:edit_templates).keys).to match_array(default_edit_templates)
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+      expect(bike.user_id).to_not eq current_user.id
+      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
     end
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
@@ -865,11 +866,15 @@ RSpec.describe BikesController, type: :request do
         expect(flash).to be_blank
         expect(response).to render_template(:edit_theft_details)
         expect(assigns(:bike).id).to eq bike.id
+        expect(bike.user_id).to eq current_user.id
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
         bike.current_stolen_record.add_recovery_information
         # And if the bike is recovered, it redirects
         get "#{base_url}/#{bike.id}/edit?edit_template=theft_details"
         expect(flash).to be_blank
         expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+        expect(bike.reload.user_id).to eq current_user.id
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
       end
     end
     context "with impound_record" do

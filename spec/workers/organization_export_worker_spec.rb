@@ -406,6 +406,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload
               expect(bike.registration_address_source).to eq "initial_creation"
+              expect(bike.registration_address(true)).to eq target_address
               expect(bike.registration_address).to eq target_address
             end
             instance.perform(export.id)
