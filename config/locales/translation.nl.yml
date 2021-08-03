@@ -1748,9 +1748,7 @@ nl:
       select_an_image_to_see_preview: 'Selecteer een afbeelding van uw fiets om een
         voorbeeld te zien van hoe uw gepromote melding eruit zal zien:'
       city_state_country: Stad staat Land
-      bike_index_promoted_alert: Bike Index Promoted Alert
-      purchase_alert: Aankoopwaarschuwing
-      select_alert: Selecteer waarschuwing
+      select_plan: Selecteer Plan
     edit_alert_purchase_confirmation:
       stay_tuned_for_an_update_once_weve_proces: Blijf op de hoogte voor een update
         zodra we uw melding hebben verwerkt.
@@ -1843,7 +1841,6 @@ nl:
       you_are_editing: Je bent aan het bewerken
       bike_type_information: "%{bike_type} Informatie"
       theft_information: Diefstalinformatie
-      purchase_alert: Aankoopwaarschuwing
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Doe deze dingen voor de beste kans
         op herstel!
@@ -2208,6 +2205,15 @@ nl:
       plan: Plan
       start: Begin
       status: Toestand
+    edit_alert_purchase:
+      bike_index_promoted_alert: Bike Index Promoted Alert
+      cancel: Annuleren
+      charge: 'Opladen: %{price}'
+      confirm: Bevestigen
+      confirm_your_plan: Bevestig uw plan
+      here_is_what_youll_get: 'Dit krijg je met het %{plan_name} -plan:'
+      youve_made_an_excellent_choice: Je hebt een uitstekende keuze gemaakt! Bevestig
+        het hieronder.
   controllers:
     bikes:
       edit:

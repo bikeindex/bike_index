@@ -120,7 +120,7 @@
                     %tr
                       %td= t(".address")
                       %td
-                        - address = @bike.address_hash
+                        - address = @bike.registration_address
                         - if @bike.valid_mailing_address?
                           = address["street"]
                           %br
