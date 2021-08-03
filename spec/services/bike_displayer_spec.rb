@@ -208,4 +208,59 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "display_edit_address_fields?" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:user) { FactoryBot.create(:user, :confirmed) }
+    it "is falsey" do
+      expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+    end
+    context "owner" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
+      it "is falsey for owner" do
+        expect(bike.reload.creator&.id).to eq user.id
+        expect(bike.reload.owner&.id).to eq user.id
+        expect(bike.reload.authorized?(user)).to be_truthy
+        expect(bike.user_id).to be_blank
+        expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+      end
+    end
+    context "user" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+      before do
+        expect(bike.authorized?(user)).to be_truthy
+        expect(bike.user_id).to eq user.id
+      end
+      it "is truthy" do
+        expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+      end
+      context "user address set" do
+        let(:user) { FactoryBot.create(:user, :in_amsterdam) }
+        it "is falsey" do
+          expect(user.reload.address_set_manually).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+        end
+      end
+      context "impounded" do
+        let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+        it "is falsey" do
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+        end
+      end
+      context "stolen" do
+        let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+        it "is falsey" do
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+        end
+      end
+      context "unregistered_parking_notification" do
+        it "is falsey" do
+          bike.status = "unregistered_parking_notification"
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+        end
+      end
+    end
+  end
 end
