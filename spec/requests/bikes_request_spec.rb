@@ -543,7 +543,7 @@ RSpec.describe BikesController, type: :request do
 
   describe "new" do
     it "renders" do
-      get "#{base_url}/new?stolen=true"
+      get "#{base_url}/new"
       expect(response.code).to eq("200")
       expect(assigns(:b_param).revised_new?).to be_truthy
       bike = assigns(:bike)
@@ -551,7 +551,6 @@ RSpec.describe BikesController, type: :request do
       expect(bike.stolen_records.last).to be_blank
       expect(response).to render_template(:new)
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
-      # BUT - just test it
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "stolen from params" do
@@ -856,6 +855,7 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:edit_bike_details)
       expect(assigns(:bike).id).to eq bike.id
       expect(assigns(:edit_templates).keys).to match_array(default_edit_templates)
+      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
