@@ -1,84 +1,83 @@
-.primary-edit-bike-form
+= form_tag theft_alerts_path, method: :post, class: "primary-edit-bike-form", id: "alert-form" do |f|
+  = hidden_field_tag :edit_template, :alert_purchase
+  = hidden_field_tag :selected_plan_id, @selected_theft_alert_plan.id
+  = hidden_field_tag :bike_id, value: @bike.id
+  = hidden_field_tag :selected_bike_image_id
+  = hidden_field_tag :currency, default_currency
+  = hidden_field_tag :description, t(".bike_index_promoted_alert")
+  = hidden_field_tag :locale, params[:locale] if params[:locale].present?
+
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: "bikes/edit_primary_menu", locals: {purchase_plan_button: true}
 
       .col-md-8.form-well
-        .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
+        .form-wrap
+          -#{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
+          -# Activate Promoted Alert
           .form-well-form-header-always-visible
-            -# Activate Promoted Alert
-            %h3.text-center.w-100
-              = @edit_templates[@edit_template]
+            %h3.uncap= @edit_templates[@edit_template]
           .row
             .col-sm-12
               %p= t(".targeted_sharing_html")
               %p= t(".bike_index_can_help", bike_type: @bike.type)
 
-          = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
-            = hidden_field_tag :edit_template, :alert_purchase
-            = hidden_field_tag :selected_plan_id
-            = hidden_field_tag :selected_bike_image_id
-            = hidden_field_tag :locale, params[:locale] if params[:locale].present?
+          .row
+            - preferred_plan = @theft_alert_plans.max_by(&:amount_cents)
+            - @theft_alert_plans.each do |theft_alert_plan|
+              - is_selected = (theft_alert_plan == @selected_theft_alert_plan)
+              - is_preferred = (theft_alert_plan == preferred_plan) if preferred_plan.present?
+              .col-md-12.col-lg-4
+                .detail-card-container.js-plan-container{class: (is_selected ? "selected" : ""), "data-id" => theft_alert_plan.id}
+                  .detail-card-title
+                    = theft_alert_plan.name
+                    - if is_preferred
+                      .preferred-tag= t(".best_value")
+                  .detail-card
+                    .detail-card-subtitle
+                      %strong= number_with_delimiter(theft_alert_plan.views)
+                      = t(".views")
+                    .detail-card-subtitle
+                      %strong= theft_alert_plan.duration_days
+                      = t(".days")
+                    .detail-card-subtitle.detail-card-price
+                      = number_to_currency(theft_alert_plan.amount_cents / 100.0)
+                  .detail-card-content-main
+                    = theft_alert_plan.description_html.html_safe
+                  .detail-card-subtitle.detail-card-footer.js-plan-select
 
-            -# Select a Plan
-            .row
-              %h3.text-center.w-100
-                = t(".select_alert")
-            .row
-              = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
-
-            -# Select an image
-            .row.mt-4
-              %h3.text-center.w-100= t(".select_an_image")
-              .col-sm-12
-                - if @bike.public_images.none?
-                  %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos)))
-                - else
-                  .image-selection-container#js-select-image-container
-                    -# Promoted Alert Image Preview
-                    .selection-preview.text-center.w-100#js-selection-preview.mb-2
-                      .selection-preview-image-template
-                        .selection-preview-image#js-selection-preview-image
-                          = image_tag @bike.public_images.first.image_url(:medium)
-                        .selection-preview-caption
-                          -# Display a generic location "City, State - Country"
-                             since users may see this preview before having
-                             entered theft details.
-                          = t(".city_state_country")
-                      = t(".preview")
-                    = t(".select_an_image_to_see_preview")
-                    %ul
-                      - @bike.public_images.each_with_index do |image, i|
-                        = content_tag "li",
-                          class: (i.zero? ? "selected js-image-select" : "js-image-select"),
-                          data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
-                          = image_tag image.image_url(:medium)
+          -# Select an image
+          %h3.text-center.mt-4.w-100.mb-1
+            = t(".select_an_image")
+          .row
+            .col-sm-12.mt-4
+              - if @bike.public_images.none?
+                %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit?edit_template=alert")))
+              - else
+                .image-selection-container#js-select-image-container
+                  -# Promoted Alert Image Preview
+                  .selection-preview.text-center.w-100#js-selection-preview.mb-2
+                    .selection-preview-image-template
+                      .selection-preview-image#js-selection-preview-image
+                        = image_tag @bike.public_images.first.image_url(:medium)
+                      .selection-preview-caption
+                        -# Display a generic location "City, State - Country"
+                           since users may see this preview before having
+                           entered theft details.
+                        = t(".city_state_country")
+                    %strong= t(".preview")
+                  %em= t(".select_an_image_to_see_preview")
+                  %ul
+                    - @bike.public_images.each_with_index do |image, i|
+                      = content_tag "li",
+                        class: (i.zero? ? "selected js-image-select" : "js-image-select"),
+                        data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
+                        = image_tag image.image_url(:medium)
 
             -# Submit form / purchase a plan - force display even on small screens
-            .extra-footer-save.d-block.text-center
-              %button.btn.btn-lg.btn-primary.purchaseAlert
-                = t(".purchase_alert")
-
-
+            .mt-5.text-center.w-100
+              = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
         .mt-4
           = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
-
-  = form_tag theft_alerts_path,
-    method: :post,
-    id: "js-confirm-plan-form",
-    data: { key: ENV["STRIPE_PUBLISHABLE_KEY"],
-    email: current_user.email,
-    type:  "Pay",
-    currency: default_currency,
-    description: t(".bike_index_promoted_alert") },
-    class: "confirm-form" do
-    = hidden_field_tag :stripe_amount, @selected_theft_alert_plan.amount_cents
-    = hidden_field_tag :stripe_currency, default_currency
-    = hidden_field_tag :stripe_email
-    = hidden_field_tag :stripe_token
-    = hidden_field_tag :bike_id, @bike.id
-    = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan.id
-
-  %script{ src: "https://checkout.stripe.com/checkout.js", async: true }

@@ -1024,6 +1024,9 @@ en:
       targeted_sharing_html: >-
         We've found targeted sharing on social media to have a <em>huge</em> effect
         on recovering stolen bikes.
+      best_value: Best value
+      days: Days
+      views: Views
     edit_alert_purchase_confirmation:
       stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
         processed your alert.
@@ -1117,7 +1120,6 @@ en:
       purchase_alert: Purchase Alert
       save_changes: Save changes
       theft_information: Theft Information
-      you_are_editing: You are editing
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!
@@ -1487,7 +1489,7 @@ en:
     theft_alerts_table:
       created: Created
       end: End
-      existing_theft_alerts: Existing Theft Alerts
+      existing_theft_alerts: Existing Promoted Alerts
       plan: Plan
       start: Start
       status: Status
@@ -5299,11 +5301,6 @@ en:
       last_word_connector: ", and "
       two_words_connector: " and "
       words_connector: ", "
-  theft_alert_plans:
-    theft_alert_plan:
-      best_value: Best value
-      days: Days
-      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"

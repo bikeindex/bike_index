@@ -1,5 +1,4 @@
 $active-bike-edit-border-width: 2px;
-$menu-select-overlay-line-height: 12px;
 
 .primary-edit-form-well-menu {
   z-index: 1;
@@ -83,7 +82,6 @@ $menu-select-overlay-line-height: 12px;
     width: 50%;
 
     select {
-      // @extend .c-select; // This style no longer exists...?
       width: 100%;
       font-family: $header-font-family;
       font-weight: $strong-font-weight;
@@ -92,17 +90,7 @@ $menu-select-overlay-line-height: 12px;
       border: none;
       font-size: 15px;
       line-height: 1em;
-      padding: 1.25em 1.75rem 0.55em 0.75em;
-    }
-
-    .menu-select-overlay {
-      position: absolute;
-      font-size: $menu-select-overlay-line-height;
-      display: block;
-      margin-left: 9px;
-      line-height: 1em;
-      left: 0;
-      top: 4px;
+      padding: 0.75em 1.75rem 0.55em 0.75em;
     }
   }
 
@@ -132,7 +120,6 @@ $menu-select-overlay-line-height: 12px;
     background: white;
 
     .form-well-edit-page-select {
-      margin-top: $menu-select-overlay-line-height;
       display: block;
     }
 

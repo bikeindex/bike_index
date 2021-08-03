@@ -29,7 +29,7 @@ class TheftAlert < ApplicationRecord
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
 
-  delegate :duration_days, :duration_days_facebook, :ad_radius_miles, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :ad_radius_miles, :amount_cents, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   geocoded_by nil

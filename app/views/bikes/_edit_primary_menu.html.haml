@@ -23,8 +23,6 @@
           %h4= description
 
   .form-well-edit-page-select
-    %span.menu-select-overlay
-      = t(".you_are_editing")
     -# ignore this select in dirty forms
     %select.dirtyignore
       - @edit_templates.each do |template, description|
@@ -34,7 +32,6 @@
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
     - if purchase_plan_button
-      %button.btn.btn-lg.btn-primary.purchaseAlert
-        = t(".purchase_alert")
+      = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
     - else
       = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'

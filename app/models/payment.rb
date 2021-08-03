@@ -64,11 +64,19 @@ class Payment < ApplicationRecord
   end
 
   def stripe_success_url
-    "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+    if theft_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/edit?edit_template=alert_purchase_confirmation&session_id={CHECKOUT_SESSION_ID}"
+    else
+      "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+    end
   end
 
   def stripe_cancel_url
-    "#{ENV["BASE_URL"]}/payments/new"
+    if theft_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/edit?edit_template=alert"
+    else
+      "#{ENV["BASE_URL"]}/payments/new"
+    end
   end
 
   def set_calculated_attributes
