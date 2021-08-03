@@ -933,9 +933,9 @@ RSpec.describe BikesController, type: :controller do
             # can't use the let block
             bc = BikesController.new
             bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
-            bc.edit_templates.keys + ["alert_purchase", "alert_purchase_confirmation"]
+            bc.edit_templates.keys + ["alert_purchase_confirmation"]
           end
-          let(:no_global_alert_templates) { %w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation] }
+          let(:no_global_alert_templates) { %w[theft_details alert photos report_recovered remove alert_purchase_confirmation] }
           before { FactoryBot.create_list(:theft_alert_plan, 3) }
           it "renders the template" do
             # Ensure stolen bike is set up correctly
@@ -971,7 +971,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(assigns(:edit_template)).to eq(template)
                 expect(assigns(:private_images)).to eq([]) if template == "photos"
                 expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
-                show_general_alert = !%w[theft_details alert photos report_recovered remove alert_purchase alert_purchase_confirmation].include?(template)
+                show_general_alert = !%w[theft_details alert photos report_recovered remove alert_purchase_confirmation].include?(template)
                 pp template unless assigns(:show_general_alert) == show_general_alert
                 expect(assigns(:show_general_alert)).to eq(show_general_alert)
               end
