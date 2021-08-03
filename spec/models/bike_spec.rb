@@ -1260,10 +1260,13 @@ RSpec.describe Bike, type: :model do
       end
       context "user with address address_set_manually" do
         let(:user) { FactoryBot.create(:user, :in_vancouver, address_set_manually: true) }
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, city: "Lancaster", zipcode: 17601) }
         it "returns user address" do
           bike.reload
           expect(bike.registration_address_source).to eq "user"
+          expect(bike.address_hash["city"]).to eq "Lancaster" # Because it's set on the bike
+          expect(bike.registration_address).to eq user.address_hash
+          expect(bike.registration_address["city"]).to eq "Vancouver"
         end
       end
       context "with stolen record" do
