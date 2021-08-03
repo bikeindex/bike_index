@@ -17,7 +17,7 @@
     ul {
       display: flex;
       flex-wrap: nowrap;
-      height: 150px;
+      height: 100px;
       list-style-type: none;
       overflow-x: auto;
       padding: 0;
@@ -29,7 +29,7 @@
       cursor: pointer;
       flex: 0 0 auto;
       margin: auto 5px;
-      padding: 5px;
+      padding: 2px;
       height: 100%;
       img {
         max-height: 100%;
