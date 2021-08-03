@@ -787,8 +787,7 @@ class Bike < ApplicationRecord
 
   def valid_mailing_address?
     # Prefer address over registration address, since it can be updated
-    addy = address_hash if address_hash.values.any?(&:present?)
-    addy ||= registration_address
+    addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
     return false if addy["street"].blank? || addy["city"].blank?
     return true if creation_organization&.default_location.blank?
