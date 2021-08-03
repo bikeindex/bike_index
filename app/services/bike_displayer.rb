@@ -38,7 +38,7 @@ class BikeDisplayer
       return false unless user.present? && (bike.user == user || bike.id.blank?)
       # If the user has set their address, that's the only way to update bike addresses
       return false if user.address_set_manually
-      # Make sure new bikes
+      # Make absolutely sure with stolen bikes
       return false if bike.current_stolen_record_id.present?
       # parking notifications, impounded, stolen etc use the associated record for their address
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
