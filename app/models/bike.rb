@@ -794,8 +794,7 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
-    # NOTE: User address is the preferred address!
-    # If user address is set, address fields don't show up on Bike!
+    # NOTE: User address is the preferred address! If user address is set, address fields don't show on bike!
     if user&.address_set_manually
       "user"
     elsif address_set_manually

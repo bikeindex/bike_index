@@ -1941,7 +1941,7 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city) }
       let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user) }
       let(:bike) { ownership.bike }
-      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"})}
+      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       it "takes location from the creation state" do
         expect(user.reload.street).to be_blank
         expect(user.address_set_manually).to be_falsey
@@ -1964,7 +1964,7 @@ RSpec.describe Bike, type: :model do
       end
       context "user street is present" do
         let(:user) { FactoryBot.create(:user_confirmed, :in_nyc) }
-        it 'uses user address' do
+        it "uses user address" do
           expect(user.reload.street).to be_present
           expect(user.address_set_manually).to be_truthy
           expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
