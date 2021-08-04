@@ -6,11 +6,6 @@ class FakeIntegrationClass
     new_data = (theft_alert.facebook_data || {}).merge(effective_object_story_id: "NEEWWW")
     theft_alert.update(facebook_data: new_data)
   end
-
-  def create_for(theft_alert)
-    new_data = (theft_alert.facebook_data || {}).merge(campaign_id: "111", adset_id: "3333", ad_id: "5555")
-    theft_alert.update(facebook_data: new_data)
-  end
 end
 
 RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
@@ -79,7 +74,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
         expect(theft_alert.missing_location?).to be_falsey
         expect(theft_alert.missing_photo?).to be_falsey
         expect(theft_alert.activateable?).to be_truthy
-        expect(theft_alert.notify?).to be_truthy
+        expect(theft_alert.notify?).to be_falsey
         expect(theft_alert.status).to eq "pending"
         expect(theft_alert.begin_at).to be_present
         expect(theft_alert.end_at).to be_present
