@@ -816,7 +816,7 @@ class Bike < ApplicationRecord
     when "initial_creation_state" then current_creation_state.address_hash
     else
       {}
-    end
+    end.with_indifferent_access
   end
 
   # Set the bike's location data (lat/long, city, postal code, country, etc.)
@@ -1005,8 +1005,8 @@ class Bike < ApplicationRecord
   # of precedence:
   #
   # 1. The current parking notification/impound record, if one is present
-  # 2. registration_address (which prioritizes user address)
-  # 3. The creation organization, if one is present
+  # 2. #registration_address (which prioritizes user address)
+  # 3. The creation organization address (so we have a general area for the bike)
   # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
   def location_record_address_hash
     l_hashes = [
