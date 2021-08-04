@@ -152,7 +152,7 @@ class Payment < ApplicationRecord
 
   def update_associations
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
-    if payment_method == "stripe" && paid? && email.present?
+    if payment_method == "stripe" && paid? && email.present? && !theft_alert?
       EmailReceiptWorker.perform_async(id)
     end
     return true unless invoice.present?

@@ -14,6 +14,17 @@ RSpec.describe Payment, type: :model do
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
       end
+      context "theft_alert" do
+        let(:payment) { FactoryBot.create(:payment, user: nil, kind: "theft_alert", email: user.email) }
+        it "does not send an extra email" do
+          expect {
+            payment
+          }.to change(EmailReceiptWorker.jobs, :size).by 0
+          payment.reload
+          expect(payment.id).to be_present
+          expect(payment.user_id).to eq user.id
+        end
+      end
     end
     context "check with organization_id but no user or email" do
       let(:organization) { FactoryBot.create(:organization) }

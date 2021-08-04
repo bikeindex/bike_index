@@ -6,11 +6,6 @@ class FakeIntegrationClass
     new_data = (theft_alert.facebook_data || {}).merge(effective_object_story_id: "NEEWWW")
     theft_alert.update(facebook_data: new_data)
   end
-
-  def create_for(theft_alert)
-    new_data = (theft_alert.facebook_data || {}).merge(campaign_id: "111", adset_id: "3333", ad_id: "5555")
-    theft_alert.update(facebook_data: new_data)
-  end
 end
 
 RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
@@ -51,24 +46,53 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
       expect(theft_alert.facebook_updated_at).to be_blank
 
       ActionMailer::Base.deliveries = []
-      # expect {
-      instance.perform(theft_alert.id)
-      # }.to change(Notification, :count).by 1
+      expect {
+        instance.perform(theft_alert.id)
+      }.to change(Notification, :count).by 1
       theft_alert.reload
       expect(theft_alert.facebook_post_url).to be_present
+      expect(theft_alert.posted?).to be_truthy
       expect(theft_alert.live?).to be_truthy
 
-      # Currently not notifying!
-      expect(theft_alert.facebook_data["no_notify"]).to be_truthy
+      expect(theft_alert.notify?).to be_truthy
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      notification = theft_alert.notifications.first
+      expect(notification.kind).to eq "theft_alert_posted"
 
-      # expect(ActionMailer::Base.deliveries.count).to eq 1
-      # notification = theft_alert.notifications.first
-      # expect(notification.kind).to eq "theft_alert_posted"
+      # Calling it again doesn't create a new notification
+      expect {
+        instance.perform(theft_alert.id)
+      }.to_not change(Notification, :count)
+    end
+    context "no_notify" do
+      it "does not notify" do
+        theft_alert.update(facebook_data: facebook_data.merge(no_notify: true))
+        stolen_record.reload
+        expect(stolen_record).to be_valid
+        expect(theft_alert.reload.stolen_record_id).to eq stolen_record.id
+        expect(theft_alert.paid?).to be_truthy
+        expect(theft_alert.live?).to be_falsey
+        expect(theft_alert.missing_location?).to be_falsey
+        expect(theft_alert.missing_photo?).to be_falsey
+        expect(theft_alert.activateable?).to be_truthy
+        expect(theft_alert.notify?).to be_falsey
+        expect(theft_alert.status).to eq "pending"
+        expect(theft_alert.begin_at).to be_present
+        expect(theft_alert.end_at).to be_present
+        expect(theft_alert.facebook_post_url).to be_blank
+        expect(theft_alert.facebook_updated_at).to be_blank
 
-      # # Calling it again doesn't create a new notification
-      # expect {
-      #   instance.perform(theft_alert.id)
-      # }.to_not change(Notification, :count)
+        ActionMailer::Base.deliveries = []
+        expect {
+          instance.perform(theft_alert.id)
+        }.to_not change(Notification, :count)
+        theft_alert.reload
+        expect(theft_alert.facebook_post_url).to be_present
+        expect(theft_alert.live?).to be_truthy
+
+        expect(theft_alert.notify?).to be_falsey
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
     end
     context "pending" do
       let(:facebook_data) { {} }
