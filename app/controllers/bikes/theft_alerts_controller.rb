@@ -14,10 +14,12 @@ class Bikes::TheftAlertsController < Bikes::BaseController
   end
 
   def show
-    return unless setup_edit_template("alert_purchase_confirmation")
     @payment = if params[:session_id].present?
       Payment.where(stripe_id: params[:session_id]).first
     end
+
+    redirect_to new_bike_theft_alert_path(bike_id: @bike.id) unless @payment.present?
+    return unless setup_edit_template("alert_purchase_confirmation")
 
     @payment&.update_from_stripe_session
   end

@@ -129,6 +129,7 @@ RSpec.describe StolenRecord, type: :model do
 
         image1 = FactoryBot.create(:public_image, imageable: bike)
         FactoryBot.create(:public_image, imageable: bike)
+        stolen_record.reload
         expect(stolen_record.alert_image).to be_blank
 
         stolen_record.generate_alert_image

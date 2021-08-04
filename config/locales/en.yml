@@ -1473,7 +1473,6 @@ en:
           to set up a promoted alert!
         preview: Promoted Alert Preview
         purchase_alert: Purchase Alert
-        select_alert: Select Alert
         select_an_image: Select an image
         select_an_image_to_see_preview: >-
           Select an image of your bike to see a preview of what your promoted alert
@@ -1485,8 +1484,8 @@ en:
       show:
         stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
           processed your alert.
-        your_order_is_pending: Your order is pending.
         thank_you: Thanks for buying an alert!
+        your_order_is_pending: Your order is pending.
       table:
         created: Created
         end: End
@@ -5304,9 +5303,7 @@ en:
       words_connector: ", "
   theft_alert_plans:
     theft_alert_plan:
-      best_value: Best value
       days: Days
-      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"
