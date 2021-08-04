@@ -5,20 +5,14 @@
 
       .col-md-8.form-well
         .form-wrap
-          .form-well-form-header
-            %h3.text-center.w-100
-              -# 'alert'-prefixed templates should all have the same header and
-              -# highlight the same nav menu item
-              = @edit_templates.select { |k, v| @edit_template.match(/#{k}/) }.values.first
+          .form-well-form-header-always-visible
+            %h3
+              = t(".thank_you")
+          .row.mt-4
+            .col-sm-12
+              %p
+                = t(".your_order_is_pending")
+              %p
+                = t(".stay_tuned_for_an_update_once_weve_proces")
 
-            .row
-              %h3.text-center.w-100= t(".thanks")
-              .col-md-12
-                .copy.text-center
-                  = t(".your_order_is_pending")
-            .row
-              .col-md-12
-                .copy.text-center
-                  = t(".stay_tuned_for_an_update_once_weve_proces")
-
-        = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }
+        = render partial: "table", locals: { theft_alerts: @theft_alerts }

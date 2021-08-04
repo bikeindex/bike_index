@@ -1,4 +1,6 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
+  before_action :get_existing_theft_alerts, except: [:create]
+
   def new
     return unless setup_edit_template("alert")
 
@@ -9,16 +11,15 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     @selected_theft_alert_plan =
       @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
       @theft_alert_plans.order(:amount_cents).second
-
-    @theft_alerts = @bike.current_stolen_record
-      .theft_alerts
-      .includes(:theft_alert_plan)
-      .creation_ordered_desc
-      .where(user: current_user)
-      .references(:theft_alert_plan)
   end
 
   def show
+    return unless setup_edit_template("alert_purchase_confirmation")
+    @payment = if params[:session_id].present?
+      Payment.where(stripe_id: params[:session_id]).first
+    end
+
+    @payment&.update_from_stripe_session
   end
 
   def create
@@ -30,28 +31,18 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     )
     @payment = Payment.new(create_parameters(theft_alert))
 
-    stripe_session = Stripe::Checkout::Session.create(current_customer_data.merge(
-      submit_type: "pay",
-      payment_method_types: ["card"],
-      line_items: [{
-        price_data: {
-          unit_amount: @payment.amount_cents,
-          currency: @payment.currency,
-          product_data: {
-            name: product_description(theft_alert),
-            images: ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"]
-          }
-        },
-        quantity: 1
-      }],
-      mode: "payment",
-      success_url: @payment.stripe_success_url,
-      cancel_url: @payment.stripe_cancel_url
-    ))
+    stripe_session = Stripe::Checkout::Session.create(
+      @payment.stripe_session_hash(item_name: product_description(theft_alert))
+    )
 
     @payment.update!(stripe_id: stripe_session.id)
     theft_alert.update(payment: @payment)
+
     redirect_to stripe_session.url
+    image_id = params[:selected_bike_image_id]
+    if image_id.present? && image_id != @bike.public_images&.first&.id
+      @bike.current_stolen_record&.generate_alert_image(bike_image: PublicImage.find_by_id(image_id))
+    end
   end
 
   private
@@ -77,5 +68,16 @@ class Bikes::TheftAlertsController < Bikes::BaseController
   def product_description(theft_alert)
     return params[:description] if params[:description].present?
     theft_alert.theft_alert_plan&.name
+  end
+
+  def get_existing_theft_alerts
+    return unless @bike&.current_stolen_record.present?
+
+    @theft_alerts = @bike.current_stolen_record
+      .theft_alerts
+      .includes(:theft_alert_plan)
+      .creation_ordered_desc
+      .where(user: current_user)
+      .references(:theft_alert_plan)
   end
 end

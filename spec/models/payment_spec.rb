@@ -70,8 +70,8 @@ RSpec.describe Payment, type: :model do
     context "theft_alert" do
       let(:theft_alert) { FactoryBot.create(:theft_alert) }
       let(:payment) { Payment.new(kind: "theft_alert", theft_alert: theft_alert) }
-      let(:target_success) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alerts?session_id={CHECKOUT_SESSION_ID}" }
-      let(:target_cancel) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alerts/new" }
+      let(:target_success) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}" }
+      let(:target_cancel) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert/new" }
       it "returns expected" do
         expect(payment.stripe_success_url).to eq target_success
         expect(payment.stripe_cancel_url).to eq target_cancel

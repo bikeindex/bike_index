@@ -27,7 +27,7 @@
     next unless payments_of_kind.count > 0
     {
       kind: kind,
-      name: Payment.display_kind(kind),
+      name: Payment.kind_humanized(kind),
       data: time_range_counts(collection: payments_of_kind),
       data_money: time_range_amounts(collection: payments_of_kind),
       count: payments_of_kind.count,

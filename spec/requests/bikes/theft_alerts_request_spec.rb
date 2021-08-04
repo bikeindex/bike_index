@@ -40,22 +40,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
 
   describe "create" do
     include_context :request_spec_logged_in_as_user
-
-    it "successfully creates" do
-      expect(bike.current_stolen_record_id).to be_present
-      expect(Payment.count).to eq 0
-      expect(TheftAlert.count).to eq 0
-      Sidekiq::Worker.clear_all
-      ActionMailer::Base.deliveries = []
-      expect(Notification.count).to eq 0
-      Sidekiq::Testing.inline! do
-        expect {
-          post base_url, params: {
-            theft_alert_plan_id: theft_alert_plan.id,
-            bike_id: bike.id
-          }
-        }.to change(TheftAlert, :count).by(1)
-      end
+    def expect_theft_alert_to_be_created
       theft_alert = TheftAlert.last
       expect(theft_alert.theft_alert_plan_id).to eq theft_alert_plan.id
       expect(theft_alert.user_id).to eq current_user.id
@@ -74,13 +59,61 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.first_payment_date).to be_blank # Ensure this gets set
       expect(payment.last_payment_date).to be_blank
       expect(payment.paid?).to be_falsey
+    end
+
+    it "successfully creates" do
+      expect(bike.current_stolen_record_id).to be_present
+      expect(Payment.count).to eq 0
+      expect(TheftAlert.count).to eq 0
+      Sidekiq::Worker.clear_all
+      ActionMailer::Base.deliveries = []
+      expect(Notification.count).to eq 0
+      Sidekiq::Testing.inline! do
+        expect {
+          post base_url, params: {
+            theft_alert_plan_id: theft_alert_plan.id,
+            bike_id: bike.id
+          }
+        }.to change(TheftAlert, :count).by(1)
+      end
+      expect_theft_alert_to_be_created
 
       # No deliveries, because the payment hasn't been completed
+      expect(Notification.count).to eq 0
       expect(ActionMailer::Base.deliveries.count).to eq 0
-      # end
     end
-    context "alert image" do
-      it "updates the alert image"
+    context "passing alert_image" do
+      let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+      let!(:image2) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+      let(:stolen_record) { bike.current_stolen_record }
+      it "updates the alert image" do
+        stolen_record.reload.current_alert_image
+        expect(stolen_record.reload.alert_image).to be_present
+        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
+        expect(Payment.count).to eq 0
+        expect(TheftAlert.count).to eq 0
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(Notification.count).to eq 0
+
+        Sidekiq::Testing.inline! do
+          expect {
+            post base_url, params: {
+              theft_alert_plan_id: theft_alert_plan.id,
+              bike_id: bike.id,
+              selected_bike_image_id: image2.id
+            }
+          }.to change(TheftAlert, :count).by(1)
+        end
+        expect_theft_alert_to_be_created
+
+        expect(stolen_record.reload.alert_image).to be_present
+        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+
+        # No deliveries, because the payment hasn't been completed
+        expect(Notification.count).to eq 0
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
     end
   end
 

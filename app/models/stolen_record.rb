@@ -272,7 +272,7 @@ class StolenRecord < ApplicationRecord
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
-    bike&.public_images&.order(:id)&.first
+    bike&.public_images&.first
   end
 
   def current_alert_image
@@ -290,7 +290,8 @@ class StolenRecord < ApplicationRecord
 
     new_image = AlertImage.new(stolen_record: self)
     if bike_image&.image.blank?
-      new_image.remote_image_url = bike.stock_photo_url
+      fallback_image = bike_main_image&.image.present? ? bike_main_image : bike.stock_photo_url
+      new_image.remote_image_url = fallback_image
     else
       new_image.image = bike_image.image
     end
