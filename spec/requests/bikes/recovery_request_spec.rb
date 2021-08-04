@@ -1,6 +1,7 @@
 require "rails_helper"
 
-RSpec.describe Bikes::RecoveryController, type: :controller do
+RSpec.describe Bikes::RecoveryController, type: :request do
+  let(:base_url) { "/bikes/#{bike.to_param}/recovery" }
   let(:bike) { FactoryBot.create(:stolen_bike) }
   let(:stolen_record) { bike.current_stolen_record }
   let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
@@ -8,7 +9,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
   describe "edit" do
     context "nonmatching recovery token" do
       it "redirects" do
-        get :edit, params: {bike_id: bike.id, token: "XXXXXXXX"}
+        get "#{base_url}/edit?token=XXXXXXXX"
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:error]).to be_present
         expect(session[:recovery_link_token]).to be_blank
@@ -16,7 +17,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
     end
     context "matching recovery token" do
       it "renders" do
-        get :edit, params: {bike_id: bike.id, token: recovery_link_token}
+        get "#{base_url}/edit?token=#{recovery_link_token}"
         expect(response).to redirect_to bike_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
       end
@@ -26,7 +27,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
       it "redirects" do
         bike.reload
         expect(bike.status_stolen?).to be_falsey
-        get :edit, params: {bike_id: bike.id, token: recovery_link_token}
+        get "#{base_url}/edit?token=#{recovery_link_token}"
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:info]).to match(/already/)
         expect(session[:recovery_link_token]).to be_blank
@@ -48,7 +49,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
     context "matching recovery token" do
       it "updates if recovery information is valid" do
         expect {
-          put :update,
+          put base_url,
             params: {
               bike_id: bike.id,
               token: recovery_link_token,
@@ -69,10 +70,10 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
       end
 
       context "with user present" do
-        include_context :logged_in_as_user
+        include_context :request_spec_logged_in_as_user
         it "updates and assigns recovering_user" do
           expect {
-            put :update, params: {bike_id: bike.id, token: recovery_link_token, stolen_record: recovery_info}
+            put base_url, params: {bike_id: bike.id, token: recovery_link_token, stolen_record: recovery_info}
           }.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(1)
           stolen_record.reload
           bike.reload
@@ -85,15 +86,14 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
           expect(stolen_record.can_share_recovery).to be_truthy
           expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
           expect(stolen_record.reload.recovered_at.to_i).to be_within(1).of 1532822233
-          expect(stolen_record.recovering_user).to be_present
-          expect(stolen_record.recovering_user).to eq user
+          expect(stolen_record.recovering_user&.id).to eq current_user.id
         end
       end
     end
     context "non-matching recovery token" do
       it "does not update" do
         expect {
-          put :update, params: {bike_id: bike.id, token: "XDSFCVVVVVVVVVSD888", stolen_record: recovery_info}
+          put base_url, params: {bike_id: bike.id, token: "XDSFCVVVVVVVVVSD888", stolen_record: recovery_info}
         }.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(0)
         stolen_record.reload
         bike.reload
