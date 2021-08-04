@@ -29,7 +29,7 @@
       kind: kind,
       name: Payment.kind_humanized(kind),
       data: time_range_counts(collection: payments_of_kind),
-      data_money: time_range_amounts(collection: payments_of_kind),
+      data_money: time_range_amounts(collection: payments_of_kind, convert_to_dollars: true),
       count: payments_of_kind.count,
       money: MoneyFormater.money_format(payments_of_kind.sum(:amount_cents)),
     }
