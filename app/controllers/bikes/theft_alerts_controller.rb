@@ -1,24 +1,24 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
   def new
-    if setup_edit_template("alert")
-      bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
+    return unless setup_edit_template("alert")
 
-      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
-      @selected_theft_alert_plan =
-        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-        @theft_alert_plans.order(:amount_cents).second
+    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
+    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
-      @theft_alerts = @bike.current_stolen_record
-        .theft_alerts
-        .includes(:theft_alert_plan)
-        .creation_ordered_desc
-        .where(user: current_user)
-        .references(:theft_alert_plan)
-    end
+    @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
+    @selected_theft_alert_plan =
+      @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
+      @theft_alert_plans.order(:amount_cents).second
+
+    @theft_alerts = @bike.current_stolen_record
+      .theft_alerts
+      .includes(:theft_alert_plan)
+      .creation_ordered_desc
+      .where(user: current_user)
+      .references(:theft_alert_plan)
   end
 
-  def update
+  def show
   end
 
   def create
@@ -28,7 +28,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       theft_alert_plan: theft_alert_plan,
       user: current_user
     )
-    @payment = Payment.new(permitted_create_parameters(theft_alert))
+    @payment = Payment.new(create_parameters(theft_alert))
 
     stripe_session = Stripe::Checkout::Session.create(current_customer_data.merge(
       submit_type: "pay",
@@ -56,7 +56,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
 
   private
 
-  def permitted_create_parameters(theft_alert)
+  def create_parameters(theft_alert)
     {
       kind: "theft_alert",
       payment_method: "stripe",

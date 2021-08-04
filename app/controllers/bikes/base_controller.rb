@@ -30,31 +30,6 @@ class Bikes::BaseController < ApplicationController
 
   protected
 
-  # Determine the appropriate edit template to use in the edit view.
-  #
-  # If provided an invalid template name, return the default page for a stolen /
-  # unstolen bike and `:is_valid` mapped to false.
-  #
-  # Return a Hash with keys :is_valid (boolean), :template (string)
-  def target_edit_template(requested_page)
-    result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase_confirmation"]
-    default_page = @bike.status_stolen? ? :theft_details : :bike_details
-
-    if requested_page.blank?
-      result[:is_valid] = true
-      result[:template] = default_page.to_s
-    elsif requested_page.in?(valid_pages)
-      result[:is_valid] = controller_name == controller_name_for(requested_page)
-      result[:template] = requested_page.to_s
-    else
-      result[:is_valid] = false
-      result[:template] = default_page.to_s
-    end
-
-    result
-  end
-
   def controller_name_for(requested_page)
     %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "bikes"
   end
@@ -94,12 +69,17 @@ class Bikes::BaseController < ApplicationController
     @edit_templates = edit_templates
     @permitted_return_to = permitted_return_to
 
+    # Determine the appropriate edit template to use in the edit view.
+    #
+    # If provided an invalid template name, redirect to the default page for a stolen /
+    # unstolen bike
     default_template = @bike.status_stolen? ? "theft_details" : "bike_details"
     @edit_template = requested_page || default_template
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == controller_name_for(@edit_template)
       redirect_template = valid_requested_page ? @edit_template : default_template
-      redirect_to(edit_bike_template_path_for(@bike, redirect_template)) && return
+      redirect_to(edit_bike_template_path_for(@bike, redirect_template))
+      return false
     end
 
     @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
