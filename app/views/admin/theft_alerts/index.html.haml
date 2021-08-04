@@ -85,6 +85,7 @@
           Matching
         Promoted Alerts
         %em
+          = humanized_time_range_column(@time_range_column)
           = humanized_time_range(@time_range)
     - if theft_alert_plans.present?
       .col
@@ -108,7 +109,7 @@
                     = admin_number_display(matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:reach))
                   %td
                     -# Directly access facebook_data, so we don't n+1
-                    - amount_cents_facebook = matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).map { |t| t.facebook_data["amount_cents"] }.compact
+                    - amount_cents_facebook = matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).map { |t| t.facebook_data&.dig("amount_cents") }.compact
                     = MoneyFormater.money_format(amount_cents_facebook.sum)
                   %td.small
                     = admin_number_display(stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count)

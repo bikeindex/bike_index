@@ -115,7 +115,10 @@ class Admin::TheftAlertsController < Admin::BaseController
       bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)
     end
-    theft_alerts.where(created_at: @time_range)
+
+    # Only handling created_at now
+    @time_range_column ||= "created_at"
+    theft_alerts.where(@time_range_column => @time_range)
   end
 
   # Deprecated - should be removed soon.
