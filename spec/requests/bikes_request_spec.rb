@@ -1,6 +1,6 @@
 require "rails_helper"
 
-# Individual actions with a lot of tests are split out into separate request spec files
+# Individual controller endpoints (methods) with a lot of tests are split out into separate request spec files
 #  - bikes/create_request_spec.rb
 #  - bikes/show_request_spec.rb
 
