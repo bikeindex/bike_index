@@ -52,7 +52,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.paid?).to be_falsey
         expect(payment.kind).to eq "donation"
         expect(payment.amount_cents).to eq 0
-        VCR.use_cassette("payments_controller-success", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           expect(Notification.count).to eq 0
@@ -85,7 +85,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.reload.email).to be_blank
           expect(payment.paid?).to be_falsey
           expect(payment.amount_cents).to eq 0
-          VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:path], re_record_interval: re_record_interval) do
+          VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
             Sidekiq::Worker.clear_all
             ActionMailer::Base.deliveries = []
             expect(Notification.count).to eq 0
@@ -113,7 +113,7 @@ RSpec.describe PaymentsController, type: :request do
 
   describe "create" do
     it "makes a onetime payment" do
-      VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:path], re_record_interval: re_record_interval) do
+      VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval: re_record_interval) do
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
@@ -148,7 +148,7 @@ RSpec.describe PaymentsController, type: :request do
       include_context :request_spec_logged_in_as_user
       it "makes a onetime payment with current user" do
         expect(current_user.reload.stripe_id).to be_blank
-        VCR.use_cassette("payments_controller-donation", match_requests_on: [:path], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-donation", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post base_url, params: {
               is_arbitrary: false,
@@ -176,7 +176,7 @@ RSpec.describe PaymentsController, type: :request do
         let(:current_user) { FactoryBot.create(:user_confirmed, email: "stripetest@bikeindex.org", stripe_id: customer_stripe_id) }
 
         it "adds the customer" do
-          VCR.use_cassette("payments_controller-donation-customer", match_requests_on: [:path], re_record_interval: re_record_interval) do
+          VCR.use_cassette("payments_controller-donation-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
             expect {
               post base_url, params: {
                 is_arbitrary: false,

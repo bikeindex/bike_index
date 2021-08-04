@@ -1,13 +1,14 @@
 class BikeIndex.BikesEditAlert extends BikeIndex
   constructor: ->
     super()
-    @$planSelectionForm = $('#js-select-plan-form')
+    @$alertForm = $('#alert-form')
     @$imageSelectionContainer = $('#js-select-image-container')
     @initializeEventListeners()
 
   initializeEventListeners: =>
-    @$planSelectionForm.on "click", ".js-plan-select", (event) =>
-      @highlightSelectedPlan(event)
+    @$alertForm.on "click", ".js-plan-container", (event) =>
+      @selectPlan(event)
+
     @$imageSelectionContainer.on "click", ".js-image-select", (event) =>
       $selectedImage = $(event.target).closest(".js-image-select")
       @highlightSelectedImage($selectedImage)
@@ -25,24 +26,14 @@ class BikeIndex.BikesEditAlert extends BikeIndex
 
   setSelectedImageId: ($selectedImage) =>
     selectedImageId = $selectedImage.data("image-id")
-    @$planSelectionForm.find("#selected_bike_image_id").val(selectedImageId)
+    @$alertForm.find("#selected_bike_image_id").val(selectedImageId)
 
-  highlightSelectedPlan: (event) =>
-    third = event.target.offsetWidth / 3
-    click_in_center_third = Math.ceil(third) < event.offsetX < Math.floor(third * 2)
-    if not click_in_center_third
-      return false
+  selectPlan: (event) =>
+    @$alertForm.find(".js-plan-container").removeClass("selected")
 
-    # clear selections
-    @$planSelectionForm.find(".js-plan-container").removeClass("selected")
-    @$planSelectionForm.find(".js-plan-select").removeClass("selected")
+    $target = $(event.target)
+    unless $target.hasClass("js-plan-container")
+      $target = $target.parents(".js-plan-container")
 
-    # highlight selected plan
-    $footer = $(event.target)
-    $footer.addClass("selected")
-    $selectedPlan = $footer.closest(".js-plan-container")
-    $selectedPlan.addClass("selected")
-
-    # set selected plan
-    selected_plan_id = $footer.data("theft-alert-plan-id")
-    @$planSelectionForm.find("#selected_plan_id").val(selected_plan_id)
+    $target.addClass("selected")
+    @$alertForm.find("#theft_alert_plan_id").val($target.attr("data-id"))

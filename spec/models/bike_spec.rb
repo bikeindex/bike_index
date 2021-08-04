@@ -665,7 +665,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_claimed) }
+        let(:ownership) { FactoryBot.create(:ownership_claimed, user: FactoryBot.create(:user_confirmed)) }
         let(:user) { ownership.user }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
@@ -1332,7 +1332,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.registration_address(true)).to eq default_location_registration_address
       end
       context "ownership creator" do
-        let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
+        let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
           expect(user.address_hash).to eq default_location_registration_address
           expect(bike.user).to_not eq user

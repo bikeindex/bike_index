@@ -1,5 +1,5 @@
 class Bikes::RecoveryController < Bikes::BaseController
-  before_action :find_bike
+  skip_before_action :ensure_user_allowed_to_edit
   before_action :ensure_token_match!
 
   def edit

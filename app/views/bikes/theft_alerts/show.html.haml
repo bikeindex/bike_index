@@ -1,0 +1,18 @@
+.primary-edit-bike-form
+  .form-well-container.container{ class: "edit-bike-page-alert" }
+    .row
+      = render partial: "bikes/edit_primary_menu", locals: { no_save_button: true }
+
+      .col-md-8.form-well
+        .form-wrap
+          .form-well-form-header-always-visible
+            %h3
+              = t(".thank_you")
+          .row.mt-4
+            .col-sm-12
+              %p
+                = t(".your_order_is_pending")
+              %p
+                = t(".stay_tuned_for_an_update_once_weve_proces")
+
+        = render partial: "table", locals: { theft_alerts: @theft_alerts }

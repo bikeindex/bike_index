@@ -8,36 +8,8 @@
 
     .times {
       font-size: 150%;
-      line-height: .8em;
+      line-height: 0.8em;
       vertical-align: middle;
-    }
-  }
-
-  .confirm-form {
-    .copy {
-      margin: 20px auto;
-      width: 85%;
-    }
-
-    .description {
-      background-color: $blue-faint;
-      border-radius: 10px;
-      margin: 0 auto;
-      padding: 50px;
-      width: 60%;
-
-      ul {
-        margin: 0;
-        padding: 0;
-      }
-
-      li {
-        list-style-type: none;
-
-        &::before {
-          content: '\2713  ';
-        }
-      }
     }
   }
 
@@ -45,7 +17,7 @@
     ul {
       display: flex;
       flex-wrap: nowrap;
-      height: 250px;
+      height: 100px;
       list-style-type: none;
       overflow-x: auto;
       padding: 0;
@@ -57,7 +29,11 @@
       cursor: pointer;
       flex: 0 0 auto;
       margin: auto 5px;
-      padding: 5px;
+      padding: 2px;
+      height: 100%;
+      img {
+        max-height: 100%;
+      }
     }
 
     li:first-of-type {
@@ -69,7 +45,7 @@
     }
 
     .selection-preview-image-template {
-      background-image: image-url('promoted_alerts/facebook-template.png');
+      background-image: image-url("promoted_alerts/facebook-template.png");
       background-size: cover;
       margin: auto;
       max-width: 420px;
@@ -86,6 +62,7 @@
 
       img {
         max-width: 95%;
+        max-height: 200px;
       }
     }
 
@@ -103,16 +80,12 @@
       vertical-align: middle;
       width: 42%;
     }
-
-    img {
-      max-height: 200px;
-    }
   }
 
   @media (max-width: $grid-breakpoint-md) {
     .image-selection-container {
       .selection-preview-caption {
-        font-size: .70rem;
+        font-size: 0.7rem;
       }
     }
   }
@@ -122,10 +95,9 @@
     border: 1px solid $gray-subtle;
     border-radius: 4px;
     margin: 15px auto;
-
-    &.selected {
-      border: 1px solid $blue;
-    }
+    max-width: 350px;
+    transition: all 125ms ease-in-out;
+    cursor: pointer;
   }
 
   .detail-card-title {
@@ -135,7 +107,7 @@
     font-size: 18px;
     font-weight: 400;
     letter-spacing: 1.25px;
-    padding: 25px;
+    padding: 0.75rem 0;
     position: relative;
     text-align: center;
   }
@@ -221,7 +193,7 @@
     font-weight: 500;
     left: 0;
     line-height: 27px;
-    padding: .618em;
+    padding: 0.618em;
     right: 0;
     transition: all 125ms ease-in-out;
 
@@ -229,32 +201,33 @@
       background-color: $white;
       border: 2px solid #919197;
       border-radius: 50%;
-      content: '';
-      cursor: pointer;
+      content: "";
       display: inline-block;
       height: 2em;
       vertical-align: middle;
       width: 2em;
     }
+  }
 
-    &.selected {
+  .detail-card-container.selected {
+    border: 1px solid $blue;
+    .detail-card-footer {
       background-color: $blue;
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
-    }
-
-    &.selected::before {
-      background-color: $blue;
-      border-color: $white;
-      color: $white;
-      content: '\2713';
-      font-family: 'zp-icons';
-      font-style: normal;
-      font-variant: normal;
-      font-weight: normal;
-      line-height: 1.8;
-      text-rendering: optimizeLegibility;
-      text-transform: none;
+      &::before {
+        background-color: $blue;
+        border-color: $white;
+        color: $white;
+        content: "\2713";
+        font-family: "zp-icons";
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        line-height: 1.8;
+        text-rendering: optimizeLegibility;
+        text-transform: none;
+      }
     }
   }
 }

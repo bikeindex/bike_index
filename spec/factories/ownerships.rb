@@ -9,7 +9,7 @@ FactoryBot.define do
     created_at { bike&.created_at } # This makes testing certain time related things easier
     trait :claimed do
       claimed { true }
-      user { FactoryBot.create(:user_confirmed) }
+      user { creator } # Reduce the number of things added to the database
       claimed_at { Time.current - 1.hour }
     end
     factory :ownership_claimed, traits: [:claimed]

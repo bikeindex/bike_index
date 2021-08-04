@@ -1,11 +1,11 @@
 class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
-  before_action :find_bike, only: %i[show edit update pdf resolve_token]
-  before_action :assign_current_organization, only: %i[index show edit]
-  before_action :ensure_user_allowed_to_edit, only: %i[edit update pdf]
   before_action :render_ad, only: %i[index show]
   before_action :remove_subdomain, only: %i[index]
+  skip_before_action :find_bike, except: %i[show edit update pdf resolve_token]
+  skip_before_action :assign_current_organization, except: %i[index show edit]
+  skip_before_action :ensure_user_allowed_to_edit, except: %i[edit update pdf]
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
@@ -152,45 +152,15 @@ class BikesController < Bikes::BaseController
 
   def edit
     @page_errors = @bike.errors
-    @edit_templates = edit_templates
-    @permitted_return_to = permitted_return_to
-    # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
-    requested_page = target_edit_template(requested_page: params[:edit_template] || params[:page])
-    @edit_template = requested_page[:template]
-    unless requested_page[:is_valid]
-      redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
-    end
+    # NOTE: switched to edit_template param in #2040 (from page), because page is used for pagination
+    return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
 
-    @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)
-    case @edit_template
-    when "photos"
-      @private_images =
-        PublicImage
-          .unscoped
-          .where(imageable_type: "Bike")
-          .where(imageable_id: @bike.id)
-          .where(is_private: true)
-    when /alert/
-      unless @bike&.current_stolen_record.present?
-        redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
-      end
-      @skip_general_alert = true
-      bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
-      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
-      @selected_theft_alert_plan =
-        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-        @theft_alert_plans.min_by(&:amount_cents)
-
-      @theft_alerts =
-        @bike
-          .current_stolen_record
-          .theft_alerts
-          .includes(:theft_alert_plan)
-          .creation_ordered_desc
-          .where(user: current_user)
-          .references(:theft_alert_plan)
+    if @edit_template == "photos"
+      @private_images = PublicImage
+        .unscoped
+        .where(imageable_type: "Bike")
+        .where(imageable_id: @bike.id)
+        .where(is_private: true)
     end
 
     render "edit_#{@edit_template}".to_sym

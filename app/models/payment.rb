@@ -41,10 +41,10 @@ class Payment < ApplicationRecord
     ["check"]
   end
 
-  def self.display_kind(kind)
+  def self.kind_humanized(kind)
     return "NO KIND!" unless kind.present?
     return "Promoted alert" if kind == "theft_alert"
-    kind.humanize
+    kind&.humanize
   end
 
   def paid?
@@ -59,16 +59,54 @@ class Payment < ApplicationRecord
     !donation?
   end
 
-  def display_kind
-    self.class.display_kind(kind)
+  def kind_humanized
+    self.class.kind_humanized(kind)
+  end
+
+  def stripe_session_hash(item_name: nil)
+    item_name ||= kind_humanized
+    {
+      submit_type: donation? ? "donate" : "pay",
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          unit_amount: amount_cents,
+          currency: currency,
+          product_data: {
+            name: item_name,
+            images: session_images
+          }
+        },
+        quantity: 1
+      }],
+      mode: "payment",
+      success_url: stripe_success_url,
+      cancel_url: stripe_cancel_url
+    }.merge(user_stripe_session_hash)
+  end
+
+  def session_images
+    if %w[donation theft_alert].include?(kind)
+      ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"]
+    else # payment, invoice_payment
+      []
+    end
   end
 
   def stripe_success_url
-    "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+    if theft_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}"
+    else
+      "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
+    end
   end
 
   def stripe_cancel_url
-    "#{ENV["BASE_URL"]}/payments/new"
+    if theft_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert/new"
+    else
+      "#{ENV["BASE_URL"]}/payments/new"
+    end
   end
 
   def set_calculated_attributes
@@ -78,12 +116,27 @@ class Payment < ApplicationRecord
     elsif email.present?
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
     end
+    self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
   end
 
   def stripe_session
     return nil unless stripe? && stripe_id.present?
     @stripe_session ||= Stripe::Checkout::Session.retrieve(stripe_id)
+  end
+
+  # Right now, this method is only good for updating unpaid payments to be paid, when stripe says they are paid
+  def update_from_stripe_session
+    return unless incomplete? && stripe_session.payment_status == "paid"
+    update(first_payment_date: Time.current,
+           amount_cents: stripe_session.amount_total)
+    # Update email if we can
+    return unless stripe_customer.present?
+    update(email: stripe_customer.email)
+    if user.present? && user.stripe_id.blank?
+      user.update(stripe_id: stripe_customer.id)
+    end
+    true
   end
 
   def stripe_customer
@@ -112,5 +165,15 @@ class Payment < ApplicationRecord
     return "invoice_payment" if invoice_id.present?
     return "theft_alert" if theft_alert.present?
     kind || "donation" # Use the current kind, if it exists
+  end
+
+  def user_stripe_session_hash
+    if user&.stripe_id.present?
+      {customer: user.stripe_id}
+    else
+      email = email.presence || user&.email
+      return {} unless email.present?
+      {customer_email: user.email}
+    end
   end
 end

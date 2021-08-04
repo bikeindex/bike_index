@@ -11,7 +11,7 @@
 }
 // There is a margin issue on bike edit, fixing it by clobbering here
 @media (min-width: 768px) {
-  #bikes_edit .form-well-header.container {
+  #edit-bike-skeleton .form-well-header.container {
     padding-left: 0;
     padding-right: 0;
   }

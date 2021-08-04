@@ -11,6 +11,8 @@ http_interactions:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_iFfzLePooLrZnU","request_duration_ms":292}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,7 +25,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 02 Jul 2021 19:51:38 GMT
+      - Tue, 03 Aug 2021 22:32:29 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,7 +45,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_A9fSiElZkl3m1U
+      - req_4QEtugFxodZ6lS
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -102,7 +104,7 @@ http_interactions:
           "url": null
         }
     http_version:
-  recorded_at: Fri, 02 Jul 2021 19:51:38 GMT
+  recorded_at: Tue, 03 Aug 2021 22:32:29 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -115,7 +117,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_A9fSiElZkl3m1U","request_duration_ms":267}}'
+      - '{"last_request_metrics":{"request_id":"req_4QEtugFxodZ6lS","request_duration_ms":205}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -128,7 +130,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 02 Jul 2021 19:51:38 GMT
+      - Tue, 03 Aug 2021 22:32:29 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -148,7 +150,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_LgF5pvRiBh5No5
+      - req_JkqAgpVyNQQrnS
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -236,5 +238,5 @@ http_interactions:
           "tax_info_verification": null
         }
     http_version:
-  recorded_at: Fri, 02 Jul 2021 19:51:38 GMT
+  recorded_at: Tue, 03 Aug 2021 22:32:29 GMT
 recorded_with: VCR 5.0.0

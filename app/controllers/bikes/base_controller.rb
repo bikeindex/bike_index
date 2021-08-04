@@ -5,6 +5,12 @@ class BikeUpdatorError < StandardError
 end
 
 class Bikes::BaseController < ApplicationController
+  before_action :find_bike
+  before_action :assign_current_organization
+  before_action :ensure_user_allowed_to_edit
+
+  helper_method :edit_bike_template_path_for
+
   def edit_templates
     return @edit_templates if @edit_templates.present?
     @theft_templates = @bike.status_stolen? ? theft_templates : {}
@@ -12,31 +18,20 @@ class Bikes::BaseController < ApplicationController
     @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
+  def edit_bike_template_path_for(bike, template = nil)
+    if controller_name_for(template) == "bikes"
+      edit_bike_url(bike.id, edit_template: template)
+    elsif template.to_s == "alert"
+      new_bike_theft_alert_path(bike_id: bike.id)
+    else
+      bike_theft_alert_path(bike_id: bike.id)
+    end
+  end
+
   protected
 
-  # Determine the appropriate edit template to use in the edit view.
-  #
-  # If provided an invalid template name, return the default page for a stolen /
-  # unstolen bike and `:is_valid` mapped to false.
-  #
-  # Return a Hash with keys :is_valid (boolean), :template (string)
-  def target_edit_template(requested_page:)
-    result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
-    default_page = @bike.status_stolen? ? :theft_details : :bike_details
-
-    if requested_page.blank?
-      result[:is_valid] = true
-      result[:template] = default_page.to_s
-    elsif requested_page.in?(valid_pages)
-      result[:is_valid] = true
-      result[:template] = requested_page.to_s
-    else
-      result[:is_valid] = false
-      result[:template] = default_page.to_s
-    end
-
-    result
+  def controller_name_for(requested_page)
+    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "bikes"
   end
 
   # NB: Hash insertion order here determines how nav links are displayed in the
@@ -44,10 +39,10 @@ class Bikes::BaseController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:theft_details, controller_method: :edit)
-      h[:publicize] = translation(:publicize, controller_method: :edit)
-      h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
+      h[:theft_details] = translation(:theft_details, scope: [:controllers, :bikes, :edit])
+      h[:publicize] = translation(:publicize, scope: [:controllers, :bikes, :edit])
+      h[:alert] = translation(:alert, scope: [:controllers, :bikes, :edit])
+      h[:report_recovered] = translation(:report_recovered, scope: [:controllers, :bikes, :edit])
     end
   end
 
@@ -56,18 +51,39 @@ class Bikes::BaseController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, controller_method: :edit)
-      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
-      h[:photos] = translation(:photos, controller_method: :edit)
-      h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
-      h[:accessories] = translation(:accessories, controller_method: :edit)
-      h[:ownership] = translation(:ownership, controller_method: :edit)
-      h[:groups] = translation(:groups, controller_method: :edit)
-      h[:remove] = translation(:remove, controller_method: :edit)
+      h[:bike_details] = translation(:bike_details, scope: [:controllers, :bikes, :edit])
+      h[:found_details] = translation(:found_details, scope: [:controllers, :bikes, :edit]) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: [:controllers, :bikes, :edit])
+      h[:drivetrain] = translation(:drivetrain, scope: [:controllers, :bikes, :edit])
+      h[:accessories] = translation(:accessories, scope: [:controllers, :bikes, :edit])
+      h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
+      h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
+      h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
       unless @bike.status_stolen_or_impounded?
-        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
+        h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
       end
     end
+  end
+
+  def setup_edit_template(requested_page = nil)
+    @edit_templates = edit_templates
+    @permitted_return_to = permitted_return_to
+
+    # Determine the appropriate edit template to use in the edit view.
+    #
+    # If provided an invalid template name, redirect to the default page for a stolen /
+    # unstolen bike
+    default_template = @bike.status_stolen? ? "theft_details" : "bike_details"
+    @edit_template = requested_page || default_template
+    valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
+    unless valid_requested_page && controller_name == controller_name_for(@edit_template)
+      redirect_template = valid_requested_page ? @edit_template : default_template
+      redirect_to(edit_bike_template_path_for(@bike, redirect_template))
+      return false
+    end
+
+    @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
+    true
   end
 
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
@@ -118,18 +134,23 @@ class Bikes::BaseController < ApplicationController
 
     if @bike.current_impound_record.present?
       error = if @bike.current_impound_record.organized?
-        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name,
+                                                     scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_impounded, bike_type: type)
+        translation(:bike_impounded, bike_type: type,
+                                     scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     elsif current_user.present?
-      error = translation(:you_dont_own_that, bike_type: type)
+      error = translation(:you_dont_own_that, bike_type: type,
+                                              scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
     else
       store_return_to
       error = if @current_ownership && @bike.current_ownership.claimed
-        translation(:you_have_to_sign_in, bike_type: type)
+        translation(:you_have_to_sign_in, bike_type: type,
+                                          scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_has_not_been_claimed_yet, bike_type: type)
+        translation(:bike_has_not_been_claimed_yet, bike_type: type,
+                                                    scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     end
 
@@ -147,12 +168,16 @@ class Bikes::BaseController < ApplicationController
 
   def assign_bike_stickers(bike_sticker)
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
-    return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker) unless bike_sticker.present?
+    unless bike_sticker.present?
+      return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker,
+                                                                  scope: [:controllers, :bikes, :assign_bike_stickers])
+    end
     bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
     if bike_sticker.errors.any?
       flash[:error] = bike_sticker.errors.full_messages
     else
-      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
+      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
+                                                       scope: [:controllers, :bikes, :assign_bike_stickers])
     end
   end
 

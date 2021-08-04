@@ -36,6 +36,8 @@ class BikeIndex.Init extends BikeIndex
     # If this is a landing page
     if body_id.match 'landing_pages_'
       return window.pageScript = new BikeIndex.LandingPage
+    if body_id.match 'bikes_theft_alerts'
+      return window.pageScript = new BikeIndex.BikesEdit
     # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex

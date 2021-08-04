@@ -1004,38 +1004,6 @@ en:
     edit_accessories:
       add_a_component: Add a component
       other_handlebar_type: Other handlebar type
-    edit_alert:
-      bike_index_can_help: >-
-        Bike Index can help by purchasing targeted ads on Facebook to spread the word
-        about your stolen %{bike_type}.
-      city_state_country: City, State - Country
-      here: here
-      no_photos_add_photos_here_html: >-
-        Uh oh. We don't have any photos of your bike available. Upload one %{link}
-        to set up a promoted alert!
-      preview: Promoted Alert Preview
-      select_an_image: Select an image
-      select_an_image_to_see_preview: >-
-        Select an image of your bike to see a preview of what your promoted alert
-        will look like:
-      select_plan: Select Plan
-      targeted_sharing_html: >-
-        We've found targeted sharing on social media to have a <em>huge</em> effect
-        on recovering stolen bikes.
-    edit_alert_purchase:
-      bike_index_promoted_alert: Bike Index Promoted Alert
-      cancel: Cancel
-      charge: 'Charge: %{price}'
-      confirm: Confirm
-      confirm_your_plan: Confirm your plan
-      here_is_what_youll_get: 'Here is what you''ll get with the %{plan_name} plan:'
-      youve_made_an_excellent_choice: You've made an excellent choice! Please confirm
-        it below.
-    edit_alert_purchase_confirmation:
-      stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
-        processed your alert.
-      thanks: Thanks!
-      your_order_is_pending: Your order is pending.
     edit_bike_details:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}
@@ -1121,9 +1089,9 @@ en:
       finished_uploading: Finished uploading
     edit_primary_menu:
       bike_type_information: "%{bike_type} Information"
+      purchase_alert: Purchase Alert
       save_changes: Save changes
       theft_information: Theft Information
-      you_are_editing: You are editing
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!
@@ -1490,13 +1458,41 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
-    theft_alerts_table:
-      created: Created
-      end: End
-      existing_theft_alerts: Existing Theft Alerts
-      plan: Plan
-      start: Start
-      status: Status
+    theft_alerts:
+      new:
+        best_value: Best value
+        bike_index_can_help: >-
+          Bike Index can help by purchasing targeted ads on Facebook to spread the
+          word about your stolen %{bike_type}.
+        bike_index_promoted_alert: Bike Index Promoted Alert
+        city_state_country: City, State - Country
+        days: Days
+        here: here
+        no_photos_add_photos_here_html: >-
+          Uh oh. We don't have any photos of your bike available. Upload one %{link}
+          to set up a promoted alert!
+        preview: Promoted Alert Preview
+        purchase_alert: Purchase Alert
+        select_an_image: Select an image
+        select_an_image_to_see_preview: >-
+          Select an image of your bike to see a preview of what your promoted alert
+          will look like:
+        targeted_sharing_html: >-
+          We've found targeted sharing on social media to have a <em>huge</em> effect
+          on recovering stolen bikes.
+        views: Views
+      show:
+        stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
+          processed your alert.
+        thank_you: Thanks for buying an alert!
+        your_order_is_pending: Your order is pending.
+      table:
+        created: Created
+        end: End
+        existing_theft_alerts: Existing Promoted Alerts
+        plan: Plan
+        start: Start
+        status: Status
   controllers:
     application:
       handle_unverified_request:
@@ -5307,9 +5303,7 @@ en:
       words_connector: ", "
   theft_alert_plans:
     theft_alert_plan:
-      best_value: Best value
       days: Days
-      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"

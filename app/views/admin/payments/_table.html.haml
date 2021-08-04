@@ -73,7 +73,7 @@
             - if payment.theft_alert?
               = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
             - else
-              = payment.display_kind
+              = payment.kind_humanized
           %td
             - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
