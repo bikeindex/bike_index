@@ -88,8 +88,6 @@ RSpec.describe "BikesController#edit", type: :request do
     # If passed an unknown template, it renders default template
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :bike_details}))
-    expect(assigns(:edit_template)).to eq "bike_details"
-    expect(assigns(:edit_templates)).to eq edit_templates.as_json
   end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }

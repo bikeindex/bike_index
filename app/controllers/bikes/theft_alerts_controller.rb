@@ -1,27 +1,21 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
   def new
-    @edit_templates = edit_templates
-    @permitted_return_to = permitted_return_to
-    requested_page = target_edit_template(requested_page: "alert")
-    @edit_template = requested_page[:template]
+    if setup_edit_template("alert")
+      bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
+      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
-    @skip_general_alert = true
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
+      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
+      @selected_theft_alert_plan =
+        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
+        @theft_alert_plans.order(:amount_cents).second
 
-    @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
-    @selected_theft_alert_plan =
-      @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-      @theft_alert_plans.order(:amount_cents).second
-
-    @theft_alerts =
-      @bike
-        .current_stolen_record
+      @theft_alerts = @bike.current_stolen_record
         .theft_alerts
         .includes(:theft_alert_plan)
         .creation_ordered_desc
         .where(user: current_user)
         .references(:theft_alert_plan)
+    end
   end
 
   def update

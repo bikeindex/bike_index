@@ -28,6 +28,14 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         expect(flash[:error]).to match(/don't own that bike/)
       end
     end
+    context "not stolen bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+      it "redirects without flash error" do
+        get "#{base_url}/new"
+        expect(response).to redirect_to(edit_bike_path(bike, edit_template: "bike_details"))
+        expect(flash).to be_blank
+      end
+    end
   end
 
   describe "create" do
@@ -35,40 +43,40 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
 
     it "successfully creates" do
       expect(bike.current_stolen_record_id).to be_present
-        expect(Payment.count).to eq 0
-        expect(TheftAlert.count).to eq 0
-        Sidekiq::Worker.clear_all
-        ActionMailer::Base.deliveries = []
-        expect(Notification.count).to eq 0
-        Sidekiq::Testing.inline! do
-          expect {
-            post base_url, params: {
-              theft_alert_plan_id: theft_alert_plan.id,
-              bike_id: bike.id,
-            }
-          }.to change(TheftAlert, :count).by(1)
-        end
-        theft_alert = TheftAlert.last
-        expect(theft_alert.theft_alert_plan_id).to eq theft_alert_plan.id
-        expect(theft_alert.user_id).to eq current_user.id
-        expect(theft_alert.bike_id).to eq bike.id
-        expect(theft_alert.stolen_record_id).to eq bike.current_stolen_record_id
-        expect(theft_alert.paid?).to be_falsey
-        expect(theft_alert.payment_id).to be_present
+      expect(Payment.count).to eq 0
+      expect(TheftAlert.count).to eq 0
+      Sidekiq::Worker.clear_all
+      ActionMailer::Base.deliveries = []
+      expect(Notification.count).to eq 0
+      Sidekiq::Testing.inline! do
+        expect {
+          post base_url, params: {
+            theft_alert_plan_id: theft_alert_plan.id,
+            bike_id: bike.id
+          }
+        }.to change(TheftAlert, :count).by(1)
+      end
+      theft_alert = TheftAlert.last
+      expect(theft_alert.theft_alert_plan_id).to eq theft_alert_plan.id
+      expect(theft_alert.user_id).to eq current_user.id
+      expect(theft_alert.bike_id).to eq bike.id
+      expect(theft_alert.stolen_record_id).to eq bike.current_stolen_record_id
+      expect(theft_alert.paid?).to be_falsey
+      expect(theft_alert.payment_id).to be_present
 
-        payment = theft_alert.payment
-        expect(payment.user_id).to eq current_user.id
-        expect(payment.stripe_id).to be_present
-        expect(payment.kind).to eq "theft_alert"
-        expect(payment.stripe_kind).to eq "stripe_session"
-        expect(payment.currency).to eq "USD"
-        expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
-        expect(payment.first_payment_date).to be_blank # Ensure this gets set
-        expect(payment.last_payment_date).to be_blank
-        expect(payment.paid?).to be_falsey
+      payment = theft_alert.payment
+      expect(payment.user_id).to eq current_user.id
+      expect(payment.stripe_id).to be_present
+      expect(payment.kind).to eq "theft_alert"
+      expect(payment.stripe_kind).to eq "stripe_session"
+      expect(payment.currency).to eq "USD"
+      expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
+      expect(payment.first_payment_date).to be_blank # Ensure this gets set
+      expect(payment.last_payment_date).to be_blank
+      expect(payment.paid?).to be_falsey
 
-        # No deliveries, because the payment hasn't been completed
-        expect(ActionMailer::Base.deliveries.count).to eq 0
+      # No deliveries, because the payment hasn't been completed
+      expect(ActionMailer::Base.deliveries.count).to eq 0
       # end
     end
     context "alert image" do

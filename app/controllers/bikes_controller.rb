@@ -150,29 +150,20 @@ class BikesController < Bikes::BaseController
     end
   end
 
-  # NOTE: Most of this controller also is in theft_alerts!!!
   def edit
     @page_errors = @bike.errors
-    @edit_templates = edit_templates
-    @permitted_return_to = permitted_return_to
-    # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
-    requested_page = target_edit_template(requested_page: params[:edit_template] || params[:page])
-    @edit_template = requested_page[:template]
-    unless requested_page[:is_valid]
-      redirect_to(edit_bike_template_path_for(@bike, @edit_template)) && return
-    end
-
-    @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)
-    if @edit_template == "photos"
-      @private_images =
-        PublicImage
+    # NOTE: switched to edit_template param in #2040 (from page), because page is used for pagination
+    if setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
+      if @edit_template == "photos"
+        @private_images = PublicImage
           .unscoped
           .where(imageable_type: "Bike")
           .where(imageable_id: @bike.id)
           .where(is_private: true)
-    end
+      end
 
-    render "edit_#{@edit_template}".to_sym
+      render "edit_#{@edit_template}".to_sym
+    end
   end
 
   def update

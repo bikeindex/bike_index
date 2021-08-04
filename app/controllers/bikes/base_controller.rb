@@ -20,13 +20,11 @@ class Bikes::BaseController < ApplicationController
 
   def edit_bike_template_path_for(bike, template = nil)
     if controller_name_for(template) == "bikes"
-      edit_bike_url(@bike, edit_template: template)
+      edit_bike_url(bike.id, edit_template: template)
+    elsif template.to_s == "alert"
+      new_bike_theft_alert_path(bike_id: bike.id)
     else
-      if template.to_s == "alert"
-        new_bike_theft_alert_path(bike_id: bike.id)
-      else
-        bike_theft_alert_path(bike_id: bike.id)
-      end
+      bike_theft_alert_path(bike_id: bike.id)
     end
   end
 
@@ -38,7 +36,7 @@ class Bikes::BaseController < ApplicationController
   # unstolen bike and `:is_valid` mapped to false.
   #
   # Return a Hash with keys :is_valid (boolean), :template (string)
-  def target_edit_template(requested_page:)
+  def target_edit_template(requested_page)
     result = {}
     valid_pages = [*edit_templates.keys, "alert_purchase_confirmation"]
     default_page = @bike.status_stolen? ? :theft_details : :bike_details
@@ -58,9 +56,8 @@ class Bikes::BaseController < ApplicationController
   end
 
   def controller_name_for(requested_page)
-    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alert" : "bikes"
+    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "bikes"
   end
-
 
   # NB: Hash insertion order here determines how nav links are displayed in the
   # UI. Keys also correspond to template names and query parameters, and values
@@ -91,6 +88,22 @@ class Bikes::BaseController < ApplicationController
         h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
       end
     end
+  end
+
+  def setup_edit_template(requested_page = nil)
+    @edit_templates = edit_templates
+    @permitted_return_to = permitted_return_to
+
+    default_template = @bike.status_stolen? ? "theft_details" : "bike_details"
+    @edit_template = requested_page || default_template
+    valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
+    unless valid_requested_page && controller_name == controller_name_for(@edit_template)
+      redirect_template = valid_requested_page ? @edit_template : default_template
+      redirect_to(edit_bike_template_path_for(@bike, redirect_template)) && return
+    end
+
+    @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
+    true
   end
 
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
@@ -142,22 +155,22 @@ class Bikes::BaseController < ApplicationController
     if @bike.current_impound_record.present?
       error = if @bike.current_impound_record.organized?
         translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name,
-            scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
+                                                     scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
         translation(:bike_impounded, bike_type: type,
-            scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
+                                     scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     elsif current_user.present?
       error = translation(:you_dont_own_that, bike_type: type,
-          scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
+                                              scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
     else
       store_return_to
       error = if @current_ownership && @bike.current_ownership.claimed
         translation(:you_have_to_sign_in, bike_type: type,
-            scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
+                                          scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
         translation(:bike_has_not_been_claimed_yet, bike_type: type,
-            scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
+                                                    scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     end
 
@@ -177,14 +190,14 @@ class Bikes::BaseController < ApplicationController
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
     unless bike_sticker.present?
       return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker,
-        scope: [:controllers, :bikes, :assign_bike_stickers])
+                                                                  scope: [:controllers, :bikes, :assign_bike_stickers])
     end
     bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
     if bike_sticker.errors.any?
       flash[:error] = bike_sticker.errors.full_messages
     else
       flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
-        scope: [:controllers, :bikes, :assign_bike_stickers])
+                                                       scope: [:controllers, :bikes, :assign_bike_stickers])
     end
   end
 
