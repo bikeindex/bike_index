@@ -5,6 +5,7 @@ RSpec.describe TheftAlert, type: :model do
     let(:theft_alert) { FactoryBot.build(:theft_alert) }
     it "is valid" do
       expect(theft_alert.save).to be_truthy
+      expect(TheftAlert.paid.pluck(:id)).to eq([])
     end
     context "begun" do
       let(:theft_alert) { FactoryBot.build(:theft_alert_begun) }
@@ -17,6 +18,7 @@ RSpec.describe TheftAlert, type: :model do
       it "is valid" do
         expect(theft_alert.save).to be_truthy
         expect(theft_alert.payment).to be_present
+        expect(TheftAlert.paid.pluck(:id)).to eq([theft_alert.id])
       end
     end
   end

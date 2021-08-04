@@ -5,14 +5,12 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=payment&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew
+      string: customer_email=user1s%40bikeiasdndex.org&submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=100&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Theft+Alert+Plan+001&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fbikes%2F17810%2Fedit%3Fedit_template%3Dalert_purchase_confirmation%26session_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fbikes%2F17810%2Fedit%3Fedit_template%3Dalert
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_JkqAgpVyNQQrnS","request_duration_ms":203}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 03 Aug 2021 22:32:30 GMT
+      - Tue, 03 Aug 2021 23:49:01 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1304'
+      - '1394'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -45,7 +43,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_PPvZPvu7rIi0G2
+      - req_TvsQCrknVv9uJH
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -56,28 +54,28 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_test_a1ncpzQh9wkQ3gslowswiv3sI26e6AvG43hTjVJe9EIgDIxXPmZqIPSw8B",
+          "id": "cs_test_a1zg4cnmGfUJSORQKh7pcPctE6wtlvfZpWzaP4bTj96G59Mk7TIuEFta2U",
           "object": "checkout.session",
           "allow_promotion_codes": null,
-          "amount_subtotal": 4000,
-          "amount_total": 4000,
+          "amount_subtotal": 100,
+          "amount_total": 100,
           "automatic_tax": {
             "enabled": false,
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://test.host/bikes/17810/edit?edit_template=alert",
           "client_reference_id": null,
           "currency": "usd",
           "customer": null,
           "customer_details": null,
-          "customer_email": null,
+          "customer_email": "user1s@bikeiasdndex.org",
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2JKW9ym0T0GBfX0v1NnoxNcI",
+          "payment_intent": "pi_2JKXM1m0T0GBfX0v1MONHdyk",
           "payment_method_options": {
           },
           "payment_method_types": [
@@ -89,14 +87,14 @@ http_interactions:
           "shipping_address_collection": null,
           "submit_type": "pay",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://test.host/bikes/17810/edit?edit_template=alert_purchase_confirmation\u0026session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_test_a1ncpzQh9wkQ3gslowswiv3sI26e6AvG43hTjVJe9EIgDIxXPmZqIPSw8B#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_test_a1zg4cnmGfUJSORQKh7pcPctE6wtlvfZpWzaP4bTj96G59Mk7TIuEFta2U#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version:
-  recorded_at: Tue, 03 Aug 2021 22:32:30 GMT
+  recorded_at: Tue, 03 Aug 2021 23:49:01 GMT
 recorded_with: VCR 5.0.0

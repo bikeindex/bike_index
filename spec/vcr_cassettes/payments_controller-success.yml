@@ -23,7 +23,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 02 Jul 2021 20:12:46 GMT
+      - Tue, 03 Aug 2021 22:32:28 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,7 +43,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_3WcNBajVLKNICb
+      - req_jpSOebhNATGoRN
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -102,7 +102,7 @@ http_interactions:
           "url": null
         }
     http_version:
-  recorded_at: Fri, 02 Jul 2021 20:12:46 GMT
+  recorded_at: Tue, 03 Aug 2021 22:32:28 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -115,7 +115,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_3WcNBajVLKNICb","request_duration_ms":253}}'
+      - '{"last_request_metrics":{"request_id":"req_jpSOebhNATGoRN","request_duration_ms":264}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -128,7 +128,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 02 Jul 2021 20:12:46 GMT
+      - Tue, 03 Aug 2021 22:32:29 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -148,7 +148,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_x8zrG98UVUz0P4
+      - req_iFfzLePooLrZnU
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-C-Cost:
@@ -236,5 +236,5 @@ http_interactions:
           "tax_info_verification": null
         }
     http_version:
-  recorded_at: Fri, 02 Jul 2021 20:12:46 GMT
+  recorded_at: Tue, 03 Aug 2021 22:32:29 GMT
 recorded_with: VCR 5.0.0

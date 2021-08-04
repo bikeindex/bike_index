@@ -1,0 +1,81 @@
+= form_tag bike_theft_alert_path, method: :post, class: "primary-edit-bike-form", id: "alert-form" do |f|
+  = hidden_field_tag :edit_template, :alert_purchase
+  = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan.id
+  = hidden_field_tag :bike_id, @bike.id
+  = hidden_field_tag :selected_bike_image_id
+  = hidden_field_tag :currency, default_currency
+  = hidden_field_tag :description, t(".bike_index_promoted_alert")
+  = hidden_field_tag :locale, params[:locale] if params[:locale].present?
+
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: "bikes/edit_primary_menu", locals: {purchase_plan_button: true}
+
+      .col-md-8.form-well
+        .form-wrap
+          .form-well-form-header-always-visible
+            %h3.uncap= @edit_templates[@edit_template]
+          .row
+            .col-sm-12
+              %p= t(".targeted_sharing_html")
+              %p= t(".bike_index_can_help", bike_type: @bike.type)
+
+          .row
+            - preferred_plan = @theft_alert_plans.max_by(&:amount_cents)
+            - @theft_alert_plans.each do |theft_alert_plan|
+              - is_selected = (theft_alert_plan == @selected_theft_alert_plan)
+              - is_preferred = (theft_alert_plan == preferred_plan) if preferred_plan.present?
+              .col-md-12.col-lg-4
+                .detail-card-container.js-plan-container{class: (is_selected ? "selected" : ""), "data-id" => theft_alert_plan.id}
+                  .detail-card-title
+                    = theft_alert_plan.name
+                    - if is_preferred
+                      .preferred-tag= t(".best_value")
+                  .detail-card
+                    .detail-card-subtitle
+                      %strong= number_with_delimiter(theft_alert_plan.views)
+                      = t(".views")
+                    .detail-card-subtitle
+                      %strong= theft_alert_plan.duration_days
+                      = t(".days")
+                    .detail-card-subtitle.detail-card-price
+                      = number_to_currency(theft_alert_plan.amount_cents / 100.0)
+                  .detail-card-content-main
+                    = theft_alert_plan.description_html.html_safe
+                  .detail-card-subtitle.detail-card-footer.js-plan-select
+
+          -# Select an image
+          %h3.text-center.mt-4.w-100.mb-1
+            = t(".select_an_image")
+          .row
+            .col-sm-12.mt-4
+              - if @bike.public_images.none?
+                %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit?edit_template=alert")))
+              - else
+                .image-selection-container#js-select-image-container
+                  -# Promoted Alert Image Preview
+                  .selection-preview.text-center.w-100#js-selection-preview.mb-2
+                    .selection-preview-image-template
+                      .selection-preview-image#js-selection-preview-image
+                        = image_tag @bike.public_images.first.image_url(:medium)
+                      .selection-preview-caption
+                        -# Display a generic location "City, State - Country"
+                           since users may see this preview before having
+                           entered theft details.
+                        = t(".city_state_country")
+                    %strong= t(".preview")
+                  %em= t(".select_an_image_to_see_preview")
+                  %ul
+                    - @bike.public_images.each_with_index do |image, i|
+                      = content_tag "li",
+                        class: (i.zero? ? "selected js-image-select" : "js-image-select"),
+                        data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
+                        = image_tag image.image_url(:medium)
+
+            -# Submit form / purchase a plan - force display even on small screens
+            .mt-5.text-center.w-100
+              = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
+
+      .col-md-8.form-well
+        .mt-4
+          = render partial: "/bikes/theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }

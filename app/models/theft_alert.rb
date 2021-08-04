@@ -23,7 +23,7 @@ class TheftAlert < ApplicationRecord
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
-  scope :paid, -> { where.not(payment_id: nil) }
+  scope :paid, -> { joins(:payment).where.not(payments: {first_payment_date: nil}) }
   scope :posted, -> { where.not(begin_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }

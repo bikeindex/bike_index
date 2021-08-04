@@ -76,9 +76,6 @@ Rails.application.routes.draw do
     collection { get :success }
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
-  resources :theft_alerts, only: [:create] do
-    collection { get :success }
-  end
   resources :documentation, only: [:index] do
     collection do
       get :api_v1
@@ -154,6 +151,7 @@ Rails.application.routes.draw do
       put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
+    resource :theft_alert, only: %i[new create update], controller: "bikes/theft_alerts"
   end
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
