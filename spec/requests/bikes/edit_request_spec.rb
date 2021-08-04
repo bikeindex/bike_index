@@ -23,7 +23,7 @@ RSpec.describe "BikesController#edit", type: :request do
     {
       theft_details: "Theft details",
       publicize: "Share on Social Media",
-      new_theft_alert: "Activate Promoted Alert",
+      alert: "Activate Promoted Alert",
       report_recovered: "Mark this Bike Recovered"
     }
   end
@@ -102,8 +102,8 @@ RSpec.describe "BikesController#edit", type: :request do
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
-      # It redirects "alert" to new_theft_alert, for backward compatibility
-      # TODO: Sometime after merging #2041, remove this redirect
+      # It redirects "alert" to new_bike_theft_alert, for backward compatibility
+      # Maybe sometime after merging #2041, stop redirecting?
       get "#{base_url}?edit_template=alert"
       expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
       expect(flash).to be_blank
@@ -145,59 +145,41 @@ RSpec.describe "BikesController#edit", type: :request do
         expect(response).to render_template "edit_theft_details"
       end
     end
-    # context "test all the templates" do
-    #   let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-    #   let(:templates) do
-    #     # Grab all the template keys from the controller so we can test that we
-    #     # render all of them Both to ensure we get all of them and because we
-    #     # can't use the let block
-    #     bc = BikesController.new
-    #     bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
-    #     bc.edit_templates.keys + ["alert_purchase_confirmation"]
-    #   end
-    #   let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove alert_purchase_confirmation] }
-    #   before { FactoryBot.create_list(:theft_alert_plan, 3) }
-    #   it "renders the template" do
-    #     # Ensure stolen bike is set up correctly
-    #     stolen_record.reload
-    #     bike.reload
-    #     expect(bike.current_stolen_record).to eq stolen_record
-    #     expect(bike.current_stolen_record.without_location?).to be_truthy
-    #     expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+    context "test all the edit templates" do
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+      let(:templates) do
+        # Grab all the template keys from the controller so we can test that we
+        # render all of them Both to ensure we get all of them and because we
+        # can't use the let block
+        bc = BikesController.new
+        bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
+        # Don't test alert templates, they're in theft alerts controller
+        bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
+      end
+      let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove] }
+      before { FactoryBot.create_list(:theft_alert_plan, 3) }
+      it "renders the template" do
+        # Ensure stolen bike is set up correctly
+        stolen_record.reload
+        bike.reload
+        expect(bike.current_stolen_record).to eq stolen_record
+        expect(bike.current_stolen_record.without_location?).to be_truthy
+        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+        templates.each do |template|
+          get base_url, params: {id: bike.id, edit_template: template}
 
-    #     templates.each do |template|
-    #       get base_url, params: {id: bike.id, edit_template: template}
+          expect(response.status).to eq(200)
+          expect(response).to render_template("edit_#{template}")
+          expect(assigns(:edit_template)).to eq(template)
+          expect(assigns(:private_images)).to eq([]) if template == "photos"
+          expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
 
-    #       expect(response.status).to eq(200)
-    #       expect(response).to render_template("edit_#{template}")
-    #       expect(assigns(:edit_template)).to eq(template)
-    #       expect(assigns(:private_images)).to eq([]) if template == "photos"
-    #       expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
-
-    #       should_show_general_alert = no_global_alert_templates.exclude?(template)
-    #       pp template unless assigns(:show_general_alert) == should_show_general_alert
-    #       expect(assigns(:show_general_alert)).to eq should_show_general_alert
-    #     end
-    #   end
-    #   # context "with a purchased alert and stolen location" do
-    #   #   it "does not render show_general_alert on photos" do
-    #   #     user.update_attributes(alert_slugs: ["theft_alert_without_photo"])
-
-    #   #     templates.each do |template|
-    #   #       get base_url, params: {id: bike.id, edit_template: template}
-
-    #   #       expect(response.status).to eq(200)
-    #   #       expect(response).to render_template("edit_#{template}")
-    #   #       expect(assigns(:edit_template)).to eq(template)
-    #   #       expect(assigns(:private_images)).to eq([]) if template == "photos"
-    #   #       expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
-    #   #       should_show_general_alert = no_global_alert_templates.exclude?(template)
-    #   #       pp template unless assigns(:show_general_alert) == should_show_general_alert
-    #   #       expect(assigns(:show_general_alert)).to eq(should_show_general_alert)
-    #   #     end
-    #   #   end
-    #   # end
-    # end
+          should_show_general_alert = no_global_alert_templates.exclude?(template)
+          pp template unless assigns(:show_general_alert) == should_show_general_alert
+          expect(assigns(:show_general_alert)).to eq should_show_general_alert
+        end
+      end
+    end
   end
 
   context "with impound_record" do

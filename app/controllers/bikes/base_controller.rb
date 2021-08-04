@@ -9,11 +9,25 @@ class Bikes::BaseController < ApplicationController
   before_action :assign_current_organization
   before_action :ensure_user_allowed_to_edit
 
+  helper_method :edit_bike_template_path_for
+
   def edit_templates
     return @edit_templates if @edit_templates.present?
     @theft_templates = @bike.status_stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)
+  end
+
+  def edit_bike_template_path_for(bike, template = nil)
+    if not_bikes_controller_templates.include?(template.to_s)
+      if template.to_s == "alert"
+        new_bike_theft_alert_path(bike_id: bike.id)
+      else
+        bike_theft_alert_path(bike_id: bike.id)
+      end
+    else
+      edit_bike_url(@bike, edit_template: template)
+    end
   end
 
   protected
@@ -33,15 +47,24 @@ class Bikes::BaseController < ApplicationController
       result[:is_valid] = true
       result[:template] = default_page.to_s
     elsif requested_page.in?(valid_pages)
-      result[:is_valid] = true
+      result[:is_valid] = if not_bikes_controller_templates.include?(requested_page.to_s)
+        controller_name != "bikes"
+      else
+        controller_name == "bikes"
+      end
       result[:template] = requested_page.to_s
     else
       result[:is_valid] = false
-      result[:template] = requested_page == "alert" ? :new_theft_alert : default_page.to_s
+      result[:template] = default_page.to_s
     end
 
     result
   end
+
+  def not_bikes_controller_templates
+    %w[alert alert_purchase_confirmation]
+  end
+
 
   # NB: Hash insertion order here determines how nav links are displayed in the
   # UI. Keys also correspond to template names and query parameters, and values
@@ -50,7 +73,7 @@ class Bikes::BaseController < ApplicationController
     {}.with_indifferent_access.tap do |h|
       h[:theft_details] = translation(:theft_details, scope: [:controllers, :bikes, :edit])
       h[:publicize] = translation(:publicize, scope: [:controllers, :bikes, :edit])
-      h[:new_theft_alert] = translation(:new_theft_alert, scope: [:controllers, :bikes, :edit])
+      h[:alert] = translation(:alert, scope: [:controllers, :bikes, :edit])
       h[:report_recovered] = translation(:report_recovered, scope: [:controllers, :bikes, :edit])
     end
   end

@@ -10,18 +10,22 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
 
   describe "new" do
     it "renders" do
+      # there need to be 2 plans
+      FactoryBot.create(:theft_alert_plan)
+      theft_alert_plan2 = FactoryBot.create(:theft_alert_plan)
       get "#{base_url}/new"
       expect(response.code).to eq("200")
       expect(response).to render_template("new")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_falsey
+      expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
     end
     context "current user not owner of bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
       it "flash errors and redirects" do
         get "#{base_url}/new"
         expect(response).to redirect_to(bike_path(bike))
-        expect(flash[:error]).to match(/not authorized party/)
+        expect(flash[:error]).to match(/don't own that bike/)
       end
     end
   end

@@ -158,11 +158,8 @@ class BikesController < Bikes::BaseController
     # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
     requested_page = target_edit_template(requested_page: params[:edit_template] || params[:page])
     @edit_template = requested_page[:template]
-    # TODO: Handle this better. Did this way to ensure backward link compatibility in #2041
-    if @edit_template == :new_theft_alert # Doesn't matter if is_valid or not, needs to go to a new controller
-      redirect_to(new_bike_theft_alert_path(@bike)) && return
-    elsif !requested_page[:is_valid]
-      redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
+    unless requested_page[:is_valid]
+      redirect_to(edit_bike_template_path_for(@bike, @edit_template)) && return
     end
 
     @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)

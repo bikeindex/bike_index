@@ -1518,7 +1518,7 @@ en:
         bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
       edit:
         accessories: Accessories and Components
-        new_theft_alert: Activate Promoted Alert
+        alert: Activate Promoted Alert
         bike_details: Bike Details
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
