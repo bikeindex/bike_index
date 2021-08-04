@@ -19,14 +19,14 @@ class Bikes::BaseController < ApplicationController
   end
 
   def edit_bike_template_path_for(bike, template = nil)
-    if not_bikes_controller_templates.include?(template.to_s)
+    if controller_name_for(template) == "bikes"
+      edit_bike_url(@bike, edit_template: template)
+    else
       if template.to_s == "alert"
         new_bike_theft_alert_path(bike_id: bike.id)
       else
         bike_theft_alert_path(bike_id: bike.id)
       end
-    else
-      edit_bike_url(@bike, edit_template: template)
     end
   end
 
@@ -47,11 +47,7 @@ class Bikes::BaseController < ApplicationController
       result[:is_valid] = true
       result[:template] = default_page.to_s
     elsif requested_page.in?(valid_pages)
-      result[:is_valid] = if not_bikes_controller_templates.include?(requested_page.to_s)
-        controller_name != "bikes"
-      else
-        controller_name == "bikes"
-      end
+      result[:is_valid] = controller_name == controller_name_for(requested_page)
       result[:template] = requested_page.to_s
     else
       result[:is_valid] = false
@@ -61,8 +57,8 @@ class Bikes::BaseController < ApplicationController
     result
   end
 
-  def not_bikes_controller_templates
-    %w[alert alert_purchase_confirmation]
+  def controller_name_for(requested_page)
+    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alert" : "bikes"
   end
 
 
