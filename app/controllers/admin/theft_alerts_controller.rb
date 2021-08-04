@@ -62,7 +62,11 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   # Override, set one week before earliest created theft alert
   def earliest_period_date
-    Time.at(1560805519)
+    if @search_facebook_data
+      Time.at(1624982189)
+    else
+      Time.at(1560805519)
+    end
   end
 
   def sortable_columns
@@ -82,6 +86,10 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
+    @search_paid = ParamsNormalizer.boolean(params[:search_paid])
+    theft_alerts = theft_alerts.paid if @search_paid
+    @search_facebook_data = ParamsNormalizer.boolean(params[:search_facebook_data])
+    theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
       theft_alerts = if @status == "posted"
@@ -107,7 +115,10 @@ class Admin::TheftAlertsController < Admin::BaseController
       bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)
     end
-    theft_alerts.where(created_at: @time_range)
+
+    # Only handling created_at now
+    @time_range_column ||= "created_at"
+    theft_alerts.where(@time_range_column => @time_range)
   end
 
   # Deprecated - should be removed soon.

@@ -8,12 +8,15 @@ module GraphingHelper
       .count
   end
 
-  def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil)
+  def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil, convert_to_dollars: false)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
-    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
+    result = collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
       .sum(amount_column)
-      .map { |k, v| [k, (v.to_f / 100.00).round(2)] } # Convert cents to dollars
+
+    return result unless convert_to_dollars
+
+    result.map { |k, v| [k, (v.to_f / 100.00).round(2)] } # Convert cents to dollars
       .to_h
   end
 
