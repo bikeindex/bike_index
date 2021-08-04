@@ -51,6 +51,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
       }.to change(Notification, :count).by 1
       theft_alert.reload
       expect(theft_alert.facebook_post_url).to be_present
+      expect(theft_alert.posted?).to be_truthy
       expect(theft_alert.live?).to be_truthy
 
       expect(theft_alert.notify?).to be_truthy
