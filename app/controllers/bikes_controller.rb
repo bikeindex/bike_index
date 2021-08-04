@@ -150,6 +150,7 @@ class BikesController < Bikes::BaseController
     end
   end
 
+  # NOTE: Most of this controller also is in theft_alerts!!!
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
@@ -157,40 +158,21 @@ class BikesController < Bikes::BaseController
     # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
     requested_page = target_edit_template(requested_page: params[:edit_template] || params[:page])
     @edit_template = requested_page[:template]
-    unless requested_page[:is_valid]
+    # TODO: Handle this better. Did this way to ensure backward link compatibility in #2041
+    if @edit_template == :new_theft_alert # Doesn't matter if is_valid or not, needs to go to a new controller
+      redirect_to(new_bike_theft_alert_path(@bike)) && return
+    elsif !requested_page[:is_valid]
       redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
     end
 
     @skip_general_alert = %w[photos theft_details report_recovered remove].include?(@edit_template)
-    case @edit_template
-    when "photos"
+    if @edit_template == "photos"
       @private_images =
         PublicImage
           .unscoped
           .where(imageable_type: "Bike")
           .where(imageable_id: @bike.id)
           .where(is_private: true)
-    when /alert/
-      unless @bike&.current_stolen_record.present?
-        redirect_to(edit_bike_url(@bike, edit_template: @edit_template)) && return
-      end
-      @skip_general_alert = true
-      bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
-      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
-      @selected_theft_alert_plan =
-        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-        @theft_alert_plans.order(:amount_cents).second
-
-      @theft_alerts =
-        @bike
-          .current_stolen_record
-          .theft_alerts
-          .includes(:theft_alert_plan)
-          .creation_ordered_desc
-          .where(user: current_user)
-          .references(:theft_alert_plan)
     end
 
     render "edit_#{@edit_template}".to_sym
