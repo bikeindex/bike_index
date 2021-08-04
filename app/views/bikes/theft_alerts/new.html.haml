@@ -9,7 +9,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "bikes/edit_primary_menu", locals: {purchase_plan_button: true}
+      = render partial: "/shared/edit_bike_primary_menu", locals: {purchase_plan_button: true}
 
       .col-md-8.form-well
         .form-wrap
@@ -78,4 +78,4 @@
 
       .col-md-8.form-well
         .mt-4
-          = render partial: "/bikes/theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
+          = render partial: "table", locals: { theft_alerts: @theft_alerts, first_form_well: true }

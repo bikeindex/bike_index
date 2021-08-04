@@ -151,7 +151,7 @@ Rails.application.routes.draw do
       put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
-    resource :theft_alert, only: %i[new create update], controller: "bikes/theft_alerts"
+    resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
   end
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"

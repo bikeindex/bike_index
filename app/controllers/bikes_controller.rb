@@ -1,11 +1,11 @@
 class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
-  before_action :find_bike, only: %i[show edit update pdf resolve_token]
-  before_action :assign_current_organization, only: %i[index show edit]
-  before_action :ensure_user_allowed_to_edit, only: %i[edit update pdf]
   before_action :render_ad, only: %i[index show]
   before_action :remove_subdomain, only: %i[index]
+  skip_before_action :find_bike, except: %i[show edit update pdf resolve_token]
+  skip_before_action :assign_current_organization, except: %i[index show edit]
+  skip_before_action :ensure_user_allowed_to_edit, except: %i[edit update pdf]
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)

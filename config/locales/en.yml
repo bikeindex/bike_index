@@ -923,11 +923,6 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
-    edit_primary_menu:
-      bike_type_information: "%{bike_type} Information"
-      purchase_alert: Purchase Alert
-      save_changes: Save changes
-      theft_information: Theft Information
   bikes:
     bike:
       hidden_because_status: because %{bike_type} is %{status}
@@ -1458,13 +1453,6 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
-    theft_alerts_table:
-      created: Created
-      end: End
-      existing_theft_alerts: Existing Promoted Alerts
-      plan: Plan
-      start: Start
-      status: Status
     theft_alerts:
       new:
         bike_index_can_help: >-
@@ -1489,11 +1477,18 @@ en:
         best_value: Best value
         days: Days
         views: Views
-      create:
+      show:
         stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
           processed your alert.
         thanks: Thanks!
         your_order_is_pending: Your order is pending.
+      table:
+        created: Created
+        end: End
+        existing_theft_alerts: Existing Promoted Alerts
+        plan: Plan
+        start: Start
+        status: Status
   controllers:
     application:
       handle_unverified_request:
@@ -1519,6 +1514,7 @@ en:
       edit:
         accessories: Accessories and Components
         bike_details: Bike Details
+        alert: Activate Promoted Alert
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
@@ -4968,6 +4964,11 @@ en:
       serial: 'Serial:'
       stolen_at: 'Stolen at:'
       stolen_from: 'Stolen from:'
+    edit_bike_primary_menu:
+      bike_type_information: "%{bike_type} Information"
+      purchase_alert: Purchase Alert
+      save_changes: Save changes
+      theft_information: Theft Information
     errors:
       error: error
       errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}

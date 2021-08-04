@@ -65,7 +65,7 @@ class Payment < ApplicationRecord
 
   def stripe_success_url
     if theft_alert?
-      "#{ENV["BASE_URL"]}/bikes/#{theft_alert.bike_id}/theft_alerts?session_id={CHECKOUT_SESSION_ID}"
+      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alerts?session_id={CHECKOUT_SESSION_ID}"
     else
       "#{ENV["BASE_URL"]}/payments/success?session_id={CHECKOUT_SESSION_ID}"
     end
@@ -86,7 +86,7 @@ class Payment < ApplicationRecord
     elsif email.present?
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
     end
-    self.amount_cents ||= theft_alert.amount_cents if theft_alert?
+    self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
   end
 

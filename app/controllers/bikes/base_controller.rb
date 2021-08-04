@@ -5,6 +5,10 @@ class BikeUpdatorError < StandardError
 end
 
 class Bikes::BaseController < ApplicationController
+  before_action :find_bike
+  before_action :assign_current_organization
+  before_action :ensure_user_allowed_to_edit
+
   def edit_templates
     return @edit_templates if @edit_templates.present?
     @theft_templates = @bike.status_stolen? ? theft_templates : {}
@@ -44,10 +48,10 @@ class Bikes::BaseController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:theft_details, controller_method: :edit)
-      h[:publicize] = translation(:publicize, controller_method: :edit)
-      h[:alert] = translation(:alert, controller_method: :edit)
-      h[:report_recovered] = translation(:report_recovered, controller_method: :edit)
+      h[:theft_details] = translation(:theft_details, scope: [:controllers, :bikes, :edit])
+      h[:publicize] = translation(:publicize, scope: [:controllers, :bikes, :edit])
+      h[:alert] = translation(:alert, scope: [:controllers, :bikes, :edit])
+      h[:report_recovered] = translation(:report_recovered, scope: [:controllers, :bikes, :edit])
     end
   end
 
@@ -56,16 +60,16 @@ class Bikes::BaseController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, controller_method: :edit)
-      h[:found_details] = translation(:found_details, controller_method: :edit) if @bike.status_found?
-      h[:photos] = translation(:photos, controller_method: :edit)
-      h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
-      h[:accessories] = translation(:accessories, controller_method: :edit)
-      h[:ownership] = translation(:ownership, controller_method: :edit)
-      h[:groups] = translation(:groups, controller_method: :edit)
-      h[:remove] = translation(:remove, controller_method: :edit)
+      h[:bike_details] = translation(:bike_details, scope: [:controllers, :bikes, :edit])
+      h[:found_details] = translation(:found_details, scope: [:controllers, :bikes, :edit]) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: [:controllers, :bikes, :edit])
+      h[:drivetrain] = translation(:drivetrain, scope: [:controllers, :bikes, :edit])
+      h[:accessories] = translation(:accessories, scope: [:controllers, :bikes, :edit])
+      h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
+      h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
+      h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
       unless @bike.status_stolen_or_impounded?
-        h[:report_stolen] = translation(:report_stolen, controller_method: :edit)
+        h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
       end
     end
   end
@@ -118,18 +122,23 @@ class Bikes::BaseController < ApplicationController
 
     if @bike.current_impound_record.present?
       error = if @bike.current_impound_record.organized?
-        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name)
+        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name,
+            scope: [:controllers, :bike, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_impounded, bike_type: type)
+        translation(:bike_impounded, bike_type: type,
+            scope: [:controllers, :bike, :ensure_user_allowed_to_edit])
       end
     elsif current_user.present?
-      error = translation(:you_dont_own_that, bike_type: type)
+      error = translation(:you_dont_own_that, bike_type: type,
+          scope: [:controllers, :bike, :ensure_user_allowed_to_edit])
     else
       store_return_to
       error = if @current_ownership && @bike.current_ownership.claimed
-        translation(:you_have_to_sign_in, bike_type: type)
+        translation(:you_have_to_sign_in, bike_type: type,
+            scope: [:controllers, :bike, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_has_not_been_claimed_yet, bike_type: type)
+        translation(:bike_has_not_been_claimed_yet, bike_type: type,
+            scope: [:controllers, :bike, :ensure_user_allowed_to_edit])
       end
     end
 
@@ -147,12 +156,14 @@ class Bikes::BaseController < ApplicationController
 
   def assign_bike_stickers(bike_sticker)
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
-    return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker) unless bike_sticker.present?
+    unless bike_sticker.present?
+      return flash[:error] = translation(:unable_to_find_sticker, scope: [:controllers, :bike, :assign_bike_stickers], bike_sticker: bike_sticker)
+    end
     bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
     if bike_sticker.errors.any?
       flash[:error] = bike_sticker.errors.full_messages
     else
-      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
+      flash[:success] = translation(:sticker_assigned, scope: [:controllers, :bike, :assign_bike_stickers], bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
     end
   end
 

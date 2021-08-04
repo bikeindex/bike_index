@@ -1,8 +1,4 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
-  before_action :find_bike
-  before_action :assign_current_organization
-  before_action :ensure_user_allowed_to_edit
-
   def new
     @edit_templates = edit_templates
     @permitted_return_to = permitted_return_to
