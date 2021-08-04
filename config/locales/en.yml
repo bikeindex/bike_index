@@ -1087,6 +1087,11 @@ en:
       drag_the_uploaded_photos: Drag the uploaded photos to rearrange the order in
         which they appear
       finished_uploading: Finished uploading
+    edit_primary_menu:
+      bike_type_information: "%{bike_type} Information"
+      purchase_alert: Purchase Alert
+      save_changes: Save changes
+      theft_information: Theft Information
     edit_publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!
@@ -1455,11 +1460,13 @@ en:
       your_police_report: your Police Report Number
     theft_alerts:
       new:
+        best_value: Best value
         bike_index_can_help: >-
-          Bike Index can help by purchasing targeted ads on Facebook to spread the word
-          about your stolen %{bike_type}.
+          Bike Index can help by purchasing targeted ads on Facebook to spread the
+          word about your stolen %{bike_type}.
         bike_index_promoted_alert: Bike Index Promoted Alert
         city_state_country: City, State - Country
+        days: Days
         here: here
         no_photos_add_photos_here_html: >-
           Uh oh. We don't have any photos of your bike available. Upload one %{link}
@@ -1474,8 +1481,6 @@ en:
         targeted_sharing_html: >-
           We've found targeted sharing on social media to have a <em>huge</em> effect
           on recovering stolen bikes.
-        best_value: Best value
-        days: Days
         views: Views
       show:
         stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
@@ -1513,8 +1518,8 @@ en:
         bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
       edit:
         accessories: Accessories and Components
-        bike_details: Bike Details
         alert: Activate Promoted Alert
+        bike_details: Bike Details
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
@@ -4964,11 +4969,6 @@ en:
       serial: 'Serial:'
       stolen_at: 'Stolen at:'
       stolen_from: 'Stolen from:'
-    edit_bike_primary_menu:
-      bike_type_information: "%{bike_type} Information"
-      purchase_alert: Purchase Alert
-      save_changes: Save changes
-      theft_information: Theft Information
     errors:
       error: error
       errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
