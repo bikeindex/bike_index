@@ -289,9 +289,11 @@ class StolenRecord < ApplicationRecord
     return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
 
     new_image = AlertImage.new(stolen_record: self)
+
+    # Try to fallback to main image
+    bike_image = bike_main_image if bike_image&.image.blank?
     if bike_image&.image.blank?
-      fallback_image = bike_main_image&.image.present? ? bike_main_image : bike.stock_photo_url
-      new_image.remote_image_url = fallback_image
+      new_image.remote_image_url = bike.stock_photo_url
     else
       new_image.image = bike_image.image
     end
