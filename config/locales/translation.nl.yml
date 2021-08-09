@@ -162,6 +162,47 @@ nl:
         restrict_dependent_destroy:
           has_many: Kan item niet verwijderen omdat afhankelijke %{record} bestaan
           has_one: Kan item niet verwijderen omdat %{record} afhankelijk is
+        access_denied: De resource eigenaar of authorisatie-server weigerde het verzoek.
+        admin_authenticator_not_configured: Access to admin panel is forbidden due
+          to Doorkeeper.configure.admin_authenticator being unconfigured.
+        credential_flow_not_configured: Resource Owner Password Credentials flow failed
+          due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.
+        invalid_client: Client verificatie is mislukt door onbekende klant, geen client
+          authenticatie opgegeven, of een niet-ondersteunde authenticatie methode.
+        invalid_code_challenge_method: The code challenge method must be plain or
+          S256.
+        invalid_grant: De verstrekte authorisatie is ongeldig, verlopen, ingetrokken,
+          komt niet overeen met de redirect uri die is opgegeven, of werd uitgegeven
+          aan een andere klant.
+        invalid_redirect_uri: De opgegeven redirect uri is niet geldig.
+        invalid_request:
+          missing_param: 'Ontbrekende vereiste parameter: %{value}.'
+          request_not_authorized: Verzoek moet worden geautoriseerd. Vereiste parameter
+            voor het autoriseren van de aanvraag ontbreekt of is ongeldig.
+          unknown: Het verzoek mist een vereiste parameter, bevat een niet-ondersteunde
+            parameter waarde of is anderszins onjuist.
+        invalid_scope: De opgevraagde scope is niet geldig, onbekend of onjuist.
+        invalid_token:
+          expired: Het toegangstoken is verlopen
+          revoked: Het toegangstoken is geweigerd
+          unknown: Het toegangstoken is ongeldig
+        resource_owner_authenticator_not_configured: Resource Owner find failed due
+          to Doorkeeper.configure.resource_owner_authenticator being unconfiged.
+        revoke:
+          unauthorized: U bent niet bevoegd om dit token in te trekken
+        server_error: De authorisatie server is een onverwachte voorwaarde tegengekomen
+          die het verzoek verhinderd.
+        temporarily_unavailable: De authorisatie-server is momenteel niet in staat
+          het verzoek te behandelen als gevolg van een tijdelijke overbelasting of
+          onderhoud aan de server.
+        unauthorized_client: De client is niet bevoegd om dit verzoek met deze methode
+          uit te voeren.
+        unsupported_grant_type: Het type authorisatie is niet ondersteund door de
+          authorisatie-server
+        unsupported_response_mode: De autorisatieserver ondersteunt deze reactiemodus
+          niet.
+        unsupported_response_type: De authorisatie server ondersteund dit response
+          type niet
       models:
         doorkeeper/application:
           attributes:
@@ -1579,8 +1620,6 @@ nl:
         date_format: "%d-%m-%Y %H:%M:%S"
     errors:
       messages:
-        invalid_request: Het verzoek mist een vereiste parameter, bevat een niet-ondersteunde
-          parameter waarde of is anderszins onjuist.
         invalid_redirect_uri: De opgegeven redirect uri is niet geldig.
         unauthorized_client: De client is niet bevoegd om dit verzoek met deze methode
           uit te voeren.
@@ -1616,6 +1655,14 @@ nl:
           to Doorkeeper.configure.admin_authenticator being unconfigured.
         revoke:
           unauthorized: U bent niet bevoegd om dit token in te trekken
+        invalid_request:
+          unknown: Het verzoek mist een vereiste parameter, bevat een niet-ondersteunde
+            parameter waarde of is anderszins onjuist.
+          missing_param: 'Ontbrekende vereiste parameter: %{value}.'
+          not_support_pkce: Ongeldige code_verifier-parameter. Server ondersteunt
+            pkce niet.
+          request_not_authorized: Verzoek moet worden geautoriseerd. Vereiste parameter
+            voor het autoriseren van de aanvraag ontbreekt of is ongeldig.
     flash:
       applications:
         create:
