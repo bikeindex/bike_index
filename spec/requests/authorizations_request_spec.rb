@@ -50,15 +50,18 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       get authorization_url
       expect(response.code).to eq("200")
       expect(response).to render_template(:new)
+      expect(response.body).to match(/authorize/i)
+      expect(response.body).to match(/form action=.\/oauth\/authorize/)
     end
 
     context "no scope" do
       let(:scope_param) { "" }
-      it "renders" do
+      it "errors" do
+        # We require a scope parameter to be passed
         get authorization_url
         expect(response.code).to eq("200")
-        expect(response).to render_template(:new)
-        expect(response.body).to match(//)
+        expect(response).to render_template(:error)
+        expect(response.body).to match("Missing required parameter: scope")
       end
     end
 

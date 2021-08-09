@@ -63,7 +63,8 @@ Doorkeeper.configure do
   enable_application_owner confirmation: true
 
   # Define access token scopes for your provider
-  default_scopes :public
+  # Authorizing with no scope parameter fails, because no default_scope - this is the current expected behavior
+  # default_scopes :public
   optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership, :write_organizations, :unconfirmed
 
   # Change the way client credentials are retrieved from the request object.
