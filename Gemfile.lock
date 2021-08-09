@@ -157,6 +157,8 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.2.6)
       railties (>= 5)
+    doorkeeper-i18n (5.2.2)
+      doorkeeper (>= 5.2)
     dotenv (2.7.5)
     dotenv-rails (2.7.5)
       dotenv (= 2.7.5)
@@ -716,6 +718,7 @@ DEPENDENCIES
   coffee-rails
   database_cleaner
   doorkeeper (~> 5.2.5)
+  doorkeeper-i18n
   dotenv-rails
   eventmachine
   facebookbusiness (~> 0.11.0)!

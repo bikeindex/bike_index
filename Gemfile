@@ -81,6 +81,7 @@ gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sd
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
 gem "doorkeeper", "~> 5.2.5" # OAuth providing
+gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape", "~> 0.19.1" # API DSL
 gem "grape-active_model_serializers", "~> 1.4.0"
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)

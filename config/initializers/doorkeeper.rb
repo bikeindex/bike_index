@@ -63,7 +63,8 @@ Doorkeeper.configure do
   enable_application_owner confirmation: true
 
   # Define access token scopes for your provider
-  # default_scopes  :public
+  # Authorizing with no scope parameter fails, because no default_scope - this is the current expected behavior
+  # default_scopes :public
   optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership, :write_organizations, :unconfirmed
 
   # Change the way client credentials are retrieved from the request object.
@@ -106,7 +107,7 @@ Doorkeeper.configure do
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
   # For example if dealing with trusted a application.
-  skip_authorization do |resource_owner, client|
+  skip_authorization do |_resource_owner, client|
     client.application.is_internal
   end
 

@@ -102,9 +102,8 @@
     - elsif show_general_alert
       = render "/shared/user_general_alert"
 
-    -# Cache this render callout to avoid allocations, 1 for breaking cache
-    - cache("footer_revised1") do
-      = render 'shared/footer_revised'
+    -# This used to be cached, but causes problems because of some current_user stuff in there
+    = render 'shared/footer_revised'
 
 :javascript
   I18n.defaultLocale = "#{I18n.default_locale}"
