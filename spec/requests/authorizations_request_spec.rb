@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe Oauth::AuthorizationsController, type: :request do
   include_context :existing_doorkeeper_app
   before { expect(doorkeeper_app).to be_present }
-  let(:scope) { "read_bikes+read_user" }
-  let(:authorization_url) { "/oauth/authorize?redirect_uri=#{CGI.escape(doorkeeper_app.redirect_uri)}&client_id=#{doorkeeper_app.uid}&response_type=code&scope=#{scope}" }
+  let(:scope_param) { "scope=read_bikes+read_user" }
+  let(:authorization_url) { "/oauth/authorize?redirect_uri=#{CGI.escape(doorkeeper_app.redirect_uri)}&client_id=#{doorkeeper_app.uid}&response_type=code&#{scope_param}" }
 
   context "no current user present" do
     it "redirects to sign in" do
@@ -52,6 +52,16 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       expect(response).to render_template(:new)
     end
 
+    context "no scope" do
+      let(:scope_param) { "" }
+      it "renders" do
+        get authorization_url
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:new)
+        expect(response.body).to match(//)
+      end
+    end
+
     context "internal app" do
       before { doorkeeper_app.update_attributes(is_internal: true) }
       it "redirects to redirect uri" do
@@ -72,7 +82,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response).to redirect_to new_session_path
       end
       context "with unconfirmed scope" do
-        let(:scope) { "read_bikes+read_user+unconfirmed" }
+        let(:scope_param) { "scope=read_bikes+read_user+unconfirmed" }
         it "renders" do
           expect(current_user.confirmed?).to be_falsey
           get authorization_url
