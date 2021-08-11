@@ -45,7 +45,7 @@ module ControllerHelpers
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
-      redirect_to(accept_terms_url(subdomain: false)) && return
+      redirect_to(accept_terms_url) && return
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to(please_confirm_email_users_path) && return
     else
@@ -85,7 +85,7 @@ module ControllerHelpers
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser
-    return my_account_url(subdomain: false) unless current_user.default_organization.present?
+    return my_account_url unless current_user.default_organization.present?
     if user_root_bike_search?
       default_bike_search_path
     else
@@ -313,7 +313,7 @@ module ControllerHelpers
   def require_member!
     return true if current_user.member_of?(current_organization)
     flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
-    redirect_to(my_account_url(subdomain: false)) && return
+    redirect_to(my_account_url) && return
   end
 
   def require_admin!
