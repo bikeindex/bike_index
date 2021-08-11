@@ -2,7 +2,6 @@ class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[index show]
-  before_action :remove_subdomain, only: %i[index]
   skip_before_action :find_bike, except: %i[show edit update pdf resolve_token]
   skip_before_action :assign_current_organization, except: %i[index show edit]
   skip_before_action :ensure_user_allowed_to_edit, except: %i[edit update pdf]
@@ -232,9 +231,5 @@ class BikesController < Bikes::BaseController
 
   def render_ad
     @ad = true
-  end
-
-  def remove_subdomain
-    redirect_to bikes_url(subdomain: false) if request.subdomain.present?
   end
 end

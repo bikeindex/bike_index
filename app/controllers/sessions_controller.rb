@@ -74,7 +74,7 @@ class SessionsController < ApplicationController
         redirect_to(new_user_path, notice: "Logged out!") && return
       end
     end
-    redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
+    redirect_to goodbye_url, notice: "Logged out!"
   end
 
   private

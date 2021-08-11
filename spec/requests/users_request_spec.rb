@@ -257,7 +257,7 @@ RSpec.describe UsersController, type: :request do
       og_auth = user.auth_token
       og_token = user.password_reset_token
       post "#{base_url}/update_password_with_reset_token", params: valid_params
-      expect(response).to redirect_to my_account_url(subdomain: false)
+      expect(response).to redirect_to my_account_url
       user.reload
       expect(user.password_reset_token).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
@@ -274,7 +274,7 @@ RSpec.describe UsersController, type: :request do
         og_token = user.password_reset_token
         expect(user.confirmed?).to be_falsey
         post "#{base_url}/update_password_with_reset_token", params: valid_params
-        expect(response).to redirect_to my_account_url(subdomain: false)
+        expect(response).to redirect_to my_account_url
         user.reload
         expect(user.password_reset_token).to_not eq og_token
         expect(user.auth_token).to_not eq og_auth
@@ -294,9 +294,9 @@ RSpec.describe UsersController, type: :request do
         expect(user.terms_of_service).to be_falsey
         post "#{base_url}/update_password_with_reset_token", params: valid_params
         # It redirects to account - but when rendering account, redirects to accept terms - tested below
-        expect(response).to redirect_to my_account_url(subdomain: false)
+        expect(response).to redirect_to my_account_url
         get "/my_account"
-        expect(response).to redirect_to accept_terms_url(subdomain: false)
+        expect(response).to redirect_to accept_terms_url
         user.reload
         expect(user.password_reset_token).to_not eq og_token
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
