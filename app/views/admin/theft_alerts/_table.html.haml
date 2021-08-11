@@ -6,38 +6,22 @@
     %thead.small-header
       %tr
         %th
-          - if render_sortable
-            = sortable "created_at"
-          - else
-            Created
+          = sortable "created_at", render_sortable: render_sortable
         %th
-          - if render_sortable
-            = sortable "status"
-          - else
-            Status
+          = sortable "status", render_sortable: render_sortable
         - unless skip_bike
           %th Bike
         %th User
         %th
-          - if render_sortable
-            = sortable "theft_alert_plan_id", "Plan"
-          - else
-            Plan
+          = sortable "theft_alert_plan_id", "Plan", render_sortable: render_sortable
         %th
-          - if render_sortable
-            = sortable "begin_at", "Start"
-          - else
-            Start
+          = sortable "amount_cents_facebook_spent", "Fbook spent", render_sortable: render_sortable
         %th
-          - if render_sortable
-            = sortable "end_at"
-          - else
-            End
+          = sortable "begin_at", "Start", render_sortable: render_sortable
         %th
-          - if render_sortable
-            = sortable "reach"
-          - else
-            Reach
+          = sortable "end_at", render_sortable: render_sortable
+        %th
+          = sortable "reach", render_sortable: render_sortable
         %th.small Clicks
         %th City
         %th Notes
@@ -85,6 +69,9 @@
             %small
               = theft_alert.amount_facebook
               %span.less-strong= theft_alert_plan.name
+          %td
+            - if theft_alert.amount_cents_facebook_spent.to_i > 0
+              = theft_alert.amount_facebook_spent
           %td
             %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td

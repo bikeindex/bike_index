@@ -70,7 +70,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at theft_alert_plan_id reach status begin_at end_at]
+    %w[created_at theft_alert_plan_id amount_cents_facebook_spent reach status begin_at end_at]
   end
 
   def available_statuses

@@ -131,6 +131,10 @@ class TheftAlert < ApplicationRecord
     MoneyFormater.money_format(amount_cents_facebook)
   end
 
+  def amount_facebook_spent
+    MoneyFormater.money_format(amount_cents_facebook_spent)
+  end
+
   def activating_at
     t = facebook_data&.dig("activating_at")
     t.present? ? TimeParser.parse(t) : nil
@@ -180,6 +184,7 @@ class TheftAlert < ApplicationRecord
       self.longitude = stolen_record.longitude
     end
     self.bike_id = stolen_record&.bike_id
+    self.amount_cents_facebook_spent = calculated_cents_facebook_spent
   end
 
   private
@@ -194,5 +199,9 @@ class TheftAlert < ApplicationRecord
     elsif begin_at >= end_at
       errors.add(:end_at, :must_be_later_than_start_time)
     end
+  end
+
+  def calculated_cents_facebook_spent
+    facebook_data&.dig("spend_cents")
   end
 end

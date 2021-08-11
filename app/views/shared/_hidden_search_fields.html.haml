@@ -15,7 +15,7 @@
 
 
 - unless skip_organization
-  = hidden_field_tag :organization_id, passive_organization&.to_param
+  = hidden_field_tag :organization_id, current_organization&.to_param
 
 -# Shared bike search fields
 - if kind == "organized_bike_search"
