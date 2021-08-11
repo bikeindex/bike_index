@@ -14,7 +14,7 @@
         %tr
           %td Stripe ID
           %td
-            = link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+            = link_to payment.stripe_id.truncate(20), "https://dashboard.stripe.com/payments/#{payment.stripe_id}", title: payment.stripe_id
             - if display_dev_info?
               %small.less-strong.only-dev-visible
                 Kind:

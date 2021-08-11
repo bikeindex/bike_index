@@ -50,9 +50,9 @@
             %td Target Spend
             %td= @theft_alert.amount_facebook
           %tr
-            %td Actual Spend
+            %td Actual Fbook Spend
             %td
-              = MoneyFormater.money_format(@theft_alert.facebook_data&.dig("spend_cents"))
+              = @theft_alert.amount_facebook_spent
               %span.text-warning
                 = @theft_alert.live? ? "so far" : "total"
     .col-sm-6

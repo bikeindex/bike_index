@@ -2769,7 +2769,8 @@ CREATE TABLE public.theft_alerts (
     longitude double precision,
     reach integer,
     bike_id bigint,
-    facebook_updated_at timestamp without time zone
+    facebook_updated_at timestamp without time zone,
+    amount_cents_facebook_spent integer
 );
 
 
@@ -5874,6 +5875,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210727011722'),
 ('20210727021013'),
 ('20210727212502'),
-('20210730172142');
+('20210730172142'),
+('20210811141935');
 
 

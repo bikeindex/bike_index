@@ -131,6 +131,7 @@ if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
             expect(theft_alert.facebook_data["amount_cents"]).to eq 999
             expect(theft_alert.facebook_data["spend_cents"]).to eq 649
             expect(theft_alert.reach).to eq 2428
+            expect(theft_alert.amount_cents_facebook_spent).to eq 649
             expect_hashes_to_match(theft_alert.engagement, target_engagement)
           end
         end
