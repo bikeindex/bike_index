@@ -18,13 +18,6 @@ RSpec.describe BikesController, type: :controller do
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
     include_context :geocoder_stubbed_bounding_box
 
-    context "with subdomain" do
-      it "redirects to no subdomain" do
-        @request.host = "stolen.example.com"
-        get :index
-        expect(response).to redirect_to bikes_url(subdomain: false)
-      end
-    end
     describe "assignment" do
       context "no params" do
         it "assigns defaults, stolenness: stolen" do

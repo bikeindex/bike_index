@@ -68,9 +68,9 @@ module ControllerHelpers
       end
 
       if force_sign_up || translation_key.to_s.match?(/create.+account/)
-        redirect_to(new_user_url(subdomain: false, partner: sign_in_partner)) && return
+        redirect_to(new_user_url(partner: sign_in_partner)) && return
       else
-        redirect_to(new_session_url(subdomain: false, partner: sign_in_partner)) && return
+        redirect_to(new_session_url(partner: sign_in_partner)) && return
       end
     end
   end
