@@ -12,10 +12,19 @@ module ControllerHelpers
     before_action :enable_rack_profiler
 
     before_action do
-      if Rails.env.production? && current_user.present?
-        Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
+      if Rails.env.production?
+        unless request.host == base_url_host
+          redirect_to("https://#{base_url_host}#{request.fullpath}", status: :moved_permanently)
+        end
+        if current_user.present?
+          Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
+        end
       end
     end
+  end
+
+  def base_url_host
+    ENV.fetch("BASE_URL", "bikeindex.org").delete_prefix("https://").freeze
   end
 
   def append_info_to_payload(payload)
