@@ -71,6 +71,7 @@
     = form_tag admin_recoveries_path, method: :get, class: "form-inline" do
       = hidden_field_tag :search_recovery_display_status, @recovery_display_status
       = hidden_field_tag :search_index_helped_recovery, params[:search_index_helped_recovery]
+      = hidden_field_tag :search_shareable, params[:search_shareable]
       = hidden_field_tag :search_displayed, params[:search_displayed]
       = render partial: "/shared/hidden_search_fields"
       .form-group.ml-auto.mr-1.mb-2

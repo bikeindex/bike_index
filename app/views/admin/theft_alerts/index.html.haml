@@ -67,7 +67,12 @@
   .mt-4.mb-4
     = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do
       = hidden_field_tag :search_recovery_display_status, @search_recovered
+      = hidden_field_tag :search_status, @status
+      = hidden_field_tag :search_paid, @search_paid
+      = hidden_field_tag :search_facebook_data, @search_facebook_data
+      = hidden_field_tag :search_recovered, @search_recovered
       = render partial: "/shared/hidden_search_fields"
+
       .form-group.ml-auto.mr-1.mb-2
         %em.small.less-strong.mr-1.d-md-inline.d-none within
         = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
