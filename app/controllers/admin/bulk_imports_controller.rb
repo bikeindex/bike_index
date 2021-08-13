@@ -69,6 +69,13 @@ class Admin::BulkImportsController < Admin::BaseController
       bulk_imports = bulk_imports.not_ascend
     end
 
+    if BulkImport.progresses.include?(params[:search_progress])
+      @progress = params[:search_progress]
+      bulk_imports = bulk_imports.where(progress: @progress)
+    else
+      @progress = "all"
+    end
+
     if params[:organization_id].present?
       bulk_imports = bulk_imports.where(organization_id: current_organization.id)
     end
