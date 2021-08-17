@@ -14,6 +14,9 @@ class AfterUserChangeWorker < ApplicationWorker
     # Create a new mailchimp datum if it's deserved
     MailchimpDatum.find_and_update_or_create_for(user)
 
+    no_address = user.bike_organizations.with_enabled_feature_slugs("no_address").any?
+    user.update(no_address: no_address) if user.no_address != no_address
+
     update_user_alerts(user)
     current_alerts = user_alert_slugs(user)
     unless user.alert_slugs == current_alerts

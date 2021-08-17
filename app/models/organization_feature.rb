@@ -32,16 +32,17 @@ class OrganizationFeature < ApplicationRecord
     bike_stickers
     bike_stickers_user_editable
     child_organizations
+    claimed_ownerships
+    credibility_badges
     csv_exports
     customize_emails
     graduated_notifications
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
+    no_address
     passwordless_users
     regional_bike_counts
-    claimed_ownerships
-    credibility_badges
     show_bulk_import
     show_bulk_import_impound_bikes
     show_multi_serial
