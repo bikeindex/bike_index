@@ -65,6 +65,9 @@
           %td
             - if bike_sticker.claimed?
               = organized_bike_text(bike_sticker.bike)
+            - elsif bike_sticker.bike_id.present?
+              = link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "small"
+              %small.text-danger Deleted?
           %td
             %strong
               = link_to bike_sticker.pretty_code, "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}"

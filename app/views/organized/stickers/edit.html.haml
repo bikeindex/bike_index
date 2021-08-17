@@ -99,5 +99,6 @@
                 = link_to(organized_bike_text(bike_sticker_update.bike), bike_path(bike_sticker_update.bike, organization_id: current_organization.to_param))
               - elsif bike_sticker_update.bike_id.present?
                 %span.text-danger= t(".bike_is_unavailable")
+                %small.less-strong ID: #{bike_sticker_update.bike_id}
             %td
               = bike_sticker_update.kind_humanized
