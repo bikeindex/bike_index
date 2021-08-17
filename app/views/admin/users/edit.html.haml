@@ -51,6 +51,14 @@
             - if @user.last_login_ip.present?
               %small.less-strong
                 = @user.last_login_ip
+        - if display_dev_info?
+          %tr.only-dev-visible
+            %td No Address
+            %td
+              - if @user.no_address?
+                %strong.text-success TRUE
+              - else
+                %small.less-strong address permitted
   .col-md-6.mt-auto
     %table.table-list
       %tr
