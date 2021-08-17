@@ -12,6 +12,11 @@ module Organized
         .page(page).per(per_page)
     end
 
+    def show
+      redirect_to edit_organization_sticker_path(params[:id], organization_id: params[:organization_id])
+      # return
+    end
+
     def edit
     end
 
