@@ -147,7 +147,7 @@ class Organization < ApplicationRecord
     # Only search for organization features if the text is organization features
     return with_enabled_feature_slugs(n) if OrganizationFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
-    match_cols = %w[organizations.name organizations.short_name locations.name locations.city]
+    match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
       .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
