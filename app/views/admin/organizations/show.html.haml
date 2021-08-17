@@ -255,7 +255,9 @@
             %td Stickers
             %td
               - if @organization.enabled?("bike_stickers")
-                = link_to "Has stickers", admin_bike_stickers_path(organization_id: @organization.to_param)
+                = link_to admin_bike_stickers_path(organization_id: @organization.to_param) do
+                  = admin_number_display(@organization.bike_stickers.count)
+                  stickers
               - else
                 %small.less-strong
                   no
