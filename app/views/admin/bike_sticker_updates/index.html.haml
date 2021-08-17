@@ -163,6 +163,8 @@
           %td
             %a.convertTime{ href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" }
               = l bike_sticker_update.created_at, format: :convert_time
+            - if display_dev_info?
+              %small.only-dev-visible= bike_sticker_update.id
           %td
             - if bike_sticker_update.user_id.present?
               - user_name = bike_sticker_update.user&.name || bike_sticker_update.user_id
@@ -183,6 +185,8 @@
             - if bike_sticker_update.bike.present?
               %small
                 = link_to organized_bike_text(bike_sticker_update.bike), edit_admin_bike_path(bike_sticker_update.bike_id)
+            - elsif bike_sticker_update.bike_id.present?
+              %code= bike_sticker_update.bike_id
           %td
             - if bike_sticker_update.organization.present?
               = link_to bike_sticker_update.organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: bike_sticker_update.organization_id))
