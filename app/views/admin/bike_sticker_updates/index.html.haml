@@ -186,7 +186,8 @@
               %small
                 = link_to organized_bike_text(bike_sticker_update.bike), edit_admin_bike_path(bike_sticker_update.bike_id)
             - elsif bike_sticker_update.bike_id.present?
-              %code= bike_sticker_update.bike_id
+              = link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "small"
+              %small.text-danger Deleted?
           %td
             - if bike_sticker_update.organization.present?
               = link_to bike_sticker_update.organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: bike_sticker_update.organization_id))
