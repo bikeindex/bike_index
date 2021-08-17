@@ -9,11 +9,13 @@
 
   / We only show this if there aren't any sortable search params, or there is a search_bike_sticker_batch_id, because performance
   - if !sortable_search_params? || params[:search_bike_sticker_batch_id].present?
-    - bike_sticker_batches = BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
+    - bike_sticker_batches = [@bike_sticker_batch] if @bike_sticker_batch.present?
+    - bike_sticker_batches ||= BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
     .col-12.mt-4
-      %h5
-        = number_with_delimiter(bike_sticker_batches.count)
-        Sticker Batches
+      - unless @bike_sticker_batch.present? # Doesn't make sense to count if there is a batch
+        %h5
+          = number_with_delimiter(bike_sticker_batches.count)
+          Sticker Batches
     .col-12
       .full-screen-table
         %table.table.table-striped.table-bordered.table-sm
