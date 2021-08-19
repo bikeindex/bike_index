@@ -21,7 +21,9 @@ spec/fixtures/tsv_creation/*.json
 .rvmrc
 .ruby-gemset
 .ruby-version
+.rbenv-gemsets
 .powenv
+.gems
 
 # Ignore Chef stuff
 Cheffile.lock
@@ -54,3 +56,6 @@ spec/examples.txt
 public/javascripts
 
 spec/vcr_cassettes/facebook/*
+
+# Ignore editor temp files
+.idea
