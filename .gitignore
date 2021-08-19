@@ -46,6 +46,7 @@ manufacturer.tsv
 yarn-debug.log*
 yarn-error.log
 .yarn-integrity
+.nvmrc
 
 # Ignore jest coverage files
 coverage
