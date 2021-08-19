@@ -47,6 +47,7 @@ yarn-debug.log*
 yarn-error.log
 .yarn-integrity
 .nvmrc
+package-lock.json
 
 # Ignore jest coverage files
 coverage
