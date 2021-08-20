@@ -21,7 +21,9 @@ spec/fixtures/tsv_creation/*.json
 .rvmrc
 .ruby-gemset
 .ruby-version
+.rbenv-gemsets
 .powenv
+.gems
 
 # Ignore Chef stuff
 Cheffile.lock
@@ -44,6 +46,8 @@ manufacturer.tsv
 yarn-debug.log*
 yarn-error.log
 .yarn-integrity
+.nvmrc
+package-lock.json
 
 # Ignore jest coverage files
 coverage
@@ -54,3 +58,6 @@ spec/examples.txt
 public/javascripts
 
 spec/vcr_cassettes/facebook/*
+
+# Ignore editor temp files
+.idea
