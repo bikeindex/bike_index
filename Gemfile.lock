@@ -455,7 +455,7 @@ GEM
     puma (5.3.1)
       nio4r (~> 2.0)
     racc (1.5.2)
-    rack (2.0.8)
+    rack (2.1.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-mini-profiler (2.3.1)
@@ -772,7 +772,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma
-  rack (= 2.0.8)
+  rack (= 2.1.4)
   rack-mini-profiler
   rack-throttle
   rails (~> 5.2)
