@@ -82,11 +82,11 @@ gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sd
 gem "api-pagination"
 gem "doorkeeper", "~> 5.2.5" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 0.19.1" # API DSL
+gem "grape", "~> 1.5.3" # API DSL
 gem "grape-active_model_serializers", "~> 1.4.0"
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer" # Grape Authentication management
+gem "wine_bouncer", git: "https://github.com/antek-drzewiecki/wine_bouncer", ref: "c82b88f73c7adc43a8e89ca73f7e18952ec30de4" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting
