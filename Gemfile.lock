@@ -671,7 +671,7 @@ GEM
     unicode-display_width (1.7.0)
     unicode_utils (1.4.0)
     uniform_notifier (1.13.0)
-    user_agent_parser (2.5.2)
+    user_agent_parser (2.7.0)
     vcr (5.0.0)
     vegas (0.1.11)
       rack (>= 1.0.0)
