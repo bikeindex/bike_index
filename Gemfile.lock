@@ -596,8 +596,8 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    secure_headers (2.5.3)
-      user_agent_parser
+    secure_headers (3.9.0)
+      useragent
     shellany (0.0.1)
     sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
@@ -671,7 +671,7 @@ GEM
     unicode-display_width (1.7.0)
     unicode_utils (1.4.0)
     uniform_notifier (1.13.0)
-    user_agent_parser (2.7.0)
+    useragent (0.16.10)
     vcr (5.0.0)
     vegas (0.1.11)
       rack (>= 1.0.0)
@@ -801,7 +801,7 @@ DEPENDENCIES
   rspec-sidekiq
   rspec_junit_formatter
   sass-rails
-  secure_headers (~> 2.5.0)
+  secure_headers (~> 3.9.0)
   sidekiq
   sidekiq-failures
   simple_spark

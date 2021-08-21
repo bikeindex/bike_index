@@ -90,7 +90,7 @@ gem "wine_bouncer" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 2.5.0"
+gem "secure_headers", "~> 3.9.0"
 
 # Frontend
 gem "jquery-rails" # Javascript framework?
