@@ -4405,6 +4405,20 @@ CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
 
 
 --
+-- Name: index_bikes_on_example; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example);
+
+
+--
+-- Name: index_bikes_on_hidden; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_hidden ON public.bikes USING btree (hidden);
+
+
+--
 -- Name: index_bikes_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4458,6 +4472,13 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 --
 
 CREATE INDEX index_bikes_on_state_id ON public.bikes USING btree (state_id);
+
+
+--
+-- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_status ON public.bikes USING btree (status);
 
 
 --
@@ -5878,6 +5899,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210727212502'),
 ('20210730172142'),
 ('20210811141935'),
-('20210817204248');
+('20210817204248'),
+('20210820220126');
 
 
