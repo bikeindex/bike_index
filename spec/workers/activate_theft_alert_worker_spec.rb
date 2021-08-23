@@ -1,6 +1,8 @@
 require "rails_helper"
 
-if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
+facebook_imported = 'Facebook::AdsIntegration'.constantize rescue nil
+
+if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
   RSpec.describe ActivateTheftAlertWorker, type: :job do
     let(:instance) { described_class.new }
 
