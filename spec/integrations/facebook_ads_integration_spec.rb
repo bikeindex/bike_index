@@ -1,6 +1,10 @@
 require "rails_helper"
 
-facebook_imported = 'Facebook::AdsIntegration'.constantize rescue nil
+facebook_imported = begin
+  "Facebook::AdsIntegration".constantize
+rescue
+  nil
+end
 
 # Not set up to run on CI currently
 if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?

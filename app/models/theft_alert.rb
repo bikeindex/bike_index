@@ -1,8 +1,8 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
-  # Timestamp for when notification functionality was added
-  NOTIFY_AFTER = 1625757882 # 2021-7-8
+  # Timestamp 1s before first alert was automated
+  AUTOMATION_START = 1625586988 # 2021-7-6
 
   enum status: STATUS_ENUM
 
@@ -57,6 +57,10 @@ class TheftAlert < ApplicationRecord
     false
   end
 
+  def before_automation?
+    (created_at || Time.current).to_i < AUTOMATION_START
+  end
+
   def notify?
     return false if facebook_data.blank? || facebook_data&.dig("no_notify").present?
     stolen_record.present? && stolen_record.receive_notifications?
@@ -98,6 +102,12 @@ class TheftAlert < ApplicationRecord
 
   def activating?
     pending? && activating_at.present?
+  end
+
+  # Simplistic, can be improved
+  def failed_to_activate?
+    return false unless activating?
+    activating_at < Time.current - 5.minutes
   end
 
   def recovered?

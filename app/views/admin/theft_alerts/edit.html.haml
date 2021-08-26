@@ -2,12 +2,22 @@
 
 %h2.mt-4
   Facebook data
-  %small
-    - if @theft_alert.facebook_updateable?
-      = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+%h4
+  - if @theft_alert.facebook_updateable?
+    = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+  - else
+    %em
+      %span.text-warning Can't update Facebook:
+    - if @theft_alert.before_automation?
+      %span.less-strong This alert was created before automation
+    - elsif !@theft_alert.activateable?
+      %span.less-strong This alert is missing required stuff
+    - elsif @theft_alert.failed_to_activate?
+      %span.text-danger Something Broke!
+      %strong Tell Seth
     - else
-      %em.text-warning can't update facebook
-      maybe this alert was created before automation?
+      %span.text-danger NOT SURE WHY!
+      %strong Tell Seth
 
 - if @theft_alert.facebook_data.present?
   .row.mt-2
