@@ -1,7 +1,9 @@
 require "rails_helper"
 
+facebook_imported = 'Facebook::AdsIntegration'.constantize rescue nil
+
 # Not set up to run on CI currently
-if !ENV["CI"] && Facebook::AdsIntegration::TOKEN.present?
+if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
   RSpec.describe Facebook::AdsIntegration do
     let(:instance) { described_class.new }
     it "gets account" do
