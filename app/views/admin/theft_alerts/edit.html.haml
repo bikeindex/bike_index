@@ -12,12 +12,13 @@
       %span.less-strong This alert was created before automation
     - elsif !@theft_alert.activateable?
       %span.less-strong This alert is missing required stuff
-    - elsif @theft_alert.failed_to_activate?
-      %span.text-danger Something Broke!
-      %strong Tell Seth
     - else
       %span.text-danger NOT SURE WHY!
       %strong Tell Seth
+
+  - if @theft_alert.failed_to_activate?
+    %span.text-danger Something Broke!
+    %strong Tell Seth
 
 - if @theft_alert.facebook_data.present?
   .row.mt-2

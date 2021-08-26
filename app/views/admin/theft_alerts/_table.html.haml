@@ -37,7 +37,7 @@
               = link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success"
             - if theft_alert.failed_to_activate?
               %span.text-danger Failed activation!
-            - if theft_alert.activating?
+            - elsif theft_alert.activating?
               %span.text-success activating!
             - else
               - unless theft_alert.recovered? && theft_alert.inactive?
