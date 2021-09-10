@@ -85,7 +85,7 @@ module Organized
         elsif @bike.parking_notifications.any? # Bike created successfully
           flash[:success] = "Parking notification created for #{@bike.type}"
         else # Bike created successfully
-          flash[:success] = "#{@bike.type.titleize} Created"
+          flash[:success] = "#{@bike.type_titleize} Created"
         end
       end
       redirect_back(fallback_location: new_iframe_organization_bikes_path(iframe_redirect_params))
@@ -111,7 +111,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_at owner_email manufacturer_id frame_model]
+      %w[id updated_at owner_email manufacturer_id frame_model cycle_type]
     end
 
     def organization_bikes

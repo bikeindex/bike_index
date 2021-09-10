@@ -24,5 +24,5 @@
             = t(".owned_but_hasnt_been_claimed_html", owner_email: @bike.owner_email)
 
       %p.mb-4
-        = link_to t(".view_bike", bike_type: @bike.type.titleize), bike_path(@bike), class: "gray-link"
+        = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
   = yield

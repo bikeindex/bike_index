@@ -164,6 +164,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           "Black, #{secondary_color.name}",
           bike.serial_number,
           nil,
+          "Bike",
           nil,
           "cool extra serial",
           nil, # Since user isn't part of organization. TODO: Currently not implemented
@@ -172,7 +173,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         instance.perform(export.id)
         export.reload
@@ -284,6 +285,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             color: "Black",
             serial: bike.serial_number,
             is_stolen: nil,
+            vehicle_type: "Bike",
             thumbnail: nil,
             extra_registration_number: "cool extra serial",
             registered_by: nil,
@@ -346,6 +348,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             color: "Black",
             serial: nil,
             is_stolen: nil,
+            vehicle_type: nil,
             thumbnail: nil,
             extra_registration_number: nil,
             registered_by: nil,
@@ -390,6 +393,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
               color: "Black",
               serial: bike.serial_number,
               is_stolen: nil,
+              vehicle_type: "Bike",
               thumbnail: nil,
               extra_registration_number: "cool extra serial",
               registered_by: nil,

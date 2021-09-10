@@ -44,7 +44,7 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if serial_known
       %span.checklist-text
-        #{bike_submitting.type.titleize} has serial number
+        #{bike_submitting.type_titleize} has serial number
         - unless serial_known
           = link_to "add serial number", edit_bike_url(id: bike_submitting.to_param, edit_template: "bike_details", return_to: current_path), class: "small"
         - if render_optional
