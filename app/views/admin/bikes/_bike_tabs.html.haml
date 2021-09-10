@@ -11,7 +11,7 @@
       .row.mb-4
         .col-sm-6.offset-sm-3
           .alert.alert-danger
-            %h4.text-danger #{bike.type.titleize} Deleted
+            %h4.text-danger #{bike.type_titleize} Deleted
             Deleted:
             %span.convertTime.preciseTime
               = l bike.deleted_at, format: :convert_time

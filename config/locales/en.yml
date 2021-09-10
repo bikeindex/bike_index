@@ -4400,6 +4400,7 @@ en:
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
+        vehicle_type: Vehicle type
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
         only_impounded_html: Only <strong>impounded</strong> bikes

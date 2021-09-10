@@ -175,7 +175,7 @@
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
-              %em= t(".bike_not_marked_stolen", bike_type: @bike.type.titleize)
+              %em= t(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
               %strong= t(".believe_it_is_anyway")
             - if @bike.contact_owner?(current_user)
               %h3= t(".contact_the_owner")

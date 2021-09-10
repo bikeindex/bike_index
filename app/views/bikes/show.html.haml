@@ -81,7 +81,7 @@
         -# This should only show up if the bike isn't registered
         %strong.text-warning= t(".not_registered_by_user")
         - if @bike.current_creation_state&.origin == "unregistered_parking_notification"
-          %em= t(".created_to_record_parking_notification", bike_type: @bike.type.titleize, organization: @bike.creation_organization.short_name)
+          %em= t(".created_to_record_parking_notification", bike_type: @bike.type_titleize, organization: @bike.creation_organization.short_name)
 
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
@@ -109,7 +109,7 @@
         - if bike_image.present? && bike_image.image_url.present?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{bike_image.id}"}
-              = image_tag(bike_image.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image.image_url })
+              = image_tag(bike_image.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image.image_url })
           - if @bike.public_images.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r
@@ -132,7 +132,7 @@
               = t(".stock_photo", year: @bike.year, model: @bike.frame_model)
               %em= t(".color_may_not_match")
             .current-photo#stock_photo_img
-              = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
+              = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
       .show-bike-details
         %ul.attr-list.split-sm
@@ -147,7 +147,7 @@
           - unless @bike.serial_hidden?
             = attr_list_item(@bike.extra_registration_number, t(".other_serial"), with_colon: true)
           - unless @bike.type == "bike"
-            = attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
+            = attr_list_item(@bike.type_titleize, t(".cycle_type"), with_colon: true)
 
           %li
             %strong.attr-title #{t(".manufacturer")}:

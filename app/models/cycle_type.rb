@@ -18,8 +18,8 @@ class CycleType
     'cargo-trike-rear': 13,
     'trail-behind': 14,
     'pedi-cab': 15,
-    e_scooter: 16,
-    e_skateboard: 17,
+    'e-scooter': 16,
+    'e-skateboard': 17,
     personal_mobility: 18
   }.freeze
 
