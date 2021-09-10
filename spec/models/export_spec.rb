@@ -200,7 +200,7 @@ RSpec.describe Export, type: :model do
     let(:additional_headers) { %w[organization_affiliation address phone bike_sticker student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 12
+      expect(permitted_headers.count).to eq 13
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
