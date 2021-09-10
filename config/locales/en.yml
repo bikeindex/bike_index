@@ -4400,7 +4400,6 @@ en:
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
-        vehicle_type: Vehicle type
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
         only_impounded_html: Only <strong>impounded</strong> bikes
@@ -4422,6 +4421,7 @@ en:
         stolen: Stolen
         stolen_bikes_html: "<em>stolen</em> bikes"
         updated: Updated
+        vehicle_type: Vehicle type
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
