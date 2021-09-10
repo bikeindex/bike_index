@@ -432,7 +432,8 @@ class Bike < ApplicationRecord
     return user.name if user&.name.present?
     # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
     return nil unless current_ownership.blank? || current_ownership&.first?
-    oname = b_params.map(&:user_name).reject(&:blank?).first
+    oname = registration_info["user_name"]
+    oname ||= b_params.map(&:user_name).reject(&:blank?).first
     return oname if oname.present?
     # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
     return nil if creation_organization.present? && owner&.member_of?(creation_organization)
