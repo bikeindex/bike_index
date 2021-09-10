@@ -849,6 +849,8 @@ nl:
         wheelchair: Rolstoel
         personal_mobility: Persoonlijk mobiliteitshulpmiddel (elektrische scooter,
           skateboard, eenwieler, enz.)
+        e_scooter: E-scooter
+        e_skateboard: E-skateboard
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
