@@ -4547,6 +4547,7 @@ nl:
         only_impounded_html: Alleen in <strong>beslag genomen</strong> fietsen
         only_not_impounded_html: Fietsen die <strong>niet in</strong> beslag <strong>worden</strong>
           genomen
+        vehicle_type: 'Voertuigtype:'
     bulk_imports:
       index:
         added: Toegevoegd
