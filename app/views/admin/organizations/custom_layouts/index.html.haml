@@ -19,6 +19,8 @@
       %th
         Link to edit
       %th
+        Preview
+      %th
         Has content
       %th
         Enabled
@@ -26,17 +28,28 @@
       %tr
         %td
           = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
-          %small.less-strong
-            page  #{link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param)}, even if "off"
+        %td.small
+          = link_to 'landing page preview', organization_landing_path(organization_id: @organization.to_param)
         %td.table-cell-check
           = check_mark if @organization.landing_html.present?
         %td.table-cell-check
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
-      - MailSnippet.organization_snippets.each do |snippet_kind, snippet_description|
-        - snippet = @organization.mail_snippets.where(kind: snippet_kind).first
+      - MailSnippet.organization_snippets.each do |kind, snippet_attrs|
+        - snippet = @organization.mail_snippets.where(kind: kind).first
         %tr
           %td
-            = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_kind)
+            = link_to snippet_attrs[:description], edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: kind)
+          %td
+            - if snippet_attrs[:emails] == "all"
+              All emails
+              = link_to "eg finished registration", edit_organization_email_path(kind, organization_id: @organization.to_param), class: "small"
+            - elsif snippet_attrs[:emails] == "finished_registration"
+              = link_to "preview finished registration", edit_organization_email_path(kind, organization_id: @organization.to_param), class: "small"
+            - elsif snippet_attrs[:emails] == "partial_registration"
+              = link_to "preview partial registration", edit_organization_email_path(kind, organization_id: @organization.to_param), class: "small"
+            - else
+              %span.text-warning
+                Unknown email kind: "#{snippet_attrs[:emails]}"
           %td.table-cell-check
             = check_mark if snippet&.body.present?
           %td.table-cell-check
