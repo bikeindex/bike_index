@@ -35,7 +35,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
 
         Sidekiq::Worker.clear_all
         expect(stolen_notification.reload.notifications.count).to eq 1
-        expect(stolen_notification.notifications.delivered.count).to eq 1
+        expect(stolen_notification.notifications.delivered.count).to eq 1 # Because admin email was sent
         expect(stolen_notification.send_dates_parsed.count).to eq 0
         expect(stolen_notification.permitted_send?).to be_falsey
 
@@ -46,7 +46,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
         EmailStolenNotificationWorker.drain
         expect(Notification.count).to eq 2
         expect(stolen_notification.reload.notifications.count).to eq 2
-        expect(stolen_notification.notifications.delivered.count).to eq 1
+        expect(stolen_notification.notifications.stolen_notification_sent.count).to eq 1
         expect(stolen_notification.send_dates_parsed.count).to eq 1
       end
 
