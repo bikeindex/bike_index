@@ -6,6 +6,19 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
     FactoryBot.create(:country, name: "United States", iso: "US")
   end
 
+  describe "updated_since_date" do
+    it "is default if nil" do
+      expect(ExternalRegistryBike::Project529Bike.updated_since_date).to be_within(5).of(Time.current - 3.years)
+    end
+    it "is yesterday if today" do
+      bike = described_class.build_from_api_response(bike_json)
+      bike.external_updated_at = Time.current
+      expect(bike.save).to be_truthy
+
+      expect(ExternalRegistryBike::Project529Bike.updated_since_date).to be_within(5).of(Time.current - 1.day)
+    end
+  end
+
   describe ".build_from_api_response" do
     it "returns a valid ExternalRegistryBike object" do
       bike = described_class.build_from_api_response(bike_json)
