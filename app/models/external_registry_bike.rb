@@ -38,7 +38,7 @@ class ExternalRegistryBike < ApplicationRecord
       case status.downcase
       when "stolen" then "status_stolen"
       when "abandoned" then "status_impounded"
-      when "new", "transferred", "registered", "pending transfer" then "status_with_owner"
+      when "new", "transferred", "registered", "pending transfer", "recovered", "for_sale" then "status_with_owner"
       else # There is a new status! Fail, we need to figure out what to do with it
         raise "Unknown external registry status: #{status}"
       end
