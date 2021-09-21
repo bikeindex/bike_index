@@ -14,7 +14,10 @@
       %td
         Bike
       %td
-        = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)
+        = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike, active_tab: "messages")
+        %small
+          %em total messages sent to bike:
+          = admin_number_display(@bike.messages_count)
     %tr
       %td
         Receiver Name
@@ -28,7 +31,7 @@
           = @bike.current_stolen_record.phone
     %tr
       %td
-        Sent #
+        Sent to owner
       %td
         = @stolen_notification.send_dates_parsed.count
         times
@@ -59,7 +62,7 @@
           = link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender_id)
     %tr
       %td
-        User sent count
+        Sender sent count
       %td
         = @stolen_notification.sender.sent_stolen_notifications.count
 
@@ -70,3 +73,7 @@
     Notification Message
   .card-body
     = @stolen_notification.message
+
+%h3
+  Notifications
+= render partial: "/admin/notifications/table", locals: {notifications: @stolen_notification.notifications.order(created_at: :desc), skip_bike: true}

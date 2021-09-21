@@ -366,6 +366,11 @@ class Bike < ApplicationRecord
     parking_notifications.current.first
   end
 
+  def messages_count
+    notifications.count + parking_notifications.count + graduated_notifications.count +
+      Feedback.bike(id).count + UserAlert.where(bike_id: id).count
+  end
+
   def status_stolen_or_impounded?
     %w[status_stolen status_impounded].include?(status)
   end
