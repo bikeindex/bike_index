@@ -444,7 +444,6 @@ class Bike < ApplicationRecord
     # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
     return nil unless current_ownership.blank? || current_ownership&.first?
     oname = registration_info["user_name"]
-    oname ||= b_params.map(&:user_name).reject(&:blank?).first
     return oname if oname.present?
     # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
     return nil if creation_organization.present? && owner&.member_of?(creation_organization)
@@ -555,7 +554,7 @@ class Bike < ApplicationRecord
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from b_params if this is the first_ownership
-    @phone ||= b_params.map(&:phone).reject(&:blank?).first if first_ownership?
+    @phone ||= registration_info["phone"] if first_ownership?
     @phone
   end
 
@@ -858,13 +857,7 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    o_affiliation = conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
-    return o_affiliation if o_affiliation.present?
-    # TODO: remove this b_params stuff, post #2035 update
-    previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
-    return "" unless previous_o_affiliation.present?
-    update(organization_affiliation: previous_o_affiliation)
-    previous_o_affiliation
+    conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
   end
 
   def student_id=(val)
@@ -872,13 +865,7 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    s_id = conditional_information["student_id"] || registration_info["student_id"]
-    return s_id if s_id.present?
-    # TODO: remove this b_params stuff, post #2035 update
-    previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
-    return "" unless previous_s_id.present?
-    update(student_id: previous_s_id)
-    previous_s_id
+    conditional_information["student_id"] || registration_info["student_id"]
   end
 
   def external_image_urls
