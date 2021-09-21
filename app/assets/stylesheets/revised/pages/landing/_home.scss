@@ -508,6 +508,11 @@
     }
   }
 
+  .css-convert-opacity {
+    opacity: 0.8;
+    // filter: grayscale(1); Might need this if there are color images
+  }
+
   .root-landing-who-square {
     flex: 0 0 10%;
   }
