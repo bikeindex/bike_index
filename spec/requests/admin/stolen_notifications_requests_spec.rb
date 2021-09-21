@@ -51,7 +51,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
       end
 
       context "stolen_notification sent" do
-        # For send
+        # Force send
         before { EmailStolenNotificationWorker.new.perform(stolen_notification.id, true) }
 
         it "redirects if the stolen notification has already been sent" do
