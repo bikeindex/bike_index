@@ -5,15 +5,17 @@ class FetchProject529BikesWorker < ScheduledWorker
     23.5.hours
   end
 
-  def perform(page = 1)
+  def perform(updated_since = nil, page = 1)
+    updated_since ||= ExternalRegistryBike::Project529Bike.fetch_from_date
+
     client = ExternalRegistryClient::Project529Client.new
 
     created_bikes = client.bikes(per_page: 100,
                                  page: page,
-                                 updated_at: ExternalRegistryBike::Project529Bike.fetch_from_date)
+                                 updated_at: updated_since)
 
     return if created_bikes.empty?
 
-    self.class.perform_async(page + 1)
+    self.class.perform_async(updated_since, page + 1)
   end
 end
