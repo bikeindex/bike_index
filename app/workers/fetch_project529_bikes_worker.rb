@@ -6,7 +6,7 @@ class FetchProject529BikesWorker < ScheduledWorker
   end
 
   def perform(updated_since = nil, page = 1)
-    updated_since ||= ExternalRegistryBike::Project529Bike.fetch_from_date
+    updated_since ||= ExternalRegistryBike::Project529Bike.updated_since_date
 
     client = ExternalRegistryClient::Project529Client.new
 

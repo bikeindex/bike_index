@@ -20,8 +20,11 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
   end
 
   class << self
-    def fetch_from_date
-      maximum(:external_updated_at) || Time.current - 3.years
+    def updated_since_date
+      [
+        maximum(:external_updated_at) || Time.current - 3.years,
+        Time.current - 1.day
+      ].min
     end
 
     def build_from_api_response(attrs = {})
