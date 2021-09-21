@@ -4,7 +4,7 @@ class Export < ApplicationRecord
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   AVERY_HEADERS = %w[owner_name address].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[vehicle_type thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
 
   mount_uploader :file, ExportUploader
 

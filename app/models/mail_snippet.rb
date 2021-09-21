@@ -36,12 +36,12 @@ class MailSnippet < ApplicationRecord
 
   def self.organization_snippets
     {
-      header: "Top of email block",
-      welcome: "Below header",
-      footer: "Above <3 <3 <3 <3 Bike Index Team",
-      partial: "Above \"Finish it\" button, in email \"Partial registration\"",
-      security: "How to keep your bike safe, in email \"Finished registration\""
-    }.as_json
+      header: {emails: "all", description: "Top of email block"},
+      welcome: {emails: "all", description: "Below header"},
+      footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
+      partial: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
+      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
+    }.with_indifferent_access.freeze
   end
 
   def self.kinds

@@ -11,7 +11,7 @@
       .row.mb-4
         .col-sm-6.offset-sm-3
           .alert.alert-danger
-            %h4.text-danger #{bike.type.titleize} Deleted
+            %h4.text-danger #{bike.type_titleize} Deleted
             Deleted:
             %span.convertTime.preciseTime
               = l bike.deleted_at, format: :convert_time
@@ -319,8 +319,7 @@
             = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
               M<span class="d-none d-md-inline">essages</span>
               %small
-                - msg_count = bike.notifications.count + Feedback.bike(bike.id).count
-                (#{admin_number_display(msg_count)})
+                (#{admin_number_display(bike.messages_count)})
           .nav-item
             = link_to admin_bike_path(bike.id, active_tab: "ownerships"), class: "nav-link bikes-ownerships" do
               O<span class="d-none d-md-inline">wnerships</span>

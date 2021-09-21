@@ -51,6 +51,7 @@
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
+    "cycle_type_cell" => "Vehicle type",
   }
   # Most columns are enabled by default, including organization specific registration columns
   initially_checked_columns = %w[created_at_cell
@@ -66,7 +67,7 @@
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   enabled_columns = initially_checked_columns
   # Some optional columns
-  enabled_columns += ["updated_at_cell"]
+  enabled_columns += %w[updated_at_cell cycle_type_cell]
   enabled_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
@@ -145,6 +146,8 @@
         %th.hiddenColumn.hidden-xs-down.stolen_cell
           %small
             = t(".stolen")
+        %th.hiddenColumn.hidden-xs-down.cycle_type_cell
+          = sortable "cycle_type", t(".vehicle_type")
         %th.hiddenColumn.hidden-xs-down.manufacturer_cell
           = sortable "manufacturer_id", t(".manufacturer")
         %th.hiddenColumn.hidden-xs-down.model_cell
@@ -182,8 +185,7 @@
     %tbody
       - @bikes.each do |bike|
         %tr
-          -# NOTE: Added 1 at the beginning to bust the cache after template modification
-          - cache("1#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
             %td.hiddenColumn.created_at_cell
               %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
@@ -192,6 +194,8 @@
                 = l bike.updated_at, format: :convert_time
             %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
               = check_mark if bike.status_stolen?
+            %td.hiddenColumn.hidden-xs-down.cycle_type_cell
+              = bike.type_titleize
             %td.hiddenColumn.hidden-xs-down.manufacturer_cell
               = bike.mnfg_name
             %td.hiddenColumn.hidden-xs-down.model_cell

@@ -366,6 +366,11 @@ class Bike < ApplicationRecord
     parking_notifications.current.first
   end
 
+  def messages_count
+    notifications.count + parking_notifications.count + graduated_notifications.count +
+      Feedback.bike(id).count + UserAlert.where(bike_id: id).count
+  end
+
   def status_stolen_or_impounded?
     %w[status_stolen status_impounded].include?(status)
   end
@@ -386,7 +391,13 @@ class Bike < ApplicationRecord
 
   # Small helper because we call this a lot
   def type
-    cycle_type && cycle_type_name.downcase
+    cycle_type && cycle_type_name&.downcase
+  end
+
+  def type_titleize
+    return "" unless type.present?
+    # make this work for e-scooter
+    type.split(/(\s|-)/).map(&:capitalize).join("")
   end
 
   def user_hidden
@@ -966,7 +977,7 @@ class Bike < ApplicationRecord
   end
 
   def cycle_type_name
-    CycleType.new(cycle_type).name
+    CycleType.new(cycle_type)&.name
   end
 
   def propulsion_type_name

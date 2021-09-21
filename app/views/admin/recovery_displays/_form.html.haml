@@ -25,7 +25,7 @@
 
 - if @bike&.manufacturer.present?
   %p.mt-4
-    #{@bike.type.titleize} manufacturer
+    #{@bike.type_titleize} manufacturer
     = link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank"
     \ - Twitter:
     - if @bike.manufacturer.blank? || @bike.manufacturer.other?
@@ -105,7 +105,7 @@
               %span.using-bike-image
                 Using #{@bike.type} image
               %span.not-using-bike-image
-                = @bike.type.titleize
+                = @bike.type_titleize
                 - if @bike.public_images.present?
                   has image
                 - else

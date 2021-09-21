@@ -16,6 +16,23 @@ RSpec.describe Notification, type: :model do
     end
   end
 
+  describe "notifications_sent_or_received_by" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user) }
+    let!(:notification1) { FactoryBot.create(:notification, user: user) }
+    it "gets from and by" do
+      expect {
+        EmailStolenNotificationWorker.new.perform(stolen_notification.id)
+        EmailStolenNotificationWorker.new.perform(stolen_notification.id, true)
+      }.to change(Notification, :count).by 2
+
+      expect(Notification.pluck(:kind)).to match_array(%w[confirmation_email stolen_notification_sent stolen_notification_blocked])
+
+      expect(Notification.notifications_sent_or_received_by(user).pluck(:id).uniq.count).to eq 3
+      expect(Notification.notifications_sent_or_received_by(user.id).pluck(:id).uniq.count).to eq 3
+    end
+  end
+
   describe "calculated_email" do
     let(:notification) { FactoryBot.create(:notification, user: user) }
     let(:user) { FactoryBot.create(:user, email: "stuff@party.eu") }

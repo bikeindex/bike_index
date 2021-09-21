@@ -1,6 +1,7 @@
 # TODO: create notifications for each other notification model:
 # - graduated_notifications
 # - parking_notifications
+# - feedbacks
 # We're creating notifications for other notification models (e.g. StolenNotification),
 # with the long term goal of moving all the notification/emailing logic here and removing it from other models
 
@@ -90,6 +91,17 @@ class Notification < ApplicationRecord
       %w[stolen_twitter_alerter bike_possibly_found]
   end
 
+  def self.notifications_sent_or_received_by(user_or_id)
+    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
+    # TODO: THIS IS SHITTY
+    customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
+    stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
+
+    where(user_id: user_id)
+      .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
+      .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+  end
+
   # TODO: update with twilio delivery status, update scope too
   def delivered?
     email_success? || delivery_status == "text_success"
@@ -139,6 +151,7 @@ class Notification < ApplicationRecord
     "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
   end
 
+  # Update notifications_sent_or_received_by if changing
   def sender
     return nil if self.class.sender_auto_kinds.include?(kind)
     if notifiable_type == "CustomerContact"

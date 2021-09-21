@@ -49,7 +49,7 @@ class Admin::NotificationsController < Admin::BaseController
     end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
-      notifications = notifications.where(user_id: @user.id) if @user.present?
+      notifications = notifications.notifications_sent_or_received_by(@user.id) if @user.present?
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.friendly_find(params[:search_bike_id])

@@ -24,43 +24,49 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
     response.body.with_indifferent_access
   end
 
-  def bikes(updated_at: nil, page: 1, per_page: 10)
+  def bikes(page: 1, per_page: 10, updated_at: nil)
+    # Exclude non-bikes, any bikes without serial numbers, since we won't be
+    # searching for these.
+    bike_attrs =
+      request_bikes(page, per_page, updated_at)
+        .map { |attrs| ExternalRegistryBike::Project529Bike.build_from_api_response(attrs) }
+        .compact
+
+    saved_bikes = bike_attrs.each(&:save).select(&:persisted?)
+
+    ExternalRegistryBike.where(id: saved_bikes.map(&:id))
+  rescue Faraday::TimeoutError
+    ExternalRegistryBike.none
+  end
+
+  def request_bikes(page, per_page, updated_at = nil)
     credentials.set_access_token unless credentials.access_token_valid?
+    # Always parse, because we need to strftime
+    updated_at = TimeParser.parse(updated_at.presence || Time.current - 20.days)
 
     req_params = {
-      updated_at: (updated_at.presence || Time.current - 20.days).strftime("%Y-%m-%d"),
+      updated_at: updated_at.strftime("%Y-%m-%d"),
       page: page,
       per_page: per_page
     }
 
     cache_key = [self.class.to_s, __method__.to_s, req_params]
 
-    response =
+    cached_response =
       Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) {
         response = conn.get("services/v1/bikes") { |req|
           req.headers["Content-Type"] = "application/json"
           req.params = req_params.merge(access_token: credentials.access_token)
         }
 
-        {status: response.status, body: response.body.with_indifferent_access}
+        {status: response.status, body: response.body}
       }
 
-    unless response[:status] == 200 && response[:body].is_a?(Hash)
-      raise Project529ClientError, response
+    if cached_response[:status] == 200 && cached_response[:body].is_a?(Hash)
+      cached_response[:body].with_indifferent_access[:bikes]
+    else
+      raise Project529ClientError, cached_response
     end
-
-    # Exclude non-bikes, any bikes without serial numbers, since we won't be
-    # searching for these.
-    results =
-      response
-        .dig(:body, :bikes)
-        .map { |attrs| ExternalRegistryBike::Project529Bike.build_from_api_response(attrs) }
-        .compact
-        .each(&:save)
-        .select(&:persisted?)
-    ExternalRegistryBike.where(id: results.map(&:id))
-  rescue Faraday::TimeoutError
-    ExternalRegistryBike.none
   end
 
   class Project529ClientError < StandardError; end

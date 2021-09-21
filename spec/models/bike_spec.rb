@@ -1098,9 +1098,18 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "type" do
+    let(:bike) { FactoryBot.build(:bike, cycle_type: type) }
+    let(:type) { "trailer" }
     it "returns the cycle type name" do
-      bike = FactoryBot.create(:bike, cycle_type: "trailer")
       expect(bike.type).to eq("bike trailer")
+      expect(bike.type_titleize).to eq("Bike Trailer")
+    end
+    context "e_scooter" do
+      let(:type) { "e-scooter" }
+      it "returns expected" do
+        expect(bike.type).to eq "e-scooter"
+        expect(bike.type_titleize).to eq "E-Scooter"
+      end
     end
   end
 
