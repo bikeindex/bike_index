@@ -25,6 +25,8 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
   end
 
   def request_bikes(page, per_page, updated_at = nil)
+    credentials.set_access_token unless credentials.access_token_valid?
+
     req_params = {
       updated_at: (updated_at.presence || Time.current - 20.days).strftime("%Y-%m-%d"),
       page: page,
@@ -33,7 +35,7 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
 
     cache_key = [self.class.to_s, __method__.to_s, req_params]
 
-    response =
+    cached_response =
       Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) {
         response = conn.get("services/v1/bikes") { |req|
           req.headers["Content-Type"] = "application/json"
@@ -43,10 +45,10 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
         {status: response.status, body: response.body.with_indifferent_access}
       }
 
-    if response[:status] == 200 && response[:body].is_a?(Hash)
-      response
+    if cached_response[:status] == 200 && cached_response[:body].is_a?(Hash)
+      cached_response
     else
-      raise Project529ClientError, response
+      raise Project529ClientError, cached_response
     end
   end
 

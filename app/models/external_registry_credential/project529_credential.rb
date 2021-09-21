@@ -1,6 +1,7 @@
 class ExternalRegistryCredential::Project529Credential < ExternalRegistryCredential
   validates :app_id, :refresh_token, presence: true
 
+  # Our credential thought it was expired, but apparently it wasn't. See PR#2076
   def set_access_token
     return unless access_token_can_be_reset?
 
