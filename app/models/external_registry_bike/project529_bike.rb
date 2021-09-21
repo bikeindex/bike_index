@@ -19,7 +19,15 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
     info_hash["thumb_url"]
   end
 
+  def updated_at_529
+    TimeParser.parse(info_hash["updated_at_529"])
+  end
+
   class << self
+    def fetch_from_date
+      maximum(:external_updated_at) || Time.current - 3.years
+    end
+
     def build_from_api_response(attrs = {})
       return if attrs["status"]&.downcase == "recovered"
 
@@ -36,9 +44,10 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
       bike.location_found = attrs.dig("active_incident", "location_address")
       bike.frame_colors = frame_colors(attrs)
       bike.description = description(attrs)
-      bike.date_stolen = date_stolen(attrs)
+      bike.date_stolen = StolenRecord.corrected_date_stolen(date_stolen(attrs))
       bike.country = country(attrs)
       bike.info_hash = info_hash(attrs)
+      bike.external_updated_at = TimeParser.parse(attrs["updated_at"])
 
       bike
     end
@@ -47,6 +56,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
 
     def info_hash(attrs)
       photo = primary_photo(attrs)
+      u_529 = TimeParser.parse(attrs["updated_at"])
 
       {
         url: attrs["url"],

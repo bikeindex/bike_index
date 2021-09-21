@@ -29,7 +29,6 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
     # searching for these.
     bike_attrs =
       request_bikes(page, per_page, updated_at)
-        .dig(:body, :bikes)
         .map { |attrs| ExternalRegistryBike::Project529Bike.build_from_api_response(attrs) }
         .compact
 
@@ -59,11 +58,11 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
           req.params = req_params.merge(access_token: credentials.access_token)
         }
 
-        {status: response.status, body: response.body.with_indifferent_access}
+        {status: response.status, body: response.body}
       }
 
     if cached_response[:status] == 200 && cached_response[:body].is_a?(Hash)
-      cached_response
+      cached_response[:body].with_indifferent_access[:bikes]
     else
       raise Project529ClientError, cached_response
     end

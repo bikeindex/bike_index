@@ -993,7 +993,8 @@ CREATE TABLE public.external_registry_bikes (
     info_hash jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    status integer
+    status integer,
+    external_updated_at timestamp without time zone
 );
 
 
@@ -5900,6 +5901,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210730172142'),
 ('20210811141935'),
 ('20210817204248'),
-('20210820220126');
+('20210820220126'),
+('20210921181852');
 
 
