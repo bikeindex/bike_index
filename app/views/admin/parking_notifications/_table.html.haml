@@ -1,0 +1,59 @@
+- render_sortable ||= false
+
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "created_at", render_sortable: render_sortable
+    %th
+      %small= sortable "updated_at", render_sortable: render_sortable
+    - unless current_organization.present?
+      %th
+        = sortable "organization_id", render_sortable: render_sortable
+    %th
+      = sortable "kind", render_sortable: render_sortable
+    %th Bike
+    %th #
+    %th Status
+    %th
+      %small
+        = sortable "user_id", "last updator", render_sortable: render_sortable
+    %th
+      %small= sortable "resolved_at", render_sortable: render_sortable
+  %tbody
+    - parking_notifications.each do |parking_notification|
+      %tr
+        %td
+          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id) }
+            = l(parking_notification.created_at, format: :convert_time)
+        %td
+          %span.convertTime.preciseTime
+            = l(parking_notification.updated_at, format: :convert_time)
+        - unless current_organization.present?
+          %td
+            = link_to parking_notification.organization&.short_name, admin_parking_notifications_path(organization_id: parking_notification.organization_id)
+        %td
+          %small
+            = parking_notification.kind_humanized
+        %td
+          - if parking_notification.bike.present?
+            = link_to organized_bike_text(parking_notification.bike), admin_bike_path(parking_notification.bike)
+        %td
+          - if parking_notification.repeat_record?
+            %small.less-strong
+              = parking_notification.notification_number
+        %td
+          - if parking_notification.status == "impounded"
+            - if parking_notification.impound_record_id.present?
+              = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+            - else
+              %span.text-danger no impound record!
+          - else
+            %em.small
+              = status_display(parking_notification.status)
+        %td
+          %small
+            = parking_notification.user&.display_name&.truncate(20)
+        %td
+          - if parking_notification.resolved_at.present?
+            %small.convertTime.preciseTime
+              = l(parking_notification.resolved_at, format: :convert_time)

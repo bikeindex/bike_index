@@ -319,8 +319,7 @@
             = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
               M<span class="d-none d-md-inline">essages</span>
               %small
-                - msg_count = bike.notifications.count + Feedback.bike(bike.id).count
-                (#{admin_number_display(msg_count)})
+                (#{admin_number_display(bike.messages_count)})
           .nav-item
             = link_to admin_bike_path(bike.id, active_tab: "ownerships"), class: "nav-link bikes-ownerships" do
               O<span class="d-none d-md-inline">wnerships</span>

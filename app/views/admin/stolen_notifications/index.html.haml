@@ -41,7 +41,9 @@
           %td
             = stolen_notification.message.truncate(120)
           %td.table-cell-check
-            - if stolen_notification.send_dates_parsed.count == 1
+            - if stolen_notification.send_dates_parsed.count == 0
+              %span.text-danger no
+            - elsif stolen_notification.send_dates_parsed.count == 1
               = check_mark
             - else
               = stolen_notification.send_dates_parsed.count
