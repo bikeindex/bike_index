@@ -41,9 +41,11 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
 
   def request_bikes(page, per_page, updated_at = nil)
     credentials.set_access_token unless credentials.access_token_valid?
+    # Always parse, because we need to strftime
+    updated_at = TimeParser.parse(updated_at.presence || Time.current - 20.days)
 
     req_params = {
-      updated_at: (updated_at.presence || Time.current - 20.days).strftime("%Y-%m-%d"),
+      updated_at: updated_at.strftime("%Y-%m-%d"),
       page: page,
       per_page: per_page
     }
