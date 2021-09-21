@@ -88,6 +88,9 @@
               = link_to notification.notifiable_display_name, admin_path_for_object(notification.notifiable)
           %td
             - sender_display_name = notification.sender_display_name
-            %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
-              = notification.sender_display_name
+            - if notification.sender.is_a?(User)
+              = link_to sender_display_name, admin_user_path(notification.sender&.id)
+            - else
+              %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
+                = sender_display_name
 
