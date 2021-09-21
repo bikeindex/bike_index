@@ -3,7 +3,7 @@ class StolenNotification < ApplicationRecord
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
 
-  has_one :notification
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :sender, :bike, :message
 
@@ -25,7 +25,7 @@ class StolenNotification < ApplicationRecord
     !bike.status_stolen? && !bike.contact_owner?(sender)
   end
 
-  # Required for compatibility with rails 3 & 4
+  # NOTE: This is legacy. Should be updated to check notifications rather than this
   def send_dates_parsed
     return [] unless send_dates
     send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates

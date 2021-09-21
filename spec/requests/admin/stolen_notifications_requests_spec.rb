@@ -27,36 +27,58 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
     end
 
     describe "resend" do
+      let(:sender) { FactoryBot.create(:user) }
+      let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: sender) }
       it "resends the stolen notification" do
+        # To create the failed notification, happens async normally
+        EmailStolenNotificationWorker.new.perform(stolen_notification.id)
+
         Sidekiq::Worker.clear_all
-        sender = FactoryBot.create(:user)
-        stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
+        expect(stolen_notification.reload.notifications.count).to eq 1
+        expect(stolen_notification.notifications.delivered.count).to eq 1
+        expect(stolen_notification.send_dates_parsed.count).to eq 0
+        expect(stolen_notification.permitted_send?).to be_falsey
+
         expect {
           get "#{base_url}/#{stolen_notification.id}/resend"
         }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+
+        EmailStolenNotificationWorker.drain
+        expect(Notification.count).to eq 2
+        expect(stolen_notification.reload.notifications.count).to eq 2
+        expect(stolen_notification.notifications.delivered.count).to eq 1
+        expect(stolen_notification.send_dates_parsed.count).to eq 1
       end
 
-      it "redirects if the stolen notification has already been sent" do
-        Sidekiq::Worker.clear_all
-        sender = FactoryBot.create(:user)
-        stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
-        stolen_notification.update_attribute :send_dates, [69].to_json
+      context "stolen_notification sent" do
+        # For send
+        before { EmailStolenNotificationWorker.new.perform(stolen_notification.id, true) }
 
-        expect {
-          get "#{base_url}/#{stolen_notification.id}/resend"
-        }.to change(EmailStolenNotificationWorker.jobs, :size).by(0)
-        expect(response).to redirect_to(:admin_stolen_notification)
-      end
+        it "redirects if the stolen notification has already been sent" do
+          Sidekiq::Worker.clear_all
+          expect(stolen_notification.reload.notifications.count).to eq 1
+          expect(stolen_notification.send_dates_parsed.count).to eq 1
 
-      it "resends if the stolen notification has already been sent if we say pretty please" do
-        Sidekiq::Worker.clear_all
-        sender = FactoryBot.create(:user)
-        stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
-        stolen_notification.update_attribute :send_dates, [69].to_json
+          expect {
+            get "#{base_url}/#{stolen_notification.id}/resend"
+          }.to change(EmailStolenNotificationWorker.jobs, :size).by(0)
+          expect(response).to redirect_to(:admin_stolen_notification)
+          EmailStolenNotificationWorker.drain
+          expect(stolen_notification.send_dates_parsed.count).to eq 1
+        end
 
-        expect {
-          get "#{base_url}/#{stolen_notification.id}/resend?pretty_please=true"
-        }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+        it "resends if the stolen notification has already been sent if we say pretty please" do
+          Sidekiq::Worker.clear_all
+          expect(stolen_notification.reload.notifications.count).to eq 1
+
+          expect {
+            get "#{base_url}/#{stolen_notification.id}/resend?pretty_please=true"
+          }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+
+          EmailStolenNotificationWorker.drain
+          expect(stolen_notification.reload.notifications.count).to eq 2
+          expect(stolen_notification.send_dates_parsed.count).to eq 2
+        end
       end
     end
   end
