@@ -19,10 +19,6 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
     info_hash["thumb_url"]
   end
 
-  def updated_at_529
-    TimeParser.parse(info_hash["updated_at_529"])
-  end
-
   class << self
     def fetch_from_date
       maximum(:external_updated_at) || Time.current - 3.years
@@ -56,7 +52,6 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
 
     def info_hash(attrs)
       photo = primary_photo(attrs)
-      u_529 = TimeParser.parse(attrs["updated_at"])
 
       {
         url: attrs["url"],

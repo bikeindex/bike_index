@@ -35,7 +35,6 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
     saved_bikes = bike_attrs.each(&:save).select(&:persisted?)
 
     ExternalRegistryBike.where(id: saved_bikes.map(&:id))
-
   rescue Faraday::TimeoutError
     ExternalRegistryBike.none
   end
