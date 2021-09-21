@@ -21,7 +21,6 @@ RSpec.describe Notification, type: :model do
     let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user) }
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
-      # To create the failed notification, happens async normally
       expect {
         EmailStolenNotificationWorker.new.perform(stolen_notification.id)
         EmailStolenNotificationWorker.new.perform(stolen_notification.id, true)
