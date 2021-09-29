@@ -4,16 +4,16 @@ class @AdDisplayer
   ads_full_width = ["adFullWidth"]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
-  max_tracker_300 = "<a id=\"binxad-max_tracker_300\" href=\"https://mymaxtracker.com/\"><img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\"></a>"
-  max_tracker_468 = "<a id=\"binxad-max_tracker_468\" href=\"https://mymaxtracker.com/\"><img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\"></a>"
+
+  max_tracker_url = "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"
 
   internalAds = {
     "max_tracker_300": {
-      "href": "https://mymaxtracker.com",
+      "href": max_tracker_url,
       "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
     },
     "max_tracker_468": {
-      "href": "https://mymaxtracker.com",
+      "href": max_tracker_url,
       "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
     }
   }
