@@ -1385,7 +1385,6 @@ en:
       with_coaster_brake: with coaster brake
     scanned:
       added: Added
-      bikemnfg_name: bike.mnfg_name
       color: Color
       isnt_linked_to_a_bike: isn't linked to a bike.
       link_bike_sticker_kind: Link %{bike_sticker_kind}
@@ -2197,7 +2196,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2223,7 +2222,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
