@@ -12,14 +12,6 @@ class Admin::BikeStickersController < Admin::BaseController
         .includes(:organization)
         .page(page)
         .per(per_page)
-    @bike_sticker_batches = if @bike_sticker_batch.present?
-      [@bike_sticker_batch]
-    elsif @matching_batches
-      BikeStickerBatch.where(id: @bike_stickers.reorder(:bike_sticker_batch_id).distinct.pluck(:bike_sticker_batch_id))
-        .reorder(id: :desc)
-    else
-      BikeStickerBatch.reorder(id: :desc).limit(5)
-    end
   end
 
   helper_method :matching_bike_stickers
@@ -34,7 +26,6 @@ class Admin::BikeStickersController < Admin::BaseController
     return @matching_bike_stickers if defined?(@matching_bike_stickers)
     bike_stickers = BikeSticker.all
     if current_organization.present?
-      @matching_batches = true
       bike_stickers = bike_stickers.where(organization_id: current_organization.id)
     end
     if params[:search_bike_sticker_batch_id].present?
@@ -43,11 +34,9 @@ class Admin::BikeStickersController < Admin::BaseController
     end
     if params[:search_claimed].present? || sort_column == "claimed_at"
       @search_claimed = true
-      @matching_batches = true
       bike_stickers = bike_stickers.claimed
     end
     if params[:search_query].present?
-      @matching_batches = true
       bike_stickers = bike_stickers.admin_text_search(params[:search_query])
     end
     @time_range_column = sort_column if %w[created_at updated_at claimed_at].include?(sort_column)

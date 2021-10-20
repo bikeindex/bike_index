@@ -7,19 +7,61 @@
       %li.nav-item
         = link_to "graph", admin_bike_stickers_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
+  - bike_sticker_batches = [@bike_sticker_batch] if @bike_sticker_batch.present?
+  - bike_sticker_batches ||= BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
   .col-12.mt-4
     - unless @bike_sticker_batch.present? # Doesn't make sense to count if there is a batch
       %h5
-        = admin_number_display(@bike_sticker_batches.count)
-        - if @matching_batches
-          matching batches
-        - else
-          most recent batches
-          %small.less-strong
-            \-
-            = admin_number_display(BikeStickerBatch.count)
-            total batches
-    = render partial: "/admin/bike_sticker_batches/table", locals: {bike_sticker_batches: @bike_sticker_batches.limit(5), render_sortable: false}
+        = number_with_delimiter(bike_sticker_batches.count)
+        Sticker Batches
+  .col-12
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm
+        %thead
+          %th Batch
+          %th Created
+          %th Updated
+          %th Creator
+          %th Organization
+          %th
+            %small count
+          %th
+            %small claimed
+          %th Prefix
+          %th
+            %small Min
+          %th
+            %small Max
+          %th Notes
+        %tbody
+          - bike_sticker_batches.each do |bike_sticker_batch|
+            %tr
+              %td
+                #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id)}
+              %td
+                %span.convertTime
+                  = l bike_sticker_batch.created_at, format: :convert_time
+              %td
+                %small.convertTime
+                  = l bike_sticker_batch.updated_at, format: :convert_time
+              %td
+                %small
+                  = bike_sticker_batch.user&.display_name
+              %td
+                - if bike_sticker_batch.organization.present?
+                  = link_to bike_sticker_batch.organization.name, admin_bike_stickers_path(organization_id: bike_sticker_batch.organization_id)
+              %td
+                %small= number_with_delimiter(bike_sticker_batch.bike_stickers.count)
+              %td
+                %small= number_with_delimiter(bike_sticker_batch.bike_stickers.claimed.count)
+              %td
+                %small= bike_sticker_batch.prefix
+              %td
+                %small= number_with_delimiter(bike_sticker_batch.min_code_integer)
+              %td
+                %small= number_with_delimiter(bike_sticker_batch.max_code_integer)
+              %td
+                %small= bike_sticker_batch.notes
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_bike_stickers, column: @time_range_column), stacked: true, thousands: ",", defer: true

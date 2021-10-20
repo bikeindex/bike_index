@@ -1,0 +1,50 @@
+- render_sortable ||= false
+- bike_sticker_batches ||= @bike_sticker_batches
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead
+      %th= sortable "id", "batch", render_sortable: render_sortable
+      %th= sortable "created_at", render_sortable: render_sortable
+      %th.small= sortable "updated_at", render_sortable: render_sortable
+      %th= sortable "creator_id", render_sortable: render_sortable
+      %th= sortable "organization_id", render_sortable: render_sortable
+      %th
+        %small count
+      %th
+        %small claimed
+      %th Prefix
+      %th
+        %small Min
+      %th
+        %small Max
+      %th Notes
+    %tbody
+      - bike_sticker_batches.each do |bike_sticker_batch|
+        %tr
+          %td
+            #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id)}
+          %td
+            %span.convertTime
+              = l bike_sticker_batch.created_at, format: :convert_time
+          %td
+            %small.convertTime
+              = l bike_sticker_batch.updated_at, format: :convert_time
+          %td
+            %small
+              = bike_sticker_batch.user&.display_name
+          %td
+            - if bike_sticker_batch.organization.present?
+              = link_to bike_sticker_batch.organization.name, admin_bike_stickers_path(organization_id: bike_sticker_batch.organization_id)
+          %td
+            %small= number_with_delimiter(bike_sticker_batch.bike_stickers.count)
+          %td
+            %small= number_with_delimiter(bike_sticker_batch.bike_stickers.claimed.count)
+          %td
+            %small= bike_sticker_batch.prefix
+          %td
+            %small= number_with_delimiter(bike_sticker_batch.min_code_integer)
+          %td
+            %small= number_with_delimiter(bike_sticker_batch.max_code_integer)
+          %td
+            %small= bike_sticker_batch.notes
