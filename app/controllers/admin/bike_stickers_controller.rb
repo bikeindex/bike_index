@@ -18,7 +18,9 @@ class Admin::BikeStickersController < Admin::BaseController
       BikeStickerBatch.where(id: @bike_stickers.reorder(:bike_sticker_batch_id).distinct.pluck(:bike_sticker_batch_id))
         .reorder(id: :desc)
     else
-      BikeStickerBatch.reorder(id: :desc).limit(5)
+      @all_batches = ParamsNormalizer.boolean(params[:search_all_batches])
+      batches = BikeStickerBatch.reorder(id: :desc)
+      @all_batches ? batches : batches.limit(5)
     end
   end
 
