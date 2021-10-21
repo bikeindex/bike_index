@@ -18,14 +18,7 @@ class Admin::UsersController < Admin::BaseController
     if params[:id] == @user.username
       redirect_to edit_admin_user_path(@user.id)
     end
-    # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-    bikes = if @user.rough_approx_bikes.count > 25
-      @user.rough_approx_bikes
-    else
-      @user.bikes
-    end
-    @bikescount = @user.bikes.count
-    @bikes = bikes.reorder(created_at: :desc).limit(10)
+    calculate_user_bikes
   end
 
   def update
@@ -45,7 +38,7 @@ class Admin::UsersController < Admin::BaseController
         @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
         redirect_to admin_users_url, notice: "User Updated"
       else
-        @bikes = @user.bikes
+        calculate_user_bikes
         render action: :edit
       end
     end
@@ -118,5 +111,16 @@ class Admin::UsersController < Admin::BaseController
 
     @time_range_column = sort_column == "updated_at" ? "updated_at" : "created_at"
     users.where(@time_range_column => @time_range)
+  end
+
+  def calculate_user_bikes
+    # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
+    bikes = if @user.rough_approx_bikes.count > 25
+      @user.rough_approx_bikes
+    else
+      @user.bikes
+    end
+    @bikescount = @user.bikes.count
+    @bikes = bikes.reorder(created_at: :desc).limit(10)
   end
 end
