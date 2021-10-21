@@ -1,0 +1,87 @@
+%h1
+  New Bike Sticker Batch
+
+.card.bg-light
+  .card-body
+    %h4 Examples
+    %p Here are the values for a few example sticker batches.
+    %table.table.table-sm.table-bordered.table-striped
+      %thead
+        %th Batch
+        %th First & Last Sticker
+        %th
+          %em Code Prefix
+        %th
+          %em Initial Sticker number
+        %th
+          %em Number of stickers to create
+        %th
+          %em Code Number Length
+
+      %tbody
+        %tr
+          %td
+            = link_to "#9 (EPS 2)", admin_bike_stickers_path(search_bike_sticker_batch_id: 9)
+          %td
+            %strong.small.d-block ED 010 133
+            %strong.small.d-block ED 061 132
+          %td
+            %code ED
+          %td
+            %code 10133
+          %td
+            %code 51000
+          %td
+            %code 6
+        %tr
+          %td
+            = link_to "#21 (3rd internal)", admin_bike_stickers_path(search_bike_sticker_batch_id: 21)
+          %td
+            %strong.small.d-block A 250 0
+            %strong.small.d-block A 309 8
+
+          %td
+            %code A
+          %td
+            %code 2500
+          %td
+            %code 599
+          %td
+            %em.less-strong blank
+
+
+= form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
+  - if @bike_sticker_batch.errors.any?
+    = render partial: "shared/errors", locals: { name: "Sticker Batch", obj: @bike_sticker_batch }
+  .row.mt-4
+    .col-md-6.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :organization_id
+        = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control", required: true})
+    .col-md-6.col-lg-9
+      .form-group
+        = f.label :notes, "Notes"
+        = f.text_field :notes, class: "form-control"
+  .row.mt-2
+    .col-md-4.col-6
+      .form-group
+        = f.label :prefix, "Code letter prefix"
+        = f.text_field :prefix, required: true, class: "form-control"
+    .col-md-4.col-6
+      .form-group
+        = f.label :initial_code_integer, "Initial sticker number"
+        = f.number_field :initial_code_integer, required: true, class: "form-control"
+    .col-md-4.col-6
+      .form-group
+        = f.label :code_number_length do
+          Code Number Length
+          %small.less-strong
+            Leave blank unless you want extra zeros
+        = f.number_field :code_number_length, class: "form-control"
+    .col-md-4.col-6
+      .form-group
+        = f.label :stickers_to_create_count, "Number of stickers to create"
+        = f.number_field :stickers_to_create_count, required: true, class: "form-control"
+  .row.mt-2
+    .col-auto
+      = f.submit "Create", class: "btn btn-success"
