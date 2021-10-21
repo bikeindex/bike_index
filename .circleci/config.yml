@@ -285,7 +285,7 @@ jobs:
       - run:
           name: Deploying to Cloud66 production
           command: |
-            curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
+            curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
   version: 2

@@ -5,6 +5,8 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "New batch", new_admin_bike_sticker_path, class: "btn btn-outline-success btn-sm"
+      %li.nav-item
         = link_to "graph", admin_bike_stickers_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
   .col-12.mt-4
@@ -12,17 +14,21 @@
       %h5
         = admin_number_display(@bike_sticker_batches.count)
         - if @matching_batches
-          matching batches
+          matching
+          = "batch".pluralize(@bike_sticker_batches.count)
         - elsif @all_batches
           batches
+          %small.less-strong
+            \- show
+            = link_to "only most recent", admin_bike_stickers_path(sortable_search_params.merge(search_all_batches: false))
         - else
           most recent batches
           %small.less-strong
             \-
             = admin_number_display(BikeStickerBatch.count)
-            = link_to "total", admin_bike_stickers_path(sortable_search_params.merge(search_all_batches: true)), class: "less-strong"
-            batches
-    = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
+            = link_to "total batches", admin_bike_stickers_path(sortable_search_params.merge(search_all_batches: true)), class: "less-strong"
+
+    = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches}
 
 
   = render partial: "/shared/admin_current_header", locals: { viewing: "Stickers" }
@@ -36,8 +42,9 @@
 .row.mt-4
   .col-md-6
     %p
-      = number_with_delimiter(@bike_stickers.total_count)
-      matching stickers
+      = admin_number_display(@bike_stickers.total_count)
+      matching
+      = "sticker".pluralize(@bike_stickers.total_count)
       - unless @search_claimed
         %span.less-strong
           = number_with_delimiter(matching_bike_stickers.claimed.count)

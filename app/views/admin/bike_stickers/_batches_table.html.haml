@@ -1,3 +1,4 @@
+- matching_count ||= false
 - render_sortable ||= false
 - bike_sticker_batches ||= @bike_sticker_batches
 
@@ -9,6 +10,9 @@
       %th.small= sortable "updated_at", render_sortable: render_sortable
       %th= sortable "creator_id", render_sortable: render_sortable
       %th= sortable "organization_id", render_sortable: render_sortable
+      - if matching_count
+        %th
+          %strong.text-info matching count
       %th
         %small count
       %th
@@ -36,15 +40,18 @@
           %td
             - if bike_sticker_batch.organization.present?
               = link_to bike_sticker_batch.organization.name, admin_bike_stickers_path(organization_id: bike_sticker_batch.organization_id)
+          - if matching_count
+            %td
+              = admin_number_display(@bike_stickers.where(bike_sticker_batch_id: bike_sticker_batch.id).count)
           %td
-            %small= number_with_delimiter(bike_sticker_batch.bike_stickers.count)
+            %small= admin_number_display(bike_sticker_batch.bike_stickers.count)
           %td
-            %small= number_with_delimiter(bike_sticker_batch.bike_stickers.claimed.count)
+            %small= admin_number_display(bike_sticker_batch.bike_stickers.claimed.count)
           %td
             %small= bike_sticker_batch.prefix
           %td
-            %small= number_with_delimiter(bike_sticker_batch.min_code_integer)
+            %small= admin_number_display(bike_sticker_batch.min_code_integer)
           %td
-            %small= number_with_delimiter(bike_sticker_batch.max_code_integer)
+            %small= admin_number_display(bike_sticker_batch.max_code_integer)
           %td
             %small= bike_sticker_batch.notes

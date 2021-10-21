@@ -1,6 +1,5 @@
 class Admin::BikeStickersController < Admin::BaseController
   include SortableTable
-
   before_action :set_period, only: [:index]
 
   def index
@@ -22,6 +21,14 @@ class Admin::BikeStickersController < Admin::BaseController
       batches = BikeStickerBatch.reorder(id: :desc)
       @all_batches ? batches : batches.limit(5)
     end
+  end
+
+  def new
+    @bike_sticker_batch ||= BikeStickerBatch.new
+    @bike_sticker_batch.organization ||= current_organization
+    @bike_sticker_batch.initial_code_integer ||= 0
+    @bike_sticker_batch.stickers_to_create_count ||= 0
+    @organizations = Organization.all
   end
 
   helper_method :matching_bike_stickers

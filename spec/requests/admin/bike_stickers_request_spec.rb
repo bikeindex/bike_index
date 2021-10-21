@@ -13,7 +13,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:bike_stickers)).to eq([bike_sticker])
-      expect(assigns(:bike_sticker_batch_id)).to eq([bike_sticker_batch])
+      expect(assigns(:bike_sticker_batches)).to eq([bike_sticker_batch])
     end
     context "with search_query" do
       it "renders" do
@@ -23,6 +23,14 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         expect(assigns(:bike_stickers)).to eq([])
         expect(assigns(:bike_sticker_batches)).to eq([])
       end
+    end
+  end
+
+  describe "new" do
+    it "renders" do
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:new)
     end
   end
 end

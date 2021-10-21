@@ -3,6 +3,8 @@ class BikeStickerBatch < ApplicationRecord
   belongs_to :organization
   has_many :bike_stickers
 
+  attr_accessor :initial_code_integer, :stickers_to_create_count
+
   def min_code_integer
     bike_stickers.minimum(:code_integer) || 0
   end
