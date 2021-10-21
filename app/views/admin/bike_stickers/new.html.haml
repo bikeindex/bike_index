@@ -64,7 +64,7 @@
     .col-md-4.col-6
       .form-group
         = f.label :initial_code_integer, "Initial sticker number"
-        = f.number_field :initial_code_integer, class: "form-control"
+        = f.number_field :initial_code_integer, required: true, class: "form-control"
     .col-md-4.col-6
       .form-group
         = f.label :code_number_length do
