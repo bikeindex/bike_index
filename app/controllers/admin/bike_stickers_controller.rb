@@ -26,8 +26,7 @@ class Admin::BikeStickersController < Admin::BaseController
   def new
     @bike_sticker_batch ||= BikeStickerBatch.new
     @bike_sticker_batch.organization ||= current_organization
-    @bike_sticker_batch.initial_code_integer ||= 0
-    @bike_sticker_batch.stickers_to_create_count ||= 0
+    @bike_sticker_batch.initial_code_integer ||= 1
     @organizations = Organization.all
   end
 

@@ -14,6 +14,8 @@
         %th
           %em Initial Sticker number
         %th
+          %em Number of stickers to create
+        %th
           %em Code Number Length
 
       %tbody
@@ -29,6 +31,8 @@
             %code 10133
           %td
             %code 51000
+          %td
+            %code 6
         %tr
           %td
             = link_to "#21 (3rd internal)", admin_bike_stickers_path(search_bike_sticker_batch_id: 21)
@@ -42,6 +46,8 @@
             %code 2500
           %td
             %code 599
+          %td
+            %em.less-strong blank
 
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
