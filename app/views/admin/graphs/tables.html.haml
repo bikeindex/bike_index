@@ -126,8 +126,8 @@
             %td
               = year
             %td
-              / Because of data import from SBR - after, we want created_at,it's more reliable
-              / because we automatically take it, also, people reporting previous thefts, etc
+              / Because of data import from SBR - after, we want created_at, it's more reliable
+            / and we're actually showing bikes registered/recorded - not stolen times
               - if [2013, 2014].include?(year)
                 - stolen_in_year = stolen_records.where(date_stolen: date.all_year).count
               - else
