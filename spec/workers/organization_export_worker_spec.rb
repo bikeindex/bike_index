@@ -50,11 +50,12 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:user) { FactoryBot.create(:admin) }
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
         let(:bike_for_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
-        let!(:b_param) do
-          FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
-                                      params: {bike: {address: "102 Washington Pl, State College",
-                                                      user_name: "Maya Skripal"}})
-        end
+        let!(:creation_state) { bike_for_avery.reload.current_creation_state.update(creation_state_attributes) }
+        let(:creation_state_attributes) { {registration_info: {address: "102 Washington Pl, State College", user_name: "Maya Skripal"}} }
+        # let!(:b_param) do
+        #   FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
+        #                               params: {bike: })
+        # end
         let(:bike_not_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
         let!(:b_param_partial) do
           FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,

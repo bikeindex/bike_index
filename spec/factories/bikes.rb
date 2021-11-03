@@ -20,6 +20,27 @@ FactoryBot.define do
       end
     end
 
+    trait :with_creation_state do
+      transient do
+        creation_state_is_pos { false }
+        creation_state_pos_kind { "" }
+        creation_state_bulk_import { nil }
+        creation_state_registration_info { nil }
+      end
+      after(:create) do |bike, evaluator|
+        create(:creation_state, creator: bike.creator,
+                                bike: bike,
+                                created_at: bike.created_at,
+                                organization: bike.creation_organization,
+                                can_edit_claimed: evaluator.can_edit_claimed,
+                                is_pos: evaluator.creation_state_is_pos,
+                                pos_kind: evaluator.creation_state_pos_kind,
+                                bulk_import: evaluator.creation_state_bulk_import,
+                                registration_info: evaluator.creation_state_registration_info)
+        bike.reload # reflexively sets bike.current_creation_state
+      end
+    end
+
     trait :with_ownership do
       transient do
         user { nil }
@@ -139,47 +160,23 @@ FactoryBot.define do
         bike.reload
       end
 
-      factory :bike_lightspeed_pos do
-        after(:create) do |bike, _evaluator|
-          create(:creation_state, creator: bike.creator,
-                                  bike: bike,
-                                  created_at: bike.created_at,
-                                  is_pos: true,
-                                  pos_kind: "lightspeed_pos",
-                                  organization: bike.creation_organization)
-          bike.reload # reflexively sets bike.current_creation_state
-        end
+      factory :bike_lightspeed_pos, traits: [:with_creation_state] do
+        creation_state_is_pos { true }
+        creation_state_pos_kind { "lightspeed_pos" }
       end
 
-      factory :bike_ascend_pos do
+      factory :bike_ascend_pos , traits: [:with_creation_state] do
         transient do
           bulk_import { FactoryBot.create(:bulk_import_ascend, organization: organization) }
         end
-        after(:create) do |bike, evaluator|
-          create(:creation_state, creator: bike.creator,
-                                  bike: bike,
-                                  created_at: bike.created_at,
-                                  is_pos: true,
-                                  pos_kind: "ascend_pos",
-                                  bulk_import: evaluator.bulk_import,
-                                  organization: bike.creation_organization)
-          bike.reload # reflexively sets bike.current_creation_state
-        end
+        creation_state_is_pos { true }
+        creation_state_pos_kind { "ascend_pos" }
+        creation_state_bulk_import { bulk_import }
       end
     end
 
     # Generally, you should use the bike_organized factory, not this one
-    factory :creation_organization_bike, traits: [:organized_bikes] do
-      after(:create) do |bike, evaluator|
-        create(:creation_state, creator: bike.creator,
-                                organization: bike.creation_organization,
-                                bike: bike,
-                                created_at: bike.created_at,
-                                can_edit_claimed: evaluator.can_edit_claimed)
-        bike.save
-        bike.reload
-      end
-    end
+    factory :creation_organization_bike, traits: [:organized_bikes, :with_creation_state]
 
     trait :blue_trek_930 do
       frame_model { "930" }
