@@ -165,10 +165,6 @@ FactoryBot.define do
         creation_state_pos_kind { "ascend_pos" }
         creation_state_bulk_import { bulk_import }
       end
-
-      # TODO!!!! Replace creation_organization_bike everywhere with bike_organized
-      # Generally, you should use the bike_organized factory, not this one
-      factory :creation_organization_bike
     end
 
     trait :blue_trek_930 do

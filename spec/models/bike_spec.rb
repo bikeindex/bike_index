@@ -1291,7 +1291,7 @@ RSpec.describe Bike, type: :model do
     context "unclaimed bike, with owner email" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
-      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
       let(:b_param) do
         FactoryBot.create(:b_param, created_bike_id: bike.id,
                                     params: {bike: {address: "102 Washington Pl, State College"}})

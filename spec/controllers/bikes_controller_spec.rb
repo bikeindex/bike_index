@@ -244,7 +244,7 @@ RSpec.describe BikesController, type: :controller do
       # This is mostly legacy - really we don't care about creation organization
       # Leaving this in just for better test coverage
       context "bike created by organization" do
-        let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
         it "renders" do
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
           get :show, params: {id: bike.id}

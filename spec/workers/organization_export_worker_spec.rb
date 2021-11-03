@@ -7,7 +7,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:organization) { export.organization }
   let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-  let(:bike) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
   let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
@@ -49,14 +49,14 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "avery export" do
         let(:user) { FactoryBot.create(:admin) }
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
-        let(:bike_for_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let(:bike_for_avery) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
         let!(:creation_state) { bike_for_avery.reload.current_creation_state.update(creation_state_attributes) }
         let(:creation_state_attributes) { {registration_info: {address: "102 Washington Pl, State College", user_name: "Maya Skripal"}} }
         # let!(:b_param) do
         #   FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
         #                               params: {bike: })
         # end
-        let(:bike_not_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let(:bike_not_avery) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
         let!(:b_param_partial) do
           FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,
                                       params: {bike: {address: "State College, PA",
@@ -144,7 +144,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
       let(:bike) do
-        FactoryBot.create(:creation_organization_bike,
+        FactoryBot.create(:bike_organized,
           organization: organization,
           manufacturer: Manufacturer.other,
           frame_model: '",,,\"<script>XSSSSS</script>',
@@ -194,7 +194,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
-      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
+      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
       let(:target_address) { {street: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103", country: "US", latitude: 37.7870205, longitude: -122.403928}.as_json }
