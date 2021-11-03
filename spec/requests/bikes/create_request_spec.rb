@@ -319,6 +319,7 @@ RSpec.describe "BikesController#create", type: :request do
             tertiary_frame_color_id: "",
             owner_email: "something@stuff.COM   ",
             phone: "312.379.9513",
+            student_id: " ",
             bike_code: "ed001"
           }
         }
@@ -333,6 +334,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.user).to be_blank
       expect(new_bike.status).to eq "status_with_owner"
       expect(new_bike.phone).to eq "3123799513"
+      expect(new_bike.student_id).to eq nil
 
       expect(new_bike.current_creation_state.organization&.id).to eq organization.id
       expect(new_bike.current_creation_state.origin).to eq "embed_extended"
@@ -371,7 +373,7 @@ RSpec.describe "BikesController#create", type: :request do
             extra_registration_number: "XXXZZZ",
             organization_affiliation: "employee",
             student_id: "999888",
-            phone: "888.777.6666"
+            phone: "1 (888) 777 - 6666"
           }
         }
       }.to change(Bike, :count).by(1)
@@ -380,7 +382,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.creator_id).to eq current_user.id
       b_param.reload
       expect(b_param.created_bike_id).to eq new_bike.id
-      expect(b_param.phone).to eq "8887776666"
+      expect(b_param.phone).to eq "18887776666"
       expect_attrs_to_match_hash(new_bike, testable_bike_params)
       expect(new_bike.manufacturer).to eq manufacturer
       expect(new_bike.current_creation_state.origin).to eq "embed_partial"
@@ -393,7 +395,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.organization_affiliation).to eq "employee"
       expect(new_bike.student_id).to eq "999888"
       expect_hashes_to_match(new_bike.conditional_information, {organization_affiliation: "employee", student_id: "999888"})
-      expect(new_bike.phone).to eq "8887776666"
+      expect(new_bike.phone).to eq "18887776666"
       current_user.reload
       expect(new_bike.owner).to eq current_user # NOTE: not bike user
       expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
