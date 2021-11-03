@@ -3,6 +3,10 @@ class BikeStickerBatch < ApplicationRecord
   belongs_to :organization
   has_many :bike_stickers
 
+  before_validation :set_calculated_attributes
+
+  attr_accessor :initial_code_integer, :stickers_to_create_count
+
   def min_code_integer
     bike_stickers.minimum(:code_integer) || 0
   end
@@ -11,6 +15,7 @@ class BikeStickerBatch < ApplicationRecord
     bike_stickers.maximum(:code_integer) || 0
   end
 
+  # Should be called through CreateBikeStickerCodesWorker generally
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
     initial_code_integer ||= max_code_integer
@@ -53,6 +58,12 @@ class BikeStickerBatch < ApplicationRecord
       previous = i
     end
     non_sequential
+  end
+
+  def set_calculated_attributes
+    self.prefix = prefix&.upcase&.strip
+    # Set this because we calculate off it in Admin controller
+    self.initial_code_integer = initial_code_integer&.to_i
   end
 
   private

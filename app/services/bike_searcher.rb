@@ -146,7 +146,7 @@ class BikeSearcher
   end
 
   def fuzzy_find_serial
-    return nil unless @normer.normalized_segments.present?
+    return [] unless @normer.normalized_segments.present?
     bike_ids = fuzzy_find_serial_ids
     # Don't return exact matches
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)

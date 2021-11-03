@@ -121,11 +121,15 @@ RSpec.describe BikeSearcher do
       result = search.fuzzy_find_serial
       expect(result.first).to eq(bike)
       expect(result.count).to eq(1)
+      expect(search.close_serials.map(&:id)).to eq([bike.id])
     end
     it "doesn't find exact matches" do
       FactoryBot.create(:bike, serial_number: "K10DY00047-bkd")
       search = BikeSearcher.new(serial: "bkd-K1oDYooo47")
       expect(search.fuzzy_find_serial).to be_empty
+    end
+    it "returns nil" do
+      expect(BikeSearcher.new(serial: "unknown").close_serials).to eq([])
     end
   end
 
