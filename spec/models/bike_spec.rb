@@ -1469,24 +1469,6 @@ RSpec.describe Bike, type: :model do
         end
       end
     end
-    context "b_param" do
-      let(:ownership) { Ownership.new }
-      let(:b_param) { BParam.new(params: {bike: {user_name: "Jane Yung"}}) }
-      before do
-        allow(bike).to receive(:current_ownership) { ownership }
-        allow(bike).to receive(:b_params) { [b_param] }
-      end
-      it "returns the phone" do
-        expect(bike.owner_name).to eq "Jane Yung"
-      end
-      context "not first ownerships" do
-        it "is the users " do
-          allow(ownership).to receive(:first?) { false }
-          allow(bike).to receive(:current_ownership) { ownership }
-          expect(bike.owner_name).to be_nil
-        end
-      end
-    end
   end
 
   describe "phone" do

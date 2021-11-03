@@ -22,6 +22,7 @@ FactoryBot.define do
 
     trait :with_creation_state do
       transient do
+        can_edit_claimed { true }
         creation_state_is_pos { false }
         creation_state_pos_kind { "" }
         creation_state_bulk_import { nil }
@@ -143,22 +144,13 @@ FactoryBot.define do
       end
     end
 
-    trait :organized_bikes do # don't use this trait, use the factories it's included with
+    factory :bike_organized, traits: [:with_creation_state] do
       transient do
+        # TODO: remove this (we should only reference creation_organization) - requires updating a bunch of specs
         organization { FactoryBot.create(:organization) }
-        can_edit_claimed { true }
       end
-      creation_organization { organization }
-    end
 
-    factory :bike_organized, traits: [:organized_bikes] do
-      after(:create) do |bike, evaluator|
-        create(:bike_organization, organization: bike.creation_organization,
-                                   bike: bike,
-                                   created_at: bike.created_at,
-                                   can_edit_claimed: evaluator.can_edit_claimed)
-        bike.reload
-      end
+      creation_organization { organization }
 
       factory :bike_lightspeed_pos, traits: [:with_creation_state] do
         creation_state_is_pos { true }
@@ -167,16 +159,17 @@ FactoryBot.define do
 
       factory :bike_ascend_pos , traits: [:with_creation_state] do
         transient do
-          bulk_import { FactoryBot.create(:bulk_import_ascend, organization: organization) }
+          bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end
         creation_state_is_pos { true }
         creation_state_pos_kind { "ascend_pos" }
         creation_state_bulk_import { bulk_import }
       end
-    end
 
-    # Generally, you should use the bike_organized factory, not this one
-    factory :creation_organization_bike, traits: [:organized_bikes, :with_creation_state]
+      # TODO!!!! Replace creation_organization_bike everywhere with bike_organized
+      # Generally, you should use the bike_organized factory, not this one
+      factory :creation_organization_bike
+    end
 
     trait :blue_trek_930 do
       frame_model { "930" }

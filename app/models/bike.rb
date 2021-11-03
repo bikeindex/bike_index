@@ -790,7 +790,7 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
-  # THIS IS FUCKING ABNOXIOUS.
+  # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
   def address
     Geocodeable.address(self, country: [:optional])
