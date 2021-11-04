@@ -51,6 +51,8 @@ module ControllerSpecHelpers
     let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = user.id.to_s }
     let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
     let(:all_scopes) { OAUTH_SCOPES.join(" ") }
+    # Partner Doorkeeper app looked up by ID
+    let(:bikehub_doorkeeper_app) { doorkeeper_app.update_attribute(:id, 264) && doorkeeper_app }
 
     let(:v2_access_token) do
       Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: v2_access_id, scopes: "write_bikes")

@@ -173,12 +173,29 @@ RSpec.describe SessionsController, type: :controller do
         get :destroy, params: {partner: "bikehub"}
         expect(cookies.signed[:auth]).to be_nil
         expect(session[:user_id]).to be_nil
-        expect(response).to redirect_to "https://parkit.bikehub.com"
+        expect(response).to redirect_to "https://parkit.bikehub.com/"
         expect(session[:return_to]).to be_nil
         expect(session[:partner]).to be_nil
         expect(session[:passive_organization_id]).to be_nil
         expect(session[:whatever]).to be_nil
       end
+      # context "other domain" do
+      #   include_context :existing_doorkeeper_app
+      #   before { expect(bikehub_doorkeeper_app).to be_present }
+      #   it "redirects to bikehub" do
+      #     get :destroy, params: {partner: "bikehub", return_to: "https://staging.bikehub.com/"}
+      #     expect(cookies.signed[:auth]).to be_nil
+      #     expect(session[:user_id]).to be_nil
+      #     expect(response).to redirect_to "https://staging.bikehub.com/"
+      #     expect(session[:return_to]).to be_nil
+      #     expect(session[:partner]).to be_nil
+      #     expect(session[:passive_organization_id]).to be_nil
+      #     expect(session[:whatever]).to be_nil
+      #   end
+      #   context "invalid other domain" do
+      #     it "redirects to parkit"
+      #   end
+      # end
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }
@@ -213,7 +230,7 @@ RSpec.describe SessionsController, type: :controller do
           expect(user.last_login_ip).to eq "66.66.66.66"
         end
         context "partner" do
-          it "authenticates and removes partner session" do
+          def it_redirects_to_partner(redirect_to_url)
             expect(user.last_login_at).to be_blank
             expect(user.last_login_ip).to be_blank
             session[:partner] = "bikehub"
@@ -222,11 +239,28 @@ RSpec.describe SessionsController, type: :controller do
             request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
             post :create, params: {session: {password: "would be correct"}}
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-            expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+            expect(response).to redirect_to redirect_to_url
             expect(session[:partner]).to be_nil
             user.reload
             expect(user.last_login_at).to be_within(1.second).of Time.current
             expect(user.last_login_ip).to eq "66.66.66.66"
+          end
+          it "authenticates and removes partner session" do
+            it_redirects_to_partner("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
+          end
+          context "other bikehub subdomain" do
+            include_context :existing_doorkeeper_app
+            before { expect(bikehub_doorkeeper_app).to be_present }
+            it "authenticates and redirects to target" do
+              pp bikehub_doorkeeper_app
+              pp "HERe HERE HERE"
+              session[:return_to] = "http://localhost:3001/oauth/authorize?client_id=#{bikehub_doorkeeper_app.uid}&company&partner=bikehub&redirect_uri=https%3A%2F%2Fstaging.bikehub.com%2Fusers%2Fauth%2Fbike_index%2Fcallback&response_type=code&scope=public&state=79bd05311b3df0c688bc152cc93b245c03b666039f638322&unauthenticated_redirect=log_in"
+              it_redirects_to_partner("https://staging.bikehub.com/account?reauthenticate_bike_index=true")
+            end
+            # context "unaccepted url" do
+            #   it "redirects to parkit" do
+            #   Doorkeeper::Application.where(owner_id: old_user.id)
+            # end
           end
         end
         context "password that's too short" do
