@@ -1,6 +1,6 @@
 class NewsController < ApplicationController
   def index
-    @blogs = Blog.published.blog.in_language(params[:language])
+    @blogs = matching_blogs
     redirect_to news_index_url(format: "atom") if request.format == "xml"
   end
 
@@ -22,5 +22,16 @@ class NewsController < ApplicationController
       @next_item = true unless @page >= @blog.listicles.count
       @prev_item = true unless @page == 1
     end
+  end
+
+  private
+
+  def matching_blogs
+    blogs = Blog.published.blog.in_language(params[:language])
+    if params[:search_tags].present?
+      @search_tags = ContentTag.matching(params[:search_tags])
+      blogs = blogs.with_tag_ids(@search_tags.pluck(:id))
+    end
+    blogs
   end
 end

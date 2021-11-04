@@ -52,9 +52,12 @@
           %ul
             - if content_page_type == "news"
               %li
-                = active_link t(".bike_index_news"), news_index_path
-            %li
-              = active_link t(".about"), about_path
+                - all_active = action_name == "index" && !sortable_search_params?
+                = link_to t(".bike_index_news"), news_index_path, class: (all_active ? "active" : "")
+            - if @related_blogs.present?
+            - else
+              %li
+                = active_link t(".about"), about_path
             - unless content_page_type == 'news'
               %li
                 = active_link t(".forum"), discuss_url
