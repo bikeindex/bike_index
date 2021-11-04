@@ -179,23 +179,32 @@ RSpec.describe SessionsController, type: :controller do
         expect(session[:passive_organization_id]).to be_nil
         expect(session[:whatever]).to be_nil
       end
-      # context "other domain" do
-      #   include_context :existing_doorkeeper_app
-      #   before { expect(bikehub_doorkeeper_app).to be_present }
-      #   it "redirects to bikehub" do
-      #     get :destroy, params: {partner: "bikehub", return_to: "https://staging.bikehub.com/"}
-      #     expect(cookies.signed[:auth]).to be_nil
-      #     expect(session[:user_id]).to be_nil
-      #     expect(response).to redirect_to "https://staging.bikehub.com/"
-      #     expect(session[:return_to]).to be_nil
-      #     expect(session[:partner]).to be_nil
-      #     expect(session[:passive_organization_id]).to be_nil
-      #     expect(session[:whatever]).to be_nil
-      #   end
-      #   context "invalid other domain" do
-      #     it "redirects to parkit"
-      #   end
-      # end
+      context "other domain" do
+        include_context :existing_doorkeeper_app
+        before { expect(bikehub_doorkeeper_app).to be_present }
+        it "redirects to bikehub" do
+          get :destroy, params: {partner: "bikehub", return_to: "https://staging.bikehub.com/"}
+          expect(cookies.signed[:auth]).to be_nil
+          expect(session[:user_id]).to be_nil
+          expect(response).to redirect_to "https://staging.bikehub.com/"
+          expect(session[:return_to]).to be_nil
+          expect(session[:partner]).to be_nil
+          expect(session[:passive_organization_id]).to be_nil
+          expect(session[:whatever]).to be_nil
+        end
+        context "invalid other domain" do
+          it "redirects to parkit" do
+            get :destroy, params: {partner: "bikehub", return_to: "https://badplace.stuff.com/"}
+            expect(cookies.signed[:auth]).to be_nil
+            expect(session[:user_id]).to be_nil
+            expect(response).to redirect_to "https://parkit.bikehub.com/"
+            expect(session[:return_to]).to be_nil
+            expect(session[:partner]).to be_nil
+            expect(session[:passive_organization_id]).to be_nil
+            expect(session[:whatever]).to be_nil
+          end
+        end
+      end
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }
@@ -252,18 +261,17 @@ RSpec.describe SessionsController, type: :controller do
             include_context :existing_doorkeeper_app
             before { expect(bikehub_doorkeeper_app).to be_present }
             it "authenticates and redirects to target" do
-              # Sanity Check
+              # Sanity test the creation of the bikehub_doorkeeper_app
               expect(bikehub_doorkeeper_app.reload.id).to eq(264)
               expect(bikehub_doorkeeper_app.redirect_uri).to match(/staging\.bikehub\.com/)
-              pp bikehub_doorkeeper_app
-
-              session[:return_to] = "http://localhost:3001/oauth/authorize?client_id=#{bikehub_doorkeeper_app.uid}&company&partner=bikehub&redirect_uri=https%3A%2F%2Fstaging.bikehub.com%2Fusers%2Fauth%2Fbike_index%2Fcallback&response_type=code&scope=public&state=zzzzzzz&unauthenticated_redirect=log_in"
+              session[:return_to] = "http://localhost:3001/oauth/authorize?client_id=#{bikehub_doorkeeper_app.uid}&company&partner=bikehub&redirect_uri=https%3A%2F%2FSTAGING.bikehub.com%2Fusers%2Fauth%2Fbike_index%2Fcallback&response_type=code&scope=public&state=zzzzzzz&unauthenticated_redirect=log_in"
               it_redirects_to_partner("https://staging.bikehub.com/account?reauthenticate_bike_index=true")
             end
-            # context "unaccepted url" do
-            #   it "redirects to parkit" do
-            #   Doorkeeper::Application.where(owner_id: old_user.id)
-            # end
+            context "unaccepted url" do
+              it "redirects to parkit" do
+                it_redirects_to_partner("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
+              end
+            end
           end
         end
         context "password that's too short" do
