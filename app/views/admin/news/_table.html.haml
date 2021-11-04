@@ -34,7 +34,7 @@
               = blog.body_abbr.html_safe if blog.body_abbr
               - if blog.content_tag_names.any?
                 %small.d-block
-                  %span.less-strong Tags:
+                  %span.less-strong Topics:
                   - if tags_no_link
                     = blog.content_tag_names.join(", ")
                   - else
