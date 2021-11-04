@@ -22,8 +22,8 @@
   - render_all_images = true
   .mt-3.mb-4
     %h4.uncap
-      = number_with_delimiter(@blogs.count)
-      = "matching article".pluralize(@blogs.count)
+      = number_with_delimiter(@blogs_count)
+      = "matching article".pluralize(@blogs_count)
       - if @search_tags.present?
         about
         %em
@@ -32,7 +32,7 @@
   %ul.news-index-list
     - @blogs.each_with_index do |blog, index|
       %li
-        - if @render_all_images || index < 10 && blog.index_image.present?
+        - if (render_all_images || index < 10) && blog.index_image.present?
           %a.index-image-link{ href: news_url(blog) }
             = image_tag blog.index_image
         %h2

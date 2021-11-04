@@ -1,6 +1,7 @@
 class NewsController < ApplicationController
   def index
     @blogs = matching_blogs
+    @blogs_count ||= @blogs.count
     redirect_to news_index_url(format: "atom") if request.format == "xml"
   end
 
@@ -31,6 +32,7 @@ class NewsController < ApplicationController
     if params[:search_tags].present?
       @search_tags = ContentTag.matching(params[:search_tags])
       blogs = blogs.with_tag_ids(@search_tags.pluck(:id))
+      @blogs_count = blogs.count.keys.count
     end
     blogs
   end

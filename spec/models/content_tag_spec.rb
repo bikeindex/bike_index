@@ -10,7 +10,7 @@ RSpec.describe ContentTag, type: :model do
       expect(ContentTag.matching_ids(" ")).to eq([])
       expect(ContentTag.matching_ids([])).to eq([])
       expect(ContentTag.matching_ids("Bike Theft")).to eq([content_tag1.id])
-      expect(ContentTag.matching_ids(["Bike THEFT"])).to eq([content_tag1.id])
+      expect(ContentTag.matching_ids(["Bike THEFT", "Bike-theft"])).to eq([content_tag1.id])
       expect(ContentTag.matching_ids("Bike THEFT, OTher thing")).to eq([content_tag1.id])
       expect(ContentTag.matching_ids("Bike THEFT, OTher, thing\n Bike Recovery")).to match_array([content_tag1.id, content_tag2.id])
       expect(ContentTag.matching_ids(["Bike THEFT", "OTher thing", "\nBike Recovery"])).to match_array([content_tag1.id, content_tag2.id])

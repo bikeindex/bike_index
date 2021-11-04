@@ -63,8 +63,14 @@ class Blog < ApplicationRecord
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
   end
 
-  # TODO: make this match only if *all* tag ids present
+  # matches ALL content tag ids
   def self.with_tag_ids(content_tag_ids)
+    content_tag_ids = Array(content_tag_ids)
+    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+      .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
+  end
+
+  def self.with_any_of_tag_ids(content_tag_ids)
     content_tag_ids = Array(content_tag_ids)
     joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
       .distinct.references(:blog_content_tags)
@@ -81,6 +87,10 @@ class Blog < ApplicationRecord
 
   def content_tag_names
     content_tags.name_ordered.pluck(:name)
+  end
+
+  def related_blogs
+
   end
 
   def to_param
