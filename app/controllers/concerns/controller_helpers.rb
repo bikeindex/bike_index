@@ -366,18 +366,15 @@ module ControllerHelpers
     "#{valid_partner_domain || "https://parkit.bikehub.com"}/#{path}"
   end
 
-  #
   def valid_partner_domain
     # Sometimes might just be return_to, but if there is a redirect_uri query param, use that
     redirect_redirect_uri = Addressable::URI.parse(session[:return_to])&.query_values&.dig("redirect_uri")
     redirect_redirect_uri ||= session[:return_to] || params[:return_to]
-    return nil if redirect_redirect_uri
+    return nil if redirect_redirect_uri.blank? || redirect_redirect_uri == "https://parkit.bikehub.com/users/auth/bike_index/callback"
     # Get redirect uris from BikeHub app and BikeHub dev app (by their ids)
-    pp "ccccccccc", Doorkeeper::Application.last
     valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)
       .map { |u| u.split("\s") }.flatten.map(&:strip)
-    pp valid_redirect_urls, redirect_redirect_uri
-    nil
+    valid_redirect_urls.include?(redirect_redirect_uri) : nil
   end
 
   def set_time_range_from_period

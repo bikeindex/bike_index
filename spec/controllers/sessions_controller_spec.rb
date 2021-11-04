@@ -252,9 +252,12 @@ RSpec.describe SessionsController, type: :controller do
             include_context :existing_doorkeeper_app
             before { expect(bikehub_doorkeeper_app).to be_present }
             it "authenticates and redirects to target" do
+              # Sanity Check
+              expect(bikehub_doorkeeper_app.reload.id).to eq(264)
+              expect(bikehub_doorkeeper_app.redirect_uri).to match(/staging\.bikehub\.com/)
               pp bikehub_doorkeeper_app
-              pp "HERe HERE HERE"
-              session[:return_to] = "http://localhost:3001/oauth/authorize?client_id=#{bikehub_doorkeeper_app.uid}&company&partner=bikehub&redirect_uri=https%3A%2F%2Fstaging.bikehub.com%2Fusers%2Fauth%2Fbike_index%2Fcallback&response_type=code&scope=public&state=79bd05311b3df0c688bc152cc93b245c03b666039f638322&unauthenticated_redirect=log_in"
+
+              session[:return_to] = "http://localhost:3001/oauth/authorize?client_id=#{bikehub_doorkeeper_app.uid}&company&partner=bikehub&redirect_uri=https%3A%2F%2Fstaging.bikehub.com%2Fusers%2Fauth%2Fbike_index%2Fcallback&response_type=code&scope=public&state=zzzzzzz&unauthenticated_redirect=log_in"
               it_redirects_to_partner("https://staging.bikehub.com/account?reauthenticate_bike_index=true")
             end
             # context "unaccepted url" do
