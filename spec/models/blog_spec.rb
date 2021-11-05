@@ -188,10 +188,10 @@ RSpec.describe Blog, type: :model do
   end
 
   describe "content_tag_names" do
-    let!(:blog1) { FactoryBot.create(:blog) }
     let!(:content_tag1) { FactoryBot.create(:content_tag, name: "A tag") }
     let!(:content_tag2) { FactoryBot.create(:content_tag, name: "b tag") }
     let!(:blog2) { FactoryBot.create(:blog, content_tag_names: content_tag1.name) }
+    let!(:blog1) { FactoryBot.create(:blog) }
     it "sets and returns" do
       expect(blog1.reload.content_tag_names).to eq([])
       blog1.update(content_tag_names: content_tag1.name.to_s)
@@ -202,9 +202,13 @@ RSpec.describe Blog, type: :model do
       expect(blog1.reload.content_tags.pluck(:id)).to match_array([content_tag1.id, content_tag2.id])
       blog1.reload
       expect(blog1.content_tag_names).to eq([content_tag1.name, content_tag2.name])
-      expect(Blog.with_any_of_tag_ids([content_tag1.id, content_tag2.id]).map(&:id)).to match_array([blog1.id, blog2.id])
-      # TODO: should be subtractive :/
+      # ONLY matching
       expect(Blog.with_tag_ids([content_tag1.id, content_tag2.id]).map(&:id)).to eq([blog1.id])
+      # matching ANY
+      expect(Blog.with_any_of_tag_ids([content_tag1.id, content_tag2.id]).map(&:id).uniq).to match_array([blog1.id, blog2.id])
+      # blog1 needs to come first because it has more tags
+      expect(Blog.ids_sorted_by_matching_tag_ids_count([content_tag1.id, content_tag2.id])).to eq([blog1.id, blog2.id])
+      expect(blog1.related_blogs.map(&:id)).to eq([blog2.id])
 
       blog1.update(content_tag_names: [content_tag2.name])
       expect(blog1.reload.content_tag_names).to eq([content_tag2.name])

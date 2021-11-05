@@ -73,7 +73,15 @@ class Blog < ApplicationRecord
   def self.with_any_of_tag_ids(content_tag_ids)
     content_tag_ids = Array(content_tag_ids)
     joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-      .distinct.references(:blog_content_tags)
+  end
+
+  # TODO: This is bad, but it's better than nothing so I'm going with it
+  # NOTE: this is unscoped (so it removes the default scope)
+  def self.ids_sorted_by_matching_tag_ids_count(content_tag_ids)
+    grouped_ids = unscoped.joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+      .group("blog_content_tags.blog_id").count
+    sorted_counted_ids = grouped_ids.to_a.sort { |a, b| b[1] <=> a[1] }
+    sorted_counted_ids.map { |id, count| id }
   end
 
   def content_tag_names=(val)
@@ -89,8 +97,15 @@ class Blog < ApplicationRecord
     content_tags.name_ordered.pluck(:name)
   end
 
+  # Returns 5 most related blogs in an array
+  # TODO: Make this less of a shitshow
   def related_blogs
-
+    blog_ids = self.class.ids_sorted_by_matching_tag_ids_count(content_tags.pluck(:id)) - [id]
+    blogs = Blog.where(id: blog_ids[0..5]).published
+    if blogs.count < 5
+      blogs += Blog.where(id: blog_ids[6..15]).published
+    end
+    blogs[0..5].uniq
   end
 
   def to_param

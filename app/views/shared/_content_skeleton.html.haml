@@ -56,7 +56,7 @@
                 = link_to t(".bike_index_news"), news_index_path, class: (all_active ? "active" : "")
             - if @related_blogs.present?
               - @related_blogs.each do |blog|
-                %li
+                %li.mt-3
                   = link_to blog.title, news_url(blog)
             - else
               %li

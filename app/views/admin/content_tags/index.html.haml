@@ -8,9 +8,9 @@
   #{matching_content_tags.count} total
 
 .full-screen-table
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th.small
+      %th
         = sortable "created_at", "Added"
       %th.small
         = sortable "updated_at"
@@ -22,8 +22,10 @@
       - @content_tags.each do |content_tag|
         %tr
           %td
-            %small.convertTime
+            %span.convertTime
               = l content_tag.created_at, format: :convert_time
+            - if display_dev_info?
+              %code.only-dev-visible= content_tag.id
           %td
             %small.convertTime
               = l content_tag.updated_at, format: :convert_time
