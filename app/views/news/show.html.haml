@@ -8,7 +8,7 @@
   %h1.global-title
     = @blog.title
 
-  %article.blogger-info
+  %article.blogger-info.pl-2
     %h4
       = t(".by")
 
@@ -19,7 +19,10 @@
         = l(@blog.published_at, format: :standard_display)
       - else
         = l(@blog.published_at, format: :no_day_with_year)
-
+    %p.blog-topics-list.mb-3
+      Topics:
+      = safe_join(@blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
+  %hr.mb-5.less-strong
 - if @blog.is_listicle
   - @blog.listicles.each_with_index do |list_item, i|
     - unless i == 0
