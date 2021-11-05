@@ -11,7 +11,7 @@ class ContentTag < ApplicationRecord
   def self.matching_ids(str_or_array)
     return [] if str_or_array.blank?
     array = str_or_array.is_a?(Array) ? str_or_array : str_or_array.split(/,|\n/)
-    array.map { |s| friendly_find_id(s) }.compact
+    array.map { |s| friendly_find_id(s) }.compact.uniq
   end
 
   def self.matching(str_or_array)
