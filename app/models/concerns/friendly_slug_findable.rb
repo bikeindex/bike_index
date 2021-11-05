@@ -8,6 +8,11 @@ module FriendlySlugFindable
       return where(id: n).first if n.is_a?(Integer) || n.strip.match(/\A\d+\z/).present?
       find_by_slug(Slugifyer.slugify(n)) || where("lower(name) = ?", n.downcase.strip).first
     end
+
+    def friendly_find_id(str)
+      o = friendly_find(str)
+      o.present? ? o.id : nil
+    end
   end
 
   included do

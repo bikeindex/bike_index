@@ -2,6 +2,13 @@
   h1 {
     @extend .uncap;
   }
+  .blogger-info {
+    h4 {
+      line-height: 2;
+      margin-bottom: 0.25rem;
+    }
+  }
+
   .primary-content-block {
     h2,
     h3,

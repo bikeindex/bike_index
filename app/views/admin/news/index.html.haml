@@ -22,7 +22,10 @@
   = render partial: "/shared/period_select"
 
 %p
-  #{number_with_delimiter(available_blogs.count)} matching
+  -# if searching by tags, count returns the group count
+  - count = available_blogs.count
+  - count = count.keys.count if count.is_a?(Hash)
+  #{number_with_delimiter(count)} matching
   %em
     = humanized_time_range(@time_range)
   - if @tags.present?
