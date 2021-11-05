@@ -45,7 +45,3 @@
         %p.blog-topics-list
           Topics:
           = safe_join(blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
-          -#- content_tag_count = blog.content_tags.count
-          -#- blog.content_tags.commonness.each do |tag|
-          -#  #{link_to tag.name, news_index_path(search_tags: tag.slug), class: "gray-link"}
-

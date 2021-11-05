@@ -190,8 +190,8 @@ RSpec.describe Blog, type: :model do
   describe "content_tag_names" do
     let!(:content_tag1) { FactoryBot.create(:content_tag, name: "A tag") }
     let!(:content_tag2) { FactoryBot.create(:content_tag, name: "b tag") }
-    let!(:blog2) { FactoryBot.create(:blog, content_tag_names: content_tag1.name) }
-    let!(:blog1) { FactoryBot.create(:blog) }
+    let!(:blog2) { FactoryBot.create(:blog, :published, content_tag_names: content_tag1.name) }
+    let!(:blog1) { FactoryBot.create(:blog, :published) }
     it "sets and returns" do
       expect(blog1.reload.content_tag_names).to eq([])
       blog1.update(content_tag_names: content_tag1.name.to_s)
