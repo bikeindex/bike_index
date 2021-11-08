@@ -165,13 +165,14 @@ class Bike < ApplicationRecord
     def friendly_find(bike_str)
       return nil unless bike_str.present?
       bike_str = bike_str.to_s.strip
-      if /^\d+\z/.match?(bike_str) # it's only numbers
-        bike_id = bike_str
-      else
-        bike_id = bike_str.match(/bikes\/\d*/i)
-        bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
+      bike_id = if /^\d+\z/.match?(bike_str) # it's only numbers
+        bike_str
+      else # Check if it's a bike URL
+        b_id = bike_str.match(/bikes\/\d*/i)
+        b_id && b_id[0].gsub(/bikes./, "")
       end.to_i
-      return nil if bike_id > 2147483647 # Max unsinged 4 bit integer (how we're storing IDs)
+      # Return nil if above max unsinged 4 bit integer size (how we're storing IDs)
+      return nil if bike_id.blank? || bike_id > 2147483647
       where(id: bike_id).first
     end
 

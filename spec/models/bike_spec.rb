@@ -21,7 +21,7 @@ RSpec.describe Bike, type: :model do
       expect(Bike.friendly_find(id)&.id).to eq bike.id
       expect(Bike.friendly_find("  #{id}\n")&.id).to eq bike.id
       expect(Bike.friendly_find("https://bikeindex.org/bikes/#{id}")&.id).to eq bike.id
-      expect(Bike.friendly_find("https://bikeindex.org/bikes/#{id}/edit")&.id).to eq bike.id
+      expect(Bike.friendly_find("bikeindex.org/bikes/#{id}/edit?edit_template=accessories")&.id).to eq bike.id
       # Check range error - currently IDs are integer with limit of 4 bytes
       expect(Bike.friendly_find("2147483648")&.id).to eq nil
       expect(Bike.friendly_find(" 9999999999999")&.id).to eq nil
