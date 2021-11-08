@@ -14,6 +14,20 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "friendly_find" do
+    let(:id) { 1999999 }
+    let!(:bike) { FactoryBot.create(:bike, id: id) }
+    it "finds" do
+      expect(Bike.friendly_find(id)&.id).to eq bike.id
+      expect(Bike.friendly_find("  #{id}\n")&.id).to eq bike.id
+      expect(Bike.friendly_find("https://bikeindex.org/bikes/#{id}")&.id).to eq bike.id
+      expect(Bike.friendly_find("bikeindex.org/bikes/#{id}/edit?edit_template=accessories")&.id).to eq bike.id
+      # Check range error - currently IDs are integer with limit of 4 bytes
+      expect(Bike.friendly_find("2147483648")&.id).to eq nil
+      expect(Bike.friendly_find(" 9999999999999")&.id).to eq nil
+    end
+  end
+
   describe ".currently_stolen_in" do
     context "given no matching state or country" do
       it "returns none" do
