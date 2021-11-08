@@ -165,12 +165,13 @@ class Bike < ApplicationRecord
     def friendly_find(bike_str)
       return nil unless bike_str.present?
       bike_str = bike_str.to_s.strip
-      if /^\d+\z/.match?(bike_str) # it's only numbers, so it's a timestamp
+      if /^\d+\z/.match?(bike_str) # it's only numbers
         bike_id = bike_str
       else
         bike_id = bike_str.match(/bikes\/\d*/i)
         bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
-      end
+      end.to_i
+      return nil if bike_id > 2147483647 # Max unsinged 4 bit integer (how we're storing IDs)
       where(id: bike_id).first
     end
 
