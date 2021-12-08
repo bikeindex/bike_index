@@ -44,6 +44,7 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
           serial
           status
           stolen
+          stolen_coordinates
           stolen_location
           thumb
           title
