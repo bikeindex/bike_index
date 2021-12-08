@@ -1,3 +1,2 @@
 ruby 2.7.3
-nodejs 12.18.3 # Also update in Dockerfile if changed
-postgres 11.5
+nodejs 16.13.1 # Also update in Dockerfile if changed

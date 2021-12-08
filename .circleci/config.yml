@@ -18,6 +18,10 @@ jobs:
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
+      - image: circleci/ruby:2.7.4-node
+        environment:
+          PGHOST: 127.0.0.1
+          PGUSER: root
       - image: circleci/postgres:12.0-alpine-postgis
         environment:
           POSTGRES_USER: root
@@ -44,6 +48,11 @@ jobs:
               libssl-dev \
               libz-dev \
               postgresql-client
+      - run:
+        name: "Update Node.js and npm"
+        command: |
+          curl -sSL "https://nodejs.org/download/release/v16.13.1/node-v16.13.1-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v16.13.1-linux-x64/bin/node
+          curl https://www.npmjs.com/install.sh | sudo bash
 
       - type: cache-restore
         name: "Dockerize: cache restore"
