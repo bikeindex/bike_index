@@ -78,8 +78,8 @@ RSpec.describe "Search API V3", type: :request do
             serial
             status
             stolen
-            stolen_location
             stolen_coordinates
+            stolen_location
             thumb
             title
             url
