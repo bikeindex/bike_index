@@ -50,9 +50,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def stolen_record
-    if stolen_record.present?
-      StolenRecordV2Serializer.new(current_stolen_record, scope: scope, root: false, event: object)
-    end
+    return nil unless current_stolen_record.present?
+    StolenRecordV2Serializer.new(current_stolen_record, scope: scope, root: false, event: object)
   end
 
   def rear_wheel_size_iso_bsd
