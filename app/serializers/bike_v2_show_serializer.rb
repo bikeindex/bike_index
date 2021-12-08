@@ -50,8 +50,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def stolen_record
-    if object.current_stolen_record.present?
-      StolenRecordV2Serializer.new(object.current_stolen_record, scope: scope, root: false, event: object)
+    if stolen_record.present?
+      StolenRecordV2Serializer.new(current_stolen_record, scope: scope, root: false, event: object)
     end
   end
 
