@@ -15,6 +15,7 @@ class BikeV2Serializer < ApplicationSerializer
     :serial,
     :status,
     :stolen,
+    :stolen_coordinates,
     :stolen_location,
     :thumb,
     :title,
@@ -45,7 +46,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def date_stolen
-    object.current_stolen_record&.date_stolen&.to_i
+    current_stolen_record&.date_stolen&.to_i
   end
 
   def thumb
@@ -73,6 +74,17 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def stolen_location
-    object.current_stolen_record&.address_location(include_all: true)
+    current_stolen_record&.address_location(include_all: true)
+  end
+
+  def stolen_coordinates
+    return nil unless current_stolen_record&.latitude_public&.present?
+    [current_stolen_record.latitude_public, current_stolen_record.longitude_public]
+  end
+
+  private
+
+  def current_stolen_record
+    object.current_stolen_record
   end
 end

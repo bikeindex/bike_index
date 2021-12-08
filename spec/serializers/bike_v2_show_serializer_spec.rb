@@ -46,6 +46,7 @@ RSpec.describe BikeV2ShowSerializer do
         is_stock_img: false,
         stolen: false,
         stolen_location: nil,
+        stolen_coordinates: nil,
         date_stolen: nil,
         registration_created_at: bike.created_at.to_i,
         registration_updated_at: bike.updated_at.to_i,
