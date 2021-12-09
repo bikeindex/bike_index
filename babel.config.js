@@ -18,15 +18,7 @@ module.exports = function (api) {
   return {
     presets: [
       "@babel/react",
-      isTestEnv && [
-        '@babel/preset-env',
-        {
-          targets: {
-            node: 'current'
-          }
-        }
-      ],
-      (isProductionEnv || isDevelopmentEnv) && [
+      [
         '@babel/preset-env',
         {
           forceAllTransforms: true,
@@ -45,7 +37,6 @@ module.exports = function (api) {
       "@babel/plugin-syntax-jsx",
       'babel-plugin-macros',
       '@babel/plugin-syntax-dynamic-import',
-      isTestEnv && 'babel-plugin-dynamic-import-node',
       '@babel/plugin-transform-destructuring',
       [
         '@babel/plugin-proposal-object-rest-spread',

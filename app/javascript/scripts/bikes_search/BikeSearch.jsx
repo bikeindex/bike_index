@@ -7,10 +7,10 @@ import TimeParser from "../utils/time_parser.js";
 import honeybadger from "../utils/honeybadger";
 
 class BikeSearch extends Component {
-  // loading states :
-  // null before querying
-  // true when loading
-  // false when query complete
+  /* loading states :
+     null before querying
+     true when loading
+     false when query complete */
 
   state = {
     loading: null,
