@@ -24,7 +24,7 @@ module.exports = function (api) {
           targets: {
             node: 'current'
           }
-        }
+        },
       ],
       (isProductionEnv || isDevelopmentEnv) && [
         '@babel/preset-env',
@@ -39,6 +39,13 @@ module.exports = function (api) {
             "browsers": "> 1%"
           }
         }
+      ],
+      [
+        "@babel/preset-react",
+        {
+          development: isDevelopmentEnv || isTestEnv,
+          useBuiltIns: true,
+        },
       ]
     ].filter(Boolean),
     plugins: [
