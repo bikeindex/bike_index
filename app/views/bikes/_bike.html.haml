@@ -29,14 +29,14 @@
     - if bike.current_stolen_record.present?
       %ul.attr-list
         %li
-          = bike_status_span(bike)
+          #{bike_status_span(bike)}:
           %span.convertTime
             = l bike.current_stolen_record.date_stolen, format: :convert_time
         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
     - if bike.current_impound_record.present?
       %ul.attr-list
         %li
-          = bike_status_span(bike)
+          #{bike_status_span(bike)}:
           %span.convertTime
             = l bike.current_impound_record.impounded_at, format: :convert_time
         = attr_list_item(bike.current_impound_record.address, t(".location"))

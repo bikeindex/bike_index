@@ -27,7 +27,7 @@ const ExternalRegistrySearchResult = ({ bike }) => (
 
       <ul className="attr-list">
         <li>
-          <span className="attr-title">{t("color")}</span>
+          <span className="attr-title">{t("color")}:&nbsp;</span>
           {
             bike.frame_colors.length
               ? bike.frame_colors.map(c => _.titleize(c)).join(", ")
@@ -35,7 +35,7 @@ const ExternalRegistrySearchResult = ({ bike }) => (
           }
         </li>
         <li>
-          <span className="attr-title">{t("serial")}</span>
+          <span className="attr-title">{t("serial")}:&nbsp;</span>
           {
             bike.serial === "absent"
               ? t("absent")
@@ -49,22 +49,22 @@ const ExternalRegistrySearchResult = ({ bike }) => (
       <ul className="attr-list">
         <li>
           <span className="attr-title text-danger">
-            {t(bike.status)}
+            {t(bike.status)}:&nbsp;
           </span>
           <span className="convertTime">
             {bike.date_stolen}
           </span>
         </li>
         <li>
-          <span className="attr-title">{t("registry")}</span>
+          <span className="attr-title">{t("registry")}:&nbsp;</span>
           <a href={bike.registry_url} target="_blank">{bike.registry_name}</a>
         </li>
         <li>
-          <span className="attr-title">{t("registry_id")}</span>
+          <span className="attr-title">{t("registry_id")}:&nbsp;</span>
           {bike.external_id}
         </li>
         <li>
-          <span className="attr-title">{t("location")}</span>
+          <span className="attr-title">{t("location")}:&nbsp;</span>
           {bike.stolen_location}
         </li>
       </ul>
