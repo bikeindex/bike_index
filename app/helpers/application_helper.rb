@@ -13,11 +13,10 @@ module ApplicationHelper
     "&#x274C;".html_safe
   end
 
-  def attr_list_item(desc, title, with_colon: false)
+  def attr_list_item(desc, title)
     return nil unless desc.present?
-    title = "#{title}:" if with_colon
     content_tag(:li) do
-      content_tag(:strong, "#{title} ", class: "attr-title") +
+      content_tag(:strong, "#{title}: ", class: "attr-title") +
         content_tag(:span, desc)
     end
   end

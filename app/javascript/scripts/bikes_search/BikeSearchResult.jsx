@@ -23,7 +23,7 @@ const BikeSerialSearchResult = ({bike}) => (
 
       <ul className="attr-list">
         <li>
-          <span className="attr-title">{t("color")}</span>
+          <span className="attr-title">{t("color")}:&nbsp;</span>
           {
             bike.frame_colors.length
               ? bike.frame_colors.join(", ")
@@ -31,7 +31,7 @@ const BikeSerialSearchResult = ({bike}) => (
           }
         </li>
         <li>
-          <span className="attr-title">{t("serial")}</span>
+          <span className="attr-title">{t("serial")}:&nbsp;</span>
           {
             bike.serial === "absent"
               ? t("absent")
@@ -58,7 +58,7 @@ const AbandonedOrStolenDateItem = ({bike}) => {
   return (
     <li>
       <span className="attr-title text-danger">
-        {bike.stolen ? t("stolen") : t("abandoned") }
+        {bike.stolen ? t("stolen") : t("abandoned") }:&nbsp;
       </span>
       <span className="convertTime">{bike.date_stolen}</span>
     </li>
@@ -72,7 +72,7 @@ const LocationItem = ({bike}) => {
 
   return (
     <li>
-      <span className="attr-title">{t("location")}</span>
+      <span className="attr-title">{t("location")}:&nbsp;</span>
       {bike.stolen_location}
     </li>
   )
