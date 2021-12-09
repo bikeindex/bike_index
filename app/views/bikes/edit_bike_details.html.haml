@@ -96,6 +96,8 @@
 
           - if BikeDisplayer.display_edit_address_fields?(@bike, current_user)
             .related-fields.no-divider-row
+              - unless @bike.user == current_user
+                .col-xs-12.text-right Bike Owner's address (not your address)
               - if !current_user.no_address? && (@bike.street.present? || @bike.creation_organization&.enabled?("reg_address"))
                 .form-group.row
                   = f.label :street, class: 'form-well-label'

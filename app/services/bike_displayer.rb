@@ -34,14 +34,23 @@ class BikeDisplayer
     end
 
     def display_edit_address_fields?(bike, user = nil)
-      # Only display for the current owner of the bike, *not* anyone who is authorized for the bike
-      return false unless user.present? && (bike.user == user || bike.id.blank?)
-      # If the user has set their address, that's the only way to update bike addresses
-      return false if user.address_set_manually
+      return false unless user_edit_address?(bike, user)
       # Make absolutely sure with stolen bikes
       return false if bike.current_stolen_record_id.present?
       # parking notifications, impounded, stolen etc use the associated record for their address
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
+    end
+
+    # Intended as an internal method, splitting out for testing purposes
+    def user_edit_address?(bike, user = nil)
+      return false if user.blank? || bike.id.blank?
+      if bike.user.present?
+        # If the user has set their address, that's the only way to update bike addresses
+        return false if bike.user.address_set_manually
+        return true if bike.user == user
+      end
+      # Otherwise - if the user is a superuser or is authorized by organization, the user can edit the address
+      user.superuser? || bike.authorized_by_organization?(u: user)
     end
   end
 end
