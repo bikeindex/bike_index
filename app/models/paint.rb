@@ -11,6 +11,8 @@ class Paint < ApplicationRecord
   belongs_to :tertiary_color, class_name: "Color"
 
   scope :official, -> { where("manufacturer_id IS NOT NULL") }
+  scope :linked, -> { where("color_id IS NOT NULL") }
+  scope :unlinked, -> { where("color_id IS NULL") }
 
   before_save :set_calculated_attributes
 
