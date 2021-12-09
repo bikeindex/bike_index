@@ -2,12 +2,6 @@
   .col-lg-6.col-sm-12
     %h1
       Edit paint
-  .col-lg-6.col-sm-12
-    .alert.alert-danger
-      %h4
-        Can't edit the name.
-      %p
-        Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
   - if @paint.id.present?
     .col-md-6.offset-md-3.mt-2
@@ -59,8 +53,12 @@
         = collection_select( :paint, :tertiary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control" )
 
   = submit_tag "Update the paint", class: "btn btn-success"
+  .alert.alert-info.mt-2
+    %p
+      %strong You can't edit the name.
+      Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
-%hr{ style: "margin: 40px 0;" }
+%hr.mt-2
 
 - if @bikes.present?
   %p
