@@ -22,8 +22,8 @@
 
     .search-sort-btns {
       margin: 0;
-      padding-top: 1* $vertical-height;
-      margin-bottom: 0.5* $vertical-height;
+      padding-top: 1 * $vertical-height;
+      margin-bottom: 0.5 * $vertical-height;
       border-top: solid 1px rgba($gray-light, 0.25);
       .sort-group-label, .btn {
         margin-bottom: 0.5 * $vertical-height;
@@ -32,7 +32,6 @@
         display: inline-block;
       }
       .btn {
-        // text-transform: none;
         margin-left: 0.25rem;
       }
       .btn.active {
