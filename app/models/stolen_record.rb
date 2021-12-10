@@ -245,7 +245,7 @@ class StolenRecord < ApplicationRecord
     row << "\t"
     row << tsv_col(police_report_department)
     row << "\t\t"
-    row << "#{ENV["BASE_URL"]}/bikes/#{b.id}\n"
+    row << "#{b.html_url}\n"
     row
   end
 

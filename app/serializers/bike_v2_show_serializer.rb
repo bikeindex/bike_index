@@ -29,10 +29,6 @@ class BikeV2ShowSerializer < BikeV2Serializer
     object.cycle_type_name
   end
 
-  def url
-    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
-  end
-
   def api_url
     "#{ENV["BASE_URL"]}/api/v1/bikes/#{object.id}"
   end

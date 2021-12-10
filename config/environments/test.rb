@@ -24,6 +24,8 @@ Rails.application.configure do
 
   # Raises error for missing translations
   config.action_view.raise_on_missing_translations = true
+  # Don't check for precompiled assets
+  config.assets.check_precompiled_asset = false
 
   # Raise exceptions instead of rendering exception templates.
   config.action_dispatch.show_exceptions = false

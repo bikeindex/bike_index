@@ -44,7 +44,7 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def url
-    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
+    object.html_url
   end
 
   def api_url
