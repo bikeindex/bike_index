@@ -215,11 +215,15 @@ RSpec.describe BikeDisplayer do
     let(:admin) { FactoryBot.create(:admin) }
 
     it "is falsey" do
-      expect(BikeDisplayer.display_edit_address_fields?(bike)).to be_falsey
       expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-
-      expect(BikeDisplayer.user_edit_address?(bike)).to be_falsey
       expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+    end
+    context "new bike" do
+      let(:bike) { Bike.new }
+      it "is truthy" do
+        expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+      end
     end
     context "owner" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }

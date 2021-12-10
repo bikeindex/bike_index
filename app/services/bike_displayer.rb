@@ -43,14 +43,15 @@ class BikeDisplayer
 
     # Intended as an internal method, splitting out for testing purposes
     def user_edit_address?(bike, user = nil)
-      return false if user.blank? || bike.id.blank?
+      return false if user.blank?
       if bike.user.present?
         # If the user has set their address, that's the only way to update bike addresses
         return false if bike.user.address_set_manually
+        # If the user is the bike owner, show it
         return true if bike.user == user
       end
-      # Otherwise - if the user is a superuser or is authorized by organization, the user can edit the address
-      user.superuser? || bike.authorized_by_organization?(u: user)
+      # otherwise if bike is new, for superusers or users authorized by organization
+      bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
     end
 
     def edit_street_address?(bike, user = nil)
