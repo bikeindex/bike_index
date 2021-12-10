@@ -52,5 +52,10 @@ class BikeDisplayer
       # Otherwise - if the user is a superuser or is authorized by organization, the user can edit the address
       user.superuser? || bike.authorized_by_organization?(u: user)
     end
+
+    def edit_street_address?(bike, user = nil)
+      return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
+      bike.street.present? || bike.creation_organization&.enabled?("reg_address")
+    end
   end
 end
