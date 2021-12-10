@@ -4408,7 +4408,7 @@ en:
         only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
         only_with_street_address_html: Only with <strong>street address</strong>
-        only_without_street_address_html: <strong>Without</strong> street
+        only_without_street_address_html: Only <strong>without</strong> street
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
