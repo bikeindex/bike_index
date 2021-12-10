@@ -4395,7 +4395,7 @@ en:
         bike: bike
         color: Color
         email_hidden: email hidden
-        impounded: 'Impounded:'
+        impounded: Impounded
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -4407,6 +4407,7 @@ en:
         only_not_impounded_html: Bikes that <strong>are not</strong> impounded
         only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
+        only_with_street_address_html: Only with <strong>Street address</strong>
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"

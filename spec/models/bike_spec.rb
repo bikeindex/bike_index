@@ -1956,6 +1956,12 @@ RSpec.describe Bike, type: :model do
         expect(bike.zipcode).to eq("10011")
         expect(bike.country).to eq(usa)
       end
+      context "with a blank street" do
+        let(:bike) { FactoryBot.create(:bike, street: "  ") }
+        it "is nil" do
+          expect(bike.reload.street).to be_nil
+        end
+      end
     end
 
     context "given no creation org location" do
