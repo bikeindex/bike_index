@@ -164,6 +164,7 @@ module Organized
       end
       if %w[none with with_street without_street].include?(params[:search_address])
         @search_address = params[:search_address]
+        # Currently removed none and with - instead using street - I think that reflects people's expectations
         bikes = case @search_address
         when "none" then bikes.without_location
         when "without_street" then bikes.without_street
@@ -173,11 +174,11 @@ module Organized
       else
         @search_address = false
       end
-      if search_impoundedness != "all"
-        bikes = if search_impoundedness == "not"
+      if search_status != "all"
+        bikes = if search_status == "not_impounded"
           bikes.where.not(status: "status_impounded")
         else
-          bikes.where(status: "status_#{search_impoundedness}")
+          bikes.where(status: "status_#{search_status}")
         end
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
@@ -188,12 +189,11 @@ module Organized
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
     end
 
-    def search_impoundedness
-      return @search_impoundedness if defined?(@search_impoundedness)
-      unless current_organization.enabled?("impound_bikes")
-        return @search_impoundedness = "all"
-      end
-      @search_impoundedness = %w[not with_owner impounded stolen all].include?(params[:search_impoundedness]) ? params[:search_impoundedness] : "not"
+    def search_status
+      return @search_status if defined?(@search_status)
+      valid_statuses = %w[with_owner stolen all]
+      valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
+      @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
     end
   end
 end

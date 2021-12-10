@@ -4549,6 +4549,8 @@ nl:
         vehicle_type: 'Voertuigtype:'
         only_with_street_address_html: Alleen met <strong>Straatadres</strong>
         only_without_street_address_html: Alleen <strong>zonder</strong> straat
+        only_stolen_html: alleen gestolen
+        only_with_owner_html: Niet gestolen of in beslag genomen
     bulk_imports:
       index:
         added: Toegevoegd

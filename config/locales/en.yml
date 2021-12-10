@@ -4405,12 +4405,10 @@ en:
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
         only_not_impounded_html: Only <strong>not</strong> impounded
-        only_with_owner_html: Not stolen or impounded
         only_stolen_html: Only stolen
         only_with_address_html: Only <strong>with</strong> address
+        only_with_owner_html: Not stolen or impounded
         only_with_stickers_html: Only <strong>with</strong> stickers
-        only_with_street_address_html: Only with <strong>street address</strong>
-        only_without_street_address_html: Only <strong>without</strong> street
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
@@ -4420,6 +4418,7 @@ en:
         sent_to: Sent to
         settings: settings
         sticker: Sticker
+        status: 'Status:'
         stickers: 'Stickers:'
         stolen: Stolen
         stolen_bikes_html: "<em>stolen</em> bikes"
