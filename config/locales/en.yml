@@ -4404,7 +4404,9 @@ en:
         only_impounded_html: Only <strong>impounded</strong> bikes
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
-        only_not_impounded_html: Bikes that <strong>are not</strong> impounded
+        only_not_impounded_html: Only <strong>not</strong> impounded
+        only_with_owner_html: Not stolen or impounded
+        only_stolen_html: Only stolen
         only_with_address_html: Only <strong>with</strong> address
         only_with_stickers_html: Only <strong>with</strong> stickers
         only_with_street_address_html: Only with <strong>street address</strong>
