@@ -18,17 +18,20 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "setting address for bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
-    let(:ownership) { FactoryBot.create(:ownership, creator: current_user, owner_email: current_user.email) }
+    let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:update_attributes) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
       bike.update_attributes(updated_at: Time.current)
       bike.reload
-      expect(bike.address_set_manually).to be_falsey
-      expect(bike.owner).to eq current_user
-      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+      expect(bike.current_ownership.claimed?).to be_truthy
+      expect(bike.user&.id).to eq current_user.id
       expect(current_user.authorized?(bike)).to be_truthy
+      expect(current_user.address_set_manually).to be_truthy
+
+      expect(bike.address_set_manually).to be_falsey
+      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
       VCR.use_cassette("bike_request-set_manual_address") do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
@@ -39,30 +42,33 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.street).to eq default_location[:street]
       expect(bike.address_set_manually).to be_falsey
     end
-  end
-  context "with user without address" do
-    let!(:current_user) { FactoryBot.create(:user_confirmed) }
-    it "sets the passed address" do
-      expect(current_user.to_coordinates).to eq([nil, nil])
-      bike.update_attributes(updated_at: Time.current)
-      bike.reload
-      expect(bike.address_set_manually).to be_falsey
-      expect(bike.owner).to eq current_user
-      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-      expect(current_user.authorized?(bike)).to be_truthy
-      VCR.use_cassette("bike_request-set_manual_address") do
-        Sidekiq::Worker.clear_all
-        Sidekiq::Testing.inline! do
-          patch base_url, params: {bike: update_attributes}
+    context "with user without address" do
+      let!(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "sets the passed address" do
+        expect(current_user.to_coordinates).to eq([nil, nil])
+        bike.update_attributes(updated_at: Time.current)
+        bike.reload
+        expect(current_user.authorized?(bike)).to be_truthy
+        expect(current_user.address_set_manually).to be_falsey
+        expect(bike.address_set_manually).to be_falsey
+        expect(bike.owner&.id).to eq current_user.id
+        expect(bike.user&.id).to eq current_user.id
+        expect(bike.to_coordinates).to eq([nil, nil])
+
+        VCR.use_cassette("bike_request-set_manual_address") do
+          Sidekiq::Worker.clear_all
+          Sidekiq::Testing.inline! do
+            patch base_url, params: {bike: update_attributes}
+          end
         end
+        bike.reload
+        expect(bike.street).to eq "10544 82 Ave NW"
+        expect(bike.country).to eq Country.canada
+        expect(bike.address_set_manually).to be_truthy
+        # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
+        expect(bike.latitude).to be_within(0.01).of(53.5183351)
+        expect(bike.longitude).to be_within(0.01).of(-113.5015663)
       end
-      bike.reload
-      expect(bike.street).to eq "10544 82 Ave NW"
-      expect(bike.country).to eq Country.canada
-      expect(bike.address_set_manually).to be_truthy
-      # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
-      expect(bike.latitude).to be_within(0.01).of(53.5183351)
-      expect(bike.longitude).to be_within(0.01).of(-113.5015663)
     end
   end
   context "mark bike stolen, the way it's done on the web" do
