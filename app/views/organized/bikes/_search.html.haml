@@ -102,7 +102,7 @@
     %p.search-sort-btns
       %span.sort-group-label= t(".address")
       = link_to t(".all"), organization_bikes_path(search_params.merge(search_address: nil)), class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}"
-      = link_to organization_bikes_path(search_params.merge(search_address: "with_street")), class: "btn btn-secondary #{@search_address == 'with' ? 'active' : ''}" do
+      = link_to organization_bikes_path(search_params.merge(search_address: "with_street")), class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do
         = t(".only_with_address_html")
       = link_to organization_bikes_path(search_params.merge(search_address: "without_street")), class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do
         = t(".only_no_address_html")
