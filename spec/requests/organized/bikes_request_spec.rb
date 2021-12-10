@@ -4,6 +4,8 @@ RSpec.describe Organized::BikesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/bikes" }
   include_context :request_spec_logged_in_as_organization_member
 
+  # NOTE: Index is tested in controller spec because of session
+
   describe "new" do
     it "renders" do
       get "#{base_url}/new"
