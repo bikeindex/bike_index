@@ -162,10 +162,12 @@ module Organized
       else
         @search_stickers = false
       end
-      if %w[none with with_street].include?(params[:search_address])
+      if %w[none with with_street without_street].include?(params[:search_address])
         @search_address = params[:search_address]
         if @search_address == "none"
           bikes = bikes.without_location
+        elsif @search_address == "without_street"
+          bikes = bikes.where(street: nil)
         else
           bikes = bikes.with_location
           bikes = bikes.where.not(street: nil) if @search_address == "with_street"

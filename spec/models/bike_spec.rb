@@ -1955,6 +1955,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.city).to eq("New York")
         expect(bike.zipcode).to eq("10011")
         expect(bike.country).to eq(usa)
+        expect(bike.street).to be_present
       end
       context "with a blank street" do
         let(:bike) { FactoryBot.create(:bike, street: "  ") }
@@ -2002,11 +2003,15 @@ RSpec.describe Bike, type: :model do
           expect(bike.registration_address_source).to eq "user"
 
           bike.reload
+          bike.address_set_manually = true
+          bike.street = nil
           bike.skip_geocoding = false
           bike.set_location_info
           expect(bike.skip_geocoding).to be_truthy
 
           expect(bike.address_hash).to eq user.address_hash
+          expect(bike.street).to eq user.street
+          expect(bike.address_set_manually).to be_falsey # Because it's set by the user
         end
       end
     end

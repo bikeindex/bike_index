@@ -107,6 +107,8 @@
         = t(".only_with_street_address_html")
       = link_to organization_bikes_path(search_params.merge(search_address: "none")), class: "btn btn-secondary #{@search_address == 'none' ? 'active' : ''}" do
         = t(".only_no_address_html")
+      = link_to organization_bikes_path(search_params.merge(search_address: "without_street")), class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do
+        = t(".only_without_street_address_html")
 
   - if current_organization.enabled?("impound_bikes")
     %p.stickers-sort-btns
