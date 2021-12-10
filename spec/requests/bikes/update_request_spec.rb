@@ -36,6 +36,27 @@ RSpec.describe "BikesController#update", type: :request do
         end
       end
       bike.reload
+      expect(bike.street).to eq default_location[:street]
+      expect(bike.address_set_manually).to be_falsey
+    end
+  end
+  context "with user without address" do
+    let!(:current_user) { FactoryBot.create(:user_confirmed) }
+    it "sets the passed address" do
+      expect(current_user.to_coordinates).to eq([nil, nil])
+      bike.update_attributes(updated_at: Time.current)
+      bike.reload
+      expect(bike.address_set_manually).to be_falsey
+      expect(bike.owner).to eq current_user
+      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+      expect(current_user.authorized?(bike)).to be_truthy
+      VCR.use_cassette("bike_request-set_manual_address") do
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          patch base_url, params: {bike: update_attributes}
+        end
+      end
+      bike.reload
       expect(bike.street).to eq "10544 82 Ave NW"
       expect(bike.country).to eq Country.canada
       expect(bike.address_set_manually).to be_truthy
