@@ -164,13 +164,11 @@ module Organized
       end
       if %w[none with with_street without_street].include?(params[:search_address])
         @search_address = params[:search_address]
-        if @search_address == "none"
-          bikes = bikes.without_location
-        elsif @search_address == "without_street"
-          bikes = bikes.where(street: nil)
-        else
-          bikes = bikes.with_location
-          bikes = bikes.where.not(street: nil) if @search_address == "with_street"
+        bikes = case @search_address
+        when "none" then bikes.without_location
+        when "without_street" then bikes.without_street
+        when "with_street" then bikes.with_street
+        when "with" then bikes.with_location
         end
       else
         @search_address = false

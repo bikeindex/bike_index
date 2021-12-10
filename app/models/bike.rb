@@ -426,6 +426,11 @@ class Bike < ApplicationRecord
     serial_number
   end
 
+  # Prevent returning ip address, rather than the TLD URL
+  def html_url
+    "#{ENV["BASE_URL"]}/bikes/#{id}"
+  end
+
   # We may eventually remove the boolean. For now, we're just going with it.
   def made_without_serial?
     made_without_serial

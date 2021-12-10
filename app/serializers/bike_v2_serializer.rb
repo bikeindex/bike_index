@@ -66,7 +66,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def url
-    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
+    object.html_url
   end
 
   def is_stock_img

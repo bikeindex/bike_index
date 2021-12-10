@@ -12,6 +12,8 @@ module Geocodeable
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
     scope :with_location, -> { where.not(latitude: nil) }
+    scope :with_street, -> { with_location.where.not(street: nil) }
+    scope :without_street, -> { where(street: nil) }
     # NOTE: without_location not included because it's overridden in stolen_record, which warns everytime it's loaded
 
     # Skip geocoding if this flag is truthy
