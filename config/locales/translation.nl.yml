@@ -4547,6 +4547,7 @@ nl:
         only_not_impounded_html: Fietsen die <strong>niet in</strong> beslag <strong>worden</strong>
           genomen
         vehicle_type: 'Voertuigtype:'
+        only_with_street_address_html: Alleen met <strong>Straatadres</strong>
     bulk_imports:
       index:
         added: Toegevoegd
