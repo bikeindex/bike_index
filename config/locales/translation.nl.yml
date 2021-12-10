@@ -4547,10 +4547,9 @@ nl:
         only_not_impounded_html: Fietsen die <strong>niet in</strong> beslag <strong>worden</strong>
           genomen
         vehicle_type: 'Voertuigtype:'
-        only_with_street_address_html: Alleen met <strong>Straatadres</strong>
-        only_without_street_address_html: Alleen <strong>zonder</strong> straat
         only_stolen_html: alleen gestolen
         only_with_owner_html: Niet gestolen of in beslag genomen
+        status: 'Toestand:'
     bulk_imports:
       index:
         added: Toegevoegd
