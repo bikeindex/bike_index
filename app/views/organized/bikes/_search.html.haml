@@ -52,6 +52,7 @@
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
     "cycle_type_cell" => "Vehicle type",
+    "url_cell" => "URL"
   }
   # Most columns are enabled by default, including organization specific registration columns
   initially_checked_columns = %w[created_at_cell
@@ -67,7 +68,7 @@
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   enabled_columns = initially_checked_columns
   # Some optional columns
-  enabled_columns += %w[updated_at_cell cycle_type_cell]
+  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell]
   enabled_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
@@ -143,6 +144,8 @@
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header.sortable
       %tr
+        %th.hiddenColumn.url_cell
+          URL
         %th.hiddenColumn.created_at_cell
           = sortable "id", t(".registered")
         %th.hiddenColumn.updated_at_cell.hidden-xs-down
@@ -190,6 +193,9 @@
       - @bikes.each do |bike|
         %tr
           - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+            %td.hiddenColumn.url_cell
+              %code.small.p0{style: "word-break: normal"}
+                = "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}"
             %td.hiddenColumn.created_at_cell
               %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
