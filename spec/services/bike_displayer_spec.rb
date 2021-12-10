@@ -209,11 +209,21 @@ RSpec.describe BikeDisplayer do
     end
   end
 
-  describe "display_edit_address_fields?" do
+  describe "user_edit_address?, display_edit_address_fields? and edit_street_address?" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user, :confirmed) }
+    let(:admin) { FactoryBot.create(:admin) }
+
     it "is falsey" do
       expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+      expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+    end
+    context "new bike" do
+      let(:bike) { Bike.new }
+      it "is truthy" do
+        expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+      end
     end
     context "owner" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
@@ -223,9 +233,11 @@ RSpec.describe BikeDisplayer do
         expect(bike.reload.authorized?(user)).to be_truthy
         expect(bike.user_id).to be_blank
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+        expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
       end
     end
-    context "user" do
+    context "bike.user" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
       before do
         expect(bike.authorized?(user)).to be_truthy
@@ -233,12 +245,19 @@ RSpec.describe BikeDisplayer do
       end
       it "is truthy" do
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+        expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
+        expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
       end
       context "user address set" do
         let(:user) { FactoryBot.create(:user, :in_amsterdam) }
         it "is falsey" do
           expect(user.reload.address_set_manually).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
         end
       end
       context "impounded" do
@@ -246,6 +265,8 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           expect(bike.reload.status).to eq "status_impounded"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
       context "stolen" do
@@ -253,12 +274,77 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           expect(bike.reload.status).to eq "status_impounded"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
       context "unregistered_parking_notification" do
         it "is falsey" do
           bike.status = "unregistered_parking_notification"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
+        end
+      end
+      context "bike street is present" do
+        before { bike.update(street: "444 something") }
+        it "is truthy" do
+          expect(bike.reload.street).to eq "444 something"
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_truthy
+        end
+      end
+    end
+    context "organized bike" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, organization: organization) }
+      let(:organization_member) { FactoryBot.create(:user, :with_organization, organization: organization) }
+      it "is truthy" do
+        expect(bike.authorized?(user)).to be_truthy
+        expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+        expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
+        expect(bike.authorized?(organization_member)).to be_truthy
+        expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
+        expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+        expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
+      end
+      context "organization reg_address" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
+        it "is truthy" do
+          expect(bike.authorized?(user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, user)).to be_truthy
+          expect(bike.authorized?(organization_member)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_truthy
+        end
+      end
+      context "user address set" do
+        let(:user) { FactoryBot.create(:user, :in_amsterdam) }
+        it "is falsey" do
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
+          expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_falsey
+          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
+        end
+      end
+      context "no_address set" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["no_address"]) }
+        it "is falsey" do
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
         end
       end
     end
