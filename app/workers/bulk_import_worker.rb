@@ -87,7 +87,7 @@ class BulkImportWorker < ApplicationWorker
         manufacturer_id: row[:manufacturer].present? ? row[:manufacturer] : "Unknown",
         owner_email: row[:owner_email],
         # Set a default color of black, since sometimes there aren't colors in imports
-        color: row[:color].present? ? row[:color] : "Black",
+        paint: row[:color].present? ? row[:color] : "Black",
         serial_number: rescue_blank_serial(row[:serial_number]),
         year: row[:year],
         frame_model: row[:model],
