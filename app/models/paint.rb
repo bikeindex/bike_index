@@ -94,6 +94,14 @@ class Paint < ApplicationRecord
     paint_str.strip.gsub(/\s+/, " ")
   end
 
+  def unlinked?
+    color_id.blank?
+  end
+
+  def linked?
+    !unlinked?
+  end
+
   def set_calculated_attributes
     self.name = name.downcase.strip
   end
