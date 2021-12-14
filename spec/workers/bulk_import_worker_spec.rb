@@ -454,11 +454,11 @@ RSpec.describe BulkImportWorker, type: :job do
         let(:organization) { FactoryBot.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
         let(:row) { {manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: "tandem"} }
-        it "registers a bike" do
+        def expect_registered_bike(passed_row)
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
           expect {
-            instance.register_bike(instance.row_to_b_param_hash(row))
+            instance.register_bike(instance.row_to_b_param_hash(passed_row))
           }.to change(Bike, :count).by 1
           bike = Bike.last
 
@@ -466,7 +466,6 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike.manufacturer).to eq manufacturer
           expect(bike.serial_number).to eq "unknown"
           expect(bike.frame_model).to eq "Midnight Special"
-          expect(bike.primary_frame_color).to eq black
 
           creation_state = bike.current_creation_state
           expect(creation_state.is_bulk).to be_truthy
@@ -474,6 +473,46 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(creation_state.organization).to eq organization
           expect(bike.creation_organization).to eq organization
           expect(bike.creator).to eq organization.auto_user
+          bike
+        end
+        it "registers a bike" do
+          bike = expect_registered_bike(row)
+
+          expect(bike.primary_frame_color).to eq black
+          expect(bike.paint_id).to be_blank
+        end
+        context "chartreuse color" do
+          let(:color) { "chartreuse" }
+          it "creates a new paint" do
+            expect(Paint.count).to eq 0
+            bike = expect_registered_bike(row.merge(color: color))
+
+            expect(bike.primary_frame_color).to eq black
+            expect(bike.paint_id).to be_present
+            expect(Paint.count).to eq 1
+            paint = bike.paint
+            expect(paint.manufacturer_id).to be_blank # I don't know where this is set...
+            expect(paint.name).to eq color
+            expect(paint.color_id).to be_blank
+            expect(paint.linked?).to be_falsey
+          end
+          context "with chartreuse paint" do
+            let(:green) { FactoryBot.create(:color, name: "Green") }
+            let!(:paint) { FactoryBot.create(:paint, name: color, color: green) }
+            it "assigns" do
+              expect(Paint.count).to eq 1
+              bike = expect_registered_bike(row.merge(color: " ChartreuSE  "))
+
+              expect(bike.primary_frame_color_id).to eq green.id
+              expect(bike.paint_id).to be_present
+              expect(Paint.count).to eq 1
+              paint = bike.paint
+              expect(paint.manufacturer_id).to be_blank # I don't know where this is set...
+              expect(paint.name).to eq color
+              expect(paint.color_id).to eq green.id
+              expect(paint.linked?).to be_truthy
+            end
+          end
         end
       end
       context "not valid bike" do

@@ -25,9 +25,8 @@ class Admin::PaintsController < Admin::BaseController
 
   def update
     if @paint.update_attributes(permitted_parameters)
-      black_id = Color.find_by_name("Black").id
-      flash[:success] = "Paint updated!"
       UpdatePaintWorker.perform_async(@paint.id)
+      flash[:success] = "Paint updating!"
       redirect_to admin_paints_url
     else
       render action: :edit

@@ -1,6 +1,41 @@
 require "rails_helper"
 
 RSpec.describe BikeDisplayer do
+  describe "show_paint_description?" do
+    let(:black) { Color.black }
+    it "returns false" do
+      expect(BikeDisplayer.paint_description?(Bike.new)).to be_falsey
+    end
+    context "with paint" do
+      let(:stickers) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
+      let(:paint) { FactoryBot.create(:paint, name: "812348123") }
+      let(:bike) { FactoryBot.create(:bike, paint: paint, primary_frame_color: black) }
+      it "returns false" do
+        expect(BikeDisplayer.paint_description?(bike)).to be_falsey
+      end
+      context "bike pos" do
+        it "returns true" do
+          allow(bike).to receive(:pos?) { true }
+          expect(bike.render_paint_description?).to be_truthy
+          # If the primary frame color isn't black, don't render
+          bike.primary_frame_color = stickers
+          expect(bike.render_paint_description?).to be_falsey
+          bike.primary_frame_color = black # reset to black
+          expect(BikeDisplayer.paint_description?(bike)).to be_truthy
+          # And with a secondary frame color it is truthy
+          bike.secondary_frame_color = stickers
+          expect(BikeDisplayer.paint_description?(bike)).to be_truthy
+        end
+      end
+    end
+    context "pos registration without paint" do
+      let(:bike) { FactoryBot.create(:bike_lightspeed_pos, primary_frame_color: black, paint: nil) }
+      it "returns false" do
+        expect(BikeDisplayer.paint_description?(bike)).to be_falsey
+      end
+    end
+  end
+
   describe "display_impound_claim?" do
     let(:bike) { Bike.new }
     let(:admin) { User.new(superuser: true) }

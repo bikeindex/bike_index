@@ -53,10 +53,8 @@
                   Colors
                 %td
                   = bike.frame_colors.to_sentence
-                  - if bike.render_paint_description?
+                  - if bike.paint_id.present?
                     %small.less-strong= bike.paint_description
-                  - elsif bike.paint.present? && display_dev_info?
-                    %small.only-dev-visible= bike.paint_description
               %tr
                 %td
                   Created
