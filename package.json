@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "lint": "standard --fix app/**/**/*.js",
+    "lint": "standard --fix",
     "test": "jest"
   },
   "dependencies": {
@@ -61,5 +61,11 @@
     "react-testing-library": "^6.0.4",
     "standard": "^16.0.4",
     "webpack-dev-server": "^3.11.0"
+  },
+  "standard": {
+    "globals": ["$", "jQuery"],
+    "ignore": [
+      "/public/*"
+    ]
   }
 }

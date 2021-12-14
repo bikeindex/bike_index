@@ -111,7 +111,13 @@ We use the following tools to automate code formatting and linting:
 
 - [EditorConfig](https://editorconfig.org/)
 - [StandardRB](https://github.com/testdouble/standard)
-- [ESlint](https://eslint.org/)
+- [StandardJS](https://standardjs.com/)
+
+**Run standard for both Ruby and JS with**
+
+```
+bin/lint
+```
 
 ### EditorConfig
 
@@ -128,10 +134,6 @@ StandardRB is an opinionated Ruby style guide, linter, and formatter - it is "a 
 See the [how do I run standard in my editor](standardrb-plugin) section of the StandardRB docs to find an appropriate plugin for on-the-fly linting.
 
 [standardrb-plugin]: https://github.com/testdouble/standard#how-do-i-run-standard-in-my-editor
-
-### ESLint
-
-ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
 
 ## Bug tracker
 

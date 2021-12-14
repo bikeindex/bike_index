@@ -32,9 +32,6 @@ plugins:
     enabled: false
     channel: rubocop-0-67
     config: ./.rubocop.yml
-  eslint:
-    enabled: true
-    config: ./.eslintrc
   csslint:
     enabled: false
 

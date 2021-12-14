@@ -1,20 +1,18 @@
-/* eslint-disable */
-
 // This is the same as application.js pack - except that it adds rails-ujs and makes jquery globally available.
 // TODO: Once the coffeescript has been converted and everything is in webpack, the application.js pack should look like this
 //       and this can be removed
 
-import Rails from "rails-ujs";
-import "bootstrap/dist/js/bootstrap";
-import "../scripts/pages/initializer";
-
-Rails.start();
+import Rails from 'rails-ujs'
+import 'bootstrap/dist/js/bootstrap'
+import '../scripts/pages/initializer'
 
 // And also include chartkick
-import Chartkick from "chartkick";
-window.Chartkick = Chartkick;
-import Chart from "chart.js";
-Chartkick.addAdapter(Chart);
+import Chartkick from 'chartkick'
+import Chart from 'chart.js'
+
+Rails.start()
+window.Chartkick = Chartkick
+Chartkick.addAdapter(Chart)
 
 // Add jQuery to the window so it's accessible in the console, and just in general
-window.$ = window.jQuery = jQuery;
+window.$ = window.jQuery = jQuery
