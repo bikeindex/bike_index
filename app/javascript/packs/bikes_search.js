@@ -1,15 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import ErrorBoundary from "@honeybadger-io/react";
+import ErrorBoundary from '@honeybadger-io/react'
 
-import SecondarySearches from "../scripts/bikes_search/SecondarySearches";
-import honeybadger from "../scripts/utils/honeybadger";
+import SecondarySearches from '../scripts/bikes_search/SecondarySearches'
+import honeybadger from '../scripts/utils/honeybadger'
 
-document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-secondary-searches");
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('js-secondary-searches')
   if (!el) {
-    return;
+    return
   }
 
   ReactDOM.render(
@@ -17,5 +17,5 @@ document.addEventListener("DOMContentLoaded", () => {
       <SecondarySearches interpretedParams={window.interpreted_params} />
     </ErrorBoundary>,
     el
-  );
-});
+  )
+})

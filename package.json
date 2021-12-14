@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "lint": "./node_modules/.bin/eslint ./app/javascript/packs",
+    "lint": "standard --fix app/**/**/*.js",
     "test": "jest"
   },
   "dependencies": {
