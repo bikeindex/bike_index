@@ -238,6 +238,10 @@ RSpec.describe BulkImportWorker, type: :job do
             allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
             expect {
               instance.perform(bulk_import.id)
+              # This test is being flaky!
+              if bulk_import.reload.blocking_error?
+                pp bulk_import.import_errors
+              end
             }.to change(Bike, :count).by 2
             bulk_import.reload
             expect(bulk_import.progress).to eq "finished"
