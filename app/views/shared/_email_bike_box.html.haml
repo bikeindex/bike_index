@@ -25,10 +25,9 @@
           %li
             %strong
               #{t(".color").pluralize(@bike.frame_colors.count)}:
-            - if @bike.render_paint_description?
-              = @bike.paint_description
-            - else
               = @bike.frame_colors.to_sentence
+            - if BikeDisplayer.paint_description?(@bike)
+              %small.less-strong - #{@bike.paint_description}
 
           - if @bike.current_stolen_record.present?
             - stolen_record = @bike.current_stolen_record

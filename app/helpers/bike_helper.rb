@@ -1,4 +1,4 @@
-# There is also BikeDisplayer for things that don't
+# There is also BikeDisplayer for things that aren't only used in view files
 module BikeHelper
   def bike_status_span(bike)
     return "" if bike.status_with_owner?

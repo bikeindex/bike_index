@@ -4,6 +4,8 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "unlinked", admin_paints_path(sortable_search_params.merge(search_unlinked: !@search_unlinked)), class: "nav-link #{@search_unlinked ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", admin_paints_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
 - if @render_chart
@@ -15,16 +17,16 @@
 .row.mt-4
   .col-sm-7
     %p
-      = number_with_delimiter(matching_paints.count)
+      = admin_number_display(matching_paints.count)
       matching paints
       %em
         = humanized_time_range(@time_range)
       %em
-        (#{matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count} today)
+        (#{admin_number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
 
       - unless sortable_search_params?
         %strong
-          = Paint.where('color_id IS NULL').count
+          = admin_number_display(Paint.unlinked.count)
 
           are unlinked
 

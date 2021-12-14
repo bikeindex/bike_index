@@ -1,7 +1,7 @@
 class BikeDeleterWorker < ApplicationWorker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: "low_priority"
 
   def perform(bike_id)
-    Bike.where(id: bike_id).first&.destroy
+    Bike.unscoped.find_by_id(bike_id).destroy
   end
 end

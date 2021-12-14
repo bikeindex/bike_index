@@ -25,20 +25,8 @@ class Admin::PaintsController < Admin::BaseController
 
   def update
     if @paint.update_attributes(permitted_parameters)
-      black_id = Color.find_by_name("Black").id
-      flash[:success] = "Paint updated!"
-      if @paint.reload.color_id.present?
-        bikes = @paint.bikes.where(primary_frame_color_id: black_id)
-        bikes.each do |bike|
-          next if bike.secondary_frame_color_id.present?
-          next unless bike.primary_frame_color_id == black_id
-          bike.primary_frame_color_id = @paint.color_id
-          bike.secondary_frame_color_id = @paint.secondary_color_id
-          bike.tertiary_frame_color_id = @paint.tertiary_color_id
-          bike.paint_name = @paint.name
-          bike.save
-        end
-      end
+      UpdatePaintWorker.perform_async(@paint.id)
+      flash[:success] = "Paint updating!"
       redirect_to admin_paints_url
     else
       render action: :edit
@@ -81,6 +69,8 @@ class Admin::PaintsController < Admin::BaseController
     else
       Paint
     end
+    @search_unlinked = ParamsNormalizer.boolean(params[:search_unlinked])
+    paints = paints.unlinked if @search_unlinked
     paints.where(created_at: @time_range)
   end
 end

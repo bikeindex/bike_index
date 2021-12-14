@@ -53,10 +53,8 @@
                   Colors
                 %td
                   = bike.frame_colors.to_sentence
-                  - if bike.render_paint_description?
-                    %small.less-strong= bike.paint_description
-                  - elsif bike.paint.present? && display_dev_info?
-                    %small.only-dev-visible= bike.paint_description
+                  - if bike.paint_id.present?
+                    = link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "small gray-link"
               %tr
                 %td
                   Created

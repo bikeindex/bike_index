@@ -52,6 +52,7 @@
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
     "cycle_type_cell" => "Vehicle type",
+    "url_cell" => "URL"
   }
   # Most columns are enabled by default, including organization specific registration columns
   initially_checked_columns = %w[created_at_cell
@@ -67,14 +68,14 @@
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   enabled_columns = initially_checked_columns
   # Some optional columns
-  enabled_columns += %w[updated_at_cell cycle_type_cell]
+  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell]
   enabled_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
   # If the search_stickers param or search_address is set, start with the settings panel open
   settings_default_open = @search_stickers.present? || @search_address.present? || params[:search_impoundedness].present? || ParamsNormalizer.boolean(params[:search_open])
   # NOTE: Checking avery incurs a performance hit - so only render it when the box is checked
-  show_avery_export = current_organization.enabled?("avery_export") && ParamsNormalizer.boolean(params[:avery_export])
+  show_avery_export = current_organization.enabled?("avery_export") && ParamsNormalizer.boolean(params[:search_avery_export])
   initially_checked_columns += ["avery_cell"] if show_avery_export
   initially_checked_columns += ["impounded_cell"] if @search_impoundedness == "impounded"
   enabled_columns = enabled_columns.sort { |a, b| column_renames[a] <=> column_renames[b] }
@@ -82,7 +83,7 @@
 .collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "") }
   %h3.header-font-alt
     = t(".visible_columns")
-  .row
+  .row.pb-3
     - enabled_columns.each do |cell_name|
       .col-xs-6.col-md-4
         .form-group
@@ -90,30 +91,33 @@
             = check_box_tag cell_name, cell_name
             = column_renames[cell_name]
   - if current_organization.enabled?("bike_stickers")
-    %p.stickers-sort-btns
-      = t(".stickers")
+    %p.search-sort-btns
+      %span.sort-group-label= t(".stickers")
       = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
       = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
         = t(".only_with_stickers_html")
       = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
         = t(".only_no_sticker_html")
   - if current_organization.enabled?("reg_address")
-    %p.stickers-sort-btns
-      = t(".address")
+    %p.search-sort-btns
+      %span.sort-group-label= t(".address")
       = link_to t(".all"), organization_bikes_path(search_params.merge(search_address: nil)), class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}"
-      = link_to organization_bikes_path(search_params.merge(search_address: "with")), class: "btn btn-secondary #{@search_address == 'with' ? 'active' : ''}" do
+      = link_to organization_bikes_path(search_params.merge(search_address: "with_street")), class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do
         = t(".only_with_address_html")
-      = link_to organization_bikes_path(search_params.merge(search_address: "none")), class: "btn btn-secondary #{@search_address == 'none' ? 'active' : ''}" do
+      = link_to organization_bikes_path(search_params.merge(search_address: "without_street")), class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do
         = t(".only_no_address_html")
-
-  - if current_organization.enabled?("impound_bikes")
-    %p.stickers-sort-btns
-      = t(".impounded")
-      = link_to t(".all"), organization_bikes_path(search_params.merge(search_impoundedness: "all")), class: "btn btn-secondary #{@search_impoundedness == 'all' ? 'active' : ''}"
-      = link_to organization_bikes_path(search_params.merge(search_impoundedness: "not")), class: "btn btn-secondary #{@search_impoundedness == 'not' ? 'active' : ''}" do
+  %p.search-sort-btns
+    %span.sort-group-label= t(".status")
+    = link_to t(".all"), organization_bikes_path(search_params.merge(search_status: "all")), class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}"
+    - if current_organization.enabled?("impound_bikes")
+      = link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")), class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do
         = t(".only_not_impounded_html")
-      = link_to organization_bikes_path(search_params.merge(search_impoundedness: "impounded")), class: "btn btn-secondary #{@search_impoundedness == 'impounded' ? 'active' : ''}" do
+      = link_to organization_bikes_path(search_params.merge(search_status: "impounded")), class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do
         = t(".only_impounded_html")
+    = link_to organization_bikes_path(search_params.merge(search_status: "with_owner")), class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do
+      = t(".only_with_owner_html")
+    = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
+      = t(".only_stolen_html")
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
@@ -139,6 +143,8 @@
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header.sortable
       %tr
+        %th.hiddenColumn.url_cell
+          URL
         %th.hiddenColumn.created_at_cell
           = sortable "id", t(".registered")
         %th.hiddenColumn.updated_at_cell.hidden-xs-down
@@ -186,6 +192,9 @@
       - @bikes.each do |bike|
         %tr
           - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+            %td.hiddenColumn.url_cell
+              %code.small.p0{style: "word-break: normal"}
+                = bike.html_url
             %td.hiddenColumn.created_at_cell
               %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
@@ -265,3 +274,4 @@
       = paginate @bikes
     .col-sm-6.text-right
       = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }
+

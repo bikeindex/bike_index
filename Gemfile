@@ -63,7 +63,6 @@ gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
-gem "rmagick" # Images
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "rqrcode", "0.10.1" # QR Codes
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more

@@ -12,33 +12,31 @@
     %th
       Remove
 
-
-
   %tbody
     - bikes.each do |bike|
       %tr
         %td
           .less-strong-hold
-            %span.less-strong-right.d-none.d-lg-table-cell
-              - if bike.example
-                %span.table-error
+              %a.small.convertTime{ href: edit_admin_bike_url(bike) }
+                = l bike.created_at, format: :convert_time
+              -# Add a space so that the id doesn't get grouped with the time
+              &nbsp;
+              %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                - if bike.example
+                  %span.text-danger
+                    = bike.id
+                - else
                   = bike.id
-              - else
-                = bike.id
-          %a{href: edit_admin_bike_url(bike) }
-
-            - if bike.created_at.today?
-              Today at #{bike.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
-              Yesterday at #{bike.created_at.strftime("%-I %p")}
-            - else
-              = bike.created_at.strftime("%-m.%-d.%Y")
         %td.d-none.d-sm-table-cell
           .less-strong-hold
-            = bike.creation_organization.name if bike.creation_organization.present?
-            - if bike.pos?
+            - if bike.creation_organization.present?
+              = link_to bike.creation_organization.name, admin_bikes_path(sortable_search_params.merge(organization_id: bike.creation_organization.to_param))
+            - if bike.creation_description
               %span.less-strong-right
-                pos
+                - if bike.bulk_import.present?
+                  = link_to origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+                - else
+                  = origin_display(bike.creation_description)
         %td.d-none.d-lg-table-cell
           = bike.owner_email
         %td
@@ -47,10 +45,10 @@
               = bike.mnfg_name
             = [bike.year, bike.frame_model].join(' ')
             = "(#{bike.type})" unless bike.type == 'bike'
-            - if bike.paint.present? && bike.paint.color_id.blank?
-              .less-strong
-                = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-                = bike.frame_colors.to_sentence
+            %span.d-none.d-lg-inline= bike.frame_colors.to_sentence
+            - if BikeDisplayer.paint_description?(bike)
+              %small.less-strong.d-none.d-lg-inline
+                = link_to bike.paint_description, edit_admin_paint_url(bike.paint)
             %br
             %small
               = bike.description

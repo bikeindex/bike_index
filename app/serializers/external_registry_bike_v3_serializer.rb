@@ -39,4 +39,7 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
   def stolen_location
     object.location_found.presence || "Unknown"
   end
+
+  def stolen_coordinates
+  end
 end

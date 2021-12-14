@@ -1,14 +1,12 @@
 -# somewhat gross hack to make it possible to show serial_display for the current user
 - skip_cache ||= false
 
--# For some reason, we're getting the ip address, rather than the TLD URL. Ugly hack to fix that
-- bike_link_target = "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}"
 %li.bike-box-item
-  %a.bike-list-image{ href: bike_link_target, class: ('hover-expand' if bike.thumb_path) }
+  %a.bike-list-image{ href: bike.html_url, class: ('hover-expand' if bike.thumb_path) }
     = bike_thumb_image(bike)
   .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
     %h5.title-link
-      %a{ href: bike_link_target }
+      %a{ href: bike.html_url }
         %strong
           = bike.type unless bike.type == 'bike'
           = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
@@ -29,14 +27,14 @@
     - if bike.current_stolen_record.present?
       %ul.attr-list
         %li
-          = bike_status_span(bike)
+          #{bike_status_span(bike)}:
           %span.convertTime
             = l bike.current_stolen_record.date_stolen, format: :convert_time
         = attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
     - if bike.current_impound_record.present?
       %ul.attr-list
         %li
-          = bike_status_span(bike)
+          #{bike_status_span(bike)}:
           %span.convertTime
             = l bike.current_impound_record.impounded_at, format: :convert_time
         = attr_list_item(bike.current_impound_record.address, t(".location"))

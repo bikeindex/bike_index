@@ -29,10 +29,6 @@ class BikeV2ShowSerializer < BikeV2Serializer
     object.cycle_type_name
   end
 
-  def url
-    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
-  end
-
   def api_url
     "#{ENV["BASE_URL"]}/api/v1/bikes/#{object.id}"
   end
@@ -50,9 +46,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def stolen_record
-    if object.current_stolen_record.present?
-      StolenRecordV2Serializer.new(object.current_stolen_record, scope: scope, root: false, event: object)
-    end
+    return nil unless current_stolen_record.present?
+    StolenRecordV2Serializer.new(current_stolen_record, scope: scope, root: false, event: object)
   end
 
   def rear_wheel_size_iso_bsd

@@ -426,6 +426,11 @@ class Bike < ApplicationRecord
     serial_number
   end
 
+  # Prevent returning ip address, rather than the TLD URL
+  def html_url
+    "#{ENV["BASE_URL"]}/bikes/#{id}"
+  end
+
   # We may eventually remove the boolean. For now, we're just going with it.
   def made_without_serial?
     made_without_serial
@@ -847,7 +852,10 @@ class Bike < ApplicationRecord
         current_stolen_record.address_hash
       end
     else
-      return true if address_set_manually # If it's not stolen, use the manual set address for the coordinates
+      if address_set_manually # If it's not stolen, use the manual set address for the coordinates
+        return true unless user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
+        self.address_set_manually = false
+      end
       address_attrs = location_record_address_hash
       return true unless address_attrs.present? # No address hash present so skip
       self.attributes = address_attrs

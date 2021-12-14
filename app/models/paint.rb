@@ -11,6 +11,8 @@ class Paint < ApplicationRecord
   belongs_to :tertiary_color, class_name: "Color"
 
   scope :official, -> { where("manufacturer_id IS NOT NULL") }
+  scope :linked, -> { where("color_id IS NOT NULL") }
+  scope :unlinked, -> { where("color_id IS NULL") }
 
   before_save :set_calculated_attributes
 
@@ -90,6 +92,14 @@ class Paint < ApplicationRecord
     paint_str.gsub!(/quicksilver/, " silver ")
     paint_str.gsub!(/burgu?a?ndy/, " red ")
     paint_str.strip.gsub(/\s+/, " ")
+  end
+
+  def unlinked?
+    color_id.blank?
+  end
+
+  def linked?
+    !unlinked?
   end
 
   def set_calculated_attributes

@@ -31,10 +31,10 @@ function BinxAppOrgBikes() {
       // When the avery cell is checked, add it to the params and make the search settings open
       $("#avery_cell").on("change", function (e) {
         let urlParams = new URLSearchParams(window.location.search);
-        urlParams.delete("avery_export");
+        urlParams.delete("search_avery_export");
         urlParams.delete("search_open");
         const averySearch = $("#avery_cell").prop("checked");
-        urlParams.append("avery_export", averySearch);
+        urlParams.append("search_avery_export", averySearch);
         urlParams.append("search_open", averySearch);
         window.location = `${location.pathname}?${urlParams.toString()}`;
       });

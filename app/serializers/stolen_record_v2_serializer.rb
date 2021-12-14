@@ -10,10 +10,11 @@ class StolenRecordV2Serializer < ApplicationSerializer
     :police_report_department,
     :created_at,
     :create_open311,
-    :id,
-    def date_stolen
-      object.date_stolen.to_i
-    end
+    :id
+
+  def date_stolen
+    object.date_stolen.to_i
+  end
 
   def created_at
     object.created_at.to_i
@@ -21,5 +22,13 @@ class StolenRecordV2Serializer < ApplicationSerializer
 
   def location
     object.address_location(include_all: true)
+  end
+
+  def latitude
+    object.latitude_public
+  end
+
+  def longitude
+    object.longitude_public
   end
 end

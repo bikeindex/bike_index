@@ -3502,7 +3502,7 @@ en:
         You bring the ideas, make the connections, and we’ll make sure you have the
         resources to get stuff done.
     ascend:
-      ascend_knowledge_base_article: Acend's Knowledge base article
+      ascend_knowledge_base_article: Ascend's Knowledge base article
       automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
         using Ascend POS
       email_shops_security_html: >-
@@ -4395,7 +4395,7 @@ en:
         bike: bike
         color: Color
         email_hidden: email hidden
-        impounded: 'Impounded:'
+        impounded: Impounded
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -4404,8 +4404,10 @@ en:
         only_impounded_html: Only <strong>impounded</strong> bikes
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
-        only_not_impounded_html: Bikes that <strong>are not</strong> impounded
+        only_not_impounded_html: Only <strong>not</strong> impounded
+        only_stolen_html: Only stolen
         only_with_address_html: Only <strong>with</strong> address
+        only_with_owner_html: Not stolen or impounded
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name
         registered: Registered
@@ -4415,6 +4417,7 @@ en:
         search_owner_email: Search owner email
         sent_to: Sent to
         settings: settings
+        status: 'Status:'
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen

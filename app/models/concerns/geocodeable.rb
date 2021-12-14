@@ -8,10 +8,12 @@ module Geocodeable
     belongs_to :country
 
     geocoded_by :address
-    before_validation :clean_state_data
+    before_validation :clean_state_and_street_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
     scope :with_location, -> { where.not(latitude: nil) }
+    scope :with_street, -> { with_location.where.not(street: nil) }
+    scope :without_street, -> { where(street: nil) }
     # NOTE: without_location not included because it's overridden in stolen_record, which warns everytime it's loaded
 
     # Skip geocoding if this flag is truthy
@@ -119,7 +121,8 @@ module Geocodeable
   end
 
   # Separate from bike_index_geocode because some models handle geocoding independently
-  def clean_state_data
+  def clean_state_and_street_data
+    self.street = nil if street.blank?
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id

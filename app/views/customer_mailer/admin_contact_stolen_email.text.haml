@@ -10,12 +10,10 @@
 = t(".text.serial")
 = @customer_contact.bike.serial_number
 
-- if @customer_contact.bike.paint.present?
-  = t(".text.color")
-  = @customer_contact.bike.paint.name
-- else
-  = t(".text.color")
-  = @customer_contact.bike.primary_frame_color.name
+= t(".text.color")
+- if BikeDisplayer.paint_description?(@customer_contact.bike)
+  = @customer_contact.bike.paint_description
+= @customer_contact.bike.frame_colors.to_sentence
 
 \---
 

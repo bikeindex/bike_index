@@ -189,7 +189,7 @@ GEM
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
     fast_blank (1.0.0)
-    ffi (1.13.1)
+    ffi (1.15.4)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -534,7 +534,6 @@ GEM
       actionpack (>= 4.2.0, < 6.0)
       railties (>= 4.2.0, < 6.0)
     rexml (3.2.5)
-    rmagick (4.0.0)
     rqrcode (0.10.1)
       chunky_png (~> 1.0)
     rspec (3.9.0)
@@ -793,7 +792,6 @@ DEPENDENCIES
   redis
   rerun
   responders (~> 2.0)
-  rmagick
   rqrcode (= 0.10.1)
   rqrcode-rails3!
   rspec (~> 3.4)

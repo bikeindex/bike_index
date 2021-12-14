@@ -3,6 +3,11 @@
 class BikeDisplayer
   # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
+    # user arg because all methods have it
+    def paint_description?(bike, _user = nil)
+      bike.pos? && bike.paint.present?
+    end
+
     def display_contact_owner?(bike, user = nil)
       bike.current_stolen_record.present?
     end
@@ -34,14 +39,29 @@ class BikeDisplayer
     end
 
     def display_edit_address_fields?(bike, user = nil)
-      # Only display for the current owner of the bike, *not* anyone who is authorized for the bike
-      return false unless user.present? && (bike.user == user || bike.id.blank?)
-      # If the user has set their address, that's the only way to update bike addresses
-      return false if user.address_set_manually
+      return false unless user_edit_address?(bike, user)
       # Make absolutely sure with stolen bikes
       return false if bike.current_stolen_record_id.present?
       # parking notifications, impounded, stolen etc use the associated record for their address
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
+    end
+
+    # Intended as an internal method, splitting out for testing purposes
+    def user_edit_address?(bike, user = nil)
+      return false if user.blank?
+      if bike.user.present?
+        # If the user has set their address, that's the only way to update bike addresses
+        return false if bike.user.address_set_manually
+        # If the user is the bike owner, show it
+        return true if bike.user == user
+      end
+      # otherwise if bike is new, for superusers or users authorized by organization
+      bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
+    end
+
+    def edit_street_address?(bike, user = nil)
+      return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
+      bike.street.present? || bike.creation_organization&.enabled?("reg_address")
     end
   end
 end
