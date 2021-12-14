@@ -54,7 +54,7 @@
                 %td
                   = bike.frame_colors.to_sentence
                   - if bike.paint_id.present?
-                    %small.less-strong= bike.paint_description
+                    = link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "small gray-link"
               %tr
                 %td
                   Created

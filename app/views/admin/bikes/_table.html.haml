@@ -17,10 +17,13 @@
           - else
             Added
         %th.d-none.d-md-table-cell
-          - if render_sortable
-            = sortable "owner_email", "Sent to"
-          - else
-            Sent to
+          .less-strong-hold
+            - if render_sortable
+              = sortable "owner_email", "Sent to"
+            - else
+              Sent to
+            %small.d-none.d-lg-block.text-info{style: "position: absolute; right: 0.25em; top: 0.4em;"}
+              claimed?
         %th
           - if render_sortable
             = sortable "manufacturer_id"
@@ -55,6 +58,8 @@
             %td.d-none.d-md-table-cell
               = bike.owner_email
               = user_icon(bike.user)
+              - if bike.claimed?
+                %small.d-none.d-lg-inline.ml-1.text-info= check_mark
             %td
               - if bike.manufacturer_other.present?
                 %span.text-warning
@@ -68,10 +73,10 @@
                 - if bike.stolen_recovery?
                   %small
                     = link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "text-success text-underline"
-                - if bike.paint.present? && bike.paint.color_id.blank?
-                  %span.less-strong
-                    = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-                    = bike.frame_colors.to_sentence
+                %span.d-none.d-lg-inline.less-strong= bike.frame_colors.to_sentence
+                - if BikeDisplayer.paint_description?(bike)
+                  %small.less-strong.d-none.d-lg-inline
+                    = link_to bike.paint_description, edit_admin_paint_url(bike.paint)
                 - if bike.status_stolen?
                   %span.text-danger.less-strong-right
                     stolen
