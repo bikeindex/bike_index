@@ -3,6 +3,11 @@
 class BikeDisplayer
   # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
+    # user included because everything else has user
+    def paint_description?(bike, _user = nil)
+      bike.pos? && bike.paint.present?
+    end
+
     def display_contact_owner?(bike, user = nil)
       bike.current_stolen_record.present?
     end

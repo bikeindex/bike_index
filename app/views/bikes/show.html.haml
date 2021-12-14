@@ -163,7 +163,7 @@
           %li.color-attrs
             %strong.attr-title #{t(".primary_colors")}:
             = @bike.frame_colors.to_sentence
-            - if @bike.render_paint_description?
+            - if BikeDisplayer.paint_description?(@bike)
               .paint-description
                 %strong.attr-title
                   #{t(".paint_description")}:
