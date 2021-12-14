@@ -1,45 +1,45 @@
-import log from "../../utils/log";
+import log from '../../utils/log'
 
-function BinxAdminBikesEdit() {
+function BinxAdminBikesEdit () {
   return {
-    init() {
-      window.originalSerialNumber = $("#bike_serial_number").val();
-      $(".serial-check input").on("change", (e) => {
-        this.updateSerialDisplay();
-      });
-      this.bikesEditRecoverySlide();
+    init () {
+      window.originalSerialNumber = $('#bike_serial_number').val()
+      $('.serial-check input').on('change', (e) => {
+        this.updateSerialDisplay()
+      })
+      this.bikesEditRecoverySlide()
     },
 
-    updateSerialDisplay() {
-      if ($(".serial-check input:checked").length) {
-        if ($(".serial-check-made-without input:checked").length) {
-          log.debug("in made without");
-          $(".serial-check-unknown input").prop("checked", false);
-          $("#bike_serial_number").val("made_without_serial");
+    updateSerialDisplay () {
+      if ($('.serial-check input:checked').length) {
+        if ($('.serial-check-made-without input:checked').length) {
+          log.debug('in made without')
+          $('.serial-check-unknown input').prop('checked', false)
+          $('#bike_serial_number').val('made_without_serial')
         } else {
-          $("#bike_serial_number").val("unknown");
+          $('#bike_serial_number').val('unknown')
         }
-        $("#bike_serial_number").addClass("fake-disabled");
+        $('#bike_serial_number').addClass('fake-disabled')
       } else {
-        $(".serial-check").collapse("show");
-        $("#bike_serial_number").val(window.originalSerialNumber);
-        $("#bike_serial_number").removeClass("fake-disabled");
+        $('.serial-check').collapse('show')
+        $('#bike_serial_number').val(window.originalSerialNumber)
+        $('#bike_serial_number').removeClass('fake-disabled')
       }
     },
 
-    bikesEditRecoverySlide() {
-      const $this = $("#stolenCheckBox input");
-      $this.on("change", (e) => {
-        e.preventDefault();
-        if ($this.prop("checked")) {
-          $("#adminRecoveryFields").collapse("hide");
-          $("#mark_recovered_reason").attr("required", false);
+    bikesEditRecoverySlide () {
+      const $this = $('#stolenCheckBox input')
+      $this.on('change', (e) => {
+        e.preventDefault()
+        if ($this.prop('checked')) {
+          $('#adminRecoveryFields').collapse('hide')
+          $('#mark_recovered_reason').attr('required', false)
         } else {
-          $("#adminRecoveryFields").collapse("show");
-          $("#mark_recovered_reason").attr("required", true);
+          $('#adminRecoveryFields').collapse('show')
+          $('#mark_recovered_reason').attr('required', true)
         }
-      });
-    },
-  };
+      })
+    }
+  }
 }
-export default BinxAdminBikesEdit;
+export default BinxAdminBikesEdit

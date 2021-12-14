@@ -1,19 +1,19 @@
 /* eslint import/no-unresolved: 0 */
 
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react'
 
-const t = BikeIndex.translator("bikes_search");
+const t = BikeIndex.translator('bikes_search')
 
-const BikeSerialSearchResult = ({bike}) => (
-  <li className="bike-box-item">
-    <ResultImage bike={bike}/>
+const BikeSerialSearchResult = ({ bike }) => (
+  <li className='bike-box-item'>
+    <ResultImage bike={bike} />
 
-    <div className="bike-information multi-attr-lists">
-      <h5 className="title-link">
-        <a href={bike.url} target="_blank">
+    <div className='bike-information multi-attr-lists'>
+      <h5 className='title-link'>
+        <a href={bike.url} target='_blank' rel='noreferrer'>
           <strong>
             {
-              bike.manufacturer_name === "unknown_brand"
+              bike.manufacturer_name === 'unknown_brand'
                 ? t(bike.manufacturer_name)
                 : [bike.year, bike.manufacturer_name].filter(a => a).join(' ')
             }
@@ -21,58 +21,58 @@ const BikeSerialSearchResult = ({bike}) => (
         </a>
       </h5>
 
-      <ul className="attr-list">
+      <ul className='attr-list'>
         <li>
-          <span className="attr-title">{t("color")}:&nbsp;</span>
+          <span className='attr-title'>{t('color')}:&nbsp;</span>
           {
             bike.frame_colors.length
-              ? bike.frame_colors.join(", ")
-              : t("unknown")
+              ? bike.frame_colors.join(', ')
+              : t('unknown')
           }
         </li>
         <li>
-          <span className="attr-title">{t("serial")}:&nbsp;</span>
+          <span className='attr-title'>{t('serial')}:&nbsp;</span>
           {
-            bike.serial === "absent"
-              ? t("absent")
-              : bike.serial === "Hidden"
-              ? t("hidden")
-              : bike.serial
+            bike.serial === 'absent'
+              ? t('absent')
+              : bike.serial === 'Hidden'
+                ? t('hidden')
+                : bike.serial
           }
         </li>
       </ul>
 
-      <ul className="attr-list">
-        {<AbandonedOrStolenDateItem bike={bike}/>}
-        {<LocationItem bike={bike}/>}
+      <ul className='attr-list'>
+        <AbandonedOrStolenDateItem bike={bike} />
+        <LocationItem bike={bike} />
       </ul>
     </div>
   </li>
 )
 
-const AbandonedOrStolenDateItem = ({bike}) => {
+const AbandonedOrStolenDateItem = ({ bike }) => {
   if (!bike.date_stolen) {
-    return <li/>
+    return <li />
   }
 
   return (
     <li>
-      <span className="attr-title text-danger">
-        {bike.stolen ? t("stolen") : t("abandoned") }:&nbsp;
+      <span className='attr-title text-danger'>
+        {bike.stolen ? t('stolen') : t('abandoned')}:&nbsp;
       </span>
-      <span className="convertTime">{bike.date_stolen}</span>
+      <span className='convertTime'>{bike.date_stolen}</span>
     </li>
   )
 }
 
-const LocationItem = ({bike}) => {
+const LocationItem = ({ bike }) => {
   if (!bike.stolen_location) {
-    return <li/>
+    return <li />
   }
 
   return (
     <li>
-      <span className="attr-title">{t("location")}:&nbsp;</span>
+      <span className='attr-title'>{t('location')}:&nbsp;</span>
       {bike.stolen_location}
     </li>
   )
@@ -80,14 +80,18 @@ const LocationItem = ({bike}) => {
 
 const ResultImage = ({ bike }) => {
   if (!bike.thumb || bike.is_stock_img) {
-    return (<a className="bike-list-image" target="_blank" href={bike.url}>
-              <img src={window.bike_placeholder_image} className="no-image"/>
-            </a>);
+    return (
+      <a className='bike-list-image' target='_blank' href={bike.url} rel='noreferrer'>
+        <img src={window.bike_placeholder_image} className='no-image' />
+      </a>
+    )
   }
 
-  return (<a className="bike-list-image hover-expand" target="_blank" href={bike.url}>
-            <img alt={bike.title} src={bike.thumb}></img>
-          </a>);
+  return (
+    <a className='bike-list-image hover-expand' target='_blank' href={bike.url} rel='noreferrer'>
+      <img alt={bike.title} src={bike.thumb} />
+    </a>
+  )
 }
 
-export default BikeSerialSearchResult;
+export default BikeSerialSearchResult

@@ -1,81 +1,81 @@
-import moment from "moment-timezone";
+import moment from 'moment-timezone'
 
 export default class BinxAppOrgExport {
-  init() {
-    let body_id = document.getElementsByTagName("body")[0].id;
+  init () {
+    const body_id = document.getElementsByTagName('body')[0].id
 
-    if (body_id == "organized_exports_new") {
-      this.initNewForm();
+    if (body_id == 'organized_exports_new') {
+      this.initNewForm()
     } else {
-      this.reloadIfUnfinished();
+      this.reloadIfUnfinished()
     }
   }
 
-  initNewForm() {
+  initNewForm () {
     // make the datetimefield expand, set the time
-    $(".field-expander").on("click", (e) => {
-      e.preventDefault();
-      let $parent = $(e.target).parents(".form-group");
-      $parent.find(".field-expander").slideUp("fast", function () {
-        $parent.find(".collapsed-fields").slideDown("fast");
+    $('.field-expander').on('click', (e) => {
+      e.preventDefault()
+      const $parent = $(e.target).parents('.form-group')
+      $parent.find('.field-expander').slideUp('fast', function () {
+        $parent.find('.collapsed-fields').slideDown('fast')
         $parent
           .find("input[type='datetime-local']")
-          .val(moment().startOf("day").format("YYYY-MM-DDTHH:mm"));
-      });
-    });
+          .val(moment().startOf('day').format('YYYY-MM-DDTHH:mm'))
+      })
+    })
     // make the datetimefield collapse, remove the time
-    $(".field-collapser").on("click", (e) => {
-      e.preventDefault();
-      let $parent = $(e.target).parents(".form-group");
-      $parent.find(".collapsed-fields").slideUp("fast", function () {
-        $parent.find(".field-expander").slideDown("fast");
-        $parent.find("input[type='datetime-local']").val("");
-      });
-    });
+    $('.field-collapser').on('click', (e) => {
+      e.preventDefault()
+      const $parent = $(e.target).parents('.form-group')
+      $parent.find('.collapsed-fields').slideUp('fast', function () {
+        $parent.find('.field-expander').slideDown('fast')
+        $parent.find("input[type='datetime-local']").val('')
+      })
+    })
 
     // Show avery
-    this.showOrHideNonAvery();
+    this.showOrHideNonAvery()
     // and on future changes, trigger the update
-    $("#export_avery_export").on("change", (e) => {
-      this.showOrHideNonAvery();
-    });
+    $('#export_avery_export').on('change', (e) => {
+      this.showOrHideNonAvery()
+    })
 
     // Show onlyCustom
-    this.showOrHideOnlyCustom();
+    this.showOrHideOnlyCustom()
     // and on future changes, trigger the update
-    $("#export_only_custom_bike_ids").on("change", (e) => {
-      this.showOrHideOnlyCustom();
-    });
+    $('#export_only_custom_bike_ids').on('change', (e) => {
+      this.showOrHideOnlyCustom()
+    })
   }
 
-  showOrHideNonAvery() {
-    let isAvery = $("#export_avery_export").is(":checked");
+  showOrHideNonAvery () {
+    const isAvery = $('#export_avery_export').is(':checked')
     if (isAvery) {
-      $(".hiddenOnAveryExport").slideUp("fast");
-      $(".shownOnAveryExport").slideDown("fast").css("display", "flex");
+      $('.hiddenOnAveryExport').slideUp('fast')
+      $('.shownOnAveryExport').slideDown('fast').css('display', 'flex')
     } else {
-      $(".hiddenOnAveryExport").slideDown("fast").css("display", "flex");
-      $(".shownOnAveryExport").slideUp("fast");
+      $('.hiddenOnAveryExport').slideDown('fast').css('display', 'flex')
+      $('.shownOnAveryExport').slideUp('fast')
     }
   }
 
-  showOrHideOnlyCustom() {
-    let isOnlyCustom = $("#export_only_custom_bike_ids").is(":checked");
+  showOrHideOnlyCustom () {
+    const isOnlyCustom = $('#export_only_custom_bike_ids').is(':checked')
     if (isOnlyCustom) {
-      $(".hiddenOnOnlyCustom").slideUp("fast");
+      $('.hiddenOnOnlyCustom').slideUp('fast')
     } else {
-      $(".hiddenOnOnlyCustom").slideDown("fast").css("display", "flex");
+      $('.hiddenOnOnlyCustom').slideDown('fast').css('display', 'flex')
     }
   }
 
-  reloadIfUnfinished() {
-    if (!$("#exportProgress").hasClass("finished")) {
+  reloadIfUnfinished () {
+    if (!$('#exportProgress').hasClass('finished')) {
       // Reload the page after 2 seconds unless the export is more than 5 minutes old - at which point we assume something is broken
-      let created = parseInt($("#exportProgress").attr("data-createdat"));
+      const created = parseInt($('#exportProgress').attr('data-createdat'))
       if (moment().unix() - created < 300) {
         setTimeout(() => {
-          location.reload(true);
-        }, 5000);
+          location.reload(true)
+        }, 5000)
       }
     }
   }

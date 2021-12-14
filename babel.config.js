@@ -1,9 +1,9 @@
 module.exports = function (api) {
-  var validEnv = ['development', 'test', 'production']
-  var currentEnv = api.env()
-  var isDevelopmentEnv = api.env('development')
-  var isProductionEnv = api.env('production')
-  var isTestEnv = api.env('test')
+  const validEnv = ['development', 'test', 'production']
+  const currentEnv = api.env()
+  const isDevelopmentEnv = api.env('development')
+  const isProductionEnv = api.env('production')
+  const isTestEnv = api.env('test')
 
   if (!validEnv.includes(currentEnv)) {
     throw new Error(
@@ -17,7 +17,7 @@ module.exports = function (api) {
 
   return {
     presets: [
-      "@babel/react",
+      '@babel/react',
       [
         '@babel/preset-env',
         {
@@ -27,14 +27,14 @@ module.exports = function (api) {
           modules: 'auto',
           exclude: ['transform-typeof-symbol'],
           targets: {
-            "node": "current",
-            "browsers": "> 1%"
+            node: 'current',
+            browsers: '> 1%'
           }
         }
       ]
     ].filter(Boolean),
     plugins: [
-      "@babel/plugin-syntax-jsx",
+      '@babel/plugin-syntax-jsx',
       'babel-plugin-macros',
       '@babel/plugin-syntax-dynamic-import',
       '@babel/plugin-transform-destructuring',

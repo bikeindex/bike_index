@@ -65,7 +65,8 @@
   "standard": {
     "globals": ["$", "jQuery"],
     "ignore": [
-      "/public/*"
+      "/public/*",
+      "app/assets/javascripts/external_scripts"
     ]
   }
 }

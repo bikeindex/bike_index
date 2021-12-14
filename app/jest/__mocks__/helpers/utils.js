@@ -2,10 +2,10 @@ const event = fns => Object.assign(
   jest.fn(),
   {
     ...fns,
-    preventDefault: () => {},
-  },
-);
+    preventDefault: () => {}
+  }
+)
 
 export {
-  event,
-};
+  event
+}

@@ -1,24 +1,24 @@
-const { environment } = require("@rails/webpacker")
+const { environment } = require('@rails/webpacker')
 
-const webpack = require("webpack");
+const webpack = require('webpack')
 
 environment.plugins.append(
-  "Provide",
+  'Provide',
   new webpack.ProvidePlugin({
-    $: "jquery",
-    jQuery: "jquery"
+    $: 'jquery',
+    jQuery: 'jquery'
   })
-);
+)
 
 const ignoreLoader = {
   module: {
     rules: [
-       { test: /\.test\.js$/, use: 'ignore-loader' }
+      { test: /\.test\.js$/, use: 'ignore-loader' }
     ]
   }
-};
-environment.config.merge(ignoreLoader);
+}
+environment.config.merge(ignoreLoader)
 
-environment.loaders.delete('nodeModules');
+environment.loaders.delete('nodeModules')
 
 module.exports = environment

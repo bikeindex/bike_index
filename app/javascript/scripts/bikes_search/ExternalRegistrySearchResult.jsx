@@ -1,23 +1,23 @@
 /* eslint import/no-unresolved: 0 */
 
-import React, { Fragment } from "react";
-import _ from "lodash";
-import lodashInflection from "lodash-inflection";
+import React, { Fragment } from 'react'
+import _ from 'lodash'
+import lodashInflection from 'lodash-inflection'
 
-_.mixin(lodashInflection);
+_.mixin(lodashInflection)
 
-const t = BikeIndex.translator("bikes_search");
+const t = BikeIndex.translator('bikes_search')
 
 const ExternalRegistrySearchResult = ({ bike }) => (
-  <li className="bike-box-item">
-    <ResultImage bike={bike}/>
+  <li className='bike-box-item'>
+    <ResultImage bike={bike} />
 
-    <div className="bike-information">
-      <h5 className="title-link">
-        <a href={bike.url} target="_blank">
+    <div className='bike-information'>
+      <h5 className='title-link'>
+        <a href={bike.url} target='_blank' rel='noreferrer'>
           <strong>
             {
-              bike.manufacturer_name === "unknown_brand"
+              bike.manufacturer_name === 'unknown_brand'
                 ? t(bike.manufacturer_name)
                 : _.titleize(bike.manufacturer_name)
             }
@@ -25,46 +25,46 @@ const ExternalRegistrySearchResult = ({ bike }) => (
         </a>
       </h5>
 
-      <ul className="attr-list">
+      <ul className='attr-list'>
         <li>
-          <span className="attr-title">{t("color")}:&nbsp;</span>
+          <span className='attr-title'>{t('color')}:&nbsp;</span>
           {
             bike.frame_colors.length
-              ? bike.frame_colors.map(c => _.titleize(c)).join(", ")
-              : t("unknown")
+              ? bike.frame_colors.map(c => _.titleize(c)).join(', ')
+              : t('unknown')
           }
         </li>
         <li>
-          <span className="attr-title">{t("serial")}:&nbsp;</span>
+          <span className='attr-title'>{t('serial')}:&nbsp;</span>
           {
-            bike.serial === "absent"
-              ? t("absent")
-              : bike.serial === "Hidden"
-              ? t("hidden")
-              : bike.serial
+            bike.serial === 'absent'
+              ? t('absent')
+              : bike.serial === 'Hidden'
+                ? t('hidden')
+                : bike.serial
           }
         </li>
       </ul>
 
-      <ul className="attr-list">
+      <ul className='attr-list'>
         <li>
-          <span className="attr-title text-danger">
+          <span className='attr-title text-danger'>
             {t(bike.status)}:&nbsp;
           </span>
-          <span className="convertTime">
+          <span className='convertTime'>
             {bike.date_stolen}
           </span>
         </li>
         <li>
-          <span className="attr-title">{t("registry")}:&nbsp;</span>
-          <a href={bike.registry_url} target="_blank">{bike.registry_name}</a>
+          <span className='attr-title'>{t('registry')}:&nbsp;</span>
+          <a href={bike.registry_url} target='_blank' rel='noreferrer'>{bike.registry_name}</a>
         </li>
         <li>
-          <span className="attr-title">{t("registry_id")}:&nbsp;</span>
+          <span className='attr-title'>{t('registry_id')}:&nbsp;</span>
           {bike.external_id}
         </li>
         <li>
-          <span className="attr-title">{t("location")}:&nbsp;</span>
+          <span className='attr-title'>{t('location')}:&nbsp;</span>
           {bike.stolen_location}
         </li>
       </ul>
@@ -74,23 +74,29 @@ const ExternalRegistrySearchResult = ({ bike }) => (
 
 const ResultImage = ({ bike }) => {
   const backgroundStyles = ({ thumb }) => ({
-    backgroundSize: "contain",
-    backgroundPosition: "left",
-    backgroundRepeat: "no-repeat",
+    backgroundSize: 'contain',
+    backgroundPosition: 'left',
+    backgroundRepeat: 'no-repeat',
     backgroundImage: `url('${thumb}')`
-  });
+  })
 
   if (bike.is_stock_img) {
-    return (<a href={bike.url} className="bike-list-image" target="_blank">
-              <img src={window.bike_placeholder_image} className="no-image" />
-            </a>);
+    return (
+      <a href={bike.url} className='bike-list-image' target='_blank' rel='noreferrer'>
+        <img src={window.bike_placeholder_image} className='no-image' />
+      </a>
+    )
   }
 
-  return (<a href={bike.url}
-             style={backgroundStyles(bike)}
-             data-img-src={bike.thumb}
-             className="bike-list-image hover-expand"
-             target="_blank"></a>);
+  return (
+    <a
+      href={bike.url}
+      style={backgroundStyles(bike)}
+      data-img-src={bike.thumb}
+      className='bike-list-image hover-expand'
+      target='_blank' rel='noreferrer'
+    />
+  )
 }
 
-export default ExternalRegistrySearchResult;
+export default ExternalRegistrySearchResult

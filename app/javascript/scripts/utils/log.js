@@ -1,5 +1,5 @@
-import loglevel from "loglevel";
+import loglevel from 'loglevel'
 
-if (process.env.RAILS_ENV !== "production") loglevel.setLevel("debug");
+if (process.env.RAILS_ENV !== 'production') loglevel.setLevel('debug')
 
-export default loglevel;
+export default loglevel
