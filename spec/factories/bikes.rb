@@ -29,7 +29,14 @@ FactoryBot.define do
         creation_state_registration_info { nil }
       end
       after(:create) do |bike, evaluator|
-        create(:creation_state, creator: bike.creator,
+        # Have to create here so created_at matches
+        if bike.creation_organization_id.present?
+          BikeOrganization.create(bike_id: bike.id,
+            organization_id: bike.creation_organization_id,
+            can_edit_claimed: evaluator.can_edit_claimed,
+            created_at: bike.created_at)
+        end
+        creation_state = create(:creation_state, creator: bike.creator,
                                 bike: bike,
                                 created_at: bike.created_at,
                                 organization: bike.creation_organization,
