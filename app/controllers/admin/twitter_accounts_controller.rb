@@ -65,7 +65,7 @@ class Admin::TwitterAccountsController < Admin::BaseController
   def permitted_parameters
     params.require(:twitter_account).permit(
       :active,
-      :address,
+      :address_string,
       :append_block,
       :city,
       :consumer_key,

@@ -2845,7 +2845,7 @@ CREATE TABLE public.twitter_accounts (
     "national" boolean DEFAULT false NOT NULL,
     latitude double precision,
     longitude double precision,
-    address character varying,
+    address_string character varying,
     append_block character varying,
     city character varying,
     consumer_key character varying NOT NULL,
@@ -5902,6 +5902,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210811141935'),
 ('20210817204248'),
 ('20210820220126'),
-('20210921181852');
+('20210921181852'),
+('20211215163717');
 
 

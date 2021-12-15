@@ -186,8 +186,8 @@ class Tweet < ApplicationRecord
         details[:tweet_account_image] = twitter_account&.account_info_image
         details[:retweet_screen_names] = retweets.map(&:tweetor)
 
-        if !twitter_account&.national? && twitter_account&.address.present?
-          details[:location] = twitter_account.address.split(",").first.strip
+        if !twitter_account&.national? && twitter_account&.address_string.present?
+          details[:location] = twitter_account.address_string.split(",").first.strip
         end
       end
     end
