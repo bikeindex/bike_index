@@ -105,7 +105,7 @@ class Bike < ApplicationRecord
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
-  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
+  scope :lightspeed_pos, -> { left_joins(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
   scope :pos_not_lightspeed_ascend, -> { includes(:creation_states).where.not(creation_states: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }

@@ -55,7 +55,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             manufacturer: trek,
             primary_frame_color: black,
             organization: organization,
-            creation_state_registration_info:  {
+            creation_state_registration_info: {
               address: "102 Washington Pl, State College",
               user_name: "Maya Skripal"
             })
@@ -432,7 +432,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           it "returns expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload
-              expect(bike.registration_address_source).to eq "initial_creation"
+              expect(bike.registration_address_source).to eq "initial_creation_state"
               expect(bike.registration_address(true)).to eq target_address
               expect(bike.registration_address).to eq target_address
             end

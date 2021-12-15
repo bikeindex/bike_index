@@ -32,11 +32,11 @@ FactoryBot.define do
         # Have to create here so created_at matches
         if bike.creation_organization_id.present?
           BikeOrganization.create(bike_id: bike.id,
-            organization_id: bike.creation_organization_id,
-            can_edit_claimed: evaluator.can_edit_claimed,
-            created_at: bike.created_at)
+                                  organization_id: bike.creation_organization_id,
+                                  can_edit_claimed: evaluator.can_edit_claimed,
+                                  created_at: bike.created_at)
         end
-        creation_state = create(:creation_state, creator: bike.creator,
+        create(:creation_state, creator: bike.creator,
                                 bike: bike,
                                 created_at: bike.created_at,
                                 organization: bike.creation_organization,
@@ -159,12 +159,12 @@ FactoryBot.define do
 
       creation_organization { organization }
 
-      factory :bike_lightspeed_pos, traits: [:with_creation_state] do
+      factory :bike_lightspeed_pos do
         creation_state_is_pos { true }
         creation_state_pos_kind { "lightspeed_pos" }
       end
 
-      factory :bike_ascend_pos , traits: [:with_creation_state] do
+      factory :bike_ascend_pos do
         transient do
           bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end

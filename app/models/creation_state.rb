@@ -99,7 +99,7 @@ class CreationState < ApplicationRecord
 
   def cleaned_registration_info
     return nil unless registration_info.present?
-    self.registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
+    registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
     registration_info.reject { |k, v| v.blank? }
   end
 end

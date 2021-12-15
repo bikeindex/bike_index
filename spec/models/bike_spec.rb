@@ -4,258 +4,359 @@ RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   it_behaves_like "geocodeable"
 
-  describe "scopes" do
-    it "default scopes to created_at desc" do
-      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
+  describe "scopes and searching" do
+    describe "scopes" do
+      it "default scopes to created_at desc" do
+        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
+      end
+      it "recovered_records default scopes to created_at desc" do
+        bike = FactoryBot.create(:bike)
+        expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
+      end
     end
-    it "recovered_records default scopes to created_at desc" do
-      bike = FactoryBot.create(:bike)
-      expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
+
+    describe "friendly_find" do
+      let(:id) { 1999999 }
+      let!(:bike) { FactoryBot.create(:bike, id: id) }
+      it "finds" do
+        expect(Bike.friendly_find(id)&.id).to eq bike.id
+        expect(Bike.friendly_find("  #{id}\n")&.id).to eq bike.id
+        expect(Bike.friendly_find("https://bikeindex.org/bikes/#{id}")&.id).to eq bike.id
+        expect(Bike.friendly_find("bikeindex.org/bikes/#{id}/edit?edit_template=accessories")&.id).to eq bike.id
+        # Check range error - currently IDs are integer with limit of 4 bytes
+        expect(Bike.friendly_find("2147483648")&.id).to eq nil
+        expect(Bike.friendly_find(" 9999999999999")&.id).to eq nil
+      end
+    end
+
+    describe ".currently_stolen_in" do
+      context "given no matching state or country" do
+        it "returns none" do
+          FactoryBot.create(:stolen_bike_in_nyc)
+          FactoryBot.create(:stolen_bike_in_los_angeles)
+          expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
+          expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
+          expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
+        end
+      end
+
+      context "given no matching stolen bikes in a valid state or country" do
+        it "returns none" do
+          expect(StolenRecord.count).to eq(0)
+          expect(Bike.currently_stolen_in(country: "US")).to be_empty
+        end
+      end
+
+      context "given a currently stolen bike in a matching city or state" do
+        it "returns only the requested bikes" do
+          FactoryBot.create(:stolen_bike_in_amsterdam)
+          FactoryBot.create(:stolen_bike_in_los_angeles)
+          FactoryBot.create(:stolen_bike_in_nyc)
+
+          bikes = Bike.currently_stolen_in(city: "Los Angeles")
+          expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
+
+          bikes = Bike.currently_stolen_in(state: "NY", country: "US")
+          expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York"])
+
+          bikes = Bike.currently_stolen_in(state: "NY", country: "NL")
+          expect(bikes).to be_empty
+        end
+      end
+
+      context "given currently stolen bikes in a matching country" do
+        it "returns only the requested bikes" do
+          FactoryBot.create(:stolen_bike_in_amsterdam)
+          FactoryBot.create(:stolen_bike_in_los_angeles)
+          FactoryBot.create(:stolen_bike_in_nyc)
+
+          bikes = Bike.currently_stolen_in(country: "NL")
+          expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Amsterdam"])
+
+          bikes = Bike.currently_stolen_in(country: "US")
+          expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York", "Los Angeles"])
+        end
+      end
+    end
+
+    describe "search_phone" do
+      let(:stolen_record1) { FactoryBot.create(:stolen_record, phone: "2223334444") }
+      let(:bike1) { stolen_record1.bike }
+      let!(:stolen_record2) { FactoryBot.create(:stolen_record, phone: "111222333", bike: bike1) }
+      let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
+      let(:bike2) { stolen_record3.bike }
+      it "finds by stolen_record" do
+        expect(stolen_record1.reload.current?).to be_falsey
+        stolen_record1.update_column :current, true
+        bike1.reload
+        expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
+        # Ideally this would keep the scope, but it doesn't. So document that behavior here
+        expect(Bike.where(id: [bike2.id]).search_phone("2223334444").pluck(:id)).to eq([bike1.id, bike2.id])
+        expect(Bike.search_phone("2223334444").pluck(:id)).to match_array([bike1.id, bike2.id])
+        expect(Bike.search_phone("23334444").pluck(:id)).to match_array([bike1.id, bike2.id])
+        expect(Bike.search_phone("233344").pluck(:id)).to match_array([bike1.id, bike2.id])
+        expect(Bike.search_phone("11222333").pluck(:id)).to match_array([bike1.id, bike2.id])
+      end
+    end
+
+    describe "pg search" do
+      it "returns a bike which has a matching part of its description" do
+        bike = FactoryBot.create(:bike, description: "Phil wood hub")
+        FactoryBot.create(:bike)
+        expect(Bike.text_search("phil wood hub").pluck(:id)).to eq([bike.id])
+      end
+    end
+
+    describe ".possibly_found_with_match" do
+      let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
+      let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
+      let(:bike2) { FactoryBot.create(:stolen_bike, serial_number: "he110") }
+      let(:bike2b) { FactoryBot.create(:impounded_bike, serial_number: "HEllO") }
+      let(:bike3) { FactoryBot.create(:stolen_bike, serial_number: "1100ll") }
+      let(:bike3b) { FactoryBot.create(:impounded_bike, serial_number: "IIOO11") }
+      it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
+        pair0 = [bike1, bike1b]
+        expect(bike1.reload.status).to eq "status_impounded"
+        expect(bike1b.reload.status).to eq "status_impounded"
+
+        pair1 = [bike2, bike2b]
+        expect(bike2.reload.status).to eq "status_stolen"
+        expect(bike2b.reload.status).to eq "status_impounded"
+
+        pair2 = [bike3, bike3b]
+
+        results = Bike.possibly_found_with_match
+        expect(results.length).to eq(2)
+
+        result_ids = results.map { |pair| pair.map(&:id) }
+        expect(result_ids).to_not include(pair0.map(&:id))
+        expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
+      end
+    end
+
+    describe ".possibly_found_externally_with_match" do
+      it "returns stolen bikes with a matching normalized serial on an external-registry bike" do
+        pair0 = [
+          FactoryBot.create(:stolen_bike, serial_number: "He10o"),
+          FactoryBot.create(:external_registry_bike, serial_number: "He10o")
+        ]
+
+        pair1 = [
+          FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "he110"),
+          FactoryBot.create(:external_registry_bike, serial_number: "He1lo")
+        ]
+
+        pair2 = [
+          FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "1100ll"),
+          FactoryBot.create(:external_registry_bike, serial_number: "IIOO11")
+        ]
+
+        results = Bike.possibly_found_externally_with_match(country_iso: "NL")
+        expect(results.length).to eq(2)
+
+        result_ids = results.map { |pair| pair.map(&:id) }
+        expect(result_ids).to_not include(pair0.map(&:id))
+        expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
+      end
     end
   end
 
-  describe "friendly_find" do
-    let(:id) { 1999999 }
-    let!(:bike) { FactoryBot.create(:bike, id: id) }
-    it "finds" do
-      expect(Bike.friendly_find(id)&.id).to eq bike.id
-      expect(Bike.friendly_find("  #{id}\n")&.id).to eq bike.id
-      expect(Bike.friendly_find("https://bikeindex.org/bikes/#{id}")&.id).to eq bike.id
-      expect(Bike.friendly_find("bikeindex.org/bikes/#{id}/edit?edit_template=accessories")&.id).to eq bike.id
-      # Check range error - currently IDs are integer with limit of 4 bytes
-      expect(Bike.friendly_find("2147483648")&.id).to eq nil
-      expect(Bike.friendly_find(" 9999999999999")&.id).to eq nil
-    end
-  end
-
-  describe ".currently_stolen_in" do
-    context "given no matching state or country" do
-      it "returns none" do
-        FactoryBot.create(:stolen_bike_in_nyc)
-        FactoryBot.create(:stolen_bike_in_los_angeles)
-        expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
-        expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
-        expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
-      end
-    end
-
-    context "given no matching stolen bikes in a valid state or country" do
-      it "returns none" do
-        expect(StolenRecord.count).to eq(0)
-        expect(Bike.currently_stolen_in(country: "US")).to be_empty
-      end
-    end
-
-    context "given a currently stolen bike in a matching city or state" do
-      it "returns only the requested bikes" do
-        FactoryBot.create(:stolen_bike_in_amsterdam)
-        FactoryBot.create(:stolen_bike_in_los_angeles)
-        FactoryBot.create(:stolen_bike_in_nyc)
-
-        bikes = Bike.currently_stolen_in(city: "Los Angeles")
-        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
-
-        bikes = Bike.currently_stolen_in(state: "NY", country: "US")
-        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York"])
-
-        bikes = Bike.currently_stolen_in(state: "NY", country: "NL")
-        expect(bikes).to be_empty
-      end
-    end
-
-    context "given currently stolen bikes in a matching country" do
-      it "returns only the requested bikes" do
-        FactoryBot.create(:stolen_bike_in_amsterdam)
-        FactoryBot.create(:stolen_bike_in_los_angeles)
-        FactoryBot.create(:stolen_bike_in_nyc)
-
-        bikes = Bike.currently_stolen_in(country: "NL")
-        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Amsterdam"])
-
-        bikes = Bike.currently_stolen_in(country: "US")
-        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York", "Los Angeles"])
-      end
-    end
-  end
-
-  describe "build_new_stolen_record" do
-    let(:bike) { FactoryBot.create(:bike_organized) }
-    let(:organization) { bike.creation_organization }
-    let(:us_id) { Country.united_states.id }
-    it "builds a new record" do
-      stolen_record = bike.build_new_stolen_record
-      expect(stolen_record.country_id).to eq us_id
-      expect(stolen_record.phone).to be_blank
-      expect(stolen_record.date_stolen).to be > Time.current - 1.second
-      expect(stolen_record.creation_organization_id).to eq organization.id
-    end
-    context "older record" do
-      let(:country) { FactoryBot.create(:country) }
-      it "builds new record without creation_organization" do
-        bike.update(created_at: Time.current - 2.days)
-        allow(bike).to receive(:phone) { "1112223333" }
-        # Accepts properties
-        stolen_record = bike.build_new_stolen_record(country_id: country.id)
-        expect(stolen_record.country_id).to eq country.id
-        expect(stolen_record.phone).to eq "1112223333"
-        expect(stolen_record.date_stolen).to be > Time.current - 1.second
-        expect(stolen_record.creation_organization_id).to be_blank
-      end
-    end
-  end
-
-  describe "build_new_impound_record" do
-    let(:bike) { FactoryBot.create(:bike) }
-    let(:us_id) { Country.united_states.id }
-    it "builds a new record" do
-      impound_record = bike.build_new_impound_record
-      expect(impound_record.country_id).to eq us_id
-      expect(impound_record.impounded_at).to be > Time.current - 1.second
-      expect(impound_record.organization_id).to be_blank
-    end
-    context "organized record" do
+  describe "factories and creation" do
+    describe "build_new_stolen_record" do
       let(:bike) { FactoryBot.create(:bike_organized) }
       let(:organization) { bike.creation_organization }
-      let(:country) { FactoryBot.create(:country) }
-      it "builds new record without organization" do
-        bike.update(created_at: Time.current - 2.days)
-        # Accepts properties
-        impound_record = bike.build_new_impound_record(country_id: country.id)
-        expect(impound_record.country_id).to eq country.id
+      let(:us_id) { Country.united_states.id }
+      it "builds a new record" do
+        stolen_record = bike.build_new_stolen_record
+        expect(stolen_record.country_id).to eq us_id
+        expect(stolen_record.phone).to be_blank
+        expect(stolen_record.date_stolen).to be > Time.current - 1.second
+        expect(stolen_record.creation_organization_id).to eq organization.id
+      end
+      context "older record" do
+        let(:country) { FactoryBot.create(:country) }
+        it "builds new record without creation_organization" do
+          bike.update(created_at: Time.current - 2.days)
+          allow(bike).to receive(:phone) { "1112223333" }
+          # Accepts properties
+          stolen_record = bike.build_new_stolen_record(country_id: country.id)
+          expect(stolen_record.country_id).to eq country.id
+          expect(stolen_record.phone).to eq "1112223333"
+          expect(stolen_record.date_stolen).to be > Time.current - 1.second
+          expect(stolen_record.creation_organization_id).to be_blank
+        end
+      end
+    end
+
+    describe "build_new_impound_record" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:us_id) { Country.united_states.id }
+      it "builds a new record" do
+        impound_record = bike.build_new_impound_record
+        expect(impound_record.country_id).to eq us_id
         expect(impound_record.impounded_at).to be > Time.current - 1.second
         expect(impound_record.organization_id).to be_blank
       end
-    end
-  end
-
-  context "unknown, absent serials" do
-    let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
-    let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
-    let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
-    it "corrects poorly entered serial numbers" do
-      [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
-      expect(bike_with_serial.made_without_serial?).to be_falsey
-      expect(bike_with_serial.serial_unknown?).to be_falsey
-      expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
-      expect(bike_made_without_serial.made_without_serial?).to be_truthy
-      expect(bike_made_without_serial.serial_unknown?).to be_falsey
-      expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
-      expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
-      expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
-      expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
-      expect(bike_with_unknown_serial.serial_number).to eq "unknown"
-      expect(Bike.with_known_serial.pluck(:id)).to match_array([bike_with_serial.id, bike_made_without_serial.id])
-    end
-  end
-
-  describe "#normalize_serial_number" do
-    context "given a bike made with no serial number" do
-      no_serials = [
-        "custom bike no serial has a unique frame design",
-        "custom built",
-        "custom"
-      ]
-      no_serials.each do |value|
-        it "('#{value}') sets the 'made_without_serial' state correctly" do
-          bike = FactoryBot.build(:bike, serial_number: value)
-          bike.normalize_serial_number
-          expect(bike.serial_number).to eq("made_without_serial")
-          expect(bike.made_without_serial).to eq(true)
-          expect(bike.serial_normalized).to eq(nil)
+      context "organized record" do
+        let(:bike) { FactoryBot.create(:bike_organized) }
+        let(:organization) { bike.creation_organization }
+        let(:country) { FactoryBot.create(:country) }
+        it "builds new record without organization" do
+          bike.update(created_at: Time.current - 2.days)
+          # Accepts properties
+          impound_record = bike.build_new_impound_record(country_id: country.id)
+          expect(impound_record.country_id).to eq country.id
+          expect(impound_record.impounded_at).to be > Time.current - 1.second
+          expect(impound_record.organization_id).to be_blank
         end
       end
     end
 
-    context "given a bike with an unknown serial number" do
-      unknown_serials = [
-        " UNKNOWn ",
-        "I don't know it",
-        "I don't remember",
-        "Sadly I don't know",
-        "absent",
-        "don't know",
-        "i don't know",
-        "idk",
-        "missing serial",
-        "missing",
-        "no serial",
-        "none",
-        "probably has one don't know it",
-        "unknown"
-      ]
-      unknown_serials.each do |value|
-        it "('#{value}') sets the 'unknown' state correctly" do
-          bike = FactoryBot.build(:bike, serial_number: value)
-          bike.normalize_serial_number
-          expect(bike.serial_number).to eq("unknown")
-          expect(bike.made_without_serial).to eq(false)
-          expect(bike.serial_normalized).to eq(nil)
+    context "unknown, absent serials" do
+      let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
+      let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
+      let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
+      it "corrects poorly entered serial numbers" do
+        [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
+        expect(bike_with_serial.made_without_serial?).to be_falsey
+        expect(bike_with_serial.serial_unknown?).to be_falsey
+        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
+        expect(bike_made_without_serial.made_without_serial?).to be_truthy
+        expect(bike_made_without_serial.serial_unknown?).to be_falsey
+        expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
+        expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
+        expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
+        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
+        expect(bike_with_unknown_serial.serial_number).to eq "unknown"
+        expect(Bike.with_known_serial.pluck(:id)).to match_array([bike_with_serial.id, bike_made_without_serial.id])
+      end
+    end
+
+    describe "#normalize_serial_number" do
+      context "given a bike made with no serial number" do
+        no_serials = [
+          "custom bike no serial has a unique frame design",
+          "custom built",
+          "custom"
+        ]
+        no_serials.each do |value|
+          it "('#{value}') sets the 'made_without_serial' state correctly" do
+            bike = FactoryBot.build(:bike, serial_number: value)
+            bike.normalize_serial_number
+            expect(bike.serial_number).to eq("made_without_serial")
+            expect(bike.made_without_serial).to eq(true)
+            expect(bike.serial_normalized).to eq(nil)
+          end
+        end
+      end
+
+      context "given a bike with an unknown serial number" do
+        unknown_serials = [
+          " UNKNOWn ",
+          "I don't know it",
+          "I don't remember",
+          "Sadly I don't know",
+          "absent",
+          "don't know",
+          "i don't know",
+          "idk",
+          "missing serial",
+          "missing",
+          "no serial",
+          "none",
+          "probably has one don't know it",
+          "unknown"
+        ]
+        unknown_serials.each do |value|
+          it "('#{value}') sets the 'unknown' state correctly" do
+            bike = FactoryBot.build(:bike, serial_number: value)
+            bike.normalize_serial_number
+            expect(bike.serial_number).to eq("unknown")
+            expect(bike.made_without_serial).to eq(false)
+            expect(bike.serial_normalized).to eq(nil)
+          end
         end
       end
     end
-  end
 
-  context "actual tests for ascend and lightspeed" do
-    let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
-    let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
-    it "scopes correctly" do
-      expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
-      expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
-      expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
-      expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
+    context "actual tests for ascend and lightspeed" do
+      let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
+      let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
+      it "scopes correctly" do
+        # There was a factory bug where it was creating multiple creation_states
+        expect(CreationState.where(bike_id: bike_lightspeed_pos.id).count).to eq 1
+        expect(CreationState.count).to eq 2
+        expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
+        expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
+        expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
+        expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
+      end
     end
-  end
 
-  describe ".possibly_found_with_match" do
-    let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
-    let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
-    let(:bike2) { FactoryBot.create(:stolen_bike, serial_number: "he110") }
-    let(:bike2b) { FactoryBot.create(:impounded_bike, serial_number: "HEllO") }
-    let(:bike3) { FactoryBot.create(:stolen_bike, serial_number: "1100ll") }
-    let(:bike3b) { FactoryBot.create(:impounded_bike, serial_number: "IIOO11") }
-    it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
-      pair0 = [bike1, bike1b]
-      expect(bike1.reload.status).to eq "status_impounded"
-      expect(bike1b.reload.status).to eq "status_impounded"
+    describe "registration_info and conditional_information" do
+      describe "organization_affiliation" do
+        let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+        let(:registration_info) { {} }
+        it "sets if searched" do
+          expect(bike.organization_affiliation).to be_blank
+          expect(bike.conditional_information).to eq({})
+          expect(bike.registration_info).to eq({})
+          bike.update(organization_affiliation: "community_member")
+          bike.reload
+          expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
+          expect(bike.registration_info).to eq({})
+          expect(bike.organization_affiliation).to eq "community_member"
+        end
+        context "with creation_state" do
+          let(:registration_info) { {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"} }
+          let(:target_registration_info) { registration_info.as_json.merge("phone" => "7177423423") }
+          it "uses correct value" do
+            bike.reload
+            expect(bike.conditional_information).to eq({})
+            expect(bike.registration_info).to eq target_registration_info
+            expect(bike.organization_affiliation).to eq "employee"
+            bike.update(organization_affiliation: "student")
+            bike.reload
+            expect(bike.organization_affiliation).to eq "student"
+            expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
+            expect(bike.registration_info).to eq target_registration_info
+          end
+        end
+      end
 
-      pair1 = [bike2, bike2b]
-      expect(bike2.reload.status).to eq "status_stolen"
-      expect(bike2b.reload.status).to eq "status_impounded"
-
-      pair2 = [bike3, bike3b]
-
-      results = Bike.possibly_found_with_match
-      expect(results.length).to eq(2)
-
-      result_ids = results.map { |pair| pair.map(&:id) }
-      expect(result_ids).to_not include(pair0.map(&:id))
-      expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
-    end
-  end
-
-  describe ".possibly_found_externally_with_match" do
-    it "returns stolen bikes with a matching normalized serial on an external-registry bike" do
-      pair0 = [
-        FactoryBot.create(:stolen_bike, serial_number: "He10o"),
-        FactoryBot.create(:external_registry_bike, serial_number: "He10o")
-      ]
-
-      pair1 = [
-        FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "he110"),
-        FactoryBot.create(:external_registry_bike, serial_number: "He1lo")
-      ]
-
-      pair2 = [
-        FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "1100ll"),
-        FactoryBot.create(:external_registry_bike, serial_number: "IIOO11")
-      ]
-
-      results = Bike.possibly_found_externally_with_match(country_iso: "NL")
-      expect(results.length).to eq(2)
-
-      result_ids = results.map { |pair| pair.map(&:id) }
-      expect(result_ids).to_not include(pair0.map(&:id))
-      expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
+      describe "student_id" do
+        let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+        let(:registration_info) { {} }
+        it "sets if searched" do
+          expect(bike.student_id).to be_blank
+          expect(bike.conditional_information).to eq({})
+          expect(bike.registration_info).to eq({})
+          bike.update(student_id: "424242")
+          bike.reload
+          expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
+          expect(bike.registration_info).to eq({})
+          expect(bike.student_id).to eq "424242"
+        end
+        context "with creation_state value" do
+          let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
+          it "uses correct value" do
+            bike.reload
+            expect(bike.current_creation_state_id).to be_present
+            bike.reload
+            expect(bike.conditional_information).to eq({})
+            expect(bike.registration_info).to eq registration_info.as_json
+            expect(bike.student_id).to eq "CCCIIIIBBBBB"
+            expect(bike.phone).to eq "7177423423"
+            expect(bike.conditional_information).to eq({})
+            expect(bike.registration_info).to eq registration_info.as_json
+            bike.update(student_id: "66")
+            bike.reload
+            expect(bike.student_id).to eq "66"
+            expect(bike.conditional_information).to eq({"student_id" => "66"})
+            expect(bike.registration_info).to eq registration_info.as_json
+          end
+        end
+      end
     end
   end
 
@@ -297,91 +398,6 @@ RSpec.describe Bike, type: :model do
         expect(bike.visible_by?(superuser)).to be_truthy
         bike.hidden = true
         expect(bike.visible_by?(superuser)).to be_truthy
-      end
-    end
-  end
-
-  describe "organization_affiliation" do
-    let(:bike) { FactoryBot.create(:bike, :with_creation_state) }
-    it "sets if searched" do
-      expect(bike.organization_affiliation).to eq "" # We expect it to be a string
-      expect(bike.conditional_information).to eq({})
-      expect(bike.registration_info).to eq({})
-      bike.update(organization_affiliation: "community_member")
-      bike.reload
-      expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
-      expect(bike.registration_info).to eq({})
-      expect(bike.organization_affiliation).to eq "community_member"
-    end
-    context "with b_param value" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"}} }
-      let(:target_registration_attrs) { {street: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"}.as_json }
-      it "gets b_param value" do
-        bike.reload
-        expect(b_param.organization_affiliation).to eq "employee"
-        expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq({})
-        expect(bike.organization_affiliation).to eq "employee"
-        expect(bike.conditional_information).to eq({"organization_affiliation" => "employee"})
-        bike.update(organization_affiliation: "student")
-        bike.reload
-        b_param.reload
-        expect(bike.organization_affiliation).to eq "student"
-        expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
-        expect(b_param.organization_affiliation).to eq "employee"
-      end
-      context "with creation_state" do
-        it "uses current_creation_state" do
-          bike.reload
-          expect(b_param.organization_affiliation).to eq "employee"
-          expect(bike.conditional_information).to eq({})
-          expect(bike.registration_info).to eq target_registration_attrs
-          expect(bike.organization_affiliation).to eq "employee"
-          expect(bike.conditional_information).to eq({})
-          bike.update(organization_affiliation: "student")
-          bike.reload
-          b_param.reload
-          expect(bike.organization_affiliation).to eq "student"
-          expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
-          expect(bike.registration_info).to eq target_registration_attrs
-          expect(b_param.organization_affiliation).to eq "employee"
-        end
-      end
-    end
-  end
-
-  describe "student_id" do
-    let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
-    let(:registration_info) { {} }
-    it "sets if searched" do
-      expect(bike.student_id).to be_blank
-      expect(bike.conditional_information).to eq({})
-      expect(bike.registration_info).to eq({})
-      bike.update(student_id: "424242")
-      bike.reload
-      expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
-      expect(bike.registration_info).to eq({})
-      expect(bike.student_id).to eq "424242"
-    end
-    context "with b_param value" do
-      let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
-      let(:target_registration_attrs) { b_param_params[:bike].except(:address).merge(street: b_param_params[:bike][:address]) }
-      it "gets b_param value" do
-        bike.reload
-        expect(bike.current_creation_state_id).to be_present
-        bike.reload
-        expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq registration_info.as_json
-        expect(bike.student_id).to eq "CCCIIIIBBBBB"
-        expect(bike.phone).to eq "7177423423"
-        expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq registration_info.as_json
-        bike.update(student_id: "66")
-        bike.reload
-        expect(bike.student_id).to eq "66"
-        expect(bike.conditional_information).to eq({"student_id" => "66"})
-        expect(bike.registration_info).to eq registration_info.as_json
       end
     end
   end
@@ -466,26 +482,6 @@ RSpec.describe Bike, type: :model do
         expect(bike.phoneable_by?(user)).to be_truthy
         expect(bike.phoneable_by?(User.new)).to be_falsey
       end
-    end
-  end
-
-  describe "search_phone" do
-    let(:stolen_record1) { FactoryBot.create(:stolen_record, phone: "2223334444") }
-    let(:bike1) { stolen_record1.bike }
-    let!(:stolen_record2) { FactoryBot.create(:stolen_record, phone: "111222333", bike: bike1) }
-    let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
-    let(:bike2) { stolen_record3.bike }
-    it "finds by stolen_record" do
-      expect(stolen_record1.reload.current?).to be_falsey
-      stolen_record1.update_column :current, true
-      bike1.reload
-      expect(bike1.stolen_records.pluck(:id)).to match_array([stolen_record1.id, stolen_record2.id])
-      # Ideally this would keep the scope, but it doesn't. So document that behavior here
-      expect(Bike.where(id: [bike2.id]).search_phone("2223334444").pluck(:id)).to eq([bike1.id, bike2.id])
-      expect(Bike.search_phone("2223334444").pluck(:id)).to match_array([bike1.id, bike2.id])
-      expect(Bike.search_phone("23334444").pluck(:id)).to match_array([bike1.id, bike2.id])
-      expect(Bike.search_phone("233344").pluck(:id)).to match_array([bike1.id, bike2.id])
-      expect(Bike.search_phone("11222333").pluck(:id)).to match_array([bike1.id, bike2.id])
     end
   end
 
@@ -1242,14 +1238,6 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display(impound_user)).to eq "Hello Party"
         end
       end
-    end
-  end
-
-  describe "pg search" do
-    it "returns a bike which has a matching part of its description" do
-      bike = FactoryBot.create(:bike, description: "Phil wood hub")
-      FactoryBot.create(:bike)
-      expect(Bike.text_search("phil wood hub").pluck(:id)).to eq([bike.id])
     end
   end
 
