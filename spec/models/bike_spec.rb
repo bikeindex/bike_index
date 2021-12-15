@@ -352,7 +352,8 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "student_id" do
-    let(:bike) { FactoryBot.create(:bike, :with_creation_state) }
+    let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+    let(:registration_info) { {} }
     it "sets if searched" do
       expect(bike.student_id).to be_blank
       expect(bike.conditional_information).to eq({})
@@ -364,26 +365,23 @@ RSpec.describe Bike, type: :model do
       expect(bike.student_id).to eq "424242"
     end
     context "with b_param value" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", student_id: "CCCIIIIBBBBB"}} }
+      let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
       let(:target_registration_attrs) { b_param_params[:bike].except(:address).merge(street: b_param_params[:bike][:address]) }
       it "gets b_param value" do
         bike.reload
         expect(bike.current_creation_state_id).to be_present
         bike.reload
-        expect(b_param.student_id).to eq "CCCIIIIBBBBB"
         expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq target_registration_attrs.as_json
+        expect(bike.registration_info).to eq registration_info.as_json
         expect(bike.student_id).to eq "CCCIIIIBBBBB"
+        expect(bike.phone).to eq "7177423423"
         expect(bike.conditional_information).to eq({})
-        expect(bike.registration_info).to eq target_registration_attrs.as_json
+        expect(bike.registration_info).to eq registration_info.as_json
         bike.update(student_id: "66")
         bike.reload
-        b_param.reload
         expect(bike.student_id).to eq "66"
         expect(bike.conditional_information).to eq({"student_id" => "66"})
-        expect(bike.registration_info).to eq target_registration_attrs.as_json
-        expect(b_param.student_id).to eq "CCCIIIIBBBBB"
+        expect(bike.registration_info).to eq registration_info.as_json
       end
     end
   end
@@ -1493,14 +1491,14 @@ RSpec.describe Bike, type: :model do
     end
     context "b_param" do
       let(:ownership) { Ownership.new }
-      let(:b_param) { BParam.new(params: {bike: {phone: "888.888.8888"}}) }
+      let(:creation_state) { CreationState.new(registration_info: {phone: "888.888.8888"}) }
       before do
         allow(bike).to receive(:current_ownership) { ownership }
-        allow(bike).to receive(:b_params) { [b_param] }
+        allow(bike).to receive(:current_creation_state) { creation_state }
       end
       it "returns the phone" do
         allow(bike).to receive(:first_ownership) { ownership }
-        expect(bike.phone).to eq "8888888888"
+        expect(bike.phone).to eq "888.888.8888"
       end
       context "not first ownerships" do
         it "is the users " do
