@@ -52,9 +52,11 @@
       %th
         = sortable "organization_id"
     %th= sortable "kind"
-    %th Body
+    %th Subject, Body
     %th
       %small Enabled
+    %th
+      %small Geo
 
     %tbody
       - @mail_snippets.each do |mail_snippet|
@@ -62,6 +64,8 @@
           %td
             %a.convertTime{ href: edit_mail_snippet_path_for(mail_snippet) }
               = l mail_snippet.created_at, format: :convert_time
+            - if display_dev_info?
+              %code.small.only-dev-visible= mail_snippet.id
           %td
             %small.convertTime
               = l mail_snippet.updated_at, format: :convert_time
@@ -72,7 +76,10 @@
           %td
             = mail_snippet.kind.humanize
           %td
+            .d-block= mail_snippet.subject
             %small
               = truncate(mail_snippet.body, length: 100)
           %td.table-cell-check
             = check_mark if mail_snippet.is_enabled
+          %td.table-cell-check
+            = check_mark if mail_snippet.with_location?

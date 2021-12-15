@@ -21,7 +21,7 @@ RSpec.describe TwitterAccount, type: :model do
         skip_geocoding: false,
         state: nil
       )
-      twitter_account.address = "1 New Address"
+      twitter_account.address_string = "1 New Address"
       expect(twitter_account).to be_should_be_geocoded
       expect(twitter_account).to be_should_be_reverse_geocoded
 

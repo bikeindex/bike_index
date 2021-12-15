@@ -61,7 +61,7 @@ class TwitterAccount < ApplicationRecord
   def self.attrs_from_user_info(info)
     {
       screen_name: info["info"]["nickname"],
-      address: info["info"]["location"],
+      address_string: info["info"]["location"],
       consumer_key: ENV["TWITTER_CONSUMER_KEY"],
       consumer_secret: ENV["TWITTER_CONSUMER_SECRET"],
       user_token: info["credentials"]["token"],
