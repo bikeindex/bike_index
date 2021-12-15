@@ -302,8 +302,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "organization_affiliation" do
-    let(:bike) { FactoryBot.create(:bike) }
-    before { bike.fetch_current_creation_state }
+    let(:bike) { FactoryBot.create(:bike, :with_creation_state) }
     it "sets if searched" do
       expect(bike.organization_affiliation).to eq "" # We expect it to be a string
       expect(bike.conditional_information).to eq({})
@@ -335,9 +334,6 @@ RSpec.describe Bike, type: :model do
       context "with creation_state" do
         it "uses current_creation_state" do
           bike.reload
-          bike.fetch_current_creation_state
-          bike.save
-          bike.reload
           expect(b_param.organization_affiliation).to eq "employee"
           expect(bike.conditional_information).to eq({})
           expect(bike.registration_info).to eq target_registration_attrs
@@ -356,9 +352,9 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "student_id" do
-    let(:bike) { FactoryBot.create(:bike) }
+    let(:bike) { FactoryBot.create(:bike, :with_creation_state) }
     it "sets if searched" do
-      expect(bike.student_id).to eq "" # We expect it to be a string
+      expect(bike.student_id).to be_blank
       expect(bike.conditional_information).to eq({})
       expect(bike.registration_info).to eq({})
       bike.update(student_id: "424242")
@@ -373,8 +369,6 @@ RSpec.describe Bike, type: :model do
       let(:target_registration_attrs) { b_param_params[:bike].except(:address).merge(street: b_param_params[:bike][:address]) }
       it "gets b_param value" do
         bike.reload
-        bike.fetch_current_creation_state
-        bike.save
         expect(bike.current_creation_state_id).to be_present
         bike.reload
         expect(b_param.student_id).to eq "CCCIIIIBBBBB"

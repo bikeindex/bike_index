@@ -49,18 +49,28 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "avery export" do
         let(:user) { FactoryBot.create(:admin) }
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
-        let(:bike_for_avery) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
-        let!(:creation_state) { bike_for_avery.reload.current_creation_state.update(creation_state_attributes) }
-        let(:creation_state_attributes) { {registration_info: {address: "102 Washington Pl, State College", user_name: "Maya Skripal"}} }
-        # let!(:b_param) do
-        #   FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
-        #                               params: {bike: })
-        # end
-        let(:bike_not_avery) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
-        let!(:b_param_partial) do
-          FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,
-                                      params: {bike: {address: "State College, PA",
-                                                      user_name: "George Washington"}})
+        let(:bike_for_avery_og) do
+          FactoryBot.create(:bike_organized,
+            :with_creation_state,
+            manufacturer: trek,
+            primary_frame_color: black,
+            organization: organization,
+            creation_state_registration_info:  {
+              address: "102 Washington Pl, State College",
+              user_name: "Maya Skripal"
+            })
+        end
+        # Force unmemoize - TODO: might not be necessary
+        let!(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
+        let!(:bike_not_avery) do
+          FactoryBot.create(:bike_organized,
+            manufacturer: trek,
+            primary_frame_color: black,
+            organization: organization,
+            creation_state_registration_info: {
+              address: "State College, PA",
+              user_name: "George Washington"
+            })
         end
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
@@ -73,6 +83,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
+          bike.reload
           expect(bike_sticker.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
@@ -80,7 +91,13 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
+            expect(bike_for_avery.registration_address_source).to eq "initial_creation_state"
+            expect(bike_for_avery.registration_address).to be_present # unmemoize -
+            expect(bike_for_avery.send("location_record_address_hash")).to eq bike_for_avery.current_creation_state.address_hash
+            pp bike_for_avery.current_creation_state.address_hash
+            # pp "#{bike_for_avery.address_set_manually}    #{bike_for_avery.registration_address}"
             bike_for_avery.update(updated_at: Time.current)
+            pp bike_for_avery.address_hash
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
             expect(bike_for_avery.address_hash).to eq bike_for_avery.registration_address
             # We need to be exporting via registration_address - NOT address_hash - so manually blank it, just to make sure
@@ -192,9 +209,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial") }
+      # let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
+      # let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
+      let(:registration_info) { {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"} }
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
       let(:target_address) { {street: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103", country: "US", latitude: 37.7870205, longitude: -122.403928}.as_json }
