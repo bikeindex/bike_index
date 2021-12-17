@@ -560,7 +560,7 @@ class Bike < ApplicationRecord
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
-    # Only grab the phone number from b_params if this is the first_ownership (otherwise it should be user, etc)
+    # Only grab the phone number from registration_info if this is the first_ownership (otherwise it should be user, etc)
     @phone ||= registration_info["phone"] if first_ownership?
     @phone
   end
@@ -818,7 +818,7 @@ class Bike < ApplicationRecord
     elsif address_set_manually
       "bike_update"
     elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
-      "initial_creation_state"
+      "initial_creation"
     end
   end
 
@@ -828,7 +828,7 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "user" then user&.address_hash
     when "bike_update" then address_hash
-    when "initial_creation_state" then current_creation_state.address_hash
+    when "initial_creation" then current_creation_state.address_hash
     else
       {}
     end.with_indifferent_access
@@ -875,12 +875,12 @@ class Bike < ApplicationRecord
     conditional_information["student_id"] || registration_info["student_id"]
   end
 
-  def external_image_urls
-    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
-  end
-
   def alert_image_url(version = nil)
     current_stolen_record&.current_alert_image&.image_url(version)
+  end
+
+  def external_image_urls
+    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
 
   def load_external_images(urls = nil)

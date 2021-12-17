@@ -1251,7 +1251,7 @@ RSpec.describe Bike, type: :model do
     end
     context "address set on bike" do
       it "returns bike_update" do
-        expect(bike.reload.registration_address_source).to eq "initial_creation_state"
+        expect(bike.reload.registration_address_source).to eq "initial_creation"
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
         expect(bike.latitude).to eq 43.9
@@ -1262,7 +1262,7 @@ RSpec.describe Bike, type: :model do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: registration_info}) }
       it "returns creation_information" do
         bike.reload
-        expect(bike.registration_address_source).to eq "initial_creation_state"
+        expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_info).to eq registration_info.as_json
       end
       context "user with address address_set_manually" do
@@ -1279,7 +1279,7 @@ RSpec.describe Bike, type: :model do
       context "with stolen record" do
         let(:bike) { FactoryBot.create(:stolen_bike, :with_creation_state, creation_state_registration_info: registration_info) }
         it "returns initial_creation" do
-          expect(bike.reload.registration_address_source).to eq "initial_creation_state"
+          expect(bike.reload.registration_address_source).to eq "initial_creation"
         end
       end
     end
@@ -1843,7 +1843,7 @@ RSpec.describe Bike, type: :model do
         expect(creation_state).to be_present
         expect(bike.reload.current_creation_state_id).to eq creation_state.id
         expect(bike.current_creation_state.address_hash[:latitude]).to be_blank
-        expect(bike.registration_address_source).to eq "initial_creation_state"
+        expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
 
         bike.reload

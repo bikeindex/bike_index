@@ -76,6 +76,6 @@ task database_vacuum: :environment do
   tables.each do |table|
     ActiveRecord::Base.connection.execute("VACUUM FULL ANALYZE #{table};")
   end
-rescue Exception => exc
+rescue
   Rails.logger.error("Database VACUUM error: #{exc.message}")
 end
