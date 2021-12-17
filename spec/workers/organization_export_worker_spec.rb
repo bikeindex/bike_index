@@ -218,7 +218,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
          phone: "717.742.3423",
          organization_affiliation: "community_member",
          student_id: "XX9999"}
-       end
+      end
       let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
@@ -440,7 +440,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload
               expect(bike.registration_address_source).to eq "initial_creation_state"
-              expect(bike.registration_address(true).except("latitude", "longitude", )).to eq target_address
+              expect(bike.registration_address(true).except("latitude", "longitude")).to eq target_address
               expect(bike.registration_address).to eq target_address
             end
             instance.perform(export.id)
