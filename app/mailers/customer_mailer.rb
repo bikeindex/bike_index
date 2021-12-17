@@ -165,7 +165,7 @@ class CustomerMailer < ApplicationMailer
     @_action_has_layout = false # layout is manually included here
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, from: '"gavin Williams" <gavin@bikeindex.org>')
+      mail(to: @user.email, from: '"Gavin Hoover" <gavin@bikeindex.org>')
     end
   end
 end
