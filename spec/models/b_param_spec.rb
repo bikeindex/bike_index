@@ -263,65 +263,11 @@ RSpec.describe BParam, type: :model do
       expect(b_param.address("address_zipcode")).to eq "11111"
       expect(b_param.address("state")).to eq "CA"
 
-      expect(b_param.fetch_formatted_address).to eq target_address
+      expect(b_param.address_hash.except("country")).to eq target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
       expect(b_param.external_image_urls).to eq(["xxxxx"])
-      expect(bike.registration_address).to be_present
-      expect(bike.valid_mailing_address?).to be_truthy
-    end
-    context "legacy address 1 (street -> address)" do
-      let(:bike_params) do
-        {
-          serial_number: "zzz",
-          organization_affiliation: "employee",
-          external_image_urls: ["xxxxx"],
-          bike_sticker: "xxxx",
-          phone: "919929333",
-          address: "123 Main St",
-          address_city: "Nevernever Land",
-          address_zipcode: "11111",
-          address_state: "CA"
-        }
-      end
-      it "has the expected fields" do
-        expect(b_param.fetch_formatted_address).to eq target_address
-        expect(b_param.bike_sticker_code).to eq "xxxx"
-        expect(b_param.organization_affiliation).to eq "employee"
-        expect(b_param.phone).to eq "919929333"
-        expect(b_param.address("address")).to eq "123 Main St"
-        expect(b_param.address("city")).to eq "Nevernever Land"
-        expect(b_param.address("address_zipcode")).to eq "11111"
-        expect(b_param.address("state")).to eq "CA"
-        expect(b_param.external_image_urls).to eq(["xxxxx"])
-        expect(bike.registration_address).to be_present
-        expect(bike.valid_mailing_address?).to be_truthy
-      end
-    end
-    context "legacy address 2" do
-      let(:bike_params) do
-        {
-          serial_number: "zzz",
-          organization_affiliation: "employee",
-          handlebar_type: nil,
-          address: "0229 HAMMOND BLDG"
-        }
-      end
-      include_context :geocoder_real
-      let(:b_param) { FactoryBot.create(:b_param, params: params_hash) }
-      it "stores the address string" do
-        b_param.reload
-        expect(b_param.params).to eq params_hash
-        VCR.use_cassette "b_param-fetch_formatted_address-fail" do
-          expect(b_param.fetch_formatted_address).to eq(street: "0229 HAMMOND BLDG")
-          b_param.reload
-          expect(b_param.params["formatted_address"]).to be_present
-          expect(bike.registration_address).to be_present
-
-          expect(bike.valid_mailing_address?).to be_falsey
-        end
-      end
     end
   end
 
