@@ -80,6 +80,8 @@
                 - if bike.status_stolen?
                   %span.text-danger.less-strong-right
                     stolen
+                - if bike.user_hidden
+                  %small.text-warning.less-strong user hidden
             %td.admin-bike-table-serial-cell
               %small.less-strong
                 = bike.serial_number
