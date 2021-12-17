@@ -34,6 +34,12 @@ task prepare_translations: :environment do
   I18n::JS.export
 end
 
+task exchange_rates_update: :environment do
+  print "\nUpdating exchange rates..."
+  is_success = ExchangeRateUpdator.update
+  print is_success ? "done.\n" : "failed.\n"
+end
+
 task database_size: :environment do
   database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
   sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"
@@ -64,8 +70,14 @@ task database_size: :environment do
   puts "\n#{"Total size".ljust(name_col_length)} | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
 end
 
-task exchange_rates_update: :environment do
-  print "\nUpdating exchange rates..."
-  is_success = ExchangeRateUpdator.update
-  print is_success ? "done.\n" : "failed.\n"
+desc "Provide DB vacuum for production environment"
+task vacuum: :environment do
+  begin
+    tables = ActiveRecord::Base.connection.tables
+    tables.each do |table|
+      ActiveRecord::Base.connection.execute("VACUUM FULL ANALYZE #{table};")
+    end
+  rescue Exception => exc
+    Rails.logger.error("Database VACUUM error: #{exc.message}")
+  end
 end
