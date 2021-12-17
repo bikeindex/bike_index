@@ -1242,12 +1242,16 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "address_source" do
-    let(:bike) { FactoryBot.create(:bike) }
-    it "returns nil" do
-      expect(bike.registration_address_source).to be_blank
+    let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+    let(:registration_info) { {street: "2864 Milwaukee Ave"} }
+    context "no address" do
+      it "returns nil" do
+        expect(Bike.new.registration_address_source).to be_blank
+      end
     end
     context "address set on bike" do
       it "returns bike_update" do
+        expect(bike.reload.registration_address_source).to eq "initial_creation_state"
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
         expect(bike.latitude).to eq 43.9
@@ -1255,11 +1259,11 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "b_param" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {street: "2864 Milwaukee Ave"}} }
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: registration_info}) }
       it "returns creation_information" do
         bike.reload
-        expect(bike.registration_address_source).to eq "initial_creation"
+        expect(bike.registration_address_source).to eq "initial_creation_state"
+        expect(bike.registration_info).to eq registration_info.as_json
       end
       context "user with address address_set_manually" do
         let(:user) { FactoryBot.create(:user, :in_vancouver, address_set_manually: true) }
@@ -1273,9 +1277,9 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with stolen record" do
-        let(:bike) { FactoryBot.create(:stolen_bike) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_creation_state, creation_state_registration_info: registration_info) }
         it "returns initial_creation" do
-          expect(bike.registration_address_source).to eq "initial_creation"
+          expect(bike.reload.registration_address_source).to eq "initial_creation_state"
         end
       end
     end
